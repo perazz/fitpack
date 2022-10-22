@@ -1,0 +1,20 @@
+name        = "fitpack"
+author      = "Federico Perini"
+copyright   = "Copyright (c) 2022, Federico Perini" 
+license     = "MIT"
+description = "Modern Fortran FITPACK"
+homepage    = "https://github.com/perazz/fitpack"
+keywords    = ["curve fitting","spline","interpolation"]
+
+[build]
+auto-executables = false
+auto-examples    = false
+auto-tests       = false
+
+[library]
+source-dir  = "src"
+include-dir = "src"
+
+[install]
+library = true
+

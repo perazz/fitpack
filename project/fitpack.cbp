@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-Jobj/Debug" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -22,6 +23,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-Jobj/Release" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -31,7 +33,22 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.f90" />
+		<Linker>
+			<Add library="gfortran" />
+			<Add library="quadmath" />
+		</Linker>
+		<Unit filename="../src/fitpack.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_core.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="../src/fitpack_tests.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../test/test.f90">
+			<Option weight="2" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
