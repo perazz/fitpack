@@ -1,7 +1,7 @@
 name        = "fitpack"
 author      = "Federico Perini"
 copyright   = "Copyright (c) 2022, Federico Perini" 
-license     = "MIT"
+license     = "BSD-3"
 description = "Modern Fortran FITPACK"
 homepage    = "https://github.com/perazz/fitpack"
 keywords    = ["curve fitting","spline","interpolation"]
