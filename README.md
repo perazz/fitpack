@@ -1,4 +1,4 @@
-FRESCO-fitpack
+fortran-fitpack
 ===
 
 This is a Modern Fortran translation of the FITPACK package for curve and surface fitting.
@@ -18,6 +18,9 @@ A simple command line build script is:
 ```
 gfortran src/fitpack_core.f90 src/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
 ```
+
+The testing executable is just a wrapper to the 29 original test programs. 
+These test programs aren't double checked yet, and their output is supposed to be the original F77 program output
 
  
 References
