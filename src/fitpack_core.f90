@@ -4,7 +4,7 @@
 !                              / /_   / /  / / / /_/ / /| |/ /   / ,<
 !                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
 !                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
-!                                      
+!
 !                                     A Curve Fitting Package
 !
 !   Refactored by Federico Perini, 10/6/2022
@@ -24,7 +24,7 @@ module fitpack_core
 
     ! Precision and array size
     integer, parameter, public :: RKIND = real64
-    integer, parameter, public :: RSIZE = int32 
+    integer, parameter, public :: RSIZE = int32
 
     ! Polar
     public :: evapol,polar,pogrid,percur,clocur,cocosp,concon,concur,cualde
@@ -37,7 +37,8 @@ module fitpack_core
     public :: curev,curfit
 
     ! B-Spline
-    public :: bispev,bispeu
+    public :: bispev  ! Evaluate 2d spline on a meshgrid
+    public :: bispeu  ! Evaluate 2d spline on arbitrary (x,y) points
     public :: sproot,insert,sphere,spgrid,splev,splder
     public :: splint,spalde,regrid,profil
 
@@ -47,6 +48,7 @@ module fitpack_core
     integer, parameter, public :: SPLINE_NOT_ALLOWED = 2 ! an error flag is returned
     integer, parameter, public :: SPLINE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
+                        public :: FITPACK_MESSAGE
                         public :: FITPACK_SUCCESS
     integer, parameter, public :: FITPACK_OK                   = 0  ! ok for spline, abs(fp-s)/s <= tol=0.001
     integer, parameter, public :: FITPACK_INTERPOLATING_OK     = -1 ! ok for interpolating spline, fp=0
@@ -64,6 +66,24 @@ module fitpack_core
     real(RKIND), parameter :: pi   = atan2(zero,-one)
 
     contains
+
+      ! Wrapper for the error flag
+      pure function FITPACK_MESSAGE(ierr) result(msg)
+         integer, intent(in) :: ierr
+         character(len=:), allocatable :: msg
+
+         select case (ierr)
+            case (FITPACK_OK); msg = 'Success!'
+            case (FITPACK_INTERPOLATING_OK); msg = 'Success! (interpolation)'
+            case (FITPACK_LEASTSQUARES_OK); msg = 'Success! (least-squares)'
+            case (FITPACK_INSUFFICIENT_STORAGE); msg = 'Insufficient Storage'
+            case (FITPACK_S_TOO_SMALL); msg = 'Smoothing parameter is too small'
+            case (FITPACK_MAXIT); msg = 'Infinite loop detected'
+            case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
+            case default; msg = 'UNKNOWN ERROR'
+         end select
+
+      end function FITPACK_MESSAGE
 
       ! Wrapper for OK
       elemental logical function FITPACK_SUCCESS(ierr)
@@ -102,8 +122,6 @@ module fitpack_core
       !           on successful exit z(i) contains the value of s(x,y)
       !           at the point (x(i),y(i)), i=1,...,m.
       !   ier   : integer error flag
-      !    ier=0 : normal return
-      !    ier=10: invalid input data (see restrictions)
       !
       !  restrictions:
       !   m >=1, lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
@@ -114,26 +132,35 @@ module fitpack_core
       !    fpbisp,fpbspl
       !
       !  ..scalar arguments..
-      integer nx,ny,kx,ky,m,lwrk,ier
+      integer, intent(in) :: nx,ny,kx,ky,m,lwrk
+      integer, intent(out) :: ier
+
       !  ..array arguments..
-      real(RKIND) tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m),z(m), &
-           wrk(lwrk)
+      real(RKIND), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
+      real(RKIND), intent(inout) :: wrk(lwrk)
+      real(RKIND), intent(out)   :: z(m)
+
       !  ..local scalars..
-      integer iwrk(2)
-      integer i, lwest
-      !  ..
-      !  before starting computations a data check is made. if the input data
-      !  are invalid control is immediately repassed to the calling program.
-      ier = 10
+      integer :: iwrk(2),i,lwest
+
+      !  Check inputs
+      ier   = FITPACK_INPUT_ERROR
       lwest = kx+ky+2
-      if (lwrk<lwest) go to 100
-      if (m<1) go to 100
-      ier = 0
-      do 10 i=1,m
-         call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),1,y(i),1,z(i),wrk(1), &
-              wrk(kx+2),iwrk(1),iwrk(2))
- 10   continue
- 100  return
+
+      if (lwrk<lwest .or. m<1) then
+         ier = FITPACK_INPUT_ERROR
+         return
+
+      else
+
+         ier = FITPACK_OK
+
+         do i=1,m
+            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),1,y(i),1,z(i),wrk(1),wrk(kx+2),iwrk(1),iwrk(2))
+         end do
+
+      end if
+
       end subroutine bispeu
 
 
@@ -181,8 +208,6 @@ module fitpack_core
       !           on successful exit z(my*(i-1)+j) contains the value of s(x,y)
       !           at the point (x(i),y(j)),i=1,...,mx;j=1,...,my.
       !   ier   : integer error flag
-      !    ier=0 : normal return
-      !    ier=10: invalid input data (see restrictions)
       !
       !  restrictions:
       !   mx >=1, my >=1, lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
@@ -575,7 +600,7 @@ module fitpack_core
          t(i1) = t(j1)+per
   60  continue
       call fpchep(u,m,t,n,k,ier)
-      if (ier==0) go to 80
+      if (ier==FITPACK_OK) go to 80
       go to 90
   70  if(s<0.) go to 90
       if(s==0. .and. nest<(m+2*k)) go to 90
@@ -733,7 +758,7 @@ module fitpack_core
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(m<4 .or. n<8) go to 40
       if(maxtr<1 .or. maxbin<1) go to 40
       lwest = 7*n+m*4+maxbin*(1+n+maxbin)
@@ -744,7 +769,7 @@ module fitpack_core
          if(x(i-1)>=x(i) .or. w(i)<=0.) go to 40
   10  continue
       call fpchec(x,m,t,n,3,ier)
-      if (ier==0) go to 20
+      if (ier==FITPACK_OK) go to 20
       go to 40
       !  set numbers e(i)
   20  n6 = n-6
@@ -976,11 +1001,11 @@ module fitpack_core
       integer iwrk(kwrk)
       logical bind(nest)
       !  ..local scalars..
-      integer i,lwest,kwest,ie,iw,lww
+      integer :: lwest,kwest,ie,iw,lww
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(iopt<0 .or. iopt>1) go to 30
       if(m<4 .or. nest<8) go to 30
       if(s<0.) go to 30
@@ -1351,18 +1376,12 @@ module fitpack_core
   40  call fppocu(idim,k,u(1),u(m),ib,db,nb,ie,de,ne,cp,np)
       !  we generate new data points which will be approximated by a spline
       !  with zero derivative constraints.
-      j = nmin
-      do 50 i=1,k1
-        wrk(i) = u(1)
-        wrk(j) = u(m)
-        j = j-1
-  50  continue
+      wrk(1:k1) = u(1)
+      wrk(nmin-k1+1:nmin) = u(m)
       !  evaluate the polynomial curve
       call curev(idim,wrk,nmin,cp,np,k,u,m,xx,mxx,ier)
       !  subtract from the old data, the values of the polynomial curve
-      do 60 i=1,mxx
-        xx(i) = x(i)-xx(i)
-  60  continue
+      xx(1:mxx) = x(1:mxx)-xx(1:mxx)
       ! we partition the working space and determine the spline curve.
   70  jfp = 1
       jz = jfp+nest
@@ -2613,84 +2632,74 @@ module fitpack_core
       end subroutine fpbfou
 
 
-      recursive subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my, &
-           z,wx,wy,lx,ly)
+      recursive subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
 
       !  ..scalar arguments..
-      integer nx,ny,kx,ky,mx,my
+      integer    , intent(in)  :: nx,ny,kx,ky,mx,my
       !  ..array arguments..
-      integer lx(mx),ly(my)
-      real(RKIND) tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my),z(mx*my), &
-       wx(mx,kx+1),wy(my,ky+1)
-      !  ..local scalars..
-      integer kx1,ky1,l,l1,l2,m,nkx1,nky1, i, i1, j, j1
-      real(RKIND) arg,sp,tb,te
-      !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
-      !  ..subroutine references..
-      !    fpbspl
-      !  ..
-      kx1 = kx+1
+      real(RKIND), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+      integer    , intent(out) :: lx(mx),ly(my)
+      real(RKIND), intent(out) :: wx(mx,kx+1),wy(my,ky+1),z(mx*my)
+
+      !  ..local variables..
+      integer :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
+      real(RKIND) :: arg,sp,tb,te,h(MAX_K+1)
+
+      ! X
+      kx1  = kx+1
       nkx1 = nx-kx1
-      tb = tx(kx1)
-      te = tx(nkx1+1)
+      tb   = tx(kx1)
+      te   = tx(nkx1+1)
       l = kx1
       l1 = l+1
-      do 40 i=1,mx
+      x_array: do i=1,mx
         arg = x(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-  10    if(arg<tx(l1) .or. l==nkx1) go to 20
-        l = l1
-        l1 = l+1
-        go to 10
-  20    call fpbspl(tx,nx,kx,arg,l,h)
+        do while (.not.(arg<tx(l1) .or. l==nkx1))
+          l = l1
+          l1 = l+1
+        end do
+        call fpbspl(tx,nx,kx,arg,l,h)
         lx(i) = l-kx1
-        do 30 j=1,kx1
-          wx(i,j) = h(j)
-  30    continue
-  40  continue
-      ky1 = ky+1
+        wx(i,1:kx1) = h(1:kx1)
+      end do x_array
+
+      ! Y
+      ky1  = ky+1
       nky1 = ny-ky1
-      tb = ty(ky1)
-      te = ty(nky1+1)
-      l = ky1
-      l1 = l+1
-      do 80 i=1,my
+      tb   = ty(ky1)
+      te   = ty(nky1+1)
+      l    = ky1
+      l1   = l+1
+      y_array: do i=1,my
         arg = y(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-  50    if(arg<ty(l1) .or. l==nky1) go to 60
-        l = l1
-        l1 = l+1
-        go to 50
-  60    call fpbspl(ty,ny,ky,arg,l,h)
+        do while (.not.(arg<ty(l1) .or. l==nky1))
+          l  = l1
+          l1 = l+1
+        end do
+        call fpbspl(ty,ny,ky,arg,l,h)
         ly(i) = l-ky1
-        do 70 j=1,ky1
-          wy(i,j) = h(j)
-  70    continue
-  80  continue
+        wy(i,1:ky1) = h(1:ky1)
+      end do y_array
+
       m = 0
-      do 130 i=1,mx
+      do i=1,mx
         l = lx(i)*nky1
-        do 90 i1=1,kx1
-          h(i1) = wx(i,i1)
-  90    continue
-        do 120 j=1,my
+        h(1:kx1) = wx(i,1:kx1)
+        do j=1,my
           l1 = l+ly(j)
-          sp = 0.
-          do 110 i1=1,kx1
-            l2 = l1
-            do 100 j1=1,ky1
-              l2 = l2+1
-              sp = sp+c(l2)*h(i1)*wy(j,j1)
- 100        continue
+          sp = zero
+          do i1=1,kx1
+            sp = sp+h(i1)*dot_product(c(l1+1:l1+ky1),wy(j,1:ky1))
             l1 = l1+nky1
- 110      continue
+          end do
           m = m+1
           z(m) = sp
- 120    continue
- 130  continue
+         end do
+      end do
       return
       end subroutine fpbisp
 

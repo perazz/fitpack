@@ -6,15 +6,15 @@ program test
     read *, itest
 
     select case (itest)
-        case (1); call mnbisp
-        case (2); call mncloc
-        case (3); call mncoco
-        case (4); call mnconc
-        case (5); call mncosp
-        case (6); call mncual
-        case (7); call mncurf
-        case (8); call mnfour
-        case (9); call mnist
+        case (1);  call mnbisp
+        case (2);  call mncloc
+        case (3);  call mncoco
+        case (4);  call mnconc
+        case (5);  call mncosp
+        case (6);  call mncual
+        case (7);  call mncurf
+        case (8);  call mnfour
+        case (9);  call mnist
         case (10); call mnpade
         case (11); call mnparc
         case (12); call mnperc
