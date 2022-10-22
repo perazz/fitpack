@@ -60,10 +60,20 @@ module fitpack_core
 
 
     ! Internal Parameters
-    integer, parameter :: MAX_K = 19
-    real(RKIND), parameter :: one  = 1.0_RKIND
-    real(RKIND), parameter :: zero = 0.0_RKIND
-    real(RKIND), parameter :: pi   = atan2(zero,-one)
+    integer    , parameter :: MAX_K  = 19
+    real(RKIND), parameter :: one    = 1.0_RKIND
+    real(RKIND), parameter :: zero   = 0.0_RKIND
+    real(RKIND), parameter :: half   = 0.5_RKIND
+    real(RKIND), parameter :: fourth = 0.25_RKIND
+    real(RKIND), parameter :: two    = 2.0_RKIND
+    real(RKIND), parameter :: three  = 3.0_RKIND
+    real(RKIND), parameter :: six    = 6.0_RKIND
+    real(RKIND), parameter :: ten    = 10.0_RKIND
+    real(RKIND), parameter :: pi     = atan2(zero,-one)
+    real(RKIND), parameter :: pi2    = 2*pi
+    real(RKIND), parameter :: smallnum03 = 1.0e-3_RKIND
+
+
 
     contains
 
@@ -311,7 +321,7 @@ module fitpack_core
       !           t(i)=u(1)+(u(m)-u(1))*(i-k-1),i=1,2,...,2*k+2. if iopt=1 the
       !           routine will continue with the knots found at the last call.
       !           attention: a call with iopt=1 must always be immediately
-      !           preceded by another call with iopt=1 or iopt=0.
+      !           preceded by another call with iopt=1 or iopt=zero
       !           unchanged on exit.
       !   ipar  : integer flag. on entry ipar must specify whether (ipar=1)
       !           the user will supply the parameter values u(i),or whether
@@ -346,7 +356,7 @@ module fitpack_core
       !           the user is strongly dissuaded from choosing k even,together
       !           with a small s-value. unchanged on exit.
       !   s     : real.on entry (in case iopt>=0) s must specify the smoothing
-      !           factor. s >=0. unchanged on exit.
+      !           factor. s >=zero unchanged on exit.
       !           for advice on the choice of s see further comments.
       !   nest  : integer. on entry nest must contain an over-estimate of the
       !           total number of knots of the splines returned, to indicate
@@ -396,7 +406,7 @@ module fitpack_core
       !           non-positive value on exit, i.e.
       !    ier=0  : normal return. the close curve returned has a residual
       !             sum of squares fp such that abs(fp-s)/s <= tol with tol a
-      !             relative tolerance set to 0.001 by the program.
+      !             relative tolerance set to zero001 by the program.
       !    ier=-1 : normal return. the curve returned is an interpolating
       !             spline curve (fp=0).
       !    ier=-2 : normal return. the curve returned is the weighted least-
@@ -471,7 +481,7 @@ module fitpack_core
       !   to economize the search for a good s-value the program provides with
       !   different modes of computation. at the first call of the routine, or
       !   whenever he wants to restart with the initial set of knots the user
-      !   must set iopt=0.
+      !   must set iopt=zero
       !   if iopt=1 the program will continue with the set of knots found at
       !   the last call of the routine. this will save a lot of computation
       !   time if clocur is called repeatedly for different values of s.
@@ -482,7 +492,7 @@ module fitpack_core
       !   calls (if these were smaller). therefore, if after a number of
       !   trials with different s-values and iopt=1, the user can finally
       !   accept a fit as satisfactory, it may be worthwhile for him to call
-      !   clocur once more with the selected value for s but now with iopt=0.
+      !   clocur once more with the selected value for s but now with iopt=zero
       !   indeed, clocur may then return an approximation of the same quality
       !   of fit but with fewer knots and therefore better if data reduction
       !   is also an important objective for the user.
@@ -536,7 +546,7 @@ module fitpack_core
        maxit,m1,nmin,ncc,j
       !  we set up the parameters tol and maxit
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -562,9 +572,9 @@ module fitpack_core
       if(ipar/=0 .or. iopt>0) go to 40
       i1 = 0
       i2 = idim
-      u(1) = 0.
+      u(1) = zero
       do 20 i=2,m
-         dist = 0.
+         dist = zero
          do 10 j1=1,idim
             i1 = i1+1
             i2 = i2+1
@@ -576,8 +586,8 @@ module fitpack_core
       do 30 i=2,m
          u(i) = u(i)/u(m)
   30  continue
-      u(m) = 0.1e+01
-  40  if(w(1)<=0.) go to 90
+      u(m) = one
+  40  if(w(1)<=zero) go to 90
       m1 = m-1
       do 50 i=1,m1
          if(u(i)>=u(i+1) .or. w(i)<=0.) go to 90
@@ -603,7 +613,7 @@ module fitpack_core
       if (ier==FITPACK_OK) go to 80
       go to 90
   70  if(s<0.) go to 90
-      if(s==0. .and. nest<(m+2*k)) go to 90
+      if(s==zero .and. nest<(m+2*k)) go to 90
       ier = 0
       ! we partition the working space and determine the spline approximation.
   80  ifp = 1
@@ -826,7 +836,7 @@ module fitpack_core
       !          satisfied. if iopt=1, the routine will continue with the set
       !          of knots found at the last call of the routine.
       !          attention: a call with iopt=1 must always be immediately
-      !          preceded by another call with iopt=1 or iopt=0.
+      !          preceded by another call with iopt=1 or iopt=zero
       !          unchanged on exit.
       !    m   : integer. on entry m must specify the number of data points.
       !          m > 3. unchanged on exit.
@@ -846,7 +856,7 @@ module fitpack_core
       !          if no convexity constraint is imposed at x(i).
       !    s   : real. on entry s must specify an over-estimate for the
       !          the weighted sum of squared residuals sq of the requested
-      !          spline. s >=0. unchanged on exit.
+      !          spline. s >=zero unchanged on exit.
       !   nest : integer. on entry nest must contain an over-estimate of the
       !          total number of knots of the spline returned, to indicate
       !          the storage space available to the routine. nest >=8.
@@ -1076,7 +1086,7 @@ module fitpack_core
       !           i=1,2,...,k+1. if iopt=1 the routine will continue with the
       !           knots found at the last call of the routine.
       !           attention: a call with iopt=1 must always be immediately
-      !           preceded by another call with iopt=1 or iopt=0.
+      !           preceded by another call with iopt=1 or iopt=zero
       !           unchanged on exit.
       !   idim  : integer. on entry idim must specify the dimension of the
       !           curve. 0 < idim < 11.
@@ -1126,7 +1136,7 @@ module fitpack_core
       !           k=1,3 or 5.
       !           unchanged on exit.
       !   s     : real.on entry (in case iopt>=0) s must specify the smoothing
-      !           factor. s >=0. unchanged on exit.
+      !           factor. s >=zero unchanged on exit.
       !           for advice on the choice of s see further comments.
       !   nest  : integer. on entry nest must contain an over-estimate of the
       !           total number of knots of the splines returned, to indicate
@@ -1259,7 +1269,7 @@ module fitpack_core
       !   to economize the search for a good s-value the program provides with
       !   different modes of computation. at the first call of the routine, or
       !   whenever he wants to restart with the initial set of knots the user
-      !   must set iopt=0.
+      !   must set iopt=zero
       !   if iopt=1 the program will continue with the set of knots found at
       !   the last call of the routine. this will save a lot of computation
       !   time if concur is called repeatedly for different values of s.
@@ -1270,7 +1280,7 @@ module fitpack_core
       !   calls (if these were smaller). therefore, if after a number of
       !   trials with different s-values and iopt=1, the user can finally
       !   accept a fit as satisfactory, it may be worthwhile for him to call
-      !   concur once more with the selected value for s but now with iopt=0.
+      !   concur once more with the selected value for s but now with iopt=zero
       !   indeed, concur may then return an approximation of the same quality
       !   of fit but with fewer knots and therefore better if data reduction
       !   is also an important objective for the user.
@@ -1327,7 +1337,7 @@ module fitpack_core
       !  ..
       !  we set up the parameters tol and maxit
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -1369,7 +1379,7 @@ module fitpack_core
       go to 90
   30  if(s<0.) go to 90
       nmax = m+k1+ib1+ie1
-      if(s==0. .and. nest<nmax) go to 90
+      if(s==zero .and. nest<nmax) go to 90
       ier = 0
       if(iopt>0) go to 70
       !  we determine a polynomial curve satisfying the boundary constraints.
@@ -1590,7 +1600,7 @@ module fitpack_core
         ll = l-k1
         do 70 j1=1,idim
           jj = ll
-          sp = 0.
+          sp = zero
           do 60 j=1,k1
             jj = jj+1
             sp = sp+c(jj)*h(j)
@@ -1635,7 +1645,7 @@ module fitpack_core
       !           k+1. if iopt=1 the routine will continue with the knots
       !           found at the last call of the routine.
       !           attention: a call with iopt=1 must always be immediately
-      !           preceded by another call with iopt=1 or iopt=0.
+      !           preceded by another call with iopt=1 or iopt=zero
       !           unchanged on exit.
       !   m     : integer. on entry m must specify the number of data points.
       !           m > k. unchanged on exit.
@@ -1658,7 +1668,7 @@ module fitpack_core
       !           the user is strongly dissuaded from choosing k even,together
       !           with a small s-value. unchanged on exit.
       !   s     : real.on entry (in case iopt>=0) s must specify the smoothing
-      !           factor. s >=0. unchanged on exit.
+      !           factor. s >=zero unchanged on exit.
       !           for advice on the choice of s see further comments.
       !   nest  : integer. on entry nest must contain an over-estimate of the
       !           total number of knots of the spline returned, to indicate
@@ -1771,7 +1781,7 @@ module fitpack_core
       !   to economize the search for a good s-value the program provides with
       !   different modes of computation. at the first call of the routine, or
       !   whenever he wants to restart with the initial set of knots the user
-      !   must set iopt=0.
+      !   must set iopt=zero
       !   if iopt=1 the program will continue with the set of knots found at
       !   the last call of the routine. this will save a lot of computation
       !   time if curfit is called repeatedly for different values of s.
@@ -1853,7 +1863,7 @@ module fitpack_core
       if (ier==0) go to 40
       go to 50
   30  if(s<0.) go to 50
-      if(s==0. .and. nest<(m+k1)) go to 50
+      if(s==zero .and. nest<(m+k1)) go to 50
       ! we partition the working space and determine the spline approximation.
   40  ifp = 1
       iz = ifp+nest
@@ -1944,7 +1954,7 @@ module fitpack_core
       !  we calculate the integrals of the normalized b-splines nj,ky+1(y)
       call fpintb(ty,ny,wrk(nkx1+1),nky1,yb,ye)
       !  calculate the integral of s(x,y)
-      dblint_res = 0.
+      dblint_res = zero
       do 200 i=1,nkx1
         res = wrk(i)
         if(res==0.) go to 200
@@ -2026,8 +2036,8 @@ module fitpack_core
       integer iwrk(2)
       !  ..
       !  calculate the (u,v)-coordinates of the given point.
-      u = 0.
-      v = 0.
+      u = zero
+      v = zero
       dist = x**2+y**2
       if(dist<=0.) go to 10
       v(1) = atan2(y,x)
@@ -2128,8 +2138,8 @@ module fitpack_core
       !  knots t(j),t(j+1),...,t(j+4).
          call fpbfou(t,n,alfa(i),wrk1,wrk2)
       !  calculate the integrals ress(i) and resc(i).
-         rs = 0.
-         rc = 0.
+         rs = zero
+         rc = zero
          do 30 j=1,n4
             rs = rs+c(j)*wrk1(j)
             rc = rc+c(j)*wrk2(j)
@@ -2155,11 +2165,10 @@ module fitpack_core
       real(RKIND) t(n),c(n),d(k1)
       !  ..local scalars..
       integer i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
-      real(RKIND) ak,fac,one
+      real(RKIND) ak,fac
       !  ..local array..
       real(RKIND) h(20)
       !  ..
-      one = 0.1d+01
       lk = l-k1
       do 100 i=1,k1
         ik = i+lk
@@ -2465,18 +2474,14 @@ module fitpack_core
       real(RKIND) t(n),ress(n),resc(n)
       !  ..local scalars..
       integer i,ic,ipj,is,j,jj,jp1,jp4,k,li,lj,ll,nmj,nm3,nm7
-      real(RKIND) ak,beta,con1,con2,c1,c2,delta,eps,fac,f1,f2,f3,one,quart, &
-       sign,six,s1,s2,term
+      real(RKIND) ak,beta,c1,c2,delta,fac,f1,f2,f3,sign,s1,s2,term
       !  ..local arrays..
       real(RKIND) co(5),si(5),hs(5),hc(5),rs(3),rc(3)
       !  ..
       !  initialization.
-      one = 0.1e+01
-      six = 0.6e+01
-      eps = 0.1e-07
-      quart = 0.25e0
-      con1 = 0.5e-01
-      con2 = 0.12e+03
+      real(RKIND), parameter ::  eps = 0.1e-07_RKIND
+      real(RKIND), parameter :: con1 = 0.5e-01_RKIND
+      real(RKIND), parameter :: con2 = 0.12e+03_RKIND
       nm3 = n-3
       nm7 = n-7
       if(par/=0.) term = six/par
@@ -2494,8 +2499,8 @@ module fitpack_core
         call fpcsin(t(4),t(jp4),par,si(1),co(1),si(jp1),co(jp1), &
         rs(j),rc(j))
         i = 5-j
-        hs(i) = 0.
-        hc(i) = 0.
+        hs(i) = zero
+        hc(i) = zero
         do 10 jj=1,j
           ipj = i+jj
           hs(ipj) = rs(jj)
@@ -2552,7 +2557,7 @@ module fitpack_core
         go to 130
       !  if !beta! <= 1 the integrals are calculated by evaluating a series
       !  expansion.
-  60    f3 = 0.
+  60    f3 = zero
         do 70 i=1,4
           ipj = i+j
           hs(i) = par*(t(ipj)-t(j))
@@ -2560,7 +2565,7 @@ module fitpack_core
           f3 = f3+hs(i)
   70    continue
         f3 = f3*con1
-        c1 = quart
+        c1 = fourth
         s1 = f3
         if(abs(f3)<=eps) go to 120
         sign = one
@@ -2571,8 +2576,8 @@ module fitpack_core
           k = k+1
           ak = k
           fac = fac*ak
-          f1 = 0.
-          f3 = 0.
+          f1 = zero
+          f3 = zero
           do 80 i=1,4
             f1 = f1+hc(i)
             f2 = f1*hs(i)
@@ -2605,8 +2610,8 @@ module fitpack_core
         i = 5-j
         call fpcsin(t(nm3),t(nmj),par,si(4),co(4),si(i-1),co(i-1), &
         rs(j),rc(j))
-        hs(i) = 0.
-        hc(i) = 0.
+        hs(i) = zero
+        hc(i) = zero
         do 170 jj=1,j
           ipj = i+jj
           hc(ipj) = rc(jj)
@@ -2703,111 +2708,108 @@ module fitpack_core
       return
       end subroutine fpbisp
 
-      recursive subroutine fpbspl(t,n,k,x,l,h)
-      !  subroutine fpbspl evaluates the (k+1) non-zero b-splines of
-      !  degree k at t(l) <= x < t(l+1) using the stable recurrence
-      !  relation of de boor and cox.
-      !  Travis Oliphant  2007
-      !    changed so that weighting of 0 is used when knots with
-      !      multiplicity are present.
-      !    Also, notice that l+k <= n and 1 <= l+1-k
-      !      or else the routine will be accessing memory outside t
-      !      Thus it is imperative that that k <= l <= n-k but this
-      !      is not checked.
-      !  ..
-      !  ..scalar arguments..
-      real(RKIND) x
-      integer, intent(in) :: n,k,l
-      !  ..array arguments..
-      real(RKIND) t(n),h(MAX_K+1)
-      !  ..local scalars..
-      real(RKIND) f,one
-      integer i,j,li,lj
-      !  ..local arrays..
-      real(RKIND) hh(MAX_K)
-      !  ..
-      one = 0.1d+01
-      h(1) = one
-      do j=1,k
-        hh(1:j) = h(1:j)
-        h(1) = 0.0d0
-        do i=1,j
-          li = l+i
-          lj = li-j
-          if (t(li)/=t(lj)) then
-             f = hh(i)/(t(li)-t(lj))
-             h(i) = h(i)+f*(t(li)-x)
-             h(i+1) = f*(x-t(lj))
-          else
-             h(i+1) = 0.0d0
-          endif
-        end do
-      end do
-      return
+
+      !  subroutine fpbspl evaluates the (k+1) non-zero b-splines of degree k at t(l) <= x < t(l+1) using
+      !  the stable recurrence relation of de boor and cox.
+      !  Travis Oliphant 2007 changed so that weighting of 0 is used when knots with multiplicity are present.
+      !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
+      !   Thus it is imperative that that k <= l <= n-k but this is not checked.
+      pure subroutine fpbspl(t,n,k,x,l,h)
+         real(RKIND), intent(in)  :: x,t(n)
+         integer    , intent(in)  :: n,k,l
+         real(RKIND), intent(out) :: h(MAX_K+1)
+
+         ! Local variables
+         real(RKIND) :: f,hh(MAX_K+1)
+         integer     :: i,j,li,lj
+
+         h(1) = one
+         do j=1,k
+           hh(1:j) = h(1:j)
+           h(1) = zero
+           do i=1,j
+             li = l+i
+             lj = li-j
+             if (t(li)/=t(lj)) then
+                f = hh(i)/(t(li)-t(lj))
+                h(i) = h(i)+f*(t(li)-x)
+                h(i+1) = f*(x-t(lj))
+             else
+                h(i+1) = zero
+             endif
+           end do
+         end do
+
       end subroutine fpbspl
 
-      recursive subroutine fpchec(x,m,t,n,k,ier)
+      !  subroutine fpchec verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
+      !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
+      !  If all of the following conditions are fulfilled, the error parameter ier is set to zero. if one
+      !  of the conditions is violated, an error flag is returned.
+      pure subroutine fpchec(x,m,t,n,k,ier)
+         integer,     intent(in)  :: m,n,k
+         real(RKIND), intent(in) :: x(m),t(n)
+         integer,     intent(out) :: ier
 
-      !  subroutine fpchec verifies the number and the position of the knots
-      !  t(j),j=1,2,...,n of a spline of degree k, in relation to the number
-      !  and the position of the data points x(i),i=1,2,...,m. if all of the
-      !  following conditions are fulfilled, the error parameter ier is set
-      !  to zero. if one of the conditions is violated ier is set to ten.
-      !      1) k+1 <= n-k-1 <= m
-      !      2) t(1) <= t(2) <= ... <= t(k+1)
-      !         t(n-k) <= t(n-k+1) <= ... <= t(n)
-      !      3) t(k+1) < t(k+2) < ... < t(n-k)
-      !      4) t(k+1) <= x(i) <= t(n-k)
-      !      5) the conditions specified by schoenberg and whitney must hold
-      !         for at least one subset of data points, i.e. there must be a
-      !         subset of data points y(j) such that
-      !             t(j) < y(j) < t(j+k+1), j=1,2,...,n-k-1
-      !  ..
-      !  ..scalar arguments..
-      integer m,n,k,ier
-      !  ..array arguments..
-      real(RKIND) x(m),t(n)
-      !  ..local scalars..
-      integer i,j,k1,k2,l,nk1,nk2,nk3
-      real(RKIND) tj,tl
-      !  ..
-      k1 = k+1
-      k2 = k1+1
-      nk1 = n-k1
-      nk2 = nk1+1
-      ier = 10
-      !  check condition no 1
-      if(nk1<k1 .or. nk1>m) go to 80
-      !  check condition no 2
-      j = n
-      do 20 i=1,k
-        if(t(i)>t(i+1)) go to 80
-        if(t(j)<t(j-1)) go to 80
-        j = j-1
-  20  continue
-      !  check condition no 3
-      do 30 i=k2,nk2
-        if(t(i)<=t(i-1)) go to 80
-  30  continue
-      !  check condition no 4
-      if(x(1)<t(k1) .or. x(m)>t(nk2)) go to 80
-      !  check condition no 5
-      if(x(1)>=t(k2) .or. x(m)<=t(nk1)) go to 80
-      i = 1
-      l = k2
-      nk3 = nk1-1
-      if(nk3<2) go to 70
-      do 60 j=2,nk3
-        tj = t(j)
-        l = l+1
-        tl = t(l)
-  40    i = i+1
-        if(i>=m) go to 80
-        if(x(i)<=tj) go to 40
-        if(x(i)>=tl) go to 80
-  60  continue
-  70  ier = 0
-  80  return
+         ! Local variables
+         integer :: i,j,k1,k2,l,nk1,nk2,nk3
+         real(RKIND) :: tj,tl
+
+         ! Init sizes
+         k1 = k+1
+         k2 = k1+1
+         nk1 = n-k1
+         nk2 = nk1+1
+
+         ier = FITPACK_INPUT_ERROR
+
+         ! 1) k+1 <= n-k-1 <= m
+         if(nk1<k1 .or. nk1>m) return
+
+         ! 2) monotonicity
+         !    t(1) <= t(2) <= ... <= t(k+1)
+         !    t(n-k) <= t(n-k+1) <= ... <= t(n)
+
+         j = n
+         monotonic: do i=1,k
+            if(t(i)>t(i+1)) return
+            if(t(j)<t(j-1)) return
+            j = j-1
+         end do monotonic
+
+         ! 3) t(k+1) < t(k+2) < ... < t(n-k)
+         do i=k2,nk2
+            if(t(i)<=t(i-1)) return
+         end do
+
+         ! 4) t(k+1) <= x(i) <= t(n-k)
+         ! 5) schoenberg and whitney conditions: they must hold for at least one subset of data points, i.e.
+         !    there must be a subset of data points y(j) such that
+         !         t(j) < y(j) < t(j+k+1), j=1,2,...,n-k-1
+
+         if(x(1)<t(k1) .or. x(m)>t(nk2)) return
+         if(x(1)>=t(k2) .or. x(m)<=t(nk1)) return
+
+         i   = 1
+         l   = k2
+         nk3 = nk1-1
+
+         if (nk3>=2) then
+             do j=2,nk3
+                tj = t(j)
+                l  = l+1
+                tl = t(l)
+                do while (i<m .and. x(i)<=tj)
+                    i = i+1
+                    if(i>=m) return
+                end do
+                if (x(i)>=tl) return
+             end do
+         endif
+
+         ! All checks passed
+         ier = FITPACK_OK
+
       end subroutine fpchec
 
 
@@ -2975,25 +2977,22 @@ module fitpack_core
       real(RKIND) s,tol,fp
       integer iopt,idim,m,mx,k,nest,maxit,k1,k2,n,nc,ier
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1) &
-      , &
+      real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
        a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
       integer nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv &
-      , &
-       p1,p2,p3,sin,store,term,ui,wi,rn,one,con1,con4,con9,half
+      real(RKIND) acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv, &
+       p1,p2,p3,sin,store,term,ui,wi,rn
       integer i,ich1,ich3,ij,ik,it,iter,i1,i2,i3,j,jj,jk,jper,j1,j2,kk, &
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(RKIND) h(MAX_K+1),h1(7),h2(6),xi(10)
       !  set constants
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1: determination of the number of knots and their position     c
       !  **************************************************************      c
@@ -3027,7 +3026,7 @@ module fitpack_core
       acc = tol*s
       !  determine nmax, the number of knots for periodic spline interpolation
       nmax = m+2*k
-      if(s>0. .or. nmax==nmin) go to 30
+      if(s>zero .or. nmax==nmin) go to 30
       !  if s=0, s(u) is an interpolating curve.
       n = nmax
       !  test whether the required storage space exceeds the available one.
@@ -3062,9 +3061,9 @@ module fitpack_core
         j = j+n
         jj = jj+n
   17  continue
-      fp = 0.
+      fp = zero
       fpint(n) = fp0
-      fpint(n-1) = 0.
+      fpint(n-1) = zero
       nrdata(n) = 0
       go to 630
   20  do 25 i=2,m1
@@ -3086,10 +3085,10 @@ module fitpack_core
       if(fp0>s) go to 50
       !  the case that s(u) is a fixed point is treated separetely.
       !  fp0 denotes the corresponding sum of squared residuals.
-  35  fp0 = 0.
-      d1 = 0.
+  35  fp0 = zero
+      d1 = zero
       do 37 j=1,idim
-        z(j) = 0.
+        z(j) = zero
   37  continue
       jj = 0
       do 45 it=1,m1
@@ -3162,7 +3161,7 @@ module fitpack_core
         n7 = nk1-k
         n10 = n7-kk
         jper = 0
-        fp = 0.
+        fp = zero
         l = k1
         jj = 0
         do 290 it=1,m1
@@ -3206,10 +3205,10 @@ module fitpack_core
       !  (the part with respect to a1) and h2 (the part with
       !  respect to a2).
  160      do 170 i=1,kk
-            h1(i) = 0.
-            h2(i) = 0.
+            h1(i) = zero
+            h2(i) = zero
  170      continue
-          h1(kk1) = 0.
+          h1(kk1) = zero
           j = l5-n10
           do 210 i=1,kk1
             j = j+1
@@ -3229,11 +3228,11 @@ module fitpack_core
       !  rotation with the rows 1,2,...n10 of matrix a.
           do 240 j=1,n10
             piv = h1(1)
-            if(piv/=0.) go to 214
+            if(piv/=zero) go to 214
             do 212 i=1,kk
               h1(i) = h1(i+1)
  212        continue
-            h1(kk1) = 0.
+            h1(kk1) = zero
             go to 240
       !  calculate the parameters of the givens transformation.
  214        call fpgivs(piv,a1(j,1),cos,sin)
@@ -3255,14 +3254,14 @@ module fitpack_core
               call fprota(cos,sin,h1(i1),a1(j,i1))
               h1(i) = h1(i1)
  230        continue
-            h1(i1) = 0.
+            h1(i1) = zero
  240      continue
       !  rotation with the rows n10+1,...n7 of matrix a.
  250      do 270 j=1,kk
             ij = n10+j
             if(ij<=0) go to 270
             piv = h2(j)
-            if(piv==0.) go to 270
+            if (piv==zero) go to 270
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a2(ij,j),cos,sin)
       !  transformations to right hand side.
@@ -3291,7 +3290,7 @@ module fitpack_core
           do 140 i=1,kk1
             j = j+1
             piv = h(i)
-            if(piv==0.) go to 140
+            if (piv==zero) go to 140
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a1(j,1),cos,sin)
       !  transformations to right hand side.
@@ -3353,7 +3352,7 @@ module fitpack_core
         fpold = fp
       !  compute the sum of squared residuals for each knot interval
       !  t(j+k) <= ui <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = 0.
+        fpart = zero
         i = 1
         l = k1
         jj = 0
@@ -3361,10 +3360,10 @@ module fitpack_core
           if(u(it)<t(l)) go to 300
           new = 1
           l = l+1
- 300      term = 0.
+ 300      term = zero
           l0 = l-k2
           do 310 j2=1,idim
-            fac = 0.
+            fac = zero
             j1 = l0
             do 305 j=1,k1
               j1 = j1+1
@@ -3416,19 +3415,19 @@ module fitpack_core
       !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
       !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
       !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<0.                                 c
+      !  guaranteed by taking f1>0 and f3<zero                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
  350  call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
       n11 = n10-1
       n8 = n7-1
-      p = 0.
+      p = zero
       l = n7
       do 352 i=1,k
          j = k+1-i
@@ -3461,8 +3460,8 @@ module fitpack_core
  358    continue
         do i=1,n7
           g1(i,k1) = a1(i,k1)
-          g1(i,k2) = 0.
-          g2(i,1) = 0.
+          g1(i,k2) = zero
+          g2(i,1) = zero
           do j=1,k
             g1(i,j) = a1(i,j)
             g2(i,j+1) = a2(i,j)
@@ -3478,13 +3477,13 @@ module fitpack_core
       !  fetch a new row of matrix b and store it in the arrays h1 (the part
       !  with respect to g1) and h2 (the part with respect to g2).
           do 380 j=1,idim
-            xi(j) = 0.
+            xi(j) = zero
  380      continue
           do 385 i=1,k1
-            h1(i) = 0.
-            h2(i) = 0.
+            h1(i) = zero
+            h2(i) = zero
  385      continue
-          h1(k2) = 0.
+          h1(k2) = zero
           if(it>n11) go to 420
           l = it
           l0 = it
@@ -3539,7 +3538,7 @@ module fitpack_core
               call fprota(cos,sin,h1(i1),g1(j,i1))
               h1(i) = h1(i1)
  490        continue
-            h1(i1) = 0.
+            h1(i1) = zero
  500      continue
       !  rotation with the rows n11+1,...n7
  510      do 530 j=1,k1
@@ -3578,16 +3577,16 @@ module fitpack_core
  545      continue
  547    continue
       !  computation of f(p).
-        fp = 0.
+        fp = zero
         l = k1
         jj = 0
         do 570 it=1,m1
           if(u(it)<t(l)) go to 550
           l = l+1
  550      l0 = l-k2
-          term = 0.
+          term = zero
           do 565 j2=1,idim
-            fac = 0.
+            fac = zero
             j1 = l0
             do 560 j=1,k1
               j1 = j1+1
@@ -3603,7 +3602,7 @@ module fitpack_core
         fpms = fp-s
         if(abs(fpms)<acc) go to 660
       !  test whether the maximal number of iterations is reached.
-        if(iter==maxit) go to 600
+        if (iter==maxit) go to 600
       !  carry out one more step of the iteration process.
         p2 = p
         f2 = fpms
@@ -3633,15 +3632,15 @@ module fitpack_core
         p = fprati(p1,f1,p2,f2,p3,f3)
  595  continue
       !  error codes and messages.
- 600  ier = 3
+ 600  ier = FITPACK_MAXIT
       go to 660
- 610  ier = 2
+ 610  ier = FITPACK_S_TOO_SMALL
       go to 660
- 620  ier = 1
+ 620  ier = FITPACK_INSUFFICIENT_STORAGE
       go to 660
- 630  ier = -1
+ 630  ier = FITPACK_INTERPOLATING_OK
       go to 660
- 640  ier = -2
+ 640  ier = FITPACK_LEASTSQUARES_OK
       !  the point (z(1),z(2),...,z(idim)) is a solution of our problem.
       !  a constant function is a spline of degree k with all b-spline
       !  coefficients equal to that constant.
@@ -3652,20 +3651,13 @@ module fitpack_core
         rn = i-1
         t(j) = u(m)+rn*per
  650  continue
+
       n = nmin
-      j1 = 0
-      do 658 j=1,idim
-        fac = z(j)
-        j2 = j1
-        do 654 i=1,k1
-          j2 = j2+1
-          c(j2) = fac
- 654    continue
-        j1 = j1+n
- 658  continue
+      forall(j=1:idim,i=1:k1) c(n*(j-1)+i) = z(j)
+
       fp = fp0
       fpint(n) = fp0
-      fpint(n-1) = 0.
+      fpint(n-1) = zero
       nrdata(n) = 0
  660  return
       end subroutine fpclos
@@ -3701,11 +3693,11 @@ module fitpack_core
       !  find the minimal number of knots.
       !  a knot is located at the data point x(i), i=2,3,...m-1 if
       !    1) v(i) ^= 0    and
-      !    2) v(i)*v(i-1) <= 0  or  v(i)*v(i+1) <= 0.
+      !    2) v(i)*v(i-1) <= 0  or  v(i)*v(i+1) <= zero
       m1 = m-1
       n = 4
       do 20 i=2,m1
-        if(v(i)==0. .or. (v(i)*v(i-1)>0. .and. &
+        if(v(i)==zero .or. (v(i)*v(i-1)>zero .and. &
         v(i)*v(i+1)>0.)) go to 20
         n = n+1
       !  test whether the required storage space exceeds the available one.
@@ -3769,8 +3761,8 @@ module fitpack_core
       !  find the interval t(k-1) <= x <= t(k) for which this sum is maximal
       !  on the condition that this interval contains at least one interior
       !  data point x(nr) and that s(x) is not given there by a straight line.
-  80  sqmax = 0.
-      sql = 0.
+  80  sqmax = zero
+      sql = zero
       l = 5
       nr = 0
       i1 = 1
@@ -3787,7 +3779,7 @@ module fitpack_core
         nr = i1+(i-i1)/2
   90    l = l+1
         i1 = i
-        sql = 0.
+        sql = zero
  100    sql = sql+term
  110  continue
       if(m-i1<=1 .or. (bind(l-4).and.bind(l-3))) go to 120
@@ -3851,18 +3843,16 @@ module fitpack_core
        z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,con1,con4,con9,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       half,one,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      real(RKIND) acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
+       p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe, &
        l,li,lj,l0,mb,me,mm,new,nk1,nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       !  ..local arrays..
       real(RKIND) h(MAX_K+1),xi(10)
 
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1: determination of the number of knots and their position     c
       !  **************************************************************      c
@@ -3931,7 +3921,7 @@ module fitpack_core
       nplus = nrdata(n)
       if(fp0>s) go to 60
   50  n = nmin
-      fpold = 0.
+      fpold = zero
       nplus = 0
       nrdata(1) = m-2
       !  main loop for the different sets of knots. m is a save upper bound
@@ -3953,13 +3943,13 @@ module fitpack_core
       !  sinf(u). the observation matrix a is built up row by row and
       !  reduced to upper triangular form by givens transformations.
       !  at the same time fp=f(p=inf) is computed.
-        fp = 0.
+        fp = zero
       !  nn denotes the dimension of the splines
         nn = nk1-ib-ie
       !  initialize the b-spline coefficients and the observation matrix a.
         do 75 i=1,nc
-          z(i) = 0.
-          c(i) = 0.
+          z(i) = zero
+          c(i) = zero
   75    continue
         if(me<mb) go to 134
         if(nn==0) go to 82
@@ -3999,7 +3989,7 @@ module fitpack_core
           do 110 i=li,lj
             j = j+1
             piv = h(i)
-            if(piv==0.) go to 110
+            if (piv==zero) go to 110
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(j,1),cos,sin)
       !  transformations to right hand side.
@@ -4059,7 +4049,7 @@ module fitpack_core
  150    fpold = fp
       !  compute the sum of squared residuals for each knot interval
       !  t(j+k) <= u(i) <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = 0.
+        fpart = zero
         i = 1
         l = k2
         new = 0
@@ -4068,10 +4058,10 @@ module fitpack_core
           if(u(it)<t(l) .or. l>nk1) go to 160
           new = 1
           l = l+1
- 160      term = 0.
+ 160      term = zero
           l0 = l-k2
           do 175 j2=1,idim
-            fac = 0.
+            fac = zero
             j1 = l0
             do 170 j=1,k1
               j1 = j1+1
@@ -4122,17 +4112,17 @@ module fitpack_core
       !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
       !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
       !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<0.                                 c
+      !  guaranteed by taking f1>0 and f3<zero                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p = 0.
+      p = zero
       do 252 i=1,nn
          p = p+a(i,1)
  252  continue
@@ -4157,7 +4147,7 @@ module fitpack_core
             h(i) = b(it,i)*pinv
  264      continue
           do 268 j=1,idim
-            xi(j) = 0.
+            xi(j) = zero
  268      continue
       !  take into account that certain b-spline coefficients must be zero.
           if(it>ib) go to 274
@@ -4168,7 +4158,7 @@ module fitpack_core
             j2 = j2+1
  270      continue
           do 272 i=j2,k2
-            h(i) = 0.
+            h(i) = zero
  272      continue
  274      jj = max0(1,it-ib)
           do 290 j=jj,nn
@@ -4189,7 +4179,7 @@ module fitpack_core
               call fprota(cos,sin,h(i1),g(j,i1))
               h(i) = h(i1)
  280        continue
-            h(i2+1) = 0.
+            h(i2+1) = zero
  290      continue
  300    continue
       !  backward substitution to obtain the b-spline coefficients.
@@ -4200,22 +4190,22 @@ module fitpack_core
           if(ib==0) go to 306
           j3 = j1
           do 304 i=1,ib
-            c(j3) = 0.
+            c(j3) = zero
             j3 = j3+1
  304      continue
  306      j1 =j1+n
  308    continue
       !  computation of f(p).
-        fp = 0.
+        fp = zero
         l = k2
         jj = (mb-1)*idim
         do 330 it=mb,me
           if(u(it)<t(l) .or. l>nk1) go to 310
           l = l+1
  310      l0 = l-k2
-          term = 0.
+          term = zero
           do 325 j2=1,idim
-            fac = 0.
+            fac = zero
             j1 = l0
             do 320 j=1,k1
               j1 = j1+1
@@ -4461,7 +4451,7 @@ module fitpack_core
       do 270 i=1,nbind
         i1 = i-1
         do 260 j=i,nbind
-          f = 0.
+          f = zero
           do 230 k=1,n4
             f = f+b(k,i)*b(k,j)*a(k,4)
  230      continue
@@ -4490,7 +4480,7 @@ module fitpack_core
       !        (11)  (c1) = (z1)
       !        (12)  (r2)'(d2)(u1) = -(b1)'(z2)
       do 310 i=1,nbind
-        f = 0.
+        f = zero
         do 280 j=1,n4
           f = f+b(j,i)*zz(j)
  280    continue
@@ -4610,7 +4600,7 @@ module fitpack_core
  490  continue
       !  evaluate s(x) at the data points x(i) and calculate the weighted
       !  sum of squared residual right hand sides sq.
- 500  sq = 0.
+ 500  sq = zero
       l = 4
       lp1 = 5
       do 530 i=1,m
@@ -4642,14 +4632,8 @@ module fitpack_core
       real(RKIND) a,b,par,sia,coa,sib,cob,ress,resc
       !  ..local scalars..
       integer i,j
-      real(RKIND) ab,ab4,ai,alfa,beta,b2,b4,eps,fac,f1,f2,one,quart,six, &
-       three,two
+      real(RKIND) ab,ab4,ai,alfa,beta,b2,b4,eps,fac,f1,f2
 
-      one = 0.1e+01
-      two = 0.2e+01
-      three = 0.3e+01
-      six = 0.6e+01
-      quart = 0.25e+0
       eps = 0.1e-09
       ab = b-a
       ab4 = ab**4
@@ -4667,9 +4651,9 @@ module fitpack_core
       resc = ab4*(coa*f1-sia*f2+cob*b4)
       go to 400
       ! ress and resc are found by evaluating a series expansion.
- 100  fac = quart
+ 100  fac = fourth
       f1 = fac
-      f2 = 0.
+      f2 = zero
       i = 4
       do 200 j=1,5
         i = i+1
@@ -4701,19 +4685,18 @@ module fitpack_core
        z(nest),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,con1,con4,con9,cos,half,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       one,p,pinv,piv,p1,p2,p3,rn,sin,store,term,wi,xi,yi
+      real(RKIND) acc,cos,fpart,fpms,fpold,fp0,f1,f2,f3, &
+       p,pinv,piv,p1,p2,p3,rn,sin,store,term,wi,xi,yi
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
       real(RKIND) h(MAX_K+1)
 
       !  set constants
-      one = 0.1d+01
-      con1 = 0.1d0
-      con9 = 0.9d0
-      con4 = 0.4d-01
-      half = 0.5d0
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1: determination of the number of knots and their position     c
       !  **************************************************************      c
@@ -4741,7 +4724,7 @@ module fitpack_core
       acc = tol*s
       !  determine nmax, the number of knots for spline interpolation.
       nmax = m+k1
-      if(s>0.0d0) go to 45
+      if(s>zero) go to 45
       !  if s=0, s(x) is an interpolating spline.
       !  test whether the required storage space exceeds the available one.
       n = nmax
@@ -4777,7 +4760,7 @@ module fitpack_core
       nplus = nrdata(n)
       if(fp0>s) go to 60
   50  n = nmin
-      fpold = 0.0d0
+      fpold = zero
       nplus = 0
       nrdata(1) = m-2
       !  main loop for the different sets of knots. m is a save upper bound
@@ -4799,7 +4782,7 @@ module fitpack_core
       !  sinf(x). the observation matrix a is built up row by row and
       !  reduced to upper triangular form by givens transformations.
       !  at the same time fp=f(p=inf) is computed.
-        fp = 0.0d0
+        fp = zero
       !  initialize the observation matrix a.
         z(1:nk1) = zero
         a(1:nk1,1:k1) = zero
@@ -4824,7 +4807,7 @@ module fitpack_core
           do 110 i=1,k1
             j = j+1
             piv = h(i)
-            if(piv==0.0d0) go to 110
+            if(piv==zero) go to 110
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(j,1),cos,sin)
       !  transformations to right hand side.
@@ -4853,7 +4836,7 @@ module fitpack_core
         fpms = fp-s
         if(abs(fpms)<acc) go to 440
       !  if f(p=inf) < s accept the choice of knots.
-        if(fpms<0.0d0) go to 250
+        if(fpms<zero) go to 250
       !  if n = nmax, sinf(x) is an interpolating spline.
         if(n==nmax) go to 430
       !  increase the number of knots.
@@ -4872,7 +4855,7 @@ module fitpack_core
  150    fpold = fp
       !  compute the sum((w(i)*(y(i)-s(x(i))))**2) for each knot interval
       !  t(j+k) <= x(i) <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = 0.0d0
+        fpart = zero
         i = 1
         l = k2
         new = 0
@@ -4880,7 +4863,7 @@ module fitpack_core
           if(x(it)<t(l) .or. l>nk1) go to 160
           new = 1
           l = l+1
- 160      term = 0.0d0
+ 160      term = zero
           l0 = l-k2
           do 170 j=1,k1
             l0 = l0+1
@@ -4928,13 +4911,13 @@ module fitpack_core
       !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
       !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
       !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<0.                                 c
+      !  guaranteed by taking f1>0 and f3<zero                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
-      p1 = 0.0d0
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
@@ -4958,7 +4941,7 @@ module fitpack_core
         do 300 it=1,n8
       !  the row of matrix b is rotated into triangle by givens transformation
           h(1:k2) = b(it,1:k2)*pinv
-          yi = 0.0d0
+          yi = zero
           do 290 j=it,nk1
             piv = h(1)
       !  calculate the parameters of the givens transformation.
@@ -4974,19 +4957,19 @@ module fitpack_core
               call fprota(cos,sin,h(i1),g(j,i1))
               h(i) = h(i1)
  280        continue
-            h(i2+1) = 0.0d0
+            h(i2+1) = zero
  290      continue
  300    continue
       !  backward substitution to obtain the b-spline coefficients.
         call fpback(g,c,nk1,k2,c,nest)
       !  computation of f(p).
-        fp = 0.0d0
+        fp = zero
         l = k2
         do 330 it=1,m
           if(x(it)<t(l) .or. l>nk1) go to 310
           l = l+1
  310      l0 = l-k2
-          term = 0.0d0
+          term = zero
           do 320 j=1,k1
             l0 = l0+1
             term = term+c(l0)*q(it,j)
@@ -5009,7 +4992,7 @@ module fitpack_core
         p = p*con4
         if(p<=p1) p=p1*con9 + p2*con1
         go to 360
- 335    if(f2<0.0d0) ich3=1
+ 335    if(f2<zero) ich3=1
  340    if(ich1/=0) go to 350
         if((f1-f2)>acc) go to 345
       !  our initial choice of p is too small
@@ -5019,7 +5002,7 @@ module fitpack_core
         if(p3<0.) go to 360
         if(p>=p3) p = p2*con1 + p3*con9
         go to 360
- 345    if(f2>0.0d0) ich1=1
+ 345    if(f2>zero) ich1=1
       !  test whether the iteration process proceeds as theoretically
       !  expected.
  350    if(f2>=f1 .or. f2<=f3) go to 410
@@ -5061,11 +5044,9 @@ module fitpack_core
       !  ..local scalars..
       integer i
       real(RKIND) a1,b1,c1,df,disc,d1,e3,f,four,half,ovfl,pi3,p3,q,r, &
-       step,tent,three,two,u,u1,u2,y
+       step,tent,u,u1,u2,y
 
       !  set constants
-      two = 0.2d+01
-      three = 0.3d+01
       four = 0.4d+01
       ovfl =0.1d+05
       half = 0.5d+0
@@ -5439,7 +5420,7 @@ module fitpack_core
        av2(nv,4),aa(2,mv),bb(2,nv),cc(nv),cosi(2,nv),bu(nu,5),bv(nv,5)
       integer nru(mu),nrv(mv)
       !  ..local scalars..
-      real(RKIND) arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term,one,three,half
+      real(RKIND) arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
 
       integer i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jj,jk,jper, &
        j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
@@ -5482,10 +5463,6 @@ module fitpack_core
       !
       !    (4)  if iop1 = 1  c(nu-4,j) = 0, j=1,2,...,nv-4.
       !
-      !  set constants
-      one = 1
-      three = 3
-      half = 0.5
       !  initialization
       nu4 = nu-4
       nu7 = nu-7
@@ -5685,7 +5662,7 @@ module fitpack_core
         do 390 i=i0,i1
           irot = irot+1
           piv = h(i)
-          if(piv==0.) go to 390
+          if (piv==zero) go to 390
       !  calculate the parameters of the givens transformation.
           call fpgivs(piv,au(irot,1),co,si)
       !  apply that transformation to the rows of matrix (qq).
@@ -5803,7 +5780,7 @@ module fitpack_core
          do 660 j=1,nv11
             piv = h1(1)
             i2 = min0(nv11-j,4)
-            if(piv==0.) go to 640
+            if (piv==zero) go to 640
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av1(j,1),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -5822,17 +5799,16 @@ module fitpack_core
                i1 = i+1
                call fprota(co,si,h1(i1),av1(j,i1))
  630        continue
- 640        do 650 i=1,i2
-               h1(i) = h1(i+1)
- 650        continue
-            h1(i2+1) = 0.
+
+ 640        h1(1:i2+1) = [h1(2:i2+1),zero]
+
  660     continue
       !  rotations with the rows nv11+1,...,nv7 of avv.
  670     do 700 j=1,4
             ij = nv11+j
             if(ij<=0) go to 700
             piv = h2(j)
-            if(piv==0.) go to 700
+            if (piv==zero) go to 700
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av2(ij,j),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -5859,7 +5835,7 @@ module fitpack_core
          do 740 i=1,5
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 740
+            if (piv==zero) go to 740
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av1(irot,1),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -6447,7 +6423,7 @@ module fitpack_core
  210    do 240 i=1,ibandx
           irot = irot+1
           piv = h(i)
-          if(piv==0.) go to 240
+          if (piv==zero) go to 240
       !  calculate the parameters of the givens transformation.
           call fpgivs(piv,ax(irot,1),cos,sin)
       !  apply that transformation to the rows of matrix q.
@@ -6507,7 +6483,7 @@ module fitpack_core
  360    do 390 i=1,ibandy
           irot = irot+1
           piv = h(i)
-          if(piv==0.) go to 390
+          if (piv==zero) go to 390
       !  calculate the parameters of the givens transformation.
           call fpgivs(piv,ay(irot,1),cos,sin)
       !  apply that transformation to the columns of matrix g.
@@ -6635,7 +6611,7 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) arg,co,dr01,dr02,dr03,dr11,dr12,dr13,fac,fac0,fac1,pinv,piv &
       , &
-       si,term,one,three,half
+       si,term
       integer i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
        j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
        numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
@@ -6680,10 +6656,7 @@ module fitpack_core
       !                    c(nu-5,j) = dr(4)+(dr(5)*cosi(1,j)+dr(6)*cosi(2,j))
       !                                *(tu(nu-4)-tu(nu-3))/3. = c1(j)
       !
-      !  set constants
-      one = 1
-      three = 3
-      half = 0.5
+
       !  initialization
       nu4 = nu-4
       nu7 = nu-7
@@ -6928,7 +6901,7 @@ module fitpack_core
         do 385 i=i0,i1
           irot = irot+1
           piv = h(i)
-          if(piv==0.) go to 385
+          if (piv==zero) go to 385
       !  calculate the parameters of the givens transformation.
           call fpgivs(piv,au(irot,1),co,si)
       !  apply that transformation to the rows of matrix (qq).
@@ -7052,7 +7025,7 @@ module fitpack_core
          do 660 j=1,nv11
             piv = h1(1)
             i2 = min0(nv11-j,4)
-            if(piv==0.) go to 640
+            if (piv==zero) go to 640
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av1(j,1),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -7071,17 +7044,15 @@ module fitpack_core
                i1 = i+1
                call fprota(co,si,h1(i1),av1(j,i1))
  630        continue
- 640        do 650 i=1,i2
-               h1(i) = h1(i+1)
- 650        continue
-            h1(i2+1) = 0.
+ 640        h1(1:i2+1) = [h1(2:i2+1),zero]
+
  660     continue
       !  rotations with the rows nv11+1,...,nv7 of avv.
  670     do 700 j=1,4
             ij = nv11+j
             if(ij<=0) go to 700
             piv = h2(j)
-            if(piv==0.) go to 700
+            if (piv==zero) go to 700
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av2(ij,j),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -7108,7 +7079,7 @@ module fitpack_core
          do 740 i=1,5
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 740
+            if (piv==zero) go to 740
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,av1(irot,1),co,si)
       !  apply that transformation to the columns of matrix g.
@@ -7374,7 +7345,7 @@ module fitpack_core
       ak = k1
       k = k1-1
       do 10 i=1,nk1
-        bint(i) = 0.0d0
+        bint(i) = zero
   10  continue
       !  the integration limits are arranged in increasing order.
       a = x
@@ -7411,14 +7382,14 @@ module fitpack_core
       !  calculation of aint(j), j=1,2,...,k+1.
       !  initialization.
   50    do 55 j=1,k1
-          aint(j) = 0.0d0
+          aint(j) = zero
   55    continue
         aint(1) = (arg-t(l))/(t(l+1)-t(l))
         h1(1) = one
         do 70 j=1,k
       !  evaluation of the non-zero b-splines of degree j at arg,i.e.
       !    h(i+1) = nl-j+i,j(arg), i=0,1,...,j.
-          h(1) = 0.0d0
+          h(1) = zero
           do 60 i=1,j
             li = l+i
             lj = li-j
@@ -7594,15 +7565,13 @@ module fitpack_core
       , &
        wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) res,sq,sqq,step1,step2,three
+      real(RKIND) res,sq,sqq,step1,step2
       integer i,id0,iop0,iop1,i1,j,l,laa,lau,lav1,lav2,lbb,lbu,lbv, &
        lcc,lcs,lq,lri,lsu,lsv,l1,l2,mm,mvnu,number
       !  ..local arrays..
       integer nr(3)
       real(RKIND) delta(3),dzz(3),sum(3),a(6,6),g(6)
 
-      !  set constant
-      three = 3
       !  we partition the working space
       lsu = 1
       lsv = lsu+4*mu
@@ -7778,15 +7747,13 @@ module fitpack_core
       , &
        wrk(lwrk),step(2)
       !  ..local scalars..
-      real(RKIND) sq,sqq,sq0,sq1,step1,step2,three
+      real(RKIND) sq,sqq,sq0,sq1,step1,step2
       integer i,id0,iop0,iop1,i1,j,l,lau,lav1,lav2,la0,la1,lbu,lbv,lb0, &
        lb1,lc0,lc1,lcs,lq,lri,lsu,lsv,l1,l2,mm,mvnu,number, id1
       !  ..local arrays..
       integer nr(6)
       real(RKIND) delta(6),drr(6),sum(6),a(6,6),g(6)
 
-      !  set constant
-      three = 3
       !  we partition the working space
       lsu = 1
       lsv = lsu+4*mu
@@ -7991,19 +7958,17 @@ module fitpack_core
        z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,con1,con4,con9,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       half,one,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      real(RKIND) acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
+       p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
       real(RKIND) h(MAX_K+1),xi(10)
 
       !  set constants
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1: determination of the number of knots and their position     c
       !  **************************************************************      c
@@ -8120,7 +8085,7 @@ module fitpack_core
           do 110 i=1,k1
             j = j+1
             piv = h(i)
-            if(piv==0.) go to 110
+            if (piv==zero) go to 110
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(j,1),cos,sin)
       !  transformations to right hand side.
@@ -8241,7 +8206,7 @@ module fitpack_core
       !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
       !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
       !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<0.                                 c
+      !  guaranteed by taking f1>0 and f3<zero                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
@@ -8384,7 +8349,7 @@ module fitpack_core
        fpintu(nuest),fpintv(nvest),wrk(lwrk)
       integer ipar(2),nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
       !  ..local scalars
-      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,one,con1,con9,con4, &
+      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn, &
        peru,perv,ub,ue,vb,ve
       integer i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa, &
        l,lau,lav,lbu,lbv,lq,lri,lsu,lsv,l1,l2,l3,l4,mm,mpm,mvnu,ncof, &
@@ -8392,10 +8357,9 @@ module fitpack_core
        nrintv,nue,nuk,nve,nuu,nvv
 
       !   set constants
-      one = 1
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !  set boundaries of the approximation domain
       ub = u(1)
       ue = u(mu)
@@ -8774,7 +8738,7 @@ module fitpack_core
       integer nrdata(nest)
       !  ..local scalars..
       real(RKIND) acc,cos,c1,d1,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv, &
-       p1,p2,p3,sin,store,term,wi,xi,yi,rn,one,con1,con4,con9,half
+       p1,p2,p3,sin,store,term,wi,xi,yi,rn
       integer i,ich1,ich3,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk, &
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
@@ -8782,11 +8746,9 @@ module fitpack_core
       real(RKIND) h(MAX_K+1),h1(7),h2(6)
 
       !  set constants
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1: determination of the number of knots and their position     c
       !  **************************************************************      c
@@ -8992,7 +8954,7 @@ module fitpack_core
       !  rotation with the rows 1,2,...n10 of matrix a.
           do 240 j=1,n10
             piv = h1(1)
-            if(piv/=0.) go to 214
+            if(piv/=zero) go to 214
             do 212 i=1,kk
               h1(i) = h1(i+1)
  212        continue
@@ -9021,7 +8983,7 @@ module fitpack_core
             ij = n10+j
             if(ij<=0) go to 270
             piv = h2(j)
-            if(piv==0.) go to 270
+            if (piv==zero) go to 270
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a2(ij,j),cos,sin)
       !  transformations to right hand side.
@@ -9044,7 +9006,7 @@ module fitpack_core
           do 140 i=1,kk1
             j = j+1
             piv = h(i)
-            if(piv==0.) go to 140
+            if (piv==zero) go to 140
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a1(j,1),cos,sin)
       !  transformations to right hand side.
@@ -9148,7 +9110,7 @@ module fitpack_core
       !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
       !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
       !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<0.                                 c
+      !  guaranteed by taking f1>0 and f3<zero                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
@@ -9456,7 +9418,7 @@ module fitpack_core
       real(RKIND) u(mu),v(mv),z(mz),tu(nuest),tv(nvest),c(nc),fpintu(nuest), &
        fpintv(nvest),dz(3),wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) acc,fpms,f1,f2,f3,p,per,pi,p1,p2,p3,vb,ve,zmax,zmin,rn,one,con1,con4,con9
+      real(RKIND) acc,fpms,f1,f2,f3,p,per,pi,p1,p2,p3,vb,ve,zmax,zmin,rn
       integer i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju, &
        ktu,l,l1,l2,l3,l4,mpm,mumin,mu0,mu1,nn,nplu,nplv,npl1,nrintu, &
        nrintv,nue,numax,nve,nvmax
@@ -9465,10 +9427,9 @@ module fitpack_core
       real(RKIND) dzz(3)
 
       !   set constants
-      one = 1d0
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !   initialization
       ifsu = 0
       ifsv = 0
@@ -9866,8 +9827,8 @@ module fitpack_core
       real(RKIND) rad
       !  ..local scalars..
       real(RKIND) acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms, &
-       f1,f2,f3,hui,huj,p,pi,pinv,piv,pi2,p1,p2,p3,r,ratio,si,sigma, &
-       sq,store,uu,u2,u3,wi,zi,rn,one,two,three,con1,con4,con9,half,ten
+       f1,f2,f3,hui,huj,p,pinv,piv,p1,p2,p3,r,ratio,si,sigma, &
+       sq,store,uu,u2,u3,wi,zi,rn
       integer i,iband,iband3,iband4,ich1,ich3,ii,il,in,ipar,ipar1,irot, &
        iter,i1,i2,i3,j,jrot,j1,j2,l,la,lf,lh,ll,lu,lv,lwest,l1,l2, &
        l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1, &
@@ -9876,16 +9837,10 @@ module fitpack_core
       real(RKIND), dimension(MAX_K+1) :: hu,hv
 
       !  set constants
-      one = 1
-      two = 2
-      three = 3
-      ten = 10
-      half = 0.5e0
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      pi = atan(one)*4
-      pi2 = pi+pi
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       ipar = iopt2*(iopt2+3)/2
       ipar1 = ipar+1
       eps = sqrt(eta)
@@ -9924,7 +9879,7 @@ module fitpack_core
          if(iopt2>0) h(4) = 0.
          do 40 j=1,4
             piv = h(j)
-            if(piv==0.) go to 40
+            if (piv==zero) go to 40
             call fpgivs(piv,a(j,1),co,si)
             call fprota(co,si,zi,f(j))
             if(j==4) go to 40
@@ -10060,7 +10015,7 @@ module fitpack_core
            cs(5) = cs(1)*cs(2)
  155       do 170 j=1,nvv
               piv = row(j)
-              if(piv==0.) go to 170
+              if (piv==zero) go to 170
               call fpgivs(piv,a(j,1),co,si)
               do 160 l=1,ipar
                  call fprota(co,si,cs(l),cosi(l,j))
@@ -10181,7 +10136,7 @@ module fitpack_core
           do 350 i=1,iband
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 350
+            if (piv==zero) go to 350
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(irot,1),co,si)
       !  apply that transformation to the right hand side.
@@ -10370,7 +10325,7 @@ module fitpack_core
       ! imated by a rational function of the form r(p) = (u*p+v)/(p+w).      c
       ! three values of p (p1,p2,p3) with corresponding values of f(p) (f1=  c
       ! f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value   c
-      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<0.c
+      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zeroc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jumps of the 3-th order derivative of
       !  the b-splines at the knots tu(l),l=5,...,nu-4.
@@ -10447,7 +10402,7 @@ module fitpack_core
             do 710 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband1,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                  if (i2<=0) go to 721
                  go to 690
               endif
@@ -10514,7 +10469,7 @@ module fitpack_core
             do 800 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband3,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                 if (i2<=0) go to 811
                 go to 780
               endif
@@ -10698,7 +10653,7 @@ module fitpack_core
         do 60 ii=i1,n
           i2 = min0(n-ii,m1)
           piv = h(1)
-          if(piv==0.) go to 30
+          if (piv==zero) go to 30
           call fpgivs(piv,a(ii,1),cos,sin)
           call fprota(cos,sin,yi,f(ii))
           if(i2==0) go to 70
@@ -10780,7 +10735,7 @@ module fitpack_core
         do 190 i1=1,ii
           j1 = min0(jj-1,m1)
           piv = h(1)
-          if(piv/=0.) go to 160
+          if(piv/=zero) go to 160
           if(j1==0) go to 200
           do 150 j2=1,j1
             j3 = j2+1
@@ -10927,18 +10882,16 @@ module fitpack_core
        fpinty(nyest),wrk(lwrk)
       integer nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
       !  ..local scalars
-      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,one,half,con1,con9,con4
+      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
       integer i,ich1,ich3,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2, &
        k3,l,lax,lay,lbx,lby,lq,lri,lsx,lsy,mk1,mm,mpm,mynx,ncof, &
        nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
        nrinty,nxe,nxk,nye
 
       !   set constants
-      one = 1
-      half = 0.5e0
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !  we partition the working space.
       kx1 = kx+1
       ky1 = ky+1
@@ -11469,7 +11422,7 @@ module fitpack_core
       real(RKIND) u(mu),v(mv),r(mr),tu(nuest),tv(nvest),c(nc),fpintu(nuest), &
        fpintv(nvest),dr(6),wrk(lwrk),step(2)
       !  ..local scalars..
-      real(RKIND) acc,fpms,f1,f2,f3,p,per,pi,p1,p2,p3,vb,ve,rmax,rmin,rn,one,con1,con4,con9
+      real(RKIND) acc,fpms,f1,f2,f3,p,per,pi,p1,p2,p3,vb,ve,rmax,rmin,rn
       integer i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju, &
        ktu,l,l1,l2,l3,l4,mpm,mumin,mu0,mu1,nn,nplu,nplv,npl1,nrintu, &
        nrintv,nue,numax,nve,nvmax
@@ -11478,10 +11431,9 @@ module fitpack_core
       real(RKIND) drr(6)
 
       !   set constants
-      one = 1d0
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !   initialization
       ifsu = 0
       ifsv = 0
@@ -11906,8 +11858,8 @@ module fitpack_core
       integer index(nrest),nummer(m)
       !  ..local scalars..
       real(RKIND) aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,facc,facs,fac1,fac2,fn, &
-       fpmax,fpms,f1,f2,f3,hti,htj,p,pi,pinv,piv,pi2,p1,p2,p3,ri,si, &
-       sigma,sq,store,wi,rn,one,con1,con9,con4,half,ten
+       fpmax,fpms,f1,f2,f3,hti,htj,p,pinv,piv,p1,p2,p3,ri,si, &
+       sigma,sq,store,wi,rn
       integer i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot, &
        iter,i1,i2,i3,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,lt,lwest,l1,l2, &
        l3,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
@@ -11916,15 +11868,11 @@ module fitpack_core
       real(RKIND), dimension(MAX_K+1) :: hp,ht
 
       !  set constants
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
-      ten = 0.1e+02
-      pi = atan(one)*4
-      pi2 = pi+pi
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       eps = sqrt(eta)
+
       if(iopt<0) go to 70
       !  calculation of acc, the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -12064,7 +12012,7 @@ module fitpack_core
            facs = sin(arg)
            do 140 j=1,npp
               piv = row(j)
-              if(piv==0.) go to 140
+              if (piv==zero) go to 140
               call fpgivs(piv,a(j,1),co,si)
               call fprota(co,si,facc,coco(j))
               call fprota(co,si,facs,cosi(j))
@@ -12183,7 +12131,7 @@ module fitpack_core
           do 310 i=1,iband
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 310
+            if (piv==zero) go to 310
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(irot,1),co,si)
       !  apply that transformation to the right hand side.
@@ -12366,7 +12314,7 @@ module fitpack_core
       ! imated by a rational function of the form r(p) = (u*p+v)/(p+w).      c
       ! three values of p (p1,p2,p3) with corresponding values of f(p) (f1=  c
       ! f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value   c
-      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<0.c
+      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zeroc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jumps of the 3-th order derivative of
       !  the b-splines at the knots tt(l),l=5,...,nt-4.
@@ -12431,7 +12379,7 @@ module fitpack_core
             do 710 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband1,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                 if (i2<=0) go to 721
                 go to 690
               endif
@@ -12448,7 +12396,7 @@ module fitpack_core
  690          do 700 l=1,i2
                 h(l) = h(l+1)
  700          continue
-              h(i2+1) = 0.
+              h(i2+1) = zero
  710        continue
  721      continue
  720    continue
@@ -12459,7 +12407,7 @@ module fitpack_core
           do 811 j=1,npp
       !  initialize the new row
             do 730 l=1,iband4
-              h(l) = 0.
+              h(l) = zero
  730        continue
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
@@ -12483,14 +12431,14 @@ module fitpack_core
             do 765 l=1,iband4
                h(l) = h(l)*pinv
  765        continue
-            ri = 0.
+            ri = zero
             jrot = 1
             if(ii>2) jrot = 3+j+(ii-3)*npp
       !  rotate the new row into triangle by givens transformations.
             do 800 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband3,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                 if (i2<=0) go to 811
                 go to 780
               endif
@@ -12507,7 +12455,7 @@ module fitpack_core
  780          do 790 l=1,i2
                 h(l) = h(l+1)
  790          continue
-              h(i2+1) = 0.
+              h(i2+1) = zero
  800        continue
  811      continue
  810    continue
@@ -12541,7 +12489,7 @@ module fitpack_core
           jrot = lt*np4+lp
           in = index(num)
  860      if(in==0) go to 890
-          store = 0.
+          store = zero
           i1 = jrot
           do 880 i=1,4
             hti = spt(in,i)
@@ -12606,7 +12554,7 @@ module fitpack_core
  960  ier = -2
       go to 990
  970  ier = -1
-      fp = 0.
+      fp = zero
  980  if(ncof/=rank) ier = -rank
  990  return
       end subroutine fpsphe
@@ -12678,7 +12626,7 @@ module fitpack_core
   90      continue
           do 120 j=1,mv
             l1 = l+lv(j)
-            sp = 0.
+            sp = zero
             do 110 i1=1,4
               l2 = l1
               do 100 j1=1,4
@@ -12714,7 +12662,7 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv, &
        piv,p1,p2,p3,sigma,sin,sq,store,wi,x0,x1,y0,y1,zi,eps, &
-       rn,one,con1,con9,con4,half,ten
+       rn
       integer i,iband,iband1,iband3,iband4,ibb,ichang,ich1,ich3,ii, &
        in,irot,iter,i1,i2,i3,j,jrot,jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l, &
        la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,nminy,nreg, &
@@ -12723,12 +12671,9 @@ module fitpack_core
       real(RKIND), dimension(MAX_K+1) :: hx,hy
 
       !  set constants
-      one = 0.1e+01
-      con1 = 0.1e0
-      con9 = 0.9e0
-      con4 = 0.4e-01
-      half = 0.5e0
-      ten = 0.1e+02
+      real(RKIND), parameter :: con1 = 0.1e0_RKIND
+      real(RKIND), parameter :: con9 = 0.9e0_RKIND
+      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 1: determination of the number of knots and their position.     c
       ! ****************************************************************     c
@@ -12915,7 +12860,7 @@ module fitpack_core
           do 220 i=1,iband
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 220
+            if (piv==zero) go to 220
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(irot,1),cos,sin)
       !  apply that transformation to the right hand side.
@@ -13153,7 +13098,7 @@ module fitpack_core
             do 540 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband1,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                 if (i2<=0) go to 551
                 go to 520
               endif
@@ -13197,7 +13142,7 @@ module fitpack_core
             do 620 irot=jrot,ncof
               piv = h(1)
               i2 = min0(iband3,ncof-irot)
-              if(piv==0.) then
+              if (piv==zero) then
                 if (i2<=0) go to 631
                 go to 600
               endif
@@ -13639,7 +13584,7 @@ module fitpack_core
          do 540 irot=1,n11
             piv = h1(1)
             i2 = min0(n11-irot,4)
-            if(piv==0.) go to 500
+            if (piv==zero) go to 500
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(irot,1),co,si)
       !  apply that transformation to the columns of matrix q.
@@ -13672,7 +13617,7 @@ module fitpack_core
             ij = n11+irot
             if(ij<=0) go to 620
             piv = h2(irot)
-            if(piv==0.) go to 620
+            if (piv==zero) go to 620
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,aa(ij,irot),co,si)
       !  apply that transformation to the columns of matrix q.
@@ -13699,19 +13644,19 @@ module fitpack_core
          do 700 i=1,5
             irot = irot+1
             piv = h(i)
-            if(piv==0.) go to 700
+            if (piv==zero) go to 700
       !  calculate the parameters of the givens transformation.
             call fpgivs(piv,a(irot,1),co,si)
       !  apply that transformation to the columns of matrix g.
             j = 0
-            do 660 ii=1,idim
+            do ii=1,idim
                l = (ii-1)*m3+irot
                do jj=1,mm
                  j = j+1
                  call fprota(co,si,right(j),q(l))
                  l = l+n7
                end do
- 660        continue
+            end do
       !  apply that transformation to the rows of (a).
             if(i==5) go to 700
             i2 = 1
@@ -14101,7 +14046,7 @@ module fitpack_core
 
       !  we set up the parameters tol and maxit
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -14153,7 +14098,7 @@ module fitpack_core
       if (ier==0) go to 80
       go to 90
   70  if(s<0.) go to 90
-      if(s==0. .and. nest<(m+k1)) go to 90
+      if(s==zero .and. nest<(m+k1)) go to 90
       ier = 0
       ! we partition the working space and determine the spline curve.
   80  ifp = 1
@@ -14955,7 +14900,7 @@ module fitpack_core
       !  ..
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -15042,7 +14987,7 @@ module fitpack_core
       if (ier==0) go to 150
       go to 200
  100  if(s<0.) go to 200
-      if(s==0. .and. (nuest<(mu+4+2*ipar(1)) .or. &
+      if(s==zero .and. (nuest<(mu+4+2*ipar(1)) .or. &
        nvest<(mv+4+2*ipar(2))) )go to 200
       ier = 0
       !  we partition the working space and determine the spline approximation
@@ -15285,7 +15230,7 @@ module fitpack_core
       !  ..
       !  we set up the parameters tol and maxit
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -15322,7 +15267,7 @@ module fitpack_core
       if (ier==0) go to 40
       go to 50
   30  if(s<0.) go to 50
-      if(s==0. .and. nest<(m+2*k)) go to 50
+      if(s==zero .and. nest<(m+2*k)) go to 50
       ier = 0
       ! we partition the working space and determine the spline approximation.
   40  ifp = 1
@@ -15666,19 +15611,16 @@ module fitpack_core
       real(RKIND) u(mu),v(mv),z(mu*mv),c((nuest-4)*(nvest-4)),tu(nuest), &
        tv(nvest),wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) per,pi,tol,uu,ve,zmax,zmin,one,half,rn,zb
+      real(RKIND) per,tol,uu,ve,zmax,zmin,rn,zb
       integer i,i1,i2,j,jwrk,j1,j2,kndu,kndv,knru,knrv,kwest,l, &
        ldz,lfpu,lfpv,lwest,lww,m,maxit,mumin,muu,nc
 
       !  set constants
-      one = 1d0
-      half = 0.5e0
-      pi = datan2(0d0,-one)
       per = pi+pi
       ve = v(1)+per
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations, a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -15782,9 +15724,8 @@ module fitpack_core
       call fpchep(wrk(9),mv+1,tv,nv,3,ier)
       if (ier==0) go to 150
       go to 200
- 140  if(s<0.) go to 200
-      if(s==0. .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. &
-       nvest<(mv+7)) ) go to 200
+ 140  if(s<zero) go to 200
+      if(s==zero .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) go to 200
       !  we partition the working space and determine the spline approximation
  150  ldz = 5
       lfpu = 9
@@ -16164,7 +16105,7 @@ module fitpack_core
       one = 1d0
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
       ier = 10
@@ -16195,9 +16136,9 @@ module fitpack_core
       do 10 i=1,m
         if(w(i)<=0.) go to 60
         dist = x(i)**2+y(i)**2
-        u(i) = 0.
-        v(i) = 0.
-        if(dist<=0.) go to 10
+        u(i) = zero
+        v(i) = zero
+        if(dist<=zero) go to 10
         v(i) = datan2(y(i),x(i))
         r = rad(v(i))
         if(r<=0.) go to 60
@@ -16207,7 +16148,7 @@ module fitpack_core
       if(iopt1==0) go to 40
       nuu = nu-8
       if(nuu<1 .or. nu>nuest) go to 60
-      tu(4) = 0.
+      tu(4) = zero
       do 20 i=1,nuu
          j = i+4
          if(tu(j)<=tu(j-1) .or. tu(j)>=one) go to 60
@@ -16335,7 +16276,7 @@ module fitpack_core
       m0 = (l-kx1)*nky1+1
       do 140 i=1,nky1
         m = m0
-        sum = 0.
+        sum = zero
         do 130 j=1,kx1
           sum = sum+h(j)*c(m)
           m = m+nky1
@@ -16358,7 +16299,7 @@ module fitpack_core
       m0 = l-ky
       do 240 i=1,nkx1
         m = m0
-        sum = 0.
+        sum = zero
         do 230 j=1,ky1
           sum = sum+h(j)*c(m)
           m = m+1
@@ -16654,7 +16595,7 @@ module fitpack_core
       !  ..
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -16704,7 +16645,7 @@ module fitpack_core
       if (ier==0) go to 60
       go to 70
   50  if(s<0.) go to 70
-      if(s==0. .and. (nxest<(mx+kx1) .or. nyest<(my+ky1)) ) &
+      if(s==zero .and. (nxest<(mx+kx1) .or. nyest<(my+ky1)) ) &
        go to 70
       ier = 0
       !  we partition the working space and determine the spline approximation
@@ -17136,19 +17077,16 @@ module fitpack_core
       real(RKIND) u(mu),v(mv),r(mu*mv),c((nuest-4)*(nvest-4)),tu(nuest), &
        tv(nvest),wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) per,pi,tol,uu,ve,rmax,rmin,one,half,rn,rb,re
+      real(RKIND) per,tol,uu,ve,rmax,rmin,rn,rb,re
       integer i,i1,i2,j,jwrk,j1,j2,kndu,kndv,knru,knrv,kwest,l, &
        ldr,lfpu,lfpv,lwest,lww,m,maxit,mumin,muu,nc
 
       !  set constants
-      one = 1d0
-      half = 0.5e0
-      pi = datan2(0d0,-one)
       per = pi+pi
       ve = v(1)+per
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations, a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = 10
@@ -17278,7 +17216,7 @@ module fitpack_core
       if (ier==0) go to 150
       go to 200
  140  if(s<0.) go to 200
-      if(s==0. .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. &
+      if(s==zero .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. &
        nvest<(mv+7)) ) go to 200
       !  we partition the working space and determine the spline approximation
  150  ldr = 5
@@ -17615,16 +17553,14 @@ module fitpack_core
        c((ntest-4)*(npest-4)),wrk1(lwrk1),wrk2(lwrk2)
       integer iwrk(kwrk)
       !  ..local scalars..
-      real(RKIND) tol,pi,pi2,one
+      real(RKIND) tol
       integer i,ib1,ib3,ki,kn,kwest,la,lbt,lcc,lcs,lro,j, &
        lbp,lco,lf,lff,lfp,lh,lq,lst,lsp,lwest,maxit,ncest,ncc,ntt, &
        npp,nreg,nrint,ncof,nt4,np4
 
-      !  set constants
-      one = 0.1e+01
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
       ier = 10
@@ -17649,12 +17585,11 @@ module fitpack_core
       kwest = m+nreg
       if(lwrk1<lwest .or. kwrk<kwest) go to 80
       if(iopt>0) go to 60
-      pi = atan(one)*4
-      pi2 = pi+pi
+
       do 20 i=1,m
         if(w(i)<=0.) go to 80
         if(teta(i)<0. .or. teta(i)>pi) go to 80
-        if(phi(i) <0. .or. phi(i)>pi2) go to 80
+        if(phi(i) <zero .or. phi(i)>pi2) go to 80
   20  continue
       if(iopt==0) go to 60
       ntt = nt-8
@@ -17883,7 +17818,7 @@ module fitpack_core
       !  evaluate the non-zero b-splines of degree k-nu at arg.
  150    call fpbspl(t,n,kk,arg,l,h)
       !  find the value of the derivative at x=arg.
-        sp = 0.0d0
+        sp = zero
         ll = l-k1
         do 160 j=1,k2
           ll = ll+1
@@ -18022,7 +17957,7 @@ module fitpack_core
       !  evaluate the non-zero b-splines at arg.
   50    call fpbspl(t, n, k, arg, l, h)
       !  find the value of s(x) at x=arg.
-        sp = 0.0d0
+        sp = zero
         ll = l - k1
         do 60 j = 1, k1
           ll = ll + 1
@@ -18088,7 +18023,7 @@ module fitpack_core
       !  ni,k+1(x), i=1,2,...nk1.
       call fpintb(t,n,wrk,nk1,a,b)
       !  calculate the integral of s(x).
-      splint_res = 0.0d0
+      splint_res = zero
       do 10 i=1,nk1
         splint_res = splint_res+c(i)*wrk(i)
   10  continue
@@ -18096,7 +18031,7 @@ module fitpack_core
       end function splint
 
 
-      recursive subroutine sproot(t,n,c,zero,mest,m,ier)
+      recursive subroutine sproot(t,n,c,zeros,mest,m,ier)
 
       !  subroutine sproot finds the zeros of a cubic spline s(x),which is
       !  given in its normalized b-spline representation.
@@ -18138,18 +18073,15 @@ module fitpack_core
       ! ..scalar arguments..
       integer n,mest,m,ier
       !  ..array arguments..
-      real(RKIND) t(n),c(n),zero(mest)
+      real(RKIND) t(n),c(n),zeros(mest)
       !  ..local scalars..
       integer i,j,j1,l,n4
       real(RKIND) ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2, &
-       three,two,t1,t2,t3,t4,t5,zz
+       t1,t2,t3,t4,t5,zz
       logical z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
       !  ..local array..
       real(RKIND) y(3)
       !  ..
-      !  set some constants
-      two = 0.2d+01
-      three = 0.3d+01
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       n4 = n-4
@@ -18193,7 +18125,7 @@ module fitpack_core
       a0 = (h2*d4+h1*d5)/t2
       ah = three*(h2*c4+h1*c5)/t2
       z1 = .true.
-      if(ah<0.0d0) z1 = .false.
+      if (ah<zero) z1 = .false.
       nz1 = .not.z1
       m = 0
       !  main loop for the different knot intervals.
@@ -18225,17 +18157,17 @@ module fitpack_core
       !  test whether or not pl(x) could have a zero in the range
       !  t(l) <= x <= t(l+1).
         z3 = .true.
-        if(b1<0.0d0) z3 = .false.
+        if(b1<zero) z3 = .false.
         nz3 = .not.z3
-        if(a0*b0<=0.0d0) go to 100
+        if(a0*b0<=zero) go to 100
         z0 = .true.
-        if(a0<0.0d0) z0 = .false.
+        if(a0<zero) z0 = .false.
         nz0 = .not.z0
         z2 = .true.
         if(a2<0.) z2 = .false.
         nz2 = .not.z2
         z4 = .true.
-        if(3.0d0*a3+a2<0.0d0) z4 = .false.
+        if(3.0d0*a3+a2<zero) z4 = .false.
         nz4 = .not.z4
         if(.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and. &
        z3.and.z4).or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and. &
@@ -18245,11 +18177,11 @@ module fitpack_core
         if(j==0) go to 200
       !  find which zeros of pl(x) are zeros of s(x).
         do 150 i=1,j
-          if(y(i)<0.0d0 .or. y(i)>1.0d0) go to 150
+          if(y(i)<zero .or. y(i)>one) go to 150
       !  test whether the number of zeros of s(x) exceeds mest.
           if(m>=mest) go to 700
           m = m+1
-          zero(m) = t(l)+h1*y(i)
+          zeros(m) = t(l)+h1*y(i)
  150    continue
  200    a0 = b0
         ah = bh
@@ -18262,19 +18194,19 @@ module fitpack_core
         j = i
  350    j1 = j-1
         if(j1==0) go to 400
-        if(zero(j)>=zero(j1)) go to 400
-        zz = zero(j)
-        zero(j) = zero(j1)
-        zero(j1) = zz
+        if(zeros(j)>=zeros(j1)) go to 400
+        zz = zeros(j)
+        zeros(j) = zeros(j1)
+        zeros(j1) = zz
         j = j1
         go to 350
  400  continue
       j = m
       m = 1
       do 500 i=2,j
-        if(zero(i)==zero(m)) go to 500
+        if(zeros(i)==zeros(m)) go to 500
         m = m+1
-        zero(m) = zero(i)
+        zeros(m) = zeros(i)
  500  continue
       go to 800
  700  ier = 1
@@ -18710,7 +18642,7 @@ module fitpack_core
 
       !  we set up the parameters tol and maxit.
       maxit = 20
-      tol = 0.1e-02
+      tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
       ier = 10
