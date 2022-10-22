@@ -13,6 +13,12 @@ An automated build is not available yet.
 - `fitpack.f90` contains the object-oriented interface
 - `fitpack_tests.f90` contains the original test programs, refactored as subroutines. 
 
+A simple command line build script is: 
+
+```
+gfortran src/fitpack_core.f90 src/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
+```
+
  
 References
 ----------

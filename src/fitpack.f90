@@ -131,7 +131,7 @@ module fitpack
         m = size(x)
 
         ! Ensure x are sorted
-        isort = argsort(x)
+        isort = RKIND_argsort(x)
         allocate(this%x,source=x(isort))
         allocate(this%y,source=y(isort))
 
@@ -268,7 +268,7 @@ module fitpack
         forall(i=1:size(list,kind=RSIZE)) ilist(i) = i
 
         ! Perform sort
-        call sort(copy,ilist)
+        call RKIND_quicksort_andlist(copy,ilist)
 
         deallocate(copy)
 
@@ -353,5 +353,43 @@ module fitpack
          end function toBeSwapped
 
     end subroutine RKIND_quicksort_andlist
+
+    elemental subroutine swap_data(a,b)
+      real(RKIND), intent(inout) :: a, b
+      real(RKIND)                :: tmp
+      tmp = a
+      a   = b
+      b   = tmp
+      return
+    end subroutine swap_data
+
+    elemental subroutine swap_size(a,b)
+      integer(RSIZE), intent(inout) :: a, b
+      integer(RSIZE)                :: tmp
+      tmp = a
+      a   = b
+      b   = tmp
+      return
+    end subroutine swap_size
+
+    elemental logical function is_before(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_before = a<b
+    end function is_before
+
+    elemental logical function is_after(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_after = a>b
+    end function is_after
+
+    elemental logical function is_ge(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_ge = a>=b
+    end function is_ge
+
+    elemental logical function is_le(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_le = a<=b
+    end function is_le
 
 end module fitpack
