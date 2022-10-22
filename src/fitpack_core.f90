@@ -1960,7 +1960,7 @@ module fitpack_core
       dblint_res = zero
       do 200 i=1,nkx1
         res = wrk(i)
-        if(res==0.) go to 200
+        if(res==zero) go to 200
         m = (i-1)*nky1
         l = nkx1
         do 100 j=1,nky1
@@ -2154,61 +2154,68 @@ module fitpack_core
       end subroutine fourco
 
 
-      recursive subroutine fpader(t,n,c,k1,x,l,d)
       !  subroutine fpader calculates the derivatives
       !             (j-1)
       !     d(j) = s     (x) , j=1,2,...,k1
       !  of a spline of order k1 at the point t(l)<=x<t(l+1), using the
       !  stable recurrence scheme of de boor
       !  ..
+      pure subroutine fpader(t,n,c,k1,x,l,d)
       !  ..scalar arguments..
-      real(RKIND) x
-      integer n,k1,l
+      real(RKIND), intent(in)  :: x
+      integer, intent(in)      :: n,k1,l
       !  ..array arguments..
-      real(RKIND) t(n),c(n),d(k1)
+      real(RKIND), intent(in)  :: t(n),c(n)
+      real(RKIND), intent(out) :: d(k1)
+
       !  ..local scalars..
-      integer i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
-      real(RKIND) ak,fac
+      integer :: i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
+      real(RKIND) :: ak,fac
       !  ..local array..
-      real(RKIND) h(20)
+      real(RKIND) :: h(20)
       !  ..
       lk = l-k1
-      do 100 i=1,k1
+      do i=1,k1
         ik = i+lk
         h(i) = c(ik)
- 100  continue
-      kj = k1
+      end do
+
+      kj  = k1
       fac = one
-      do 700 j=1,k1
+
+      order_loop: do j=1,k1
         ki = kj
         j1 = j+1
-        if(j==1) go to 300
-        i = k1
-        do 200 jj=j,k1
-          li = i+lk
-          lj = li+kj
-          h(i) = (h(i)-h(i-1))/(t(lj)-t(li))
-          i = i-1
- 200    continue
- 300    do 400 i=j,k1
-          d(i) = h(i)
- 400    continue
-        if(j==k1) go to 600
-        do jj=j1,k1
-          ki = ki-1
-          i = k1
-          do j2=jj,k1
-            li = i+lk
-            lj = li+ki
-            d(i) = ((x-t(li))*d(i)+(t(lj)-x)*d(i-1))/(t(lj)-t(li))
-            i = i-1
-          end do
-        end do
- 600    d(j) = d(k1)*fac
+        if(j>1) then
+           i = k1
+           do jj=j,k1
+              li = i+lk
+              lj = li+kj
+              h(i) = (h(i)-h(i-1))/(t(lj)-t(li))
+              i = i-1
+           end do
+        endif
+
+        d(j:k1) = h(j:k1)
+
+        if(j<k1) then
+            do jj=j1,k1
+              ki = ki-1
+              i = k1
+              do j2=jj,k1
+                li = i+lk
+                lj = li+ki
+                d(i) = ((x-t(li))*d(i)+(t(lj)-x)*d(i-1))/(t(lj)-t(li))
+                i = i-1
+              end do
+            end do
+        endif
+        d(j) = d(k1)*fac
         ak = k1-j
         fac = fac*ak
         kj = kj-1
- 700  continue
+      end do order_loop
+
       return
       end subroutine fpader
 
@@ -3246,9 +3253,7 @@ module fitpack_core
               j1 = j1+n
  217        continue
       !  transformations to the left hand side with respect to a2.
-            do 220 i=1,kk
-              call fprota(cos,sin,h2(i),a2(j,i))
- 220        continue
+            call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
             if(j==n10) go to 250
             i2 = min0(n10-j,kk)
       !  transformations to the left hand side with respect to a1.
@@ -3276,15 +3281,11 @@ module fitpack_core
             if(j==kk) go to 280
             j1 = j+1
       !  transformations to left hand side.
-            do 260 i=j1,kk
-              call fprota(cos,sin,h2(i),a2(ij,i))
- 260        continue
+            call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
  270      continue
       !  add contribution of this row to the sum of squares of residual
       !  right hand sides.
- 280      do 282 j2=1,idim
-            fp = fp+xi(j2)**2
- 282      continue
+ 280      fp = fp+sum(xi(1:idim)**2)
           go to 290
       !  rotation of the new row of the observation matrix into
       !  triangle in case the b-splines nj,k+1(u),j=n7+1,...n-k-1 are all zero
@@ -3340,7 +3341,7 @@ module fitpack_core
         fpms = fp-s
         if(abs(fpms)<acc) go to 660
       !  if f(p=inf) < s accept the choice of knots.
-        if(fpms<0.) go to 350
+        if(fpms<zero) go to 350
       !  if n=nmax, sinf(u) is an interpolating curve.
         if(n==nmax) go to 630
       !  increase the number of knots.
@@ -5426,7 +5427,7 @@ module fitpack_core
       real(RKIND) arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
 
       integer i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jj,jk,jper, &
-       j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
+       j0,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
        numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
       real(RKIND) h(MAX_K+1),h1(5),h2(4)
@@ -5670,10 +5671,7 @@ module fitpack_core
           call fpgivs(piv,au(irot,1),co,si)
       !  apply that transformation to the rows of matrix (qq).
           iq = (irot-1)*mvv
-          do 370 j=1,mvv
-            iq = iq+1
-            call fprota(co,si,right(j),q(iq))
- 370      continue
+          call fprota(co,si,right(1:mvv),q(iq+1:iq+mvv))
       !  apply that transformation to the columns of (auu).
           if(i==i1) go to 390
           i2 = 1
@@ -5793,15 +5791,11 @@ module fitpack_core
                ic = ic+nv7
  610        continue
       !  apply that transformation to the rows of (avv) with respect to av2.
-            do 620 i=1,4
-               call fprota(co,si,h2(i),av2(j,i))
- 620        continue
+            call fprota(co,si,h2(1:4),av2(j,1:4))
       !  apply that transformation to the rows of (avv) with respect to av1.
             if(i2==0) go to 670
-            do 630 i=1,i2
-               i1 = i+1
-               call fprota(co,si,h1(i1),av1(j,i1))
- 630        continue
+
+            call fprota(co,si,h1(2:i2+1),av1(j,2:i2+1))
 
  640        h1(1:i2+1) = [h1(2:i2+1),zero]
 
@@ -5822,15 +5816,10 @@ module fitpack_core
  680        continue
             if(j==4) go to 700
       !  apply that transformation to the rows of (avv) with respect to av2.
-            j1 = j+1
-            do 690 i=j1,4
-               call fprota(co,si,h2(i),av2(ij,i))
- 690        continue
+            call fprota(co,si,h2(j+1:4),av2(ij,j+1:4))
  700     continue
       ! we update the sum of squared residuals
-         do 705 i=1,nuu
-           sq = sq+right(i)**2
- 705     continue
+         sq = sq+sum(right(1:nuu)**2)
          go to 750
       !  rotation into triangle of the new row of (avv), in case the elements
       !  corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
@@ -6406,13 +6395,11 @@ module fitpack_core
           h(j) = bx(n1,j)*pinv
  160    continue
       !  find the appropriate column of q.
-        do 170 j=1,my
-          right(j) = 0.
- 170    continue
+        right(1:my) = zero
         irot = nrold
         go to 210
       !  fetch a new row of matrix (spx).
- 180    h(ibandx) = 0.
+ 180    h(ibandx) = zero
         do 190 j=1,kx1
           h(j) = spx(it,j)
  190    continue
@@ -6431,10 +6418,7 @@ module fitpack_core
           call fpgivs(piv,ax(irot,1),cos,sin)
       !  apply that transformation to the rows of matrix q.
           iq = (irot-1)*my
-          do 220 j=1,my
-            iq = iq+1
-            call fprota(cos,sin,right(j),q(iq))
- 220      continue
+          call fprota(cos,sin,right(1:my),q(iq+1:iq+my))
       !  apply that transformation to the columns of (ax).
           if(i==ibandx) go to 250
           i2 = 1
@@ -6539,13 +6523,9 @@ module fitpack_core
       !                  tx(r+kx) <= x(i) <= tx(r+kx+1)
       !    fpy(r) = sumi=1,mx(sum''j(res(i,j))) , r=1,2,...,ny-2*ky-1
       !                  ty(r+ky) <= y(j) <= ty(r+ky+1)
-      fp = 0.
-      do 490 i=1,nx
-        fpx(i) = 0.
- 490  continue
-      do 500 i=1,ny
-        fpy(i) = 0.
- 500  continue
+      fp  = zero
+      fpx = zero
+      fpy = zero
       nk1y = ny-ky1
       iz = 0
       nroldx = 0
@@ -6605,15 +6585,13 @@ module fitpack_core
       integer ifsu,ifsv,ifbu,ifbv,iback,mu,mv,mr,iop0,iop1,nu,nv,nc, &
        mm,mvnu
       !  ..array arguments..
-      real(RKIND) u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv) &
-      , &
+      real(RKIND) u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv), &
        spu(mu,4),spv(mv,4),right(mm),q(mvnu),au(nu,5),av1(nv,6),c0(nv), &
        av2(nv,4),a0(2,mv),b0(2,nv),cosi(2,nv),bu(nu,5),bv(nv,5),c1(nv), &
        a1(2,mv),b1(2,nv)
       integer nru(mu),nrv(mv)
       !  ..local scalars..
-      real(RKIND) arg,co,dr01,dr02,dr03,dr11,dr12,dr13,fac,fac0,fac1,pinv,piv &
-      , &
+      real(RKIND) arg,co,dr01,dr02,dr03,dr11,dr12,dr13,fac,fac0,fac1,pinv,piv, &
        si,term
       integer i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
        j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
@@ -7038,9 +7016,7 @@ module fitpack_core
                ic = ic+nv7
  610        continue
       !  apply that transformation to the rows of (avv) with respect to av2.
-            do 620 i=1,4
-               call fprota(co,si,h2(i),av2(j,i))
- 620        continue
+            call fprota(co,si,h2(1:4),av2(j,1:4))
       !  apply that transformation to the rows of (avv) with respect to av1.
             if(i2==0) go to 670
             do 630 i=1,i2
@@ -7067,9 +7043,7 @@ module fitpack_core
             if(j==4) go to 700
       !  apply that transformation to the rows of (avv) with respect to av2.
             j1 = j+1
-            do 690 i=j1,4
-               call fprota(co,si,h2(i),av2(ij,i))
- 690        continue
+            call fprota(co,si,h2(j1:4),av2(ij,j1:4))
  700     continue
       !  we update the sum of squared residuals.
          do 705 i=1,nuu
@@ -8108,11 +8082,9 @@ module fitpack_core
  110      continue
       !  add contribution of this row to the sum of squares of residual
       !  right hand sides.
- 120      do 125 j2=1,idim
-             fp  = fp+xi(j2)**2
- 125      continue
+ 120      fp = fp + sum(xi(1:idim)**2)
  130    continue
-        if(ier==(-2)) fp0 = fp
+        if(ier==-2) fp0 = fp
         fpint(n) = fp0
         fpint(n-1) = fpold
         nrdata(n) = nplus
@@ -10895,6 +10867,7 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       !  we partition the working space.
       kx1 = kx+1
       ky1 = ky+1
@@ -11231,87 +11204,100 @@ module fitpack_core
  440  return
       end subroutine fpregr
 
-
-
-      recursive subroutine fprota(cos,sin,a,b)
       !  subroutine fprota applies a givens rotation to a and b.
-      !  ..
-      !  ..scalar arguments..
-      real(RKIND) cos,sin,a,b
-      ! ..local scalars..
-      real(RKIND) stor1,stor2
-      !  ..
-      stor1 = a
-      stor2 = b
-      b = cos*stor2+sin*stor1
-      a = cos*stor1-sin*stor2
-      return
+      elemental subroutine fprota(cos,sin,a,b)
+
+          !  ..scalar arguments..
+          real(RKIND), intent(in)    :: cos,sin
+          real(RKIND), intent(inout) :: a,b
+
+          ! ..local scalars..
+          real(RKIND) stor1,stor2
+
+          !  ..
+          stor1 = a
+          stor2 = b
+          b = cos*stor2+sin*stor1
+          a = cos*stor1-sin*stor2
+          return
+
       end subroutine fprota
 
-
-      recursive subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
 
       !  given the coefficients of a constrained bicubic spline, as determined
       !  in subroutine fppola, subroutine fprppo calculates the coefficients
       !  in the standard b-spline representation of bicubic splines.
+      pure subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
+
       !  ..
       !  ..scalar arguments..
-      real(RKIND) ratio
-      integer nu,nv,if1,if2,ncoff
+      real(RKIND), intent(in) :: ratio
+      integer, intent(in) :: if1,if2,nu,nv,ncoff
       !  ..array arguments
-      real(RKIND) c(ncoff),f(ncoff),cosi(5,nv)
+      real(RKIND), intent(inout) :: c(ncoff),f(ncoff)
+      real(RKIND), intent(in) :: cosi(5,nv)
       !  ..local scalars..
-      integer i,iopt,ii,j,k,l,nu4,nvv
+      integer :: i,iopt,ii,j,k,l,nu4,nvv
       !  ..
-      nu4 = nu-4
-      nvv = nv-7
+      nu4  = nu-4
+      nvv  = nv-7
       iopt = if1+1
-      do 10 i=1,ncoff
-         f(i) = 0.
-  10  continue
-      i = 0
-      do 120 l=1,nu4
+      f    = zero
+      i    = 0
+
+      main_loop: do l=1,nu4
          ii = i
-         if(l>iopt) go to 80
-         go to (20,40,60),l
-  20     do 30 k=1,nvv
-            i = i+1
-            f(i) = c(1)
-  30     continue
-         j = 1
-         go to 100
-  40     do 50 k=1,nvv
-            i = i+1
-            f(i) = c(1)+c(2)*cosi(1,k)+c(3)*cosi(2,k)
-  50     continue
-         j = 3
-         go to 100
-  60     do 70 k=1,nvv
-            i = i+1
-            f(i) = c(1)+ratio*(c(2)*cosi(1,k)+c(3)*cosi(2,k))+ &
-                   c(4)*cosi(3,k)+c(5)*cosi(4,k)+c(6)*cosi(5,k)
-  70     continue
-         j = 6
-         go to 100
-  80     if(l==nu4 .and. if2/=0) go to 120
-         do 90 k=1,nvv
-            i = i+1
-            j = j+1
-            f(i) = c(j)
-  90     continue
- 100     do 110 k=1,3
+         if(l==nu4 .and. if2/=0) then
+            exit main_loop
+         elseif (l>iopt) then
+
+             do k=1,nvv
+                i = i+1
+                j = j+1
+                f(i) = c(j)
+             end do
+
+         elseif (l==1) then
+
+             do k=1,nvv
+                i = i+1
+                f(i) = c(1)
+             end do
+             j = 1
+
+         elseif (l==2) then
+
+             do k=1,nvv
+                i = i+1
+                f(i) = c(1)+c(2)*cosi(1,k)+c(3)*cosi(2,k)
+             end do
+             j = 3
+
+
+         elseif (l==3) then
+
+             do k=1,nvv
+                i = i+1
+                f(i) = c(1)+ratio*(c(2)*cosi(1,k)+c(3)*cosi(2,k))+ &
+                       c(4)*cosi(3,k)+c(5)*cosi(4,k)+c(6)*cosi(5,k)
+             end do
+             j = 6
+
+         end if
+
+
+         do k=1,3
             ii = ii+1
             i = i+1
             f(i) = f(ii)
- 110     continue
- 120  continue
-      do 130 i=1,ncoff
-         c(i) = f(i)
- 130  continue
+         end do
+
+      end do main_loop
+
+      c = f
+
       return
       end subroutine fprppo
-
-
 
       recursive subroutine fprpsp(nt,np,co,si,c,f,ncoff)
 
@@ -11906,11 +11892,11 @@ module fitpack_core
          fn = fac2*arg*arg*(fac1-arg)
          f1 = (one-fn)*wi
          fn = fn*wi
-         if(fn==0.) go to 20
+         if(fn==zero) go to 20
          call fpgivs(fn,d1,co,si)
          call fprota(co,si,f1,aa)
          call fprota(co,si,ri,cn)
- 20      if(f1==0.) go to 30
+ 20      if(f1==zero) go to 30
          call fpgivs(f1,d2,co,si)
          call fprota(co,si,ri,c1)
  30      sup = sup+ri*ri
@@ -16668,15 +16654,12 @@ module fitpack_core
       end subroutine regrid
 
 
-
-      recursive subroutine spalde(t,n,c,k1,x,d,ier)
-
-      !  subroutine spalde evaluates at a point x all the derivatives
+      !  subroutine spalde evaluates at a point x ALL the derivatives
       !              (j-1)
       !      d(j) = s     (x) , j=1,2,...,k1
-      !  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline
-      !  representation.
-      !
+      !  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
+      recursive subroutine spalde(t,n,c,k1,x,d,ier)
+
       !  calling sequence:
       !     call spalde(t,n,c,k1,x,d,ier)
       !
@@ -16720,28 +16703,36 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer n,k1,ier
-      real(RKIND) x
+      integer, intent(in)      :: n,k1
+      integer, intent(out)     :: ier
+
+      real(RKIND), intent(in)  :: x
       !  ..array arguments..
-      real(RKIND) t(n),c(n),d(k1)
+      real(RKIND), intent(in)  :: t(n),c(n)
+      real(RKIND), intent(out) :: d(k1)
+
       !  ..local scalars..
-      integer l,nk1
+      integer :: l,nk1
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       nk1 = n-k1
-      if(x<t(k1) .or. x>t(nk1+1)) go to 300
+
+      if(x<t(k1) .or. x>t(nk1+1)) return
+
       !  search for knot interval t(l) <= x < t(l+1)
       l = k1
- 100  if(x<t(l+1) .or. l==nk1) go to 200
-      l = l+1
-      go to 100
- 200  if(t(l)>=t(l+1)) go to 300
-      ier = 0
+      do while (.not.(x<t(l+1) .or. l==nk1))
+         l = l+1
+      end do
+
+      if(t(l)>=t(l+1)) return
+
       !  calculate the derivatives.
+      ier = FITPACK_OK
       call fpader(t,n,c,k1,x,l,d)
- 300  return
+
       end subroutine spalde
 
 
