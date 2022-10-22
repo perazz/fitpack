@@ -4,7 +4,7 @@
 !                              / /_   / /  / / / /_/ / /| |/ /   / ,<
 !                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
 !                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
-!                                      
+!
 !                                     A Curve Fitting Package
 !
 !   Refactored by Federico Perini, 10/6/2022
@@ -25,37 +25,46 @@ module fitpack
     ! Public interface
     public :: RKIND
 
-    ! Max fitting degree    
+    ! Max fitting degree
     integer, parameter :: MAX_K = 5
 
-    ! A public type describing a curve fitter
-    type, public :: fitpack_fitter
+    !> A public type describing a curve fitter
+    type, public :: fitpack_curve
 
-        ! The data points
+        !> The data points
         integer :: m = 0
         real(RKIND), allocatable :: x(:),y(:)
 
-        ! Spline degree
+        !> Spline degree
         integer :: order = 3
 
-        ! Interval boundaries
+        !> Interval boundaries
         real(RKIND) :: xleft,xright
 
         ! Node weights
         real(RKIND), allocatable :: sp(:),w(:)
 
         ! Estimated and actual number of knots and their allocations
-        integer :: nest  = 0
-        integer :: lwrk  = 0
-        integer, allocatable :: iwrk(:)
+        integer                  :: nest  = 0
+        integer                  :: lwrk  = 0
+        integer, allocatable     :: iwrk(:)
         real(RKIND), allocatable :: wrk(:)
 
-        ! Spline representation
+        ! Curve fit smoothing parameter (fit vs. points MSE)
         real(RKIND) :: smoothing = 1000.d0
+
+        ! Actual curve MSE
         real(RKIND) :: fp = 0.d0
-        integer      :: knots = 0
-        real(RKIND), allocatable :: t(:)  ! Position
-        real(RKIND), allocatable :: c(:)  ! Spline coefficients [knots-order-1]
+
+        ! Curve extrapolation behavior
+        integer     :: bc = SPLINE_NEAREST_BND
+
+        ! Knots
+        integer     :: knots = 0
+        real(RKIND), allocatable :: t(:)  ! Knot location
+
+        ! Spline coefficients [knots-order-1]
+        real(RKIND), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = 0
@@ -71,18 +80,49 @@ module fitpack
            !> Generate new fit
            procedure :: new_fit
 
-           !> Generate/update fit
+           !> Generate/update fitting curve, with optional smoothing
            procedure :: fit => curve_fit_automatic_knots
 
            !> Evaluate curve at given coordinates
            procedure :: eval => curve_eval
 
-    end type fitpack_fitter
+           !> Evaluate derivative at given coordinates
+           procedure, private :: curve_derivative
+           procedure, private :: curve_derivatives
+           generic   :: dfdx => curve_derivative,curve_derivatives
+
+           !> Properties: MSE
+           procedure, non_overridable :: mse => curve_error
+
+
+    end type fitpack_curve
+
+    ! Default constructor
+    interface fitpack_curve
+       module procedure new_from_points
+    end interface fitpack_curve
+
 
     contains
 
+    ! A default constructor
+    type(fitpack_curve) function new_from_points(x,y,w,ierr) result(this)
+        real(RKIND), intent(in) :: x(:),y(size(x))
+        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        integer, optional, intent(out) :: ierr
+
+        integer :: ierr0
+
+        ierr0 = this%new_fit(x,y,w)
+
+        ! Error handling
+        call fitpack_error_handling(ierr0,ierr,'new curve fit')
+
+    end function new_from_points
+
+    ! Fit a new curve
     integer function new_fit(this,x,y,w)
-        class(fitpack_fitter), intent(inout) :: this
+        class(fitpack_curve), intent(inout) :: this
         real(RKIND), intent(in) :: x(:),y(size(x))
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
 
@@ -92,7 +132,7 @@ module fitpack
     end function new_fit
 
     elemental subroutine destroy(this)
-       class(fitpack_fitter), intent(inout) :: this
+       class(fitpack_curve), intent(inout) :: this
        integer :: ierr
        this%m = 0
        deallocate(this%x,stat=ierr)
@@ -103,22 +143,22 @@ module fitpack
        deallocate(this% wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
-       this%xleft = 0.d0
-       this%xright = 0.d0
+       this%xleft = 0.0_RKIND
+       this%xright = 0.0_RKIND
 
        this%smoothing = 1000.d0
-       this%order = 3
-       this%iopt = 0
-       this%nest = 0
-       this%lwrk = 0
-       this%knots = 0
-       this%fp = 0.d0
-
+       this%order     = 3
+       this%iopt      = 0
+       this%nest      = 0
+       this%lwrk      = 0
+       this%knots     = 0
+       this%fp        = 0.0_RKIND
+       this%bc        = SPLINE_NEAREST_BND
 
     end subroutine destroy
 
     subroutine new_points(this,x,y,w)
-        class(fitpack_fitter), intent(inout) :: this
+        class(fitpack_curve), intent(inout) :: this
         real(RKIND), intent(in) :: x(:),y(size(x))
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
 
@@ -163,35 +203,36 @@ module fitpack
     end subroutine new_points
 
     ! Curve evaluation driver
-    integer function curve_eval(this,x,y) result(ierr)
-        class(fitpack_fitter), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:)
-        real(RKIND), intent(out) :: y(size(x))
+    function curve_eval(this,x,ierr) result(y)
+        class(fitpack_curve), intent(inout)  :: this
+        real(RKIND),          intent(in)     :: x(:)   ! Evaluation points
+        integer, optional,    intent(out)    :: ierr   ! Optional error flag
+        real(RKIND) :: y(size(x))
 
-        integer :: npts
+        integer :: npts,ier
 
         npts = size(x)
 
-      !  subroutine splev evaluates in a number of points x(i),i=1,2,...,m
-      !  a spline s(x) of degree k, given in its b-spline representation.
-      !
-      !  calling sequence:
-      !     call splev(t,n,c,k,x,y,m,e,ier)
-      !
-      !  input parameters:
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(x).
-      !    c    : array,length n, which contains the b-spline coefficients.
-      !    k    : integer, giving the degree of s(x).
-      !    x    : array,length m, which contains the points where s(x) must
-      !           be evaluated.
-      !    m    : integer, giving the number of points where s(x) must be
-      !           evaluated.
-      !    e    : integer, if 0 the spline is extrapolated from the end
-      !           spans for points not in the support, if 1 the spline
-      !           evaluates to zero for those points, if 2 ier is set to
-      !           1 and the subroutine returns, and if 3 the spline evaluates
-      !           to the value of the nearest boundary point.
+        !  subroutine splev evaluates in a number of points x(i),i=1,2,...,m
+        !  a spline s(x) of degree k, given in its b-spline representation.
+        !
+        !  calling sequence:
+        !     call splev(t,n,c,k,x,y,m,e,ier)
+        !
+        !  input parameters:
+        !    t    : array,length n, which contains the position of the knots.
+        !    n    : integer, giving the total number of knots of s(x).
+        !    c    : array,length n, which contains the b-spline coefficients.
+        !    k    : integer, giving the degree of s(x).
+        !    x    : array,length m, which contains the points where s(x) must
+        !           be evaluated.
+        !    m    : integer, giving the number of points where s(x) must be
+        !           evaluated.
+        !    e    : integer, if 0 the spline is extrapolated from the end
+        !           spans for points not in the support, if 1 the spline
+        !           evaluates to zero for those points, if 2 ier is set to
+        !           1 and the subroutine returns, and if 3 the spline evaluates
+        !           to the value of the nearest boundary point.
 
         call splev(t=this%t,&                      ! the position of the knots
                    n=this%knots,&                  ! total number of knots of s(x)
@@ -199,25 +240,16 @@ module fitpack
                    k=this%order,&                  ! the degree of s(x)
                    x=x,m=npts,&                    ! the points where s(x) must be evaluated.
                    y=y, &                          ! the predictions
-                   e=SPLINE_NEAREST_BND,&          ! What to do outside mapped knot range
-                   ier=ierr)
+                   e=this%bc,           &          ! What to do outside mapped knot range
+                   ier=ier)
 
-!        call curev(idim=1,&                        ! dimension of the spline curve.
-!                   t=this%t,&                      ! the position of the knots
-!                   n=this%knots,&                  ! total number of knots of s(u)
-!                   c=this%c,&                      ! the b-spline coefficients
-!                   nc=this%knots-this%order+1, &   ! number of coefficients of s(u)
-!                   k=this%order,&                  ! the degree of s(u)
-!                   u=x,m=npts,&                    ! the points where s(u) must be evaluated.
-!                   x=y,&
-!                   mx=npts,&                       ! the dimension of array x
-!                   ier=ierr)
+        call fitpack_error_handling(ier,ierr,'evaluate 1d spline')
 
     end function curve_eval
 
     ! Curve fitting driver: automatic number of knots
     integer function curve_fit_automatic_knots(this,smoothing) result(ierr)
-        class(fitpack_fitter), intent(inout) :: this
+        class(fitpack_curve), intent(inout) :: this
         real(RKIND), optional, intent(in) :: smoothing
 
         integer :: loop,nit
@@ -253,6 +285,12 @@ module fitpack
         end do
 
     end function curve_fit_automatic_knots
+
+    ! Return fitting MSE
+    elemental real(RKIND) function curve_error(this)
+       class(fitpack_curve), intent(in) :: this
+       curve_error = this%fp
+    end function curve_error
 
     ! Utilities: argsort
     ! Return indices of sorted array
@@ -391,5 +429,78 @@ module fitpack
        real(RKIND), intent(in) :: a,b
        is_le = a<=b
     end function is_le
+
+    ! Flow control: on output flag present, return it;
+    ! otherwise, halt on error
+    subroutine fitpack_error_handling(ierr,ierr_out,whereAt)
+        integer, intent(in) :: ierr
+        integer, optional, intent(out) :: ierr_out
+        character(*), intent(in) :: whereAt
+
+
+        if (present(ierr_out)) then
+            ierr_out = ierr
+        elseif (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[fitpack] at '//trim(whereAt)//' failed with error '//FITPACK_MESSAGE(ierr)
+            stop ierr
+        end if
+    end subroutine fitpack_error_handling
+
+    !> Evaluate k-th derivative of the curve at points x
+    !> Use 1st derivative if order not present
+    function curve_derivatives(this, x, order, ierr) result(ddx)
+       class(fitpack_curve), intent(in) :: this
+       real(RKIND),          intent(in) :: x(:)   ! Evaluation point (scalar)
+       integer, optional,    intent(in) :: order  ! Derivative order. Default 1
+       integer, optional,    intent(out) :: ierr  ! Optional error flag
+       real(RKIND), dimension(size(x))   :: ddx
+
+       integer :: ddx_order,m,ierr0
+
+       if (present(order)) then
+          ddx_order = max(0,order)
+       else
+          ddx_order = 1
+       end if
+
+       ierr0 = FITPACK_OK
+
+
+       m = size(x); if (m<=0) goto 1
+
+       !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of
+       !  order nu of a spline s(x) of degree k, given in its b-spline representation.
+
+       call splder(this%t, & ! Position of the knots
+                   this%knots, & ! Number of knots
+                   this%c,     & ! spline coefficients
+                   this%order, & ! spline degree
+                   ddx_order,  & ! derivative order (0<=order<=this%order)  x,y,m,e,wrk,ier)
+                   x,          & ! Array of points where this should be evaluated
+                   ddx,        & ! Evaluated derivatives
+                   m,          & ! Number of input points
+                   this%bc,    & ! Extrapolation behavior
+                   this%wrk,   & ! Temporary working space
+                   ierr0)        ! Output flag
+
+       1 call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
+
+    end function curve_derivatives
+
+    !> Evaluate k-th derivative of the curve at points x
+    !> Use 1st derivative if order not present
+    real(RKIND) function curve_derivative(this, x, order, ierr) result(ddx)
+       class(fitpack_curve), intent(in)  :: this
+       real(RKIND),          intent(in)  :: x      ! Evaluation point (scalar)
+       integer, optional,    intent(in)  :: order  ! Derivative order. Default 1
+       integer, optional,    intent(out) :: ierr   ! Optional error flag
+
+       real(RKIND) :: ddxa(1)
+
+       ! Use the array-based wrapper
+       ddxa = curve_derivatives(this,[x],order,ierr)
+       ddx  = ddxa(1)
+
+    end function curve_derivative
 
 end module fitpack

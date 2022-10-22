@@ -3,6 +3,7 @@ fortran-fitpack
 
 This is a Modern Fortran translation of the FITPACK package for curve and surface fitting.
 The functions are modernized and translated from the original Fortran77 code [FITPACK](http://www.netlib.org/dierckx) by Paul Dierckx.
+The starting code used the double precision version of FITPACK distributed with [scipy](http://www.scipy.org).
 An object-oriented interface wrapper is also being built. 
 
 Building, using

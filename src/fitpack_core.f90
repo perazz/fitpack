@@ -39,7 +39,11 @@ module fitpack_core
     ! B-Spline
     public :: bispev  ! Evaluate 2d spline on a meshgrid
     public :: bispeu  ! Evaluate 2d spline on arbitrary (x,y) points
-    public :: sproot,insert,sphere,spgrid,splev,splder
+    public :: sproot,insert,sphere,spgrid
+
+
+    public :: splev   ! Evaluate 1d spline value
+    public :: splder  ! Evaluate 1d spline derivative
     public :: splint,spalde,regrid,profil
 
     ! Spline behavior for points not in the support
@@ -57,7 +61,6 @@ module fitpack_core
     integer, parameter, public :: FITPACK_S_TOO_SMALL          = 2
     integer, parameter, public :: FITPACK_MAXIT                = 3
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
-
 
     ! Internal Parameters
     integer    , parameter :: MAX_K  = 19
