@@ -22,7 +22,7 @@ program test
         case (13); call mnpogr(dapogr)
         case (14); call mnpola(dapola)
         case (15); call mnprof
-        case (16); call mnregr
+        case (16); call mnregr(daregr_x,daregr_y,daregr_z)
         case (17); call mnspal
         case (18); call mnspde
         case (19); call mnspev
@@ -35,7 +35,7 @@ program test
         case (26); call mndbin
         case (27); call mnevpo
         case (28); call mnpasu(dapasu)
-        case (29); call mnspgr
+        case (29); call mnspgr(daspgr_u,daspgr_v,daspgr_r)
         case default; stop 'invalid test ID'
     end select
 

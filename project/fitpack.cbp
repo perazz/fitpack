@@ -14,6 +14,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Jobj/Debug" />
+					<Add option="-Wpedantic" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -43,11 +44,14 @@
 		<Unit filename="../src/fitpack_core.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="../src/fitpack_tests.f90">
+		<Unit filename="../test/fitpack_test_data.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="../test/test.f90">
+		<Unit filename="../test/fitpack_tests.f90">
 			<Option weight="2" />
+		</Unit>
+		<Unit filename="../test/test.f90">
+			<Option weight="3" />
 		</Unit>
 		<Extensions />
 	</Project>

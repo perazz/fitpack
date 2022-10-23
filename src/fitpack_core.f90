@@ -63,18 +63,18 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
 
     ! Internal Parameters
-    integer    , parameter :: MAX_K  = 19
-    real(RKIND), parameter :: one    = 1.0_RKIND
-    real(RKIND), parameter :: zero   = 0.0_RKIND
-    real(RKIND), parameter :: half   = 0.5_RKIND
-    real(RKIND), parameter :: fourth = 0.25_RKIND
-    real(RKIND), parameter :: two    = 2.0_RKIND
-    real(RKIND), parameter :: three  = 3.0_RKIND
-    real(RKIND), parameter :: six    = 6.0_RKIND
-    real(RKIND), parameter :: ten    = 10.0_RKIND
-    real(RKIND), parameter :: pi     = atan2(zero,-one)
-    real(RKIND), parameter :: pi2    = 2*pi
-    real(RKIND), parameter :: smallnum03 = 1.0e-3_RKIND
+    integer    , parameter, public :: SIZ_K  = 19                ! Max order (for array allocation)
+    real(RKIND), parameter, public :: one    = 1.0_RKIND
+    real(RKIND), parameter, public :: zero   = 0.0_RKIND
+    real(RKIND), parameter, public :: half   = 0.5_RKIND
+    real(RKIND), parameter, public :: fourth = 0.25_RKIND
+    real(RKIND), parameter, public :: two    = 2.0_RKIND
+    real(RKIND), parameter, public :: three  = 3.0_RKIND
+    real(RKIND), parameter, public :: six    = 6.0_RKIND
+    real(RKIND), parameter, public :: ten    = 10.0_RKIND
+    real(RKIND), parameter, public :: pi     = atan2(zero,-one)
+    real(RKIND), parameter, public :: pi2    = 2*pi
+    real(RKIND), parameter, public :: smallnum03 = 1.0e-3_RKIND
 
 
 
@@ -1474,7 +1474,7 @@ module fitpack_core
       !  ..local scalars..
       integer i,j,kk,l,m,nk1
       !  ..local array..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -1565,7 +1565,7 @@ module fitpack_core
       integer i,j,jj,j1,k1,l,ll,l1,mm,nk1
       real(RKIND) arg,sp,tb,te
       !  ..local array..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -2658,7 +2658,7 @@ module fitpack_core
 
       !  ..local variables..
       integer :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
-      real(RKIND) :: arg,sp,tb,te,h(MAX_K+1)
+      real(RKIND) :: arg,sp,tb,te,h(SIZ_K+1)
 
       ! X
       kx1  = kx+1
@@ -2727,10 +2727,10 @@ module fitpack_core
       pure subroutine fpbspl(t,n,k,x,l,h)
          real(RKIND), intent(in)  :: x,t(n)
          integer    , intent(in)  :: n,k,l
-         real(RKIND), intent(out) :: h(MAX_K+1)
+         real(RKIND), intent(out) :: h(SIZ_K+1)
 
          ! Local variables
-         real(RKIND) :: f,hh(MAX_K+1)
+         real(RKIND) :: f,hh(SIZ_K+1)
          integer     :: i,j,li,lj
 
          h(1) = one
@@ -2999,7 +2999,7 @@ module fitpack_core
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),h1(7),h2(6),xi(10)
+      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(10)
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -3854,7 +3854,7 @@ module fitpack_core
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe, &
        l,li,lj,l0,mb,me,mm,new,nk1,nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),xi(10)
+      real(RKIND) h(SIZ_K+1),xi(10)
 
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -4287,7 +4287,7 @@ module fitpack_core
        l,lp1,l1,l2,l3,merk,nbind,number,n1,n4,n6
       real(RKIND) f,wi,xi
       !  ..local array..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..subroutine references..
       !    fpbspl,fpadno,fpdeno,fpfrno,fpseno
       !  ..
@@ -4696,7 +4696,7 @@ module fitpack_core
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -5432,7 +5432,7 @@ module fitpack_core
        j0,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
        numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),h1(5),h2(4)
+      real(RKIND) h(SIZ_K+1),h1(5),h2(4)
 
       !  let
       !               |   (spu)    |            |   (spv)    |
@@ -5995,7 +5995,7 @@ module fitpack_core
        ncof,nroldu,nroldv,number,nmd,numu,numu1,numv,numv1,nuu,nvv, &
        nu4,nu7,nu8,nv4,nv7,nv8, n33
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..subroutine references..
       !    fpback,fpbspl,fpdisc,fpbacp,fptrnp,fptrpe
       !  ..
@@ -6290,7 +6290,7 @@ module fitpack_core
        l1,l2,ncof,nk1x,nk1y,nrold,nroldx,nroldy,number,numx,numx1, &
        numy,numy1,n1
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..subroutine references..
       !    fpback,fpbspl,fpgivs,fpdisc,fprota
       !  ..
@@ -6599,7 +6599,7 @@ module fitpack_core
        j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
        numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),h1(5),h2(4)
+      real(RKIND) h(SIZ_K+1),h1(5),h2(4)
 
       !  let
       !               |     (spu)      |            |     (spv)      |
@@ -7317,7 +7317,7 @@ module fitpack_core
       integer i,ia,ib,it,j,j1,k,k1,l,li,lj,lk,l0,min
       real(RKIND) a,ak,arg,b,f,one
       !  ..local arrays..
-      real(RKIND) aint(6),h(MAX_K+1),h1(6)
+      real(RKIND) aint(6),h(SIZ_K+1),h1(6)
       !  initialization.
       one = 0.1d+01
       k1 = n-nk1
@@ -7942,7 +7942,7 @@ module fitpack_core
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),xi(10)
+      real(RKIND) h(SIZ_K+1),xi(10)
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -8720,7 +8720,7 @@ module fitpack_core
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1),h1(7),h2(6)
+      real(RKIND) h(SIZ_K+1),h1(7),h2(6)
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -9811,7 +9811,7 @@ module fitpack_core
        l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1, &
        numin,nvmin,rank,iband1, jlu
       !  ..local arrays..
-      real(RKIND), dimension(MAX_K+1) :: hu,hv
+      real(RKIND), dimension(SIZ_K+1) :: hu,hv
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -11858,7 +11858,7 @@ module fitpack_core
        l3,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
        num1,rank
       !  ..local arrays..
-      real(RKIND), dimension(MAX_K+1) :: hp,ht
+      real(RKIND), dimension(SIZ_K+1) :: hp,ht
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -12566,7 +12566,7 @@ module fitpack_core
       integer i,i1,j,j1,k,l,l1,l2,l3,m,nuv,nu4,nv4
       real(RKIND) arg,sp,tb,te
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..subroutine references..
       !    fpbspl
       !  ..
@@ -12661,7 +12661,7 @@ module fitpack_core
        la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,nminy,nreg, &
        nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,n1,rank
       !  ..local arrays..
-      real(RKIND), dimension(MAX_K+1) :: hx,hy
+      real(RKIND), dimension(SIZ_K+1) :: hx,hy
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -13359,7 +13359,7 @@ module fitpack_core
       integer i,iband,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3, &
        nrold,n4,number,n1
       !  ..local arrays..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..subroutine references..
       !    fpgivs,fprota
       !  ..
@@ -16230,7 +16230,7 @@ module fitpack_core
       integer i,j,kx1,ky1,l,l1,m,m0,nkx1,nky1
       real(RKIND) sum
       !  ..local array
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -17697,7 +17697,7 @@ module fitpack_core
       integer k3
       !..++
       !  ..local arrays ..
-      real(RKIND) h(MAX_K+1)
+      real(RKIND) h(SIZ_K+1)
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
       ier = 10

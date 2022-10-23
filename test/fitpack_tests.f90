@@ -54,11 +54,6 @@ module fitpack_tests
     public :: mnspgr
 
 
-    real(RKIND), parameter :: one  = 1.0_RKIND
-    real(RKIND), parameter :: zero = 0.0_RKIND
-    real(RKIND), parameter :: half = 0.5_RKIND
-    real(RKIND), parameter :: pi   = atan2(zero,-one)
-
     contains
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !c                                                                    cc
@@ -1383,11 +1378,8 @@ module fitpack_tests
       !      rc =      !    x*cos(alfa*x) dx
       !             0 /
       integer k,k2
-      real(RKIND) ::aa,ak,alfa,cc,c1,half,one,rc,rs,ss,s1,three
-      !  set constants
-      one = 0.1e+01
-      three = 0.3e+01
-      half = 0.5e0
+      real(RKIND) ::aa,ak,alfa,cc,c1,rc,rs,ss,s1
+
       if(abs(alfa)<one) go to 10
       !  integration by parts
       aa = one/alfa
@@ -1977,7 +1969,6 @@ module fitpack_tests
  905  format(1h0,2x,1hv,11(3x,f4.1))
  910  format(1h ,1x,1hu)
  915  format(1h ,f4.1)
- 920  format(11f7.3)
  925  format(5x,11f7.3)
  935  format(37h0least-squares surface of periodicity,2i3)
  940  format(33h0smoothing surface of periodicity,2i3)
@@ -2275,7 +2266,6 @@ module fitpack_tests
         write(6,935) sum,ermax
  300  continue
       stop
- 900  format(10f8.3)
  905  format(49h1data value (exact function value) at grid points)
  910  format(8h u(i),i=,3x,9(i1,7x))
  915  format(8h v(j),j=)
@@ -2473,7 +2463,6 @@ module fitpack_tests
       !  format statements
  900  format(15h1the input data)
  905  format(1h0,3(3x,1hx,6x,1hy,6x,1hz,5x))
- 910  format(12f6.3)
  915  format(1h ,3(3f7.3,2x))
  920  format(14h0mean error = ,f7.4,5x,13hmax. error = ,f7.4)
  925  format(38h0smoothing spline on the disk with s =,f5.0)
@@ -2648,36 +2637,31 @@ module fitpack_tests
       !c               mnregr : regrid test program                         cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnregr
-      real(RKIND) ::x(11),y(11),z(121),tx(17),ty(17),c(300),wrk(850),f(121), &
-       wk(132)
-      integer iwrk(60),iw(22)
-      real(RKIND) ::ai,fp,s,xb,xe,yb,ye
-      integer kx,ky,kwrk,lwrk,m,mx,my,m1,m2,nc,nx,nxest,ny,nyest, &
-       i,ier,is,iopt,j
-      !  we fetch the number of x-coordinates of the grid.
-      read(5,900) mx
-      !  we fetch the x-coordinates of the grid.
-      read(5,905) (x(i),i=1,mx)
-      !  we fetch the number of y-coordinates of the grid.
-      read(5,900) my
-      !  we fetch the y-coordinates of the grid.
-      read(5,905) (y(i),i=1,my)
-      !  we fetch the function values at the grid points.
-      m = mx*my
-      read(5,910) (z(i),i=1,m)
-      !  printing of the input data.
-      write(6,915)
-      write(6,920) (y(i),i=1,6)
-      write(6,925)
-      m1 = 1
-      do 10 i=1,mx
-        m2 = m1+5
-        write(6,930) x(i),(z(j),j=m1,m2)
-        m1 = m1+my
-  10  continue
-      write(6,920) (y(i),i=7,my)
-      write(6,925)
+      subroutine mnregr(x,y,z)
+        real(RKIND), intent(in) :: x(:),y(:),z(size(x)*size(y))
+        real(RKIND) :: tx(17),ty(17),c(300),wrk(850),f(121), wk(132)
+        integer iwrk(60),iw(22)
+        real(RKIND) ::ai,fp,s,xb,xe,yb,ye
+        integer kx,ky,kwrk,lwrk,m,mx,my,m1,m2,nc,nx,nxest,ny,nyest,i,ier,is,iopt,j
+
+        ! fetch the grid size.
+        mx = size(x)
+        my = size(y)
+        m  = mx*my
+
+        !  printing of the input data.
+        write(6,915)
+        write(6,920) (y(i),i=1,6)
+        write(6,925)
+        m1 = 1
+        do i=1,mx
+          m2 = m1+5
+          write(6,930) x(i),(z(j),j=m1,m2)
+          m1 = m1+my
+        end do
+
+        write(6,920) (y(i),i=7,my)
+        write(6,925)
       m1 = 7
       do 20 i=1,mx
         m2 = m1+4
@@ -2767,9 +2751,6 @@ module fitpack_tests
  300  continue
       stop
       !  format statements.
- 900  format(i2)
- 905  format(11f5.1)
- 910  format(11f7.4)
  915  format(15h1the input data)
  920  format(1h0,8x,1hy,4x,6(4x,f4.1))
  925  format(1h ,7x,1hx)
@@ -3053,46 +3034,34 @@ module fitpack_tests
       !c                  mnspgr : spgrid test program                      cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnspgr
-      !  ..local scalars..
-      real(RKIND) ::del,ermax,erf,exr0,exr1,fp,sum,r0,r1,one,ai,s
-      integer i,ier,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv
-      !  ..local arrays..
-      integer ider(4),iopt(3),iwrk(70),iw(25)
-      real(RKIND) ::u(11),v(14),r(154),c(300),tu(25),tv(25),f(154),wk(100), &
-       exact(154),err(14),sp(14),wrk(1500)
-      !  ..
-      !  set constants
-      one = 1
-      del = pi*0.05_RKIND
-      ! we set up the number of u (latitude)-values of the grid.
-      mu = 11
-      ! we set up the u-coordinates of the grid.
-      read(5,905)(iw(i),i=1,mu)
-      do 10 i=1,mu
-         ai = iw(i)
-         u(i) = ai*del
-  10  continue
-      ! we set up the number of v (longitude)-values of the grid
-      mv = 14
-      ! we set up the v-coordinates of the grid.
-      read(5,905)(iw(i),i=1,mv)
-      do 20 i=1,mv
-         ai = iw(i)
-         v(i) = ai*del
-  20  continue
-      ! we fetch the data values at the grid points.
-      m = mu*mv
-      read(5,900) (r(i),i=1,m)
-      ! we print the data values at the grid points. we also compute and print
-      ! the exact value of the test function underlying the data.
-      write(6,910)
-      write(6,915) (j,j=1,mv,2)
-      write(6,920)
-      exr0 = tesspg(zero,zero)
-      exr1 = tesspg(pi,zero)
-      ermax = zero
-      sum = zero
+      subroutine mnspgr(u,v,r)
+        real(RKIND), intent(in) :: u(:),v(:),r(size(u)*size(v))
+
+        !  ..local scalars..
+        real(RKIND) :: ermax,erf,exr0,exr1,fp,sum,r0,r1,ai,s
+        integer i,ier,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv
+        !  ..local arrays..
+        integer ider(4),iopt(3),iwrk(70)
+        real(RKIND) :: c(300),tu(25),tv(25),f(154),wk(100),exact(154),err(14),sp(14),wrk(1500)
+
+
+        ! set up the number of u (latitude)-values of the grid.
+        mu = size(u)
+        ! set up the number of v (longitude)-values of the grid
+        mv = size(v)
+
+        ! we fetch the data values at the grid points.
+        m  = mu*mv
+
+        ! we print the data values at the grid points. we also compute and print
+        ! the exact value of the test function underlying the data.
+        write(6,910)
+        write(6,915) (j,j=1,mv,2)
+        write(6,920)
+        exr0 = tesspg(zero,zero)
+        exr1 = tesspg(pi,zero)
+        ermax = zero
+        sum = zero
       l = 0
       do 40 i=1,mu
         l = (i-1)*mv+1
@@ -3203,7 +3172,7 @@ module fitpack_tests
         write(6,995)
         write(6,985) (c(i),i=1,nc)
       !  evaluation of the spline approximation
-        call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iw,25,ier)
+        call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iwrk,70,ier)
         write(6,1000)
         write(6,915) (j,j=1,mv,2)
         write(6,920)
@@ -3227,8 +3196,6 @@ module fitpack_tests
         write(6,1005) c(1),c(nc)
  300  continue
       stop
- 900  format(7f8.3)
- 905  format(14i3)
  910  format(49h1data value (exact function value) at grid points)
  915  format(8h0v(j),j=,3x,7(i2,6x))
  920  format(8h u(i),i=)
