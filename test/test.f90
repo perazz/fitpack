@@ -26,11 +26,11 @@ program test
         case (17); call mnspal
         case (18); call mnspde
         case (19); call mnspev
-        case (20); call mnsphe
+        case (20); call mnsphe(dasphe)
         case (21); call mnspin
         case (22); call mnspro
         case (23); call mnsuev
-        case (24); call mnsurf
+        case (24); call mnsurf(dasurf_xyz,dasurf_delta)
         case (25); call mncuev
         case (26); call mndbin
         case (27); call mnevpo

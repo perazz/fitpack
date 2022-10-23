@@ -2109,7 +2109,7 @@ module fitpack_tests
         real(RKIND), intent(in) :: datafile(*)
 
         !  ..local scalars..
-        real(RKIND) ::cv,del,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,ai,s
+        real(RKIND) ::cv,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,ai,s
         integer i,ier,is,j,k,kwrk,lwrk,m,nc,nuest,nu,nvest,nv,pos
 
         ! number of u (radius)-values of the grid.
@@ -3234,19 +3234,19 @@ module fitpack_tests
       !c             mnsphe : sphere test program                           cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsphe
-      real(RKIND) :: teta(192),phi(192),r(192),w(192),tp(30),tt(30),c(300), &
-                     p(9),t(9),f(81),eps,fp,pi,pi2,pi4,s,scale,scp,sct,ai
-      real(RKIND), allocatable :: wrk1(:),wrk2(:)
-      integer :: i,ier,iopt,j,kwrk,lwrk1,lwrk2,l1,l2,l,m,np,npest,nt,ntest, &
-                 is,i1,i2,nc,ntt,npp,iwrk(300)
+      subroutine mnsphe(datafile)
+        real(RKIND), intent(in) :: datafile(:)
+        real(RKIND) :: teta(192),phi(192),r(192),w(192),tp(30),tt(30),c(300), &
+                       p(9),t(9),f(81),eps,fp,s,scale,scp,sct,ai
+        real(RKIND), allocatable :: wrk1(:),wrk2(:)
+        integer :: i,ier,iopt,j,kwrk,lwrk1,lwrk2,l1,l2,l,m,np,npest,nt,ntest, &
+                   is,i1,i2,nc,ntt,npp,iwrk(300),pos
 
       allocate(wrk1(12000),wrk2(72))
 
+
+
       !  set constants
-      pi4 = atan(0.1d+01)
-      pi = pi4*4
-      pi2 = pi+pi
       scale = pi4/0.45e+02
       !  we fetch the number of data points.
       m = 192
@@ -3255,10 +3255,16 @@ module fitpack_tests
       write(6,900)
       write(6,905)
       l2 = 0
+      pos = 0
       do 10 i=1,48
          l1 = l2+1
          l2 = l2+4
-         read(5,910) (teta(l),phi(l),l=l1,l2)
+
+         do l=l1,l2
+            teta(l) = datafile(pos+1); pos = pos+1
+            phi (l) = datafile(pos+1); pos = pos+1
+         end do
+
          write(6,915)(teta(l),phi(l),l=l1,l2)
   10  continue
       !  we set up the weights, scale into radians the latitude-longitude
@@ -3356,7 +3362,6 @@ module fitpack_tests
       !  format statements.
  900  format(55h1latitude-longitude values of the data points (degrees))
  905  format(1h0,4(3x,10hteta   phi,3x))
- 910  format(8f6.0)
  915  format(1h ,4(3x,f4.0,2x,f4.0,3x))
  920  format(50h0least-squares spline approximation on the sphere.)
  925  format(32h0smoothing spline on the sphere.)
@@ -3712,47 +3717,55 @@ module fitpack_tests
       !c        mnsurf : surfit test program                                cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsurf
-      real(RKIND), allocatable :: wrk1(:),wrk2(:)
-      real(RKIND) ::x(80),y(80),z(80),w(80),tx(15),ty(15),c(200)
-      real(RKIND) :: ai,delta,eps,fp,s,ww,xb,xe,yb,ye,xx(11),yy(11),zz(121)
-      integer :: iwrk(300),i,ier,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
-                 nmax,nx,nxest,ny,nyest
+      subroutine mnsurf(xyz,delta)
+         real(RKIND), intent(in) :: xyz(:,:), delta
+         real(RKIND), allocatable :: wrk1(:),wrk2(:)
+         real(RKIND), dimension(size(xyz,2)) :: x,y,z,w
+         real(RKIND) :: tx(15),ty(15),c(200)
+         real(RKIND) :: ai,eps,fp,s,xb,xe,yb,ye,xx(11),yy(11),zz(121)
+         integer :: iwrk(300),i,ier,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
+                    nmax,nx,nxest,ny,nyest
 
-      allocate(wrk1(12000),wrk2(6000))
+         allocate(wrk1(12000),wrk2(6000))
 
-      !  we fetch the number of data points
-      read(5,900) m
-      write(6,905) m
-      !  we fetch the co-ordinate and function values of each data point.
-      write(6,910)
-      do 10 i=1,m
-        read(5,915) x(i),y(i),z(i)
-        if((i/2)*2.ne.i) go to 10
-        j = i-1
-        write(6,920) j,x(j),y(j),z(j),i,x(i),y(i),z(i)
-  10  continue
-      !  we fetch an estimate of the standard deviation of the data values.
-      read(5,925) delta
-      write(6,930) delta
-      !  the weights are set equal to delta**(-1)
-      ww = 1./delta
-      do 20 i=1,m
-        w(i) = ww
-  20  continue
-      !  we set up the boundaries of the approximation domain.
-      xb = -2.
-      xe = 2.
-      yb = -2.
-      ye = 2.
-      ! we generate a rectangular grid for evaluating the splines.
-      mx = 11
-      my = 11
-      do 30 i=1,11
-        ai = i-6
-        xx(i) = ai*0.4
-        yy(i) = xx(i)
-  30  continue
+         !  we fetch the number of data points
+         m = size(xyz,2)
+         write(6,905) m
+
+         !  we fetch the co-ordinate and function values of each data point.
+         x = xyz(1,:)
+         y = xyz(2,:)
+         z = xyz(3,:)
+         write(6,910)
+
+         ! Only print half of the points
+         do i=1,m
+            if((i/2)*2/=i)cycle
+            j = i-1
+            write(6,920) j,x(j),y(j),z(j),i,x(i),y(i),z(i)
+         end do
+
+         !  we fetch an estimate of the standard deviation of the data values.
+         write(6,930) delta
+
+         !  the weights are set equal to delta**(-1)
+         w = one/delta
+
+         !  we set up the boundaries of the approximation domain.
+         xb = -two
+         xe = +two
+         yb = -two
+         ye = +two
+
+         ! we generate a rectangular grid for evaluating the splines.
+         mx = 11
+         my = 11
+         do i=1,11
+           ai = i-6
+           xx(i) = ai*0.4
+           yy(i) = xx(i)
+         end do
+
       !  we set up the dimension information
       nxest = 15
       nyest = 15
@@ -3832,12 +3845,9 @@ module fitpack_tests
  300  continue
       stop
       !  format statements.
- 900  format(i3)
  905  format(1h1,i3,12h data points)
  910  format(1h0,2(2x,1hi,5x,4hx(i),6x,4hy(i),6x,4hz(i),6x))
- 915  format(3f10.4)
  920  format(1x,2(i3,3f10.4,5x))
- 925  format(e20.6)
  930  format(1x,40hestimate of standard deviation of z(i) =,e15.6)
  935  format(32h0least-squares spline of degrees,2i3)
  940  format(28h0smoothing spline of degrees,2i3)

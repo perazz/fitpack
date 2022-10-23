@@ -74,6 +74,7 @@ module fitpack_core
     real(RKIND), parameter, public :: ten    = 10.0_RKIND
     real(RKIND), parameter, public :: pi     = atan2(zero,-one)
     real(RKIND), parameter, public :: pi2    = 2*pi
+    real(RKIND), parameter, public :: pi4    = 4*pi
     real(RKIND), parameter, public :: smallnum03 = 1.0e-3_RKIND
 
 
