@@ -43,8 +43,11 @@ module fitpack_core
 
 
     public :: splev   ! Evaluate 1d spline value
+
+    public :: splint  ! Evaluate integral below spline
+    public :: regrid,profil
     public :: splder  ! Evaluate 1d spline derivative
-    public :: splint,spalde,regrid,profil
+    public :: spalde  ! Evaluate all 1d derivatives at x
 
     ! Spline behavior for points not in the support
     integer, parameter, public :: SPLINE_EXTRAPOLATE = 0 ! extrapolated from the end spans

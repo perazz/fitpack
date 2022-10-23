@@ -7,6 +7,7 @@ fitpack.f90 \
 fitpack_core.f90 
 
 SRCS_f90d2 = \
+fitpack_curve_tests.f90 \
 fitpack_test_data.f90 \
 fitpack_tests.f90 \
 test.f90 
@@ -16,6 +17,7 @@ fitpack.o \
 fitpack_core.o 
 
 OBJS_f90d2 = \
+fitpack_curve_tests.o \
 fitpack_test_data.o \
 fitpack_tests.o \
 test.o 
@@ -61,6 +63,10 @@ fitpack.o: \
     fitpack_core.o
 fitpack_core.o: \
     fitpack_core.f90
+fitpack_curve_tests.o: \
+    fitpack_curve_tests.f90 \
+    fitpack.o \
+    fitpack_core.o
 fitpack_test_data.o: \
     fitpack_test_data.f90 \
     fitpack_core.o
@@ -70,6 +76,7 @@ fitpack_tests.o: \
     fitpack_test_data.o
 test.o: \
     test.f90 \
+    fitpack_curve_tests.o \
     fitpack_test_data.o \
     fitpack_tests.o
 

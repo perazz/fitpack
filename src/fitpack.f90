@@ -24,12 +24,13 @@ module fitpack
 
     ! Public interface
     public :: RKIND
+    public :: fitpack_curve
 
     ! Max fitting degree
     integer, parameter :: MAX_K = 5
 
     !> A public type describing a curve fitter
-    type, public :: fitpack_curve
+    type :: fitpack_curve
 
         !> The data points
         integer :: m = 0
@@ -81,10 +82,13 @@ module fitpack
            procedure :: new_fit
 
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit => curve_fit_automatic_knots
+           procedure :: fit         => curve_fit_automatic_knots
+           procedure :: interpolate => interpolating_curve
 
            !> Evaluate curve at given coordinates
-           procedure :: eval => curve_eval
+           procedure, private :: curve_eval_one
+           procedure, private :: curve_eval_many
+           generic :: eval => curve_eval_one,curve_eval_many
 
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
@@ -121,13 +125,15 @@ module fitpack
     end function new_from_points
 
     ! Fit a new curve
-    integer function new_fit(this,x,y,w)
+    integer function new_fit(this,x,y,w,smoothing)
         class(fitpack_curve), intent(inout) :: this
         real(RKIND), intent(in) :: x(:),y(size(x))
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(RKIND), optional, intent(in) :: smoothing
 
         call this%new_points(x,y,w)
-        new_fit = this%fit()
+
+        new_fit = this%fit(smoothing)
 
     end function new_fit
 
@@ -202,8 +208,21 @@ module fitpack
 
     end subroutine new_points
 
+    real(RKIND) function curve_eval_one(this,x,ierr) result(y)
+        class(fitpack_curve), intent(inout)  :: this
+        real(RKIND),          intent(in)     :: x      ! Evaluation point
+        integer, optional,    intent(out)    :: ierr   ! Optional error flag
+
+        real(RKIND) :: y1(1)
+
+        y1 = curve_eval_many(this,[x],ierr)
+        y  = y1(1)
+
+    end function curve_eval_one
+
+
     ! Curve evaluation driver
-    function curve_eval(this,x,ierr) result(y)
+    function curve_eval_many(this,x,ierr) result(y)
         class(fitpack_curve), intent(inout)  :: this
         real(RKIND),          intent(in)     :: x(:)   ! Evaluation points
         integer, optional,    intent(out)    :: ierr   ! Optional error flag
@@ -245,7 +264,16 @@ module fitpack
 
         call fitpack_error_handling(ier,ierr,'evaluate 1d spline')
 
-    end function curve_eval
+    end function curve_eval_many
+
+    ! Interpolating curve
+    integer function interpolating_curve(this) result(ierr)
+        class(fitpack_curve), intent(inout) :: this
+
+        ! Set zero smoothing
+        ierr = curve_fit_automatic_knots(this,zero)
+
+    end function interpolating_curve
 
     ! Curve fitting driver: automatic number of knots
     integer function curve_fit_automatic_knots(this,smoothing) result(ierr)
@@ -285,6 +313,8 @@ module fitpack
         end do
 
     end function curve_fit_automatic_knots
+
+
 
     ! Return fitting MSE
     elemental real(RKIND) function curve_error(this)
