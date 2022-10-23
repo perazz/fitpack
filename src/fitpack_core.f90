@@ -2495,7 +2495,8 @@ module fitpack_core
       real(RKIND), parameter :: con2 = 0.12e+03_RKIND
       nm3 = n-3
       nm7 = n-7
-      if(par/=0.) term = six/par
+
+      term = merge(six/par,zero,par/=zero)
       beta = par*t(4)
       co(1) = cos(beta)
       si(1) = sin(beta)
@@ -5317,26 +5318,26 @@ module fitpack_core
       end subroutine fpdisc
 
 
-      recursive subroutine fpfrno(maxtr,up,left,right,info,point, &
-         merk,n1,count,ier)
+      !  subroutine fpfrno collects the free nodes (up field zero) of the triply linked tree the information
+      !  of which is kept in the arrays up,left,right and info. the maximal length of the branches of the
+      !  tree is given by n1. if no free nodes are found, the error flag ier is set to 1.
+      recursive subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
-      !  subroutine fpfrno collects the free nodes (up field zero) of the
-      !  triply linked tree the information of which is kept in the arrays
-      !  up,left,right and info. the maximal length of the branches of the
-      !  tree is given by n1. if no free nodes are found, the error flag
-      !  ier is set to 1.
       !  ..
       !  ..scalar arguments..
-      integer maxtr,point,merk,n1,count,ier
+      integer, intent(in)    :: maxtr,n1
+      integer, intent(inout) :: point,merk
+      integer, intent(out)   :: count,ier
       !  ..array arguments..
       integer up(maxtr),left(maxtr),right(maxtr),info(maxtr)
       !  ..local scalars
       integer i,j,k,l,n,niveau
       !  ..
-      ier = 1
-      if(n1==2) go to 140
+      ier    = 1
       niveau = 1
-      count = 2
+      count  = 2
+      if (n1==2) return
+
   10  j = 0
       i = 1
   20  if(j==niveau) go to 30
@@ -7289,7 +7290,7 @@ module fitpack_core
       end subroutine fpinst
 
 
-      recursive subroutine fpintb(t,n,bint,nk1,x,y)
+      pure subroutine fpintb(t,n,bint,nk1,x,y)
 
       !  subroutine fpintb calculates integrals of the normalized b-splines
       !  nj,k+1(x) of degree k, defined on the set of knots t(j),j=1,2,...n.
@@ -7310,38 +7311,39 @@ module fitpack_core
       !    bint : array,length nk1, containing the integrals of the b-splines.
       !  ..
       !  ..scalars arguments..
-      integer n,nk1
-      real(RKIND) x,y
+      integer,     intent(in)  :: n,nk1
+      real(RKIND), intent(in)  :: x,y
       !  ..array arguments..
-      real(RKIND) t(n),bint(nk1)
+      real(RKIND), intent(in)  :: t(n)
+      real(RKIND), intent(out) :: bint(nk1)
+
       !  ..local scalars..
-      integer i,ia,ib,it,j,j1,k,k1,l,li,lj,lk,l0,min
-      real(RKIND) a,ak,arg,b,f,one
+      integer :: i,ia,ib,it,j,j1,k,k1,l,li,lj,lk,l0
+      logical :: lmin
+      real(RKIND) :: a,ak,arg,b,f
       !  ..local arrays..
       real(RKIND) aint(6),h(SIZ_K+1),h1(6)
+
+      integer, parameter :: nit = 2 ! number of iterations
+
       !  initialization.
-      one = 0.1d+01
-      k1 = n-nk1
-      ak = k1
-      k = k1-1
-      do 10 i=1,nk1
-        bint(i) = zero
-  10  continue
+      k1   = n-nk1
+      ak   = k1
+      k    = k1-1
+      bint = zero
+
       !  the integration limits are arranged in increasing order.
-      a = x
-      b = y
-      min = 0
-      if (a<b) go to 30
-      if (a==b) go to 160
-      go to 20
-  20  a = y
-      b = x
-      min = 1
-  30  if(a<t(k1)) a = t(k1)
-      if(b>t(nk1+1)) b = t(nk1+1)
-      if(a>b) go to 160
-      !  using the expression of gaffney for the indefinite integral of a
-      !  b-spline we find that
+      if (x==y) return
+
+      a = max(x,y)
+      b = min(x,y)
+      lmin = x>y
+
+      a = max(t(k1),a)
+      b = min(t(nk1+1),b)
+      if (a>b) return
+
+      !  using the expression of gaffney for the indefinite integral of a b-spline we find that
       !  bint(j) = (t(j+k+1)-t(j))*(res(j,b)-res(j,a))/(k+1)
       !    where for t(l) <= x < t(l+1)
       !    res(j,x) = 0, j=1,2,...,l-k-1
@@ -7349,34 +7351,33 @@ module fitpack_core
       !             = aint(j+k-l+1), j=l-k,l-k+1,...,l
       !               = sumi((x-t(j+i))*nj+i,k+1-i(x)/(t(j+k+1)-t(j+i)))
       !                 i=0,1,...,k
-      l = k1
+      l  = k1
       l0 = l+1
       !  set arg = a.
       arg = a
-      do 90 it=1,2
+      ia  = 0
+      iterations: do it=1,nit
       !  search for the knot interval t(l) <= arg < t(l+1).
-  40    if(arg<t(l0) .or. l==nk1) go to 50
-        l = l0
-        l0 = l+1
-        go to 40
+        do while (.not.(arg<t(l0) .or. l==nk1))
+           l  = l0
+           l0 = l+1
+        end do
       !  calculation of aint(j), j=1,2,...,k+1.
       !  initialization.
-  50    do 55 j=1,k1
-          aint(j) = zero
-  55    continue
-        aint(1) = (arg-t(l))/(t(l+1)-t(l))
+        aint(1)  = (arg-t(l))/(t(l+1)-t(l))
+        aint(2:) = zero
         h1(1) = one
-        do 70 j=1,k
+        do j=1,k
       !  evaluation of the non-zero b-splines of degree j at arg,i.e.
       !    h(i+1) = nl-j+i,j(arg), i=0,1,...,j.
           h(1) = zero
-          do 60 i=1,j
+          do i=1,j
             li = l+i
             lj = li-j
             f = h1(i)/(t(li)-t(lj))
             h(i) = h(i)+f*(t(li)-arg)
             h(i+1) = f*(arg-t(lj))
-  60      continue
+          end do
       !  updating of the integrals aint.
           j1 = j+1
           do i=1,j1
@@ -7385,99 +7386,105 @@ module fitpack_core
             aint(i) = aint(i)+h(i)*(arg-t(lj))/(t(li)-t(lj))
             h1(i) = h(i)
           end do
-  70    continue
-        if(it==2) go to 100
-      !  updating of the integrals bint
-        lk = l-k
-        ia = lk
-        do 80 i=1,k1
-          bint(lk) = -aint(i)
-          lk = lk+1
-  80    continue
-      !  set arg = b.
-        arg = b
-  90  continue
+        end do
+
+        if (it<nit) then
+            ! updating of the integrals bint
+            lk = l-k
+            ia = lk
+            do i=1,k1
+              bint(lk) = -aint(i)
+              lk = lk+1
+            end do
+
+            arg = b
+        endif
+      end do iterations
       !  updating of the integrals bint.
- 100  lk = l-k
+      lk = l-k
       ib = lk-1
-      do 110 i=1,k1
-        bint(lk) = bint(lk)+aint(i)
-        lk = lk+1
- 110  continue
-      if(ib<ia) go to 130
-      do 120 i=ia,ib
-        bint(i) = bint(i)+one
- 120  continue
+      do i=1,k1
+         bint(lk) = bint(lk)+aint(i)
+         lk = lk+1
+      end do
+      if (ib>=ia) bint(ia:ib) = bint(ia:ib)+one
+
       !  the scaling factors are taken into account.
- 130  f = one/ak
-      do 140 i=1,nk1
+      f = one/ak
+      do i=1,nk1
         j = i+k1
         bint(i) = bint(i)*(t(j)-t(i))*f
- 140  continue
+      end do
       !  the order of the integration limits is taken into account.
-      if(min==0) go to 160
-      do 150 i=1,nk1
-        bint(i) = -bint(i)
- 150  continue
- 160  return
+      if (lmin) bint = -bint
+
       end subroutine fpintb
 
 
-      recursive subroutine fpknot(x,m,t,n,fpint,nrdata,nrint,nest, &
-         istart)
-
-      !  subroutine fpknot locates an additional knot for a spline of degree
-      !  k and adjusts the corresponding parameters,i.e.
+      !  subroutine fpknot locates an additional knot for a spline of degree k and adjusts the
+      !  corresponding parameters,i.e.
       !    t     : the position of the knots.
       !    n     : the number of knots.
       !    nrint : the number of knotintervals.
       !    fpint : the sum of squares of residual right hand sides
       !            for each knot interval.
       !    nrdata: the number of data points inside each knot interval.
-      !  istart indicates that the smallest data point at which the new knot
-      !  may be added is x(istart+1)
+      !  istart indicates that the smallest data point at which the new knot may be added is x(istart+1)
+      pure subroutine fpknot(x,m,t,n,fpint,nrdata,nrint,nest,istart)
+
       !  ..
       !  ..scalar arguments..
-      integer m,n,nrint,nest,istart
+      integer, intent(in)    :: m,nest,istart
+      integer, intent(inout) :: n,nrint
       !  ..array arguments..
-      real(RKIND) x(m),t(nest),fpint(nest)
-      integer nrdata(nest)
+      real(RKIND), intent(in)    :: x(m)
+      real(RKIND), intent(inout) :: t(nest)
+      real(RKIND), intent(inout) :: fpint(nest)
+      integer    , intent(inout) :: nrdata(nest)
+
       !  ..local scalars..
-      real(RKIND) an,am,fpmax
-      integer ihalf,j,jbegin,jj,jk,jpoint,k,maxbeg,maxpt, &
-       next,nrx,number
+      real(RKIND) :: an,am,fpmax
+      integer :: ihalf,j,jbegin,jj,jk,jpoint,k,maxbeg,maxpt,next,nrx,number
       !  ..
-      k = (n-nrint-1)/2
-      !  search for knot interval t(number+k) <= x <= t(number+k+1) where
-      !  fpint(number) is maximal on the condition that nrdata(number)
-      !  not equals zero.
-      fpmax = 0.
+      number = 0
+      maxpt  = 0
+      maxbeg = 0
+      k      = (n-nrint-1)/2
+      !  search for knot interval t(number+k) <= x <= t(number+k+1) where fpint(number) is maximal on the
+      !  condition that nrdata(number)/=0 .
+      fpmax = zero
       jbegin = istart
-      do 20 j=1,nrint
+      do j=1,nrint
         jpoint = nrdata(j)
-        if(fpmax>=fpint(j) .or. jpoint==0) go to 10
-        fpmax = fpint(j)
-        number = j
-        maxpt = jpoint
-        maxbeg = jbegin
-  10    jbegin = jbegin+jpoint+1
-  20  continue
+
+        if (fpmax<fpint(j) .and. jpoint/=0) then
+           fpmax = fpint(j)
+           number = j
+           maxpt = jpoint
+           maxbeg = jbegin
+        endif
+
+        jbegin = jbegin+jpoint+1
+      end do
       !  let coincide the new knot t(number+k+1) with a data point x(nrx)
       !  inside the old knot interval t(number+k) <= x <= t(number+k+1).
       ihalf = maxpt/2+1
-      nrx = maxbeg+ihalf
-      next = number+1
-      if(next>nrint) go to 40
+      nrx   = maxbeg+ihalf
+      next  = number+1
+
       !  adjust the different parameters.
-      do 30 j=next,nrint
-        jj = next+nrint-j
-        fpint(jj+1) = fpint(jj)
-        nrdata(jj+1) = nrdata(jj)
-        jk = jj+k
-        t(jk+1) = t(jk)
-  30  continue
-  40  nrdata(number) = ihalf-1
-      nrdata(next) = maxpt-ihalf
+      if(next<=nrint) then
+         do j=next,nrint
+            jj = next+nrint-j
+            fpint(jj+1) = fpint(jj)
+            nrdata(jj+1) = nrdata(jj)
+            jk = jj+k
+            t(jk+1) = t(jk)
+         end do
+      endif
+
+      nrdata(number) = ihalf-1
+      nrdata(next)   = maxpt-ihalf
       am = maxpt
       an = nrdata(number)
       fpint(number) = fpmax*an/am
@@ -7485,7 +7492,7 @@ module fitpack_core
       fpint(next) = fpmax*an/am
       jk = next+k
       t(jk) = x(nrx)
-      n = n+1
+      n     = n+1
       nrint = nrint+1
       return
       end subroutine fpknot
@@ -8327,8 +8334,7 @@ module fitpack_core
        fpintu(nuest),fpintv(nvest),wrk(lwrk)
       integer ipar(2),nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
       !  ..local scalars
-      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn, &
-       peru,perv,ub,ue,vb,ve
+      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,peru,perv,ub,ue,vb,ve
       integer i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa, &
        l,lau,lav,lbu,lbv,lq,lri,lsu,lsv,l1,l2,l3,l4,mm,mpm,mvnu,ncof, &
        nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,nrintu, &
@@ -8338,6 +8344,20 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
+      !  acc denotes the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      !  find nmaxu and nmaxv which denote the number of knots in u- and v-
+      !  direction in case of spline interpolation.
+      nmaxu = mu+4+2*ipar(1)
+      nmaxv = mv+4+2*ipar(2)
+
+      !  find nue and nve which denote the maximum number of knots
+      !  allowed in each direction
+      nue = min0(nmaxu,nuest)
+      nve = min0(nmaxv,nvest)
+
       !  set boundaries of the approximation domain
       ub = u(1)
       ue = u(mu)
@@ -8390,17 +8410,8 @@ module fitpack_core
   20  nminu = 8
       nminv = 8
       if(iopt<0) go to 100
-      !  acc denotes the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  find nmaxu and nmaxv which denote the number of knots in u- and v-
-      !  direction in case of spline interpolation.
-      nmaxu = mu+4+2*ipar(1)
-      nmaxv = mv+4+2*ipar(2)
-      !  find nue and nve which denote the maximum number of knots
-      !  allowed in each direction
-      nue = min0(nmaxu,nuest)
-      nve = min0(nmaxv,nvest)
-      if(s>0.) go to 60
+
+      if(s>zero) go to 60
       !  if s = 0, s(u,v) is an interpolating spline.
       nu = nmaxu
       nv = nmaxv
@@ -9421,6 +9432,16 @@ module fitpack_core
       per = pi+pi
       vb = v(1)
       ve = vb+per
+
+      !  acc denotes the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      !  numax and nvmax denote the number of knots needed for interpolation.
+      numax = mu+5+iopt(2)+iopt(3)
+      nvmax = mv+7
+      nue = min0(numax,nuest)
+      nve = min0(nvmax,nvest)
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 1: determination of the number of knots and their position.     c
       ! ****************************************************************     c
@@ -9443,13 +9464,7 @@ module fitpack_core
       !       compute the least-squares polynomial directly.                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       if(iopt(1)<0) go to 120
-      !  acc denotes the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  numax and nvmax denote the number of knots needed for interpolation.
-      numax = mu+5+iopt(2)+iopt(3)
-      nvmax = mv+7
-      nue = min0(numax,nuest)
-      nve = min0(nvmax,nvest)
+
       if(s>0.) go to 100
       !  if s = 0, s(u,v) is an interpolating spline.
       nu = numax
@@ -9792,12 +9807,12 @@ module fitpack_core
 
       !  ..scalar arguments..
       integer iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc, &
-       intest,nrest,nu,nv,lwrk,ier
+       intest,nrest,lwrk,ier
+      integer, intent(inout) :: nu,nv
       real(RKIND) s,eta,tol,fp,sup
       !  ..array arguments..
       integer index(nrest),nummer(m)
-      real(RKIND) u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest) &
-      , &
+      real(RKIND) u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest), &
        coord(intest),f(ncc),ff(nc),row(nvest),cs(nvest),cosi(5,nvest), &
        a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4),spv(m,4), &
        h(ib3),wrk(lwrk)
@@ -9819,14 +9834,19 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
+      fpms = zero
       ipar = iopt2*(iopt2+3)/2
       ipar1 = ipar+1
       eps = sqrt(eta)
+      iband1 = 0
+
+      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
       if(iopt1<0) go to 90
       numin = 9
       nvmin = 9+iopt2*(iopt2+1)
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
+
       if(iopt1==0) go to 10
       if(s<sup) then
         if (nv<nvmin) go to 70
@@ -9839,7 +9859,7 @@ module fitpack_core
       !        f(2) = 0 if iopt3> 0.
       !  the corresponding weighted sum of squared residuals gives the upper
       !  bound sup for the smoothing factor s.
-  10  sup = 0.
+  10  sup = zero
       f(1:4) = zero
       a(1:4,1:4) = zero
       do 50 i=1,m
@@ -9852,9 +9872,9 @@ module fitpack_core
          h(2) = u3*wi
          h(3) = u2*(one-uu)*wi
          h(4) = uu*(one-u2)*wi
-         if(iopt3/=0) h(2) = 0.
-         if(iopt2>1) h(3) = 0.
-         if(iopt2>0) h(4) = 0.
+         if(iopt3/=0) h(2) = zero
+         if(iopt2>1) h(3) = zero
+         if(iopt2>0) h(4) = zero
          do 40 j=1,4
             piv = h(j)
             if (piv==zero) go to 40
@@ -9870,11 +9890,11 @@ module fitpack_core
   40     continue
          sup = sup+zi*zi
   50  continue
-      if(a(4,1)/=0.) f(4) = f(4)/a(4,1)
-      if(a(3,1)/=0.) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
-      if(a(2,1)/=0.) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
-      if(a(1,1)/=0.) &
-       f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+      if(a(4,1)/=zero) f(4) = f(4)/a(4,1)
+      if(a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
+      if(a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
+      if(a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+
       !  find the b-spline representation of this least-squares polynomial
       c1 = f(1)
       c4 = f(2)
@@ -9883,15 +9903,15 @@ module fitpack_core
       nu = 8
       nv = 8
       do 60 i=1,4
-         c(i) = c1
-         c(i+4) = c2
-         c(i+8) = c3
+         c(i)    = c1
+         c(i+4)  = c2
+         c(i+8)  = c3
          c(i+12) = c4
-         tu(i) = 0.
+         tu(i)   = zero
          tu(i+4) = one
-         rn = 2*i-9
-         tv(i) = rn*pi
-         rn = 2*i-1
+         rn      = 2*i-9
+         tv(i)   = rn*pi
+         rn      = 2*i-1
          tv(i+4) = rn*pi
   60  continue
       fp = sup
@@ -9907,10 +9927,8 @@ module fitpack_core
       nvv = nv-8
       rn = nvv+1
       fac = pi2/rn
-      do 80 i=1,nvv
-         rn = i
-         tv(i+4) = rn*fac-pi
-  80  continue
+      forall (i=1:nvv) tv(i+4) = i*fac-pi
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 1 : computation of least-squares bicubic splines.              c
       !  ******************************************************              c
@@ -10316,7 +10334,7 @@ module fitpack_core
       f1 = sup-s
       p3 = -one
       f3 = fpms
-      p = 0.
+      p = zero
       do 590 i=1,ncof
         p = p+a(i,1)
  590  continue
@@ -11247,6 +11265,7 @@ module fitpack_core
       iopt = if1+1
       f    = zero
       i    = 0
+      j    = 0
 
       main_loop: do l=1,nu4
          ii = i

@@ -10,19 +10,27 @@ Building, using
 ===============
 
 An automated build is not available yet. 
-- `fitpack_core.f90` contains the refactored package
-- `fitpack.f90` contains the object-oriented interface
-- `fitpack_tests.f90` contains the original test programs, refactored as subroutines. 
+- `src/fitpack_core.f90` contains the refactored package
+- `src/fitpack.f90` contains the object-oriented interface
+- `test/fitpack_tests.f90` contains the original test programs, refactored as subroutines. 
+- `test/fitpack_test_data.f90` contains support data to the original test programs
+- `test/test.f90` is the test driver program 
 
 A simple command line build script is: 
 
 ```
-gfortran src/fitpack_core.f90 src/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
+gfortran src/fitpack_core.f90 test/fitpack_test_data.f90 test/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
+```
+
+A simple makefile for the GNU compiler suite is provided in folder `project`; to run it: 
+
+```
+cd project/
+make -f makefile.gcc
 ```
 
 The testing executable is just a wrapper to the 29 original test programs. 
 These test programs aren't double checked yet, and their output is supposed to be the original F77 program output
-
  
 References
 ----------
