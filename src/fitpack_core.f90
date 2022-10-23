@@ -13076,15 +13076,13 @@ module fitpack_core
           ii = i-ky1
           do 551 j=1,nk1x
       !  initialize the new row.
-            do 490 l=1,iband
-              h(l) = 0.
- 490        continue
+            h(1:iband) = zero
+
+
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
-            do 500 l=1,ky2
-              h(l) = by(ii,l)*pinv
- 500        continue
-            zi = 0.
+            h(1:ky2) = by(ii,1:ky2)*pinv
+            zi   = zero
             jrot = (j-1)*nk1y+ii
       !  rotate the new row into triangle by givens transformations without
       !  square roots.
@@ -13105,10 +13103,7 @@ module fitpack_core
                 l1 = l+1
                 call fprota(cos,sin,h(l1),q(irot,l1))
  510          continue
- 520          do 530 l=1,i2
-                h(l) = h(l+1)
- 530          continue
-              h(i2+1) = 0.
+ 520          h(1:i2+1) = [h(2:i2+1),zero]
  540        continue
  551      continue
  550    continue
@@ -13119,9 +13114,7 @@ module fitpack_core
           ii = i-kx1
           do 631 j=1,nk1y
       !  initialize the new row
-            do 570 l=1,iband4
-              h(l) = 0.
- 570        continue
+            h(1:iband4) = zero
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
             j1 = 1
@@ -13129,7 +13122,7 @@ module fitpack_core
               h(j1) = bx(ii,l)*pinv
               j1 = j1+nk1y
  580        continue
-            zi = 0.
+            zi = zero
             jrot = (i-kx2)*nk1y+j
       !  rotate the new row into triangle by givens transformations .
             do 620 irot=jrot,ncof
@@ -13149,10 +13142,7 @@ module fitpack_core
                 l1 = l+1
                 call fprota(cos,sin,h(l1),q(irot,l1))
  590          continue
- 600          do 610 l=1,i2
-                h(l) = h(l+1)
- 610          continue
-              h(i2+1) = 0.
+ 600          h(1:i2+1) = [h(2:i2+1),zero]
  620        continue
  631      continue
  630    continue
@@ -13173,11 +13163,10 @@ module fitpack_core
         la = lh+iband4
         call fprank(q,ff,ncof,iband4,nc,sigma,c,sq,rank,wrk(la), &
          wrk(lf),wrk(lh))
- 675    do 680 i=1,ncof
-          q(i,1) = q(i,1)/dmax
- 680    continue
-      !  compute f(p).
-        fp = 0.
+ 675    q(1:ncof,1) = q(1:ncof,1)/dmax
+
+        !  compute f(p).
+        fp = zero
         do 720 num = 1,nreg
           num1 = num-1
           lx = num1/nyy
@@ -13217,17 +13206,17 @@ module fitpack_core
         p = p*con4
         if(p<=p1) p = p1*con9 + p2*con1
         go to 770
- 730    if(f2<0.) ich3 = 1
+ 730    if(f2<zero) ich3 = 1
  740    if(ich1/=0) go to 760
         if((f1-f2)>acc) go to 750
       !  our initial choice of p is too small
         p1 = p2
         f1 = f2
         p = p/con4
-        if(p3<0.) go to 770
+        if(p3<zero) go to 770
         if(p>=p3) p = p2*con1 + p3*con9
         go to 770
- 750    if(f2>0.) ich1 = 1
+ 750    if(f2>zero) ich1 = 1
       !  test whether the iteration process proceeds as theoretically
       !  expected.
  760    if(f2>=f1 .or. f2<=f3) go to 800
@@ -13464,22 +13453,18 @@ module fitpack_core
       real(RKIND) p
       integer m,mm,idim,n
       !  ..array arguments..
-      real(RKIND) sp(m,4),b(n,5),z(m*mm*idim),a(n,5),aa(n,4),q((n-7)*mm*idim) &
-      , &
-       right(mm*idim)
+      real(RKIND) sp(m,4),b(n,5),z(m*mm*idim),a(n,5),aa(n,4),q((n-7)*mm*idim), right(mm*idim)
       integer nr(m)
       !  ..local scalars..
-      real(RKIND) co,pinv,piv,si,one
-      integer i,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3, &
-       nrold,n4,number,n1,n7,n11,m1
+      real(RKIND) co,pinv,piv,si
+      integer i,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
       integer i1, ij,j1,jk,jper,l0,l1, ik
       !  ..local arrays..
       real(RKIND) h(5),h1(5),h2(4)
       !  ..subroutine references..
       !    fpgivs,fprota
       !  ..
-      one = 1
-      if(p>0.) pinv = one/p
+      if (p>zero) pinv = one/p
       n4 = n-4
       n7 = n-7
       n11 = n-11
@@ -13508,7 +13493,7 @@ module fitpack_core
       do 760 it=1,m1
         number = nr(it)
  120    if(nrold==number) go to 180
-        if(p<=0.) go to 740
+        if(p<=zero) go to 740
       !  fetch a new row of matrix (b).
         n1 = nrold+1
         do 140 j=1,5
@@ -16254,52 +16239,57 @@ module fitpack_core
       nkx1 = nx-kx1
       nky1 = ny-ky1
       ier = 10
-      if(iopt/=0) go to 200
-      if(nu<ny) go to 300
-      if(u<tx(kx1) .or. u>tx(nkx1+1)) go to 300
-      !  the b-splinecoefficients of f(y) = s(u,y).
-      ier = 0
-      l = kx1
-      l1 = l+1
- 110  if(u<tx(l1) .or. l==nkx1) go to 120
-      l = l1
-      l1 = l+1
-      go to 110
- 120  call fpbspl(tx,nx,kx,u,l,h)
-      m0 = (l-kx1)*nky1+1
-      do 140 i=1,nky1
-        m = m0
-        sum = zero
-        do 130 j=1,kx1
-          sum = sum+h(j)*c(m)
-          m = m+nky1
- 130    continue
-        cu(i) = sum
-        m0 = m0+1
- 140  continue
-      go to 300
- 200  if(nu<nx) go to 300
-      if(u<ty(ky1) .or. u>ty(nky1+1)) go to 300
-      !  the b-splinecoefficients of g(x) = s(x,u).
-      ier = 0
-      l = ky1
-      l1 = l+1
- 210  if(u<ty(l1) .or. l==nky1) go to 220
-      l = l1
-      l1 = l+1
-      go to 210
- 220  call fpbspl(ty,ny,ky,u,l,h)
-      m0 = l-ky
-      do 240 i=1,nkx1
-        m = m0
-        sum = zero
-        do 230 j=1,ky1
-          sum = sum+h(j)*c(m)
-          m = m+1
- 230    continue
-        cu(i) = sum
-        m0 = m0+nky1
- 240  continue
+
+      select case (iopt)
+
+         case (0)
+
+                  if(nu<ny) go to 300
+                  if(u<tx(kx1) .or. u>tx(nkx1+1)) go to 300
+                  !  the b-splinecoefficients of f(y) = s(u,y).
+                  ier = 0
+                  l = kx1
+                  l1 = l+1
+             110  if(u<tx(l1) .or. l==nkx1) go to 120
+                  l = l1
+                  l1 = l+1
+                  go to 110
+             120  call fpbspl(tx,nx,kx,u,l,h)
+                  m0 = (l-kx1)*nky1+1
+                  do 140 i=1,nky1
+                    m = m0
+                    sum = zero
+                    do 130 j=1,kx1
+                      sum = sum+h(j)*c(m)
+                      m = m+nky1
+             130    continue
+                    cu(i) = sum
+                    m0 = m0+1
+             140  continue
+                  go to 300
+
+         case default
+
+            if(nu<nx) go to 300
+                  if(u<ty(ky1) .or. u>ty(nky1+1)) go to 300
+                  !  the b-splinecoefficients of g(x) = s(x,u).
+                  ier = 0
+                  l = ky1
+                  l1 = l+1
+             210  if(u<ty(l1) .or. l==nky1) go to 220
+                  l = l1
+                  l1 = l+1
+                  go to 210
+             220  call fpbspl(ty,ny,ky,u,l,h)
+                  m0 = l-ky
+                  do 240 i=1,nkx1
+                    m = m0
+                    cu(i) = dot_product(h(1:ky1),c(m0:m0+ky))
+                    m0 = m0+nky1
+             240  continue
+
+                  end select
+
  300  return
       end subroutine profil
 

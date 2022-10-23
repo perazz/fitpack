@@ -1,9 +1,11 @@
 # depslib dependency file v1.0
-1666463496 source:/Users/federico/code/fitpack/src/fitpack_core.f90
+1666471888 source:/Users/federico/code/fitpack/src/fitpack_core.f90
 
-1666423064 source:/Users/federico/code/fitpack/src/fitpack.f90
+1666463791 source:/Users/federico/code/fitpack/src/fitpack.f90
 
-1666436279 source:/Users/federico/code/fitpack/src/fitpack_tests.f90
+1666511730 source:/Users/federico/code/fitpack/src/fitpack_tests.f90
 
 1666436293 source:/Users/federico/code/fitpack/test/test.f90
+
+1666510980 source:/Users/federico/code/fitpack/test/fitpack_test_data.f90
 

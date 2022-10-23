@@ -1,5 +1,6 @@
 program test
     use fitpack_tests
+    use fitpack_test_data
 
     ! Get test ID from the useri
     write(*,'(A)',advance='no') 'Enter fitpack test ID [1:29] > '
@@ -18,8 +19,8 @@ program test
         case (10); call mnpade
         case (11); call mnparc
         case (12); call mnperc
-        case (13); call mnpogr
-        case (14); call mnpola
+        case (13); call mnpogr(dapogr)
+        case (14); call mnpola(dapola)
         case (15); call mnprof
         case (16); call mnregr
         case (17); call mnspal
@@ -33,7 +34,7 @@ program test
         case (25); call mncuev
         case (26); call mndbin
         case (27); call mnevpo
-        case (28); call mnpasu
+        case (28); call mnpasu(dapasu)
         case (29); call mnspgr
         case default; stop 'invalid test ID'
     end select

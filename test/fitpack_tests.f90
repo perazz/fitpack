@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_tests
     use fitpack_core
+    use fitpack_test_data
     implicit none
     private
 
@@ -1851,13 +1852,16 @@ module fitpack_tests
       !c               mnpasu : parsur test program                         cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnpasu
-      real(RKIND) ::u(21),v(11),f(693),tu(27),tv(17),c(900),wrk(2000),z(693), &
-       wk(128)
+      subroutine mnpasu(datafile)
+        real(RKIND), intent(in) :: datafile(:)
+        real(RKIND) ::u(21),v(11),f(693),tu(27),tv(17),c(900),wrk(2000),z(693), wk(128)
       integer iwrk(80),iw(32),ipar(2)
       real(RKIND) ::ai,fp,s
-      integer kwrk,lwrk,m,mu,mv,j0,j1,j2,j3,nc,nu,nuest,nv,nvest, &
-       i,idim,ier,is,iopt,j,l
+      integer kwrk,lwrk,m,mu,mv,j0,j1,j2,j3,nc,nu,nuest,nv,nvest,i,idim,ier,is,iopt,j,l,pos
+
+      ! Store a pointer to the datafile
+      pos = 0
+
       !  we generate the u-coordinates of the grid.
       mu = 21
       do 10 i=1,mu
@@ -1882,7 +1886,11 @@ module fitpack_tests
         do 30 l=1,idim
           j2 = j1+1
           j3 = j1+mv
-          read(5,920) (f(j),j=j2,j3)
+
+          ! Read from an array
+          f(j2:j3) = datafile(pos+1:pos+mv)
+          pos = pos+mv
+
           write(6,925) (f(j),j=j2,j3)
           j1 = j1+m
   30    continue
@@ -2106,40 +2114,43 @@ module fitpack_tests
       !c                  mnpogr : pogrid test program                      cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnpogr
-      !  ..local scalars..
-      real(RKIND) ::cv,del,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,one,ai,s
-      integer i,ier,is,j,k,kwrk,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv
-      !  ..local arrays..
-      integer ider(2),iopt(3),iwrk(100),iw(29)
-      real(RKIND) ::u(9),v(20),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
-       exact(180),err(9),sp(9),wrk(1600)
+      subroutine mnpogr(datafile)
+        real(RKIND), intent(in) :: datafile(*)
 
-      !  ..
-      !  set constants
-      one = 1
-      ! we set up the radius of the disc
-      r = one
-      ! we set up the number of u (radius)-values of the grid.
-      mu = 9
-      ! we set up the u-coordinates of the grid.
-      do 10 i=1,mu
-         ai = i
-         u(i) = ai*0.1
-  10  continue
-      ! we set up the number of v (angle)-values of the grid
-      mv = 20
-      ! we set up the v-coordinates of the grid.
-      del = pi*0.1
-      do 20 j=1,mv
-         ai = j-1
-         v(j) = ai*del-pi
-  20  continue
-      ! we fetch the data values at the grid points.
-      m = mu*mv
-      read(5,900) (z(i),i=1,m)
-      ! we fetch the data value at the origin.
-      read(5,900) z0
+        !  ..local scalars..
+        real(RKIND) ::cv,del,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,ai,s
+        integer i,ier,is,j,k,kwrk,lwrk,m,nc,nuest,nu,nvest,nv,pos
+
+        ! number of u (radius)-values of the grid.
+        integer, parameter :: mu = 9
+
+        ! number of v (angle)-values of the grid
+        integer, parameter :: mv = 20
+
+        ! ..local arrays..
+        integer :: ider(2),iopt(3),iwrk(100),iw(29)
+        real(RKIND) :: u(mu),v(mv),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
+                       exact(180),err(mu),sp(mu),wrk(1600)
+
+        ! Store a pointer to the data array
+        pos = 0
+
+        ! we set up the radius of the disc
+        r = one
+
+        ! set up the u-coordinates of the grid.
+        forall(i=1:mu) u(i) = 0.1_RKIND*i
+
+        ! we set up the v-coordinates of the grid.
+        forall(j=1:mv) v(j) = (j-1)*pi*0.1_RKIND -pi
+
+        ! we fetch the data values at the grid points.
+        m = mu*mv
+        z(1:m) = datafile(pos+1:pos+m); pos = pos+m
+
+        ! we fetch the data value at the origin.
+        z0     = datafile(pos+1)      ; pos = pos+1
+
       ! we print the data values at the grid points. we also compute and print
       ! the exact value of the test function underlying the data.
       write(6,905)
@@ -2305,17 +2316,20 @@ module fitpack_tests
       !c                 mnpola : polar test program                        cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnpola
+      subroutine mnpola(datafile)
         integer, parameter :: m1 = 200
         integer, parameter :: m2 = 90
+
+        real(RKIND), intent(in) :: datafile(:)
 
         real(RKIND), dimension(m1) :: x,y,z,w,u,v,exact,f
         real(RKIND) :: tu(30),tv(30),c(300),s,fp,eps,sum,ermax,error,ai
         real(RKIND), allocatable :: wrk1(:),wrk2(:)
         integer :: iopt(3),iwrk(500)
-        integer :: i,is,ier,kwrk,l,lwrk1,lwrk2,l1,l2,m,nc,nu,nv,nuest,nvest
+        integer :: i,is,ier,kwrk,l,lwrk1,lwrk2,l1,l2,m,nc,nu,nv,nuest,nvest,pos
 
         allocate(wrk1(15000),wrk2(5700))
+        pos = 0
 
       !  we fetch and print the coordinates and function values of the data.
       write(6,900)
@@ -2324,7 +2338,14 @@ module fitpack_tests
       do 10 i=1,50
          l1 = l2+1
          l2 = l2+4
-         read(5,910) (x(l),y(l),z(l),l=l1,l2)
+
+         do l=l1,l2
+            pos = pos+1; x(l) = datafile(pos)
+            pos = pos+1; y(l) = datafile(pos)
+            pos = pos+1; z(l) = datafile(pos)
+         end do
+
+         !read(5,910) (x(l),y(l),z(l),l=l1,l2)
   10  continue
       write(6,915)(x(l),y(l),z(l),l=1,m1)
       !  we calculate the exact function values and set up the weights w(i)=
