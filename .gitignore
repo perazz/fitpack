@@ -1,0 +1,5 @@
+*.o
+*.mod
+build/*
+project/bin/*
+project/obj/*
