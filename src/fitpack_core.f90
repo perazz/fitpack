@@ -27,8 +27,11 @@ module fitpack_core
     integer, parameter, public :: RSIZE = int32
 
     ! Polar
-    public :: evapol,polar,pogrid,percur,clocur,cocosp,concon,concur,cualde
+    public :: evapol,polar,pogrid,percur,cocosp,concon,concur,cualde
     public :: dblint,fourco,parcur,parder,pardeu,pardtc,parsur
+
+    ! Closed-curve
+    public :: clocur
 
     ! Surface
     public :: surev,surfit
@@ -108,7 +111,7 @@ module fitpack_core
          FITPACK_SUCCESS = ierr<=FITPACK_OK
       end function FITPACK_SUCCESS
 
-      recursive subroutine bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
+      pure subroutine bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
 
       !  subroutine bispeu evaluates on a set of points (x(i),y(i)),i=1,...,m
       !  a bivariate spline s(x,y) of degrees kx and ky, given in the
@@ -161,10 +164,10 @@ module fitpack_core
       integer :: iwrk(2),i,lwest
 
       !  Check inputs
-      ier   = FITPACK_INPUT_ERROR
       lwest = kx+ky+2
 
       if (lwrk<lwest .or. m<1) then
+
          ier = FITPACK_INPUT_ERROR
          return
 
@@ -181,39 +184,26 @@ module fitpack_core
       end subroutine bispeu
 
 
-      recursive subroutine bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z, &
-          wrk,lwrk,iwrk,kwrk,ier)
+      !  subroutine bispev evaluates on a grid (x(i),y(j)),i=1,...,mx; j=1,...,my a bivariate spline
+      !  s(x,y) of degrees kx and ky, given in the b-spline representation.
+      pure subroutine bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
 
-      !  subroutine bispev evaluates on a grid (x(i),y(j)),i=1,...,mx; j=1,...
-      !  ,my a bivariate spline s(x,y) of degrees kx and ky, given in the
-      !  b-spline representation.
-      !
-      !  calling sequence:
-      !     call bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,
-      !    * iwrk,kwrk,ier)
       !
       !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the
-      !           knots in the x-direction.
+      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
       !   nx    : integer, giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the
-      !           knots in the y-direction.
+      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
       !   ny    : integer, giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the
-      !           b-spline coefficients.
+      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   x     : real array of dimension (mx).
-      !           before entry x(i) must be set to the x co-ordinate of the
-      !           i-th grid point along the x-axis.
+      !           before entry x(i) must be set to the x co-ordinate of the i-th grid point along the x-axis.
       !           tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2,...,mx.
-      !   mx    : on entry mx must specify the number of grid points along
-      !           the x-axis. mx >=1.
+      !   mx    : on entry mx must specify the number of grid points along the x-axis. mx >=1.
       !   y     : real array of dimension (my).
-      !           before entry y(j) must be set to the y co-ordinate of the
-      !           j-th grid point along the y-axis.
+      !           before entry y(j) must be set to the y co-ordinate of the j-th grid point along the y-axis.
       !           ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
-      !   my    : on entry my must specify the number of grid points along
-      !           the y-axis. my >=1.
+      !   my    : on entry my must specify the number of grid points along the y-axis. my >=1.
       !   wrk   : real array of dimension lwrk. used as workspace.
       !   lwrk  : integer, specifying the dimension of wrk.
       !           lwrk >= mx*(kx+1)+my*(ky+1)
@@ -251,37 +241,30 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer nx,ny,kx,ky,mx,my,lwrk,kwrk,ier
+      integer, intent(in) :: nx,ny,kx,ky,mx,my,lwrk,kwrk
+      integer, intent(out) :: ier
       !  ..array arguments..
-      integer iwrk(kwrk)
-      real(RKIND) tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my),z(mx*my), &
-       wrk(lwrk)
+      integer, intent(inout) :: iwrk(kwrk)
+      real(RKIND), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+      real(RKIND), intent(out)   :: z(mx*my)
+      real(RKIND), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
-      integer i,iw,lwest
+      integer :: iw,lwest
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
+      ier   = FITPACK_INPUT_ERROR
       lwest = (kx+1)*mx+(ky+1)*my
-      if(lwrk<lwest) go to 100
-      if(kwrk<(mx+my)) go to 100
-      if (mx<1) go to 100
-      if (mx==1) go to 30
-      go to 10
-  10  do 20 i=2,mx
-        if(x(i)<x(i-1)) go to 100
-  20  continue
-  30  if (my<1) go to 100
-      if (my==1) go to 60
-      go to 40
-  40  do 50 i=2,my
-        if(y(i)<y(i-1)) go to 100
-  50  continue
-  60  ier = 0
-      iw = mx*(kx+1)+1
-      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk(1),wrk(iw), &
-       iwrk(1),iwrk(mx+1))
- 100  return
+
+      if (lwrk<lwest .or. kwrk<(mx+my) .or. mx<1 .or. my<1) return
+      if (mx>1 .and. any(x(2:mx)<x(1:mx-1))) return
+      if (my>1 .and. any(y(2:my)<y(1:my-1))) return
+
+      ! Evaluate spline
+      ier = FITPACK_OK
+      iw  = mx*(kx+1)+1
+      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk(1),wrk(iw),iwrk(1),iwrk(mx+1))
+
       end subroutine bispev
 
 
@@ -1621,8 +1604,7 @@ module fitpack_core
       end subroutine curev
 
 
-      recursive subroutine curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n, &
-         t,c,fp,wrk,lwrk,iwrk,ier)
+      recursive subroutine curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
 
       !  given the set of data points (x(i),y(i)) and the set of positive
       !  numbers w(i),i=1,2,...,m,subroutine curfit determines a smooth spline
@@ -1837,55 +1819,54 @@ module fitpack_core
       real(RKIND) x(m),y(m),w(m),t(nest),c(nest),wrk(lwrk)
       integer iwrk(nest)
       !  ..local scalars..
-      real(RKIND) tol
-      integer i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,maxit,nmin
+      integer i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin
       !  ..
       !  we set up the parameters tol and maxit
-      maxit = 20
-      tol = 0.1d-02
+      real(RKIND), parameter :: tol = smallnum03
+      integer    , parameter :: maxit = 20
+
+      k1   = k+1
+      k2   = k1+1
+      nmin = 2*k1
+
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
-      if(k<=0 .or. k>5) go to 50
-      k1 = k+1
-      k2 = k1+1
-      if(iopt<(-1) .or. iopt>1) go to 50
-      nmin = 2*k1
-      if(m<k1 .or. nest<nmin) go to 50
+      ier = FITPACK_INPUT_ERROR
+      if (k<=0 .or. k>5)         return
+      if (iopt<(-1) .or. iopt>1) return
+      if (m<k1 .or. nest<nmin)   return
       lwest = m*k1+nest*(7+3*k)
-      if(lwrk<lwest) go to 50
-      if(xb>x(1) .or. xe<x(m)) go to 50
-      do 10 i=2,m
-         if(x(i-1)>x(i)) go to 50
-  10  continue
-      if(iopt>=0) go to 30
-      if(n<nmin .or. n>nest) go to 50
-      j = n
-      do 20 i=1,k1
-         t(i) = xb
-         t(j) = xe
-         j = j-1
-  20  continue
-      call fpchec(x,m,t,n,k,ier)
-      if (ier==0) go to 40
-      go to 50
-  30  if(s<0.) go to 50
-      if(s==zero .and. nest<(m+k1)) go to 50
+      if(lwrk<lwest)             return
+      if(xb>x(1) .or. xe<x(m))   return
+      if (any(x(1:m-1)>x(2:m)))  return
+
+      if (iopt>=0) then
+          if (s<zero .or. (s==zero .and. nest<(m+k1))) return
+      else
+          if (n<nmin .or. n>nest) return
+          j = n
+          do i=1,k1
+             t(i) = xb
+             t(j) = xe
+             j = j-1
+          end do
+          call fpchec(x,m,t,n,k,ier); if (ier/=0) return
+      endif
+
       ! we partition the working space and determine the spline approximation.
-  40  ifp = 1
+      ifp = 1
       iz = ifp+nest
       ia = iz+nest
       ib = ia+nest*k1
       ig = ib+nest*k2
       iq = ig+nest*k2
       call fpcurf(iopt,x,y,w,m,xb,xe,k,s,nest,tol,maxit,k1,k2,n,t,c,fp, &
-       wrk(ifp),wrk(iz),wrk(ia),wrk(ib),wrk(ig),wrk(iq),iwrk,ier)
-  50  return
+                  wrk(ifp),wrk(iz),wrk(ia),wrk(ib),wrk(ig),wrk(iq),iwrk,ier)
+
       end subroutine curfit
 
 
-      recursive function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb, &
-          ye,wrk) result(dblint_res)
+      recursive function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
 
       real(RKIND) :: dblint_res
       !  function dblint calculates the double integral
@@ -2652,7 +2633,7 @@ module fitpack_core
       end subroutine fpbfou
 
 
-      recursive subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
+      pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
 
       !  ..scalar arguments..
       integer    , intent(in)  :: nx,ny,kx,ky,mx,my
@@ -5343,8 +5324,8 @@ module fitpack_core
 
   10  j = 0
       i = 1
-  20  if(j==niveau) go to 30
       k = 0
+  20  if(j==niveau) go to 30
       l = left(i)
       if(l==0) go to 110
       i = l
@@ -5484,7 +5465,7 @@ module fitpack_core
       nv8 = nv-8
       nv11 = nv-11
       nuu = nu4-iop0-iop1-1
-      if(p>0.) pinv = one/p
+      pinv = merge(one/p,one,p>zero)
       !  it depends on the value of the flags ifsu,ifsv,ifbu,ifbv and iop0 and
       !  on the value of p whether the matrices (spu), (spv), (bu), (bv) and
       !  (cosi) still must be determined.
@@ -6324,7 +6305,7 @@ module fitpack_core
       half = 0.5
       nk1x = nx-kx1
       nk1y = ny-ky1
-      if(p>0.) pinv = one/p
+      pinv = merge(one/p,one,p>zero)
       !  it depends on the value of the flags ifsx,ifsy,ifbx and ifby and on
       !  the value of p whether the matrices (spx),(spy),(bx) and (by) still
       !  must be determined.
@@ -6655,7 +6636,7 @@ module fitpack_core
       nv8 = nv-8
       nv11 = nv-11
       nuu = nu4-iop0-iop1-2
-      if(p>0.) pinv = one/p
+      pinv = merge(one/p,one,p>zero)
       !  it depends on the value of the flags ifsu,ifsv,ifbu,ifbv,iop0,iop1
       !  and on the value of p whether the matrices (spu), (spv), (bu), (bv),
       !  (cosi) still must be determined.
@@ -6702,22 +6683,16 @@ module fitpack_core
   50  continue
       ifsv = 1
       if(iop0==0 .and. iop1==0) go to 85
-      !  calculate the coefficients of the interpolating splines for cos(v)
-      !  and sin(v).
-      do 55 i=1,nv4
-         cosi(1,i) = 0.
-         cosi(2,i) = 0.
-  55  continue
+      !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
+      cosi(:,1:nv4) = zero
       if(nv7<4) go to 85
       do 65 i=1,nv7
          l = i+3
          arg = tv(l)
          call fpbspl(tv,nv,3,arg,l,h)
-         do 60 j=1,3
-            av1(i,j) = h(j)
-  60     continue
-         cosi(1,i) = cos(arg)
-         cosi(2,i) = sin(arg)
+         av1(i,1:3) = h(1:3)
+         cosi(1,i)  = cos(arg)
+         cosi(2,i)  = sin(arg)
   65  continue
       call fpcyt1(av1,nv7,nv)
       do 80 j=1,2
@@ -6750,15 +6725,11 @@ module fitpack_core
       !  simultaneously, we compute the resulting sum of squared residuals sq.
  150  dr01 = dr(1)
       dr11 = dr(4)
-      do 155 i=1,mv
-         a0(1,i) = dr01
-         a1(1,i) = dr11
- 155  continue
-      if(nv8==0 .or. p<=0.) go to 165
-      do 160 i=1,nv8
-         b0(1,i) = 0.
-         b1(1,i) = 0.
- 160  continue
+      a0(1,1:mv) = dr01
+      a1(1,1:mv) = dr11
+      if(nv8==0 .or. p<=zero) go to 165
+      b0(1,1:nv8) = zero
+      b1(1,1:nv8) = zero
  165  mvv = mv
       if(iop0==0) go to 195
       fac = (tu(5)-tu(4))/three
@@ -6930,10 +6901,7 @@ module fitpack_core
       !  triangular matrix of bandwidth 5.
       ncof = nuu*nv7
       !  initialization.
-      do 430 i=1,ncof
-        c(i) = 0.
- 430  continue
-
+      c(:ncof) = zero
       av1(1:nv4,1:5) = zero
       av2(1:nv4,1:4) = zero
       jper = 0
@@ -7986,7 +7954,7 @@ module fitpack_core
       acc = tol*s
       !  determine nmax, the number of knots for spline interpolation.
       nmax = m+k1
-      if(s>0.) go to 45
+      if(s>zero) go to 45
       !  if s=0, s(u) is an interpolating curve.
       !  test whether the required storage space exceeds the available one.
       n = nmax
@@ -8046,9 +8014,7 @@ module fitpack_core
       !  at the same time fp=f(p=inf) is computed.
         fp = 0.
       !  initialize the b-spline coefficients and the observation matrix a.
-        do 75 i=1,nc
-          z(i) = 0.
-  75    continue
+        z(1:nc) = zero
         a(1:nk1,1:k1) = zero
         l = k1
         jj = 0
@@ -8131,7 +8097,7 @@ module fitpack_core
  150    fpold = fp
       !  compute the sum of squared residuals for each knot interval
       !  t(j+k) <= u(i) <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = 0.
+        fpart = zero
         i = 1
         l = k2
         new = 0
@@ -12262,7 +12228,7 @@ module fitpack_core
         if(npest<np+2) l2=ntt
       !  test whether we cannot further increase the number of knots.
         if(l1>l2) go to 950
- 500    fpmax = 0.
+ 500    fpmax = zero
         l = 0
         do 510 i=l1,l2
           if(fpmax>=fpint(i)) go to 510
@@ -12276,7 +12242,7 @@ module fitpack_core
         if(l>ntt) go to 530
       !  addition in the teta-direction
         l4 = l+4
-        fpint(l) = 0.
+        fpint(l) = zero
         fac1 = tt(l4)-arg
         fac2 = arg-tt(l4-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
@@ -12293,7 +12259,7 @@ module fitpack_core
         if(arg<pi) go to 540
         arg = arg-pi
         l4 = l4-nrr
- 540    fpint(l) = 0.
+ 540    fpint(l) = zero
         fac1 = tp(l4)-arg
         fac2 = arg-tp(l4-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
@@ -12339,14 +12305,11 @@ module fitpack_core
       !  the b-splines at the knots tp(l),l=5,...,np-4.
       call fpdisc(tp,np,5,bp,npest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = sup-s
       p3 = -one
       f3 = fpms
-      p = 0.
-      do 585 i=1,ncof
-        p = p+a(i,1)
- 585  continue
+      p  = sum(a(1:ncof,1))
       rn = ncof
       p = rn/p
       !  find the bandwidth of the extended observation matrix.
@@ -12849,16 +12812,11 @@ module fitpack_core
       !  evaluate for the y-direction, the (ky+1) non-zero b-splines at y(in).
           call fpbspl(ty,ny,ky,y(in),l2,hy)
       !  store the value of these b-splines in spx and spy respectively.
-          do 160 i=1,kx1
-            spx(in,i) = hx(i)
- 160      continue
-          do 170 i=1,ky1
-            spy(in,i) = hy(i)
- 170      continue
+          spx(in,1:kx1) = hx(1:kx1)
+          spy(in,1:ky1) = hy(1:ky1)
       !  initialize the new row of observation matrix.
-          do 180 i=1,iband
-            h(i) = 0.
- 180      continue
+          h(1:iband) = zero
+
       !  calculate the non-zero elements of the new row by making the cross
       !  products of the non-zero b-splines in x- and y-direction.
           i1 = 0
@@ -12899,11 +12857,7 @@ module fitpack_core
  250    continue
       !  find dmax, the maximum value for the diagonal elements in the reduced
       !  triangle.
-        dmax = 0.
-        do 260 i=1,ncof
-          if(a(i,1)<=dmax) go to 260
-          dmax = a(i,1)
- 260    continue
+        dmax = max(zero,maxval(a(1:ncof,1)))
       !  check whether the observation matrix is rank deficient.
         sigma = eps*dmax
         do 270 i=1,ncof
@@ -12912,9 +12866,7 @@ module fitpack_core
       !  backward substitution in case of full rank.
         call fpback(a,f,ncof,iband,c,nc)
         rank = ncof
-        do 275 i=1,ncof
-          q(i,1) = a(i,1)/dmax
- 275    continue
+        q(:ncof,1) = a(:ncof,1)/dmax
         go to 300
       !  in case of rank deficiency, find the minimum norm solution.
       !  check whether there is sufficient working space
@@ -12949,10 +12901,8 @@ module fitpack_core
       !  data points having the coordinate belonging to that knot interval.
       !  calculate also coord which is the same sum, weighted by the position
       !  of the data points considered.
-        do 320 i=1,nrint
-          fpint(i) = 0.
-          coord(i) = 0.
- 320    continue
+        fpint(:nrint) = zero
+        coord(:nrint) = zero
         do 360 num=1,nreg
           num1 = num-1
           lx = num1/nyy
@@ -12962,7 +12912,7 @@ module fitpack_core
           jrot = lx*nk1y+ly
           in = index(num)
  330      if(in==0) go to 360
-          store = 0.
+          store = zero
           i1 = jrot
           do 350 i=1,kx1
             hxi = spx(in,i)
@@ -12984,7 +12934,7 @@ module fitpack_core
       !  find the interval for which fpint is maximal on the condition that
       !  there still can be added a knot.
  370    l = 0
-        fpmax = 0.
+        fpmax = zero
         l1 = 1
         l2 = nrint
         if(nx==nxe) l1 = nxx+1
@@ -13003,7 +12953,7 @@ module fitpack_core
         if(l>nxx) go to 400
       !  addition in the x-direction.
         jxy = l+kx1
-        fpint(l) = 0.
+        fpint(l) = zero
         fac1 = tx(jxy)-arg
         fac2 = arg-tx(jxy-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 370
@@ -13017,7 +12967,7 @@ module fitpack_core
         go to 420
       !  addition in the y-direction.
  400    jxy = l+ky1-nxx
-        fpint(l) = 0.
+        fpint(l) = zero
         fac1 = ty(jxy)-arg
         fac2 = arg-ty(jxy-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 370
@@ -13066,14 +13016,11 @@ module fitpack_core
       !  the b-splines at the knots ty(l),l=ky+2,...,ny-ky-1.
       call fpdisc(ty,ny,ky2,by,nmax)
       !  initial value for p.
- 450  p1 = 0.
+ 450  p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p = 0.
-      do 460 i=1,ncof
-        p = p+a(i,1)
- 460  continue
+      p = sum(a(:ncof,1))
       rn = ncof
       p = rn/p
       !  find the bandwidth of the extended observation matrix.
@@ -13197,7 +13144,7 @@ module fitpack_core
           jrot = lx*nk1y+ly
           in = index(num)
  690      if(in==0) go to 720
-          store = 0.
+          store = zero
           i1 = jrot
           do 710 i=1,kx1
             hxi = spx(in,i)
@@ -13260,7 +13207,7 @@ module fitpack_core
  810  ier = 1
       go to 830
  815  ier = -1
-      fp = 0.
+      fp = zero
  820  if(ncof/=rank) ier = -rank
       !  test whether x and y are in the original order.
  830  if(ichang<0) go to 930
@@ -13387,7 +13334,7 @@ module fitpack_core
       !    fpgivs,fprota
       !  ..
       one = 1
-      if(p>zero) pinv = one/p
+      pinv = merge(one/p,one,p>zero)
       n4 = n-4
       mid = mm*idim
       m2 = m*mm
@@ -13487,7 +13434,7 @@ module fitpack_core
       !  ..subroutine references..
       !    fpgivs,fprota
       !  ..
-      if (p>zero) pinv = one/p
+      pinv = merge(one/p,one,p>zero)
       n4 = n-4
       n7 = n-7
       n11 = n-11
@@ -13519,19 +13466,12 @@ module fitpack_core
         if(p<=zero) go to 740
       !  fetch a new row of matrix (b).
         n1 = nrold+1
-        do 140 j=1,5
-          h(j) = b(n1,j)*pinv
- 140    continue
+        h  = b(n1,:)*pinv
       !  find the appropriate row of q.
-        do 160 j=1,mid
-          right(j) = 0.
- 160    continue
+        right(:mid) = zero
         go to 240
       !  fetch a new row of matrix (sp)
- 180    h(5) = 0.
-        do 200 j=1,4
-          h(j) = sp(it,j)
- 200    continue
+ 180    h = [sp(it,:),zero]
       !  find the appropriate row of q.
         j = 0
         do 220 ii=1,idim
@@ -13561,11 +13501,8 @@ module fitpack_core
       !  if one of the non-zero elements of the new row corresponds to one of
       !  the b-splines n(j;*),j=n7+1,...,n4,we take account of the periodicity
       !  conditions for setting up this row of (a).
- 320     do 340 i=1,4
-            h1(i) = 0.
-            h2(i) = 0.
- 340     continue
-         h1(5) = 0.
+ 320     h1 = zero
+         h2 = zero
          j = nrold-n11
          do 420 i=1,5
             j = j+1
@@ -13611,7 +13548,7 @@ module fitpack_core
  500        do 520 i=1,i2
                h1(i) = h1(i+1)
  520        continue
-            h1(i2+1) = 0.
+            h1(i2+1) = zero
  540     continue
       !  rotations with the rows n11+1,...,n7 of a.
  560     do 620 irot=1,4
@@ -14066,9 +14003,9 @@ module fitpack_core
       if(ipar/=0 .or. iopt>0) go to 40
       i1 = 0
       i2 = idim
-      u(1) = 0.
+      u(1) = zero
       do 20 i=2,m
-         dist = 0.
+         dist = zero
          do 10 j=1,idim
             i1 = i1+1
             i2 = i2+1
@@ -14080,8 +14017,8 @@ module fitpack_core
       do 30 i=2,m
          u(i) = u(i)/u(m)
   30  continue
-      ub = 0.
-      ue = 1.
+      ub = zero
+      ue = one
       u(m) = ue
   40  if(ub>u(1) .or. ue<u(m) .or. w(1)<=0.) go to 90
       do 50 i=2,m
@@ -15658,10 +15595,7 @@ module fitpack_core
       if(ider(1)<0) go to 50
       zb = z0
       go to 70
-  50  zb = 0.
-      do 60 i=1,mv
-         zb = zb+z(i)
-  60  continue
+  50  zb = sum(z(1:mv))
       rn = mv
       zb = zb/rn
       !  we determine the range of z-values.
@@ -15672,8 +15606,8 @@ module fitpack_core
          if(z(i)>zmax) zmax = z(i)
   80  continue
       wrk(5) = zb
-      wrk(6) = 0.
-      wrk(7) = 0.
+      wrk(6) = zero
+      wrk(7) = zero
       wrk(8) = zmax -zmin
       iwrk(4) = mu
       if(iopt(1)==0) go to 140
@@ -15681,12 +15615,12 @@ module fitpack_core
       if(nv<11 .or. nv>nvest) go to 200
       j = nu
       do 90 i=1,4
-        tu(i) = 0.
+        tu(i) = zero
         tu(j) = r
         j = j-1
   90  continue
       l = 9
-      wrk(l) = 0.
+      wrk(l) = zero
       if(iopt(2)==0) go to 100
       l = l+1
       uu = u(1)
@@ -17140,16 +17074,12 @@ module fitpack_core
       if(ider(1)<0) go to 45
       rb = r0
       go to 55
-  45  rb = 0.
-      do 50 i=1,mv
-         rb = rb+r(i)
-  50  continue
-      rb = rb/rn
+  45  rb = sum(r(1:mv))/rn
       !  if not given, we compute an estimate for r1.
   55  if(ider(3)<0) go to 60
       re = r1
       go to 70
-  60  re = 0.
+  60  re = zero
       j = m
       do 65 i=1,mv
          re = re+r(j)
@@ -17164,11 +17094,11 @@ module fitpack_core
          if(r(i)>rmax) rmax = r(i)
   80  continue
       wrk(5) = rb
-      wrk(6) = 0.
-      wrk(7) = 0.
+      wrk(6) = zero
+      wrk(7) = zero
       wrk(8) = re
-      wrk(9) = 0.
-      wrk(10) = 0.
+      wrk(9) = zero
+      wrk(10) = zero
       wrk(11) = rmax -rmin
       wrk(12) = wrk(11)
       iwrk(4) = mu
@@ -17178,12 +17108,12 @@ module fitpack_core
       if(nv<11 .or. nv>nvest) go to 200
       j = nu
       do 90 i=1,4
-        tu(i) = 0.
+        tu(i) = zero
         tu(j) = pi
         j = j-1
   90  continue
       l = 13
-      wrk(l) = 0.
+      wrk(l) = zero
       if(iopt(2)==0) go to 100
       l = l+1
       uu = u(1)
@@ -17606,14 +17536,14 @@ module fitpack_core
       ntt = nt-8
       if(ntt<0 .or. nt>ntest) go to 80
       if(ntt==0) go to 40
-      tt(4) = 0.
+      tt(4) = zero
       do 30 i=1,ntt
          j = i+4
          if(tt(j)<=tt(j-1) .or. tt(j)>=pi) go to 80
   30  continue
   40  npp = np-8
       if(npp<1 .or. np>npest) go to 80
-      tp(4) = 0.
+      tp(4) = zero
       do 50 i=1,npp
          j = i+4
          if(tp(j)<=tp(j-1) .or. tp(j)>=pi2) go to 80
