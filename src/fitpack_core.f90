@@ -42,10 +42,11 @@ module fitpack_core
     ! B-Spline
     public :: bispev  ! Evaluate 2d spline on a meshgrid
     public :: bispeu  ! Evaluate 2d spline on arbitrary (x,y) points
-    public :: sproot,insert,sphere,spgrid
+    public :: insert,sphere,spgrid
 
 
     public :: splev   ! Evaluate 1d spline value
+    public :: sproot  ! Find zeroes of a 1d spline
 
     public :: splint  ! Evaluate integral below spline
     public :: regrid,profil
@@ -76,6 +77,7 @@ module fitpack_core
     real(RKIND), parameter, public :: fourth = 0.25_RKIND
     real(RKIND), parameter, public :: two    = 2.0_RKIND
     real(RKIND), parameter, public :: three  = 3.0_RKIND
+    real(RKIND), parameter, public :: four   = 4.0_RKIND
     real(RKIND), parameter, public :: six    = 6.0_RKIND
     real(RKIND), parameter, public :: ten    = 10.0_RKIND
     real(RKIND), parameter, public :: pi     = atan2(zero,-one)
@@ -5013,10 +5015,9 @@ module fitpack_core
       end subroutine fpcurf
 
 
-      recursive subroutine fpcuro(a,b,c,d,x,n)
+      !  subroutine fpcuro finds the real zeros of a cubic polynomial p(x) = a*x**3+b*x**2+c*x+d.
+      pure subroutine fpcuro(a,b,c,d,x,n)
 
-      !  subroutine fpcuro finds the real zeros of a cubic polynomial
-      !  p(x) = a*x**3+b*x**2+c*x+d.
       !
       !  calling sequence:
       !     call fpcuro(a,b,c,d,x,n)
@@ -5029,81 +5030,93 @@ module fitpack_core
       !    n      : integer, giving the number of real zeros of p(x).
       !  ..
       !  ..scalar arguments..
-      real(RKIND) a,b,c,d
-      integer n
+      real(RKIND), intent(in) :: a,b,c,d
+      integer,     intent(out) :: n
       !  ..array argument..
-      real(RKIND) x(3)
+      real(RKIND), intent(out) :: x(3)
       !  ..local scalars..
-      integer i
-      real(RKIND) a1,b1,c1,df,disc,d1,e3,f,four,half,ovfl,pi3,p3,q,r, &
-       step,tent,u,u1,u2,y
+      integer :: i
+      real(RKIND) :: a1,b1,c1,df,disc,d1,f,p3,q,r,step,u,u1,u2,y
 
       !  set constants
-      four = 0.4d+01
-      ovfl =0.1d+05
-      half = 0.5d+0
-      tent = 0.1d+0
-      e3 = tent/0.3d0
-      pi3 = datan(0.1d+01)/0.75d0
+      real(RKIND), parameter :: ovfl = 1.0e4_RKIND
+      real(RKIND), parameter :: tent = 0.1_RKIND
+      real(RKIND), parameter :: pi3  = datan(one)/0.75_RKIND
+      real(RKIND), parameter :: e3   = tent/0.3_RKIND
+
       a1 = abs(a)
       b1 = abs(b)
       c1 = abs(c)
       d1 = abs(d)
-      !  test whether p(x) is a third degree polynomial.
-      if(max(b1,c1,d1)<a1*ovfl) go to 300
-      !  test whether p(x) is a second degree polynomial.
-      if(max(c1,d1)<b1*ovfl) go to 200
-      !  test whether p(x) is a first degree polynomial.
-      if(d1<c1*ovfl) go to 100
-      !  p(x) is a constant function.
-      n = 0
-      go to 800
-      !  p(x) is a first degree polynomial.
- 100  n = 1
-      x(1) = -d/c
-      go to 500
-      !  p(x) is a second degree polynomial.
- 200  disc = c*c-four*b*d
-      n = 0
-      if(disc<0.) go to 800
-      n = 2
-      u = sqrt(disc)
-      b1 = b+b
-      x(1) = (-c+u)/b1
-      x(2) = (-c-u)/b1
-      go to 500
-      !  p(x) is a third degree polynomial.
- 300  b1 = b/a*e3
-      c1 = c/a
-      d1 = d/a
-      q = c1*e3-b1*b1
-      r = b1*b1*b1+(d1-b1*c1)*half
-      disc = q*q*q+r*r
-      if(disc>0.) go to 400
-      u = sqrt(abs(q))
-      if(r<0.) u = -u
-      p3 = atan2(sqrt(-disc),abs(r))*e3
-      u2 = u+u
-      n = 3
-      x(1) = -u2*cos(p3)-b1
-      x(2) = u2*cos(pi3-p3)-b1
-      x(3) = u2*cos(pi3+p3)-b1
-      go to 500
- 400  u = sqrt(disc)
-      u1 = -r+u
-      u2 = -r-u
-      n = 1
-      x(1) = sign(abs(u1)**e3,u1)+sign(abs(u2)**e3,u2)-b1
-      !  apply a newton iteration to improve the accuracy of the roots.
- 500  do 700 i=1,n
-        y = x(i)
-        f = ((a*y+b)*y+c)*y+d
-        df = (three*a*y+two*b)*y+c
-        step = 0.
-        if(abs(f)<abs(df)*tent) step = f/df
+
+      if (max(b1,c1,d1)<a1*ovfl) then
+
+         !  p(x) is a third degree polynomial.
+         b1 = b/a*e3
+         c1 = c/a
+         d1 = d/a
+         q = c1*e3-b1*b1
+         r = b1*b1*b1+(d1-b1*c1)*half
+         disc = q*q*q+r*r
+         if (disc>zero) then
+
+            u = sqrt(disc)
+            u1 = -r+u
+            u2 = -r-u
+            n = 1
+            x(1) = sign(abs(u1)**e3,u1)+sign(abs(u2)**e3,u2)-b1
+
+         else
+
+            u = sign(sqrt(abs(q)),r)
+            p3 = atan2(sqrt(-disc),abs(r))*e3
+            u2 = u+u
+            n = 3
+            x(1) = -u2*cos(p3)-b1
+            x(2) = u2*cos(pi3-p3)-b1
+            x(3) = u2*cos(pi3+p3)-b1
+
+         end if
+
+      elseif(max(c1,d1)<b1*ovfl) then
+
+         !  p(x) is a second degree polynomial.
+         disc = c*c-four*b*d
+
+         if (disc<zero) then
+            n = 0
+            return
+         else
+            n = 2
+            u = sqrt(disc)
+            b1 = b+b
+            x(1) = (-c+u)/b1
+            x(2) = (-c-u)/b1
+         endif
+
+      elseif (d1<c1*ovfl) then
+
+         !  p(x) is a first degree polynomial.
+         n = 1
+         x(1) = -d/c
+
+      else
+
+         !  p(x) is a constant function.
+         n = 0
+         return
+
+      end if
+
+      ! apply a newton iteration to improve the accuracy of the roots.
+      do i=1,n
+        y    = x(i)
+        f    = ((a*y+b)*y+c)*y+d
+        df   = (three*a*y+two*b)*y+c
+        step = merge(f/df,zero,abs(f)<abs(df)*tent)
         x(i) = y-step
- 700  continue
- 800  return
+      end do
+
       end subroutine fpcuro
 
 
@@ -11822,8 +11835,7 @@ module fitpack_core
       end subroutine fpspgr
 
 
-      recursive subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest, &
-       eta,tol,maxit, &
+      recursive subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
        ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
        ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
 
@@ -12314,7 +12326,7 @@ module fitpack_core
       p = rn/p
       !  find the bandwidth of the extended observation matrix.
       iband4 = iband+3
-      if(ntt<=4) iband4 = ncof
+      if (ntt<=4) iband4 = ncof
       iband3 = iband4 -1
       ich1 = 0
       ich3 = 0
@@ -17972,13 +17984,10 @@ module fitpack_core
       end function splint
 
 
-      recursive subroutine sproot(t,n,c,zeros,mest,m,ier)
+      !  subroutine sproot finds the zeros of a cubic spline s(x),which is given in its normalized
+      ! b-spline representation.
+      pure subroutine sproot(t,n,c,zeros,mest,m,ier)
 
-      !  subroutine sproot finds the zeros of a cubic spline s(x),which is
-      !  given in its normalized b-spline representation.
-      !
-      !  calling sequence:
-      !     call sproot(t,n,c,zero,mest,m,ier)
       !
       !  input parameters:
       !    t    : real array,length n, containing the knots of s(x).
@@ -17987,9 +17996,9 @@ module fitpack_core
       !    mest : integer, specifying the dimension of array zero.
       !
       !  output parameters:
-      !    zero : real array,length mest, containing the zeros of s(x).
-      !    m    : integer,giving the number of zeros.
-      !    ier  : error flag:
+      !    zeros : real array,length mest, containing the zeros of s(x).
+      !    m     : integer,giving the number of zeros.
+      !    ier   : error flag:
       !      ier = 0: normal return.
       !      ier = 1: the number of zeros exceeds mest.
       !      ier =10: invalid input data (see restrictions).
@@ -18008,45 +18017,43 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1987
+      !  latest update : october 2022
       !
       ! ..
       ! ..scalar arguments..
-      integer n,mest,m,ier
+      integer, intent(in)  :: n,mest
+      integer, intent(out) :: m,ier
       !  ..array arguments..
-      real(RKIND) t(n),c(n),zeros(mest)
+      real(RKIND), intent(in)  :: t(n),c(n)
+      real(RKIND), intent(out) :: zeros(mest)
       !  ..local scalars..
-      integer i,j,j1,l,n4
-      real(RKIND) ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2, &
-       t1,t2,t3,t4,t5,zz
-      logical z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
+      integer :: i,j,j1,l,n4
+      real(RKIND) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5,zz
+      logical :: z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
       !  ..local array..
-      real(RKIND) y(3)
+      real(RKIND) :: y(3)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      n4 = n-4
-      ier = 10
-      if(n<8) go to 800
+      n4  = n-4
+      ier = FITPACK_INPUT_ERROR
+      if(n<8) return
       j = n
-      do 10 i=1,3
-        if(t(i)>t(i+1)) go to 800
-        if(t(j)<t(j-1)) go to 800
+      do i=1,3
+        if(t(i)>t(i+1)) return
+        if(t(j)<t(j-1)) return
         j = j-1
-  10  continue
-      do 20 i=4,n4
-        if(t(i)>=t(i+1)) go to 800
-  20  continue
-      !  the problem considered reduces to finding the zeros of the cubic
-      !  polynomials pl(x) which define the cubic spline in each knot
-      !  interval t(l)<=x<=t(l+1). a zero of pl(x) is also a zero of s(x) on
-      !  the condition that it belongs to the knot interval.
-      !  the cubic polynomial pl(x) is determined by computing s(t(l)),
-      !  s'(t(l)),s(t(l+1)) and s'(t(l+1)). in fact we only have to compute
-      !  s(t(l+1)) and s'(t(l+1)); because of the continuity conditions of
-      !  splines and their derivatives, the value of s(t(l)) and s'(t(l))
-      !  is already known from the foregoing knot interval.
-      ier = 0
+      end do
+      if (any(t(4:n4)>=t(5:n4+1))) return
+
+      !  the problem considered reduces to finding the zeros of the cubic polynomials pl(x) which define
+      !  the cubic spline in each knot interval t(l)<=x<=t(l+1). a zero of pl(x) is also a zero of s(x) on
+      !  the condition that it belongs to the knot interval. the cubic polynomial pl(x) is determined by
+      !  computing s(t(l)), s'(t(l)),s(t(l+1)) and s'(t(l+1)). in fact we only have to compute s(t(l+1))
+      !  and s'(t(l+1)); because of the continuity conditions of splines and their derivatives, the value
+      !  of s(t(l)) and s'(t(l)) is already known from the foregoing knot interval.
+      ier = FITPACK_OK
+
       !  evaluate some constants for the first knot interval
       h1 = t(4)-t(3)
       h2 = t(5)-t(4)
@@ -18065,12 +18072,14 @@ module fitpack_core
       d5 = (t3*c2+h1*c3)/t5
       a0 = (h2*d4+h1*d5)/t2
       ah = three*(h2*c4+h1*c5)/t2
-      z1 = .true.
-      if (ah<zero) z1 = .false.
+
+      z1  = .not.ah<zero
       nz1 = .not.z1
+
       m = 0
       !  main loop for the different knot intervals.
-      do 300 l=4,n4
+      knot_intervals: do l=4,n4
+
       !  evaluate some constants for the knot interval t(l) <= x <= t(l+1).
         h1 = h2
         h2 = t(l+2)-t(l+1)
@@ -18079,6 +18088,7 @@ module fitpack_core
         t3 = t(l+3)-t(l+1)
         t4 = t5
         t5 = t(l+3)-t(l)
+
       !  find a0 = s(t(l)), ah = s'(t(l)), b0 = s(t(l+1)) and bh = s'(t(l+1)).
         c1 = c2
         c2 = c3
@@ -18089,28 +18099,28 @@ module fitpack_core
         d5 = (h1*c3+t3*c2)/t5
         b0 = (h2*d4+h1*d5)/t2
         bh = three*(h2*c4+h1*c5)/t2
+
       !  calculate the coefficients a0,a1,a2 and a3 of the cubic polynomial
       !  pl(x) = ql(y) = a0+a1*y+a2*y**2+a3*y**3 ; y = (x-t(l))/(t(l+1)-t(l)).
         a1 = ah*h1
         b1 = bh*h1
         a2 = three*(b0-a0)-b1-two*a1
         a3 = two*(a0-b0)+b1+a1
+
       !  test whether or not pl(x) could have a zero in the range
       !  t(l) <= x <= t(l+1).
-        z3 = .true.
-        if(b1<zero) z3 = .false.
+        z3  = .not.b1<zero
         nz3 = .not.z3
         if(a0*b0<=zero) go to 100
-        z0 = .true.
-        if(a0<zero) z0 = .false.
+
+        z0  = .not.a0<zero
         nz0 = .not.z0
-        z2 = .true.
-        if(a2<0.) z2 = .false.
+        z2  = .not.a2<zero
         nz2 = .not.z2
-        z4 = .true.
-        if(3.0d0*a3+a2<zero) z4 = .false.
+        z4  = .not.three*a3+a2<zero
         nz4 = .not.z4
-        if(.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and. &
+
+        if (.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and. &
        z3.and.z4).or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and. &
        nz3.and.nz4))))go to 200
       !  find the zeros of ql(y).
@@ -18120,7 +18130,10 @@ module fitpack_core
         do 150 i=1,j
           if(y(i)<zero .or. y(i)>one) go to 150
       !  test whether the number of zeros of s(x) exceeds mest.
-          if(m>=mest) go to 700
+          if (m>=mest) then
+             ier = FITPACK_INSUFFICIENT_STORAGE
+             return
+          end if
           m = m+1
           zeros(m) = t(l)+h1*y(i)
  150    continue
@@ -18128,30 +18141,31 @@ module fitpack_core
         ah = bh
         z1 = z3
         nz1 = nz3
- 300  continue
+      end do knot_intervals
+
       !  the zeros of s(x) are arranged in increasing order.
-      if(m<2) go to 800
-      do 400 i=2,m
-        j = i
- 350    j1 = j-1
-        if(j1==0) go to 400
-        if(zeros(j)>=zeros(j1)) go to 400
-        zz = zeros(j)
-        zeros(j) = zeros(j1)
-        zeros(j1) = zz
-        j = j1
-        go to 350
- 400  continue
+      if (m<2) return
+
+      ! FP this double loop can be made more efficient
+      sort_zeros: do j=1,m
+        inner_loop: do j1 = i+1,m
+          if (zeros(j1)>=zeros(j)) cycle inner_loop
+          zz        = zeros(j)
+          zeros(j)  = zeros(j1)
+          zeros(j1) = zz
+        end do inner_loop
+      end do sort_zeros
+
+      ! Filter duplicates
       j = m
       m = 1
-      do 500 i=2,j
-        if(zeros(i)==zeros(m)) go to 500
+      filter_duplicates: do i=2,j
+        if(zeros(i)==zeros(m)) cycle filter_duplicates
         m = m+1
         zeros(m) = zeros(i)
- 500  continue
-      go to 800
- 700  ier = 1
- 800  return
+      end do filter_duplicates
+      return
+
       end subroutine sproot
 
 
