@@ -18148,7 +18148,7 @@ module fitpack_core
 
       ! FP this double loop can be made more efficient
       sort_zeros: do j=1,m
-        inner_loop: do j1 = i+1,m
+        inner_loop: do j1 = j+1,m
           if (zeros(j1)>=zeros(j)) cycle inner_loop
           zz        = zeros(j)
           zeros(j)  = zeros(j1)
