@@ -28,13 +28,16 @@ module fitpack_core
 
     ! Polar
     public :: evapol,polar,pogrid,percur,cocosp,concon,concur,cualde
-    public :: dblint,fourco,parcur,parder,pardeu,pardtc,parsur
+    public :: dblint,fourco,parcur,parder,pardeu,pardtc
 
     ! Closed-curve
     public :: clocur
 
     ! Surface
-    public :: surev,surfit
+    public :: surfit
+
+    public :: parsur
+    public :: surev   ! Evaluate parametric surface on an (u(i),v(j)) grid
 
     ! Curve
     public :: curev,curfit
@@ -1854,6 +1857,8 @@ module fitpack_core
           end do
           call fpchec(x,m,t,n,k,ier); if (ier/=0) return
       endif
+
+      ier = FITPACK_OK
 
       ! we partition the working space and determine the spline approximation.
       ifp = 1

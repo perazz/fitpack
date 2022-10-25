@@ -974,78 +974,88 @@ module fitpack_tests
       !c                mncurf : curfit test program                        cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mncurf
-      real(RKIND) ::x(25),y(25),w(25),t(35),c(35),wrk(1000),sp(25)
-      integer iwrk(35)
-      real(RKIND) ::ai,fp,s,xb,xe
-      integer i,ier,iopt,is,j,k,l,lwrk,l1,l2,m,n,nest,nk1
-      !  the ordinate values of the data points
-      data y(1),y(2),y(3),y(4),y(5),y(6),y(7),y(8),y(9),y(10),y(11), &
-       y(12),y(13),y(14),y(15),y(16),y(17),y(18),y(19),y(20),y(21), &
-       y(22),y(23),y(24),y(25)/1.0,1.0,1.4,1.1,1.0,1.0,4.0,9.0,13.0, &
-       13.4,12.8,13.1,13.0,14.0,13.0,13.5,10.0,2.0,3.0,2.5,2.5,2.5, &
-       3.0,4.0,3.5/
+      logical function mncurf() result(success)
+
       !  m denotes the number of data points
-      m = 25
-      !  we set up the abscissae and weights of the data points
-      do 10 i=1,m
-         ai = i-1
-         x(i) = ai
-         w(i) = 1.0
-  10  continue
+      integer, parameter :: m = 25
+
+      ! we set up the dimension information
+      integer :: nest = 35
+      integer, parameter :: lwrk = 1000
+
+      real(RKIND) :: t(35),c(35),wrk(lwrk),sp(m)
+      real(RKIND) :: ai,fp,s,xb,xe
+      integer     :: i,ier,iopt,is,j,k,l,l1,l2,n,nk1,iwrk(35)
+
+      ! we set up the abscissae, ordinate values, and weights of the data points
+      real(RKIND), parameter :: w(m) = one
+      real(RKIND), parameter :: x(m) = [(real(i-1,RKIND),i=1,m)]
+      real(RKIND), parameter :: y(m) = [1.0_RKIND,1.0_RKIND,1.4_RKIND,1.1_RKIND,1.0_RKIND,1.0_RKIND,&
+                                        4.0_RKIND,9.0_RKIND,13.0_RKIND,13.4_RKIND,12.8_RKIND,13.1_RKIND,&
+                                        13.0_RKIND,14.0_RKIND,13.0_RKIND,13.5_RKIND,10.0_RKIND,2.0_RKIND,&
+                                        3.0_RKIND,2.5_RKIND,2.5_RKIND,2.5_RKIND,3.0_RKIND,4.0_RKIND,&
+                                        3.5_RKIND]
+
       !  we set up the boundaries of the approximation interval
       xb = x(1)
       xe = x(m)
-      !  we set up the dimension information.
-      nest = 35
-      lwrk = 1000
+
       !  loop for the different spline degrees.
-      do 400 k=3,5,2
+      spline_degrees: do k=3,5,2
       !  loop for the different spline approximations of degree k
-         do 300 is=1,7
-            go to (110,120,130,140,150,160,170),is
-      !  we start computing the least-squares polynomial (large value for s).
- 110        iopt = 0
-            s = 1000.
-            go to 200
-      !  iopt=1 from the second call on
- 120        iopt = 1
-            s = 60.
-            go to 200
-      !  a smaller value for s to get a closer approximation
- 130        s = 10.
-            go to 200
-      !  a larger value for s to get a smoother approximation
- 140        s = 30.
-            go to 200
-      !  if a satisfactory fit is obtained  we can calculate a spline of equal
-      !  quality of fit ( same value for s ) but possibly with fewer knots by
-      !  specifying iopt=0
- 150        s = 30.
-            iopt = 0
-            go to 200
-      !  we calculate an interpolating spline
- 160        s = 0.
-            go to 200
-      !  finally, we also calculate a least-squares spline function with
-      !  specified knots
- 170        iopt = -1
-            j = k+2
-            do 180 l=1,7
-               ai =3*l
-               t(j) = ai
-               j = j+1
- 180        continue
-            n = 9+2*k
- 200        call curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk, &
-             iwrk,ier)
-      !  printing of the results.
-            if(iopt>=0) go to 210
-            write(6,910) k
-            go to 220
- 210        write(6,915) k
-            write(6,920) s
- 220        write(6,925) fp,ier
+         test_case: do is=1,7
+
+            select case (is)
+              case (1)
+                 !  we start computing the least-squares polynomial (large value for s).
+                 iopt = 0
+                 s = 1000.0_RKIND
+              case (2)
+                 !  iopt=1 from the second call on
+                 iopt = 1
+                 s = 60.0_RKIND
+              case (3)
+                 !  a smaller value for s to get a closer approximation
+                 s = 10.0_RKIND
+              case (4)
+                 !  a larger value for s to get a smoother approximation
+                 s = 30.0_RKIND
+              case (5)
+                 !  if a satisfactory fit is obtained  we can calculate a spline of equal quality
+                 !  of fit ( same value for s ) but possibly with fewer knots by specifying iopt=0
+                 s = 30.0_RKIND
+                 iopt = 0
+              case (6)
+                 !  we calculate an interpolating spline
+                 s = zero
+
+              case (7)
+
+                 ! finally, we also calculate a least-squares spline function with specified knots
+                 iopt = -1
+                 j = k+2
+                 do l=1,7
+                    ai =3*l
+                    t(j) = ai
+                    j = j+1
+                 end do
+                 n = 9+2*k
+
+            end select
+
+            ! Call fitting routine
+            call curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
+            if (.not.FITPACK_SUCCESS(ier)) exit spline_degrees
+
+            !  printing of the results.
+            if (iopt<0) then
+                write(6,910) k
+            else
+                write(6,915) k
+                write(6,920) s
+            endif
+
+            write(6,925) fp,ier
             write(6,930) n
             write(6,935)
             write(6,940) (t(i),i=1,n)
@@ -1053,28 +1063,36 @@ module fitpack_tests
             write(6,945)
             write(6,950) (c(i),i=1,nk1)
             write(6,955)
-      !  evaluation of the spline approximation
+
+            ! evaluation of the spline approximation
             call splev(t,n,c,k,x,sp,m,0,ier)
-            do 230 i=1,5
+            if (.not.FITPACK_SUCCESS(ier)) exit spline_degrees
+
+            do i=1,5
                l1 = (i-1)*5+1
                l2 = l1+4
                write(6,960) (x(l),y(l),sp(l),l=l1,l2)
- 230        continue
- 300     continue
- 400  continue
-      stop
- 910  format(32h0least-squares spline of degree ,i1)
- 915  format(28h0smoothing spline of degree ,i1)
- 920  format(20h smoothing factor s=,f5.0)
- 925  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i2)
- 930  format(1x,24htotal number of knots n=,i3)
- 935  format(1x,22hposition of the knots )
- 940  format(5x,12f6.1)
- 945  format(23h0b-spline coefficients )
- 950  format(5x,8f9.4)
- 955  format(1h0,5(1x,2hxi,3x,2hyi,2x,5hs(xi),1x))
- 960  format(1h ,5(f4.1,1x,f4.1,1x,f4.1,2x))
-      end subroutine mncurf
+            end do
+         end do test_case
+      end do spline_degrees
+
+      success = FITPACK_SUCCESS(ier)
+      if (.not.success) print *, '[mncurf] returned error ',FITPACK_MESSAGE(ier)
+
+      return
+
+      910 format(32h0least-squares spline of degree ,i1)
+      915 format(28h0smoothing spline of degree ,i1)
+      920 format(20h smoothing factor s=,f5.0)
+      925 format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i2)
+      930 format(1x,24htotal number of knots n=,i3)
+      935 format(1x,22hposition of the knots )
+      940 format(5x,12f6.1)
+      945 format(23h0b-spline coefficients )
+      950 format(5x,8f9.4)
+      955 format(1h0,5(1x,2hxi,3x,2hyi,2x,5hs(xi),1x))
+      960 format(1h ,5(f4.1,1x,f4.1,1x,f4.1,2x))
+      end function mncurf
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

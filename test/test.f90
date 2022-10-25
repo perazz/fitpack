@@ -21,13 +21,17 @@ program test
     ! Run legacy tests
     call run_legacy_tests
 
-!    if (failed>0) then
-!       print 1, passed, failed, 'interface'
-!       stop -1
-!    endif
+    if (failed>0) then
+       print 1, passed, failed, 'legacy'
+       stop -1
+    else
+       print 2, passed
+       stop 0
+    endif
 
 
     1 format('[fitpack] there are ',i0,' passed, ',i0,' failed ',a,' tests.')
+    2 format(//'[fitpack] SUCCESS! ',i0,' test passed, none failed.')
 
 
     contains
@@ -47,9 +51,20 @@ program test
 
         integer :: itest
 
-        ! Get test ID from the useri
-        write(*,'(A)',advance='no') 'Enter fitpack test ID [1:29] > '
-        read *, itest
+        ! Perform all le
+        do itest = 7,7
+           call add_test(perform_legacy_test(itest))
+        end do
+
+
+
+    end subroutine run_legacy_tests
+
+    ! Perform FITPACK's i-th legacy test case
+    logical function perform_legacy_test(itest) result(success)
+        integer, intent(in) :: itest
+
+        success = .true.
 
         select case (itest)
             case (1);  call mnbisp
@@ -58,7 +73,7 @@ program test
             case (4);  call mnconc
             case (5);  call mncosp
             case (6);  call mncual
-            case (7);  call mncurf
+            case (7);  success = mncurf()
             case (8);  call mnfour
             case (9);  call mnist
             case (10); call mnpade
@@ -81,10 +96,12 @@ program test
             case (27); call mnevpo
             case (28); call mnpasu(dapasu)
             case (29); call mnspgr(daspgr_u,daspgr_v,daspgr_r)
-            case default; stop 'invalid test ID'
+            case default;
+                 print *, 'invalid test ID'
+                 success = .false.
         end select
 
-    end subroutine run_legacy_tests
+    end function perform_legacy_test
 
     subroutine add_test(success)
         logical, intent(in) :: success
