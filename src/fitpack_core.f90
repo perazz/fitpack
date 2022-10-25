@@ -73,7 +73,8 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
 
     ! Internal Parameters
-    integer    , parameter, public :: SIZ_K  = 19                ! Max order (for array allocation)
+    integer    , parameter, public :: SIZ_IDIM = 10                ! Max number of dimensions
+    integer    , parameter, public :: SIZ_K    = 19                ! Max order (for array allocation)
     real(RKIND), parameter, public :: one    = 1.0_RKIND
     real(RKIND), parameter, public :: zero   = 0.0_RKIND
     real(RKIND), parameter, public :: half   = 0.5_RKIND
@@ -1335,7 +1336,7 @@ module fitpack_core
       tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(iopt<(-1) .or. iopt>1) go to 90
       if(idim<=0 .or. idim>10) go to 90
       if(k<=0 .or. k>5) go to 90
@@ -1356,11 +1357,9 @@ module fitpack_core
       ncc = nest*idim
       if(mx<mxx .or. nc<ncc) go to 90
       lwest = m*k1+nest*(6+idim+3*k)
-      if(lwrk<lwest) go to 90
-      if(w(1)<=0.) go to 90
-      do 10 i=2,m
-         if(u(i-1)>=u(i) .or. w(i)<=0.) go to 90
-  10  continue
+      if (lwrk<lwest) go to 90
+      if (any(w<=zero)) go to 90
+      if (any(u(1:m-1)>=u(2:m))) goto 90
       if(iopt>=0) go to 30
       if(n<nmin .or. n>nest) go to 90
       j = n
@@ -1370,9 +1369,9 @@ module fitpack_core
          j = j-1
   20  continue
       call fpched(u,m,t,n,k,ib,ie,ier)
-      if (ier==0) go to 40
+      if (ier==FITPACK_OK) go to 40
       go to 90
-  30  if(s<0.) go to 90
+  30  if(s<zero) go to 90
       nmax = m+k1+ib1+ie1
       if(s==zero .and. nest<nmax) go to 90
       ier = 0
@@ -1402,16 +1401,14 @@ module fitpack_core
       end subroutine concur
 
 
-      recursive subroutine cualde(idim,t,n,c,nc,k1,u,d,nd,ier)
-
       !  subroutine cualde evaluates at the point u all the derivatives
       !                     (l)
       !     d(idim*l+j) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim
       !  given in its b-spline representation.
-      !
-      !  calling sequence:
-      !     call cualde(idim,t,n,c,nc,k1,u,d,nd,ier)
+
+      pure subroutine cualde(idim,t,n,c,nc,k1,u,d,nd,ier)
+
       !
       !  input parameters:
       !    idim : integer, giving the dimension of the spline curve.
@@ -1420,14 +1417,12 @@ module fitpack_core
       !    c    : array,length nc, which contains the b-spline coefficients.
       !    nc   : integer, giving the total number of coefficients of s(u).
       !    k1   : integer, giving the order of s(u) (order=degree+1).
-      !    u    : real, which contains the point where the derivatives must
-      !           be evaluated.
+      !    u    : real, which contains the point where the derivatives must be evaluated.
       !    nd   : integer, giving the dimension of the array d. nd >= k1*idim
       !
       !  output parameters:
-      !    d    : array,length nd,giving the different curve derivatives.
-      !           d(idim*l+j) will contain the j-th coordinate of the l-th
-      !           derivative of the curve at the point u.
+      !    d    : array,length nd,giving the different curve derivatives. d(idim*l+j) will contain the
+      !           j-th coordinate of the l-th derivative of the curve at the point u.
       !    ier  : error flag
       !      ier = 0 : normal return
       !      ier =10 : invalid input data (see restrictions)
@@ -1459,40 +1454,45 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer idim,n,nc,k1,nd,ier
-      real(RKIND) u
+      integer, intent(in)  :: idim,n,nc,k1,nd
+      integer, intent(out) :: ier
+      real(RKIND), intent(in) :: u
       !  ..array arguments..
-      real(RKIND) t(n),c(nc),d(nd)
+      real(RKIND), intent(in) :: t(n),c(nc)
+      real(RKIND), intent(out) :: d(nd)
       !  ..local scalars..
-      integer i,j,kk,l,m,nk1
+      integer :: i,j,kk,l,m,nk1
       !  ..local array..
-      real(RKIND) h(SIZ_K+1)
+      real(RKIND) :: h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      if(nd<(k1*idim)) go to 500
+      ier = FITPACK_INPUT_ERROR
+      if(nd<(k1*idim)) return
       nk1 = n-k1
-      if(u<t(k1) .or. u>t(nk1+1)) go to 500
+      if(u<t(k1) .or. u>t(nk1+1)) return
+
       !  search for knot interval t(l) <= u < t(l+1)
       l = k1
- 100  if(u<t(l+1) .or. l==nk1) go to 200
-      l = l+1
-      go to 100
- 200  if(t(l)>=t(l+1)) go to 500
-      ier = 0
+      do while (.not.(u<t(l+1) .or. l==nk1))
+         l = l+1
+      end do
+      if(t(l)>=t(l+1)) return
+
+      ier = FITPACK_OK
+
       !  calculate the derivatives.
       j = 1
-      do 400 i=1,idim
-        call fpader(t,n,c(j),k1,u,l,h)
-        m = i
-        do 300 kk=1,k1
-          d(m) = h(kk)
-          m = m+idim
- 300    continue
-        j = j+n
- 400  continue
- 500  return
+      do i=1,idim
+         call fpader(t,n,c(j),k1,u,l,h)
+         m = i
+         do kk=1,k1
+            d(m) = h(kk)
+            m = m+idim
+         end do
+         j = j+n
+      end do
+      return
       end subroutine cualde
 
 
@@ -2992,7 +2992,7 @@ module fitpack_core
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(10)
+      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(SIZ_IDIM)
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -3836,18 +3836,18 @@ module fitpack_core
       !  ..
       !  ..scalar arguments..
       real(RKIND) s,tol,fp
-      integer iopt,idim,m,mx,ib,ie,k,nest,maxit,k1,k2,n,nc,ier
+      integer mx,ib,ie,k,nest,maxit,k1,k2,n,nc
+      integer, intent(in)    :: iopt,idim,m
+      integer, intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest), &
-       z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe, &
        l,li,lj,l0,mb,me,mm,new,nk1,nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),xi(10)
+      real(RKIND) h(SIZ_K+1),xi(SIZ_IDIM)
 
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -3875,16 +3875,11 @@ module fitpack_core
       !  determine nmin, the number of knots for polynomial approximation.
       nmin = 2*k1
       !  find which data points are to be considered.
-      mb = 2
-      jb = ib
-      if(ib>0) go to 10
-      mb = 1
-      jb = 1
-  10  me = m-1
-      je = ie
-      if(ie>0) go to 20
-      me = m
-      je = 1
+      mb = merge(2,1,ib>0)
+      jb = merge(ib,1,ib>0)
+      me = merge(m-1,m,ie>0)
+      je = merge(ie,1,ie>0)
+
   20  if(iopt<0) go to 60
       !  calculation of acc, the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -3893,7 +3888,7 @@ module fitpack_core
       mmin = kbe+2
       mm = m-mmin
       nmax = nmin+mm
-      if(s>0.) go to 40
+      if(s>zero) go to 40
       !  if s=0, s(u) is an interpolating curve.
       !  test whether the required storage space exceeds the available one.
       n = nmax
@@ -7939,7 +7934,7 @@ module fitpack_core
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),xi(10)
+      real(RKIND) h(SIZ_K+1),xi(SIZ_IDIM)
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -8008,12 +8003,13 @@ module fitpack_core
       nplus = nrdata(n)
       if(fp0>s) go to 60
   50  n = nmin
-      fpold = 0.
+      fpold = zero
       nplus = 0
       nrdata(1) = m-2
+
       !  main loop for the different sets of knots. m is a save upper bound
       !  for the number of trials.
-  60  do 200 iter = 1,m
+  60  main_loop: do iter = 1,m
         if(n==nmin) ier = -2
       !  find nrint, tne number of knot intervals.
         nrint = n-nmin+1
@@ -8152,10 +8148,10 @@ module fitpack_core
       !  if n=nmax we locate the knots as for interpolation
           if(n==nmax) go to 10
       !  test whether we cannot further increase the number of knots.
-          if(n==nest) go to 200
+          if(n==nest) cycle main_loop
  190    continue
       !  restart the computations with the new set of knots.
- 200  continue
+      end do main_loop
       !  test whether the least-squares kth degree polynomial curve is a
       !  solution of our approximation problem.
  250  if(ier==(-2)) go to 440
