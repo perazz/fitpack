@@ -70,6 +70,8 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INSUFFICIENT_STORAGE = 1
     integer, parameter, public :: FITPACK_S_TOO_SMALL          = 2
     integer, parameter, public :: FITPACK_MAXIT                = 3
+    integer, parameter, public :: FITPACK_TOO_MANY_KNOTS       = 4
+    integer, parameter, public :: FITPACK_OVERLAPPING_KNOTS    = 5
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
 
     ! Internal Parameters
@@ -105,6 +107,8 @@ module fitpack_core
             case (FITPACK_INSUFFICIENT_STORAGE); msg = 'Insufficient Storage'
             case (FITPACK_S_TOO_SMALL); msg = 'Smoothing parameter is too small'
             case (FITPACK_MAXIT); msg = 'Infinite loop detected'
+            case (FITPACK_TOO_MANY_KNOTS); msg = 'More knots than data points'
+            case (FITPACK_OVERLAPPING_KNOTS); msg = 'Overlapping knots found'
             case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
             case default; msg = 'UNKNOWN ERROR'
          end select
@@ -8863,7 +8867,7 @@ module fitpack_core
         n7 = nk1-k
         n10 = n7-kk
         jper = 0
-        fp = 0.
+        fp = zero
         l = k1
         do 290 it=1,m1
       !  fetch the current data point x(it),y(it)
@@ -8902,11 +8906,8 @@ module fitpack_core
       !  of the observation matrix a. this row is stored in the arrays h1
       !  (the part with respect to a1) and h2 (the part with
       !  respect to a2).
- 160      do 170 i=1,kk
-            h1(i) = 0.
-            h2(i) = 0.
- 170      continue
-          h1(kk1) = 0.
+ 160      h1 = zero
+          h2 = zero
           j = l5-n10
           do 210 i=1,kk1
             j = j+1
@@ -8948,7 +8949,7 @@ module fitpack_core
               call fprota(cos,sin,h1(i1),a1(j,i1))
               h1(i) = h1(i1)
  230        continue
-            h1(i1) = 0.
+            h1(i1) = zero
  240      continue
       !  rotation with the rows n10+1,...n7 of matrix a.
  250      do 270 j=1,kk
@@ -9026,7 +9027,7 @@ module fitpack_core
         fpold = fp
       !  compute the sum(wi*(yi-s(xi))**2) for each knot interval
       !  t(j+k) <= xi <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = 0.
+        fpart = zero
         i = 1
         l = k1
         do 320 it=1,m1
@@ -9946,7 +9947,7 @@ module fitpack_core
  120     continue
         l = nu
         do 130 i=1,4
-          tu(i) = 0.
+          tu(i) = zero
           tu(l) = one
           l = l-1
  130    continue
@@ -10253,7 +10254,7 @@ module fitpack_core
         if(l>nuu) go to 530
       !  addition in the u-direction
         l4 = l+4
-        fpint(l) = 0.
+        fpint(l) = zero
         fac1 = tu(l4)-arg
         fac2 = arg-tu(l4-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
@@ -10267,7 +10268,7 @@ module fitpack_core
         go to 570
       !  addition in the v-direction
  530    l4 = l+4-nuu
-        fpint(l) = 0.
+        fpint(l) = zero
         fac1 = tv(l4)-arg
         fac2 = arg-tv(l4-1)
         if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
@@ -10353,9 +10354,7 @@ module fitpack_core
  640      continue
           do 721 j=1,nuu
       !  initialize the new row.
-            do 645 l=1,iband
-              h(l) = 0.
- 645        continue
+            h(1:iband) = zero
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
             if(j>iopt2) go to 665
@@ -10398,7 +10397,7 @@ module fitpack_core
  690          do 700 l=1,i2
                 h(l) = h(l+1)
  700          continue
-              h(i2+1) = 0.
+              h(i2+1) = zero
  710        continue
  721      continue
  720    continue
@@ -10408,9 +10407,7 @@ module fitpack_core
           ii = i-4
           do 811 j=1,nvv
       !  initialize the new row
-            do 730 l=1,iband4
-              h(l) = 0.
- 730        continue
+            h(1:iband4) = zero
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
             j1 = 1
@@ -10465,7 +10462,7 @@ module fitpack_core
  780          do 790 l=1,i2
                 h(l) = h(l+1)
  790          continue
-              h(i2+1) = 0.
+              h(i2+1) = zero
  800        continue
  811      continue
  810    continue
@@ -10508,7 +10505,7 @@ module fitpack_core
           jrot = lu*nv4+lv
           in = index(num)
  860      if(in==0) go to 890
-          store = 0.
+          store = zero
           i1 = jrot
           do 880 i=1,4
             hui = spu(in,i)
@@ -10564,17 +10561,17 @@ module fitpack_core
       go to 990
  935  ier = 4
       go to 990
- 940  ier = 3
+ 940  ier = FITPACK_MAXIT
       go to 990
- 945  ier = 2
+ 945  ier = FITPACK_S_TOO_SMALL
       go to 990
- 950  ier = 1
+ 950  ier = FITPACK_INSUFFICIENT_STORAGE
       go to 990
- 960  ier = -2
+ 960  ier = FITPACK_LEASTSQUARES_OK
       go to 990
- 970  ier = -1
-      fp = 0.
- 980  if(ncof/=rank) ier = -rank
+ 970  ier = FITPACK_INTERPOLATING_OK
+      fp  = zero
+ 980  if (ncof/=rank) ier = -rank
  990  return
       end subroutine fppola
 
@@ -16035,7 +16032,7 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,eps,fp
+      real(RKIND), intent(in) :: s,eps,fp
       integer m,nuest,nvest,nu,nv,lwrk1,lwrk2,kwrk,ier
       !  ..array arguments..
       real(RKIND) x(m),y(m),z(m),w(m),tu(nuest),tv(nvest),u(m),v(m), &
@@ -16044,20 +16041,20 @@ module fitpack_core
       !  ..user specified function
       real(RKIND) rad
       !  ..local scalars..
-      real(RKIND) tol,pi,dist,r,one
+      real(RKIND) pi,dist,r
       integer i,ib1,ib3,ki,kn,kwest,la,lbu,lcc,lcs,lro,j, &
-       lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,maxit,ncest,ncc,nuu, &
+       lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,ncest,ncc,nuu, &
        nvv,nreg,nrint,nu4,nv4,iopt1,iopt2,iopt3,ipar,nvmin
 
       !  set up constants
-      one = 1d0
       !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+      integer, parameter :: maxit = 20
+      real(RKIND), parameter :: tol = smallnum03
+
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
-      ier = 10
-      if(eps<=0. .or. eps>=1.) go to 60
+      ier = FITPACK_INPUT_ERROR
+      if(eps<=zero .or. eps>=one) go to 60
       iopt1 = iopt(1)
       if(iopt1<(-1) .or. iopt1>1) go to 60
       iopt2 = iopt(2)
@@ -16111,8 +16108,8 @@ module fitpack_core
          if(tv(j)<=tv(j-1) .or. tv(j)>=pi) go to 60
   30  continue
       go to 50
-  40  if(s<0.) go to 60
-  50  ier = 0
+  40  if(s<zero) go to 60
+  50  ier = FITPACK_OK
       !  we partition the working space and determine the spline approximation
       kn = 1
       ki = kn+m
