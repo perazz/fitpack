@@ -127,21 +127,17 @@ module fitpack_core
       !     call bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,iwrk,kwrk,ier)
       !
       !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the
-      !           knots in the x-direction.
+      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
       !   nx    : integer, giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the
-      !           knots in the y-direction.
+      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
       !   ny    : integer, giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the
-      !           b-spline coefficients.
+      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   x     : real array of dimension (mx).
       !   y     : real array of dimension (my).
       !   m     : on entry m must specify the number points. m >= 1.
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk.
-      !           lwrk >= kx+ky+2
+      !   lwrk  : integer, specifying the dimension of wrk. lwrk >= kx+ky+2
       !
       !  output parameters:
       !   z     : real array of dimension m.
