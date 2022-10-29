@@ -3884,7 +3884,7 @@ module fitpack_core
       me = merge(m-1,m,ie>0)
       je = merge(ie,1,ie>0)
 
-  20  if(iopt<0) go to 60
+      if(iopt<0) go to 60
       !  calculation of acc, the absolute tolerance for the root of f(p)=s.
       acc = tol*s
       !  determine nmax, the number of knots for spline interpolation.
@@ -5124,7 +5124,7 @@ module fitpack_core
       end subroutine fpcuro
 
 
-      recursive subroutine fpcyt1(a,n,nn)
+      pure subroutine fpcyt1(a,n,nn)
 
       ! (l u)-decomposition of a cyclic tridiagonal matrix with the non-zero
       ! elements stored as follows
@@ -5138,16 +5138,14 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      integer n,nn
+      integer, intent(in) :: n,nn
       !  ..array arguments..
-      real(RKIND) a(nn,6)
+      real(RKIND), intent(inout) :: a(nn,6)
       !  ..local scalars..
-      real(RKIND) aa,beta,gamma,sum,teta,v,one
+      real(RKIND) aa,beta,gamma,sum,teta,v
       integer i,n1,n2
       !  ..
-      !  set constant
-      one = 1
-      n2 = n-2
+      n2   = n-2
       beta = one/a(1,2)
       gamma = a(n,3)
       teta = a(1,1)*beta
@@ -5155,7 +5153,8 @@ module fitpack_core
       a(1,5) = gamma
       a(1,6) = teta
       sum = gamma*teta
-      do 10 i=2,n2
+
+      internal_rows: do i=2,n2
          v = a(i-1,3)*beta
          aa = a(i,1)
          beta = one/(a(i,2)-aa*v)
@@ -5165,7 +5164,8 @@ module fitpack_core
          a(i,5) = gamma
          a(i,6) = teta
          sum = sum+gamma*teta
-  10  continue
+      end do internal_rows
+
       n1 = n-1
       v = a(n2,3)*beta
       aa = a(n1,1)
@@ -5176,11 +5176,12 @@ module fitpack_core
       a(n1,5) = gamma
       a(n1,6) = teta
       a(n,4) = one/(a(n,2)-(sum+gamma*teta))
+
       return
       end subroutine fpcyt1
 
 
-      recursive subroutine fpcyt2(a,n,b,c,nn)
+      pure subroutine fpcyt2(a,n,b,c,nn)
 
       ! subroutine fpcyt2 solves a linear n x n system
       !         a * c = b
@@ -5188,30 +5189,32 @@ module fitpack_core
       ! using subroutine fpsyt1.
       !  ..
       !  ..scalar arguments..
-      integer n,nn
+      integer, intent(in) :: n,nn
       !  ..array arguments..
-      real(RKIND) a(nn,6),b(n),c(n)
+      real(RKIND), intent(in)  :: a(nn,6),b(n)
+      real(RKIND), intent(out) :: c(n)
       !  ..local scalars..
       real(RKIND) cc,sum
       integer i,j,j1,n1
       !  ..
       c(1) = b(1)*a(1,4)
-      sum = c(1)*a(1,5)
-      n1 = n-1
-      do 10 i=2,n1
+      sum  = c(1)*a(1,5)
+      n1   = n-1
+      do i=2,n1
          c(i) = (b(i)-a(i,1)*c(i-1))*a(i,4)
          sum = sum+c(i)*a(i,5)
-  10  continue
-      cc = (b(n)-sum)*a(n,4)
-      c(n) = cc
+      end do
+      cc    = (b(n)-sum)*a(n,4)
+      c(n)  = cc
       c(n1) = c(n1)-cc*a(n1,6)
       j = n1
-      do 20 i=3,n
+      do i=3,n
          j1 = j-1
          c(j1) = c(j1)-c(j)*a(j1,3)*a(j1,4)-cc*a(j1,6)
          j = j1
-  20  continue
+      end do
       return
+
       end subroutine fpcyt2
 
 
@@ -5511,7 +5514,7 @@ module fitpack_core
       !  servation matrix according to the least-squares spline approximation
       !  problem in the v-direction.
   30  if(ifsv/=0) go to 85
-      l = 4
+      l  = 4
       l1 = 5
       number = 0
       do 50 it=1,mv
@@ -5531,35 +5534,25 @@ module fitpack_core
       if(iop0==0) go to 85
       !  calculate the coefficients of the interpolating splines for cos(v)
       !  and sin(v).
-      do 55 i=1,nv4
-         cosi(1,i) = 0.
-         cosi(2,i) = 0.
-  55  continue
-      if(nv7<4) go to 85
+      cosi(:,:nv4) = zero
+      if (nv7<4) go to 85
       do 65 i=1,nv7
          l = i+3
          arg = tv(l)
          call fpbspl(tv,nv,3,arg,l,h)
-         do 60 j=1,3
-            av1(i,j) = h(j)
-  60     continue
+         av1(i,1:3) = h(1:3)
          cosi(1,i) = cos(arg)
          cosi(2,i) = sin(arg)
   65  continue
       call fpcyt1(av1,nv7,nv)
-      do 80 j=1,2
-         do 70 i=1,nv7
-            right(i) = cosi(j,i)
-  70     continue
-         call fpcyt2(av1,nv7,right,right,nv)
-         do 75 i=1,nv7
-            cosi(j,i+1) = right(i)
-  75     continue
-         cosi(j,1) = cosi(j,nv7+1)
-         cosi(j,nv7+2) = cosi(j,2)
-         cosi(j,nv4) = cosi(j,3)
-  80  continue
-  85  if(p<=0.) go to  150
+      do j=1,2
+         call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
+         cosi(j,2:nv7+1) = right(1:nv7)
+         cosi(j,1)       = cosi(j,nv7+1)
+         cosi(j,nv7+2)   = cosi(j,2)
+         cosi(j,nv4)     = cosi(j,3)
+      end do
+  85  if(p<=zero) go to  150
       !  calculate the non-zero elements of the matrix (bu).
       if(ifbu/=0 .or. nu8==0) go to 90
       call fpdisc(tu,nu,5,bu,nu)
@@ -5579,10 +5572,8 @@ module fitpack_core
       do 155 i=1,mv
          aa(1,i) = dz1
  155  continue
-      if(nv8==0 .or. p<=0.) go to 165
-      do 160 i=1,nv8
-         bb(1,i) = 0.
- 160  continue
+      if(nv8==0 .or. p<=zero) go to 165
+      bb(1,1:nv8) = zero
  165  mvv = mv
       if(iop0==0) go to 220
       fac = tu(5)/three
@@ -5629,18 +5620,14 @@ module fitpack_core
       !  find the appropriate column of q.
  250    right(1:mvv) = zero
         if(nrold==number) go to 280
-        if(p<=0.) go to 410
+        if(p<=zero) go to 410
       !  fetch a new row of matrix (bu).
-        do 270 j=1,5
-          h(j) = bu(n1,j)*pinv
- 270    continue
+        h(1:5) = bu(n1,1:5)*pinv
         i0 = 1
         i1 = 5
         go to 310
       !  fetch a new row of matrix (spu).
- 280    do 290 j=1,4
-          h(j) = spu(it,j)
- 290    continue
+ 280   h(1:4) = spu(it,1:4)
       !  find the appropriate column of q.
         do 300 j=1,mv
           l = l+1
@@ -5762,11 +5749,8 @@ module fitpack_core
       !  the b-splines n(j;v),j=nv7+1,...,nv4, we take account of condition
       !  (2) for setting up this row of (avv). the row is stored in h1( the
       !  part with respect to av1) and h2 (the part with respect to av2).
- 550     do 560 i=1,4
-            h1(i) = 0.
-            h2(i) = 0.
- 560     continue
-         h1(5) = 0.
+ 550     h1 = zero
+         h2 = zero
          j = nrold-nv11
          do 600 i=1,5
             j = j+1
@@ -5889,9 +5873,7 @@ module fitpack_core
       ncof = nu4*nv4
       i = nv4
       j = 0
-      do 805 l=1,nv4
-         q(l) = dz1
- 805  continue
+      q(1:nv4) = dz1
       if(iop0==0) go to 815
       do 810 l=1,nv4
          i = i+1
@@ -5914,11 +5896,9 @@ module fitpack_core
  850  if(iop1==0) go to 870
       do 860 l=1,nv4
          i = i+1
-         q(i) = 0.
+         q(i) = zero
  860  continue
- 870  do 880 i=1,ncof
-         c(i) = q(i)
- 880  continue
+ 870  c(1:ncof) = q(1:ncof)
       !  calculate the quantities
       !    res(i,j) = (z(i,j) - s(u(i),v(j)))**2 , i=1,2,..,mu;j=1,2,..,mv
       !    fp = sumi=1,mu(sumj=1,mv(res(i,j)))
@@ -5926,13 +5906,9 @@ module fitpack_core
       !                  tu(r+3) <= u(i) <= tu(r+4)
       !    fpv(r) = sumi=1,mu(sum''j(res(i,j))) , r=1,2,...,nv-7
       !                  tv(r+3) <= v(j) <= tv(r+4)
-      fp = 0.
-      do 890 i=1,nu
-        fpu(i) = 0.
- 890  continue
-      do 900 i=1,nv
-        fpv(i) = 0.
- 900  continue
+      fp  = zero
+      fpu = zero
+      fpv = zero
       iz = 0
       nroldu = 0
       !  main loop for the different grid points.
@@ -6713,18 +6689,13 @@ module fitpack_core
   65  continue
       call fpcyt1(av1,nv7,nv)
       do 80 j=1,2
-         do 70 i=1,nv7
-            right(i) = cosi(j,i)
-  70     continue
-         call fpcyt2(av1,nv7,right,right,nv)
-         do 75 i=1,nv7
-            cosi(j,i+1) = right(i)
-  75     continue
-         cosi(j,1) = cosi(j,nv7+1)
-         cosi(j,nv7+2) = cosi(j,2)
-         cosi(j,nv4) = cosi(j,3)
+         call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
+         cosi(j,2:nv7+1) = right(1:nv7)
+         cosi(j,1)       = cosi(j,nv7+1)
+         cosi(j,nv7+2)   = cosi(j,2)
+         cosi(j,nv4)     = cosi(j,3)
   80  continue
-  85  if(p<=0.) go to  150
+  85  if(p<=zero) go to  150
       !  calculate the non-zero elements of the matrix (bu).
       if(ifbu/=0 .or. nu8==0) go to 90
       call fpdisc(tu,nu,5,bu,nu)
@@ -12549,86 +12520,79 @@ module fitpack_core
       end subroutine fpsphe
 
 
-      recursive subroutine fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f, &
-         wu,wv,lu,lv)
+      ! Once all inputs checked, do the actual b-spline surface evaluation
+      pure subroutine fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wu,wv,lu,lv)
 
       !  ..scalar arguments..
-      integer idim,nu,nv,mu,mv
+      integer, intent(in) :: idim,nu,nv,mu,mv
       !  ..array arguments..
-      integer lu(mu),lv(mv)
-      real(RKIND) tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv), &
-       f(mu*mv*idim),wu(mu,4),wv(mv,4)
+      integer, intent(out)    :: lu(mu),lv(mv)
+      real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
+      real(RKIND), intent(out) :: wu(mu,4),wv(mv,4),f(mu*mv*idim)
       !  ..local scalars..
-      integer i,i1,j,j1,k,l,l1,l2,l3,m,nuv,nu4,nv4
-      real(RKIND) arg,sp,tb,te
+      integer :: i,i1,j,j1,k,l,l1,l3,m,nuv,nu4,nv4
+      real(RKIND) :: arg,sp,tb,te
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1)
+      real(RKIND) :: h(SIZ_K+1)
       !  ..subroutine references..
       !    fpbspl
       !  ..
+
+      ! Process u
       nu4 = nu-4
       tb = tu(4)
       te = tu(nu4+1)
-      l = 4
+      l  = 4
       l1 = l+1
-      do 40 i=1,mu
-        arg = u(i)
-        if(arg<tb) arg = tb
-        if(arg>te) arg = te
-  10    if(arg<tu(l1) .or. l==nu4) go to 20
-        l = l1
-        l1 = l+1
-        go to 10
-  20    call fpbspl(tu,nu,3,arg,l,h)
+      do i=1,mu
+        arg = min(max(tb,u(i)),te)
+        do while (.not.(arg<tu(l1) .or. l==nu4))
+           l = l1
+           l1 = l+1
+        end do
+        call fpbspl(tu,nu,3,arg,l,h)
         lu(i) = l-4
-        do 30 j=1,4
-          wu(i,j) = h(j)
-  30    continue
-  40  continue
+        wu(i,1:4) = h(1:4)
+      end do
+
+      ! Process v
       nv4 = nv-4
       tb = tv(4)
       te = tv(nv4+1)
       l = 4
       l1 = l+1
-      do 80 i=1,mv
-        arg = v(i)
-        if(arg<tb) arg = tb
-        if(arg>te) arg = te
-  50    if(arg<tv(l1) .or. l==nv4) go to 60
-        l = l1
-        l1 = l+1
-        go to 50
-  60    call fpbspl(tv,nv,3,arg,l,h)
-        lv(i) = l-4
-        do 70 j=1,4
-          wv(i,j) = h(j)
-  70    continue
-  80  continue
+      do i=1,mv
+         arg = min(max(v(i),tb),te)
+         do while (.not.(arg<tv(l1) .or. l==nv4))
+           l = l1
+           l1 = l+1
+         end do
+         call fpbspl(tv,nv,3,arg,l,h)
+         lv(i) = l-4
+         wv(i,1:4) = h(1:4)
+      end do
+
       m = 0
       nuv = nu4*nv4
-      do 140 k=1,idim
+      dims: do k=1,idim
         l3 = (k-1)*nuv
-        do 130 i=1,mu
+        do i=1,mu
           l = lu(i)*nv4+l3
-          do 90 i1=1,4
-            h(i1) = wu(i,i1)
-  90      continue
-          do 120 j=1,mv
+          h(1:4) = wu(i,1:4)
+          do j=1,mv
             l1 = l+lv(j)
             sp = zero
-            do 110 i1=1,4
-              l2 = l1
-              do 100 j1=1,4
-                l2 = l2+1
-                sp = sp+c(l2)*h(i1)*wv(j,j1)
- 100          continue
+            do i1=1,4
+              do j1=1,4
+                sp = sp+c(l1+j1)*h(i1)*wv(j,j1)
+              end do
               l1 = l1+nv4
- 110        continue
+            end do
             m = m+1
             f(m) = sp
- 120      continue
- 130    continue
- 140  continue
+          end do
+         end do
+      end do dims
       return
       end subroutine fpsuev
 
@@ -18167,52 +18131,39 @@ module fitpack_core
       end subroutine sproot
 
 
-      recursive subroutine surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf, &
-       wrk,lwrk,iwrk,kwrk,ier)
+      recursive subroutine surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
 
-      !  subroutine surev evaluates on a grid (u(i),v(j)),i=1,...,mu; j=1,...
-      !  ,mv a bicubic spline surface of dimension idim, given in the
-      !  b-spline representation.
+      !  subroutine surev evaluates on a grid (u(i),v(j)),i=1,...,mu; j=1,...,mv a bicubic spline
+      !  surface of dimension idim, given in the b-spline representation.
       !
       !  calling sequence:
-      !     call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,
-      !    * iwrk,kwrk,ier)
+      !     call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
       !
       !  input parameters:
       !   idim  : integer, specifying the dimension of the spline surface.
-      !   tu    : real array, length nu, which contains the position of the
-      !           knots in the u-direction.
+      !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
       !   nu    : integer, giving the total number of knots in the u-direction
-      !   tv    : real array, length nv, which contains the position of the
-      !           knots in the v-direction.
+      !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
       !   nv    : integer, giving the total number of knots in the v-direction
-      !   c     : real array, length (nu-4)*(nv-4)*idim, which contains the
-      !           b-spline coefficients.
+      !   c     : real array, length (nu-4)*(nv-4)*idim, which contains the b-spline coefficients.
       !   u     : real array of dimension (mu).
-      !           before entry u(i) must be set to the u co-ordinate of the
-      !           i-th grid point along the u-axis.
+      !           before entry u(i) must be set to the u co-ordinate of the i-th grid point along the u-axis.
       !           tu(4)<=u(i-1)<=u(i)<=tu(nu-3), i=2,...,mu.
-      !   mu    : on entry mu must specify the number of grid points along
-      !           the u-axis. mu >=1.
+      !   mu    : on entry mu must specify the number of grid points along the u-axis. mu >=1.
       !   v     : real array of dimension (mv).
-      !           before entry v(j) must be set to the v co-ordinate of the
-      !           j-th grid point along the v-axis.
+      !           before entry v(j) must be set to the v co-ordinate of the j-th grid point along the v-axis.
       !           tv(4)<=v(j-1)<=v(j)<=tv(nv-3), j=2,...,mv.
-      !   mv    : on entry mv must specify the number of grid points along
-      !           the v-axis. mv >=1.
-      !   mf    : on entry, mf must specify the dimension of the array f.
-      !           mf >= mu*mv*idim
+      !   mv    : on entry mv must specify the number of grid points along the v-axis. mv >=1.
+      !   mf    : on entry, mf must specify the dimension of the array f. mf >= mu*mv*idim
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk.
-      !           lwrk >= 4*(mu+mv)
+      !   lwrk  : integer, specifying the dimension of wrk. lwrk >= 4*(mu+mv)
       !   iwrk  : integer array of dimension kwrk. used as workspace.
       !   kwrk  : integer, specifying the dimension of iwrk. kwrk >= mu+mv.
       !
       !  output parameters:
       !   f     : real array of dimension (mf).
-      !           on successful exit f(mu*mv*(l-1)+mv*(i-1)+j) contains the
-      !           l-th co-ordinate of the bicubic spline surface at the
-      !           point (u(i),v(j)),l=1,...,idim,i=1,...,mu;j=1,...,mv.
+      !           on successful exit f(mu*mv*(l-1)+mv*(i-1)+j) contains the l-th co-ordinate of the bicubic
+      !           spline surface at the point (u(i),v(j)),l=1,...,idim,i=1,...,mu;j=1,...,mv.
       !   ier   : integer error flag
       !    ier=0 : normal return
       !    ier=10: invalid input data (see restrictions)
@@ -18242,17 +18193,16 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer idim,nu,nv,mu,mv,mf,lwrk,kwrk,ier
+      integer :: idim,nu,nv,mu,mv,mf,lwrk,kwrk,ier
       !  ..array arguments..
-      integer iwrk(kwrk)
-      real(RKIND) tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv),f(mf), &
-       wrk(lwrk)
+      integer :: iwrk(kwrk)
+      real(RKIND) :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv),f(mf),wrk(lwrk)
       !  ..local scalars..
-      integer i,muv
+      integer :: i,muv
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(mf<mu*mv*idim) go to 100
       muv = mu+mv
       if(lwrk<4*muv) go to 100
@@ -18270,123 +18220,89 @@ module fitpack_core
         if(v(i)<v(i-1)) go to 100
   50  continue
   60  ier = 0
-      call fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wrk(1),wrk(4*mu+1), &
-       iwrk(1),iwrk(mu+1))
+      call fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wrk(1),wrk(4*mu+1),iwrk(1),iwrk(mu+1))
  100  return
       end subroutine surev
 
 
-      recursive subroutine surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s, &
-        nxest,nyest,nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2, &
-        iwrk,kwrk,ier)
+      recursive subroutine surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx,tx,ny,ty,&
+                                  c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
-      ! given the set of data points (x(i),y(i),z(i)) and the set of positive
-      ! numbers w(i),i=1,...,m, subroutine surfit determines a smooth bivar-
-      ! iate spline approximation s(x,y) of degrees kx and ky on the rect-
-      ! angle xb <= x <= xe, yb <= y <= ye.
-      ! if iopt = -1 surfit calculates the weighted least-squares spline
-      ! according to a given set of knots.
-      ! if iopt >= 0 the total numbers nx and ny of these knots and their
-      ! position tx(j),j=1,...,nx and ty(j),j=1,...,ny are chosen automatic-
-      ! ally by the routine. the smoothness of s(x,y) is then achieved by
-      ! minimalizing the discontinuity jumps in the derivatives of s(x,y)
-      ! across the boundaries of the subpanels (tx(i),tx(i+1))*(ty(j),ty(j+1).
-      ! the amounth of smoothness is determined by the condition that f(p) =
-      ! sum ((w(i)*(z(i)-s(x(i),y(i))))**2) be <= s, with s a given non-neg-
-      ! ative constant, called the smoothing factor.
-      ! the fit is given in the b-spline representation (b-spline coefficients
-      ! c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be eval-
-      ! uated by means of subroutine bispev.
+      ! given the set of data points (x(i),y(i),z(i)) and the set of positive numbers w(i),i=1,...,m,
+      ! subroutine surfit determines a smooth bivariate spline approximation s(x,y) of degrees kx and
+      ! ky on the rect angle xb <= x <= xe, yb <= y <= ye.
+      ! if iopt = -1 surfit calculates the weighted least-squares spline according to a given set of knots.
+      ! if iopt >= 0 the total numbers nx and ny of these knots and their position tx(j),j=1,...,nx and
+      ! ty(j),j=1,...,ny are chosen automatically by the routine. the smoothness of s(x,y) is then achieved
+      ! by minimizing the discontinuity jumps in the derivatives of s(x,y) across the boundaries of the
+      ! subpanels (tx(i),tx(i+1))*(ty(j),ty(j+1).
+      ! The amounth of smoothness is determined by the condition that, for a given smoothing factor s>=0,
+      ! f(p) = sum ((w(i)*(z(i)-s(x(i),y(i))))**2) be <= s. the fit is given in the b-spline representation
+      ! (b-spline coefficients c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be evaluated
+      ! by means of subroutine bispev.
       !
       ! calling sequence:
       !     call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,
       !    *  nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       !
       ! parameters:
-      !  iopt  : integer flag. on entry iopt must specify whether a weighted
-      !          least-squares spline (iopt=-1) or a smoothing spline (iopt=0
-      !          or 1) must be determined.
+      !  iopt  : integer flag. on entry iopt must specify whether a weighted least-squares spline (iopt=-1)
+      !          or a smoothing spline (iopt=0 or 1) must be determined.
       !          if iopt=0 the routine will start with an initial set of knots
-      !          tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=
-      !          1,...,ky+1. if iopt=1 the routine will continue with the set
-      !          of knots found at the last call of the routine.
-      !          attention: a call with iopt=1 must always be immediately pre-
-      !                     ceded by another call with iopt=1 or iopt=0.
-      !          unchanged on exit.
+      !          tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=1,...,ky+1.
+      !          if iopt=1 the routine will continue with the set of knots found at the last call of the
+      !          routine. attention: a call with iopt=1 must always be immediately preceded by another call
+      !          with iopt=1 or iopt=0. unchanged on exit.
       !  m     : integer. on entry m must specify the number of data points.
       !          m >= (kx+1)*(ky+1). unchanged on exit.
       !  x     : real array of dimension at least (m).
       !  y     : real array of dimension at least (m).
       !  z     : real array of dimension at least (m).
-      !          before entry, x(i),y(i),z(i) must be set to the co-ordinates
-      !          of the i-th data point, for i=1,...,m. the order of the data
-      !          points is immaterial. unchanged on exit.
-      !  w     : real array of dimension at least (m). before entry, w(i) must
-      !          be set to the i-th value in the set of weights. the w(i) must
-      !          be strictly positive. unchanged on exit.
-      !  xb,xe : real values. on entry xb,xe,yb and ye must specify the bound-
-      !  yb,ye   aries of the rectangular approximation domain.
-      !          xb<=x(i)<=xe,yb<=y(i)<=ye,i=1,...,m. unchanged on exit.
-      !  kx,ky : integer values. on entry kx and ky must specify the degrees
-      !          of the spline. 1<=kx,ky<=5. it is recommended to use bicubic
-      !          (kx=ky=3) splines. unchanged on exit.
-      !  s     : real. on entry (in case iopt>=0) s must specify the smoothing
-      !          factor. s >=0. unchanged on exit.
-      !          for advice on the choice of s see further comments
+      !          before entry, x(i),y(i),z(i) must be set to the co-ordinates of the i-th data point, for
+      !          i=1,...,m. the order of the data points is immaterial. unchanged on exit.
+      !  w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value in
+      !          the set of weights. the w(i) must be strictly positive. unchanged on exit.
+      !  xb,xe : real values. on entry xb,xe,yb and ye must specify the boundaries of the rectangular
+      !  yb,ye   approximation domain. xb<=x(i)<=xe,yb<=y(i)<=ye,i=1,...,m. unchanged on exit.
+      !  kx,ky : integer values. on entry kx and ky must specify the degrees of the spline. 1<=kx,ky<=5. it
+      !          is recommended to use bicubic (kx=ky=3) splines. unchanged on exit.
+      !  s     : real. on entry (in case iopt>=0) s must specify the smoothing factor. s>=0. unchanged
+      !          on exit. for advice on the choice of s see further comments
       !  nxest : integer. unchanged on exit.
       !  nyest : integer. unchanged on exit.
-      !          on entry, nxest and nyest must specify an upper bound for the
-      !          number of knots required in the x- and y-directions respect.
-      !          these numbers will also determine the storage space needed by
-      !          the routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1).
-      !          in most practical situation nxest = kx+1+sqrt(m/2), nyest =
-      !          ky+1+sqrt(m/2) will be sufficient. see also further comments.
-      !  nmax  : integer. on entry nmax must specify the actual dimension of
-      !          the arrays tx and ty. nmax >= nxest, nmax >=nyest.
-      !          unchanged on exit.
-      !  eps   : real.
-      !          on entry, eps must specify a threshold for determining the
-      !          effective rank of an over-determined linear system of equat-
-      !          ions. 0 < eps < 1.  if the number of decimal digits in the
-      !          computer representation of a real number is q, then 10**(-q)
-      !          is a suitable value for eps in most practical applications.
-      !          unchanged on exit.
-      !  nx    : integer.
-      !          unless ier=10 (in case iopt >=0), nx will contain the total
-      !          number of knots with respect to the x-variable, of the spline
-      !          approximation returned. if the computation mode iopt=1 is
-      !          used, the value of nx should be left unchanged between sub-
-      !          sequent calls.
-      !          in case iopt=-1, the value of nx should be specified on entry
+      !          on entry, nxest and nyest must specify an upper bound for the number of knots required in
+      !          the x- and y-directions respect. these numbers will also determine the storage space needed
+      !          by the routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1). in most practical situation
+      !          nxest = kx+1+sqrt(m/2), nyest = ky+1+sqrt(m/2) will be sufficient. see also further comments.
+      !  nmax  : integer. on entry nmax must specify the actual dimension of the arrays tx and ty.
+      !          nmax >= nxest, nmax >=nyest. unchanged on exit.
+      !  eps   : real. on entry, eps must specify a threshold for determining the effective rank of an
+      !          over-determined linear system of equations. 0 < eps < 1.  if the number of decimal digits
+      !          in the computer representation of a real number is q, then 10**(-q)
+      !          is a suitable value for eps in most practical applications. unchanged on exit.
+      !  nx    : integer. unless ier=10 (in case iopt >=0), nx will contain the total number of knots with
+      !          respect to the x-variable, of the spline approximation returned. if the computation mode
+      !          iopt=1 is used, the value of nx should be left unchanged between subsequent calls.
+      !          in case iopt=-1, the value of nx should be specified on entry.
       !  tx    : real array of dimension nmax.
-      !          on successful exit, this array will contain the knots of the
-      !          spline with respect to the x-variable, i.e. the position of
-      !          the interior knots tx(kx+2),...,tx(nx-kx-1) as well as the
-      !          position of the additional knots tx(1)=...=tx(kx+1)=xb and
-      !          tx(nx-kx)=...=tx(nx)=xe needed for the b-spline representat.
-      !          if the computation mode iopt=1 is used, the values of tx(1),
-      !          ...,tx(nx) should be left unchanged between subsequent calls.
-      !          if the computation mode iopt=-1 is used, the values tx(kx+2),
-      !          ...tx(nx-kx-1) must be supplied by the user, before entry.
-      !          see also the restrictions (ier=10).
-      !  ny    : integer.
-      !          unless ier=10 (in case iopt >=0), ny will contain the total
-      !          number of knots with respect to the y-variable, of the spline
-      !          approximation returned. if the computation mode iopt=1 is
-      !          used, the value of ny should be left unchanged between sub-
-      !          sequent calls.
+      !          on successful exit, this array will contain the knots of the spline with respect to the
+      !          x-variable, i.e. the position of the interior knots tx(kx+2),...,tx(nx-kx-1) as well as the
+      !          position of the additional knots tx(1)=...=tx(kx+1)=xb and tx(nx-kx)=...=tx(nx)=xe needed
+      !          for the b-spline representation. if the computation mode iopt=1 is used, the values of tx(1),
+      !          ...,tx(nx) should be left unchanged between subsequent calls. if the computation mode
+      !          iopt=-1 is used, the values tx(kx+2),...tx(nx-kx-1) must be supplied by the user, before
+      !          entry. see also the restrictions (ier=10).
+      !  ny    : integer. unless ier=10 (in case iopt >=0), ny will contain the total number of knots with
+      !          respect to the y-variable, of the spline approximation returned. if the computation mode
+      !          iopt=1 is used, the value of ny should be left unchanged between subsequent calls.
       !          in case iopt=-1, the value of ny should be specified on entry
-      !  ty    : real array of dimension nmax.
-      !          on successful exit, this array will contain the knots of the
-      !          spline with respect to the y-variable, i.e. the position of
-      !          the interior knots ty(ky+2),...,ty(ny-ky-1) as well as the
-      !          position of the additional knots ty(1)=...=ty(ky+1)=yb and
-      !          ty(ny-ky)=...=ty(ny)=ye needed for the b-spline representat.
-      !          if the computation mode iopt=1 is used, the values of ty(1),
-      !          ...,ty(ny) should be left unchanged between subsequent calls.
-      !          if the computation mode iopt=-1 is used, the values ty(ky+2),
-      !          ...ty(ny-ky-1) must be supplied by the user, before entry.
-      !          see also the restrictions (ier=10).
+      !  ty    : real array of dimension nmax. on successful exit, this array will contain the knots of the
+      !          spline with respect to the y-variable, i.e. the position of the interior knots ty(ky+2),...,
+      !          ty(ny-ky-1) as well as the position of the additional knots ty(1)=...=ty(ky+1)=yb and
+      !          ty(ny-ky)=...=ty(ny)=ye needed for the b-spline representation. if the computation mode
+      !          iopt=1 is used, the values of ty(1),...,ty(ny) should be left unchanged between subsequent
+      !          calls. if the computation mode iopt=-1 is used, the values ty(ky+2),...ty(ny-ky-1) must be
+      !          supplied by the user, before entry. see also the restrictions (ier=10).
       !  c     : real array of dimension at least (nxest-kx-1)*(nyest-ky-1).
       !          on successful exit, c contains the coefficients of the spline
       !          approximation s(x,y)
@@ -18581,24 +18497,24 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) xb,xe,yb,ye,s,eps,fp
-      integer iopt,m,kx,ky,nxest,nyest,nmax,nx,ny,lwrk1,lwrk2,kwrk,ier
+      real(RKIND) :: xb,xe,yb,ye,s,eps,fp
+      integer, intent(in) :: iopt
+      integer :: m,kx,ky,nxest,nyest,nmax,nx,ny,lwrk1,lwrk2,kwrk,ier
       !  ..array arguments..
-      real(RKIND) x(m),y(m),z(m),w(m),tx(nmax),ty(nmax), &
+      real(RKIND) :: x(m),y(m),z(m),w(m),tx(nmax),ty(nmax), &
        c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),wrk2(lwrk2)
-      integer iwrk(kwrk)
+      integer :: iwrk(kwrk)
       !  ..local scalars..
-      real(RKIND) tol
-      integer i,ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx, &
-       lby,lco,lf,lff,lfp,lh,lq,lsx,lsy,lwest,maxit,ncest,nest,nek, &
+      integer :: i,ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx, &
+       lby,lco,lf,lff,lfp,lh,lq,lsx,lsy,lwest,ncest,nest,nek, &
        nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
 
       !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+      integer, parameter :: maxit = 20
+      real(RKIND), parameter :: tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(eps<=0. .or. eps>=1.) go to 71
       if(kx<=0 .or. kx>5) go to 71
       kx1 = kx+1
@@ -18652,7 +18568,7 @@ module fitpack_core
         if(ty(i+1)<=ty(i)) go to 73
   40  continue
       go to 60
-  50  if(s<0.) go to 71
+  50  if(s<zero) go to 71
   60  ier = 0
       !  we partition the working space and determine the spline approximation
       kn = 1

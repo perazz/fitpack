@@ -29,7 +29,12 @@ module fitpack
     ! Max fitting degree
     integer, parameter :: MAX_K = 5
 
-    !> A public type describing a curve fitter
+    !> A public type describing a surface fitter z = s(x,y)
+    type :: fitpack_surface
+
+    end type fitpack_surface
+
+    !> A public type describing a curve fitter y = c(x)
     type :: fitpack_curve
 
         !> The data points
@@ -97,7 +102,6 @@ module fitpack
 
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
-
 
     end type fitpack_curve
 
@@ -532,5 +536,44 @@ module fitpack
        ddx  = ddxa(1)
 
     end function curve_derivative
+
+    ! Call the surface fitting driver to determine a spline approximation
+    integer function surface_fit(this,smoothing) result(ierr)
+        class(fitpack_surface), intent(inout) :: this
+        real(RKIND), optional, intent(in) :: smoothing
+
+!        integer :: loop,nit
+!
+!        real(RKIND), parameter :: smoothing_trajectory(*) = [1000.d0,60.d0,30.d0]
+!        real(RKIND), dimension(size(smoothing_trajectory)) :: smooth_now
+!
+!        if (present(smoothing)) then
+!            smooth_now = smoothing
+!            nit        = 1
+!        else
+!            smooth_now = smoothing_trajectory
+!            nit        = size(smoothing_trajectory)
+!        end if
+!
+!        ! First iteration lets solver decide knots
+!        this%iopt = 0
+!
+!        do loop=1,nit
+!
+!            ! Set current smoothing
+!            this%smoothing = smooth_now(loop)
+!
+!            ! Call curvfit
+!            call curfit(this%iopt,                   &  ! option
+!                        this%m,this%x,this%y,this%w, &  ! points
+!                        this%xleft,this%xright,      &  ! x range
+!                        this%order,this%smoothing,   &  ! spline accuracy
+!                        this%nest,this%knots,this%t, &  ! spline output
+!                        this%c,this%fp,              &  ! spline output
+!                        this%wrk,this%lwrk,this%iwrk,&  ! memory
+!                        ierr)                           ! Error flag
+!        end do
+
+    end function surface_fit
 
 end module fitpack
