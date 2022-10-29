@@ -6626,82 +6626,88 @@ module fitpack_core
       nv11 = nv-11
       nuu = nu4-iop0-iop1-2
       pinv = merge(one/p,one,p>zero)
+
       !  it depends on the value of the flags ifsu,ifsv,ifbu,ifbv,iop0,iop1
       !  and on the value of p whether the matrices (spu), (spv), (bu), (bv),
       !  (cosi) still must be determined.
-      if(ifsu/=0) go to 30
-      !  calculate the non-zero elements of the matrix (spu) which is the ob-
-      !  servation matrix according to the least-squares spline approximation
-      !  problem in the u-direction.
-      l = 4
-      l1 = 5
-      number = 0
-      do 25 it=1,mu
-        arg = u(it)
-  10    if(arg<tu(l1) .or. l==nu4) go to 15
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 10
-  15    call fpbspl(tu,nu,3,arg,l,h)
-        do 20 i=1,4
-          spu(it,i) = h(i)
-  20    continue
-        nru(it) = number
-  25  continue
-      ifsu = 1
+      if (ifsu==0) then
+          !  calculate the non-zero elements of the matrix (spu) which is the observation matrix
+          !  according to the least-squares spline approximation problem in the u-direction.
+          l  = 4
+          l1 = 5
+          number = 0
+          do it=1,mu
+            arg = u(it)
+            do while (.not.(arg<tu(l1) .or. l==nu4))
+                l = l1
+                l1 = l+1
+                number = number+1
+            end do
+            call fpbspl(tu,nu,3,arg,l,h)
+            spu(it,1:4) = h(1:4)
+            nru(it) = number
+          end do
+          ifsu = 1
+      endif
+
       !  calculate the non-zero elements of the matrix (spv) which is the ob-
       !  servation matrix according to the least-squares spline approximation
       !  problem in the v-direction.
-  30  if(ifsv/=0) go to 85
-      l = 4
-      l1 = 5
-      number = 0
-      do 50 it=1,mv
-        arg = v(it)
-  35    if(arg<tv(l1) .or. l==nv4) go to 40
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 35
-  40    call fpbspl(tv,nv,3,arg,l,h)
-        do 45 i=1,4
-          spv(it,i) = h(i)
-  45    continue
-        nrv(it) = number
-  50  continue
-      ifsv = 1
-      if(iop0==0 .and. iop1==0) go to 85
-      !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
-      cosi(:,1:nv4) = zero
-      if(nv7<4) go to 85
-      do 65 i=1,nv7
-         l = i+3
-         arg = tv(l)
-         call fpbspl(tv,nv,3,arg,l,h)
-         av1(i,1:3) = h(1:3)
-         cosi(1,i)  = cos(arg)
-         cosi(2,i)  = sin(arg)
-  65  continue
-      call fpcyt1(av1,nv7,nv)
-      do 80 j=1,2
-         call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
-         cosi(j,2:nv7+1) = right(1:nv7)
-         cosi(j,1)       = cosi(j,nv7+1)
-         cosi(j,nv7+2)   = cosi(j,2)
-         cosi(j,nv4)     = cosi(j,3)
-  80  continue
-  85  if(p<=zero) go to  150
-      !  calculate the non-zero elements of the matrix (bu).
-      if(ifbu/=0 .or. nu8==0) go to 90
-      call fpdisc(tu,nu,5,bu,nu)
-      ifbu = 1
-      !  calculate the non-zero elements of the matrix (bv).
-  90  if(ifbv/=0 .or. nv8==0) go to 150
-      call fpdisc(tv,nv,5,bv,nv)
-      ifbv = 1
-      !  substituting (2),(3) and (4) into (1), we obtain the overdetermined
-      !  system
+      if(ifsv==0) then
+
+          l  = 4
+          l1 = 5
+          number = 0
+          do it=1,mv
+            arg = v(it)
+            do while (.not.(arg<tv(l1) .or. l==nv4))
+                l = l1
+                l1 = l+1
+                number = number+1
+            end do
+            call fpbspl(tv,nv,3,arg,l,h)
+            spv(it,1:4) = h(1:4)
+            nrv(it) = number
+          end do
+          ifsv = 1
+
+
+          !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
+          if (iop0/=0 .or. iop1/=0) then
+
+              cosi(:,1:nv4) = zero
+              if (nv7>=4) then
+                  do i=1,nv7
+                     l = i+3
+                     arg = tv(l)
+                     call fpbspl(tv,nv,3,arg,l,h)
+                     av1(i,1:3) = h(1:3)
+                     cosi(:,i)  = [cos(arg),sin(arg)]
+                  end do
+                  call fpcyt1(av1,nv7,nv)
+                  do j=1,2
+                     call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
+                     cosi(j,1:nv4) = [right(nv7),right(1:nv7),right(1:2)]
+                  end do
+              endif
+          endif
+
+      endif
+
+      if (p>zero) then
+          !  calculate the non-zero elements of the matrix (bu).
+          if(ifbu==0 .and. nu8/=0) then
+             call fpdisc(tu,nu,5,bu,nu)
+             ifbu = 1
+          endif
+
+          !  calculate the non-zero elements of the matrix (bv).
+          if (ifbv==0 .and. nv8/=0) then
+             call fpdisc(tv,nv,5,bv,nv)
+             ifbv = 1
+          endif
+      endif
+      !  substituting (2),(3) and (4) into (1), we obtain the overdetermined system
       !         (5)  (avv) (cc) (auu)' = (qq)
       !  from which the nuu*nv7 remaining coefficients
       !         c(i,j) , i=2+iop0,3+iop0,...,nu-5-iop1,j=1,2,...,nv-7.
@@ -6719,9 +6725,8 @@ module fitpack_core
       fac = (tu(5)-tu(4))/three
       dr02 = dr(2)*fac
       dr03 = dr(3)*fac
-      do 170 i=1,nv4
-         c0(i) = dr01+dr02*cosi(1,i)+dr03*cosi(2,i)
- 170  continue
+      c0(1:nv4) = dr01+dr02*cosi(1,1:nv4)+dr03*cosi(2,1:nv4)
+
       do 180 i=1,mv
          number = nrv(i)
          fac = 0.
@@ -6787,32 +6792,31 @@ module fitpack_core
         number = nru(it)
       !  find the appropriate column of q.
  250    right(1:mvv) = zero
-        if(nrold==number) go to 280
-        if(p<=zero) go to 410
-      !  fetch a new row of matrix (bu).
-        h(1:5) = bu(n1,1:5)*pinv
-        i0 = 1
-        i1 = 5
-        go to 310
-      !  fetch a new row of matrix (spu).
- 280    do 290 j=1,4
-          h(j) = spu(it,j)
- 290    continue
-      !  find the appropriate column of q.
-        do 300 j=1,mv
-          l = l+1
-          right(j) = r(l)
- 300    continue
-        i0 = 1
-        i1 = 4
+
+        if (nrold==number) then
+           !  fetch a new row of matrix (spu).
+           h(1:4) = spu(it,1:4)
+
+           !  find the appropriate column of q.
+           right(1:mv) = r(l+1:l+mv)
+           l  = l+mv
+           i0 = 1
+           i1 = 4
+        else
+
+           if(p<=zero) go to 410
+           !  fetch a new row of matrix (bu).
+           h(1:5) = bu(n1,1:5)*pinv
+           i0 = 1
+           i1 = 5
+        end if
+
  310    j0 = n1
         j1 = nu7-number
       !  take into account that we eliminate the constraints (3)
  315     if(j0-1>iop0) go to 335
          fac0 = h(i0)
-         do 320 j=1,mv
-            right(j) = right(j)-fac0*a0(j0,j)
- 320     continue
+         right(1:mv) = right(1:mv)-fac0*a0(j0,1:mv)
          if(mv==mvv) go to 330
          j = mv
          do 325 jj=1,nv8
@@ -6825,9 +6829,7 @@ module fitpack_core
       !  take into account that we eliminate the constraints (4)
  335     if(j1-1>iop1) go to 360
          fac1 = h(i1)
-         do 340 j=1,mv
-            right(j) = right(j)-fac1*a1(j1,j)
- 340     continue
+         right(1:mv) = right(1:mv)-fac1*a1(j1,1:mv)
          if(mv==mvv) go to 350
          j = mv
          do 345 jj=1,nv8
@@ -6896,13 +6898,9 @@ module fitpack_core
         if(p<=0.) go to 760
       !  fetch a new row of matrix (bv).
         n1 = nrold+1
-        do 460 j=1,5
-          h(j) = bv(n1,j)*pinv
- 460    continue
+        h(1:5) = bv(n1,1:5)*pinv
       !  find the appropriate row of g.
-        do 465 j=1,nuu
-          right(j) = 0.
- 465    continue
+        right(1:nuu) = zero
         if(mv==mvv) go to 510
         l = mv+n1
         do 470 j=1,nuu
@@ -6911,10 +6909,7 @@ module fitpack_core
  470    continue
         go to 510
       !  fetch a new row of matrix (spv)
- 480    h(5) = 0.
-        do 490 j=1,4
-          h(j) = spv(it,j)
- 490    continue
+ 480    h(1:5) = [spv(it,1:4),zero]
       !  find the appropriate row of g.
         l = it
         do 500 j=1,nuu
@@ -6941,11 +6936,8 @@ module fitpack_core
       !  the b-splines n(j;v),j=nv7+1,...,nv4, we take account of condition
       !  (2) for setting up this row of (avv). the row is stored in h1( the
       !  part with respect to av1) and h2 (the part with respect to av2).
- 550     do 560 i=1,4
-            h1(i) = 0.
-            h2(i) = 0.
- 560     continue
-         h1(5) = 0.
+         h1 = zero
+         h2 = zero
          j = nrold-nv11
          do 600 i=1,5
             j = j+1
@@ -7097,14 +7089,13 @@ module fitpack_core
             q(i) = q(ii)
  825     continue
  830  continue
- 835  if(iop1==0) go to 845
-      do 840 l=1,nv4
-         i = i+1
-         q(i) = c1(l)
- 840  continue
- 845  do 850 i=1,ncof
-         c(i) = q(i)
- 850  continue
+ 835  if(iop1/=0) then
+          do l=1,nv4
+             i = i+1
+             q(i) = c1(l)
+          end do
+      endif
+      c(1:ncof) = q(1:ncof)
       !  calculate the quantities
       !    res(i,j) = (r(i,j) - s(u(i),v(j)))**2 , i=1,2,..,mu;j=1,2,..,mv
       !    fp = sumi=1,mu(sumj=1,mv(res(i,j)))
@@ -7112,13 +7103,9 @@ module fitpack_core
       !                  tu(r+3) <= u(i) <= tu(r+4)
       !    fpv(r) = sumi=1,mu(sum''j(res(i,j))) , r=1,2,...,nv-7
       !                  tv(r+3) <= v(j) <= tv(r+4)
-      fp = 0.
-      do 890 i=1,nu
-        fpu(i) = 0.
- 890  continue
-      do 900 i=1,nv
-        fpv(i) = 0.
- 900  continue
+      fp = zero
+      fpu = zero
+      fpv = zero
       ir = 0
       nroldu = 0
       !  main loop for the different grid points.
@@ -7182,10 +7169,9 @@ module fitpack_core
       !  ..array arguments..
       real(RKIND) t(nest),c(nest),tt(nest),cc(nest)
       !  ..local scalars..
-      real(RKIND) fac,per,one
+      real(RKIND) fac,per
       integer i,i1,j,k1,m,mk,nk,nk1,nl,ll
       !  ..
-      one = 0.1e+01
       k1 = k+1
       nk1 = n-k1
       !  the new knots
