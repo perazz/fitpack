@@ -6713,7 +6713,7 @@ module fitpack_core
       !         c(i,j) , i=2+iop0,3+iop0,...,nu-5-iop1,j=1,2,...,nv-7.
       !  the elements of (cc), are then determined in the least-squares sense.
       !  simultaneously, we compute the resulting sum of squared residuals sq.
- 150  dr01 = dr(1)
+      dr01 = dr(1)
       dr11 = dr(4)
       a0(1,1:mv) = dr01
       a1(1,1:mv) = dr11
@@ -6736,7 +6736,7 @@ module fitpack_core
  175     continue
          a0(2,i) = fac
  180  continue
-      if(nv8==0 .or. p<=0.) go to 195
+      if(nv8==0 .or. p<=zero) go to 195
       do 190 i=1,nv8
          number = i
          fac = 0.
@@ -6751,19 +6751,11 @@ module fitpack_core
       fac = (tu(nu4)-tu(nu4+1))/three
       dr12 = dr(5)*fac
       dr13 = dr(6)*fac
-      do 200 i=1,nv4
-         c1(i) = dr11+dr12*cosi(1,i)+dr13*cosi(2,i)
- 200  continue
+      c1(1:nv4) = dr11+dr12*cosi(1,1:nv4)+dr13*cosi(2,1:nv4)
       do 210 i=1,mv
-         number = nrv(i)
-         fac = 0.
-         do 205 j=1,4
-            number = number+1
-            fac = fac+c1(number)*spv(i,j)
- 205     continue
-         a1(2,i) = fac
+         a1(2,i) = dot_product(c1(nrv(i)+1:nrv(i)+4),spv(i,1:4))
  210  continue
-      if(nv8==0 .or. p<=0.) go to 225
+      if(nv8==0 .or. p<=zero) go to 225
       do 220 i=1,nv8
          number = i
          fac = 0.
@@ -6811,7 +6803,7 @@ module fitpack_core
            i1 = 5
         end if
 
- 310    j0 = n1
+        j0 = n1
         j1 = nu7-number
       !  take into account that we eliminate the constraints (3)
  315     if(j0-1>iop0) go to 335
@@ -6936,7 +6928,7 @@ module fitpack_core
       !  the b-splines n(j;v),j=nv7+1,...,nv4, we take account of condition
       !  (2) for setting up this row of (avv). the row is stored in h1( the
       !  part with respect to av1) and h2 (the part with respect to av2).
-         h1 = zero
+ 550     h1 = zero
          h2 = zero
          j = nrold-nv11
          do 600 i=1,5
@@ -7120,7 +7112,7 @@ module fitpack_core
       !  evaluate s(u,v) at the current grid point by making the sum of the
       !  cross products of the non-zero b-splines at (u,v), multiplied with
       !  the appropriate b-spline coefficients.
-          term = 0.
+          term = zero
           k1 = numu*nv4+numv
           do 920 l1=1,4
             k2 = k1
@@ -7152,82 +7144,75 @@ module fitpack_core
       end subroutine fpgrsp
 
 
-      recursive subroutine fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
+      !  given the b-spline representation (knots t(j),j=1,2,...,n, b-spline coefficients c(j),j=1,2,...,
+      !  n-k-1) of a spline of degree k, fpinst calculates the b-spline representation (knots
+      !  tt(j),j=1,2,...,nn, b-spline coefficients cc(j),j=1,2,...,nn-k-1) of the same spline if an
+      !  additional knot is inserted at the point x situated in the inter val t(l)<=x<t(l+1).
+      !  iopt/=0: periodic spline; at leas one of the following conditions must be fulfilled: l>2*k or l<n-2*k.
+      !  iopt==0: non-periodic spline
+      pure subroutine fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
 
-      !  given the b-spline representation (knots t(j),j=1,2,...,n, b-spline
-      !  coefficients c(j),j=1,2,...,n-k-1) of a spline of degree k, fpinst
-      !  calculates the b-spline representation (knots tt(j),j=1,2,...,nn,
-      !  b-spline coefficients cc(j),j=1,2,...,nn-k-1) of the same spline if
-      !  an additional knot is inserted at the point x situated in the inter-
-      !  val t(l)<=x<t(l+1). iopt denotes whether (iopt/=0) or not (iopt=0)
-      !  the given spline is periodic. in case of a periodic spline at least
-      !  one of the following conditions must be fulfilled: l>2*k or l<n-2*k.
       !
       !  ..scalar arguments..
-      integer k,n,l,nn,iopt,nest
-      real(RKIND) x
+      integer, intent(in) :: k,n,l,iopt,nest
+      integer, intent(out) :: nn
+      real(RKIND), intent(in) :: x
       !  ..array arguments..
-      real(RKIND) t(nest),c(nest),tt(nest),cc(nest)
+      real(RKIND), intent(in)  :: t(nest),c(nest)
+      real(RKIND), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
-      real(RKIND) fac,per
-      integer i,i1,j,k1,m,mk,nk,nk1,nl,ll
+      real(RKIND) :: fac,per
+      integer :: i,i1,j,k1,m,mk,nk,nk1,nl,ll
       !  ..
-      k1 = k+1
+      k1  = k+1
       nk1 = n-k1
       !  the new knots
       ll = l+1
-      i = n
-      do 10 j=ll,n
-         tt(i+1) = t(i)
-         i = i-1
-  10  continue
-      tt(ll) = x
-      do 20 j=1,l
-         tt(j) = t(j)
-  20  continue
+      tt(1:n+1) = [t(1:l),x,t(ll:n)]
       !  the new b-spline coefficients
       i = nk1
-      do 30 j=l,nk1
+      do j=l,nk1
          cc(i+1) = c(i)
          i = i-1
-  30  continue
+      end do
       i = l
-      do 40 j=1,k
+      do j=1,k
          m = i+k1
          fac = (x-tt(i))/(tt(m)-tt(i))
          i1 = i-1
          cc(i) = fac*c(i)+(one-fac)*c(i1)
          i = i1
-  40  continue
-      do 50 j=1,i
-         cc(j) = c(j)
-  50  continue
+      end do
+      cc(1:i) = c(1:i)
       nn = n+1
-      if(iopt==0) return
-      !   incorporate the boundary conditions for a periodic spline.
-      nk = nn-k
-      nl = nk-k1
-      per = tt(nk)-tt(k1)
-      i = k1
-      j = nk
-      if(ll<=nl) go to 70
-      do 60 m=1,k
-         mk = m+nl
-         cc(m) = cc(mk)
-         i = i-1
-         j = j-1
-         tt(i) = tt(j)-per
-  60  continue
-      return
-  70  if(ll>(k1+k)) return
-      do 80 m=1,k
-         mk = m+nl
-         cc(mk) = cc(m)
-         i = i+1
-         j = j+1
-         tt(j) = tt(i)+per
-  80  continue
-      return
+
+      ! incorporate the boundary conditions for a periodic spline.
+      if (iopt/=0) then
+
+          nk = nn-k
+          nl = nk-k1
+          per = tt(nk)-tt(k1)
+          i = k1
+          j = nk
+          if (ll>nl) then
+              do m=1,k
+                 mk = m+nl
+                 cc(m) = cc(mk)
+                 i = i-1
+                 j = j-1
+                 tt(i) = tt(j)-per
+              end do
+          elseif (ll<=(k1+k)) then
+             do m=1,k
+                mk = m+nl
+                cc(mk) = cc(m)
+                i = i+1
+                j = j+1
+                tt(j) = tt(i)+per
+             end do
+          endif
+      endif
+
       end subroutine fpinst
 
 
@@ -7532,7 +7517,7 @@ module fitpack_core
       sq = sq+res
       ! in case all derivative values dz(i) are given (step<=0) or in case
       ! we have spline interpolation, we accept this spline as a solution.
-  5   if(step<=0. .or. sq<=0.) return
+  5   if(step<=zero .or. sq<=zero) return
       dzz(1) = dz(1)
       dzz(2) = dz(2)
       dzz(3) = dz(3)
