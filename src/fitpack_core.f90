@@ -7823,7 +7823,7 @@ module fitpack_core
       integer,     intent(out) :: nummer(m),index(nreg)
       !  ..local scalars..
       real(RKIND) :: xi,yi
-      integer :: i,im,k,kx1,ky1,k1,l,l1,nk1x,nk1y,num,nyy
+      integer :: im,k,kx1,ky1,k1,l,l1,nk1x,nk1y,num,nyy
 
       !  ..
       kx1 = kx+1
@@ -13551,40 +13551,37 @@ module fitpack_core
       end subroutine fptrpe
 
 
-      recursive subroutine insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
-
-      !  subroutine insert inserts a new knot x into a spline function s(x)
-      !  of degree k and calculates the b-spline representation of s(x) with
-      !  respect to the new set of knots. in addition, if iopt/=0, s(x)
-      !  will be considered as a periodic spline with period per=t(n-k)-t(k+1)
-      !  satisfying the boundary constraints
+      !  subroutine insert inserts a new knot x into a spline function s(x) of degree k and calculates
+      !  the b-spline representation of s(x) with respect to the new set of knots. in addition, if
+      !  iopt/=0, s(x) will be considered as a periodic spline with period per=t(n-k)-t(k+1) satisfying
+      !  the boundary constraints
       !       t(i+n-2*k-1) = t(i)+per  ,i=1,2,...,2*k+1
       !       c(i+n-2*k-1) = c(i)      ,i=1,2,...,k
-      !  in that case, the knots and b-spline coefficients returned will also
-      !  satisfy these boundary constraints, i.e.
+      !  in that case, the knots and b-spline coefficients returned will also satisfy the periodic BCs, i.e.
       !       tt(i+nn-2*k-1) = tt(i)+per  ,i=1,2,...,2*k+1
       !       cc(i+nn-2*k-1) = cc(i)      ,i=1,2,...,k
+
+      pure subroutine insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
+
       !
       !  calling sequence:
       !     call insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
       !
       !  input parameters:
-      !    iopt : integer flag, specifying whether (iopt/=0) or not (iopt=0)
-      !           the given spline must be considered as being periodic.
+      !    iopt : integer flag, specifying whether (iopt/=0) or not (iopt=0) the given spline must be
+      !           considered as being periodic.
       !    t    : array,length nest, which contains the position of the knots.
       !    n    : integer, giving the total number of knots of s(x).
       !    c    : array,length nest, which contains the b-spline coefficients.
       !    k    : integer, giving the degree of s(x).
       !    x    : real, which gives the location of the knot to be inserted.
-      !    nest : integer specifying the dimension of the arrays t,c,tt and cc
-      !           nest > n.
+      !    nest : integer specifying the dimension of the arrays t,c,tt and cc. nest > n.
       !
       !  output parameters:
-      !    tt   : array,length nest, which contains the position of the knots
-      !           after insertion.
+      !    tt   : array,length nest, which contains the position of the knots after insertion.
       !    nn   : integer, giving the total number of knots after insertion
-      !    cc   : array,length nest, which contains the b-spline coefficients
-      !           of s(x) with respect to the new set of knots.
+      !    cc   : array,length nest, which contains the b-spline coefficients of s(x) with respect to the
+      !           new set of knots.
       !    ier  : error flag
       !      ier = 0 : normal return
       !      ier =10 : invalid input data (see restrictions)
@@ -13592,9 +13589,8 @@ module fitpack_core
       !  restrictions:
       !    nest > n
       !    t(k+1) <= x <= t(n-k)
-      !    in case of a periodic spline (iopt/=0) there must be
-      !       either at least k interior knots t(j) satisfying t(k+1)<t(j)<=x
-      !       or at least k interior knots t(j) satisfying x<=t(j)<t(n-k)
+      !    in case of a periodic spline (iopt/=0) there must be either at least k interior knots t(j)
+      !       satisfying t(k+1)<t(j)<=x or at least k interior knots t(j) satisfying x<=t(j)<t(n-k)
       !
       !  other subroutines required: fpinst.
       !
@@ -13604,10 +13600,9 @@ module fitpack_core
       !   in which case the new representation will simply replace the old one
       !
       !  references :
-      !    boehm w : inserting new knots into b-spline curves. computer aided
-      !              design 12 (1980) 199-201.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
+      !    boehm w : inserting new knots into b-spline curves. computer aided design 12 (1980) 199-201.
+      !   dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
+      !                university press, 1993.
       !
       !  author :
       !    p.dierckx
@@ -13615,44 +13610,47 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : february 2007 (second interval search added)
-      !
       !  ..scalar arguments..
-      integer iopt,n,k,nn,nest,ier
-      real(RKIND) x
+      integer, intent(in) :: iopt,n,k,nest
+      integer, intent(out) :: nn,ier
+      real(RKIND), intent(in) :: x
       !  ..array arguments..
-      real(RKIND) t(nest),c(nest),tt(nest),cc(nest)
+      real(RKIND), intent(in) :: t(nest),c(nest)
+      real(RKIND), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
-      integer kk,k1,l,nk
+      integer :: kk,k1,l,nk
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      if(nest<=n) go to 40
+      ier = FITPACK_INPUT_ERROR
+      if (nest<=n) return
       k1 = k+1
       nk = n-k
-      if(x<t(k1) .or. x>t(nk)) go to 40
+      if (x<t(k1) .or. x>t(nk)) return
       !  search for knot interval t(l) <= x < t(l+1).
       l = k1
-  10  if(x<t(l+1)) go to 20
-      l = l+1
-      if(l==nk) go to 14
-      go to 10
+      do while (l<nk .and. .not.x<t(l+1))
+         l = l+1
+      end do
       !  if no interval found above, then reverse the search and
       !  look for knot interval t(l) < x <= t(l+1).
-  14  l = nk-1
-  16  if(x>t(l)) go to 20
-      l = l-1
-      if(l==k) go to 40
-      go to 16
-  20  if(t(l)>=t(l+1)) go to 40
-      if(iopt==0) go to 30
-      kk = 2*k
-      if(l<=kk .and. l>=(n-kk)) go to 40
-  30  ier = 0
+      l = nk-1
+      do while (l>k .and. .not.x>t(l))
+        l = l-1
+      end do
+
+      !  no interval found in whole range
+      if(t(l)>=t(l+1)) return
+
+      if(iopt/=0) then
+         kk = 2*k
+         if (l<=kk .and. l>=(n-kk)) return
+      endif
+
+      ier = FITPACK_OK
       !  insert the new knot.
       call fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
-  40  return
+
       end subroutine insert
 
 
