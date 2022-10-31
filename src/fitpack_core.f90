@@ -13850,12 +13850,12 @@ module fitpack_core
       integer, intent(in) :: iopt,ipar,idim,m,mx,k,nest,n,lwrk,nc
       integer, intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: x(mx)
+      real(RKIND), intent(in) :: x(idim,m)
       real(RKIND), intent(inout) :: u(m),w(m),t(nest),c(nc),wrk(lwrk)
       integer, intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      real(RKIND) :: x2(idim),x1(idim)
       integer i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin,ncc
+
 
       !  we set up the parameters tol and maxit
       integer, parameter :: maxit = 20
@@ -13881,17 +13881,10 @@ module fitpack_core
       ! Normalize coordinates
       if (ipar==0 .and. iopt<=0) then
 
-          x1 = zero
-          x2 = zero
-
           ! Point coordinates are stored in x(:), offset by idim values
           u(1) = zero
-
-          x1 = x(:idim)
           do i=2,m
-             x2     = x((i-1)*idim+1:i*idim)
-             u(i)   = u(i-1)+norm2(x2-x1)
-             x1     = x2
+             u(i) = u(i-1) + norm2(x(:,i)-x(:,i-1))
           end do
           if (u(m)<=zero) return
 
