@@ -37,8 +37,8 @@ module fitpack_curve_tests
        real(RKIND), parameter :: RTOL = 1.0e-1_RKIND
        real(RKIND), parameter :: ATOL = 1.0e-2_RKIND
        type(fitpack_curve) :: curve
-       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime
-       integer :: ierr,i
+       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3)
+       integer :: ierr,i,order
 
        success = .false.
 
@@ -68,29 +68,43 @@ module fitpack_curve_tests
              return
           end if
 
+          ! Get analytical function and derivatives
+          dfdx(0) = sin(xrand(i)) ! the function
+          dfdx(1) = cos(xrand(i))
+          dfdx(2) = -dfdx(0)
+          dfdx(3) = -dfdx(1)
+
           ! error
-          if (abs(yeval-sin(xrand(i)))*rewt(RTOL,ATOL,sin(xrand(i)))>one) then
-             print *, '[sine_fit] sine function error is too large: x=',xrand(i),' yspline=',yeval,' analytical=',sin(xrand(i))
+          if (abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))>one) then
+             print 1, xrand(i),yeval,dfdx(0)
              return
           end if
 
           ! Evaluate first derivative
-          yprime = curve%dfdx(xrand(i),ierr=ierr);
-          if (.not.FITPACK_SUCCESS(ierr)) then
-            print *, '[sine_fit] cannot evaluate derivative at ',xrand(i),': ',FITPACK_MESSAGE(ierr)
-            return
-          end if
+          do order = 1,3
+             yprime = curve%dfdx(xrand(i),order=order,ierr=ierr)
 
-          ! error
-          if (abs(yprime-cos(xrand(i)))*rewt(RTOL,ATOL,sin(xrand(i)))>one) then
-             print *, '[sine_fit] 1st derivative error is too large: x=',xrand(i),' yp(spline)=',yprime,' analytical=',cos(xrand(i))
-             return
-          end if
+             ! Check evaluation
+             if (.not.FITPACK_SUCCESS(ierr)) then
+               print 2, order,xrand(i),FITPACK_MESSAGE(ierr)
+               return
+             end if
+
+             ! Check error
+             if (abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))>one) then
+                print 3, order,xrand(i),yprime,dfdx(order)
+                return
+             end if
+          end do
 
        end do
 
        ! All checks passed: success!
        success = .true.
+
+       1 format('[sine_fit] sine function error is too large: x=',f6.2,' yspline=',f6.2,' analytical=',f6.2)
+       2 format('[sine_fit] cannot evaluate ',i0,'-th derivative at ',f6.2,': ',a)
+       3 format('[sine_fit] ',i0,'-th derivative error is too large: x=',f6.2,' yp(spline)=',f6.2,' analytical=',f6.2)
 
     end function test_sine_fit
 

@@ -12014,9 +12014,7 @@ module fitpack_core
  250        continue
             go to 280
  260        if(jlt==3) go to 270
-            h(j1+1) = facc*htj
-            h(j1+2) = facs*htj
-            h(j1+3) = htj
+            h(j1+1:j1+3) = htj*[facc,facs,one]
             j1 = j1+2
             go to 280
  270        h(1:3) = [h(1)+htj,facc*htj,facs*htj]
@@ -17400,11 +17398,10 @@ module fitpack_core
 
 
 
-      recursive subroutine splder(t,n,c,k,nu,x,y,m,e,wrk,ier)
+      !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of order nu
+      !  of a spline s(x) of degree k,given in its b-spline representation.
+      pure subroutine splder(t,n,c,k,nu,x,y,m,e,wrk,ier)
 
-      !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m
-      !  the derivative of order nu of a spline s(x) of degree k,given in
-      !  its b-spline representation.
       !
       !  calling sequence:
       !     call splder(t,n,c,k,nu,x,y,m,e,wrk,ier)
@@ -17415,19 +17412,15 @@ module fitpack_core
       !    c    : array,length n, which contains the b-spline coefficients.
       !    k    : integer, giving the degree of s(x).
       !    nu   : integer, specifying the order of the derivative. 0<=nu<=k
-      !    x    : array,length m, which contains the points where the deriv-
-      !           ative of s(x) must be evaluated.
-      !    m    : integer, giving the number of points where the derivative
-      !           of s(x) must be evaluated
-      !    e    : integer, if 0 the spline is extrapolated from the end
-      !           spans for points not in the support, if 1 the spline
-      !           evaluates to zero for those points, and if 2 ier is set to
+      !    x    : array,length m, which contains the points where the derivative of s(x) must be evaluated.
+      !    m    : integer, giving the number of points where the derivative of s(x) must be evaluated
+      !    e    : integer, if 0 the spline is extrapolated from the end spans for points not in the
+      !           support, if 1 the spline evaluates to zero for those points, and if 2 ier is set to
       !           1 and the subroutine returns.
       !    wrk  : real array of dimension n. used as working space.
       !
       !  output parameters:
-      !    y    : array,length m, giving the value of the derivative of s(x)
-      !           at the different points.
+      !    y    : array,length m, giving the value of the derivative of s(x) at the different points.
       !    ier  : error flag
       !      ier = 0 : normal return
       !      ier = 1 : argument out of bounds and e == 2
@@ -17441,10 +17434,8 @@ module fitpack_core
       !  other subroutines required: fpbspl
       !
       !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
+      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
       !   dierckx p. : curve and surface fitting with splines, monographs on
       !                numerical analysis, oxford university press, 1993.
       !
@@ -17456,140 +17447,111 @@ module fitpack_core
       !
       !  latest update : march 1987
       !
-      !++ pearu: 13 aug 20003
+      !++ pearu: 13 aug 2003
       !++   - disabled cliping x values to interval [min(t),max(t)]
       !++   - removed the restriction of the orderness of x values
       !++   - fixed initialization of sp to real(RKIND) value
       !
       !  ..scalar arguments..
-      integer n,k,nu,m,e,ier
+      integer, intent(in) :: n,k,nu,m,e
+      integer, intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) t(n),c(n),x(m),y(m),wrk(n)
+      real(RKIND), intent(in) :: t(n),c(n),x(m)
+      real(RKIND), intent(out) :: y(m)
+      real(RKIND), intent(inout) :: wrk(n)
       !  ..local scalars..
-      integer i,j,kk,k1,k2,l,ll,l1,l2,nk1,nk2,nn
-      real(RKIND) ak,arg,fac,sp,tb,te
-      !++..
-      integer k3
-      !..++
+      integer :: i,j,k1,k2,k3,l,l1,l2,nk1,nk2,kk
+      real(RKIND) :: ak,arg,fac,tb,te
       !  ..local arrays ..
-      real(RKIND) h(SIZ_K+1)
+      real(RKIND) :: h(SIZ_K+1)
+      logical :: nonflat
+
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      if(nu<0 .or. nu>k) go to 200
-      !--      if(m-1) 200,30,10
-      !++..
-      if(m<1) go to 200
-      !..++
-      !--  10  do 20 i=2,m
-      !--        if(x(i)<x(i-1)) go to 200
-      !--  20  continue
-      ier = 0
+      ier = FITPACK_INPUT_ERROR
+      if (nu<0 .or. nu>k) return
+      if (m<1) return
+
+      kk  = k-nu
+
+      ier = FITPACK_OK
+
       !  fetch tb and te, the boundaries of the approximation interval.
       k1 = k+1
       k3 = k1+1
       nk1 = n-k1
       tb = t(k1)
       te = t(nk1+1)
+
       !  the derivative of order nu of a spline of degree k is a spline of
       !  degree k-nu,the b-spline coefficients wrk(i) of which can be found
       !  using the recurrence scheme of de boor.
-      l = 1
-      kk = k
-      nn = n
-      do 40 i=1,nk1
-         wrk(i) = c(i)
-  40  continue
-      if(nu==0) go to 100
-      nk2 = nk1
-      do 60 j=1,nu
-         ak = kk
-         nk2 = nk2-1
-         l1 = l
-         do 50 i=1,nk2
-            l1 = l1+1
-            l2 = l1+kk
-            fac = t(l2)-t(l1)
-            if(fac<=0.) go to 50
-            wrk(i) = ak*(wrk(i+1)-wrk(i))/fac
-  50     continue
-         l = l+1
-         kk = kk-1
-  60  continue
-      if(kk/=0) go to 100
-      !  if nu=k the derivative is a piecewise constant function
-      j = 1
-      do 90 i=1,m
-        arg = x(i)
-      !++..
-      !  check if arg is in the support
-        if (arg < tb .or. arg > te) then
-            if (e == 0) then
-                goto 65
-            else if (e == 1) then
-                y(i) = 0
-                goto 90
-            else if (e == 2) then
-                ier = 1
-                goto 200
-            endif
-        endif
-      !  search for knot interval t(l) <= arg < t(l+1)
- 65     if(arg>=t(l) .or. l+1==k3) go to 70
-        l1 = l
-        l = l-1
-        j = j-1
-        go to 65
-      !..++
-  70    if(arg<t(l+1) .or. l==nk1) go to 80
-        l = l+1
-        j = j+1
-        go to 70
-  80    y(i) = wrk(j)
-  90  continue
-      go to 200
+      l  = 1
+      wrk(1:nk1) = c(1:nk1)
+      if (nu/=0) then
+          nk2 = nk1
+          de_boor: do j=1,nu
+             ak  = k1-j
+             nk2 = nk2-1
+             l1  = l
+             do i=1,nk2
+                l1 = l1+1
+                l2 = l1+k1-j
+                fac = t(l2)-t(l1)
+                if (fac>zero) wrk(i) = ak*(wrk(i+1)-wrk(i))/fac
+             end do
+             l = l+1
+          end do de_boor
+      endif
 
- 100  l = k1
+      nonflat = nu==0 .or. k/=nu
+
+      l  = k1
       l1 = l+1
       k2 = k1-nu
+      j  = 1
       !  main loop for the different points.
-      do 180 i=1,m
-      !  fetch a new x-value arg.
+      user_points: do i=1,m
+        ! fetch a new x-value arg.
         arg = x(i)
-      !  check if arg is in the support
+        ! check if arg is in the support
         if (arg < tb .or. arg > te) then
-            if (e == 0) then
-                goto 135
-            else if (e == 1) then
-                y(i) = 0
-                goto 180
-            else if (e == 2) then
-                ier = 1
-                goto 200
-            endif
+            select case (e)
+               case (SPLINE_EXTRAPOLATE)
+                  ! continue like any other point
+               case (SPLINE_ZERO)
+                  y(i) = zero
+                  cycle user_points
+               case (SPLINE_NOT_ALLOWED)
+                  ier = FITPACK_INSUFFICIENT_STORAGE
+                  return
+            end select
         endif
-      !  search for knot interval t(l) <= arg < t(l+1)
- 135    if(arg>=t(l) .or. l1==k3) go to 140
-        l1 = l
-        l = l-1
-        go to 135
-      !..++
- 140    if(arg<t(l1) .or. l==nk1) go to 150
-        l = l1
-        l1 = l+1
-        go to 140
-      !  evaluate the non-zero b-splines of degree k-nu at arg.
- 150    call fpbspl(t,n,kk,arg,l,h)
-      !  find the value of the derivative at x=arg.
-        sp = zero
-        ll = l-k1
-        do 160 j=1,k2
-          ll = ll+1
-          sp = sp+wrk(ll)*h(j)
- 160    continue
-        y(i) = sp
- 180  continue
- 200  return
+        ! search for knot interval t(l) <= arg < t(l+1)
+        do while (.not.(arg>=t(l) .or. l1==k3))
+           l1 = l
+           l  = l-1
+           j  = j-1
+        end do
+        ! ++
+        do while (.not.(arg<t(l1) .or. l==nk1))
+           l  = l1
+           l1 = l+1
+           j  = j+1
+        end do
+
+        if (nonflat) then
+           !  evaluate the non-zero b-splines of degree k-nu at arg.
+           call fpbspl(t,n,kk,arg,l,h)
+           !  find the value of the derivative at x=arg.
+           y(i) = dot_product(h(1:k2),wrk(l-k:l-nu))
+        else
+           ! if nu=k the derivative is a piecewise constant function
+           y(i) = wrk(j)
+        endif
+      end do user_points
+
+      return
       end subroutine splder
 
 
@@ -17690,21 +17652,18 @@ module fitpack_core
         arg = x(i)
       !  check if arg is in the support
         if (arg < tb .or. arg > te) then
-            if (e == 0) then
+            select case (e)
+               case (SPLINE_EXTRAPOLATE)
                 goto 35
-            else if (e == 1) then
+            case (SPLINE_ZERO)
                 y(i) = 0
                 goto 80
-            else if (e == 2) then
+            case (SPLINE_NOT_ALLOWED)
                 ier = 1
                 goto 100
-            else if (e == 3) then
-                if (arg < tb) then
-                    arg = tb
-                else
-                    arg = te
-                endif
-            endif
+            case (SPLINE_NEAREST_BND)
+                arg = max(min(arg,te),tb)
+            end select
         endif
       !  search for knot interval t(l) <= arg < t(l+1)
       !++..
