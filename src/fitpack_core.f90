@@ -80,6 +80,7 @@ module fitpack_core
     real(RKIND), parameter, public :: one    = 1.0_RKIND
     real(RKIND), parameter, public :: zero   = 0.0_RKIND
     real(RKIND), parameter, public :: half   = 0.5_RKIND
+    real(RKIND), parameter, public :: onep5  = 1.5_RKIND
     real(RKIND), parameter, public :: fourth = 0.25_RKIND
     real(RKIND), parameter, public :: two    = 2.0_RKIND
     real(RKIND), parameter, public :: three  = 3.0_RKIND
@@ -180,7 +181,6 @@ module fitpack_core
       else
 
          ier = FITPACK_OK
-
          do i=1,m
             call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),1,y(i),1,z(i),wrk(1),wrk(kx+2),iwrk(1),iwrk(2))
          end do
@@ -537,15 +537,14 @@ module fitpack_core
       real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),wrk(lwrk)
       integer iwrk(nest)
       !  ..local scalars..
-      real(RKIND) per,tol,dist
-      integer i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest, &
-       maxit,m1,nmin,ncc,j
+      real(RKIND) per,dist
+      integer i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest,m1,nmin,ncc,j
       !  we set up the parameters tol and maxit
-      maxit = 20
-      tol = smallnum03
+      integer, parameter :: maxit = 20
+      real(RKIND), parameter :: tol = smallnum03
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       if(iopt<(-1) .or. iopt>1) go to 90
       if(ipar<0 .or. ipar>1) go to 90
       if(idim<=0 .or. idim>10) go to 90
@@ -586,7 +585,7 @@ module fitpack_core
   40  if(w(1)<=zero) go to 90
       m1 = m-1
       do 50 i=1,m1
-         if(u(i)>=u(i+1) .or. w(i)<=0.) go to 90
+         if(u(i)>=u(i+1) .or. w(i)<=zero) go to 90
   50  continue
       if(iopt>=0) go to 70
       if(n<=nmin .or. n>nest) go to 90
@@ -1496,12 +1495,11 @@ module fitpack_core
       end subroutine cualde
 
 
-      recursive subroutine curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
 
-      !  subroutine curev evaluates in a number of points u(i),i=1,2,...,m
-      !  a spline curve s(u) of degree k and dimension idim, given in its
-      !  b-spline representation.
-      !
+      !  subroutine curev evaluates in a number of points u(i),i=1,2,...,m a spline curve s(u) of degree k
+      !  and dimension idim, given in its b-spline representation.
+      pure subroutine curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
+
       !  calling sequence:
       !     call curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
       !
@@ -1512,16 +1510,13 @@ module fitpack_core
       !    c    : array,length nc, which contains the b-spline coefficients.
       !    nc   : integer, giving the total number of coefficients of s(u).
       !    k    : integer, giving the degree of s(u).
-      !    u    : array,length m, which contains the points where s(u) must
-      !           be evaluated.
-      !    m    : integer, giving the number of points where s(u) must be
-      !           evaluated.
+      !    u    : array,length m, which contains the points where s(u) must be evaluated.
+      !    m    : integer, giving the number of points where s(u) must be evaluated.
       !    mx   : integer, giving the dimension of the array x. mx >= m*idim
       !
       !  output parameters:
-      !    x    : array,length mx,giving the value of s(u) at the different
-      !           points. x(idim*(i-1)+j) will contain the j-th coordinate
-      !           of the i-th point on the curve.
+      !    x    : array,length mx,giving the value of s(u) at the different points. x(idim*(i-1)+j) will
+      !           contain the j-th coordinate of the i-th point on the curve.
       !    ier  : error flag
       !      ier = 0 : normal return
       !      ier =10 : invalid input data (see restrictions)
@@ -1534,12 +1529,10 @@ module fitpack_core
       !  other subroutines required: fpbspl.
       !
       !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
+      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
+      !                 university press, 1993.
       !
       !  author :
       !    p.dierckx
@@ -1547,65 +1540,64 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
-      integer idim,n,nc,k,m,mx,ier
+      integer, intent(in) :: idim,n,nc,k,m,mx
+      integer, intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) t(n),c(nc),u(m),x(mx)
+      real(RKIND), intent(in) :: t(n),c(nc),u(m)
+      real(RKIND), intent(out) :: x(idim,m) ! x has size (mx), assume 2d (idim,m)
       !  ..local scalars..
-      integer i,j,jj,j1,k1,l,ll,l1,mm,nk1
-      real(RKIND) arg,sp,tb,te
+      integer :: i,j1,k1,l,ll,l1,nk1
+      real(RKIND) :: arg,tb,te
       !  ..local array..
       real(RKIND) h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      if (m<1) go to 100
-      if (m==1) go to 30
-      go to 10
-  10  do 20 i=2,m
-        if(u(i)<u(i-1)) go to 100
-  20  continue
-  30  if(mx<(m*idim)) go to 100
-      ier = 0
+      ier = FITPACK_INPUT_ERROR
+      if (m<1) return
+
+      ! Check monotonic
+      if (m>1) then
+         if (any(u(2:m)<u(1:m-1))) return
+      endif
+
+      ! Check enough output space
+      if (mx<(m*idim)) return
+
+      ier = FITPACK_OK
+
       !  fetch tb and te, the boundaries of the approximation interval.
-      k1 = k+1
+      k1  = k+1
       nk1 = n-k1
-      tb = t(k1)
-      te = t(nk1+1)
-      l = k1
-      l1 = l+1
+      tb  = t(k1)
+      te  = t(nk1+1)
+      l   = k1
+      l1  = l+1
       !  main loop for the different points.
-      mm = 0
-      do 80 i=1,m
-      !  fetch a new u-value arg.
-        arg = u(i)
-        if(arg<tb) arg = tb
-        if(arg>te) arg = te
-      !  search for knot interval t(l) <= arg < t(l+1)
-  40    if(arg<t(l1) .or. l==nk1) go to 50
-        l = l1
-        l1 = l+1
-        go to 40
-      !  evaluate the non-zero b-splines at arg.
-  50    call fpbspl(t,n,k,arg,l,h)
-      !  find the value of s(u) at u=arg.
+      eval_points: do i=1,m
+
+        ! fetch a new u-value arg.
+        arg = min(max(u(i),tb),te)
+
+        ! search for knot interval t(l) <= arg < t(l+1)
+        do while (.not.(arg<t(l1) .or. l==nk1))
+          l = l1
+          l1 = l+1
+        end do
+
+        ! evaluate the non-zero b-splines at arg.
+        call fpbspl(t,n,k,arg,l,h)
+
+        ! find the value of s(u) at u=arg.
         ll = l-k1
-        do 70 j1=1,idim
-          jj = ll
-          sp = zero
-          do 60 j=1,k1
-            jj = jj+1
-            sp = sp+c(jj)*h(j)
-  60      continue
-          mm = mm+1
-          x(mm) = sp
+        do j1=1,idim
+          x(idim,m) = dot_product(h(1:k1),c(ll+1:ll+k1))
           ll = ll+n
-  70    continue
-  80  continue
- 100  return
+        end do
+      end do eval_points
+
+      return
       end subroutine curev
 
 
@@ -1841,8 +1833,8 @@ module fitpack_core
       if (iopt<(-1) .or. iopt>1) return
       if (m<k1 .or. nest<nmin)   return
       lwest = m*k1+nest*(7+3*k)
-      if(lwrk<lwest)             return
-      if(xb>x(1) .or. xe<x(m))   return
+      if (lwrk<lwest)             return
+      if (xb>x(1) .or. xe<x(m))  return
       if (any(x(1:m-1)>x(2:m)))  return
 
       if (iopt>=0) then
@@ -1873,49 +1865,41 @@ module fitpack_core
       end subroutine curfit
 
 
-      recursive function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
-
-      real(RKIND) :: dblint_res
       !  function dblint calculates the double integral
       !         / xe  / ye
       !        |     |      s(x,y) dx dy
       !    xb /  yb /
-      !  with s(x,y) a bivariate spline of degrees kx and ky, given in the
-      !  b-spline representation.
+      !  with s(x,y) a bivariate spline of degrees kx and ky, given in the b-spline representation.
+      real(RKIND) function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
+
       !
       !  calling sequence:
       !     aint = dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk)
       !
       !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the
-      !           knots in the x-direction.
+      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
       !   nx    : integer, giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the
-      !           knots in the y-direction.
+      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
       !   ny    : integer, giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the
-      !           b-spline coefficients.
+      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   xb,xe : real values, containing the boundaries of the integration
-      !   yb,ye   domain. s(x,y) is considered to be identically zero out-
-      !           side the rectangle (tx(kx+1),tx(nx-kx))*(ty(ky+1),ty(ny-ky))
+      !   yb,ye   domain. s(x,y) is considered to be identically zero outside the rectangle
+      !           (tx(kx+1),tx(nx-kx))*(ty(ky+1),ty(ny-ky))
       !
       !  output parameters:
       !   aint  : real , containing the double integral of s(x,y).
-      !   wrk   : real array of dimension at least (nx+ny-kx-ky-2).
-      !           used as working space.
+      !   wrk   : real array of dimension at least (nx+ny-kx-ky-2). used as working space.
       !           on exit, wrk(i) will contain the integral
       !                / xe
       !               | ni,kx+1(x) dx , i=1,2,...,nx-kx-1
       !           xb /
-      !           with ni,kx+1(x) the normalized b-spline defined on
-      !           the knots tx(i),...,tx(i+kx+1)
+      !           with ni,kx+1(x) the normalized b-spline defined on the knots tx(i),...,tx(i+kx+1)
       !           wrk(j+nx-kx-1) will contain the integral
       !                / ye
       !               | nj,ky+1(y) dy , j=1,2,...,ny-ky-1
       !           yb /
-      !           with nj,ky+1(y) the normalized b-spline defined on
-      !           the knots ty(j),...,ty(j+ky+1)
+      !           with nj,ky+1(y) the normalized b-spline defined on the knots ty(j),...,ty(j+ky+1)
       !
       !  other subroutines required: fpintb
       !
@@ -1931,36 +1915,39 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1989
-      !
       !  ..scalar arguments..
-      integer nx,ny,kx,ky
-      real(RKIND) xb,xe,yb,ye
+      integer, intent(in) :: nx,ny,kx,ky
+      real(RKIND), intent(in) :: xb,xe,yb,ye
       !  ..array arguments..
-      real(RKIND) tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),wrk(nx+ny-kx-ky-2)
+      real(RKIND), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
+      real(RKIND), intent(out) :: wrk(nx+ny-kx-ky-2)
       !  ..local scalars..
-      integer i,j,l,m,nkx1,nky1
-      real(RKIND) res
+      integer :: i,j,l,m,nkx1,nky1
+      real(RKIND) :: res
+
       !  ..
       nkx1 = nx-kx-1
       nky1 = ny-ky-1
+
       !  we calculate the integrals of the normalized b-splines ni,kx+1(x)
       call fpintb(tx,nx,wrk,nkx1,xb,xe)
+
       !  we calculate the integrals of the normalized b-splines nj,ky+1(y)
       call fpintb(ty,ny,wrk(nkx1+1),nky1,yb,ye)
+
       !  calculate the integral of s(x,y)
       dblint_res = zero
-      do 200 i=1,nkx1
+      x_dim: do i=1,nkx1
         res = wrk(i)
-        if(res==zero) go to 200
+        if (res==zero) cycle x_dim
         m = (i-1)*nky1
         l = nkx1
-        do 100 j=1,nky1
+        y_dim: do j=1,nky1
           m = m+1
           l = l+1
           dblint_res = dblint_res + res*wrk(l)*c(m)
- 100    continue
- 200  continue
+        end do y_dim
+      end do x_dim
       return
       end function dblint
 
@@ -11801,6 +11788,12 @@ module fitpack_core
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
       eps = sqrt(eta)
 
+      ! Initializations
+      lwest = 0
+      ntt   = 0
+      iband1 = 0
+
+
       if(iopt<0) go to 70
       !  calculation of acc, the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -11816,14 +11809,14 @@ module fitpack_core
       !     f1(0) = 1, f1(pi) = f1'(0) = f1'(pi) = 0 ; fn(teta) = 1-f1(teta).
       !  the corresponding weighted sum of squared residuals gives the upper
       !  bound sup for the smoothing factor s.
-  10  sup = 0.
-      d1 = 0.
-      d2 = 0.
-      c1 = 0.
-      cn = 0.
+  10  sup = zero
+      d1 = zero
+      d2 = zero
+      c1 = zero
+      cn = zero
       fac1 = pi*(one + half)
       fac2 = (one + one)/pi**3
-      aa = 0.
+      aa = zero
       do 40 i=1,m
          wi = w(i)
          ri = r(i)*wi
@@ -11840,21 +11833,17 @@ module fitpack_core
          call fprota(co,si,ri,c1)
  30      sup = sup+ri*ri
  40   continue
-      if(d2/=0.) c1 = c1/d2
-      if(d1/=0.) cn = (cn-aa*c1)/d1
+      if(d2/=zero) c1 = c1/d2
+      if(d1/=zero) cn = (cn-aa*c1)/d1
       !  find the b-spline representation of this least-squares polynomial
       nt = 8
       np = 8
-      do 50 i=1,4
-         c(i) = c1
-         c(i+4) = c1
-         c(i+8) = cn
-         c(i+12) = cn
-         tt(i) = 0.
-         tt(i+4) = pi
-         tp(i) = 0.
-         tp(i+4) = pi2
-  50  continue
+      c(1:8)   = c1
+      c(9:16)  = cn
+      tt(1:4)  = zero
+      tt(5:8)  = pi
+      tp(1:4)  = zero
+      tp(5:8)  = pi2
       fp = sup
       !  test whether the least-squares polynomial is an acceptable solution
       fpms = sup-s
@@ -11864,9 +11853,7 @@ module fitpack_core
       !  find the initial set of interior knots of the spherical spline in
       !  case iopt = 0.
       np = 11
-      tp(5) = pi*half
-      tp(6) = pi
-      tp(7) = tp(5)+pi
+      tp(5:7) = pi*[half,one,onep5]
       nt = 9
       tt(5) = tp(5)
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -11901,12 +11888,8 @@ module fitpack_core
             tp(l2) = tp(l4)-pi2
             tp(l3) = tp(l1)+pi2
   80     continue
-        l = nt
-        do 90 i=1,4
-          tt(i) = 0.
-          tt(l) = pi
-          l = l-1
-  90    continue
+        tt(1:4)     = zero
+        tt(nt-3:nt) = pi
       !  find nrint, the total number of knot intervals and nreg, the number
       !  of panels in which the approximation domain is subdivided by the
       !  intersection of knots.
@@ -11996,20 +11979,14 @@ module fitpack_core
       !  evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
           call fpbspl(tp,np,3,phi(in),l2,hp)
       !  store the value of these b-splines in spt and spp resp.
-          do 180 i=1,4
-            spp(in,i) = hp(i)
-            spt(in,i) = ht(i)
- 180      continue
+          spp(in,1:4) = hp(1:4)
+          spt(in,1:4) = ht(1:4)
       !  initialize the new row of observation matrix.
-          do 190 i=1,iband
-            h(i) = 0.
- 190      continue
+         h(1:iband) = zero
       !  calculate the non-zero elements of the new row by making the cross
       !  products of the non-zero b-splines in teta- and phi-direction and
       !  by taking into account the conditions of the spherical splines.
-          do 200 i=1,npp
-             row(i) = 0.
- 200      continue
+         row(1:npp) = zero
       !  take into account the condition (3) of the spherical splines.
           ll = lp
           do 210 i=1,4
@@ -12019,12 +11996,8 @@ module fitpack_core
  210      continue
       !  take into account the other conditions of the spherical splines.
           if(lt>2 .and. lt<(ntt-1)) go to 230
-          facc = 0.
-          facs = 0.
-          do 220 i=1,npp
-             facc = facc+row(i)*coco(i)
-             facs = facs+row(i)*cosi(i)
- 220     continue
+          facc = dot_product(row(:npp),coco(:npp))
+          facs = dot_product(row(:npp),cosi(:npp))
       !  fill in the non-zero elements of the new row.
  230     j1 = 0
          do 280 j =1,4
@@ -12046,14 +12019,10 @@ module fitpack_core
             h(j1+3) = htj
             j1 = j1+2
             go to 280
- 270        h(1) = h(1)+htj
-            h(2) = facc*htj
-            h(3) = facs*htj
+ 270        h(1:3) = [h(1)+htj,facc*htj,facs*htj]
             j1 = 3
  280      continue
-          do 290 i=1,iband
-            h(i) = h(i)*wi
- 290      continue
+          h(:iband) = h(:iband1)*wi
       !  rotate the row into triangle by givens transformations.
           irot = jrot
           do 310 i=1,iband
@@ -12082,15 +12051,10 @@ module fitpack_core
  340    continue
       !  find dmax, the maximum value for the diagonal elements in the reduced
       !  triangle.
-        dmax = 0.
-        do 350 i=1,ncof
-          if(a(i,1)<=dmax) go to 350
-          dmax = a(i,1)
- 350    continue
+        dmax = max(zero,maxval(a(:ncof,1),a(:ncof,1)>=zero))
       !  check whether the observation matrix is rank deficient.
         sigma = eps*dmax
         if (any(a(1:ncof,1)<=sigma)) then
-
             lwest = ncof*iband+ncof+iband
             if(lwrk<lwest) go to 925
             lf = 1
@@ -12126,7 +12090,7 @@ module fitpack_core
           go to 980
         endif
       !  if f(p=inf) < s, accept the choice of knots.
-        if(fpms<0.) go to 580
+        if(fpms<zero) go to 580
       !  test whether we cannot further increase the number of knots.
         if(ncof>m) go to 935
       !  search where to add a new knot.
@@ -12134,10 +12098,8 @@ module fitpack_core
       !  data points having the coordinate belonging to that knot interval.
       !  calculate also coord which is the same sum, weighted by the position
       !  of the data points considered.
-        do 450 i=1,nrint
-          fpint(i) = 0.
-          coord(i) = 0.
- 450    continue
+        fpint(:nrint) = zero
+        coord(:nrint) = zero
         do 490 num=1,nreg
           num1 = num-1
           lt = num1/npp
@@ -12318,10 +12280,7 @@ module fitpack_core
                 l1 = l+1
                 call fprota(co,si,h(l1),q(irot,l1))
  680          continue
- 690          do 700 l=1,i2
-                h(l) = h(l+1)
- 700          continue
-              h(i2+1) = zero
+ 690          h(1:i2+1) = [h(2:i2+1),zero]
  710        continue
  721      continue
  720    continue
@@ -12331,9 +12290,7 @@ module fitpack_core
           ii = i-4
           do 811 j=1,npp
       !  initialize the new row
-            do 730 l=1,iband4
-              h(l) = zero
- 730        continue
+          h(1:iband4) = zero
       !  fill in the non-zero elements of the row. jrot records the column
       !  number of the first non-zero element in the row.
             j1 = 1
@@ -12377,10 +12334,7 @@ module fitpack_core
                 l1 = l+1
                 call fprota(co,si,h(l1),q(irot,l1))
  770          continue
- 780          do 790 l=1,i2
-                h(l) = h(l+1)
- 790          continue
-              h(i2+1) = zero
+ 780          h(1:i2+1) = [h(2:i2+1),zero]
  800        continue
  811      continue
  810    continue
@@ -12446,7 +12400,7 @@ module fitpack_core
         p = p*con4
         if(p<=p1) p = p1*con9 + p2*con1
         go to 920
- 895    if(f2<0.) ich3 = 1
+ 895    if(f2<zero) ich3 = 1
  900    if(ich1/=0) go to 910
         if((f1-f2)>acc) go to 905
       !  our initial choice of p is too small
@@ -13351,16 +13305,16 @@ module fitpack_core
       end subroutine fptrnp
 
 
+      !  subroutine fptrpe reduces the (m+n-7) x (n-7) cyclic bandmatrix a to upper triangular form and
+      !  applies the same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the (n-7) x
+      !  (mm) x (idim) matrix q.
       recursive subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
 
-      !  subroutine fptrpe reduces the (m+n-7) x (n-7) cyclic bandmatrix a
-      !  to upper triangular form and applies the same givens transformations
-      !  to the (m) x (mm) x (idim) matrix z to obtain the (n-7) x (mm) x
-      !  (idim) matrix q.
+
       !  ..
       !  ..scalar arguments..
-      real(RKIND) p
-      integer m,mm,idim,n
+      real(RKIND), intent(in) :: p
+      integer, intent(in) :: m,mm,idim,n
       !  ..array arguments..
       real(RKIND) sp(m,4),b(n,5),z(m*mm*idim),a(n,5),aa(n,4),q((n-7)*mm*idim), right(mm*idim)
       integer nr(m)
@@ -13381,20 +13335,18 @@ module fitpack_core
       m2 = m*mm
       m3 = n7*mm
       m1 = m-1
-      !  we determine the matrix (a) and then we reduce her to
-      !  upper triangular form (r) using givens rotations.
-      !  we apply the same transformations to the rows of matrix
-      !  z to obtain the (mm) x (n-7) matrix g.
-      !  we store matrix (r) into a and aa, g into q.
-      !  the n7 x n7 upper triangular matrix (r) has the form
+      !  we determine the matrix (a) and then we reduce her to upper triangular form (r) using givens
+      !  rotations. we apply the same transformations to the rows of matrix z to obtain the (mm) x (n-7)
+      !  matrix g. we store matrix (r) into a and aa, g into q. the n7 x n7 upper triangular matrix (r)
+      !  has the form
       !             | a1 '     |
       !       (r) = |    ' a2  |
       !             |  0 '     |
-      !  with (a2) a n7 x 4 matrix and (a1) a n11 x n11 upper
-      !  triangular matrix of bandwidth 5.
+      !  with (a2) a n7 x 4 matrix and (a1) a n11 x n11 upper triangular matrix of bandwidth 5.
+
       !  initialization.
       nmd = n7*mid
-      q(1:nmd) = zero
+      q (1:nmd)    = zero
       aa(1:n4,1:4) = zero
       a (1:n4,1:5) = zero
       jper = 0
@@ -14014,7 +13966,7 @@ module fitpack_core
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
+      ier = FITPACK_INPUT_ERROR
       kx1 = kx+1
       ky1 = ky+1
       nkx1 = nx-kx1
@@ -14028,16 +13980,12 @@ module fitpack_core
       if (mx<1) go to 400
       if (mx==1) go to 30
       go to 10
-  10  do 20 i=2,mx
-        if(x(i)<x(i-1)) go to 400
-  20  continue
+  10  if(any(x(2:mx)<x(1:mx-1))) go to 400
   30  if (my<1) go to 400
       if (my==1) go to 60
       go to 40
-  40  do 50 i=2,my
-        if(y(i)<y(i-1)) go to 400
-  50  continue
-  60  ier = 0
+  40  if(any(y(2:my)<y(1:my-1))) go to 400
+  60  ier = FITPACK_OK
       nxx = nkx1
       nyy = nky1
       kkx = kx
@@ -14045,9 +13993,7 @@ module fitpack_core
       !  the partial derivative of order (nux,nuy) of a bivariate spline of
       !  degrees kx,ky is a bivariate spline of degrees kx-nux,ky-nuy.
       !  we calculate the b-spline coefficients of this spline
-      do 70 i=1,nc
-        wrk(i) = c(i)
-  70  continue
+      wrk(1:nc) = c(1:nc)
       if(nux==0) go to 200
       lx = 1
       do 100 j=1,nux
@@ -14104,7 +14050,7 @@ module fitpack_core
  300  iwx = 1+nxx*nyy
       iwy = iwx+mx*(kx1-nux)
       call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,wrk,kkx,kky, &
-       x,mx,y,my,z,wrk(iwx),wrk(iwy),iwrk(1),iwrk(mx+1))
+                  x,mx,y,my,z,wrk(iwx),wrk(iwy),iwrk(1),iwrk(mx+1))
  400  return
       end subroutine parder
 
