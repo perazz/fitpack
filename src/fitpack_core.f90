@@ -12000,26 +12000,25 @@ module fitpack_core
           facs = dot_product(row(:npp),cosi(:npp))
       !  fill in the non-zero elements of the new row.
  230     j1 = 0
-         do 280 j =1,4
+         new_row: do j =1,4
             jlt = j+lt
             htj = ht(j)
-            if(jlt>2 .and. jlt<=nt4) go to 240
+
+            if (jlt>2 .and. jlt<=nt4) go to 240
             j1 = j1+1
             h(j1) = h(j1)+htj
-            go to 280
+            cycle new_row
  240        if(jlt==3 .or. jlt==nt4) go to 260
-            do 250 i=1,npp
-               j1 = j1+1
-               h(j1) = row(i)*htj
- 250        continue
-            go to 280
+            h(j1+1:j1+1:npp) = row(1:npp)*htj
+            j1 = j1+npp
+            cycle new_row
  260        if(jlt==3) go to 270
             h(j1+1:j1+3) = htj*[facc,facs,one]
             j1 = j1+2
-            go to 280
+            cycle new_row
  270        h(1:3) = [h(1)+htj,facc*htj,facs*htj]
             j1 = 3
- 280      continue
+          end do new_row
           h(:iband) = h(:iband1)*wi
       !  rotate the row into triangle by givens transformations.
           irot = jrot
@@ -18111,75 +18110,54 @@ module fitpack_core
       !          calls. if the computation mode iopt=-1 is used, the values ty(ky+2),...ty(ny-ky-1) must be
       !          supplied by the user, before entry. see also the restrictions (ier=10).
       !  c     : real array of dimension at least (nxest-kx-1)*(nyest-ky-1).
-      !          on successful exit, c contains the coefficients of the spline
-      !          approximation s(x,y)
-      !  fp    : real. unless ier=10, fp contains the weighted sum of
-      !          squared residuals of the spline approximation returned.
+      !          on successful exit, c contains the coefficients of the spline approximation s(x,y)
+      !  fp    : real. unless ier=10, fp contains the weighted sum of squared residuals of the spline
+      !          approximation returned.
       !  wrk1  : real array of dimension (lwrk1). used as workspace.
-      !          if the computation mode iopt=1 is used the value of wrk1(1)
-      !          should be left unchanged between subsequent calls.
-      !          on exit wrk1(2),wrk1(3),...,wrk1(1+(nx-kx-1)*(ny-ky-1)) will
-      !          contain the values d(i)/max(d(i)),i=1,...,(nx-kx-1)*(ny-ky-1)
-      !          with d(i) the i-th diagonal element of the reduced triangular
-      !          matrix for calculating the b-spline coefficients. it includes
-      !          those elements whose square is less than eps,which are treat-
-      !          ed as 0 in the case of presumed rank deficiency (ier<-2).
-      !  lwrk1 : integer. on entry lwrk1 must specify the actual dimension of
-      !          the array wrk1 as declared in the calling (sub)program.
-      !          lwrk1 must not be too small. let
+      !          if the computation mode iopt=1 is used the value of wrk1(1) should be left unchanged between
+      !          subsequent calls. on exit wrk1(2),wrk1(3),...,wrk1(1+(nx-kx-1)*(ny-ky-1)) will contain the
+      !          values d(i)/max(d(i)),i=1,...,(nx-kx-1)*(ny-ky-1) with d(i) the i-th diagonal element of the
+      !          reduced triangular matrix for calculating the b-spline coefficients. it includes those
+      !          elements whose square is less than eps,which are treated as 0 in the case of presumed rank
+      !          deficiency (ier<-2).
+      !  lwrk1 : integer. on entry lwrk1 must specify the actual dimension of the array wrk1 as declared in
+      !          the calling (sub)program. lwrk1 must not be too small. let
       !            u = nxest-kx-1, v = nyest-ky-1, km = max(kx,ky)+1,
       !            ne = max(nxest,nyest), bx = kx*v+ky+1, by = ky*u+kx+1,
       !            if(bx<=by) b1 = bx, b2 = b1+v-ky
-      !            if(bx>by) b1 = by, b2 = b1+u-kx  then
+      !            if(bx >by) b1 = by, b2 = b1+u-kx  then
       !          lwrk1 >= u*v*(2+b1+b2)+2*(u+v+km*(m+ne)+ne-kx-ky)+b2+1
-      !  wrk2  : real array of dimension (lwrk2). used as workspace, but
-      !          only in the case a rank deficient system is encountered.
-      !  lwrk2 : integer. on entry lwrk2 must specify the actual dimension of
-      !          the array wrk2 as declared in the calling (sub)program.
-      !          lwrk2 > 0 . a save upper boundfor lwrk2 = u*v*(b2+1)+b2
-      !          where u,v and b2 are as above. if there are enough data
-      !          points, scattered uniformly over the approximation domain
-      !          and if the smoothing factor s is not too small, there is a
-      !          good chance that this extra workspace is not needed. a lot
-      !          of memory might therefore be saved by setting lwrk2=1.
-      !          (see also ier > 10)
+      !  wrk2  : real array of dimension (lwrk2). used as workspace, but only in the case a rank deficient
+      !          system is encountered.
+      !  lwrk2 : integer. on entry lwrk2 must specify the actual dimension of the array wrk2 as declared in
+      !          the calling (sub)program. lwrk2 > 0 . a save upper boundfor lwrk2 = u*v*(b2+1)+b2 where u,v
+      !          and b2 are as above. if there are enough data points, scattered uniformly over the
+      !          approximation domain and if the smoothing factor s is not too small, there is a good chance
+      !          that this extra workspace is not needed. a lot of memory might therefore be saved by setting
+      !          lwrk2=1. (see also ier > 10)
       !  iwrk  : integer array of dimension (kwrk). used as workspace.
-      !  kwrk  : integer. on entry kwrk must specify the actual dimension of
-      !          the array iwrk as declared in the calling (sub)program.
-      !          kwrk >= m+(nxest-2*kx-1)*(nyest-2*ky-1).
-      !  ier   : integer. unless the routine detects an error, ier contains a
-      !          non-positive value on exit, i.e.
-      !   ier=0  : normal return. the spline returned has a residual sum of
-      !            squares fp such that abs(fp-s)/s <= tol with tol a relat-
-      !            ive tolerance set to 0.001 by the program.
-      !   ier=-1 : normal return. the spline returned is an interpolating
-      !            spline (fp=0).
-      !   ier=-2 : normal return. the spline returned is the weighted least-
-      !            squares polynomial of degrees kx and ky. in this extreme
-      !            case fp gives the upper bound for the smoothing factor s.
-      !   ier<-2 : warning. the coefficients of the spline returned have been
-      !            computed as the minimal norm least-squares solution of a
-      !            (numerically) rank deficient system. (-ier) gives the rank.
-      !            especially if the rank deficiency which can be computed as
-      !            (nx-kx-1)*(ny-ky-1)+ier, is large the results may be inac-
-      !            curate. they could also seriously depend on the value of
-      !            eps.
-      !   ier=1  : error. the required storage space exceeds the available
-      !            storage space, as specified by the parameters nxest and
-      !            nyest.
-      !            probably causes : nxest or nyest too small. if these param-
-      !            eters are already large, it may also indicate that s is
-      !            too small
-      !            the approximation returned is the weighted least-squares
-      !            spline according to the current set of knots.
-      !            the parameter fp gives the corresponding weighted sum of
-      !            squared residuals (fp>s).
-      !   ier=2  : error. a theoretically impossible result was found during
-      !            the iteration process for finding a smoothing spline with
-      !            fp = s. probably causes : s too small or badly chosen eps.
-      !            there is an approximation returned but the corresponding
-      !            weighted sum of squared residuals does not satisfy the
-      !            condition abs(fp-s)/s < tol.
+      !  kwrk  : integer. on entry kwrk must specify the actual dimension of the array iwrk as declared in
+      !          the calling (sub)program.  kwrk >= m+(nxest-2*kx-1)*(nyest-2*ky-1).
+      !  ier   : integer. unless the routine detects an error, ier contains a non-positive value on exit, i.e.
+      !   ier=0  : normal return. the spline returned has a residual sum of squares fp such that
+      !            abs(fp-s)/s <= tol with tol a relative tolerance set to 0.001 by the program.
+      !   ier=-1 : normal return. the spline returned is an interpolating spline (fp=0).
+      !   ier=-2 : normal return. the spline returned is the weighted least-squares polynomial of degrees kx
+      !            and ky. in this extreme case fp gives the upper bound for the smoothing factor s.
+      !   ier<-2 : warning. the coefficients of the spline returned have been computed as the minimal norm
+      !            least-squares solution of a (numerically) rank deficient system. (-ier) gives the rank.
+      !            especially if the rank deficiency which can be computed as (nx-kx-1)*(ny-ky-1)+ier, is
+      !            large the results may be inaccurate. they could also seriously depend on the value of eps.
+      !   ier=1  : error. the required storage space exceeds the available storage space, as specified by the
+      !            parameters nxest and nyest.
+      !            probably causes : nxest or nyest too small. if these parameters are already large, it may
+      !            also indicate that s is too small. the approximation returned is the weighted least-squares
+      !            spline according to the current set of knots. parameter fp gives the corresponding weighted
+      !            sum of squared residuals (fp>s).
+      !   ier=2  : error. a theoretically impossible result was found during the iteration process for finding
+      !            a smoothing spline with fp = s. probably causes : s too small or badly chosen eps.
+      !            there is an approximation returned but the corresponding weighted sum of squared residuals
+      !            does not satisfy the condition abs(fp-s)/s < tol.
       !   ier=3  : error. the maximal number of iterations maxit (set to 20
       !            by the program) allowed for finding a smoothing spline
       !            with fp=s has been reached. probably causes : s too small
@@ -18304,39 +18282,41 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) :: xb,xe,yb,ye,s,eps,fp
+      real(RKIND), intent(in) :: xb,xe,yb,ye,s,eps,fp
       integer, intent(in) :: iopt
       integer :: m,kx,ky,nxest,nyest,nmax,nx,ny,lwrk1,lwrk2,kwrk,ier
       !  ..array arguments..
-      real(RKIND) :: x(m),y(m),z(m),w(m),tx(nmax),ty(nmax), &
-       c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),wrk2(lwrk2)
+      real(RKIND) :: x(m),y(m),z(m),w(m),tx(nmax),ty(nmax),c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),wrk2(lwrk2)
       integer :: iwrk(kwrk)
       !  ..local scalars..
-      integer :: i,ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx, &
-       lby,lco,lf,lff,lfp,lh,lq,lsx,lsy,lwest,ncest,nest,nek, &
-       nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
+      integer :: ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx,lby,lco,lf,lff,lfp,lh,lq,lsx,lsy, &
+                 lwest,ncest,nest,nek,nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
 
       !  we set up the parameters tol and maxit.
+      logical, parameter :: verbose = .true.
       integer, parameter :: maxit = 20
       real(RKIND), parameter :: tol = smallnum03
+
+      ! Size parameters
+      kx1   = kx+1
+      ky1   = ky+1
+      kmax  = max(kx,ky)
+      km1   = kmax+1
+      km2   = km1+1
+      nminx = 2*kx1
+      nminy = 2*ky1
+
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
       ier = FITPACK_INPUT_ERROR
-      if(eps<=0. .or. eps>=1.) go to 71
-      if(kx<=0 .or. kx>5) go to 71
-      kx1 = kx+1
-      if(ky<=0 .or. ky>5) go to 71
-      ky1 = ky+1
-      kmax = max0(kx,ky)
-      km1 = kmax+1
-      km2 = km1+1
-      if(iopt<(-1) .or. iopt>1) go to 71
-      if(m<(kx1*ky1)) go to 71
-      nminx = 2*kx1
-      if(nxest<nminx .or. nxest>nmax) go to 71
-      nminy = 2*ky1
-      if(nyest<nminy .or. nyest>nmax) go to 71
-      nest = max0(nxest,nyest)
+      if (.not.(eps>zero .and. eps<one))         goto 1
+      if (.not.(kx>0 .and. kx<=5))               goto 1
+      if (.not.(ky>0 .and. ky<=5))               goto 1
+      if (.not.(iopt>=(-1) .and. iopt<=1))       goto 1
+      if (.not.m>=(kx1*ky1))                     goto 1
+      if (.not.(nxest>=nminx .and. nxest<=nmax)) goto 1
+      if (.not.(nyest>=nminy .and. nyest<=nmax)) goto 1
+      nest = max(nxest,nyest)
       nxk = nxest-kx1
       nyk = nyest-ky1
       ncest = nxk*nyk
@@ -18344,39 +18324,40 @@ module fitpack_core
       nmy = nyest-nminy+1
       nrint = nmx+nmy
       nreg = nmx*nmy
-      ib1 = kx*nyk+ky1
       jb1 = ky*nxk+kx1
+      ib1 = min(kx*nyk+ky1,jb1)
       ib3 = kx1*nyk+1
-      if(ib1<=jb1) go to 10
-      ib1 = jb1
-      ib3 = ky1*nxk+1
-  10  lwest = ncest*(2+ib1+ib3)+2*(nrint+nest*km2+m*km1)+ib3
+      lwest = ncest*(2+ib1+ib3)+2*(nrint+nest*km2+m*km1)+ib3
       kwest = m+nreg
-      if(lwrk1<lwest .or. kwrk<kwest) go to 71
-      if(xb>=xe .or. yb>=ye) go to 71
-      do 20 i=1,m
-        if(w(i)<=0.) go to 70
-        if(x(i)<xb .or. x(i)>xe) go to 71
-        if(y(i)<yb .or. y(i)>ye) go to 71
-  20  continue
-      if(iopt>=0) go to 50
-      if(nx<nminx .or. nx>nxest) go to 71
-      nxk = nx-kx1
-      tx(kx1) = xb
-      tx(nxk+1) = xe
-      do 30 i=kx1,nxk
-        if(tx(i+1)<=tx(i)) go to 72
-  30  continue
-      if(ny<nminy .or. ny>nyest) go to 71
-      nyk = ny-ky1
-      ty(ky1) = yb
-      ty(nyk+1) = ye
-      do 40 i=ky1,nyk
-        if(ty(i+1)<=ty(i)) go to 73
-  40  continue
-      go to 60
-  50  if(s<zero) go to 71
-  60  ier = 0
+      if (.not.(lwrk1>=lwest .and. kwrk>=kwest)) goto 1
+      if (.not.(xb<xe .and. yb<ye))              goto 1
+      if (any(w<=zero))                          goto 1
+      if (any(x<xb .or. x>xe))                   goto 1
+      if (any(y<xb .or. y>xe))                   goto 1
+
+      if (iopt>=0) then
+
+          if (s<zero) goto 1
+
+      else
+
+          ! Check that the pre-existing x, y knot locations are monotonic
+          if (nx<nminx .or. nx>nxest) goto 1
+          nxk       = nx-kx1
+          tx(kx1)   = xb
+          tx(nxk+1) = xe
+          if (any(tx(kx1+1:nxk+1)<=tx(kx1:nxk))) goto 2
+
+          if (ny<nminy .or. ny>nyest) goto 1
+          nyk       = ny-ky1
+          ty(ky1)   = yb
+          ty(nyk+1) = ye
+          if (any(ty(ky1+1:nyk+1)<=ty(ky1:nyk))) goto 3
+
+      endif
+
+      ier = FITPACK_OK
+
       !  we partition the working space and determine the spline approximation
       kn = 1
       ki = kn+m
@@ -18393,20 +18374,25 @@ module fitpack_core
       lsx = lby+nek
       lsy = lsx+m*km1
       call fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
-       eps,tol,maxit,nest,km1,km2,ib1,ib3,ncest,nrint,nreg,nx,tx, &
-       ny,ty,c,fp,wrk1(1),wrk1(lfp),wrk1(lco),wrk1(lf),wrk1(lff), &
-       wrk1(la),wrk1(lq),wrk1(lbx),wrk1(lby),wrk1(lsx),wrk1(lsy), &
-       wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
- 70   return
- 71   print*,"iopt,kx,ky,m=",iopt,kx,ky,m
-      print*,"nxest,nyest,nmax=",nxest,nyest,nmax
-      print*,"lwrk1,lwrk2,kwrk=",lwrk1,lwrk2,kwrk
-      print*,"xb,xe,yb,ye=",xb,xe,yb,ye
-      print*,"eps,s",eps,s
+                  eps,tol,maxit,nest,km1,km2,ib1,ib3,ncest,nrint,nreg,nx,tx, &
+                  ny,ty,c,fp,wrk1(1),wrk1(lfp),wrk1(lco),wrk1(lf),wrk1(lff), &
+                  wrk1(la),wrk1(lq),wrk1(lbx),wrk1(lby),wrk1(lsx),wrk1(lsy), &
+                  wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
       return
- 72   print*,"tx=",tx
+
+      ! Input parameter error
+  1   if (verbose) then
+         print "('[fitpack] surfit input parameter error: ')"
+         print "('[fitpack] iopt=',i0,' kx=',i0,' ky=',i0,' m=',i0)", iopt,kx,ky,m
+         print "('[fitpack] nxest=',i0,' nyest=',i0,' nmax=',i0)", nxest,nyest,nmax
+         print "('[fitpack] lwrk1=',i0,' lwrk2=',i0,' kwrk=',i0)", lwrk1,lwrk2,kwrk
+         print "('[fitpack] xbounts=[',g0,',',g0,'] ybounds=[',g0,',',g0,']')",xb,xe,yb,ye
+         print "('[fitpack] eps=',g0,' s=',g0)", eps,s
+      endif
       return
- 73   print*,"ty=",ty
+  2   if (verbose) print "('[fitpack] x knot locations are not monotonic: '/,10x,'tx=',*(1x,g0))", tx
+      return
+  3   if (verbose) print "('[fitpack] y knot locations are not monotonic: '/,10x,'ty=',*(1x,g0))", ty
       return
       end subroutine surfit
 
