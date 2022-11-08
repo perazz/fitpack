@@ -2705,8 +2705,8 @@ module fitpack_core
       !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
       !   Thus it is imperative that that k <= l <= n-k but this is not checked.
       pure subroutine fpbspl(t,n,k,x,l,h)
-         real(RKIND), intent(in)  :: x,t(n)
          integer    , intent(in)  :: n,k,l
+         real(RKIND), intent(in)  :: x,t(n)
          real(RKIND), intent(out) :: h(SIZ_K+1)
 
          ! Local variables
@@ -9718,21 +9718,16 @@ module fitpack_core
       integer, intent(inout) :: nu,nv
       real(RKIND) s,eta,tol,fp,sup
       !  ..array arguments..
-      integer index(nrest),nummer(m)
-      real(RKIND) u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest), &
-       coord(intest),f(ncc),ff(nc),row(nvest),cs(nvest),cosi(5,nvest), &
-       a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4),spv(m,4), &
-       h(ib3),wrk(lwrk)
+      integer :: index(nrest),nummer(m)
+      real(RKIND) :: u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
+                     cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4),spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
-      real(RKIND) rad
+      real(RKIND) :: rad
       !  ..local scalars..
-      real(RKIND) acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms, &
-       f1,f2,f3,hui,huj,p,pinv,piv,p1,p2,p3,r,ratio,si,sigma, &
-       sq,store,uu,u2,u3,wi,zi,rn
-      integer i,iband,iband3,iband4,ich1,ich3,ii,il,in,ipar,ipar1,irot, &
-       iter,i1,i2,i3,j,jrot,j1,j2,l,la,lf,lh,ll,lu,lv,lwest,l1,l2, &
-       l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1, &
-       numin,nvmin,rank,iband1, jlu
+      real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,hui,huj,p,pinv,piv,p1,p2,p3, &
+                     r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
+      integer :: i,iband,iband3,iband4,ich1,ich3,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
+                 lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,iband1,jlu
       !  ..local arrays..
       real(RKIND), dimension(SIZ_K+1) :: hu,hv
 
@@ -9836,21 +9831,18 @@ module fitpack_core
       fac = pi2/rn
       forall (i=1:nvv) tv(i+4) = i*fac-pi
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 1 : computation of least-squares bicubic splines.              c
-      !  ******************************************************              c
-      !  if iopt1<0 we compute the least-squares bicubic spline according    c
-      !  to the given set of knots.                                          c
-      !  if iopt1>=0 we compute least-squares bicubic splines with in-       c
-      !  creasing numbers of knots until the corresponding sum f(p=inf)<=s.  c
-      !  the initial set of knots then depends on the value of iopt1         c
-      !    if iopt1=0 we start with one interior knot in the u-direction     c
-      !              (0.5) and 1+iopt2*(iopt2+1) in the v-direction.         c
-      !    if iopt1>0 we start with the set of knots found at the last       c
-      !              call of the routine.                                    c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  main loop for the different sets of knots. m is a save upper bound
-      !  for the number of trials.
+      !  ************************************************************************************************************
+      !  part 1 : computation of least-squares bicubic splines.
+      !  ************************************************************************************************************
+      !  if iopt1<0 we compute the least-squares bicubic spline according to the given set of knots.
+      !  if iopt1>=0 we compute least-squares bicubic splines with increasing numbers of knots until the
+      !  corresponding sum f(p=inf)<=s.
+      !  the initial set of knots then depends on the value of iopt1:
+      !    if iopt1=0 we start with one interior knot in the u-direction (0.5) and 1+iopt2*(iopt2+1) in the
+      !               v-direction.
+      !    if iopt1>0 we start with the set of knots found at the last call of the routine.
+      !  ************************************************************************************************************
+      !  main loop for the different sets of knots. m is a save upper bound for the number of trials.
   90  do 570 iter=1,m
       !  find the position of the additional knots which are needed for the
       !  b-spline representation of s(u,v).
@@ -9953,150 +9945,148 @@ module fitpack_core
       !  initialize the sum of squared residuals.
         fp = zero
         ratio = one+tu(6)/tu(5)
-      !  fetch the data points in the new order. main loop for the
-      !  different panels.
-        do 380 num=1,nreg
-      !  fix certain constants for the current panel; jrot records the column
-      !  number of the first non-zero element in a row of the observation
-      !  matrix according to a data point of the panel.
-          num1 = num-1
-          lu = num1/nvv
-          l1 = lu+4
-          lv = num1-lu*nvv+1
-          l2 = lv+3
-          jrot = 0
-          if(lu>iopt2) jrot = ipar1+(lu-iopt2-1)*nvv
-          lu = lu+1
-      !  test whether there are still data points in the current panel.
-          in = index(num)
- 210      if(in==0) go to 380
-      !  fetch a new data point.
-          wi = w(in)
-          zi = z(in)*wi
-      !  evaluate for the u-direction, the 4 non-zero b-splines at u(in)
-          call fpbspl(tu,nu,3,u(in),l1,hu)
-      !  evaluate for the v-direction, the 4 non-zero b-splines at v(in)
-          call fpbspl(tv,nv,3,v(in),l2,hv)
-      !  store the value of these b-splines in spu and spv resp.
-          do 220 i=1,4
-            spu(in,i) = hu(i)
-            spv(in,i) = hv(i)
- 220      continue
-      !  initialize the new row of observation matrix.
-          do 240 i=1,iband
-            h(i) = 0.
- 240      continue
-      !  calculate the non-zero elements of the new row by making the cross
-      !  products of the non-zero b-splines in u- and v-direction and
-      !  by taking into account the conditions of the splines.
-          do 250 i=1,nvv
-             row(i) = 0.
- 250      continue
-      !  take into account the periodicity condition of the bicubic splines.
-          ll = lv
-          do 260 i=1,4
-             if(ll>nvv) ll=1
-             row(ll) = row(ll)+hv(i)
-             ll = ll+1
- 260      continue
-      !  take into account the other conditions of the splines.
-          if(iopt2==0 .or. lu>iopt2+1) go to 280
-          cs(1:ipar) = matmul(cosi(1:ipar,1:nvv),row(1:nvv))
-      !  fill in the non-zero elements of the new row.
- 280     j1 = 0
-         do 330 j =1,4
-            jlu = j+lu
-            huj = hu(j)
-            if(jlu>iopt2+2) go to 320
-            go to (290,290,300,310),jlu
- 290        h(1) = huj
-            j1 = 1
-            go to 330
- 300        h(1) = h(1)+huj
-            h(2) = huj*cs(1)
-            h(3) = huj*cs(2)
-            j1 = 3
-            go to 330
- 310        h(1) = h(1)+huj
-            h(2) = h(2)+huj*ratio*cs(1)
-            h(3) = h(3)+huj*ratio*cs(2)
-            h(4) = huj*cs(3)
-            h(5) = huj*cs(4)
-            h(6) = huj*cs(5)
-            j1 = 6
-            go to 330
- 320        if(jlu>nu4 .and. iopt3/=0) go to 330
-            do 325 i=1,nvv
-               j1 = j1+1
-               h(j1) = row(i)*huj
- 325        continue
- 330      continue
-          do 335 i=1,iband
-            h(i) = h(i)*wi
- 335      continue
-      !  rotate the row into triangle by givens transformations.
-          irot = jrot
-          do 350 i=1,iband
-            irot = irot+1
-            piv = h(i)
-            if (piv==zero) go to 350
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(irot,1),co,si)
-      !  apply that transformation to the right hand side.
-            call fprota(co,si,zi,f(irot))
-            if(i==iband) go to 360
-      !  apply that transformation to the left hand side.
-            i2 = 1
-            i3 = i+1
-            do 340 j=i3,iband
-              i2 = i2+1
-              call fprota(co,si,h(j),a(irot,i2))
- 340        continue
- 350      continue
-      !  add the contribution of the row to the sum of squares of residual
-      !  right hand sides.
- 360      fp = fp+zi**2
-      !  find the number of the next data point in the panel.
-          in = nummer(in)
-          go to 210
- 380    continue
-      !  find dmax, the maximum value for the diagonal elements in the reduced
-      !  triangle.
-        dmax = 0.
-        do 390 i=1,ncof
-          if(a(i,1)<=dmax) go to 390
-          dmax = a(i,1)
- 390    continue
-      !  check whether the observation matrix is rank deficient.
+      !  fetch the data points in the new order. main loop for the different panels.
+        panels: do num=1,nreg
+           !  fix certain constants for the current panel; jrot records the column number of the first
+           ! non-zero element in a row of the observation matrix according to a data point of the panel.
+           num1 = num-1
+           lu = num1/nvv
+           l1 = lu+4
+           lv = num1-lu*nvv+1
+           l2 = lv+3
+           jrot = 0
+           if(lu>iopt2) jrot = ipar1+(lu-iopt2-1)*nvv
+           lu = lu+1
+
+           !  test whether there are still data points in the current panel.
+           in = index(num)
+           points_left: do while (in/=0)
+
+              ! fetch a new data point.
+              wi = w(in)
+              zi = z(in)*wi
+
+              ! evaluate for the u-direction, the 4 non-zero b-splines at u(in)
+              call fpbspl(tu,nu,3,u(in),l1,hu)
+
+              ! evaluate for the v-direction, the 4 non-zero b-splines at v(in)
+              call fpbspl(tv,nv,3,v(in),l2,hv)
+
+              ! store the value of these b-splines in spu and spv resp.
+              spu(in,:) = hu(1:4)
+              spv(in,:) = hv(1:4)
+
+              ! initialize the new row of observation matrix.
+              h(1:iband) = zero
+
+              ! calculate the non-zero elements of the new row by making the cross
+              ! products of the non-zero b-splines in u- and v-direction and
+              ! by taking into account the conditions of the splines.
+              row(1:nvv) = zero
+
+              ! take into account the periodicity condition of the bicubic splines.
+              ll = lv
+              do i=1,4
+                 if (ll>nvv) ll=1
+                 row(ll) = row(ll)+hv(i)
+                 ll = ll+1
+              end do
+
+              ! take into account the other conditions of the splines.
+              if (iopt2/=0 .and. lu<=iopt2+1) &
+              cs(1:ipar) = matmul(cosi(1:ipar,1:nvv),row(1:nvv))
+
+              ! fill in the non-zero elements of the new row.
+              j1 = 0
+              new_row: do j =1,4
+                jlu = j+lu
+                huj = hu(j)
+                if (jlu>iopt2+2) then
+                    if (jlu>nu4 .and. iopt3/=0) cycle new_row
+                    h(j1+1:j1+nvv) = row(1:nvv)*huj
+                    j1 = j1+nvv
+                elseif (jlu==1 .or. jlu==2) then
+                    h(1) = huj
+                    j1 = 1
+                elseif (jlu==3) then
+                    h(1:3) = [h(1)+huj,huj*cs(1:2)]
+                    j1 = 3
+                elseif (jlu==4) then
+                    h(1)   = h(1)+huj
+                    h(2:3) = h(2:3)+huj*ratio*cs(1:2)
+                    h(4:6) = huj*cs(3:5)
+                    j1 = 6
+                endif
+              end do new_row
+              h(1:iband) = wi*h(1:iband)
+
+              ! rotate the row into triangle by givens transformations.
+              irot = jrot
+              rotate: do i=1,iband
+                irot = irot+1
+                piv  = h(i)
+                if (piv==zero) cycle rotate
+
+                ! calculate the parameters of the givens transformation.
+                call fpgivs(piv,a(irot,1),co,si)
+
+                ! apply that transformation to the right hand side.
+                call fprota(co,si,zi,f(irot))
+
+                if (i==iband) exit rotate
+
+                ! apply that transformation to the left hand side.
+                i2 = 1
+                do j=i+1,iband
+                  i2 = i2+1
+                  call fprota(co,si,h(j),a(irot,i2))
+                end do
+              end do rotate
+
+              ! add the contribution of the row to the sum of squares of residual right hand sides.
+              fp = fp+zi**2
+
+              ! find the number of the next data point in the panel.
+              in = nummer(in)
+           end do points_left
+        end do panels
+
+        ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
+        dmax = max(zero,maxval(a(1:ncof,1)))
+
+        ! check whether the observation matrix is rank deficient.
         sigma = eps*dmax
-        do 400 i=1,ncof
-          if(a(i,1)<=sigma) go to 410
- 400    continue
-      !  backward substitution in case of full rank.
-        call fpback(a,f,ncof,iband,c,ncc)
-        rank = ncof
-        do 405 i=1,ncof
-          q(i,1) = a(i,1)/dmax
- 405    continue
-        go to 430
-      !  in case of rank deficiency, find the minimum norm solution.
- 410    lwest = ncof*iband+ncof+iband
-        if(lwrk<lwest) go to 925
-        lf = 1
-        lh = lf+ncof
-        la = lh+iband
-        ff(1:ncof) = f(1:ncof)
-        q(1:ncof,1:iband) = a(1:ncof,1:iband)
-        call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la), &
-         wrk(lf),wrk(lh))
-         q(1:ncof,1) = q(1:ncof,1)/dmax
-      !  add to the sum of squared residuals, the contribution of reducing
-      !  the rank.
-        fp = fp+sq
-      !  find the coefficients in the standard b-spline representation of
-      !  the spline.
- 430    call fprppo(nu,nv,iopt2,iopt3,cosi,ratio,c,ff,ncoff)
-      !  test whether the least-squares spline is an acceptable solution.
+
+        if (all(a(i,1:ncof)>sigma)) then
+
+           ! backward substitution in case of full rank.
+           call fpback(a,f,ncof,iband,c,ncc)
+           rank = ncof
+           q(1:ncof,1) = a(1:ncof,1)/dmax
+
+        else
+
+           ! in case of rank deficiency, find the minimum norm solution.
+           lwest = ncof*iband+ncof+iband
+           if(lwest>lwrk) go to 925
+
+           lf = 1
+           lh = lf+ncof
+           la = lh+iband
+           ff(1:ncof) = f(1:ncof)
+           q(1:ncof,1:iband) = a(1:ncof,1:iband)
+           call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+           q(1:ncof,1) = q(1:ncof,1)/dmax
+
+           ! add to the sum of squared residuals, the contribution of reducing the rank.
+           fp = fp+sq
+
+        endif
+
+        ! find the coefficients in the standard b-spline representation of the spline.
+        call fprppo(nu,nv,iopt2,iopt3,cosi,ratio,c,ff,ncoff)
+
+        ! test whether the least-squares spline is an acceptable solution.
         if(iopt1<0) then
           if (fp<=0) go to 970
           go to 980
@@ -10107,7 +10097,7 @@ module fitpack_core
             go to 980
         endif
       !  if f(p=inf) < s, accept the choice of knots.
-        if(fpms<0.) go to 580
+        if(fpms<zero) go to 580
       !  test whether we cannot further increase the number of knots
         if(m<ncof) go to 935
       !  search where to add a new knot.
@@ -10115,10 +10105,9 @@ module fitpack_core
       !  data points having the coordinate belonging to that knot interval.
       !  calculate also coord which is the same sum, weighted by the position
       !  of the data points considered.
-        do 450 i=1,nrint
-          fpint(i) = 0.
-          coord(i) = 0.
- 450    continue
+        fpint(1:nrint) = zero
+        coord(1:nrint) = zero
+
         do 490 num=1,nreg
           num1 = num-1
           lu = num1/nvv
@@ -10128,7 +10117,7 @@ module fitpack_core
           jrot = lu*nv4+lv
           in = index(num)
  460      if(in==0) go to 490
-          store = 0.
+          store = zero
           i1 = jrot
           do 480 i=1,4
             hui = spu(in,i)
@@ -11994,30 +11983,32 @@ module fitpack_core
              row(ll) = row(ll)+hp(i)
              ll = ll+1
  210      continue
-      !  take into account the other conditions of the spherical splines.
-          if(lt>2 .and. lt<(ntt-1)) go to 230
-          facc = dot_product(row(:npp),coco(:npp))
-          facs = dot_product(row(:npp),cosi(:npp))
-      !  fill in the non-zero elements of the new row.
- 230     j1 = 0
+          ! take into account the other conditions of the spherical splines.
+          if(lt<=2 .or. lt>=(ntt-1)) then
+             facc = dot_product(row(:npp),coco(:npp))
+             facs = dot_product(row(:npp),cosi(:npp))
+          else
+             facc = zero
+             facs = zero
+          endif
+         ! fill in the non-zero elements of the new row.
+         j1 = 0
          new_row: do j =1,4
             jlt = j+lt
             htj = ht(j)
-
-            if (jlt>2 .and. jlt<=nt4) go to 240
-            j1 = j1+1
-            h(j1) = h(j1)+htj
-            cycle new_row
- 240        if(jlt==3 .or. jlt==nt4) go to 260
-            h(j1+1:j1+1:npp) = row(1:npp)*htj
-            j1 = j1+npp
-            cycle new_row
- 260        if(jlt==3) go to 270
-            h(j1+1:j1+3) = htj*[facc,facs,one]
-            j1 = j1+2
-            cycle new_row
- 270        h(1:3) = [h(1)+htj,facc*htj,facs*htj]
-            j1 = 3
+            if (jlt==3) then
+                h(1:3) = [h(1)+htj,facc*htj,facs*htj]
+                j1 = 3
+            elseif (jlt==nt4) then
+                h(j1+1:j1+3) = htj*[facc,facs,one]
+                j1 = j1+2
+            elseif (jlt>2 .and. jlt<=nt4) then
+                h(j1+1:j1+1:npp) = row(1:npp)*htj
+                j1 = j1+npp
+            else
+                j1 = j1+1
+                h(j1) = h(j1)+htj
+            endif
           end do new_row
           h(:iband) = h(:iband1)*wi
       !  rotate the row into triangle by givens transformations.
@@ -12565,8 +12556,8 @@ module fitpack_core
       ! parameters) will be switched if this can reduce the bandwidth of the c
       ! system to be solved.                                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  ichang denotes whether(1) or not(-1) the directions have been inter-
-      !  changed.
+
+      ! ichang denotes whether(1) or not(-1) the directions have been inter changed.
       ichang = -1
       x0 = xb
       x1 = xe
@@ -12600,8 +12591,8 @@ module fitpack_core
       !  b-spline representation of s(x,y).
         l = nx
         do 40 i=1,kx1
-          tx(i) = x0
-          tx(l) = x1
+          tx(i) = x0 ! 1, 2, ..., kx1
+          tx(l) = x1 ! nx, nx-1, ..., nx+1-kx1
           l = l-1
   40    continue
         l = ny
@@ -12625,46 +12616,17 @@ module fitpack_core
         if(iband1<=l) go to 130
         iband1 = l
         ichang = -ichang
-        do 60 i=1,m
-          store = x(i)
-          x(i) = y(i)
-          y(i) = store
-  60    continue
-        store = x0
-        x0 = y0
-        y0 = store
-        store = x1
-        x1 = y1
-        y1 = store
-        n = min0(nx,ny)
-        do 70 i=1,n
-          store = tx(i)
-          tx(i) = ty(i)
-          ty(i) = store
-  70    continue
+        call swap_RKIND(x,y)
+        call swap_RKIND(x0,y0)
+        call swap_RKIND(x1,y1)
+        n  = min(nx,ny)
         n1 = n+1
-        if (nx<ny) go to 80
-        if (nx==ny) go to 120
-        go to 100
-  80    do 90 i=n1,ny
-          tx(i) = ty(i)
-  90    continue
-        go to 120
- 100    do 110 i=n1,nx
-          ty(i) = tx(i)
- 110    continue
- 120    l = nx
-        nx = ny
-        ny = l
-        l = nxe
-        nxe = nye
-        nye = l
-        l = nxx
-        nxx = nyy
-        nyy = l
-        l = kx
-        kx = ky
-        ky = l
+        call swap_RKIND(tx ,ty)
+        call swap_int  (nx ,ny)
+        call swap_int  (nxe,nye)
+        call swap_int  (nxx,nyy)
+        call swap_int  (kx ,ky)
+        call swap_int  (kx ,ky)
         kx1 = kx+1
         ky1 = ky+1
  130    iband = iband1+1
@@ -12745,35 +12707,31 @@ module fitpack_core
           in = nummer(in)
           go to 150
  250    continue
-      !  find dmax, the maximum value for the diagonal elements in the reduced
-      !  triangle.
+      !  find dmax, the maximum value for the diagonal elements in the reduced triangle.
         dmax = max(zero,maxval(a(1:ncof,1)))
       !  check whether the observation matrix is rank deficient.
         sigma = eps*dmax
-        do 270 i=1,ncof
-          if(a(i,1)<=sigma) go to 280
- 270    continue
-      !  backward substitution in case of full rank.
-        call fpback(a,f,ncof,iband,c,nc)
-        rank = ncof
-        q(:ncof,1) = a(:ncof,1)/dmax
-        go to 300
-      !  in case of rank deficiency, find the minimum norm solution.
-      !  check whether there is sufficient working space
- 280    lwest = ncof*iband+ncof+iband
-        if(lwrk<lwest) go to 780
-        ff(1:ncof) = f(1:ncof)
-        q(1:ncof,1:iband)=a(1:ncof,1:iband)
-        lf =1
-        lh = lf+ncof
-        la = lh+iband
-        call fprank(q,ff,ncof,iband,nc,sigma,c,sq,rank,wrk(la), &
-          wrk(lf),wrk(lh))
-        q(1:ncof,1)=q(1:ncof,1)/dmax
-      !  add to the sum of squared residuals, the contribution of reducing
-      !  the rank.
-        fp = fp+sq
- 300    if(ier==(-2)) fp0 = fp
+        if (all(a(1:ncof,1)>sigma)) then
+            ! backward substitution in case of full rank.
+            call fpback(a,f,ncof,iband,c,nc)
+            rank = ncof
+            q(:ncof,1) = a(:ncof,1)/dmax
+        else
+            ! in case of rank deficiency, find the minimum norm solution.
+            !  check whether there is sufficient working space
+            lwest = ncof*iband+ncof+iband
+            if(lwrk<lwest) go to 780
+            ff(1:ncof) = f(1:ncof)
+            q(1:ncof,1:iband)=a(1:ncof,1:iband)
+            lf =1
+            lh = lf+ncof
+            la = lh+iband
+            call fprank(q,ff,ncof,iband,nc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+            q(1:ncof,1)=q(1:ncof,1)/dmax
+            !  add to the sum of squared residuals, the contribution of reducing the rank.
+            fp = fp+sq
+        endif
+        if(ier==(-2)) fp0 = fp
       !  test whether the least-squares spline is an acceptable solution.
         if(iopt<0) go to 820
         fpms = fp-s
@@ -17368,7 +17326,7 @@ module fitpack_core
          if(tp(j)<=tp(j-1) .or. tp(j)>=pi2) go to 80
   50  continue
       go to 70
-  60  if(s<0.) go to 80
+  60  if(s<zero) go to 80
   70  ier = 0
       !  we partition the working space and determine the spline approximation
       kn = 1
@@ -18158,30 +18116,21 @@ module fitpack_core
       !            a smoothing spline with fp = s. probably causes : s too small or badly chosen eps.
       !            there is an approximation returned but the corresponding weighted sum of squared residuals
       !            does not satisfy the condition abs(fp-s)/s < tol.
-      !   ier=3  : error. the maximal number of iterations maxit (set to 20
-      !            by the program) allowed for finding a smoothing spline
-      !            with fp=s has been reached. probably causes : s too small
-      !            there is an approximation returned but the corresponding
-      !            weighted sum of squared residuals does not satisfy the
-      !            condition abs(fp-s)/s < tol.
-      !   ier=4  : error. no more knots can be added because the number of
-      !            b-spline coefficients (nx-kx-1)*(ny-ky-1) already exceeds
-      !            the number of data points m.
-      !            probably causes : either s or m too small.
-      !            the approximation returned is the weighted least-squares
-      !            spline according to the current set of knots.
-      !            the parameter fp gives the corresponding weighted sum of
+      !   ier=3  : error. the maximal number of iterations maxit (set to 20 by the program) allowed for
+	  !            finding a smoothing spline with fp=s has been reached. probably causes : s too small there
+	  !            is an approximation returned but the corresponding weighted sum of squared residuals does
+	  !            not satisfy the condition abs(fp-s)/s < tol.
+      !   ier=4  : error. no more knots can be added because the number of b-spline coefficients
+	  !            (nx-kx-1)*(ny-ky-1) already exceeds the number of data points m. likely causes: either s
+	  !            or m too small. the approximation returned is the weighted least-squares spline according
+	  !            to the current set of knots. the parameter fp gives the corresponding weighted sum of
       !            squared residuals (fp>s).
-      !   ier=5  : error. no more knots can be added because the additional
-      !            knot would (quasi) coincide with an old one.
-      !            probably causes : s too small or too large a weight to an
-      !            inaccurate data point.
-      !            the approximation returned is the weighted least-squares
-      !            spline according to the current set of knots.
-      !            the parameter fp gives the corresponding weighted sum of
-      !            squared residuals (fp>s).
-      !   ier=10 : error. on entry, the input data are controlled on validity
-      !            the following restrictions must be satisfied.
+      !   ier=5  : error. no more knots can be added because the additional knot would (quasi) coincide with
+	  !            an old one. likely causes : s too small or too large a weight to an inaccurate data point.
+      !            the approximation returned is the weighted least-squares spline according to the current
+	  !            set of knots. the parameter fp gives the corresponding weighted sum of squared residuals (fp>s).
+      !   ier=10 : error. on entry, the input data are controlled on validity the following restrictions must
+	  !            be satisfied.
       !            -1<=iopt<=1, 1<=kx,ky<=5, m>=(kx+1)*(ky+1), nxest>=2*kx+2,
       !            nyest>=2*ky+2, 0<eps<1, nmax>=nxest, nmax>=nyest,
       !            xb<=x(i)<=xe, yb<=y(i)<=ye, w(i)>0, i=1,...,m
@@ -18192,76 +18141,51 @@ module fitpack_core
       !                        2*ky+2<=ny<=nyest
       !                        yb<ty(ky+2)<ty(ky+3)<...<ty(ny-ky-1)<ye
       !            if iopt>=0: s>=0
-      !            if one of these conditions is found to be violated,control
-      !            is immediately repassed to the calling program. in that
-      !            case there is no approximation returned.
-      !   ier>10 : error. lwrk2 is too small, i.e. there is not enough work-
-      !            space for computing the minimal least-squares solution of
-      !            a rank deficient system of linear equations. ier gives the
-      !            requested value for lwrk2. there is no approximation re-
-      !            turned but, having saved the information contained in nx,
-      !            ny,tx,ty,wrk1, and having adjusted the value of lwrk2 and
-      !            the dimension of the array wrk2 accordingly, the user can
-      !            continue at the point the program was left, by calling
-      !            surfit with iopt=1.
+      !            if one of these conditions is found to be violated,control is returned to the calling program.
+	  !            in that case there is no approximation returned.
+      !   ier>10 : error. lwrk2 is too small, i.e. there is not enough work-space for computing the minimal
+	  !            least-squares solution of a rank deficient system of linear equations. ier gives the
+	  !            requested value for lwrk2. there is no approximation returned but, having saved the
+	  !            information contained in nx,ny,tx,ty,wrk1, and having adjusted the value of lwrk2 and
+      !            the dimension of the array wrk2 accordingly, the user cancontinue at the point the program
+	  !            was left, by calling surfit with iopt=1.
       !
       ! further comments:
-      !  by means of the parameter s, the user can control the tradeoff
-      !   between closeness of fit and smoothness of fit of the approximation.
-      !   if s is too large, the spline will be too smooth and signal will be
-      !   lost ; if s is too small the spline will pick up too much noise. in
-      !   the extreme cases the program will return an interpolating spline if
-      !   s=0 and the weighted least-squares polynomial (degrees kx,ky)if s is
-      !   very large. between these extremes, a properly chosen s will result
-      !   in a good compromise between closeness of fit and smoothness of fit.
-      !   to decide whether an approximation, corresponding to a certain s is
-      !   satisfactory the user is highly recommended to inspect the fits
-      !   graphically.
-      !   recommended values for s depend on the weights w(i). if these are
-      !   taken as 1/d(i) with d(i) an estimate of the standard deviation of
-      !   z(i), a good s-value should be found in the range (m-sqrt(2*m),m+
-      !   sqrt(2*m)). if nothing is known about the statistical error in z(i)
-      !   each w(i) can be set equal to one and s determined by trial and
-      !   error, taking account of the comments above. the best is then to
-      !   start with a very large value of s ( to determine the least-squares
-      !   polynomial and the corresponding upper bound fp0 for s) and then to
-      !   progressively decrease the value of s ( say by a factor 10 in the
-      !   beginning, i.e. s=fp0/10, fp0/100,...and more carefully as the
-      !   approximation shows more detail) to obtain closer fits.
-      !   to choose s very small is strongly discouraged. this considerably
-      !   increases computation time and memory requirements. it may also
-      !   cause rank-deficiency (ier<-2) and endager numerical stability.
-      !   to economize the search for a good s-value the program provides with
-      !   different modes of computation. at the first call of the routine, or
-      !   whenever he wants to restart with the initial set of knots the user
-      !   must set iopt=0.
-      !   if iopt=1 the program will continue with the set of knots found at
-      !   the last call of the routine. this will save a lot of computation
-      !   time if surfit is called repeatedly for different values of s.
-      !   the number of knots of the spline returned and their location will
-      !   depend on the value of s and on the complexity of the shape of the
-      !   function underlying the data. if the computation mode iopt=1
-      !   is used, the knots returned may also depend on the s-values at
-      !   previous calls (if these were smaller). therefore, if after a number
-      !   of trials with different s-values and iopt=1, the user can finally
-      !   accept a fit as satisfactory, it may be worthwhile for him to call
-      !   surfit once more with the selected value for s but now with iopt=0.
-      !   indeed, surfit may then return an approximation of the same quality
-      !   of fit but with fewer knots and therefore better if data reduction
-      !   is also an important objective for the user.
-      !   the number of knots may also depend on the upper bounds nxest and
-      !   nyest. indeed, if at a certain stage in surfit the number of knots
-      !   in one direction (say nx) has reached the value of its upper bound
-      !   (nxest), then from that moment on all subsequent knots are added
-      !   in the other (y) direction. this may indicate that the value of
-      !   nxest is too small. on the other hand, it gives the user the option
-      !   of limiting the number of knots the routine locates in any direction
-      !   for example, by setting nxest=2*kx+2 (the lowest allowable value for
-      !   nxest), the user can indicate that he wants an approximation which
-      !   is a simple polynomial of degree kx in the variable x.
-      !
-      !  other subroutines required:
-      !    fpback,fpbspl,fpsurf,fpdisc,fpgivs,fprank,fprati,fprota,fporde
+      !  by means of the parameter s, the user can control the tradeoff between closeness of fit and smoothness
+      !   of fit of the approximation. if s is too large, the spline will be too smooth and signal will be lost;
+      !   if s is too small the spline will pick up too much noise. in the extreme cases the program will return
+	  !   an interpolating spline ifs=0 and the weighted least-squares polynomial (degrees kx,ky)if s is very
+	  !   large. between these extremes, a properly chosen s will result in a good compromise between closeness
+	  !   of fit and smoothness of fit. to decide whether an approximation, corresponding to a certain s is
+      !   satisfactory the user is highly recommended to inspect the fits graphically.
+      !   recommended values for s depend on the weights w(i). if these are taken as 1/d(i) with d(i) an estimate
+	  !   of the standard deviation of z(i), a good s-value should be found in the range (m-sqrt(2*m),m+sqrt(2*m)).
+      !   if nothing is known about the statistical error in z(i) each w(i) can be set equal to one and s
+	  !   determined by trial and error, taking account of the comments above. the best is then to start with a
+	  !   very large value of s ( to determine the least-squares polynomial and the corresponding upper bound fp0
+	  !   for s) and then to progressively decrease the value of s ( say by a factor 10 in the beginning, i.e.
+	  !   s=fp0/10, fp0/100,...and more carefully as the approximation shows more detail) to obtain closer fits.
+      !   to choose s very small is strongly discouraged. this considerably increases computation time and memory
+	  !   requirements. it may also cause rank-deficiency (ier<-2) and endager numerical stability. to economize
+	  !   the search for a good s-value the program provides with different modes of computation. at the first
+	  !   call of the routine, or whenever he wants to restart with the initial set of knots the user must set
+	  !   iopt=0.
+      !   if iopt=1 the program will continue with the set of knots found at the last call of the routine. this
+	  !   will save a lot of computation time if surfit is called repeatedly for different values of s. the number
+	  !   of knots of the spline returned and their location will depend on the value of s and on the complexity
+	  !   of the shape of the function underlying the data. if the computation mode iopt=1 is used, the knots
+	  !   returned may also depend on the s-values at previous calls (if these were smaller). therefore, if after
+	  !   a number of trials with different s-values and iopt=1, the user can finally accept a fit as satisfactory,
+	  !   it may be worthwhile for him to call surfit once more with the selected value for s but now with iopt=0.
+	  !   indeed, surfit may then return an approximation of the same quality of fit but with fewer knots and
+	  !   therefore better if data reduction is also an important objective for the user. the number of knots may
+	  !   also depend on the upper bounds nxest and nyest. indeed, if at a certain stage in surfit the number of
+	  !   knots in one direction (say nx) has reached the value of its upper bound (nxest), then from that moment
+	  !   on all subsequent knots are added in the other (y) direction. this may indicate that the value of nxest
+	  !   is too small. on the other hand, it gives the user the option of limiting the number of knots the
+	  !   routine locates in any direction for example, by setting nxest=2*kx+2 (the lowest allowable value for
+      !   nxest), the user can indicate that he wants an approximation which is a simple polynomial of degree kx
+	  !   in the variable x.
       !
       !  references:
       !   dierckx p. : an algorithm for surface fitting with spline functions
@@ -18278,7 +18202,6 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  creation date : may 1979
-      !  latest update : march 1987
       !
       !  ..
       !  ..scalar arguments..
@@ -18337,18 +18260,18 @@ module fitpack_core
 
       if (iopt>=0) then
 
-          if (s<zero) goto 1
+          if (s<zero)                            goto 1
 
       else
 
           ! Check that the pre-existing x, y knot locations are monotonic
-          if (nx<nminx .or. nx>nxest) goto 1
+          if (nx<nminx .or. nx>nxest)            goto 1
           nxk       = nx-kx1
           tx(kx1)   = xb
           tx(nxk+1) = xe
           if (any(tx(kx1+1:nxk+1)<=tx(kx1:nxk))) goto 2
 
-          if (ny<nminy .or. ny>nyest) goto 1
+          if (ny<nminy .or. ny>nyest)            goto 1
           nyk       = ny-ky1
           ty(ky1)   = yb
           ty(nyk+1) = ye
@@ -18356,6 +18279,7 @@ module fitpack_core
 
       endif
 
+      ! All checks passed
       ier = FITPACK_OK
 
       !  we partition the working space and determine the spline approximation
@@ -18395,5 +18319,27 @@ module fitpack_core
   3   if (verbose) print "('[fitpack] y knot locations are not monotonic: '/,10x,'ty=',*(1x,g0))", ty
       return
       end subroutine surfit
+
+      ! Swap two real numbers
+      elemental subroutine swap_RKIND(a,b)
+         real(RKIND), intent(inout) :: a,b
+         real(RKIND) :: tmp
+
+         tmp = a
+         a   = b
+         b   = tmp
+
+      end subroutine swap_RKIND
+
+      elemental subroutine swap_int(a,b)
+         integer, intent(inout) :: a,b
+         integer :: tmp
+
+         tmp = a
+         a   = b
+         b   = tmp
+
+      end subroutine swap_int
+
 
 end module fitpack_core
