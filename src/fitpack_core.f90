@@ -2199,65 +2199,71 @@ module fitpack_core
       end subroutine fpader
 
 
-      recursive subroutine fpadno(maxtr,up,left,right,info,count, &
-         merk,jbind,n1,ier)
+      pure subroutine fpadno(maxtr,up,left,right,info,count,merk,jbind,n1,ier)
 
-      !  subroutine fpadno adds a branch of length n1 to the triply linked
-      !  tree,the information of which is kept in the arrays up,left,right
-      !  and info. the information field of the nodes of this new branch is
-      !  given in the array jbind. in linking the new branch fpadno takes
-      !  account of the property of the tree that
-      !    info(k) < info(right(k)) ; info(k) < info(left(k))
-      !  if necessary the subroutine calls subroutine fpfrno to collect the
-      !  free nodes of the tree. if no computer words are available at that
-      !  moment, the error parameter ier is set to 1.
+      !  subroutine fpadno adds a branch of length n1 to the triply linked tree,the information of
+      !  which is kept in the arrays up,left,right and info. the information field of the nodes of
+      !  this new branch is given in the array jbind. in linking the new branch fpadno takes account
+      !  of the property of the tree that info(k) < info(right(k)) ; info(k) < info(left(k))
+      !  if necessary the subroutine calls subroutine fpfrno to collect the free nodes of the tree.
+      !  if no computer words are available at that moment, the error parameter ier is set to 1.
       !  ..
       !  ..scalar arguments..
-      integer maxtr,count,merk,n1,ier
+      integer, intent(in)    :: maxtr,n1
+      integer, intent(inout) :: count,merk
+      integer, intent(out)   :: ier
       !  ..array arguments..
-      integer up(maxtr),left(maxtr),right(maxtr),info(maxtr),jbind(n1)
+      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      integer, intent(in)    :: jbind(n1)
       !  ..local scalars..
-      integer k,niveau,point
-      logical bool
-      !  ..subroutine references..
-      !    fpfrno
+      integer :: k,level,point
+      logical :: is_left
+
       !  ..
-      point = 1
-      niveau = 1
-  10  k = left(point)
-      bool = .true.
-  20  if(k==0) go to 50
-      if (info(k)-jbind(niveau)<0) go to 30
-      if (info(k)-jbind(niveau)==0) go to 40
-      go to 50
-  30  point = k
-      k = right(point)
-      bool = .false.
-      go to 20
-  40  point = k
-      niveau = niveau+1
-      go to 10
-  50  if(niveau>n1) go to 90
-      count = count+1
-      if(count<=maxtr) go to 60
-      call fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
-      if(ier/=0) go to 100
-  60  info(count) = jbind(niveau)
-      left(count) = 0
-      right(count) = k
-      if(bool) go to 70
-      bool = .true.
-      right(point) = count
-      up(count) = up(point)
-      go to 80
-  70  up(count) = point
-      left(point) = count
-  80  point = count
-      niveau = niveau+1
-      k = 0
-      go to 50
-  90  ier = 0
- 100  return
+      point   = 1
+      level  = 1
+      k       = left(point)
+      is_left = .true.
+      loop: do while (k/=0 .and. info(k)-jbind(level)<=0)
+          point = k
+          if (info(k)-jbind(level)<0) then
+              k       = right(point)
+              is_left = .false.
+          else ! info(k)-jbind(level)==0
+              level  = level+1
+              k       = left(point)
+              is_left = .true.
+          endif
+      end do loop
+
+      loop2: do while (level<=n1)
+          count = count+1
+          if (count>maxtr) then
+             call fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
+             if (ier/=FITPACK_OK) return
+          endif
+
+          info (count) = jbind(level)
+          left (count) = 0
+          right(count) = k
+
+          if(is_left) then
+              up   (count) = point
+              left (point) = count
+          else
+              is_left      = .true.
+              right(point) = count
+              up   (count) = up(point)
+          endif
+
+          point        = count
+          level       = level+1
+          k = 0
+      end do loop2
+
+      ! Success!
+      ier = FITPACK_OK
+
       end subroutine fpadno
 
 
@@ -5214,24 +5220,24 @@ module fitpack_core
       !  ..array arguments..
       integer up(maxtr),left(maxtr),right(maxtr)
       !  ..local scalars ..
-      integer i,j,k,l,niveau,point
+      integer i,j,k,l,level,point
       !  ..
       i = 1
-      niveau = 0
+      level = 0
   10  point = i
       i = left(point)
       if(i==0) go to 20
-      niveau = niveau+1
+      level = level+1
       go to 10
-  20  if(niveau==nbind) go to 70
+  20  if(level==nbind) go to 70
   30  i = right(point)
       j = up(point)
       up(point) = 0
       k = left(j)
       if(point/=k) go to 50
       if(i/=0) go to 40
-      niveau = niveau-1
-      if(niveau==0) go to 80
+      level = level-1
+      if(level==0) go to 80
       point = j
       go to 30
   40  left(j) = i
@@ -5245,8 +5251,8 @@ module fitpack_core
   70  i = right(point)
       if(i/=0) go to 10
       i = up(point)
-      niveau = niveau-1
-      if(niveau==0) go to 80
+      level = level-1
+      if(level==0) go to 80
       point = i
       go to 70
   80  k = 1
@@ -5305,10 +5311,11 @@ module fitpack_core
       end subroutine fpdisc
 
 
-      !  subroutine fpfrno collects the free nodes (up field zero) of the triply linked tree the information
-      !  of which is kept in the arrays up,left,right and info. the maximal length of the branches of the
-      !  tree is given by n1. if no free nodes are found, the error flag ier is set to 1.
-      recursive subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
+      !  subroutine fpfrno collects the free nodes (up field zero) of the triply linked tree the
+      !  information of which is kept in the arrays up,left,right and info. the maximal length of the
+      !  branches of the tree is given by n1. if no free nodes are found, the error flag ier is set
+      !  to 1.
+      pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
       !  ..
       !  ..scalar arguments..
@@ -5316,64 +5323,84 @@ module fitpack_core
       integer, intent(inout) :: point,merk
       integer, intent(out)   :: count,ier
       !  ..array arguments..
-      integer up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
       !  ..local scalars
-      integer i,j,k,l,n,niveau
+      integer :: i,j,k,l,n,level
       !  ..
       ier    = 1
-      niveau = 1
+      level  = 1
       count  = 2
-      if (n1==2) return
+      if (n1==2) return ! No free nodes
 
-  10  j = 0
-      i = 1
-      k = 0
-  20  if(j==niveau) go to 30
-      l = left(i)
-      if(l==0) go to 110
-      i = l
-      j = j+1
-      go to 20
-  30  if (i<count) go to 110
-      if (i==count) go to 100
-      go to 40
-  40  if(up(count)==0) go to 50
-      count = count+1
-      go to 30
-  50  up(count) = up(i)
-      left(count) = left(i)
-      right(count) = right(i)
-      info(count) = info(i)
-      if(merk==i) merk = count
-      if(point==i) point = count
-      if(k==0) go to 60
-      right(k) = count
-      go to 70
-  60  n = up(i)
-      left(n) = count
-  70  l = left(i)
-  80  if(l==0) go to 90
-      up(l) = count
-      l = right(l)
-      go to 80
-  90  up(i) = 0
-      i = count
+      free_nodes_left: do while (level<=n1)
+         j = 0
+         i = 1
+         k = 0
+         l = 0
+      20  march_left: do while (j/=level)
+            l = left(i)
+            if (l==0) exit march_left
+            i = l
+            j = j+1
+          end do march_left
+  30  if (i< count .or. l==0) then
+          go to 110
+      elseif (i==count) then
+          go to 100
+      else
+
+          if (up(count)==0) then
+              up   (count) = up   (i)
+              left (count) = left (i)
+              right(count) = right(i)
+              info (count) = info (i)
+              if( merk==i) merk  = count
+              if(point==i) point = count
+              if (k==0) then
+                 n = up(i)
+                 left(n) = count
+              else
+                 right(k) = count
+              endif
+              l = left(i)
+              do while (l/=0)
+                up(l) = count
+                l = right(l)
+              end do
+              up(i) = 0
+              i = count
+          else
+             count = count+1
+             go to 30
+          endif
+
+
+      endif
+
  100  count = count+1
  110  l = right(i)
       k = i
-      if(l==0) go to 120
-      i = l
-      go to 20
+      if (l==0) then
+          go to 120
+      else
+          i = l
+          go to 20
+      endif
+
  120  l = up(i)
       j = j-1
-      if(j==0) go to 130
-      i = l
-      go to 110
- 130  niveau = niveau+1
-      if(niveau<=n1) go to 10
-      if(count>maxtr) go to 140
-      ier = 0
- 140  return
+      if (j==0) then
+          level = level+1
+          cycle free_nodes_left
+      else
+          i = l
+          go to 110
+      endif
+
+      end do free_nodes_left
+
+      if(count<=maxtr) ier = FITPACK_OK
+      return
       end subroutine fpfrno
 
 
