@@ -12653,7 +12653,6 @@ module fitpack_core
         call swap_int  (nxe,nye)
         call swap_int  (nxx,nyy)
         call swap_int  (kx ,ky)
-        call swap_int  (kx ,ky)
         kx1 = kx+1
         ky1 = ky+1
  130    iband = iband1+1
