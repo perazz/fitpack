@@ -17780,7 +17780,7 @@ module fitpack_core
       real(RKIND), intent(out) :: zeros(mest)
       !  ..local scalars..
       integer :: i,j,j1,l,n4
-      real(RKIND) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5,zz
+      real(RKIND) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5
       logical :: z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
       !  ..local array..
       real(RKIND) :: y(3)
@@ -17863,7 +17863,7 @@ module fitpack_core
       !  t(l) <= x <= t(l+1).
         z3  = .not.b1<zero
         nz3 = .not.z3
-        if(a0*b0<=zero) go to 100
+        if (a0*b0<=zero) go to 100
 
         z0  = .not.a0<zero
         nz0 = .not.z0
@@ -17872,23 +17872,26 @@ module fitpack_core
         z4  = .not.three*a3+a2<zero
         nz4 = .not.z4
 
-        if (.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and. &
-       z3.and.z4).or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and. &
-       nz3.and.nz4))))go to 200
-      !  find the zeros of ql(y).
+        ! find the zeros of ql(y).
+        if (.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and.z3.and.z4) &
+              .or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and.nz3.and.nz4)))) go to 200
+
  100    call fpcuro(a3,a2,a1,a0,y,j)
-        if(j==0) go to 200
-      !  find which zeros of pl(x) are zeros of s(x).
-        do 150 i=1,j
-          if(y(i)<zero .or. y(i)>one) go to 150
-      !  test whether the number of zeros of s(x) exceeds mest.
-          if (m>=mest) then
-             ier = FITPACK_INSUFFICIENT_STORAGE
-             return
-          end if
-          m = m+1
-          zeros(m) = t(l)+h1*y(i)
- 150    continue
+
+        if (j/=0) then
+            ! find which zeros of pl(x) are zeros of s(x).
+            which_zeros: do i=1,j
+              if(y(i)<zero .or. y(i)>one) cycle which_zeros
+              ! test whether the number of zeros of s(x) exceeds mest.
+              if (m>=mest) then
+                 ier = FITPACK_INSUFFICIENT_STORAGE
+                 return
+              end if
+              m = m+1
+              zeros(m) = t(l)+h1*y(i)
+            end do which_zeros
+        endif
+
  200    a0 = b0
         ah = bh
         z1 = z3
@@ -17901,10 +17904,7 @@ module fitpack_core
       ! FP this double loop can be made more efficient
       sort_zeros: do j=1,m
         inner_loop: do j1 = j+1,m
-          if (zeros(j1)>=zeros(j)) cycle inner_loop
-          zz        = zeros(j)
-          zeros(j)  = zeros(j1)
-          zeros(j1) = zz
+          if (zeros(j1)<zeros(j)) call swap_RKIND(zeros(j),zeros(j1))
         end do inner_loop
       end do sort_zeros
 
