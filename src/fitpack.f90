@@ -233,6 +233,7 @@ module fitpack
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
 
         integer, allocatable :: isort(:)
+        integer, parameter   :: SAFE = 10
 
         associate(m=>this%m,nest=>this%nest,lwrk=>this%lwrk)
 
@@ -261,7 +262,7 @@ module fitpack
         this%iopt = 0
 
         ! Reset estimated knots
-        nest = max(2*MAX_K+2,ceiling(1.4*this%m))
+        nest = max(SAFE*2*MAX_K+2,ceiling(1.4*this%m))
         allocate(this%iwrk(nest),this%t(nest),this%c(nest))
 
         ! Setup working space.
@@ -687,6 +688,7 @@ module fitpack
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
 
         integer :: clen,uv(2),km,bxy(2),b1,b2
+        integer, parameter :: SAFE = 2
 
 
         associate(m=>this%m,nest=>this%nest,nmax=>this%nmax,order=>this%order)
@@ -718,7 +720,7 @@ module fitpack
 
 
         ! Knot space: overestimate (2*order+1 => order+m+1)
-        nest = order + m + 1
+        nest = SAFE*(order + m + 1)
         nmax = maxval(nest)
         nest = nmax
         allocate(this%t(nmax,2),source=zero)
