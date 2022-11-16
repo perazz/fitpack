@@ -17966,20 +17966,15 @@ module fitpack_core
       !    fpsuev,fpbspl
       !
       !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
+      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford university press, 1993.
       !
       !  author :
       !    p.dierckx
       !    dept. computer science, k.u.leuven
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : march 1987
       !
       !  ..scalar arguments..
       integer,     intent(in)    :: idim,nu,nv,mu,mv,mf,lwrk,kwrk
