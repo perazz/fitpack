@@ -49,12 +49,13 @@ module fitpack_core
 
 
     public :: splev   ! Evaluate 1d spline value
-    public :: sproot  ! Find zeroes of a 1d spline
-
-    public :: splint  ! Evaluate integral below spline
-    public :: regrid,profil
     public :: splder  ! Evaluate 1d spline derivative
     public :: spalde  ! Evaluate all 1d derivatives at x
+    public :: splint  ! Evaluate integral below spline
+    public :: sproot  ! Find zeroes of a 1d spline
+
+    public :: regrid
+    public :: profil
 
     ! Spline behavior for points not in the support
     integer, parameter, public :: SPLINE_EXTRAPOLATE = 0 ! extrapolated from the end spans
@@ -17537,7 +17538,6 @@ module fitpack_core
       return
       end subroutine splder
 
-
       recursive subroutine splev(t,n,c,k,x,y,m,e,ier)
       !  subroutine splev evaluates in a number of points x(i),i=1,2,...,m
       !  a spline s(x) of degree k, given in its b-spline representation.
@@ -17673,39 +17673,32 @@ module fitpack_core
  100  return
       end subroutine splev
 
-
-      recursive function splint(t,n,c,k,a,b,wrk) result(splint_res)
-
-      real(RKIND) :: splint_res
       !  function splint calculates the integral of a spline function s(x)
       !  of degree k, which is given in its normalized b-spline representation
-      !
+
+      real(RKIND) function splint(t,n,c,k,a,b,wrk) result(integral)
+
       !  calling sequence:
       !     aint = splint(t,n,c,k,a,b,wrk)
       !
       !  input parameters:
-      !    t    : array,length n,which contains the position of the knots
-      !           of s(x).
+      !    t    : array,length n,which contains the position of the knots of s(x).
       !    n    : integer, giving the total number of knots of s(x).
       !    c    : array,length n, containing the b-spline coefficients.
       !    k    : integer, giving the degree of s(x).
-      !    a,b  : real values, containing the end points of the integration
-      !           interval. s(x) is considered to be identically zero outside
-      !           the interval (t(k+1),t(n-k)).
+      !    a,b  : real values, containing the end points of the integration interval. s(x) is considered to be identically
+      !           zero outside the interval (t(k+1),t(n-k)).
       !
       !  output parameter:
       !    aint : real, containing the integral of s(x) between a and b.
-      !    wrk  : real array, length n.  used as working space
-      !           on output, wrk will contain the integrals of the normalized
+      !    wrk  : real array, length n, used as working space. on output, wrk will contain the integrals of the normalized
       !           b-splines defined on the set of knots.
       !
       !  other subroutines required: fpintb.
       !
       !  references :
-      !    gaffney p.w. : the calculation of indefinite integrals of b-splines
-      !                   j. inst. maths applics 17 (1976) 37-41.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
+      !    gaffney p.w. : the calculation of indefinite integrals of b-splines. j. inst. maths applics 17 (1976) 37-41.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford university press, 1993.
       !
       !  author :
       !    p.dierckx
@@ -17713,28 +17706,25 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
-      real(RKIND) a,b
-      integer n,k
+      real(RKIND), intent(in) :: a,b
+      integer    , intent(in) :: n,k
       !  ..array arguments..
-      real(RKIND) t(n),c(n),wrk(n)
+      real(RKIND), intent(in)    :: t(n),c(n)
+      real(RKIND), intent(inout) :: wrk(n)
+
       !  ..local scalars..
-      integer i,nk1
-      !  ..
+      integer :: i,nk1
+
       nk1 = n-k-1
-      !  calculate the integrals wrk(i) of the normalized b-splines
-      !  ni,k+1(x), i=1,2,...nk1.
+
+      !  calculate the integrals wrk(i) of the normalized b-splines ni,k+1(x), i=1,2,...nk1.
       call fpintb(t,n,wrk,nk1,a,b)
+
       !  calculate the integral of s(x).
-      splint_res = zero
-      do 10 i=1,nk1
-        splint_res = splint_res+c(i)*wrk(i)
-  10  continue
+      integral = dot_product(c(1:nk1),wrk(1:nk1))
       return
       end function splint
-
 
       !  subroutine sproot finds the zeros of a cubic spline s(x),which is given in its normalized
       ! b-spline representation.
