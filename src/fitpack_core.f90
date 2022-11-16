@@ -17920,11 +17920,10 @@ module fitpack_core
 
       end subroutine sproot
 
-
-      recursive subroutine surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
-
       !  subroutine surev evaluates on a grid (u(i),v(j)),i=1,...,mu; j=1,...,mv a bicubic spline
       !  surface of dimension idim, given in the b-spline representation.
+      pure subroutine surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
+
       !
       !  calling sequence:
       !     call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
@@ -17983,35 +17982,35 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer :: idim,nu,nv,mu,mv,mf,lwrk,kwrk,ier
+      integer,     intent(in)    :: idim,nu,nv,mu,mv,mf,lwrk,kwrk
+      integer,     intent(out)   :: ier
       !  ..array arguments..
-      integer :: iwrk(kwrk)
-      real(RKIND) :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv),f(mf),wrk(lwrk)
+      integer,     intent(inout) :: iwrk(kwrk)
+      real(RKIND), intent(in)    :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
+      real(RKIND), intent(inout) :: wrk(lwrk)
+      real(RKIND), intent(out)   :: f(mf)
       !  ..local scalars..
-      integer :: i,muv
+      integer :: muv
+
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
       ier = FITPACK_INPUT_ERROR
-      if(mf<mu*mv*idim) go to 100
       muv = mu+mv
-      if(lwrk<4*muv) go to 100
-      if(kwrk<muv) go to 100
-      if (mu<1) go to 100
-      if (mu==1) go to 30
-      go to 10
-  10  do 20 i=2,mu
-        if(u(i)<u(i-1)) go to 100
-  20  continue
-  30  if (mv<1) go to 100
-      if (mv==1) go to 60
-      go to 40
-  40  do 50 i=2,mv
-        if(v(i)<v(i-1)) go to 100
-  50  continue
-  60  ier = 0
+
+      if (mf<mu*mv*idim .or. &
+          lwrk<4*muv    .or. &
+          kwrk<muv      .or. &
+          mu<1          .or. &
+          mv<1)         return
+
+      if (mu>1 .and. any(u(2:mu)<u(1:mu-1))) return
+      if (mv>1 .and. any(v(2:mv)<v(1:mv-1))) return
+
+      ! All checks passed
+      ier = FITPACK_OK
       call fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wrk(1),wrk(4*mu+1),iwrk(1),iwrk(mu+1))
- 100  return
+
       end subroutine surev
 
 
