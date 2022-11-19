@@ -58,10 +58,10 @@ module fitpack_core
     public :: profil
 
     ! Spline behavior for points not in the support
-    integer, parameter, public :: SPLINE_EXTRAPOLATE = 0 ! extrapolated from the end spans
-    integer, parameter, public :: SPLINE_ZERO        = 1 ! spline evaluates to zero
-    integer, parameter, public :: SPLINE_NOT_ALLOWED = 2 ! an error flag is returned
-    integer, parameter, public :: SPLINE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
+    integer, parameter, public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
+    integer, parameter, public :: OUTSIDE_ZERO        = 1 ! spline evaluates to zero
+    integer, parameter, public :: OUTSIDE_NOT_ALLOWED = 2 ! an error flag is returned
+    integer, parameter, public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
                         public :: FITPACK_MESSAGE
                         public :: FITPACK_SUCCESS
@@ -73,6 +73,7 @@ module fitpack_core
     integer, parameter, public :: FITPACK_MAXIT                = 3
     integer, parameter, public :: FITPACK_TOO_MANY_KNOTS       = 4
     integer, parameter, public :: FITPACK_OVERLAPPING_KNOTS    = 5
+    integer, parameter, public :: FITPACK_INVALID_RANGE        = 6
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
 
     ! Internal Parameters
@@ -111,6 +112,7 @@ module fitpack_core
             case (FITPACK_MAXIT); msg = 'Infinite loop detected'
             case (FITPACK_TOO_MANY_KNOTS); msg = 'More knots than data points'
             case (FITPACK_OVERLAPPING_KNOTS); msg = 'Overlapping knots found'
+            case (FITPACK_INVALID_RANGE); msg = 'Invalid variable range'
             case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
             case default; msg = 'UNKNOWN ERROR'
          end select
@@ -3428,9 +3430,7 @@ module fitpack_core
          l = l-1
          if(l==0) go to 356
  352  continue
-      do 354 i=1,n10
-         p = p+a1(i,1)
- 354  continue
+      p = p + sum(a1(1:n10,1))
  356  rn = n7
       p = rn/p
       ich1 = 0
@@ -17501,12 +17501,12 @@ module fitpack_core
         ! check if arg is in the support
         if (arg < tb .or. arg > te) then
             select case (e)
-               case (SPLINE_EXTRAPOLATE)
+               case (OUTSIDE_EXTRAPOLATE)
                   ! continue like any other point
-               case (SPLINE_ZERO)
+               case (OUTSIDE_ZERO)
                   y(i) = zero
                   cycle user_points
-               case (SPLINE_NOT_ALLOWED)
+               case (OUTSIDE_NOT_ALLOWED)
                   ier = FITPACK_INSUFFICIENT_STORAGE
                   return
             end select
@@ -17538,10 +17538,10 @@ module fitpack_core
       return
       end subroutine splder
 
-      recursive subroutine splev(t,n,c,k,x,y,m,e,ier)
-      !  subroutine splev evaluates in a number of points x(i),i=1,2,...,m
-      !  a spline s(x) of degree k, given in its b-spline representation.
-      !
+      ! subroutine splev evaluates in a number of points x(i),i=1,2,...,m a spline s(x) of degree k,
+      ! given in its b-spline representation.
+      pure subroutine splev(t,n,c,k,x,y,m,e,ier)
+
       !  calling sequence:
       !     call splev(t,n,c,k,x,y,m,e,ier)
       !
@@ -17550,37 +17550,28 @@ module fitpack_core
       !    n    : integer, giving the total number of knots of s(x).
       !    c    : array,length n, which contains the b-spline coefficients.
       !    k    : integer, giving the degree of s(x).
-      !    x    : array,length m, which contains the points where s(x) must
-      !           be evaluated.
-      !    m    : integer, giving the number of points where s(x) must be
-      !           evaluated.
-      !    e    : integer, if 0 the spline is extrapolated from the end
-      !           spans for points not in the support, if 1 the spline
-      !           evaluates to zero for those points, if 2 ier is set to
-      !           1 and the subroutine returns, and if 3 the spline evaluates
-      !           to the value of the nearest boundary point.
+      !    x    : array,length m, which contains the points where s(x) must be evaluated.
+      !    m    : integer, giving the number of points where s(x) must be evaluated.
+      !    e    : integer, boundary condition for points outside the support
+      !           0 = the spline is extrapolated from the end spans
+      !           1 = the spline evaluates to zero for those points,
+      !           2 = extrapolation not allowed, ier is set to 1 and the subroutine returns,
+      !           3 = the spline evaluates to the value of the nearest boundary point.
       !
       !  output parameter:
-      !    y    : array,length m, giving the value of s(x) at the different
-      !           points.
+      !    y    : array,length m, giving the value of s(x) at the different points.
       !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier = 1 : argument out of bounds and e == 2
-      !      ier =10 : invalid input data (see restrictions)
       !
       !  restrictions:
       !    m >= 1
-      !--    t(k+1) <= x(i) <= x(i+1) <= t(n-k) , i=1,2,...,m-1.
       !
       !  other subroutines required: fpbspl.
       !
       !  references :
-      !    de boor c  : on calculating with b-splines, j. approximation theory
-      !                 6 (1972) 50-62.
-      !    cox m.g.   : the numerical evaluation of b-splines, j. inst. maths
-      !                 applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
+      !    de boor c  : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !    cox m.g.   : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
+      !                 university press, 1993.
       !
       !  author :
       !    p.dierckx
@@ -17588,89 +17579,73 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1987
-      !
-      !++ pearu: 11 aug 2003
-      !++   - disabled cliping x values to interval [min(t),max(t)]
-      !++   - removed the restriction of the orderness of x values
-      !++   - fixed initialization of sp to real(RKIND) value
-      !
       !  ..scalar arguments..
-      integer n, k, m, e, ier
+      integer,     intent(in)  :: n, k, m, e
+      integer,     intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) t(n), c(n), x(m), y(m)
+      real(RKIND), intent(in)  :: t(n), c(n), x(m)
+      real(RKIND), intent(out) :: y(m)
+
       !  ..local scalars..
-      integer i, j, k1, l, ll, l1, nk1
-      !++..
-      integer k2
-      !..++
-      real(RKIND) arg, sp, tb, te
+      integer :: i, k1, l, l1, nk1,k2
+      real(RKIND) :: arg, tb, te
       !  ..local array..
-      real(RKIND) h(20)
+      real(RKIND) :: h(SIZ_K+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      !--      if(m-1) 100,30,10
-      !++..
-      if (m < 1) go to 100
-      !..++
-      !--  10  do 20 i=2,m
-      !--        if(x(i)<x(i-1)) go to 100
-      !--  20  continue
-      ier = 0
+      ier = FITPACK_INPUT_ERROR
+      if (m<1) return
+
+      ier = FITPACK_OK
       !  fetch tb and te, the boundaries of the approximation interval.
-      k1 = k + 1
-      !++..
-      k2 = k1 + 1
-      !..++
+      k1  = k  + 1
+      k2  = k1 + 1
       nk1 = n - k1
-      tb = t(k1)
-      te = t(nk1 + 1)
-      l = k1
-      l1 = l + 1
+      tb  = t(k1)
+      te  = t(nk1 + 1)
+      l   = k1
+      l1  = l + 1
+
       !  main loop for the different points.
-      do 80 i = 1, m
-      !  fetch a new x-value arg.
+      user_points: do i = 1, m
+
+        ! fetch a new x-value arg.
         arg = x(i)
-      !  check if arg is in the support
-        if (arg < tb .or. arg > te) then
+
+        ! check if arg is in the support
+        outside: if (arg<tb .or. arg>te) then
             select case (e)
-               case (SPLINE_EXTRAPOLATE)
-                goto 35
-            case (SPLINE_ZERO)
-                y(i) = 0
-                goto 80
-            case (SPLINE_NOT_ALLOWED)
-                ier = 1
-                goto 100
-            case (SPLINE_NEAREST_BND)
-                arg = max(min(arg,te),tb)
+               case (OUTSIDE_EXTRAPOLATE)
+                ! Continue normally
+               case (OUTSIDE_ZERO)
+                  y(i) = zero
+                  cycle user_points
+               case (OUTSIDE_NOT_ALLOWED)
+                  ier = FITPACK_INVALID_RANGE
+                  return
+               case (OUTSIDE_NEAREST_BND)
+                  arg = max(min(arg,te),tb)
             end select
-        endif
-      !  search for knot interval t(l) <= arg < t(l+1)
-      !++..
- 35     if (arg >= t(l) .or. l1 == k2) go to 40
-        l1 = l
-        l = l - 1
-        go to 35
-      !..++
-  40    if(arg < t(l1) .or. l == nk1) go to 50
-        l = l1
-        l1 = l + 1
-        go to 40
-      !  evaluate the non-zero b-splines at arg.
-  50    call fpbspl(t, n, k, arg, l, h)
-      !  find the value of s(x) at x=arg.
-        sp = zero
-        ll = l - k1
-        do 60 j = 1, k1
-          ll = ll + 1
-          sp = sp + c(ll)*h(j)
-  60    continue
-        y(i) = sp
-  80  continue
- 100  return
+        endif outside
+
+        ! search for knot interval t(l) <= arg < t(l+1)
+        do while (arg<t(l) .and. l1/=k2)
+          l1 = l
+          l  = l - 1
+        end do
+        do while (arg>=t(l1) .and. l/=nk1)
+          l  = l1
+          l1 = l + 1
+        end do
+
+        ! evaluate the non-zero b-splines at arg.
+        call fpbspl(t, n, k, arg, l, h)
+
+        ! find the value of s(x) at x=arg.
+        y(i) = dot_product(c(l-k:l),h(1:k1))
+      end do user_points
+
       end subroutine splev
 
       !  function splint calculates the integral of a spline function s(x)
@@ -17714,7 +17689,7 @@ module fitpack_core
       real(RKIND), intent(inout) :: wrk(n)
 
       !  ..local scalars..
-      integer :: i,nk1
+      integer :: nk1
 
       nk1 = n-k-1
 

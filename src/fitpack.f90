@@ -60,7 +60,7 @@ module fitpack
         real(RKIND) :: fp = zero
 
         ! Curve extrapolation behavior
-        integer     :: bc = SPLINE_NEAREST_BND
+        integer     :: bc = OUTSIDE_NEAREST_BND
 
         ! Knots
         integer     :: knots(2) = 0
@@ -119,7 +119,7 @@ module fitpack
         real(RKIND) :: fp = zero
 
         ! Curve extrapolation behavior
-        integer     :: bc = SPLINE_NEAREST_BND
+        integer     :: bc = OUTSIDE_NEAREST_BND
 
         ! Knots
         integer     :: knots = 0
@@ -223,7 +223,7 @@ module fitpack
        this%lwrk      = 0
        this%knots     = 0
        this%fp        = 0.0_RKIND
-       this%bc        = SPLINE_NEAREST_BND
+       this%bc        = OUTSIDE_NEAREST_BND
 
     end subroutine destroy
 
@@ -678,7 +678,7 @@ module fitpack
        this%liwrk     = 0
        this%knots     = 0
        this%fp        = zero
-       this%bc        = SPLINE_NEAREST_BND
+       this%bc        = OUTSIDE_NEAREST_BND
 
     end subroutine surf_destroy
 

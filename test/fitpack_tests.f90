@@ -1001,7 +1001,7 @@ module fitpack_tests
       xe = x(m)
 
       !  loop for the different spline degrees.
-      spline_degrees: do k=3,5,2
+      OUTSIDE_degrees: do k=3,5,2
       !  loop for the different spline approximations of degree k
          test_case: do is=1,7
 
@@ -1045,7 +1045,7 @@ module fitpack_tests
 
             ! Call fitting routine
             call curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
-            if (.not.FITPACK_SUCCESS(ier)) exit spline_degrees
+            if (.not.FITPACK_SUCCESS(ier)) exit OUTSIDE_degrees
 
             !  printing of the results.
             if (iopt<0) then
@@ -1066,7 +1066,7 @@ module fitpack_tests
 
             ! evaluation of the spline approximation
             call splev(t,n,c,k,x,sp,m,0,ier)
-            if (.not.FITPACK_SUCCESS(ier)) exit spline_degrees
+            if (.not.FITPACK_SUCCESS(ier)) exit OUTSIDE_degrees
 
             do i=1,5
                l1 = (i-1)*5+1
@@ -1074,7 +1074,7 @@ module fitpack_tests
                write(6,960) (x(l),y(l),sp(l),l=l1,l2)
             end do
          end do test_case
-      end do spline_degrees
+      end do OUTSIDE_degrees
 
       success = FITPACK_SUCCESS(ier)
       if (.not.success) print *, '[mncurf] returned error ',FITPACK_MESSAGE(ier)
@@ -1547,8 +1547,8 @@ module fitpack_tests
         write(6,940)
         write(6,930) (c2(i),i=1,n2k1)
       !  evaluate the two splines
-        call splev(t1,n1,c1,k,x,y1,m,SPLINE_EXTRAPOLATE,ier)
-        call splev(t2,n2,c2,k,x,y2,m,SPLINE_EXTRAPOLATE,ier)
+        call splev(t1,n1,c1,k,x,y1,m,OUTSIDE_EXTRAPOLATE,ier)
+        call splev(t2,n2,c2,k,x,y2,m,OUTSIDE_EXTRAPOLATE,ier)
       !  insert the knots of the second spline into those of the first one
         call insert(iopt,t1,n1,c1,k,0.1d0,t1,n1,c1,nest,ier)
         call insert(iopt,t1,n1,c1,k,0.8d0,t1,n1,c1,nest,ier)
@@ -2600,7 +2600,7 @@ module fitpack_tests
           write(6,955) u
           write(6,950) (cc(j),j=1,nky1)
       !  evaluation of the one-dimensional spline f(y)
-          call splev(ty,ny,cc,ky,y,z(m0),my,SPLINE_EXTRAPOLATE,ier)
+          call splev(ty,ny,cc,ky,y,z(m0),my,OUTSIDE_EXTRAPOLATE,ier)
           m0 = m0+my
   80    continue
         write(6,960)
@@ -2621,7 +2621,7 @@ module fitpack_tests
           write(6,995) u
           write(6,950) (cc(j),j=1,nkx1)
       !  evaluation of the one-dimensional spline g(x)
-          call splev(tx,nx,cc,kx,x,z(m0),mx,SPLINE_EXTRAPOLATE,ier)
+          call splev(tx,nx,cc,kx,x,z(m0),mx,OUTSIDE_EXTRAPOLATE,ier)
           m0 = m0+mx
  120    continue
         write(6,960)
@@ -2945,7 +2945,7 @@ module fitpack_tests
         do 40 i=1,k1
       !  nu denotes the order of the derivative
           nu = i-1
-          call splder(t,n,c,k,nu,x,y(j),m,SPLINE_EXTRAPOLATE,wrk,ier)
+          call splder(t,n,c,k,nu,x,y(j),m,OUTSIDE_EXTRAPOLATE,wrk,ier)
           j = j+m
   40    continue
       !  print the results.
@@ -3018,7 +3018,7 @@ module fitpack_tests
           c(i) = 0.1e-01*ai*(ai-0.5e01)
   30    continue
       !  evaluate the spline.
-        call splev(t,n,c,k,x,y,m,SPLINE_EXTRAPOLATE,ier)
+        call splev(t,n,c,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
       !  print the results.
         write(6,900) k
         write(6,905)
