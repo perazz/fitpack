@@ -27,8 +27,12 @@ module fitpack_core
     integer, parameter, public :: RSIZE = int32
 
     ! Polar
-    public :: evapol,polar,pogrid,percur,cocosp,concon,concur,cualde
-    public :: dblint,fourco,parcur,parder,pardeu,pardtc
+    public :: evapol ! Evaluate polar spline s(u,v) at (x,y)
+    public :: polar,pogrid,percur,cocosp,concon,concur,cualde
+    public :: dblint,parcur,parder,pardeu,pardtc
+
+    ! Fourier coefficients
+    public :: fourco
 
     ! Closed-curve
     public :: clocur
@@ -92,9 +96,16 @@ module fitpack_core
     real(RKIND), parameter, public :: pi     = atan2(zero,-one)
     real(RKIND), parameter, public :: pi2    = 2*pi
     real(RKIND), parameter, public :: pi4    = 4*pi
-    real(RKIND), parameter, public :: smallnum03 = 1.0e-3_RKIND
+    real(RKIND), parameter, public :: smallnum03 = 1.0e-03_RKIND
+    real(RKIND), parameter, public :: smallnum10 = 1.0e-10_RKIND
 
-
+    abstract interface
+       ! Function defining the boundary of the curve approximation domain
+       pure real(RKIND) function boundary(v) result(rad)
+          import RKIND
+          real(RKIND), intent(in) :: v
+       end function boundary
+    end interface
 
     contains
 
@@ -1561,9 +1572,7 @@ module fitpack_core
       if (m<1) return
 
       ! Check monotonic
-      if (m>1) then
-         if (any(u(2:m)<u(1:m-1))) return
-      endif
+      if (m>1 .and. any(u(2:m)<u(1:m-1))) return
 
       ! Check enough output space
       if (mx<(m*idim)) return
@@ -1954,49 +1963,37 @@ module fitpack_core
       return
       end function dblint
 
-
-      recursive function evapol(tu,nu,tv,nv,c,rad,x,y) result(e_res)
-
-      real(RKIND) :: e_res
-      !  function program evacir evaluates the function f(x,y) = s(u,v),
-      !  defined through the transformation
+      !  function program evapol evaluates the function f(x,y) = s(u,v), defined through the transformation
       !      x = u*rad(v)*cos(v)    y = u*rad(v)*sin(v)
-      !  and where s(u,v) is a bicubic spline ( 0<=u<=1 , -pi<=v<=pi ), given
-      !  in its standard b-spline representation.
-      !
+      !  and where s(u,v) is a bicubic spline ( 0<=u<=1 , -pi<=v<=pi ), given in its standard b-spline
+      !  representation.
+
+      pure real(RKIND) function evapol(tu,nu,tv,nv,c,rad,x,y) result(e_res)
+
       !  calling sequence:
       !     f = evapol(tu,nu,tv,nv,c,rad,x,y)
       !
       !  input parameters:
-      !   tu    : real array, length nu, which contains the position of the
-      !           knots in the u-direction.
+      !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
       !   nu    : integer, giving the total number of knots in the u-direction
-      !   tv    : real array, length nv, which contains the position of the
-      !           knots in the v-direction.
+      !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
       !   nv    : integer, giving the total number of knots in the v-direction
-      !   c     : real array, length (nu-4)*(nv-4), which contains the
-      !           b-spline coefficients.
-      !   rad   : real function subprogram, defining the boundary of the
-      !           approximation domain. must be declared external in the
-      !           calling (sub)-program
-      !   x,y   : real values.
-      !           before entry x and y must be set to the co-ordinates of
-      !           the point where f(x,y) must be evaluated.
+      !   c     : real array, length (nu-4)*(nv-4), which contains the b-spline coefficients.
+      !   rad   : real function subprogram, defining the boundary of the approximation domain. must be
+      !           declared external in the calling (sub)-program
+      !   x,y   : the co-ordinates of the point where f(x,y) must be evaluated.
       !
       !  output parameter:
-      !   f     : real
-      !           on exit f contains the value of f(x,y)
+      !   e_res : the value of f(x,y)
       !
       !  other subroutines required:
       !    bispev,fpbisp,fpbspl
       !
       !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
+      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
+      !                 university press, 1993.
       !
       !  author :
       !    p.dierckx
@@ -2004,40 +2001,38 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1989
-      !
       !  ..scalar arguments..
-      integer nu,nv
-      real(RKIND) x,y
+      integer, intent(in) :: nu,nv
+      real(RKIND), intent(in) :: x,y
       !  ..array arguments..
-      real(RKIND) tu(nu),tv(nv),c((nu-4)*(nv-4))
+      real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
       !  ..user specified function
-      real(RKIND) rad
+      procedure(boundary) :: rad
       !  ..local scalars..
-      integer ier
-      real(RKIND) u(1),v(1),r,f(1),dist
+      integer :: ier
+      integer, parameter :: liwrk = 2, lwrk = 8
+      real(RKIND) :: u(1),v(1),r,f(1),dist
       !  ..local arrays
-      real(RKIND) wrk(8)
-      integer iwrk(2)
+      real(RKIND) :: wrk(lwrk)
+      integer :: iwrk(liwrk)
       !  ..
       !  calculate the (u,v)-coordinates of the given point.
-      u = zero
-      v = zero
+      u    = zero
+      v    = zero
       dist = x**2+y**2
-      if(dist<=0.) go to 10
-      v(1) = atan2(y,x)
-      r = rad(v(1))
-      if(r<=0.) go to 10
-      u(1) = min(sqrt(dist)/r,one)
-      !  evaluate s(u,v)
-  10  call bispev(tu,nu,tv,nv,c,3,3,u,1,v,1,f,wrk,8,iwrk,2,ier)
+      if (dist>zero) then
+         v(1) = atan2(y,x)
+         r    = rad(v(1))
+         if (r>zero) &
+         u(1) = min(sqrt(dist)/r,one)
+      endif
+      ! evaluate s(u,v)
+      call bispev(tu,nu,tv,nv,c,3,3,u,1,v,1,f,wrk,lwrk,iwrk,liwrk,ier)
+
+      ! Return scalar result
       e_res = f(1)
       return
       end function evapol
-
-
-
-      recursive subroutine fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
 
       !  subroutine fourco calculates the integrals
       !                    /t(n-3)
@@ -2046,9 +2041,9 @@ module fitpack_core
       !                    /t(n-3)
       !    resc(i) =      !        s(x)*cos(alfa(i)*x) dx, i=1,...,m,
       !              t(4)/
-      !  where s(x) denotes a cubic spline which is given in its
-      !  b-spline representation.
-      !
+      !  where s(x) denotes a cubic spline which is given in its b-spline representation.
+      pure subroutine fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
+
       !  calling sequence:
       !     call fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
       !
@@ -2077,9 +2072,8 @@ module fitpack_core
       !  other subroutines required: fpbfou,fpcsin
       !
       !  references :
-      !    dierckx p. : calculation of fouriercoefficients of discrete
-      !                 functions using cubic splines. j. computational
-      !                 and applied mathematics 3 (1977) 207-209.
+      !    dierckx p. : calculation of fourier coefficients of discrete functions using cubic splines.
+      !                 j. computational and applied mathematics 3 (1977) 207-209.
       !    dierckx p. : curve and surface fitting with splines, monographs on
       !                 numerical analysis, oxford university press, 1993.
       !
@@ -2089,50 +2083,46 @@ module fitpack_core
       !    celestijnenlaan 200a, b-3001 heverlee, belgium.
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
-      integer n,m,ier
+      integer, intent(in) :: n,m
+      integer, intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) t(n),c(n),wrk1(n),wrk2(n),alfa(m),ress(m),resc(m)
+      real(RKIND), intent(in) :: t(n),c(n),alfa(m)
+      real(RKIND), intent(inout) :: wrk1(n),wrk2(n)
+      real(RKIND), intent(out) :: ress(m),resc(m)
       !  ..local scalars..
-      integer i,j,n4
-      real(RKIND) rs,rc
+      integer :: i,n4
       !  ..
       n4 = n-4
       !  before starting computations a data check is made. in the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
-      if(n<10) go to 50
-      j = n
-      do 10 i=1,3
-        if(t(i)>t(i+1)) go to 50
-        if(t(j)<t(j-1)) go to 50
-        j = j-1
-  10  continue
-      do 20 i=4,n4
-        if(t(i)>=t(i+1)) go to 50
-  20  continue
-      ier = 0
+      ier = FITPACK_INPUT_ERROR
+
+      ! Not enough points
+      if (n<10) return
+
+      ! Ends of the support: knots must be monotonic
+      if (any(t(1:3)>t(2:4)))       return
+      if (any(t(n-2:n)<t(n-3:n-1))) return
+
+      ! Interior: knots must be strictly monotonic
+      if (any(t(4:n4)>=t(5:n-3)))   return
+
+      ier = FITPACK_OK
       !  main loop for the different alfa(i).
-      do 40 i=1,m
-      !  calculate the integrals
-      !    wrk1(j) = integral(nj,4(x)*sin(alfa*x))    and
-      !    wrk2(j) = integral(nj,4(x)*cos(alfa*x)),  j=1,2,...,n-4,
-      !  where nj,4(x) denotes the normalised cubic b-spline defined on the
-      !  knots t(j),t(j+1),...,t(j+4).
+      alphas: do i=1,m
+
+         !  calculate the integrals
+         !    wrk1(j) = integral(nj,4(x)*sin(alfa*x))    and
+         !    wrk2(j) = integral(nj,4(x)*cos(alfa*x)),  j=1,2,...,n-4,
+         !  where nj,4(x) denotes the normalised cubic b-spline defined on the knots t(j),t(j+1),...,t(j+4).
          call fpbfou(t,n,alfa(i),wrk1,wrk2)
-      !  calculate the integrals ress(i) and resc(i).
-         rs = zero
-         rc = zero
-         do 30 j=1,n4
-            rs = rs+c(j)*wrk1(j)
-            rc = rc+c(j)*wrk2(j)
-  30     continue
-         ress(i) = rs
-         resc(i) = rc
-  40  continue
-  50  return
+
+         ! calculate the integrals ress(i) and resc(i).
+         ress(i) = dot_product(c(1:n4),wrk1(1:n4))
+         resc(i) = dot_product(c(1:n4),wrk2(1:n4))
+      end do alphas
+
       end subroutine fourco
 
 
@@ -2376,69 +2366,67 @@ module fitpack_core
   30  return
       end subroutine fpback
 
-
-      recursive subroutine fpbacp(a,b,z,n,k,c,k1,nest)
-
-      !  subroutine fpbacp calculates the solution of the system of equations
-      !  g * c = z  with g  a n x n upper triangular matrix of the form
+      !  subroutine fpbacp calculates the solution of the system of equations g * c = z
+      !  with g  a n x n upper triangular matrix of the form
       !            ! a '   !
       !        g = !   ' b !
       !            ! 0 '   !
-      !  with b a n x k matrix and a a (n-k) x (n-k) upper triangular
-      !  matrix of bandwidth k1.
+      !  with b a n x k matrix and a a (n-k) x (n-k) upper triangular matrix of bandwidth k1.
+      pure subroutine fpbacp(a,b,z,n,k,c,k1,nest)
+
       !  ..
       !  ..scalar arguments..
-      integer n,k,k1,nest
+      integer, intent(in) :: n,k,k1,nest
       !  ..array arguments..
-      real(RKIND) a(nest,k1),b(nest,k),z(n),c(n)
+      real(RKIND), intent(in) :: a(nest,k1),b(nest,k),z(n)
+      real(RKIND), intent(out) :: c(n)
       !  ..local scalars..
-      integer i,i1,j,l,l0,l1,n2
-      real(RKIND) store
+      integer :: i,i1,j,l,l0,l1,n2
+      real(RKIND) :: store
       !  ..
       n2 = n-k
-      l = n
-      do 30 i=1,k
-        store = z(l)
-        j = k+2-i
-        if(i==1) go to 20
-        l0 = l
-        do 10 l1=j,k
-          l0 = l0+1
-          store = store-c(l0)*b(l,l1)
-  10    continue
-  20    c(l) = store/b(l,j-1)
-        l = l-1
-        if(l==0) go to 80
-  30  continue
-      do 50 i=1,n2
-        store = z(i)
-        l = n2
-        do 40 j=1,k
-          l = l+1
-          store = store-c(l)*b(i,j)
-  40    continue
-        c(i) = store
-  50  continue
+      l  = n
+      do i=1,k
+         store = z(l)
+         j = k+2-i
+         if (i/=1) then
+             l0 = l
+             do l1=j,k
+               l0 = l0+1
+               store = store-c(l0)*b(l,l1)
+             end do
+         endif
+         c(l) = store/b(l,j-1)
+         l = l-1
+         if (l==0) return
+      end do
+      do i=1,n2
+         store = z(i)
+         l = n2
+         do j=1,k
+           l = l+1
+           store = store-c(l)*b(i,j)
+         end do
+         c(i) = store
+      end do
       i = n2
       c(i) = c(i)/a(i,1)
-      if(i==1) go to 80
-      do 70 j=2,n2
-        i = i-1
-        store = c(i)
-        i1 = k
-        if(j<=k) i1=j-1
-        l = i
-        do 60 l0=1,i1
-          l = l+1
-          store = store-c(l)*a(i,l0+1)
-  60    continue
-        c(i) = store/a(i,1)
-  70  continue
-  80  return
+      if (i==1) return
+      do j=2,n2
+         i = i-1
+         store = c(i)
+         i1 = k
+         if(j<=k) i1=j-1
+         l = i
+         do l0=1,i1
+           l = l+1
+           store = store-c(l)*a(i,l0+1)
+         end do
+         c(i) = store/a(i,1)
+      end do
+      return
       end subroutine fpbacp
 
-
-      recursive subroutine fpbfou(t,n,par,ress,resc)
 
       !  subroutine fpbfou calculates the integrals
       !                    /t(n-3)
@@ -2447,9 +2435,9 @@ module fitpack_core
       !                    /t(n-3)
       !    resc(j) =      !        nj,4(x)*cos(par*x) dx ,  j=1,2,...n-4
       !              t(4)/
-      !  where nj,4(x) denotes the cubic b-spline defined on the knots
-      !  t(j),t(j+1),...,t(j+4).
-      !
+      !  where nj,4(x) denotes the cubic b-spline defined on the knots t(j),t(j+1),...,t(j+4).
+      pure subroutine fpbfou(t,n,par,ress,resc)
+
       !  calling sequence:
       !     call fpbfou(t,n,par,ress,resc)
       !
@@ -2466,15 +2454,16 @@ module fitpack_core
       !    n >= 10, t(4) < t(5) < ... < t(n-4) < t(n-3).
       !  ..
       !  ..scalar arguments..
-      integer n
-      real(RKIND) par
+      integer, intent(in) :: n
+      real(RKIND), intent(in) :: par
       !  ..array arguments..
-      real(RKIND) t(n),ress(n),resc(n)
+      real(RKIND), intent(in) :: t(n)
+      real(RKIND), intent(out) :: ress(n),resc(n)
       !  ..local scalars..
-      integer i,ic,ipj,is,j,jj,jp1,jp4,k,li,lj,ll,nmj,nm3,nm7
-      real(RKIND) ak,beta,c1,c2,delta,fac,f1,f2,f3,sign,s1,s2,term
+      integer :: i,ic,ipj,is,j,jj,jp1,jp4,k,li,lj,ll,nmj,nm3,nm7
+      real(RKIND) :: ak,beta,c1,c2,delta,fac,f1,f2,f3,sign,s1,s2,term
       !  ..local arrays..
-      real(RKIND) co(5),si(5),hs(5),hc(5),rs(3),rc(3)
+      real(RKIND) :: co(5),si(5),hs(5),hc(5),rs(3),rc(3)
       !  ..
       !  initialization.
       real(RKIND), parameter ::  eps = 0.1e-07_RKIND
@@ -2487,24 +2476,23 @@ module fitpack_core
       beta = par*t(4)
       co(1) = cos(beta)
       si(1) = sin(beta)
-      !  calculate the integrals ress(j) and resc(j), j=1,2,3 by setting up
-      !  a divided difference table.
-      do 30 j=1,3
+
+      !  calculate the integrals ress(j) and resc(j), j=1,2,3 by setting up a divided difference table.
+      left: do j=1,3
         jp1 = j+1
         jp4 = j+4
         beta = par*t(jp4)
         co(jp1) = cos(beta)
         si(jp1) = sin(beta)
-        call fpcsin(t(4),t(jp4),par,si(1),co(1),si(jp1),co(jp1), &
-        rs(j),rc(j))
+        call fpcsin(t(4),t(jp4),par,si(1),co(1),si(jp1),co(jp1),rs(j),rc(j))
         i = 5-j
         hs(i) = zero
         hc(i) = zero
-        do 10 jj=1,j
+        do jj=1,j
           ipj = i+jj
           hs(ipj) = rs(jj)
           hc(ipj) = rc(jj)
-  10    continue
+        end do
         do jj=1,3
           if (i<jj) i = jj
           k = 5
@@ -2520,102 +2508,92 @@ module fitpack_core
         end do
         ress(j) = hs(5)-hs(4)
         resc(j) = hc(5)-hc(4)
-  30  continue
-      if(nm7<4) go to 160
+      end do left
+
       !  calculate the integrals ress(j) and resc(j),j=4,5,...,n-7.
-      do 150 j=4,nm7
+      center: do j=4,nm7
         jp4 = j+4
         beta = par*t(jp4)
         co(5) = cos(beta)
         si(5) = sin(beta)
         delta = t(jp4)-t(j)
-      !  the way of computing ress(j) and resc(j) depends on the value of
-      !  beta = par*(t(j+4)-t(j)).
+
+        ! the way of computing ress(j) and resc(j) depends on the value of beta = par*(t(j+4)-t(j)).
         beta = delta*par
-        if(abs(beta)<=one) go to 60
-      !  if !beta! > 1 the integrals are calculated by setting up a divided
-      !  difference table.
-        do 40 k=1,5
-          hs(k) = si(k)
-          hc(k) = co(k)
-  40    continue
-        do jj=1,3
-          k = 5
-          li = jp4
-          do ll=jj,4
-            lj = li-jj
-            fac = par*(t(li)-t(lj))
-            hs(k) = (hs(k)-hs(k-1))/fac
-            hc(k) = (hc(k)-hc(k-1))/fac
-            k = k-1
-            li = li-1
-          end do
-        end do
-        s2 = (hs(5)-hs(4))*term
-        c2 = (hc(5)-hc(4))*term
-        go to 130
-      !  if !beta! <= 1 the integrals are calculated by evaluating a series
-      !  expansion.
-  60    f3 = zero
-        do 70 i=1,4
-          ipj = i+j
-          hs(i) = par*(t(ipj)-t(j))
-          hc(i) = hs(i)
-          f3 = f3+hs(i)
-  70    continue
-        f3 = f3*con1
-        c1 = fourth
-        s1 = f3
-        if(abs(f3)<=eps) go to 120
-        sign = one
-        fac = con2
-        k = 5
-        is = 0
-        do 110 ic=1,20
-          k = k+1
-          ak = k
-          fac = fac*ak
-          f1 = zero
-          f3 = zero
-          do 80 i=1,4
-            f1 = f1+hc(i)
-            f2 = f1*hs(i)
-            hc(i) = f2
-            f3 = f3+f2
-  80      continue
-          f3 = f3*six/fac
-          if(is==0) go to 90
-          is = 0
-          s1 = s1+f3*sign
-          go to 100
-  90      sign = -sign
-          is = 1
-          c1 = c1+f3*sign
- 100      if(abs(f3)<=eps) go to 120
- 110    continue
- 120    s2 = delta*(co(1)*s1+si(1)*c1)
-        c2 = delta*(co(1)*c1-si(1)*s1)
- 130    ress(j) = s2
+
+        ! if |beta|>1 the integrals are calculated by setting up a divided difference table.
+        if(abs(beta)>one) then
+
+            hs(1:5) = si(1:5)
+            hc(1:5) = co(1:5)
+            do jj=1,3
+              k = 5
+              li = jp4
+              do ll=jj,4
+                lj = li-jj
+                fac = par*(t(li)-t(lj))
+                hs(k) = (hs(k)-hs(k-1))/fac
+                hc(k) = (hc(k)-hc(k-1))/fac
+                k = k-1
+                li = li-1
+              end do
+            end do
+            s2 = (hs(5)-hs(4))*term
+            c2 = (hc(5)-hc(4))*term
+        else
+            ! if |beta|<=1 the integrals are calculated by evaluating a series expansion.
+            hs(:4) = par*(t(j+1:j+4)-t(j))
+            hc(:4) = hs(:4)
+            f3 = con1*sum(hs(1:4))
+            c1 = fourth
+            s1 = f3
+            if(abs(f3)>eps) then
+                sign = one
+                fac  = con2
+                k    = 5
+                is   = 0
+
+                series_coef: do ic=1,20
+                   k = k+1
+                   ak = k
+                   fac = fac*ak
+                   f1 = zero
+                   f3 = zero
+                   do i=1,4
+                      f1 = f1+hc(i)
+                      f2 = f1*hs(i)
+                      hc(i) = f2
+                      f3 = f3+f2
+                   end do
+                   f3 = f3*six/fac
+                   if (is==0) then
+                       sign = -sign
+                       is = 1
+                       c1 = c1+f3*sign
+                   else
+                       is = 0
+                       s1 = s1+f3*sign
+                   end if
+                   if(abs(f3)<=eps) exit series_coef
+                end do series_coef
+            endif
+            s2 = delta*(co(1)*s1+si(1)*c1)
+            c2 = delta*(co(1)*c1-si(1)*s1)
+        endif
+
+        ress(j) = s2
         resc(j) = c2
-        do 140 i=1,4
-          co(i) = co(i+1)
-          si(i) = si(i+1)
- 140    continue
- 150  continue
+        co(1:4) = co(2:5)
+        si(1:4) = si(2:5)
+      end do center
       !  calculate the integrals ress(j) and resc(j),j=n-6,n-5,n-4 by setting
       !  up a divided difference table.
- 160  do 190 j=1,3
+      right: do j=1,3
         nmj = nm3-j
         i = 5-j
-        call fpcsin(t(nm3),t(nmj),par,si(4),co(4),si(i-1),co(i-1), &
-        rs(j),rc(j))
-        hs(i) = zero
-        hc(i) = zero
-        do 170 jj=1,j
-          ipj = i+jj
-          hc(ipj) = rc(jj)
-          hs(ipj) = rs(jj)
- 170    continue
+        call fpcsin(t(nm3),t(nmj),par,si(4),co(4),si(i-1),co(i-1),rs(j),rc(j))
+        hc(i:i+j) = [zero,rc(1:j)]
+        hs(i:i+j) = [zero,rs(1:j)]
         do jj=1,3
           if(i<jj) i = jj
           k = 5
@@ -2631,7 +2609,8 @@ module fitpack_core
         end do
         ress(nmj) = hs(4)-hs(5)
         resc(nmj) = hc(4)-hc(5)
- 190  continue
+      end do right
+
       return
       end subroutine fpbfou
 
@@ -4610,54 +4589,59 @@ module fitpack_core
       end subroutine fpcosp
 
 
-      recursive subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
+      pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
 
       !  fpcsin calculates the integrals ress=integral((b-x)**3*sin(par*x))
       !  and resc=integral((b-x)**3*cos(par*x)) over the interval (a,b),
       !  given sia=sin(par*a),coa=cos(par*a),sib=sin(par*b) and cob=cos(par*b)
       !  ..
       !  ..scalar arguments..
-      real(RKIND) a,b,par,sia,coa,sib,cob,ress,resc
+      real(RKIND), intent(in)  :: a,b,par,sia,coa,sib,cob
+      real(RKIND), intent(out) :: ress,resc
       !  ..local scalars..
-      integer i,j
-      real(RKIND) ab,ab4,ai,alfa,beta,b2,b4,eps,fac,f1,f2
+      integer :: i,j
+      real(RKIND) :: ab,ab4,ai,alfa,beta,b2,b4,fac,f1,f2
+      real(RKIND), parameter :: eps = smallnum10
 
-      eps = 0.1e-09
-      ab = b-a
-      ab4 = ab**4
+      ab   = b-a
+      ab4  = ab**4
       alfa = ab*par
       ! the way of calculating the integrals ress and resc depends on
       ! the value of alfa = (b-a)*par.
-      if(abs(alfa)<=one) go to 100
-      ! integration by parts.
-      beta = one/alfa
-      b2 = beta**2
-      b4 = six*b2**2
-      f1 = three*b2*(one-two*b2)
-      f2 = beta*(one-six*b2)
-      ress = ab4*(coa*f2+sia*f1+sib*b4)
-      resc = ab4*(coa*f1-sia*f2+cob*b4)
-      go to 400
-      ! ress and resc are found by evaluating a series expansion.
- 100  fac = fourth
-      f1 = fac
-      f2 = zero
-      i = 4
-      do 200 j=1,5
-        i = i+1
-        ai = i
-        fac = fac*alfa/ai
-        f2 = f2+fac
-        if(abs(fac)<=eps) go to 300
-        i = i+1
-        ai = i
-        fac = -fac*alfa/ai
-        f1 = f1+fac
-        if(abs(fac)<=eps) go to 300
- 200  continue
- 300  ress = ab4*(coa*f2+sia*f1)
-      resc = ab4*(coa*f1-sia*f2)
- 400  return
+
+      if(abs(alfa)<=one) then
+         ! ress and resc are found by evaluating a series expansion.
+         fac = fourth
+         f1  = fac
+         f2  = zero
+         i   = 4
+         series: do j=1,5
+           i   = i+1
+           ai  = i
+           fac = fac*alfa/ai
+           f2  = f2+fac
+           if (abs(fac)<=eps) exit series
+           i   = i+1
+           ai  = i
+           fac = -fac*alfa/ai
+           f1  = f1+fac
+           if (abs(fac)<=eps) exit series
+         end do series
+         ress = ab4*(coa*f2+sia*f1)
+         resc = ab4*(coa*f1-sia*f2)
+
+      else
+         ! integration by parts.
+         beta = one/alfa
+         b2   = beta**2
+         b4   = six*b2**2
+         f1   = three*b2*(one-two*b2)
+         f2   = beta*(one-six*b2)
+         ress = ab4*(coa*f2+sia*f1+sib*b4)
+         resc = ab4*(coa*f1-sia*f2+cob*b4)
+         return
+      endif
+
       end subroutine fpcsin
 
 

@@ -580,12 +580,12 @@ module fitpack_tests
           testpo=(x**2+y**2)/((x+y)**2+half)
       end function testpo
 
-      real(RKIND) function r1(v)
+      pure real(RKIND) function r1(v)
           real(RKIND), intent(in) :: v
           r1 = one
       end function r1
 
-      real(RKIND) function r2(v)
+      pure real(RKIND) function r2(v)
           real(RKIND), intent(in) :: v
           r2 = (one+cos(v)**2)*half
       end function r2
@@ -2498,19 +2498,18 @@ module fitpack_tests
       end subroutine mnpola
 
 
-      real(RKIND) function rad1(v)
-      !  function program rad1 defines in polar coordinates, the boundary of
-      !  the approximation domain  x**2+y**2<=1.
-      real(RKIND), intent(in) :: v
-      rad1 = 1.
-      return
+      !  the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
+      pure real(RKIND) function rad1(v)
+         real(RKIND), intent(in) :: v
+         rad1 = one
+         return
       end function rad1
-      real(RKIND) function rad2(v)
-      !  function program rad2 defines in polar coordinates, the boundary of
-      !  the approximation domain  3*x**2+3*y**2-4*x*y<=1.
-      real(RKIND), intent(in) :: v
-      rad2 = 1./sqrt(3.-2.*sin(v+v))
-      return
+
+      ! the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
+      pure real(RKIND) function rad2(v)
+         real(RKIND), intent(in) :: v
+         rad2 = one/sqrt(three-two*sin(2*v))
+         return
       end function rad2
 
 
