@@ -2329,38 +2329,36 @@ module fitpack_core
       return
       end subroutine fpadpo
 
+      !  subroutine fpback calculates the solution of the system of equations a*c = z with
+      !  a a n x n upper triangular matrix of bandwidth k.
+      pure subroutine fpback(a,z,n,k,c,nest)
 
-      recursive subroutine fpback(a,z,n,k,c,nest)
-
-      !  subroutine fpback calculates the solution of the system of
-      !  equations a*c = z with a a n x n upper triangular matrix
-      !  of bandwidth k.
-      !  ..
       !  ..scalar arguments..
-      integer n,k,nest
+      integer, intent(in) :: n,k,nest
       !  ..array arguments..
-      real(RKIND) a(nest,k),z(n),c(n)
+      real(RKIND), intent(in)  :: a(nest,k),z(n)
+      real(RKIND), intent(out) :: c(n)
       !  ..local scalars..
-      real(RKIND) store
-      integer i,i1,j,k1,l,m
+      real(RKIND) :: store
+      integer :: i,i1,j,k1,l,m
       !  ..
-      k1 = k-1
+      k1   = k-1
       c(n) = z(n)/a(n,1)
-      i = n-1
-      if(i==0) go to 30
-      do 20 j=2,n
+      i    = n-1
+      if (i==0) return
+
+      rows: do j=2,n
         store = z(i)
-        i1 = k1
-        if(j<=k1) i1 = j-1
+        i1 = merge(j-1,k1,j<=k1)
         m = i
-        do 10 l=1,i1
+        do l=1,i1
           m = m+1
           store = store-c(m)*a(i,l+1)
-  10    continue
+        end do
         c(i) = store/a(i,1)
         i = i-1
-  20  continue
-  30  return
+      end do rows
+
       end subroutine fpback
 
       !  subroutine fpbacp calculates the solution of the system of equations g * c = z
