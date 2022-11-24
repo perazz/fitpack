@@ -5196,18 +5196,16 @@ module fitpack_core
       end subroutine fpcyt2
 
 
-      recursive subroutine fpdeno(maxtr,up,left,right,nbind,merk)
-
-      !  subroutine fpdeno frees the nodes of all branches of a triply linked
-      !  tree with length < nbind by putting to zero their up field.
-      !  on exit the parameter merk points to the terminal node of the
-      !  most left branch of length nbind or takes the value 1 if there
-      !  is no such branch.
+      ! subroutine fpdeno frees the nodes of all branches of a triply linked tree with length < nbind
+      ! by putting to zero their up field. on exit the parameter merk points to the terminal node of
+      ! the most left branch of length nbind or takes the value 1 if there is no such branch.
+      pure subroutine fpdeno(maxtr,up,left,right,nbind,merk)
       !  ..
       !  ..scalar arguments..
-      integer maxtr,nbind,merk
+      integer, intent(in)  :: maxtr,nbind
+      integer, intent(inout) :: merk
       !  ..array arguments..
-      integer up(maxtr),left(maxtr),right(maxtr)
+      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr)
       !  ..local scalars ..
       integer i,j,k,l,level,point
       !  ..
@@ -11289,41 +11287,46 @@ module fitpack_core
       end subroutine fprpsp
 
 
-      recursive subroutine fpseno(maxtr,up,left,right,info,merk, &
-          ibind,nbind)
+      ! subroutine fpseno fetches a branch of a triply linked tree the information of which is kept
+      ! in the arrays up,left,right and info.
+      ! the branch has a specified length nbind and is determined by the parameter merk which points to
+      ! its terminal node. the information field of the nodes of this branch is stored in the array
+      ! ibind. on exit merk points to a new branch of length nbind or takes the value 1 if no such
+      !  branch was found.
+      pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
-      !  subroutine fpseno fetches a branch of a triply linked tree the
-      !  information of which is kept in the arrays up,left,right and info.
-      !  the branch has a specified length nbind and is determined by the
-      !  parameter merk which points to its terminal node. the information
-      !  field of the nodes of this branch is stored in the array ibind. on
-      !  exit merk points to a new branch of length nbind or takes the value
-      !  1 if no such branch was found.
       !  ..
       !  ..scalar arguments..
-      integer maxtr,merk,nbind
+      integer, intent(in)    :: maxtr   ! Tree array sizes
+      integer, intent(inout) :: merk    ! (in) terminal node of the branch
+      integer, intent(in)    :: nbind
       !  ..array arguments..
-      integer up(maxtr),left(maxtr),right(maxtr),info(maxtr), &
-       ibind(nbind)
+      integer, intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      integer, intent(out)   :: ibind(nbind)
       !  ..scalar arguments..
-      integer i,j,k
+      integer :: i,j,k
       !  ..
       k = merk
       j = nbind
-      do 10 i=1,nbind
-        ibind(j) = info(k)
-        k = up(k)
-        j = j-1
-  10  continue
-  20  k = right(merk)
-      if(k/=0) go to 30
-      merk = up(merk)
-      if (merk<=1) go to 40
-      go to 20
-  30  merk = k
-      k = left(merk)
-      if(k/=0) go to 30
-  40  return
+      do i=1,nbind
+         ibind(j) = info(k)
+         k = up(k)
+         j = j-1
+      end do
+
+      do
+          k = right(merk)
+          if (k/=0) exit
+          merk = up(merk)
+          if (merk<=1) return
+      end do
+
+      do
+          merk = k
+          k = left(merk)
+          if (k==0) exit
+      end do
+
       end subroutine fpseno
 
 
