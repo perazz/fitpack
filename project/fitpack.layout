@@ -7,10 +7,9 @@
 			<Cursor1 position="84218" topLine="47" />
 		</Cursor>
 	</File>
-	<File name="../src/fitpack.f90" open="1" top="0" tabpos="2" split="2" active="1" splitpos="837" zoom_1="0" zoom_2="0">
+	<File name="../test/fitpack_curve_tests.f90" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="22949" topLine="650" />
-			<Cursor2 position="0" topLine="0" />
+			<Cursor1 position="1018" topLine="14" />
 		</Cursor>
 	</File>
 	<File name="../test/fitpack_test_data.f90" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -18,20 +17,21 @@
 			<Cursor1 position="24248" topLine="15" />
 		</Cursor>
 	</File>
-	<File name="../src/fitpack_core.f90" open="1" top="1" tabpos="1" split="2" active="1" splitpos="1153" zoom_1="2" zoom_2="3">
-		<Cursor>
-			<Cursor1 position="187663" topLine="4544" />
-			<Cursor2 position="3190" topLine="52" />
-		</Cursor>
-	</File>
-	<File name="../test/fitpack_curve_tests.f90" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1018" topLine="14" />
-		</Cursor>
-	</File>
 	<File name="../test/test.f90" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="851" topLine="22" />
+		</Cursor>
+	</File>
+	<File name="../src/fitpack.f90" open="1" top="0" tabpos="2" split="2" active="1" splitpos="837" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="22949" topLine="650" />
+			<Cursor2 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../src/fitpack_core.f90" open="1" top="1" tabpos="1" split="2" active="1" splitpos="1153" zoom_1="2" zoom_2="3">
+		<Cursor>
+			<Cursor1 position="309635" topLine="8177" />
+			<Cursor2 position="3190" topLine="52" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

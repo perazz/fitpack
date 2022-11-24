@@ -2331,13 +2331,13 @@ module fitpack_core
 
       !  subroutine fpback calculates the solution of the system of equations a*c = z with
       !  a a n x n upper triangular matrix of bandwidth k.
-      pure subroutine fpback(a,z,n,k,c,nest)
+      pure function fpback(a,z,n,k,nest) result(c)
 
       !  ..scalar arguments..
       integer, intent(in) :: n,k,nest
       !  ..array arguments..
       real(RKIND), intent(in)  :: a(nest,k),z(n)
-      real(RKIND), intent(out) :: c(n)
+      real(RKIND)              :: c(n)
       !  ..local scalars..
       real(RKIND) :: store
       integer :: i,i1,j,k1,l,m
@@ -2359,7 +2359,7 @@ module fitpack_core
         i = i-1
       end do rows
 
-      end subroutine fpback
+      end function fpback
 
       !  subroutine fpbacp calculates the solution of the system of equations g * c = z
       !  with g  a n x n upper triangular matrix of the form
@@ -3982,7 +3982,7 @@ module fitpack_core
         j1 = 1
         do 132 j2=1,idim
            j3 = j1+ib
-           call fpback(a,z(j1),nn,k1,c(j3),nest)
+           c(j3:j3+nn-1) = fpback(a,z(j1),nn,k1,nest)
            j1 = j1+n
  132    continue
       !  test whether the approximation sinf(u) is an acceptable solution.
@@ -4146,7 +4146,7 @@ module fitpack_core
         j1 = 1
         do 308 j2=1,idim
           j3 = j1+ib
-          call fpback(g,c(j1),nn,k2,c(j3),nest)
+          c(j3:j3+nn-1) = fpback(g,c(j1),nn,k2,nest)
           if(ib==0) go to 306
           j3 = j1
           do 304 i=1,ib
@@ -4222,17 +4222,20 @@ module fitpack_core
       end subroutine fpcons
 
 
-      recursive subroutine fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,a, &
-                                  b,const,z,zz,u,q,info,up,left,right,jbind,ibind,ier)
+      pure subroutine fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,a, &
+                             b,const,z,zz,u,q,info,up,left,right,jbind,ibind,ier)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) sq
-      integer m,n,maxtr,maxbin,nm,mb,ier
+      real(RKIND), intent(out) :: sq
+      integer,     intent(in)  :: m,n,maxtr,maxbin,nm,mb
+      integer,     intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) x(m),y(m),w(m),t(n),e(n),c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
-      integer :: info(maxtr),up(maxtr),left(maxtr),right(maxtr),jbind(mb),ibind(mb)
-      logical :: bind(n)
+      real(RKIND), intent(in)  :: x(m),y(m),w(m)
+      real(RKIND), intent(inout) :: t(n),e(n),c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
+      integer, intent(inout)   :: info(maxtr),up(maxtr),left(maxtr),right(maxtr)
+      integer, intent(out)     :: ibind(mb),jbind(mb)
+      logical, intent(out)     :: bind(n)
       !  ..local scalars..
       integer :: count,i,i1,j,j1,j2,j3,k,kdim,k1,k2,k3,k4,k5,k6,l,l1,l2,l3,merk,nbind,violated,n1,n4,n6
       real(RKIND) :: f,wi,xi
@@ -4251,7 +4254,7 @@ module fitpack_core
       !  if the inequality constraints (2) are numbered from 1 to n-6, this algorithm finds a subset of
       !  constraints ibind(1)..ibind(nbind) such that the solution of the minimization problem (1) with
       !  these constraints in equality form, satisfies all constraints. such a feasible solution is optimal
-      !  if the lagrange parameters associated with that problem with equality constraints, are all positive.
+      !  if the lagrange parameters associated with that problem with equality constraints are all positive.
       !  *****
 
       !  determine n6, the number of inequality constraints.
@@ -4806,7 +4809,7 @@ module fitpack_core
         fpint(n-1) = fpold
         nrdata(n) = nplus
       !  backward substitution to obtain the b-spline coefficients.
-        call fpback(a,z,nk1,k1,c,nest)
+        c(:nk1) = fpback(a,z,nk1,k1,nest)
       !  test whether the approximation sinf(x) is an acceptable solution.
         if(iopt<0) go to 440
         fpms = fp-s
@@ -4937,7 +4940,7 @@ module fitpack_core
  290      continue
  300    continue
       !  backward substitution to obtain the b-spline coefficients.
-        call fpback(g,c,nk1,k2,c,nest)
+        c(:nk1) = fpback(g,c,nk1,k2,nest)
       !  computation of f(p).
         fp = zero
         l = k2
@@ -5858,7 +5861,7 @@ module fitpack_core
           right(i) = c(l)
           l = l+nv7
  790    continue
-        call fpback(au,right,nuu,5,right,nu)
+        right(:nuu) = fpback(au,right,nuu,5,nu)
         l = k
         do 795 i=1,nuu
            c(l) = right(i)
@@ -6113,7 +6116,7 @@ module fitpack_core
              if (ipar(2)/=0) then
                 call fpbacp(av,av1,c(k),nvv,4,c(k),5,nv)
              else
-                call fpback(av,c(k),nvv,5,c(k),nv)
+                c(k:k+nvv-1) = fpback(av,c(k),nvv,5,nv)
              end if
              k = k+nvv
           end do
@@ -6131,7 +6134,7 @@ module fitpack_core
             if (ipar(1)/=0) then
                 call fpbacp(au,au1,right,nuu,4,right,5,nu)
             else
-                call fpback(au,right,nuu,5,right,nu)
+                right(:nuu) = fpback(au,right,nuu,5,nu)
             end if
             l = k
             do i=1,nuu
@@ -6475,7 +6478,7 @@ module fitpack_core
       !  first step: solve the system  (ry) (c1) = h.
       k = 1
       do 450 i=1,nk1x
-        call fpback(ay,c(k),nk1y,ibandy,c(k),ny)
+        c(k:k+nk1y-1) = fpback(ay,c(k),nk1y,ibandy,ny)
         k = k+nk1y
  450  continue
       !  second step: solve the system  c (rx)' = (c1).
@@ -6487,7 +6490,7 @@ module fitpack_core
           right(i) = c(l)
           l = l+nk1y
  460    continue
-        call fpback(ax,right,nk1x,ibandx,right,nx)
+        right(:nk1x) = fpback(ax,right,nk1x,ibandx,nx)
         l = k
         do 470 i=1,nk1x
           c(l) = right(i)
@@ -7045,7 +7048,7 @@ module fitpack_core
           right(i) = c(l)
           l = l+nv7
  785    continue
-        call fpback(au,right,nuu,5,right,nu)
+        right(:nuu) = fpback(au,right,nuu,5,nu)
         l = k
         do 790 i=1,nuu
            c(l) = right(i)
@@ -8025,7 +8028,7 @@ module fitpack_core
       !  backward substitution to obtain the b-spline coefficients.
         j1 = 1
         do 135 j2=1,idim
-           call fpback(a,z(j1),nk1,k1,c(j1),nest)
+           c(j1:j1+nk1-1) = fpback(a,z(j1),nk1,k1,nest)
            j1 = j1+n
  135    continue
       !  test whether the approximation sinf(u) is an acceptable solution.
@@ -8174,11 +8177,11 @@ module fitpack_core
       !  backward substitution to obtain the b-spline coefficients.
         j1 = 1
         do 305 j2=1,idim
-          call fpback(g,c(j1),nk1,k2,c(j1),nest)
+          c(j1:j1+nk1-1) = fpback(g,c(j1),nk1,k2,nest)
           j1 =j1+n
  305    continue
       !  computation of f(p).
-        fp = 0.
+        fp = zero
         l = k2
         jj = 0
         do 330 it=1,m
@@ -9940,8 +9943,7 @@ module fitpack_core
  175    continue
          do 190 l=1,ipar
             cs(1:nvv) = cosi(l,1:nvv)
-            call fpback(a,cs,nvv,nvv,cs,ncc)
-            cosi(l,1:nvv) = cs(1:nvv)
+            cosi(l,1:nvv) = fpback(a,cs,nvv,nvv,ncc)
  190     continue
       !  find ncof, the dimension of the spline and ncoff, the number
       !  of coefficients in the standard b-spline representation.
@@ -10074,7 +10076,7 @@ module fitpack_core
         if (all(a(i,1:ncof)>sigma)) then
 
            ! backward substitution in case of full rank.
-           call fpback(a,f,ncof,iband,c,ncc)
+           c(:ncof) = fpback(a,f,ncof,iband,ncc)
            rank = ncof
            q(1:ncof,1) = a(1:ncof,1)/dmax
 
@@ -10405,7 +10407,7 @@ module fitpack_core
           if(q(i,1)<=sigma) go to 840
  830    continue
       !  backward substitution in case of full rank.
-        call fpback(q,ff,ncof,iband4,c,ncc)
+        c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
         rank = ncof
         go to 845
       !  in case of rank deficiency, find the minimum norm solution.
@@ -11944,8 +11946,8 @@ module fitpack_core
  130          continue
  140       continue
  150    continue
-        call fpback(a,coco,npp,npp,coco,ncc)
-        call fpback(a,cosi,npp,npp,cosi,ncc)
+        coco(:npp) = fpback(a,coco,npp,npp,ncc)
+        cosi(:npp) = fpback(a,cosi,npp,npp,ncc)
       !  find ncof, the dimension of the spherical spline and ncoff, the
       !  number of coefficients in the standard b-spline representation.
         nt4 = nt-4
@@ -12077,7 +12079,7 @@ module fitpack_core
             fp = fp+sq
         else
           !  backward substitution in case of full rank.
-            call fpback(a,f,ncof,iband,c,ncc)
+            c(:ncof) = fpback(a,f,ncof,iband,ncc)
             rank = ncof
             q(1:ncof,1) = a(1:ncof,1)/dmax
         endif
@@ -12351,7 +12353,7 @@ module fitpack_core
       !  check whether the matrix is rank deficient.
         sigma = max(eps*dmax,maxval(q(1:ncof,1)))
       !  backward substitution in case of full rank.
-        call fpback(q,ff,ncof,iband4,c,ncc)
+        c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
         rank = ncof
         go to 845
       !  in case of rank deficiency, find the minimum norm solution.
@@ -12731,7 +12733,7 @@ module fitpack_core
         sigma = eps*dmax
         if (all(a(1:ncof,1)>sigma)) then
             ! backward substitution in case of full rank.
-            call fpback(a,f,ncof,iband,c,nc)
+            c(:ncof) = fpback(a,f,ncof,iband,nc)
             rank = ncof
             q(:ncof,1) = a(:ncof,1)/dmax
         else
@@ -12988,7 +12990,7 @@ module fitpack_core
       !  check whether the matrix is rank deficient.
         sigma = max(eps*dmax,maxval(q(1:ncof,1),1))
       !  backward substitution in case of full rank.
-        call fpback(q,ff,ncof,iband4,c,nc)
+        c(:ncof) = fpback(q,ff,ncof,iband4,nc)
         rank = ncof
         go to 675
       !  in case of rank deficiency, find the minimum norm solution.
