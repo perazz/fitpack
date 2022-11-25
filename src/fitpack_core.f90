@@ -7867,8 +7867,8 @@ module fitpack_core
       !  ..
       !  ..scalar arguments..
       real(RKIND) :: ub,ue,s,tol,fp
-      integer, intent(in) :: idim
-      integer :: iopt,m,mx,k,nest,maxit,k1,k2,n,nc,ier
+      integer, intent(in) :: idim,maxit
+      integer :: iopt,m,mx,k,nest,k1,k2,n,nc,ier
       !  ..array arguments..
       real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest), &
        z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
@@ -7876,8 +7876,9 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
        p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer :: i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
-       mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
+       mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      logical :: new,check1,check3
       !  ..local arrays..
       real(RKIND) :: h(SIZ_K+1),xi(idim)
 
@@ -7925,7 +7926,7 @@ module fitpack_core
               end if
 
               !  find the position of the interior knots in case of interpolation.
-          10  mk1 = m-k1
+              mk1 = m-k1
               if (mk1/=0) then
                   k3 = k/2
                   i  = k2
@@ -7964,9 +7965,12 @@ module fitpack_core
 
       endif bootstrap
 
-      !  main loop for the different sets of knots. m is a save upper bound
+      !  main loop for the different sets of knots. m is a safe upper bound
       !  for the number of trials.
-      main_loop: do iter = 1,m
+      iter = 0
+      main_loop: do while (iter<=m)
+
+        iter = iter+1
 
         if (n==nmin) ier = FITPACK_LEASTSQUARES_OK
 
@@ -8040,9 +8044,8 @@ module fitpack_core
         end do coefs
 
         if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
-        fpint(n) = fp0
-        fpint(n-1) = fpold
-        nrdata(n) = nplus
+        fpint(n-1:n) = [fpold,fp0]
+        nrdata(n)    = nplus
 
         ! backward substitution to obtain the b-spline coefficients.
         j1 = 1
@@ -8052,97 +8055,129 @@ module fitpack_core
         end do
 
         ! test whether the approximation sinf(u) is an acceptable solution.
-        if (iopt<0) go to 440
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 440
-      !  if f(p=inf) < s accept the choice of knots.
-        if(fpms<zero) go to 250
-      !  if n = nmax, sinf(u) is an interpolating spline curve.
-        if(n==nmax) go to 430
-      !  increase the number of knots.
-      !  if n=nest we cannot increase the number of knots because of
-      !  the storage capacity limitation.
-        if(n==nest) go to 420
-      !  determine the number of knots nplus we are going to add.
-        if(ier==0) go to 140
-        nplus = 1
-        ier = 0
-        go to 150
- 140    npl1 = nplus*2
-        rn = nplus
-        if(fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
-        nplus = min0(nplus*2,max0(npl1,nplus/2,1))
- 150    fpold = fp
-      !  compute the sum of squared residuals for each knot interval
-      !  t(j+k) <= u(i) <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
+        if (iopt<0) return ! was done already
+
+        fpms = fp-s; if(abs(fpms)<acc) return
+
+        ! if f(p=inf) < s accept the choice of knots.
+        if(fpms<zero) exit main_loop
+
+        ! if n = nmax, sinf(u) is an interpolating spline curve.
+        if (n==nmax) then
+           ier = FITPACK_INTERPOLATING_OK
+           return
+        endif
+
+        ! increase the number of knots.
+        ! if n=nest we cannot increase the number of knots because of the storage capacity limitation.
+        if (n==nest) then
+            ier = FITPACK_INSUFFICIENT_STORAGE
+            return
+        end if
+
+        ! determine the number of knots nplus we are going to add.
+        if (ier==FITPACK_OK) then
+           npl1 = nplus*2
+           rn = nplus
+           if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
+           nplus = min(nplus*2,max(npl1,nplus/2,1))
+        else
+           nplus = 1
+           ier   = FITPACK_OK
+        endif
+
+        ! Initialize iterate
+        fpold = fp
+
+        ! compute the sum of squared residuals for each knot interval
+        ! t(j+k) <= u(i) <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
         fpart = zero
         i = 1
         l = k2
-        new = 0
+        new = .false.
         jj = 0
-        do 180 it=1,m
-          if(u(it)<t(l) .or. l>nk1) go to 160
-          new = 1
-          l = l+1
- 160      term = zero
-          l0 = l-k2
-          do 175 j2=1,idim
-            fac = 0.
-            j1 = l0
-            do 170 j=1,k1
-              j1 = j1+1
-              fac = fac+c(j1)*q(it,j)
- 170        continue
-            jj = jj+1
-            term = term+(w(it)*(fac-x(jj)))**2
-            l0 = l0+n
- 175      continue
-          fpart = fpart+term
-          if(new==0) go to 180
-          store = term*half
-          fpint(i) = fpart-store
-          i = i+1
-          fpart = store
-          new = 0
- 180    continue
+        square_residuals: do it=1,m
+            if (u(it)>=t(l) .and. l<=nk1) then
+               new = .true.
+               l = l+1
+            endif
+            term = zero
+            l0 = l-k2
+            do j2=1,idim
+               fac  = dot_product(c(l0+1:l0+k1),q(it,1:k1))
+               jj   = jj+1
+               term = term+(w(it)*(fac-x(jj)))**2
+               l0   = l0+n
+            end do
+            fpart = fpart+term
+            if (new) then
+               store    = term*half
+               fpint(i) = fpart-store
+               i        = i+1
+               fpart    = store
+               new      = .false.
+            endif
+        end do square_residuals
+
         fpint(nrint) = fpart
-        do 190 l=1,nplus
-      !  add a new knot.
-          call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
-      !  if n=nmax we locate the knots as for interpolation
-          if(n==nmax) go to 10
-      !  test whether we cannot further increase the number of knots.
-          if(n==nest) cycle main_loop
- 190    continue
+        add_new_knots: do l=1,nplus
+
+            ! add a new knot.
+            call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+
+            ! if n=nmax we locate the knots as for interpolation
+            if (n==nmax) then
+               !  find the position of the interior knots in case of interpolation.
+               mk1 = m-k1
+               if (mk1/=0) then
+                  k3 = k/2
+                  i  = k2
+                  j  = k3+2
+                  do jj=1,mk1
+                    t(i) = merge( u(j) , (u(j)+u(j-1))*half , k3*2/=k)
+                    i = i+1
+                    j = j+1
+                  end do
+               endif
+
+               ! Restart main loop
+               iter = 0
+               cycle main_loop
+
+            end if
+
+            ! test whether we cannot further increase the number of knots.
+            if (n==nest) exit add_new_knots
+        end do add_new_knots
       !  restart the computations with the new set of knots.
       end do main_loop
-      !  test whether the least-squares kth degree polynomial curve is a
-      !  solution of our approximation problem.
- 250  if(ier==(-2)) go to 440
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 2: determination of the smoothing spline curve sp(u).          c
-      !  **********************************************************          c
-      !  we have determined the number of knots and their position.          c
-      !  we now compute the b-spline coefficients of the smoothing curve     c
-      !  sp(u). the observation matrix a is extended by the rows of matrix   c
-      !  b expressing that the kth derivative discontinuities of sp(u) at    c
-      !  the interior knots t(k+2),...t(n-k-1) must be zero. the corres-     c
-      !  ponding weights of these additional rows are set to 1/p.            c
-      !  iteratively we then have to determine the value of p such that f(p),c
-      !  the sum of squared residuals be = s. we already know that the least c
-      !  squares kth degree polynomial curve corresponds to p=0, and that    c
-      !  the least-squares spline curve corresponds to p=infinity. the       c
-      !  iteration process which is proposed here, makes use of rational     c
-      !  interpolation. since f(p) is a convex and strictly decreasing       c
-      !  function of p, it can be approximated by a rational function        c
-      !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
-      !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
-      !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<zero                                 c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  evaluate the discontinuity jump of the kth derivative of the
-      !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
+
+      ! test whether the least-squares kth degree polynomial curve is a solution
+      ! of our approximation problem.
+      if (ier==FITPACK_LEASTSQUARES_OK) return
+
+      ! *****
+      !  part 2: determination of the smoothing spline curve sp(u).
+      ! *****
+      !  we have determined the number of knots and their position.
+      !  we now compute the b-spline coefficients of the smoothing curve sp(u). the observation matrix a
+      !  is extended by the rows of matrix b expressing that the kth derivative discontinuities of sp(u)
+      !  at the interior knots t(k+2),...t(n-k-1) must be zero. the corresponding weights of these
+      !  additional rows are set to 1/p.
+      !  iteratively we then have to determine the value of p such that f(p), the sum of squared
+      !  residuals be = s. we already know that the least squares kth degree polynomial curve corresponds
+      !  to p=0, and that the least-squares spline curve corresponds to p=infinity. the iteration process
+      !  which is proposed here, makes use of rational interpolation. since f(p) is a convex and strictly
+      !  decreasing function of p, it can be approximated by a rational function r(p) = (u*p+v)/(p+w).
+      !  three values of p(p1,p2,p3) with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s)
+      !  are used to calculate the new value of p such that r(p)=s. convergence is guaranteed by taking
+      !  f1>0 and f3<zero
+      ! *****
+
+      ! evaluate the discontinuity jump of the kth derivative of the b-splines at the knots
+      ! t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
+
       !  initial value for p.
       p1 = zero
       f1 = fp0-s
@@ -8150,114 +8185,119 @@ module fitpack_core
       f3 = fpms
       p  = sum(a(1:nk1,1))
       rn = nk1
-      p = rn/p
-      ich1 = 0
-      ich3 = 0
+      p  = rn/p
+      check1 = .false.
+      check3 = .false.
       n8 = n-nmin
+
       !  iteration process to find the root of f(p) = s.
-      do 360 iter=1,maxit
-      !  the rows of matrix b with weight 1/p are rotated into the
-      !  triangularised observation matrix a which is stored in g.
-        pinv = one/p
-        c(1:nc)       = z(1:nc)
-        g(1:nk1,k2)   = zero
-        g(1:nk1,1:k1) = a(1:nk1,1:k1)
-        do 300 it=1,n8
-      !  the row of matrix b is rotated into triangle by givens transformation
-          h(1:k2) = b(it,1:k2)*pinv
-          xi(1:idim) = zero
-          do 290 j=it,nk1
-            piv = h(1)
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,g(j,1),cos,sin)
-      !  transformations to right hand side.
-            j1 = j
-            do 277 j2=1,idim
-              call fprota(cos,sin,xi(j2),c(j1))
-              j1 = j1+n
- 277        continue
-            if(j==nk1) go to 300
-            i2 = k1
-            if(j>n8) i2 = nk1-j
-            do 280 i=1,i2
-      !  transformations to left hand side.
-              i1 = i+1
-              call fprota(cos,sin,h(i1),g(j,i1))
-              h(i) = h(i1)
- 280        continue
-            h(i2+1) = 0.
- 290      continue
- 300    continue
-      !  backward substitution to obtain the b-spline coefficients.
-        j1 = 1
-        do 305 j2=1,idim
-          c(j1:j1+nk1-1) = fpback(g,c(j1),nk1,k2,nest)
-          j1 =j1+n
- 305    continue
-      !  computation of f(p).
-        fp = zero
-        l = k2
-        jj = 0
-        do 330 it=1,m
-          if(u(it)<t(l) .or. l>nk1) go to 310
-          l = l+1
- 310      l0 = l-k2
-          term = 0.
-          do 325 j2=1,idim
-            fac = 0.
-            j1 = l0
-            do 320 j=1,k1
-              j1 = j1+1
-              fac = fac+c(j1)*q(it,j)
- 320        continue
-            jj = jj+1
-            term = term+(fac-x(jj))**2
-            l0 = l0+n
- 325      continue
-          fp = fp+term*w(it)**2
- 330    continue
-      !  test whether the approximation sp(u) is an acceptable solution.
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 440
-      !  test whether the maximal number of iterations is reached.
-        if(iter==maxit) go to 400
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 340
-        if((f2-f3)>acc) go to 335
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p=p1*con9 + p2*con1
-        go to 360
- 335    if(f2<0.) ich3=1
- 340    if(ich1/=0) go to 350
-        if((f1-f2)>acc) go to 345
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 360
-        if(p>=p3) p = p2*con1 + p3*con9
-        go to 360
- 345    if(f2>0.) ich1=1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 350    if(f2>=f1 .or. f2<=f3) go to 410
-      !  find the new value for p.
-        p = fprati(p1,f1,p2,f2,p3,f3)
- 360  continue
-      !  error codes and messages.
- 400  ier = 3
-      go to 440
- 410  ier = 2
-      go to 440
- 420  ier = 1
-      go to 440
- 430  ier = -1
- 440  return
+      iter = 0
+      find_root: do while (iter<maxit)
+
+         iter = iter+1
+
+         ! the rows of matrix b with weight 1/p are rotated into the
+         ! triangularised observation matrix a which is stored in g.
+         pinv = one/p
+         c(1:nc)       = z(1:nc)
+         g(1:nk1,k2)   = zero
+         g(1:nk1,1:k1) = a(1:nk1,1:k1)
+         b_rows: do it=1,n8
+            ! the row of matrix b is rotated into triangle by givens transformation
+            h(1:k2) = b(it,1:k2)*pinv
+            xi = zero
+            b_cols: do j=it,nk1
+               piv = h(1)
+
+               ! calculate the parameters of the givens transformation.
+               call fpgivs(piv,g(j,1),cos,sin)
+
+               ! transformations to right hand side.
+               call fprota(cos,sin,xi,c(j:j+idim*n:n))
+               if (j==nk1) cycle b_rows
+
+               !  transformations to left hand side.
+               i2 = merge(nk1-j,k1,j>n8)
+               do i=1,i2
+                  call fprota(cos,sin,h(i+1),g(j,i+1))
+                  h(i) = h(i+1)
+               end do
+               h(i2+1) = zero
+            end do b_cols
+         end do b_rows
+
+         ! backward substitution to obtain the b-spline coefficients.
+         j1 = 1
+         do j2=1,idim
+            c(j1:j1+nk1-1) = fpback(g,c(j1),nk1,k2,nest)
+            j1 =j1+n
+         end do
+
+         ! computation of f(p).
+         fp = zero
+         l = k2
+         jj = 0
+         get_fp: do it=1,m
+            if (u(it)>=t(l) .and. l<=nk1) l = l+1
+            l0 = l-k2
+            term = zero
+            do j2=1,idim
+              fac  = dot_product(c(l0+1:l0+k1),q(it,1:k1))
+              jj   = jj+1
+              term = term+(fac-x(jj))**2
+              l0   = l0+n
+            end do
+            fp = fp+term*w(it)**2
+         end do get_fp
+
+         ! SUCCESS! the approximation sp(u) is an acceptable solution.
+         fpms = fp-s; if(abs(fpms)<acc) return
+
+         ! Reinitialize p to carry out one more iteration
+         p2 = p
+         f2 = fpms
+         if (.not.check3) then
+            if((f2-f3)>acc) then
+               if (f2<zero) check3=.true.
+            else
+               ! our initial choice of p is too large.
+               p3 = p2
+               f3 = f2
+               p  = p*con4
+               if (p<=p1) p=p1*con9 + p2*con1
+               cycle find_root
+            endif
+         endif
+
+         if (.not.check1) then
+            if ((f1-f2)>acc) then
+                if (f2>zero) check1 = .true.
+            else
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3<zero) cycle find_root
+                if (p>=p3) p = p2*con1 + p3*con9
+                cycle find_root
+            endif
+         endif
+
+         ! test whether the iteration process proceeds as theoretically expected.
+         if (f2>=f1 .or. f2<=f3) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+         endif
+
+         ! find the new value for p.
+         p = fprati(p1,f1,p2,f2,p3,f3)
+
+      end do find_root
+
+      ! Maximum number of iterations reached
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fppara
 
 
