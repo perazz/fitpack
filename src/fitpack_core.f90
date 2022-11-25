@@ -7863,180 +7863,200 @@ module fitpack_core
 
 
       subroutine fppara(iopt,idim,m,u,mx,x,w,ub,ue,k,s,nest,tol,maxit, &
-       k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
+                        k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
       !  ..scalar arguments..
-      real(RKIND) ub,ue,s,tol,fp
-      integer iopt,idim,m,mx,k,nest,maxit,k1,k2,n,nc,ier
+      real(RKIND) :: ub,ue,s,tol,fp
+      integer, intent(in) :: idim
+      integer :: iopt,m,mx,k,nest,maxit,k1,k2,n,nc,ier
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest), &
+      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest), &
        z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer nrdata(nest)
+      integer :: nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
+      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
        p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
+      integer :: i,ich1,ich3,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
        mk1,new,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),xi(SIZ_IDIM)
+      real(RKIND) :: h(SIZ_K+1),xi(idim)
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 1: determination of the number of knots and their position     c
-      !  **************************************************************      c
-      !  given a set of knots we compute the least-squares curve sinf(u),    c
-      !  and the corresponding sum of squared residuals fp=f(p=inf).         c
-      !  if iopt=-1 sinf(u) is the requested curve.                          c
-      !  if iopt=0 or iopt=1 we check whether we can accept the knots:       c
-      !    if fp <=s we will continue with the current set of knots.         c
-      !    if fp > s we will increase the number of knots and compute the    c
-      !       corresponding least-squares curve until finally fp<=s.         c
-      !    the initial choice of knots depends on the value of s and iopt.   c
-      !    if s=0 we have spline interpolation; in that case the number of   c
-      !    knots equals nmax = m+k+1.                                        c
-      !    if s > 0 and                                                      c
-      !      iopt=0 we first compute the least-squares polynomial curve of   c
-      !      degree k; n = nmin = 2*k+2                                      c
-      !      iopt=1 we start with the set of knots found at the last         c
-      !      call of the routine, except for the case that s > fp0; then     c
-      !      we compute directly the polynomial curve of degree k.           c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      ! *****
+      !  part 1: determination of the number of knots and their position
+      ! *****
+      !  given a set of knots we compute the least-squares curve sinf(u), and the corresponding sum
+      !  of squared residuals fp=f(p=inf).
+      !  if iopt=-1 sinf(u) is the requested curve.
+      !  if iopt=0 or iopt=1 we check whether we can accept the knots:
+      !    if fp <=s we will continue with the current set of knots.
+      !    if fp > s we will increase the number of knots and compute the corresponding least-
+      !    squares curve until finally fp<=s.
+      !  the initial choice of knots depends on the value of s and iopt.
+      !    if s=0 we have spline interpolation; in that case the number of knots equals nmax = m+k+1.
+      !    if (s>0 and iopt=0) we first compute the least-squares polynomial curve of degree k;
+      !      n = nmin = 2*k+2
+      !    iopt=1 we start with the set of knots found at the last call of the routine, except for
+      !    the case that s > fp0; then we compute directly the polynomial curve of degree k.
+      ! *****
+
       !  determine nmin, the number of knots for polynomial approximation.
       nmin = 2*k1
-      if(iopt<0) go to 60
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  determine nmax, the number of knots for spline interpolation.
-      nmax = m+k1
-      if(s>zero) go to 45
-      !  if s=0, s(u) is an interpolating curve.
-      !  test whether the required storage space exceeds the available one.
-      n = nmax
-      if(nmax>nest) go to 420
-      !  find the position of the interior knots in case of interpolation.
-  10  mk1 = m-k1
-      if(mk1==0) go to 60
-      k3 = k/2
-      i = k2
-      j = k3+2
-      if(k3*2==k) go to 30
-      do 20 l=1,mk1
-        t(i) = u(j)
-        i = i+1
-        j = j+1
-  20  continue
-      go to 60
-  30  do 40 l=1,mk1
-        t(i) = (u(j)+u(j-1))*half
-        i = i+1
-        j = j+1
-  40  continue
-      go to 60
-      !  if s>0 our initial choice of knots depends on the value of iopt.
-      !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
-      !  polynomial curve which is a spline curve without interior knots.
-      !  if iopt=1 and fp0>s we start computing the least squares spline curve
-      !  according to the set of knots found at the last call of the routine.
-  45  if(iopt==0) go to 50
-      if(n==nmin) go to 50
-      fp0 = fpint(n)
-      fpold = fpint(n-1)
-      nplus = nrdata(n)
-      if(fp0>s) go to 60
-  50  n = nmin
-      fpold = zero
-      nplus = 0
-      nrdata(1) = m-2
+      bootstrap: if (iopt>=0) then
+
+          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          !  determine nmax, the number of knots for spline interpolation.
+          nmax = m+k1
+
+          interpolating: if (s<=zero) then
+
+              !  if s=0, s(u) is an interpolating curve.
+              !  check that the required storage space exceeds the available one.
+              n = nmax
+              if (nmax>nest) then
+                 ier = FITPACK_INSUFFICIENT_STORAGE
+                 return
+              end if
+
+              !  find the position of the interior knots in case of interpolation.
+          10  mk1 = m-k1
+              if (mk1/=0) then
+                  k3 = k/2
+                  i  = k2
+                  j  = k3+2
+                  do l=1,mk1
+                    t(i) = merge( u(j) , (u(j)+u(j-1))*half , k3*2/=k)
+                    i = i+1
+                    j = j+1
+                  end do
+              endif
+
+          else interpolating
+
+              !  if s>0 our initial choice of knots depends on the value of iopt.
+              !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
+              !  polynomial curve which is a spline curve without interior knots.
+              !  if iopt=1 and fp0>s we start computing the least squares spline curve
+              !  according to the set of knots found at the last call of the routine.
+              use_last_call: if (iopt/=0 .and. n/=nmin)  then
+                 fp0   = fpint(n)
+                 fpold = fpint(n-1)
+                 nplus = nrdata(n)
+                 if (fp0<=s) then
+                    n         = nmin
+                    fpold     = zero
+                    nplus     = 0
+                    nrdata(1) = m-2
+                 end if
+              else use_last_call
+                 n = nmin
+                 fpold = zero
+                 nplus = 0
+                 nrdata(1) = m-2
+              endif use_last_call
+          endif interpolating
+
+      endif bootstrap
 
       !  main loop for the different sets of knots. m is a save upper bound
       !  for the number of trials.
-  60  main_loop: do iter = 1,m
-        if(n==nmin) ier = -2
-      !  find nrint, tne number of knot intervals.
+      main_loop: do iter = 1,m
+
+        if (n==nmin) ier = FITPACK_LEASTSQUARES_OK
+
+        ! find nrint, tne number of knot intervals.
         nrint = n-nmin+1
-      !  find the position of the additional knots which are needed for
-      !  the b-spline representation of s(u).
+        ! find the position of the additional knots which are needed for
+        ! the b-spline representation of s(u).
         nk1 = n-k1
         i = n
-        do 70 j=1,k1
-          t(j) = ub
-          t(i) = ue
-          i = i-1
-  70    continue
-      !  compute the b-spline coefficients of the least-squares spline curve
-      !  sinf(u). the observation matrix a is built up row by row and
-      !  reduced to upper triangular form by givens transformations.
-      !  at the same time fp=f(p=inf) is computed.
-        fp = 0.
-      !  initialize the b-spline coefficients and the observation matrix a.
+        do j=1,k1
+           t(j) = ub
+           t(i) = ue
+           i = i-1
+        end do
+
+        ! compute the b-spline coefficients of the least-squares spline curve
+        ! sinf(u). the observation matrix a is built up row by row and
+        ! reduced to upper triangular form by givens transformations.
+        ! at the same time fp=f(p=inf) is computed.
+        fp = zero
+
+        ! initialize the b-spline coefficients and the observation matrix a.
         z(1:nc) = zero
         a(1:nk1,1:k1) = zero
         l = k1
-        jj = 0
-        do 130 it=1,m
-      !  fetch the current data point u(it),x(it).
-          ui = u(it)
-          wi = w(it)
-          do 83 j=1,idim
-             jj = jj+1
-             xi(j) = x(jj)*wi
-  83      continue
-      !  search for knot interval t(l) <= ui < t(l+1).
-  85      if(ui<t(l+1) .or. l==nk1) go to 90
-          l = l+1
-          go to 85
-      !  evaluate the (k+1) non-zero b-splines at ui and store them in q.
-  90      call fpbspl(t,n,k,ui,l,h)
-          do 95 i=1,k1
-            q(it,i) = h(i)
-            h(i) = h(i)*wi
-  95      continue
-      !  rotate the new row of the observation matrix into triangle.
-          j = l-k1
-          do 110 i=1,k1
-            j = j+1
-            piv = h(i)
-            if (piv==zero) go to 110
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(j,1),cos,sin)
-      !  transformations to right hand side.
-            j1 = j
-            do 97 j2 =1,idim
-               call fprota(cos,sin,xi(j2),z(j1))
-               j1 = j1+n
-  97        continue
-            if(i==k1) go to 120
-            i2 = 1
-            i3 = i+1
-            do 100 i1 = i3,k1
-              i2 = i2+1
-      !  transformations to left hand side.
-              call fprota(cos,sin,h(i1),a(j,i2))
- 100        continue
- 110      continue
-      !  add contribution of this row to the sum of squares of residual
-      !  right hand sides.
- 120      fp = fp + sum(xi(1:idim)**2)
- 130    continue
-        if(ier==-2) fp0 = fp
+        coefs: do it=1,m
+
+           ! fetch the current data point u(it),x(it).
+           ui = u(it)
+           wi = w(it)
+           xi = x((it-1)*idim+1:it*idim)*wi
+
+           ! search for knot interval t(l) <= ui < t(l+1).
+           do while (ui>=t(l+1) .and. l/=nk1)
+              l = l+1
+           end do
+
+           ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
+           call fpbspl(t,n,k,ui,l,h)
+           q(it,1:k1) = h(1:k1)
+           h(:k1) = wi*h(:k1)
+
+           ! rotate the new row of the observation matrix into triangle.
+           j = l-k1
+           rotate_row: do i=1,k1
+
+              j = j+1
+
+              piv = h(i); if (piv==zero) cycle rotate_row
+
+              ! calculate the parameters of the givens transformation.
+              call fpgivs(piv,a(j,1),cos,sin)
+
+              ! transformations to right hand side.
+              call fprota(cos,sin,xi,z(j:j+idim*n:n))
+
+              ! transformations to left hand side.
+              not_last: if (i<k1) then
+                 i2 = 1
+                 i3 = i+1
+                 do i1 = i3,k1
+                   i2 = i2+1
+                   call fprota(cos,sin,h(i1),a(j,i2))
+                 end do
+              endif not_last
+           end do rotate_row
+
+           !  add contribution of this row to the sum of squares of residual right hand sides.
+           fp = fp + sum(xi**2)
+
+        end do coefs
+
+        if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
         fpint(n) = fp0
         fpint(n-1) = fpold
         nrdata(n) = nplus
-      !  backward substitution to obtain the b-spline coefficients.
+
+        ! backward substitution to obtain the b-spline coefficients.
         j1 = 1
-        do 135 j2=1,idim
+        do j2=1,idim
            c(j1:j1+nk1-1) = fpback(a,z(j1),nk1,k1,nest)
            j1 = j1+n
- 135    continue
-      !  test whether the approximation sinf(u) is an acceptable solution.
-        if(iopt<0) go to 440
+        end do
+
+        ! test whether the approximation sinf(u) is an acceptable solution.
+        if (iopt<0) go to 440
         fpms = fp-s
         if(abs(fpms)<acc) go to 440
       !  if f(p=inf) < s accept the choice of knots.
-        if(fpms<0.) go to 250
+        if(fpms<zero) go to 250
       !  if n = nmax, sinf(u) is an interpolating spline curve.
         if(n==nmax) go to 430
       !  increase the number of knots.
@@ -8064,7 +8084,7 @@ module fitpack_core
           if(u(it)<t(l) .or. l>nk1) go to 160
           new = 1
           l = l+1
- 160      term = 0.
+ 160      term = zero
           l0 = l-k2
           do 175 j2=1,idim
             fac = 0.
@@ -8124,14 +8144,11 @@ module fitpack_core
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p = 0.
-      do 252 i=1,nk1
-         p = p+a(i,1)
- 252  continue
+      p  = sum(a(1:nk1,1))
       rn = nk1
       p = rn/p
       ich1 = 0
@@ -8142,11 +8159,8 @@ module fitpack_core
       !  the rows of matrix b with weight 1/p are rotated into the
       !  triangularised observation matrix a which is stored in g.
         pinv = one/p
-        do 255 i=1,nc
-          c(i) = z(i)
- 255    continue
-
-        g(1:nk1,k2) = zero
+        c(1:nc)       = z(1:nc)
+        g(1:nk1,k2)   = zero
         g(1:nk1,1:k1) = a(1:nk1,1:k1)
         do 300 it=1,n8
       !  the row of matrix b is rotated into triangle by givens transformation
@@ -11133,7 +11147,7 @@ module fitpack_core
  440  return
       end subroutine fpregr
 
-      !  subroutine fprota applies a givens rotation to a and b.
+      ! subroutine fprota applies a givens rotation to a and b.
       elemental subroutine fprota(cos,sin,a,b)
 
           !  ..scalar arguments..
