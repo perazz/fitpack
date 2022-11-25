@@ -2329,7 +2329,7 @@ module fitpack_core
       return
       end subroutine fpadpo
 
-      !  subroutine fpback calculates the solution of the system of equations a*c = z with
+      !  function fpback calculates the solution of the system of equations a*c = z with
       !  a a n x n upper triangular matrix of bandwidth k.
       pure function fpback(a,z,n,k,nest) result(c)
 
@@ -2361,20 +2361,19 @@ module fitpack_core
 
       end function fpback
 
-      !  subroutine fpbacp calculates the solution of the system of equations g * c = z
+      !  function fpbacp calculates the solution of the system of equations g * c = z
       !  with g  a n x n upper triangular matrix of the form
       !            ! a '   !
       !        g = !   ' b !
       !            ! 0 '   !
       !  with b a n x k matrix and a a (n-k) x (n-k) upper triangular matrix of bandwidth k1.
-      pure subroutine fpbacp(a,b,z,n,k,c,k1,nest)
+      pure function fpbacp(a,b,z,n,k,k1,nest) result(c)
 
-      !  ..
       !  ..scalar arguments..
       integer, intent(in) :: n,k,k1,nest
       !  ..array arguments..
       real(RKIND), intent(in) :: a(nest,k1),b(nest,k),z(n)
-      real(RKIND), intent(out) :: c(n)
+      real(RKIND) :: c(n)
       !  ..local scalars..
       integer :: i,i1,j,l,l0,l1,n2
       real(RKIND) :: store
@@ -2420,7 +2419,7 @@ module fitpack_core
          c(i) = store/a(i,1)
       end do
       return
-      end subroutine fpbacp
+      end function fpbacp
 
 
       !  subroutine fpbfou calculates the integrals
@@ -3286,10 +3285,10 @@ module fitpack_core
         nrdata(n) = nplus
       !  backward substitution to obtain the b-spline coefficients .
         j1 = 1
-        do 292 j2=1,idim
-           call fpbacp(a1,a2,z(j1),n7,kk,c(j1),kk1,nest)
+        do j2=1,idim
+           c(j1:j1+n-1) = fpbacp(a1,a2,z(j1),n7,kk,kk1,nest)
            j1 = j1+n
- 292    continue
+        end do
       !  calculate from condition (**) the remaining coefficients.
         do 297 i=1,k
           j1 = i
@@ -3441,13 +3440,9 @@ module fitpack_core
         do 540 it=1,n8
       !  fetch a new row of matrix b and store it in the arrays h1 (the part
       !  with respect to g1) and h2 (the part with respect to g2).
-          do 380 j=1,idim
-            xi(j) = zero
- 380      continue
-          do 385 i=1,k1
-            h1(i) = zero
-            h2(i) = zero
- 385      continue
+          xi(:idim) = zero
+          h1(:k1) = zero
+          h2(:k1) = zero
           h1(k2) = zero
           if(it>n11) go to 420
           l = it
@@ -3529,7 +3524,7 @@ module fitpack_core
       !  backward substitution to obtain the b-spline coefficients
         j1 = 1
         do 542 j2=1,idim
-          call fpbacp(g1,g2,c(j1),n7,k1,c(j1),k2,nest)
+          c(j1:j1+n-1) = fpbacp(g1,g2,c(j1),n7,k1,k2,nest)
           j1 = j1+n
  542    continue
       !  calculate from condition (**) the remaining b-spline coefficients.
@@ -5849,7 +5844,7 @@ module fitpack_core
       !  first step: solve the system  (rv) (c1) = h.
       k = 1
       do 780 i=1,nuu
-         call fpbacp(av1,av2,c(k),nv7,4,c(k),5,nv)
+         c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
          k = k+nv7
  780  continue
       !  second step: solve the system  (cr) (ru)' = (c1).
@@ -6114,7 +6109,7 @@ module fitpack_core
       do ii=1,idim
           do i=1,nuu
              if (ipar(2)/=0) then
-                call fpbacp(av,av1,c(k),nvv,4,c(k),5,nv)
+                c(k:k+nvv-1) = fpbacp(av,av1,c(k),nvv,4,5,nv)
              else
                 c(k:k+nvv-1) = fpback(av,c(k),nvv,5,nv)
              end if
@@ -6132,7 +6127,7 @@ module fitpack_core
                 l = l+nvv
             end do
             if (ipar(1)/=0) then
-                call fpbacp(au,au1,right,nuu,4,right,5,nu)
+                right(:nuu) = fpbacp(au,au1,right,nuu,4,5,nu)
             else
                 right(:nuu) = fpback(au,right,nuu,5,nu)
             end if
@@ -7036,7 +7031,7 @@ module fitpack_core
       !  first step: solve the system  (rv) (c1) = h.
       k = 1
       do 780 i=1,nuu
-         call fpbacp(av1,av2,c(k),nv7,4,c(k),5,nv)
+         c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
          k = k+nv7
  780  continue
       !  second step: solve the system  (cr) (ru)' = (c1).
@@ -7870,14 +7865,11 @@ module fitpack_core
       integer, intent(in) :: idim,maxit
       integer :: iopt,m,mx,k,nest,k1,k2,n,nc,ier
       !  ..array arguments..
-      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest), &
-       z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer :: nrdata(nest)
       !  ..local scalars..
-      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0, &
-       mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       logical :: new,check1,check3
       !  ..local arrays..
       real(RKIND) :: h(SIZ_K+1),xi(idim)
@@ -7979,12 +7971,8 @@ module fitpack_core
         ! find the position of the additional knots which are needed for
         ! the b-spline representation of s(u).
         nk1 = n-k1
-        i = n
-        do j=1,k1
-           t(j) = ub
-           t(i) = ue
-           i = i-1
-        end do
+        t(1:k1)    = ub
+        t(nk1+1:n) = ue
 
         ! compute the b-spline coefficients of the least-squares spline curve
         ! sinf(u). the observation matrix a is built up row by row and
@@ -8676,7 +8664,7 @@ module fitpack_core
         go to 350
       !  test whether the iteration process proceeds as theoretically
       !  expected.
- 330    if(f2>0.) ich1 = 1
+ 330    if(f2>zero) ich1 = 1
  340    if(f2>=f1 .or. f2<=f3) go to 410
       !  find the new value of p.
         p = fprati(p1,f1,p2,f2,p3,f3)
@@ -8994,11 +8982,13 @@ module fitpack_core
         fpint(n) = fp0
         fpint(n-1) = fpold
         nrdata(n) = nplus
-      !  backward substitution to obtain the b-spline coefficients c(j),j=1,.n
-        call fpbacp(a1,a2,z,n7,kk,c,kk1,nest)
-      !  calculate from condition (**) the coefficients c(j+n7),j=1,2,...k.
+
+        ! backward substitution to obtain the b-spline coefficients c(j),j=1,.n
+        c(1:n7) = fpbacp(a1,a2,z,n7,kk,kk1,nest)
+
+        ! calculate from condition (**) the coefficients c(j+n7),j=1,2,...k.
         do 295 i=1,k
-          j = i+n7
+          j    = i+n7
           c(j) = c(i)
  295    continue
         if(iopt<0) go to 660
@@ -9211,7 +9201,7 @@ module fitpack_core
  540    continue
       !  backward substitution to obtain the b-spline coefficients
       !  c(j),j=1,2,...n7 of sp(x).
-        call fpbacp(g1,g2,c,n7,k1,c,k2,nest)
+        c(:n7) = fpbacp(g1,g2,c,n7,k1,k2,nest)
       !  calculate from condition (**) the b-spline coefficients c(n7+j),j=1,.
         do 545 i=1,k
           j = i+n7
