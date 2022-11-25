@@ -5250,48 +5250,49 @@ module fitpack_core
       end subroutine fpdeno
 
 
-      recursive subroutine fpdisc(t,n,k2,b,nest)
-
       !  subroutine fpdisc calculates the discontinuity jumps of the kth
       !  derivative of the b-splines of degree k at the knots t(k+2)..t(n-k-1)
+      pure subroutine fpdisc(t,n,k2,b,nest)
+
       !  ..scalar arguments..
-      integer n,k2,nest
+      integer, intent(in) :: n,k2,nest
       !  ..array arguments..
-      real(RKIND) t(n),b(nest,k2)
+      real(RKIND), intent(in) :: t(n)
+      real(RKIND), intent(out) :: b(nest,k2)
       !  ..local scalars..
-      real(RKIND) an,fac,prod
+      real(RKIND) :: an,fac,prod
       integer i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
       !  ..local array..
-      real(RKIND) h(12)
+      real(RKIND) :: h(12)
       !  ..
-      k1 = k2-1
-      k = k1-1
-      nk1 = n-k1
+      k1    = k2-1
+      k     = k1-1
+      nk1   = n-k1
       nrint = nk1-k
-      an = nrint
-      fac = an/(t(nk1+1)-t(k1))
-      do 40 l=k2,nk1
-        lmk = l-k1
-        do 10 j=1,k1
-          ik = j+k1
-          lj = l+j
-          lk = lj-k2
-          h(j) = t(l)-t(lk)
-          h(ik) = t(l)-t(lj)
-  10    continue
-        lp = lmk
-        do 30 j=1,k2
-          jk = j
-          prod = h(j)
-          do 20 i=1,k
-            jk = jk+1
-            prod = prod*h(jk)*fac
-  20      continue
-          lk = lp+k1
-          b(lmk,j) = (t(lk)-t(lp))/prod
-          lp = lp+1
-  30    continue
-  40  continue
+      an    = nrint
+      fac   = an/(t(nk1+1)-t(k1))
+      do l=k2,nk1
+         lmk = l-k1
+         do j=1,k1
+            ik = j+k1
+            lj = l+j
+            lk = lj-k2
+            h(j) = t(l)-t(lk)
+            h(ik) = t(l)-t(lj)
+         end do
+         lp = lmk
+         do j=1,k2
+           jk = j
+           prod = h(j)
+           do i=1,k
+             jk = jk+1
+             prod = prod*h(jk)*fac
+           end do
+           lk = lp+k1
+           b(lmk,j) = (t(lk)-t(lp))/prod
+           lp = lp+1
+         end do
+      end do
       return
       end subroutine fpdisc
 
@@ -9073,7 +9074,7 @@ module fitpack_core
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
  350  call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
