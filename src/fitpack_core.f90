@@ -5303,7 +5303,6 @@ module fitpack_core
       !  to 1.
       pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
-      !  ..
       !  ..scalar arguments..
       integer, intent(in)    :: maxtr,n1
       integer, intent(inout) :: point,merk
@@ -5323,65 +5322,61 @@ module fitpack_core
          i = 1
          k = 0
          l = 0
-      20  march_left: do while (j/=level)
+      20 march_left: do while (j/=level)
             l = left(i)
             if (l==0) exit march_left
             i = l
             j = j+1
-          end do march_left
-  30  if (i< count .or. l==0) then
-          go to 110
-      elseif (i==count) then
-          go to 100
-      else
-
-          if (up(count)==0) then
-              up   (count) = up   (i)
-              left (count) = left (i)
-              right(count) = right(i)
-              info (count) = info (i)
-              if( merk==i) merk  = count
-              if(point==i) point = count
-              if (k==0) then
-                 n = up(i)
-                 left(n) = count
-              else
-                 right(k) = count
-              endif
-              l = left(i)
-              do while (l/=0)
-                up(l) = count
-                l = right(l)
-              end do
-              up(i) = 0
-              i = count
-          else
+         end do march_left
+      30 if (i<count .or. l==0) then
+             ! continue
+         elseif (i==count) then
+             count = count+1
+             ! continue
+         elseif (up(count)==0) then
+             up   (count) = up   (i)
+             left (count) = left (i)
+             right(count) = right(i)
+             info (count) = info (i)
+             if( merk==i) merk  = count
+             if(point==i) point = count
+             if (k==0) then
+                n = up(i)
+                left(n) = count
+             else
+                right(k) = count
+             endif
+             l = left(i)
+             do while (l/=0)
+               up(l) = count
+               l = right(l)
+             end do
+             up(i) = 0
+             i = count
+             count = count+1
+         else
              count = count+1
              go to 30
+         endif
+
+      hundred10: do
+          l = right(i)
+          k = i
+          if (l/=0) then
+              i = l
+              go to 20
           endif
 
-
-      endif
-
- 100  count = count+1
- 110  l = right(i)
-      k = i
-      if (l==0) then
-          go to 120
-      else
-          i = l
-          go to 20
-      endif
-
- 120  l = up(i)
-      j = j-1
-      if (j==0) then
-          level = level+1
-          cycle free_nodes_left
-      else
-          i = l
-          go to 110
-      endif
+          l = up(i)
+          j = j-1
+          if (j==0) then
+              level = level+1
+              exit hundred10
+          else
+              i = l
+              cycle hundred10
+          endif
+      end do hundred10
 
       end do free_nodes_left
 
@@ -5390,25 +5385,21 @@ module fitpack_core
       end subroutine fpfrno
 
 
-      recursive subroutine fpgivs(piv,ww,cos,sin)
+      !  subroutine fpgivs calculates the parameters of a givens transformation .
+      elemental subroutine fpgivs(piv,ww,cos,sin)
+          real(RKIND), intent(in)    :: piv
+          real(RKIND), intent(inout) :: ww
+          real(RKIND), intent(out)   :: cos,sin
+          !  ..local scalars..
+          real(RKIND) :: dd,store
 
-      !  subroutine fpgivs calculates the parameters of a givens
-      !  transformation .
-      !  ..
-      !  ..scalar arguments..
-      real(RKIND) piv,ww,cos,sin
-      !  ..local scalars..
-      real(RKIND) dd,one,store
-
-      !  ..
-      one = 0.1e+01
-      store = abs(piv)
-      if(store>=ww) dd = store*sqrt(one+(ww/piv)**2)
-      if(store<ww) dd = ww*sqrt(one+(piv/ww)**2)
-      cos = ww/dd
-      sin = piv/dd
-      ww = dd
-      return
+          store = abs(piv)
+          dd  = merge(store*sqrt(one+(ww/piv)**2), &
+                      ww   *sqrt(one+(piv/ww)**2), store>=ww)
+          cos = ww/dd
+          sin = piv/dd
+          ww  = dd
+          return
       end subroutine fpgivs
 
 
@@ -5951,26 +5942,42 @@ module fitpack_core
       end subroutine fpgrdi
 
 
-      recursive subroutine fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu, &
-       v,mv,z,mz,tu,nu,tv,nv,p,c,nc,fp,fpu,fpv,mm,mvnu,spu,spv, &
-       right,q,au,au1,av,av1,bu,bv,nru,nrv)
+      !  find the least-squares spline sinf(u,v) and calculate for each knot interval tu(j+3)<=u<=tu(j+4)
+      !  (tv(j+3)<=v<=tv(j+4)) the sum of squared residuals fpintu(j),j=1,2,...,nu-7 (fpintv(j),j=1,2,...
+      !  ,nv-7) for the data points having their absciss (ordinate)-value belonging to that interval.
+      !  fp gives the total sum of squared residuals.
+      subroutine fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu,nu,tv,nv,p,c,nc,fp,fpu,fpv, &
+                        mm,mvnu,spu,spv,right,q,au,au1,av,av1,bu,bv,nru,nrv)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) p,fp
-      integer ifsu,ifsv,ifbu,ifbv,idim,mu,mv,mz,nu,nv,nc,mm,mvnu
+      integer, intent(inout) :: ifsu ! (spu) needs to be determined if /=0 [todo: make logical]
+      integer, intent(inout) :: ifsv ! (spv) needs to be determined
+      integer, intent(inout) :: ifbu ! (bu)  needs to be determined
+      integer, intent(inout) :: ifbv ! (bv)  needs to be determined
+      integer, intent(in) :: idim,mu,mv,mz,nu,nv,nc,mm,mvnu ! sizes
+
       !  ..array arguments..
-      real(RKIND) u(mu),v(mv),z(mz*idim),tu(nu),tv(nv),c(nc*idim),fpu(nu), &
-       fpv(nv),spu(mu,4),spv(mv,4),right(mm*idim),q(mvnu),au(nu,5), &
-       au1(nu,4),av(nv,5),av1(nv,4),bu(nu,5),bv(nv,5)
-      integer ipar(2),nru(mu),nrv(mv)
+      real(RKIND), intent(inout) :: c(nc*idim),right(mm*idim),q(mvnu),au(nu,5),av(nv,5)
+      real(RKIND), intent(in) :: u(mu),v(mv),z(mz*idim),tu(nu),tv(nv),au1(nu,4),av1(nv,4)
+      integer,     intent(in) :: ipar(2)
+
+      real(RKIND), intent(in)  :: p
+      real(RKIND), intent(out) :: fp,fpu(nu),fpv(nv)
+
+      ! Only modified if ifsu, ifsv
+      real(RKIND), intent(inout) :: spu(mu,4),spv(mv,4)
+      integer,     intent(inout) :: nru(mu),nrv(mv)
+
+      ! Only modified if ifbu,ifbv
+      real(RKIND), intent(inout) :: bu(nu,5),bv(nv,5)
+
       !  ..local scalars..
-      real(RKIND) arg,fac,term,one,half,value
-      integer i,id,ii,it,iz,i1,i2,j,jz,k,k1,k2,l,l1,l2,mvv,k0,muu, &
-       ncof,nroldu,nroldv,number,nmd,numu,numu1,numv,numv1,nuu,nvv, &
-       nu4,nu7,nu8,nv4,nv7,nv8, n33
+      real(RKIND) :: arg,fac,term,value
+      integer :: i,id,ii,it,iz,i1,i2,j,jz,k,k1,k2,l,l1,l2,mvv,k0,muu,ncof,nroldu,nroldv,number,nmd,numu, &
+                 numu1,numv,numv1,nuu,nvv,nu4,nu7,nu8,nv4,nv7,nv8,n33
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1)
+      real(RKIND) :: h(SIZ_K+1)
       !  ..subroutine references..
       !    fpback,fpbspl,fpdisc,fpbacp,fptrnp,fptrpe
       !  ..
@@ -5983,18 +5990,15 @@ module fitpack_core
       !                            q = | ------ |
       !                                | 0  ' 0 |
       !
-      !  with c      : the (nu-4) x (nv-4) matrix which contains the b-spline
-      !                coefficients.
+      !  with c      : the (nu-4) x (nv-4) matrix which contains the b-spline coefficients.
       !       z      : the mu x mv matrix which contains the function values.
-      !       spu,spv: the mu x (nu-4), resp. mv x (nv-4) observation matrices
-      !                according to the least-squares problems in the u-,resp.
-      !                v-direction.
-      !       bu,bv  : the (nu-7) x (nu-4),resp. (nv-7) x (nv-4) matrices
-      !                containing the discontinuity jumps of the derivatives
-      !                of the b-splines in the u-,resp.v-variable at the knots
-      !  the b-spline coefficients of the smoothing spline are then calculated
-      !  as the least-squares solution of the following over-determined linear
-      !  system of equations
+      !       spu,spv: the mu x (nu-4), resp. mv x (nv-4) observation matrices according to the
+      !                least-squares problems in the u-,resp. v-direction.
+      !       bu,bv  : the (nu-7) x (nu-4),resp. (nv-7) x (nv-4) matrices containing the discontinuity
+      !                jumps of the derivatives of the b-splines in the u-,resp.v-variable at the knots
+      !
+      !  the b-spline coefficients of the smoothing spline are then calculated as the least-squares
+      !  solution of the following over-determined linear system of equations
       !
       !    (1)  (av) c (au)' = q
       !
@@ -6006,9 +6010,7 @@ module fitpack_core
       !    (3)  c(i,nv-3+j) = c(i,j), j=1,2,3 ; i=1,2,...,nu-4
       !            if(ipar(2)/=0)
       !
-      !  set constants
-      one = 1
-      half = 0.5
+
       !  initialization
       nu4 = nu-4
       nu7 = nu-7
@@ -6016,96 +6018,104 @@ module fitpack_core
       nv4 = nv-4
       nv7 = nv-7
       nv8 = nv-8
-      muu = mu
-      if(ipar(1)/=0) muu = mu-1
-      mvv = mv
-      if(ipar(2)/=0) mvv = mv-1
+      muu = mu - merge(1,0,ipar(1)/=0)
+      mvv = mv - merge(1,0,ipar(2)/=0)
+
       !  it depends on the value of the flags ifsu,ifsv,ifbu  and ibvand
       !  on the value of p whether the matrices (spu), (spv), (bu) and (bv)
       !  still must be determined.
-      if(ifsu/=0) go to 50
-      !  calculate the non-zero elements of the matrix (spu) which is the ob-
-      !  servation matrix according to the least-squares spline approximation
-      !  problem in the u-direction.
-      l = 4
-      l1 = 5
-      number = 0
-      do 40 it=1,muu
-        arg = u(it)
-  10    if(arg<tu(l1) .or. l==nu4) go to 20
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 10
-  20    call fpbspl(tu,nu,3,arg,l,h)
-        do 30 i=1,4
-          spu(it,i) = h(i)
-  30    continue
-        nru(it) = number
-  40  continue
-      ifsu = 1
-      !  calculate the non-zero elements of the matrix (spv) which is the ob-
-      !  servation matrix according to the least-squares spline approximation
-      !  problem in the v-direction.
-  50  if(ifsv/=0) go to 100
-      l = 4
-      l1 = 5
-      number = 0
-      do 90 it=1,mvv
-        arg = v(it)
-  60    if(arg<tv(l1) .or. l==nv4) go to 70
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 60
-  70    call fpbspl(tv,nv,3,arg,l,h)
-        do 80 i=1,4
-          spv(it,i) = h(i)
-  80    continue
-        nrv(it) = number
-  90  continue
-      ifsv = 1
- 100  if(p<=0.) go to  150
-      !  calculate the non-zero elements of the matrix (bu).
-      if(ifbu/=0 .or. nu8==0) go to 110
-      call fpdisc(tu,nu,5,bu,nu)
-      ifbu = 1
-      !  calculate the non-zero elements of the matrix (bv).
- 110  if(ifbv/=0 .or. nv8==0) go to 150
-      call fpdisc(tv,nv,5,bv,nv)
-      ifbv = 1
-      !  substituting (2)  and (3) into (1), we obtain the overdetermined
-      !  system
+      compute_spu: if (ifsu==0) then
+          !  calculate the non-zero elements of the matrix (spu) [mu x nu-4] which is the observation
+          !  matrix according to the least-squares spline approximation problem in the u-direction.
+          l  = 4
+          l1 = 5
+          number = 0
+          spu_rows: do it=1,muu
+            arg = u(it)
+            do while (arg>=tu(l1) .and. l/=nu4)
+               l  = l1
+               l1 = l+1
+               number = number+1
+            end do
+            call fpbspl(tu,nu,3,arg,l,h)
+            spu(it,1:4) = h(1:4)
+            nru(it) = number
+          end do spu_rows
+
+          ! Set (spu) known
+          ifsu = 1
+      endif compute_spu
+
+      !  calculate the non-zero elements of the matrix (spv) [mv x nv-4] which is the observation
+      !  matrix according to the least-squares spline approximation problem in the v-direction.
+      compute_spv: if (ifsv==0) then
+          l  = 4
+          l1 = 5
+          number = 0
+          spv_rows: do it=1,mvv
+            arg = v(it)
+            do while (arg>=tv(l1) .and. l/=nv4)
+               l = l1
+               l1 = l+1
+               number = number+1
+            end do
+            call fpbspl(tv,nv,3,arg,l,h)
+            spv(it,1:4) = h(1:4)
+            nrv(it) = number
+          end do spv_rows
+
+          ! Set (spv) known
+          ifsv = 1
+      endif compute_spv
+
+      if (p>zero) then
+
+         ! calculate the non-zero elements of the matrix (bu).
+         if (ifbu==0 .and. nu8>0) then
+            call fpdisc(tu,nu,5,bu,nu)
+            ifbu = 1
+         endif
+
+         ! calculate the non-zero elements of the matrix (bv).
+         if (ifbv==0 .and. nv8/=0) then
+            call fpdisc(tv,nv,5,bv,nv)
+            ifbv = 1
+         endif
+
+      endif
+
+      !  substituting (2)  and (3) into (1), we obtain the overdetermined system
       !         (4)  (avv) (cr) (auu)' = (qq)
       !  from which the nuu*nvv remaining coefficients
       !         c(i,j) , i=1,...,nu-4-3*ipar(1) ; j=1,...,nv-4-3*ipar(2) ,
       !  the elements of (cr), are then determined in the least-squares sense.
-      !  we first determine the matrices (auu) and (qq). then we reduce the
-      !  matrix (auu) to upper triangular form (ru) using givens rotations.
-      !  we apply the same transformations to the rows of matrix qq to obtain
-      !  the (mv) x nuu matrix g.
+      !  we first determine the matrices (auu) and (qq). then we reduce the matrix (auu) to upper
+      !  triangular form (ru) using givens rotations.
+      !  we apply the same transformations to the rows of matrix qq to obtain the (mv) x nuu matrix g.
       !  we store matrix (ru) into au (and au1 if ipar(1)=1) and g into q.
- 150  if(ipar(1)/=0) go to 160
-      nuu = nu4
-      call fptrnp(mu,mv,idim,nu,nru,spu,p,bu,z,au,q,right)
-      go to 180
- 160  nuu = nu7
-      call fptrpe(mu,mv,idim,nu,nru,spu,p,bu,z,au,au1,q,right)
-      !  we determine the matrix (avv) and then we reduce this matrix to
-      !  upper triangular form (rv) using givens rotations.
-      !  we apply the same transformations to the columns of matrix
-      !  g to obtain the (nvv) x (nuu) matrix h.
-      !  we store matrix (rv) into av (and av1 if ipar(2)=1) and h into c.
- 180  if(ipar(2)/=0) go to 190
-      nvv = nv4
-      call fptrnp(mv,nuu,idim,nv,nrv,spv,p,bv,q,av,c,right)
-      go to 200
- 190  nvv = nv7
-      call fptrpe(mv,nuu,idim,nv,nrv,spv,p,bv,q,av,av1,c,right)
-      !  backward substitution to obtain the b-spline coefficients as the
-      !  solution of the linear system    (rv) (cr) (ru)' = h.
+      if (ipar(1)==0) then
+         nuu = nu4
+         call fptrnp(mu,mv,idim,nu,nru,spu,p,bu,z,au,q,right)
+      else
+         nuu = nu7
+         call fptrpe(mu,mv,idim,nu,nru,spu,p,bu,z,au,au1,q,right)
+      endif
+
+      !  we determine the matrix (avv) and then we reduce this matrix to upper triangular form (rv)
+      !  using givens rotations. we apply the same transformations to the columns of matrix g to obtain
+      !  the (nvv) x (nuu) matrix h. we store matrix (rv) into av (and av1 if ipar(2)=1) and h into c.
+      if (ipar(2)==0) then
+         nvv = nv4
+         call fptrnp(mv,nuu,idim,nv,nrv,spv,p,bv,q,av,c,right)
+      else
+         nvv = nv7
+         call fptrpe(mv,nuu,idim,nv,nrv,spv,p,bv,q,av,av1,c,right)
+      endif
+
+      !  backward substitution to obtain the b-spline coefficients as the solution of the linear system
+      !   (rv) (cr) (ru)' = h.
       !  first step: solve the system  (rv) (c1) = h.
- 200  ncof = nuu*nvv
+      ncof = nuu*nvv
       k = 1
       do ii=1,idim
           do i=1,nuu
@@ -6117,6 +6127,7 @@ module fitpack_core
              k = k+nvv
           end do
       end do
+
       !  second step: solve the system  (cr) (ru)' = (c1).
       do ii=1,idim
           k = (ii-1)*ncof
@@ -6139,50 +6150,53 @@ module fitpack_core
             end do
           end do
       end do
-      !  calculate from the conditions (2)-(3), the remaining b-spline
-      !  coefficients.
-      if(ipar(2)==0) go to 600
-      i = 0
-      j = 0
-      do id=1,idim
-          do l=1,nuu
+
+      !  calculate from the conditions (2)-(3), the remaining b-spline coefficients.
+      if (ipar(2)/=0) then
+          i = 0
+          j = 0
+          do id=1,idim
+              do l=1,nuu
+                 ii = i
+                 do k=1,nvv
+                    i = i+1
+                    j = j+1
+                    q(i) = c(j)
+                 end do
+                 do k=1,3
+                    ii = ii+1
+                    i = i+1
+                    q(i) = q(ii)
+                 end do
+              end do
+          end do
+          ncof = nv4*nuu
+          nmd  = ncof*idim
+          c(1:nmd) = q(1:nmd)
+      endif
+
+      if (ipar(1)/=0) then
+          i = 0
+          j = 0
+          n33 = 3*nv4
+          do id=1,idim
              ii = i
-             do k=1,nvv
+             do k=1,ncof
                 i = i+1
                 j = j+1
                 q(i) = c(j)
              end do
-             do k=1,3
+             do k=1,n33
                 ii = ii+1
                 i = i+1
                 q(i) = q(ii)
              end do
           end do
-      end do
-      ncof = nv4*nuu
-      nmd = ncof*idim
-      c(1:nmd) = q(1:nmd)
+          ncof = nv4*nu4
+          nmd  = ncof*idim
+          c(1:nmd) = q(1:nmd)
+      endif
 
- 600  if(ipar(1)==0) go to 700
-      i = 0
-      j = 0
-      n33 = 3*nv4
-      do 660 id=1,idim
-         ii = i
-         do 620 k=1,ncof
-            i = i+1
-            j = j+1
-            q(i) = c(j)
- 620     continue
-         do 640 k=1,n33
-            ii = ii+1
-            i = i+1
-            q(i) = q(ii)
- 640     continue
- 660  continue
-      ncof = nv4*nu4
-      nmd = ncof*idim
-      c(1:nmd) = q(1:nmd)
       !  calculate the quantities
       !    res(i,j) = (z(i,j) - s(u(i),v(j)))**2 , i=1,2,..,mu;j=1,2,..,mv
       !    fp = sumi=1,mu(sumj=1,mv(res(i,j)))
@@ -6190,58 +6204,64 @@ module fitpack_core
       !                  tu(r+3) <= u(i) <= tu(r+4)
       !    fpv(r) = sumi=1,mu(sum''j(res(i,j))) , r=1,2,...,nv-7
       !                  tv(r+3) <= v(j) <= tv(r+4)
- 700  fp = zero
+      fp = zero
       fpu(1:nu) = zero
       fpv(1:nv) = zero
       nroldu = 0
+
       !  main loop for the different grid points.
-      do 860 i1=1,muu
-        numu = nru(i1)
-        numu1 = numu+1
-        nroldv = 0
-        iz = (i1-1)*mv
-        do 840 i2=1,mvv
-          numv = nrv(i2)
-          numv1 = numv+1
-          iz = iz+1
-      !  evaluate s(u,v) at the current grid point by making the sum of the
-      !  cross products of the non-zero b-splines at (u,v), multiplied with
-      !  the appropriate b-spline coefficients.
-          term = 0.
-          k0 = numu*nv4+numv
-          jz = iz
-          do 800 id=1,idim
-          k1 = k0
-          value = 0.
-          do 780 l1=1,4
-            k2 = k1
-            fac = spu(i1,l1)
-            do 760 l2=1,4
-              k2 = k2+1
-              value = value+fac*spv(i2,l2)*c(k2)
- 760        continue
-            k1 = k1+nv4
- 780      continue
-      !  calculate the squared residual at the current grid point.
-          term = term+(z(jz)-value)**2
-          jz = jz+mz
-          k0 = k0+ncof
- 800      continue
-      !  adjust the different parameters.
-          fp = fp+term
-          fpu(numu1) = fpu(numu1)+term
-          fpv(numv1) = fpv(numv1)+term
-          fac = term*half
-          if(numv==nroldv) go to 820
-          fpv(numv1) = fpv(numv1)-fac
-          fpv(numv) = fpv(numv)+fac
- 820      nroldv = numv
-          if(numu==nroldu) go to 840
-          fpu(numu1) = fpu(numu1)-fac
-          fpu(numu) = fpu(numu)+fac
- 840    continue
-        nroldu = numu
- 860  continue
+      u_points: do i1=1,muu
+         numu   = nru(i1)
+         numu1  = numu+1
+         nroldv = 0
+         iz     = (i1-1)*mv
+
+         v_points: do i2=1,mvv
+            numv  = nrv(i2)
+            numv1 = numv+1
+            iz    = iz+1
+
+            ! evaluate s(u,v) at the current grid point by making the sum of the cross products of the
+            ! non-zero b-splines at (u,v), multiplied with the appropriate b-spline coefficients.
+            term = zero
+            k0 = numu*nv4+numv
+            jz = iz
+            do id=1,idim
+               k1 = k0
+               value = zero
+               do l1=1,4
+                  k2 = k1
+                  fac = spu(i1,l1)
+                  do l2=1,4
+                     k2 = k2+1
+                     value = value+fac*spv(i2,l2)*c(k2)
+                  end do
+                  k1 = k1+nv4
+               end do
+               ! calculate the squared residual at the current grid point.
+               term = term+(z(jz)-value)**2
+               jz = jz+mz
+               k0 = k0+ncof
+            end do
+
+            ! adjust the different parameters.
+            fp = fp+term
+            fpu(numu1) = fpu(numu1)+term
+            fpv(numv1) = fpv(numv1)+term
+            fac = term*half
+
+            if (numv/=nroldv) then
+               fpv(numv1) = fpv(numv1)-fac
+               fpv(numv)  = fpv(numv) +fac
+            endif
+            nroldv = numv
+            if (numu/=nroldu) then
+               fpu(numu1) = fpu(numu1)-fac
+               fpu(numu)  = fpu(numu) +fac
+            endif
+         end do v_points
+         nroldu = numu
+      end do u_points
       return
       end subroutine fpgrpa
 
@@ -13223,104 +13243,115 @@ module fitpack_core
       end subroutine fpsysy
 
 
-      recursive subroutine fptrnp(m,mm,idim,n,nr,sp,p,b,z,a,q,right)
-
-      !  subroutine fptrnp reduces the (m+n-7) x (n-4) matrix a to upper
-      !  triangular form and applies the same givens transformations to
-      !  the (m) x (mm) x (idim) matrix z to obtain the (n-4) x (mm) x
+      !  subroutine fptrnp reduces the (m+n-7) x (n-4) matrix a to upper triangular form and applies the
+      !  same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the (n-4) x (mm) x
       !  (idim) matrix q
+      pure subroutine fptrnp(m,mm,idim,n,nr,sp,p,b,z,a,q,right)
+
       !  ..
       !  ..scalar arguments..
-      real(RKIND) p
-      integer m,mm,idim,n
+      real(RKIND), intent(in) :: p
+      integer,     intent(in) :: m,mm,idim,n
       !  ..array arguments..
-      real(RKIND) sp(m,4),b(n,5),z(m*mm*idim),a(n,5),q((n-4)*mm*idim), &
-       right(mm*idim)
-      integer nr(m)
+      real(RKIND), intent(in)  :: sp(m,4),b(n,5),z(m*mm*idim)
+      real(RKIND), intent(out) :: q((n-4)*mm*idim),a(n,5),right(mm*idim)
+      integer,     intent(in)  :: nr(m)
+
       !  ..local scalars..
-      real(RKIND) cos,pinv,piv,sin,one
-      integer i,iband,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3, &
-       nrold,n4,number,n1
+      real(RKIND) :: cos,pinv,piv,sin
+      integer     :: i,iband,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1)
+      real(RKIND) :: h(SIZ_K+1)
       !  ..subroutine references..
       !    fpgivs,fprota
       !  ..
-      one = 1
       pinv = merge(one/p,one,p>zero)
-      n4 = n-4
-      mid = mm*idim
-      m2 = m*mm
-      m3 = n4*mm
+      n4   = n-4
+      mid  = mm*idim
+      m2   = m*mm
+      m3   = n4*mm
       !  reduce the matrix (a) to upper triangular form (r) using givens
       !  rotations. apply the same transformations to the rows of matrix z
       !  to obtain the mm x (n-4) matrix g.
       !  store matrix (r) into (a) and g into q.
       !  initialization.
-      nmd = n4*mid
-      q(1:nmd) = zero
+      nmd         = n4*mid
+      q(1:nmd)    = zero
       a(1:n4,1:5) = zero
-      nrold = 0
+
+
       !  iband denotes the bandwidth of the matrices (a) and (r).
       iband = 4
-      do 750 it=1,m
-        number = nr(it)
- 150    if(nrold==number) go to 300
-        if(p<=0.) go to 700
-        iband = 5
-      !  fetch a new row of matrix (b).
-        n1 = nrold+1
-        do 200 j=1,5
-          h(j) = b(n1,j)*pinv
- 200    continue
-      !  find the appropriate column of q.
-        right(1:mid) = zero
-        irot = nrold
-        go to 450
-      !  fetch a new row of matrix (sp).
- 300    h(iband) = zero
-        h(1:4) = sp(it,1:4)
-      !  find the appropriate column of q.
-        j = 0
-        do ii=1,idim
-          l = (ii-1)*m2+(it-1)*mm
-          do jj=1,mm
-            j = j+1
-            l = l+1
-            right(j) = z(l)
-          end do
-        end do
-        irot = number
-      !  rotate the new row of matrix (a) into triangle.
- 450    do 600 i=1,iband
-          irot = irot+1
-          piv = h(i)
-          if(piv==zero) go to 600
-      !  calculate the parameters of the givens transformation.
-          call fpgivs(piv,a(irot,1),cos,sin)
-      !  apply that transformation to the rows of matrix q.
-          j = 0
-          do ii=1,idim
-            l = (ii-1)*m3+irot
-            do jj=1,mm
-              j = j+1
-              call fprota(cos,sin,right(j),q(l))
-              l = l+n4
-            end do
-          end do
-      !  apply that transformation to the columns of (a).
-          if(i==iband) go to 650
-          i2 = 1
-          i3 = i+1
-          do 550 j=i3,iband
-            i2 = i2+1
-            call fprota(cos,sin,h(j),a(irot,i2))
- 550      continue
- 600    continue
- 650    if(nrold==number) go to 750
- 700    nrold = nrold+1
-        go to 150
- 750  continue
+      nrold  = 0
+      number = nr(1)
+      rows: do it=1,m
+         number = nr(it)
+         increase_old: do ! 150
+             if (nrold/=number) then
+
+                 if (p<=zero) then
+                    nrold = nrold+1
+                    cycle increase_old
+                 end if
+                 iband = 5
+                 ! fetch a new row of matrix (b).
+                 n1 = nrold+1
+                 h(1:5) = b(n1,1:5)*pinv
+                 !  find the appropriate column of q.
+                 right(1:mid) = zero
+                 irot = nrold
+
+             else
+                 ! fetch a new row of matrix (sp).
+                 h(iband) = zero
+                 h(1:4) = sp(it,1:4)
+                 ! find the appropriate column of q.
+                 j = 0
+                 do ii=1,idim
+                   l = (ii-1)*m2+(it-1)*mm
+                   do jj=1,mm
+                     j = j+1
+                     l = l+1
+                     right(j) = z(l)
+                   end do
+                 end do
+                 irot = number
+             endif
+
+             ! rotate the new row of matrix (a) into triangle.
+             rotate: do i=1,iband
+                irot = irot+1
+                piv  = h(i); if (piv==zero) cycle rotate
+
+                ! calculate the parameters of the givens transformation.
+                call fpgivs(piv,a(irot,1),cos,sin)
+
+                ! apply that transformation to the rows of matrix q.
+                j = 0
+                do ii=1,idim
+                   l = (ii-1)*m3+irot
+                   do jj=1,mm
+                      j = j+1
+                      call fprota(cos,sin,right(j),q(l))
+                      l = l+n4
+                   end do
+                end do
+
+                ! apply that transformation to the columns of (a).
+                if (i<iband) then
+                    i2 = 1
+                    i3 = i+1
+                    do j=i3,iband
+                       i2 = i2+1
+                       call fprota(cos,sin,h(j),a(irot,i2))
+                    end do
+                endif
+             end do rotate
+
+             if (nrold==number) cycle rows
+             nrold = nrold+1
+         end do increase_old
+      end do rows
       return
       end subroutine fptrnp
 
