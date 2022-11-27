@@ -11215,12 +11215,10 @@ module fitpack_core
       end subroutine fprota
 
 
-      !  given the coefficients of a constrained bicubic spline, as determined
-      !  in subroutine fppola, subroutine fprppo calculates the coefficients
-      !  in the standard b-spline representation of bicubic splines.
+      !  given the coefficients of a constrained bicubic spline, as determined in subroutine fppola,
+      !  fprppo calculates the coefficients in the standard b-spline representation of bicubic splines.
       pure subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
 
-      !  ..
       !  ..scalar arguments..
       real(RKIND), intent(in) :: ratio
       integer, intent(in) :: if1,if2,nu,nv,ncoff
@@ -11239,7 +11237,7 @@ module fitpack_core
 
       main_loop: do l=1,nu4
          ii = i
-         if(l==nu4 .and. if2/=0) then
+         if (l==nu4 .and. if2/=0) then
 
             exit main_loop
 
@@ -11279,10 +11277,9 @@ module fitpack_core
 
          end if
 
-
          do k=1,3
-            ii = ii+1
-            i = i+1
+            ii   = ii+1
+            i    = i+1
             f(i) = f(ii)
          end do
 
@@ -11293,19 +11290,20 @@ module fitpack_core
       return
       end subroutine fprppo
 
-      recursive subroutine fprpsp(nt,np,co,si,c,f,ncoff)
-
-      !  given the coefficients of a spherical spline function, subroutine
-      !  fprpsp calculates the coefficients in the standard b-spline re-
-      !  presentation of this bicubic spline.
+      ! given the coefficients of a spherical spline function, subroutine fprpsp calculates the coefficients
+      ! in the standard b-spline representation of this bicubic spline.
+      pure subroutine fprpsp(nt,np,co,si,c,f,ncoff)
       !  ..
       !  ..scalar arguments
-      integer nt,np,ncoff
+      integer,     intent(in)  :: nt,np,ncoff
+
       !  ..array arguments
-      real(RKIND) co(np),si(np),c(ncoff),f(ncoff)
+      real(RKIND), intent(in)  :: co(np),si(np)
+      real(RKIND), intent(out) :: c(ncoff),f(ncoff) ! f is a working array
+
       !  ..local scalars
-      real(RKIND) cn,c1,c2,c3
-      integer i,ii,j,k,l,ncof,npp,np4,nt4
+      real(RKIND) :: cn,c1,c2,c3
+      integer :: i,ii,j,k,l,ncof,npp,np4,nt4
       !  ..
       nt4 = nt-4
       np4 = np-4
@@ -11313,40 +11311,39 @@ module fitpack_core
       ncof = 6+npp*(nt4-4)
       c1 = c(1)
       cn = c(ncof)
-      j = ncoff
-      do 10 i=1,np4
-         f(i) = c1
-         f(j) = cn
-         j = j-1
-  10  continue
+      f(1:np4)             = c1
+      f(ncoff-np4+1:ncoff) = cn
+
       i = np4
-      j=1
-      do 70 l=3,nt4
+      j = 1
+      do l=3,nt4
          ii = i
-         if(l==3 .or. l==nt4) go to 30
-         do 20 k=1,npp
-            i = i+1
-            j = j+1
-            f(i) = c(j)
-  20     continue
-         go to 50
-  30     if(l==nt4) c1 = cn
-         c2 = c(j+1)
-         c3 = c(j+2)
-         j = j+2
-         do 40 k=1,npp
-            i = i+1
-            f(i) = c1+c2*co(k)+c3*si(k)
-  40     continue
-  50     do 60 k=1,3
+         if (l==3 .or. l==nt4) then
+            if (l==nt4) c1 = cn
+            c2 = c(j+1)
+            c3 = c(j+2)
+            j = j+2
+            do k=1,npp
+               i = i+1
+               f(i) = c1+c2*co(k)+c3*si(k)
+            end do
+         else
+            do k=1,npp
+               i = i+1
+               j = j+1
+               f(i) = c(j)
+            end do
+         endif
+
+         do k=1,3
             ii = ii+1
             i = i+1
             f(i) = f(ii)
-  60     continue
-  70  continue
-      do 80 i=1,ncoff
-         c(i) = f(i)
-  80  continue
+         end do
+      end do
+
+      c(1:ncoff) = f(1:ncoff)
+
       return
       end subroutine fprpsp
 
@@ -11359,7 +11356,6 @@ module fitpack_core
       !  branch was found.
       pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
-      !  ..
       !  ..scalar arguments..
       integer, intent(in)    :: maxtr   ! Tree array sizes
       integer, intent(inout) :: merk    ! (in) terminal node of the branch
