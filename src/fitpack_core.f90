@@ -12520,9 +12520,6 @@ module fitpack_core
       real(RKIND) :: arg,sp,tb,te
       !  ..local arrays..
       real(RKIND) :: h(SIZ_K+1)
-      !  ..subroutine references..
-      !    fpbspl
-      !  ..
 
       ! Process u
       nu4 = nu-4
@@ -13177,61 +13174,60 @@ module fitpack_core
 
 
 
-      recursive subroutine fpsysy(a,n,g)
+      ! subroutine fpsysy solves a linear n x n symmetric system   (a) * (b) = (g), with n<=6
+      ! on input, vector g contains the right hand side ; on output it will contain the solution (b).
+      pure subroutine fpsysy(a,n,g)
 
-      ! subroutine fpsysy solves a linear n x n symmetric system
-      !    (a) * (b) = (g)
-      ! on input, vector g contains the right hand side ; on output it will
-      ! contain the solution (b).
-      !  ..
       !  ..scalar arguments..
-      integer n
+      integer,     intent(in)    ::  n
       !  ..array arguments..
-      real(RKIND) a(6,6),g(6)
+      real(RKIND), intent(inout) :: a(6,6)
+      real(RKIND), intent(inout) :: g(6)
+
       !  ..local scalars..
-      real(RKIND) fac
-      integer i,i1,j,k
+      real(RKIND) :: fac
+      integer :: i,i1,j,k
       !  ..
       g(1) = g(1)/a(1,1)
-      if(n==1) return
-      !  decomposition of the symmetric matrix (a) = (l) * (d) *(l)'
-      !  with (l) a unit lower triangular matrix and (d) a diagonal
-      !  matrix
-      do 10 k=2,n
-         a(k,1) = a(k,1)/a(1,1)
-  10  continue
-      do 40 i=2,n
+      if (n==1) return
+      !  decomposition of the symmetric matrix (a) = (l) * (d) *(l)'  with (l) a unit lower triangular
+      !  matrix and (d) a diagonal matrix
+      a(2:n,1) = a(2:n,1)/a(1,1)
+
+      do i=2,n
          i1 = i-1
-         do 30 k=i,n
+         do k=i,n
             fac = a(k,i)
-            do 20 j=1,i1
+            do j=1,i1
                fac = fac-a(j,j)*a(k,j)*a(i,j)
-  20        continue
+            end do
             a(k,i) = fac
-            if(k>i) a(k,i) = fac/a(i,i)
-  30     continue
-  40  continue
+            if (k>i) a(k,i) = fac/a(i,i)
+         end do
+      end do
       !  solve the system (l)*(d)*(l)'*(b) = (g).
+
       !  first step : solve (l)*(d)*(c) = (g).
-      do 60 i=2,n
+      do i=2,n
          i1 = i-1
          fac = g(i)
-         do 50 j=1,i1
+         do j=1,i1
             fac = fac-g(j)*a(j,j)*a(i,j)
-  50     continue
+         end do
          g(i) = fac/a(i,i)
-  60  continue
+      end do
+
       !  second step : solve (l)'*(b) = (c)
       i = n
-      do 80 j=2,n
+      do j=2,n
          i1 = i
          i = i-1
          fac = g(i)
-         do 70 k=i1,n
+         do k=i1,n
             fac = fac-g(k)*a(k,i)
-  70     continue
+         end do
          g(i) = fac
-  80  continue
+      end do
       return
       end subroutine fpsysy
 
