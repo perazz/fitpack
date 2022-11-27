@@ -16471,7 +16471,7 @@ module fitpack_core
       !              (j-1)
       !      d(j) = s     (x) , j=1,2,...,k1
       !  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
-      recursive subroutine spalde(t,n,c,k1,x,d,ier)
+      pure subroutine spalde(t,n,c,k1,x,d,ier)
 
       !  calling sequence:
       !     call spalde(t,n,c,k1,x,d,ier)
