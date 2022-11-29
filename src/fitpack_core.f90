@@ -5099,9 +5099,6 @@ module fitpack_core
 
       end subroutine fpcuro
 
-
-      pure subroutine fpcyt1(a,n,nn)
-
       ! (l u)-decomposition of a cyclic tridiagonal matrix with the non-zero
       ! elements stored as follows
       !
@@ -5111,85 +5108,82 @@ module fitpack_core
       !    |               ...............                            |
       !    |                               a(n-1,1) a(n-1,2) a(n-1,3) |
       !    | a(n,3)                                  a(n,1)   a(n,2)  |
-      !
-      !  ..
-      !  ..scalar arguments..
-      integer, intent(in) :: n,nn
-      !  ..array arguments..
-      real(RKIND), intent(inout) :: a(nn,6)
-      !  ..local scalars..
-      real(RKIND) aa,beta,gamma,sum,teta,v
-      integer i,n1,n2
-      !  ..
-      n2   = n-2
-      beta = one/a(1,2)
-      gamma = a(n,3)
-      teta = a(1,1)*beta
-      a(1,4) = beta
-      a(1,5) = gamma
-      a(1,6) = teta
-      sum = gamma*teta
+      pure subroutine fpcyt1(a,n,nn)
 
-      internal_rows: do i=2,n2
-         v = a(i-1,3)*beta
-         aa = a(i,1)
-         beta = one/(a(i,2)-aa*v)
-         gamma = -gamma*v
-         teta = -teta*aa*beta
-         a(i,4) = beta
-         a(i,5) = gamma
-         a(i,6) = teta
-         sum = sum+gamma*teta
-      end do internal_rows
+          !  ..scalar arguments..
+          integer, intent(in) :: n,nn
+          !  ..array arguments..
+          real(RKIND), intent(inout) :: a(nn,6)
+          !  ..local scalars..
+          real(RKIND) aa,beta,gamma,sum,teta,v
+          integer i,n1,n2
+          !  ..
+          n2   = n-2
+          beta = one/a(1,2)
+          gamma = a(n,3)
+          teta = a(1,1)*beta
+          a(1,4) = beta
+          a(1,5) = gamma
+          a(1,6) = teta
+          sum = gamma*teta
 
-      n1 = n-1
-      v = a(n2,3)*beta
-      aa = a(n1,1)
-      beta = one/(a(n1,2)-aa*v)
-      gamma = a(n,1)-gamma*v
-      teta = (a(n1,3)-teta*aa)*beta
-      a(n1,4) = beta
-      a(n1,5) = gamma
-      a(n1,6) = teta
-      a(n,4) = one/(a(n,2)-(sum+gamma*teta))
+          internal_rows: do i=2,n2
+             v = a(i-1,3)*beta
+             aa = a(i,1)
+             beta = one/(a(i,2)-aa*v)
+             gamma = -gamma*v
+             teta = -teta*aa*beta
+             a(i,4) = beta
+             a(i,5) = gamma
+             a(i,6) = teta
+             sum = sum+gamma*teta
+          end do internal_rows
+
+          n1 = n-1
+          v = a(n2,3)*beta
+          aa = a(n1,1)
+          beta = one/(a(n1,2)-aa*v)
+          gamma = a(n,1)-gamma*v
+          teta = (a(n1,3)-teta*aa)*beta
+          a(n1,4) = beta
+          a(n1,5) = gamma
+          a(n1,6) = teta
+          a(n,4) = one/(a(n,2)-(sum+gamma*teta))
 
       return
       end subroutine fpcyt1
 
 
-      pure subroutine fpcyt2(a,n,b,c,nn)
-
       ! subroutine fpcyt2 solves a linear n x n system
-      !         a * c = b
-      ! where matrix a is a cyclic tridiagonal matrix, decomposed
-      ! using subroutine fpsyt1.
-      !  ..
-      !  ..scalar arguments..
-      integer, intent(in) :: n,nn
-      !  ..array arguments..
-      real(RKIND), intent(in)  :: a(nn,6),b(n)
-      real(RKIND), intent(out) :: c(n)
-      !  ..local scalars..
-      real(RKIND) cc,sum
-      integer i,j,j1,n1
-      !  ..
-      c(1) = b(1)*a(1,4)
-      sum  = c(1)*a(1,5)
-      n1   = n-1
-      do i=2,n1
-         c(i) = (b(i)-a(i,1)*c(i-1))*a(i,4)
-         sum = sum+c(i)*a(i,5)
-      end do
-      cc    = (b(n)-sum)*a(n,4)
-      c(n)  = cc
-      c(n1) = c(n1)-cc*a(n1,6)
-      j = n1
-      do i=3,n
-         j1 = j-1
-         c(j1) = c(j1)-c(j)*a(j1,3)*a(j1,4)-cc*a(j1,6)
-         j = j1
-      end do
-      return
+      !     a * c = b
+      ! where matrix a is a cyclic tridiagonal matrix, decomposed using subroutine fpsyt1.
+      pure subroutine fpcyt2(a,n,b,c,nn)
+          !  ..scalar arguments..
+          integer, intent(in) :: n,nn
+          !  ..array arguments..
+          real(RKIND), intent(in)  :: a(nn,6),b(n)
+          real(RKIND), intent(out) :: c(n)
+          !  ..local scalars..
+          real(RKIND) cc,sum
+          integer i,j,j1,n1
+          !  ..
+          c(1) = b(1)*a(1,4)
+          sum  = c(1)*a(1,5)
+          n1   = n-1
+          do i=2,n1
+             c(i) = (b(i)-a(i,1)*c(i-1))*a(i,4)
+             sum = sum+c(i)*a(i,5)
+          end do
+          cc    = (b(n)-sum)*a(n,4)
+          c(n)  = cc
+          c(n1) = c(n1)-cc*a(n1,6)
+          j = n1
+          do i=3,n
+             j1 = j-1
+             c(j1) = c(j1)-c(j)*a(j1,3)*a(j1,4)-cc*a(j1,6)
+             j = j1
+          end do
+          return
 
       end subroutine fpcyt2
 
@@ -5211,7 +5205,7 @@ module fitpack_core
       level = 0
   10  point = i
       i = left(point)
-      if(i==0) go to 20
+      if (i==0) go to 20
       level = level+1
       go to 10
   20  if(level==nbind) go to 70
@@ -5219,33 +5213,38 @@ module fitpack_core
       j = up(point)
       up(point) = 0
       k = left(j)
-      if(point/=k) go to 50
-      if(i/=0) go to 40
-      level = level-1
-      if(level==0) go to 80
-      point = j
-      go to 30
+      if (point/=k) go to 50
+      if (i==0) then
+          level = level-1
+          if (level==0) go to 80
+          point = j
+          go to 30
+      endif
   40  left(j) = i
       go to 10
   50  l = right(k)
-      if(point==l) go to 60
-      k = l
-      go to 50
+      if (point/=l) then
+          k = l
+          go to 50
+      endif
   60  right(k) = i
       point = k
   70  i = right(point)
       if(i/=0) go to 10
       i = up(point)
       level = level-1
-      if(level==0) go to 80
-      point = i
-      go to 70
+      if (level/=0) then
+         point = i
+         go to 70
+      endif
   80  k = 1
       l = left(k)
-      if(up(l)==0) return
-  90  merk = k
-      k = left(k)
-      if(k/=0) go to 90
+      if (up(l)/=0) then
+          do while (k/=0)
+             merk = k
+             k = left(k)
+          end do
+      endif
       return
       end subroutine fpdeno
 
@@ -11290,59 +11289,59 @@ module fitpack_core
       return
       end subroutine fprppo
 
-      ! given the coefficients of a spherical spline function, subroutine fprpsp calculates the coefficients
-      ! in the standard b-spline representation of this bicubic spline.
+      ! given the coefficients of a spherical spline function, subroutine fprpsp calculates the
+      ! coefficients in the standard b-spline representation of this bicubic spline.
       pure subroutine fprpsp(nt,np,co,si,c,f,ncoff)
-      !  ..
-      !  ..scalar arguments
-      integer,     intent(in)  :: nt,np,ncoff
+          !  ..
+          !  ..scalar arguments
+          integer,     intent(in)    :: nt,np,ncoff
 
-      !  ..array arguments
-      real(RKIND), intent(in)  :: co(np),si(np)
-      real(RKIND), intent(out) :: c(ncoff),f(ncoff) ! f is a working array
+          !  ..array arguments
+          real(RKIND), intent(in)    :: co(np),si(np)
+          real(RKIND), intent(inout) :: c(ncoff),f(ncoff) ! f is a working array
 
-      !  ..local scalars
-      real(RKIND) :: cn,c1,c2,c3
-      integer :: i,ii,j,k,l,ncof,npp,np4,nt4
-      !  ..
-      nt4 = nt-4
-      np4 = np-4
-      npp = np4-3
-      ncof = 6+npp*(nt4-4)
-      c1 = c(1)
-      cn = c(ncof)
-      f(1:np4)             = c1
-      f(ncoff-np4+1:ncoff) = cn
+          !  ..local scalars
+          real(RKIND) :: cn,c1,c2,c3
+          integer :: i,ii,j,k,l,ncof,npp,np4,nt4
+          !  ..
+          nt4 = nt-4
+          np4 = np-4
+          npp = np4-3
+          ncof = 6+npp*(nt4-4)
+          c1 = c(1)
+          cn = c(ncof)
+          f(1:np4)             = c1
+          f(ncoff-np4+1:ncoff) = cn
 
-      i = np4
-      j = 1
-      do l=3,nt4
-         ii = i
-         if (l==3 .or. l==nt4) then
-            if (l==nt4) c1 = cn
-            c2 = c(j+1)
-            c3 = c(j+2)
-            j = j+2
-            do k=1,npp
-               i = i+1
-               f(i) = c1+c2*co(k)+c3*si(k)
-            end do
-         else
-            do k=1,npp
-               i = i+1
-               j = j+1
-               f(i) = c(j)
-            end do
-         endif
+          i = np4
+          j = 1
+          do l=3,nt4
+             ii = i
+             if (l==3 .or. l==nt4) then
+                if (l==nt4) c1 = cn
+                c2 = c(j+1)
+                c3 = c(j+2)
+                j = j+2
+                do k=1,npp
+                   i = i+1
+                   f(i) = c1+c2*co(k)+c3*si(k)
+                end do
+             else
+                do k=1,npp
+                   i = i+1
+                   j = j+1
+                   f(i) = c(j)
+                end do
+             endif
 
-         do k=1,3
-            ii = ii+1
-            i = i+1
-            f(i) = f(ii)
-         end do
-      end do
+             do k=1,3
+                ii = ii+1
+                i = i+1
+                f(i) = f(ii)
+             end do
+          end do
 
-      c(1:ncoff) = f(1:ncoff)
+          c(1:ncoff) = f(1:ncoff)
 
       return
       end subroutine fprpsp
@@ -11356,36 +11355,36 @@ module fitpack_core
       !  branch was found.
       pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
-      !  ..scalar arguments..
-      integer, intent(in)    :: maxtr   ! Tree array sizes
-      integer, intent(inout) :: merk    ! (in) terminal node of the branch
-      integer, intent(in)    :: nbind
-      !  ..array arguments..
-      integer, intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
-      integer, intent(out)   :: ibind(nbind)
-      !  ..scalar arguments..
-      integer :: i,j,k
-      !  ..
-      k = merk
-      j = nbind
-      do i=1,nbind
-         ibind(j) = info(k)
-         k = up(k)
-         j = j-1
-      end do
+          !  ..scalar arguments..
+          integer, intent(in)    :: maxtr   ! Tree array sizes
+          integer, intent(inout) :: merk    ! (in) terminal node of the branch
+          integer, intent(in)    :: nbind
+          !  ..array arguments..
+          integer, intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+          integer, intent(out)   :: ibind(nbind)
+          !  ..scalar arguments..
+          integer :: i,j,k
+          !  ..
+          k = merk
+          j = nbind
+          do i=1,nbind
+             ibind(j) = info(k)
+             k = up(k)
+             j = j-1
+          end do
 
-      do
-          k = right(merk)
-          if (k/=0) exit
-          merk = up(merk)
-          if (merk<=1) return
-      end do
+          do
+              k = right(merk)
+              if (k/=0) exit
+              merk = up(merk)
+              if (merk<=1) return
+          end do
 
-      do
-          merk = k
-          k = left(merk)
-          if (k==0) exit
-      end do
+          do
+              merk = k
+              k = left(merk)
+              if (k==0) exit
+          end do
 
       end subroutine fpseno
 
@@ -11547,132 +11546,131 @@ module fitpack_core
       return
 
       !  if s>0 our initial choice of knots depends on the value of iopt(1).
- 100  ier = 0
-      if(iopt(1)==0) go to 115
-      step(1) = -step(1)
-      step(2) = -step(2)
-      if(fp0<=s) go to 115
-      !  if iopt(1)=1 and fp0 > s we start computing the least-squares spline
-      !  according to the set of knots found at the last call of the routine.
-      !  we determine the number of grid coordinates u(i) inside each knot
-      !  interval (tu(l),tu(l+1)).
-      l = 5
-      j = 1
-      nrdatu(1) = 0
-      mu0 = 2-iopt(2)
-      mu1 = mu-1+iopt(3)
-      do 105 i=mu0,mu1
-        nrdatu(j) = nrdatu(j)+1
-        if(u(i)<tu(l)) go to 105
-        nrdatu(j) = nrdatu(j)-1
-        l = l+1
-        j = j+1
-        nrdatu(j) = 0
- 105  continue
-      !  we determine the number of grid coordinates v(i) inside each knot
-      !  interval (tv(l),tv(l+1)).
-      l = 5
-      j = 1
-      nrdatv(1) = 0
-      do 110 i=2,mv
-        nrdatv(j) = nrdatv(j)+1
-        if(v(i)<tv(l)) go to 110
-        nrdatv(j) = nrdatv(j)-1
-        l = l+1
-        j = j+1
-        nrdatv(j) = 0
- 110  continue
-      idd = ider
+ 100  ier = FITPACK_OK
+      if (iopt(1)/=0) step = -step
 
-      go to 120
-      !  if iopt(1)=0 or iopt(1)=1 and s >= fp0,we start computing the least-
-      !  squares polynomial (which is a spline without interior knots).
- 115  ier = -2
-      idd = [ider(1),1,ider(3),1]
-      nu = 8
-      nv = 8
-      nrdatu(1) = mu-2+iopt(2)+iopt(3)
-      nrdatv(1) = mv-1
-      lastdi = 0
-      nplusu = 0
-      nplusv = 0
-      fp0    = zero
-      fpold  = zero
-      reducu = zero
-      reducv = zero
+      if (fp0<=s .or. iopt(1)==0) then
+
+          !  if iopt(1)=0 or iopt(1)=1 and fp0 <= s,we start computing the least-
+          !  squares polynomial (which is a spline without interior knots).
+          ier = FITPACK_LEASTSQUARES_OK
+          idd = [ider(1),1,ider(3),1]
+          nu = 8
+          nv = 8
+          nrdatu(1) = mu-2+iopt(2)+iopt(3)
+          nrdatv(1) = mv-1
+          lastdi = 0
+          nplusu = 0
+          nplusv = 0
+          fp0    = zero
+          fpold  = zero
+          reducu = zero
+          reducv = zero
+
+
+      else
+
+          !  if iopt(1)=1 and fp0 > s we start computing the least-squares spline
+          !  according to the set of knots found at the last call of the routine.
+          !  we determine the number of grid coordinates u(i) inside each knot
+          !  interval (tu(l),tu(l+1)).
+          l = 5
+          j = 1
+          nrdatu(1) = 0
+          mu0 = 2-iopt(2)
+          mu1 = mu-1+iopt(3)
+          do i=mu0,mu1
+            nrdatu(j) = nrdatu(j)+1
+            if (u(i)>=tu(l)) then
+                nrdatu(j) = nrdatu(j)-1
+                l = l+1
+                j = j+1
+                nrdatu(j) = 0
+            endif
+          end do
+          !  we determine the number of grid coordinates v(i) inside each knot
+          !  interval (tv(l),tv(l+1)).
+          l = 5
+          j = 1
+          nrdatv(1) = 0
+          do i=2,mv
+            nrdatv(j) = nrdatv(j)+1
+            if (v(i)>=tv(l)) then
+               nrdatv(j) = nrdatv(j)-1
+               l = l+1
+               j = j+1
+               nrdatv(j) = 0
+            endif
+          end do
+          idd = ider
+
+      endif
 
       !  main loop for the different sets of knots.mpm=mu+mv is a safe upper
       !  bound for the number of iterations
  120  mpm = mu+mv
       do 270 iter=1,mpm
-      !  find nrintu (nrintv) which is the number of knot intervals in the
-      !  u-direction (v-direction).
-        nrintu = nu-7
-        nrintv = nv-7
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(u,v).
-        i = nu
-        do 125 j=1,4
-          tu(j) = 0.
-          tu(i) = pi
-          i = i-1
- 125    continue
-        l1 = 4
-        l2 = l1
-        l3 = nv-3
-        l4 = l3
-        tv(l2) = vb
-        tv(l3) = ve
-        do 130 j=1,3
-          l1 = l1+1
-          l2 = l2-1
-          l3 = l3+1
-          l4 = l4-1
-          tv(l2) = tv(l4)-pi2
-          tv(l3) = tv(l1)+pi2
- 130    continue
-      !  find an estimate of the range of possible values for the optimal
-      !  derivatives at the origin.
-        ktu = nrdatu(1)+2-iopt(2)
-        if(ktu<mumin) ktu = mumin
-        if(ktu==lastu0) go to 140
-         rmin = r0
-         rmax = r0
-         l = mv*ktu
-         do 135 i=1,l
-            if(r(i)<rmin) rmin = r(i)
-            if(r(i)>rmax) rmax = r(i)
- 135     continue
-         step(1) = rmax-rmin
-         lastu0 = ktu
- 140    ktu = nrdatu(nrintu)+2-iopt(3)
-        if(ktu<mumin) ktu = mumin
-        if(ktu==lastu1) go to 150
-         rmin = r1
-         rmax = r1
-         l = mv*ktu
-         j = mr
-         do 145 i=1,l
-            if(r(j)<rmin) rmin = r(j)
-            if(r(j)>rmax) rmax = r(j)
-            j = j-1
- 145     continue
-         step(2) = rmax-rmin
-         lastu1 = ktu
-      !  find the least-squares spline sinf(u,v).
- 150    call fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r,mr,r0,r1,dr,iopt, &
-         idd,tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru, &
-         nrv,wrk,lwrk)
+         ! find nrintu (nrintv) which is the number of knot intervals in the
+         ! u-direction (v-direction).
+         nrintu = nu-7
+         nrintv = nv-7
+
+         ! find the position of the additional knots which are needed for the
+         ! b-spline representation of s(u,v).
+         i = nu
+         do j=1,4
+            tu(j) = zero
+            tu(i) = pi
+            i = i-1
+         end do
+         l1 = 4
+         l2 = l1
+         l3 = nv-3
+         l4 = l3
+         tv(l2) = vb
+         tv(l3) = ve
+         do j=1,3
+            l1 = l1+1
+            l2 = l2-1
+            l3 = l3+1
+            l4 = l4-1
+            tv(l2) = tv(l4)-pi2
+            tv(l3) = tv(l1)+pi2
+         end do
+
+         ! find an estimate of the range of possible values for the optimal derivatives at the origin.
+         ktu = max(mumin,nrdatu(1)+2-iopt(2))
+         if (ktu/=lastu0) then
+             l       = mv*ktu
+             rmin    = min(r0,minval(r(:l)))
+             rmax    = max(r0,maxval(r(:l)))
+             step(1) = rmax-rmin
+             lastu0  = ktu
+         endif
+
+         ktu = max(mumin,nrdatu(nrintu)+2-iopt(3))
+         if (ktu/=lastu1) then
+            l = mv*ktu
+            rmin = min(r1,minval(r(mr-l+1:mr)))
+            rmax = max(r1,maxval(r(mr-l+1:mr)))
+            step(2) = rmax-rmin
+            lastu1 = ktu
+         endif
+
+         ! find the least-squares spline sinf(u,v).
+         call fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r,mr,r0,r1,dr,iopt, &
+                     idd,tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru, &
+                     nrv,wrk,lwrk)
 
          step = abs(step)
-         if(ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
+         if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
 
          ! test whether the least-squares spline is an acceptable solution.
          if (iopt(1)<0) return
-         fpms = fp-s; if(abs(fpms) < acc) return ! success
+         fpms = fp-s; if (abs(fpms) < acc) return ! success
 
          ! if f(p=inf) < s, we accept the choice of knots.
-         if(fpms<zero) go to 300
+         if (fpms<zero) go to 300
 
          ! if nu=numax and nv=nvmax, sinf(u,v) is an interpolating spline
          if(nu==numax .and. nv==nvmax) then
@@ -11681,96 +11679,99 @@ module fitpack_core
             return
          endif
 
-        ! increase the number of knots.
-        ! if nu=nue and nv=nve we cannot further increase the number of knots
-        ! because of the storage capacity limitation.
-        if (nu==nue .and. nv==nve) then
-           ier = FITPACK_INSUFFICIENT_STORAGE
-           return
-        endif
+         ! increase the number of knots.
+         ! if nu=nue and nv=nve we cannot further increase the number of knots
+         ! because of the storage capacity limitation.
+         if (nu==nue .and. nv==nve) then
+            ier = FITPACK_INSUFFICIENT_STORAGE
+            return
+         endif
 
-        if(ider(1)==0) fpintu(1)      = fpintu(1)     +(r0-dr(1))**2
-        if(ider(3)==0) fpintu(nrintu) = fpintu(nrintu)+(r1-dr(4))**2
-        ier = FITPACK_OK
+         if(ider(1)==0) fpintu(1)      = fpintu(1)     +(r0-dr(1))**2
+         if(ider(3)==0) fpintu(nrintu) = fpintu(nrintu)+(r1-dr(4))**2
+         ier = FITPACK_OK
 
-        ! adjust the parameter reducu or reducv according to the direction
-        ! in which the last added knots were located.
-        if (lastdi<0) then
+         ! adjust the parameter reducu or reducv according to the direction
+         ! in which the last added knots were located.
+         first_knot: if (lastdi==0) then
 
-           reducu = fpold-fp
-           go to 175
+            nplv = 3
+            idd(2) = ider(2)
+            idd(4) = ider(4)
+            fpold = fp
 
-        elseif (lastdi==0) then
+         else first_knot
 
-           nplv = 3
-           idd(2) = ider(2)
-           idd(4) = ider(4)
-           fpold = fp
-           go to 230
+            if (lastdi<0) reducu = fpold-fp
+            if (lastdi>0) reducv = fpold-fp
 
-        else
+            ! store the sum of squared residuals for the current set of knots.
+            fpold = fp
+
+            ! find nplu, the number of knots we should add in the u-direction.
+            nplu = 1
+            if (nu/=8) then
+               npl1 = nplusu*2
+               rn = nplusu
+               if (reducu>acc) npl1 = int(rn*fpms/reducu)
+               nplu = min(nplusu*2,max(npl1,nplusu/2,1))
+            endif
+
+            ! find nplv, the number of knots we should add in the v-direction.
+            nplv = 3
+            if (nv/=8) then
+               npl1 = nplusv*2
+               rn = nplusv
+               if (reducv>acc) npl1 = int(rn*fpms/reducv)
+               nplv = min(nplusv*2,max(npl1,nplusv/2,1))
+            endif
+
+         endif first_knot
 
 
-            go to 170
-        endif
 
- 170    reducv = fpold-fp
-      !  store the sum of squared residuals for the current set of knots.
- 175    fpold = fp
-      !  find nplu, the number of knots we should add in the u-direction.
-        nplu = 1
-        if(nu==8) go to 180
-        npl1 = nplusu*2
-        rn = nplusu
-        if(reducu>acc) npl1 = int(rn*fpms/reducu)
-        nplu = min0(nplusu*2,max0(npl1,nplusu/2,1))
-      !  find nplv, the number of knots we should add in the v-direction.
- 180    nplv = 3
-        if(nv==8) go to 190
-        npl1 = nplusv*2
-        rn = nplusv
-        if(reducv>acc) npl1 = int(rn*fpms/reducv)
-        nplv = min0(nplusv*2,max0(npl1,nplusv/2,1))
-      !  test whether we are going to add knots in the u- or v-direction.
- 190    if (nplu<nplv) go to 210
-        if (nplu==nplv) go to 200
-        go to 230
- 200    if(lastdi<0) go to 230
- 210    if(nu==nue) go to 230
+         ! test whether we are going to add knots in the u- or v-direction.
+         ! lastdi = last knot direction: lastdi==0  = not yet set
+         !                               lastdi==1  = v direction
+         !                               lastdi==-1 = u direction
+        choose_dir: if ( nv<nve .and. &
+                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi>=0)) &
+                          .or. nplu>nplv &
+                          .or. (nplu==nplv .and. lastdi<0) )) then
 
-        ! addition in the u-direction.
-        lastdi = -1
-        nplusu = nplu
-        ifsu   = 0
-        istart = merge(1,0,iopt(2)==0)
-        add_u_knots: do l=1,nplusu
+            ! addition in the v-direction.
+            lastdi = 1
+            nplusv = nplv
+            ifsv   = 0
 
-           ! add a new knot in the u-direction
-           call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,istart)
+            add_v_knots: do l=1,nplusv
 
-           ! test whether we cannot further increase the number of knots in the u-direction.
-           if (nu==nue) exit add_u_knots
+               ! add a new knot in the v-direction.
+               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
 
-        end do add_u_knots
+               ! test whether we cannot further increase the number of knots in the v-direction.
+               if (nv==nve) exit add_v_knots
 
-        go to 270
+            end do add_v_knots
 
- 230    if(nv==nve) go to 210
+        else choose_dir
 
-        ! addition in the v-direction.
-        lastdi = 1
-        nplusv = nplv
-        ifsv   = 0
+            ! addition in the u-direction.
+            lastdi = -1
+            nplusu = nplu
+            ifsu   = 0
+            istart = merge(1,0,iopt(2)==0)
+            add_u_knots: do l=1,nplusu
 
-        add_v_knots: do l=1,nplusv
+               ! add a new knot in the u-direction
+               call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,istart)
 
-           ! add a new knot in the v-direction.
-           call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
+               ! test whether we cannot further increase the number of knots in the u-direction.
+               if (nu==nue) exit add_u_knots
 
-           ! test whether we cannot further increase the number of knots in the v-direction.
-           if (nv==nve) exit add_v_knots
+            end do add_u_knots
 
-        end do add_v_knots
+        endif choose_dir
 
         ! restart the computations with the new set of knots.
         270  continue
@@ -18004,8 +18005,8 @@ module fitpack_core
       !           tu(4)<=u(i-1)<=u(i)<=tu(nu-3), i=2,...,mu.
       !   mu    : on entry mu must specify the number of grid points along the u-axis. mu >=1.
       !   v     : real array of dimension (mv).
-      !           before entry v(j) must be set to the v co-ordinate of the j-th grid point along the v-axis.
-      !           tv(4)<=v(j-1)<=v(j)<=tv(nv-3), j=2,...,mv.
+      !           before entry v(j) must be set to the v co-ordinate of the j-th grid point along the
+      !           v-axis.  tv(4)<=v(j-1)<=v(j)<=tv(nv-3), j=2,...,mv.
       !   mv    : on entry mv must specify the number of grid points along the v-axis. mv >=1.
       !   mf    : on entry, mf must specify the dimension of the array f. mf >= mu*mv*idim
       !   wrk   : real array of dimension lwrk. used as workspace.
@@ -18032,7 +18033,8 @@ module fitpack_core
       !  references :
       !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
       !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford university press, 1993.
+      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis,
+      !                 oxford university press, 1993.
       !
       !  author :
       !    p.dierckx
