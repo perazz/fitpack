@@ -5411,14 +5411,16 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) :: sq,fp
-      real(RKIND), intent(out) :: p
+      real(RKIND), intent(out)   :: sq
+      real(RKIND), intent(inout) :: fp  ! computed if iback==0
+      real(RKIND), intent(out)   :: p
       integer :: ifsu,ifsv,ifbu,ifbv,iback,mu,mv,mz,iop0,iop1,nu,nv,nc,mm,mvnu
       !  ..array arguments..
-      real(RKIND) :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv), &
+      real(RKIND), intent(inout) :: fpu(nu),fpv(nv) ! if iback==0
+      real(RKIND) :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv),c(nc), &
                      spu(mu,4),spv(mv,4),right(mm),q(mvnu),au(nu,5),av1(nv,6), &
                      av2(nv,4),aa(2,mv),bb(2,nv),cc(nv),cosi(2,nv),bu(nu,5),bv(nv,5)
-      integer :: nru(mu),nrv(mv)
+      integer, intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
       real(RKIND) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
 
@@ -6289,32 +6291,9 @@ module fitpack_core
       end subroutine fpgrpa
 
 
-      recursive subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
-       kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
-       spx,spy,right,q,ax,ay,bx,by,nrx,nry)
-
       !  ..
-      !  ..scalar arguments..
-      real(RKIND) p,fp
-      integer ifsx,ifsy,ifbx,ifby,mx,my,mz,kx,ky,nx,ny,nc,mm,mynx, &
-       kx1,kx2,ky1,ky2
-      !  ..array arguments..
-      real(RKIND) x(mx),y(my),z(mz),tx(nx),ty(ny),c(nc),spx(mx,kx1),spy(my,ky1),&
-       right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
-      integer nrx(mx),nry(my)
-      !  ..local scalars..
-      real(RKIND) arg,cos,fac,pinv,piv,sin,term,one,half
-      integer i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,k2,l, &
-       l1,l2,ncof,nk1x,nk1y,nrold,nroldx,nroldy,number,numx,numx1, &
-       numy,numy1,n1
-      !  ..local arrays..
-      real(RKIND) h(SIZ_K+1)
-      !  ..subroutine references..
-      !    fpback,fpbspl,fpgivs,fpdisc,fprota
-      !  ..
-      !  the b-spline coefficients of the smoothing spline are calculated as
-      !  the least-squares solution of the over-determined linear system of
-      !  equations  (ay) c (ax)' = q       where
+      !  the b-spline coefficients of the smoothing spline are calculated as the least-squares
+      !  solution of the over-determined linear system of equations  (ay) c (ax)' = q  where
       !
       !               |   (spx)    |            |   (spy)    |
       !        (ax) = | ---------- |     (ay) = | ---------- |
@@ -6324,79 +6303,99 @@ module fitpack_core
       !                            q = | ------ |
       !                                | 0  ' 0 |
       !
-      !  with c      : the (ny-ky-1) x (nx-kx-1) matrix which contains the
-      !                b-spline coefficients.
+      !  with c      : the (ny-ky-1) x (nx-kx-1) matrix which contains the b-spline coefficients.
       !       z      : the my x mx matrix which contains the function values.
-      !       spx,spy: the mx x (nx-kx-1) and  my x (ny-ky-1) observation
-      !                matrices according to the least-squares problems in
-      !                the x- and y-direction.
-      !       bx,by  : the (nx-2*kx-1) x (nx-kx-1) and (ny-2*ky-1) x (ny-ky-1)
-      !                matrices which contain the discontinuity jumps of the
-      !                derivatives of the b-splines in the x- and y-direction.
-      one = 1
-      half = 0.5
+      !       spx,spy: the mx x (nx-kx-1) and  my x (ny-ky-1) observation matrices according to the
+      !                least-squares problems in the x- and y-direction.
+      !       bx,by  : the (nx-2*kx-1) x (nx-kx-1) and (ny-2*ky-1) x (ny-ky-1) matrices which contain
+      !                the discontinuity jumps of the derivatives of the b-splines in the x- and
+      !                y-direction.
+      recursive subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
+                                  kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
+                                  spx,spy,right,q,ax,ay,bx,by,nrx,nry)
+
+      !  ..
+      !  ..scalar arguments..
+      real(RKIND) ::p,fp
+      integer :: ifsx,ifsy,ifbx,ifby,mx,my,mz,kx,ky,nx,ny,nc,mm,mynx,kx1,kx2,ky1,ky2
+      !  ..array arguments..
+      real(RKIND) :: x(mx),y(my),z(mz),tx(nx),ty(ny),c(nc),spx(mx,kx1),spy(my,ky1),&
+                     right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
+      integer :: nrx(mx),nry(my)
+      !  ..local scalars..
+      real(RKIND) :: arg,cos,fac,pinv,piv,sin,term
+      integer :: i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,k2,l,l1,l2,ncof,nk1x,nk1y,&
+                 nrold,nroldx,nroldy,number,numx,numx1,numy,numy1,n1
+      !  ..local arrays..
+      real(RKIND) :: h(SIZ_K+1)
+
       nk1x = nx-kx1
       nk1y = ny-ky1
       pinv = merge(one/p,one,p>zero)
-      !  it depends on the value of the flags ifsx,ifsy,ifbx and ifby and on
-      !  the value of p whether the matrices (spx),(spy),(bx) and (by) still
-      !  must be determined.
-      if(ifsx/=0) go to 50
-      !  calculate the non-zero elements of the matrix (spx) which is the
-      !  observation matrix according to the least-squares spline approximat-
-      !  ion problem in the x-direction.
-      l = kx1
-      l1 = kx2
-      number = 0
-      do 40 it=1,mx
-        arg = x(it)
-  10    if(arg<tx(l1) .or. l==nk1x) go to 20
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 10
-  20    call fpbspl(tx,nx,kx,arg,l,h)
-        do 30 i=1,kx1
-          spx(it,i) = h(i)
-  30    continue
-        nrx(it) = number
-  40  continue
-      ifsx = 1
-  50  if(ifsy/=0) go to 100
-      !  calculate the non-zero elements of the matrix (spy) which is the
-      !  observation matrix according to the least-squares spline approximat-
-      !  ion problem in the y-direction.
-      l = ky1
-      l1 = ky2
-      number = 0
-      do 90 it=1,my
-        arg = y(it)
-  60    if(arg<ty(l1) .or. l==nk1y) go to 70
-        l = l1
-        l1 = l+1
-        number = number+1
-        go to 60
-  70    call fpbspl(ty,ny,ky,arg,l,h)
-        do 80 i=1,ky1
-          spy(it,i) = h(i)
-  80    continue
-        nry(it) = number
-  90  continue
-      ifsy = 1
- 100  if(p<=0.) go to 120
-      !  calculate the non-zero elements of the matrix (bx).
-      if(ifbx/=0 .or. nx==2*kx1) go to 110
-      call fpdisc(tx,nx,kx2,bx,nx)
-      ifbx = 1
-      !  calculate the non-zero elements of the matrix (by).
- 110  if(ifby/=0 .or. ny==2*ky1) go to 120
-      call fpdisc(ty,ny,ky2,by,ny)
-      ifby = 1
-      !  reduce the matrix (ax) to upper triangular form (rx) using givens
-      !  rotations. apply the same transformations to the rows of matrix q
-      !  to obtain the my x (nx-kx-1) matrix g.
+
+      !  it depends on the value of the flags ifsx,ifsy,ifbx and ifby and on the value of p whether
+      !  the matrices (spx),(spy),(bx) and (by) still must be determined.
+      if (ifsx==0) then
+
+          !  calculate the non-zero elements of the matrix (spx) which is the observation matrix
+          !  according to the least-squares spline approximation problem in the x-direction.
+          l  = kx1
+          l1 = kx2
+          number = 0
+          get_nrx: do it=1,mx
+            arg = x(it)
+            do while (arg>=tx(l1) .and. l/=nk1x)
+               l  = l1
+               l1 = l+1
+               number = number+1
+            end do
+            call fpbspl(tx,nx,kx,arg,l,h)
+            spx(it,1:kx1) = h(1:kx1)
+            nrx(it) = number
+          end do get_nrx
+
+          ifsx = 1
+      endif
+
+      if (ifsy==0) then
+
+          ! calculate the non-zero elements of the matrix (spy) which is the observation matrix
+          ! according to the least-squares spline approximation problem in the y-direction.
+          l  = ky1
+          l1 = ky2
+          number = 0
+          get_nry: do it=1,my
+             arg = y(it)
+             do while (arg>=ty(l1) .and. l/=nk1y)
+                l = l1
+                l1 = l+1
+                number = number+1
+             end do
+            call fpbspl(ty,ny,ky,arg,l,h)
+            spy(it,1:ky1) = h(1:ky1)
+            nry(it) = number
+          end do get_nry
+
+          ifsy = 1
+      endif
+
+      if (p>zero) then
+          !  calculate the non-zero elements of the matrix (bx).
+          if (ifbx==0 .and. nx/=2*kx1) then
+             call fpdisc(tx,nx,kx2,bx,nx)
+             ifbx = 1
+          endif
+          !  calculate the non-zero el ements of the matrix (by).
+          if (ifby==0 .and. ny/=2*ky1) then
+             call fpdisc(ty,ny,ky2,by,ny)
+             ifby = 1
+          endif
+      endif
+
+      !  reduce the matrix (ax) to upper triangular form (rx) using givens rotations. apply the
+      !  same transformations to the rows of matrix q to obtain the my x (nx-kx-1) matrix g.
       !  store matrix (rx) into (ax) and g into q.
- 120  l = my*nk1x
+      l = my*nk1x
       !  initialization.
       q(1:l) = zero
       ax(1:nk1x,kx2) = zero
@@ -6404,63 +6403,71 @@ module fitpack_core
       nrold = 0
       !  ibandx denotes the bandwidth of the matrices (ax) and (rx).
       ibandx = kx1
-      do 270 it=1,mx
-        number = nrx(it)
- 150    if(nrold==number) go to 180
-        if(p<=0.) go to 260
-        ibandx = kx2
-      !  fetch a new row of matrix (bx).
-        n1 = nrold+1
-        do 160 j=1,kx2
-          h(j) = bx(n1,j)*pinv
- 160    continue
-      !  find the appropriate column of q.
-        right(1:my) = zero
-        irot = nrold
-        go to 210
-      !  fetch a new row of matrix (spx).
- 180    h(ibandx) = zero
-        do 190 j=1,kx1
-          h(j) = spx(it,j)
- 190    continue
-      !  find the appropriate column of q.
-        do 200 j=1,my
-          l = l+1
-          right(j) = z(l)
- 200    continue
-        irot = number
-      !  rotate the new row of matrix (ax) into triangle.
- 210    do 240 i=1,ibandx
-          irot = irot+1
-          piv = h(i)
-          if (piv==zero) go to 240
-      !  calculate the parameters of the givens transformation.
-          call fpgivs(piv,ax(irot,1),cos,sin)
-      !  apply that transformation to the rows of matrix q.
-          iq = (irot-1)*my
-          call fprota(cos,sin,right(1:my),q(iq+1:iq+my))
-      !  apply that transformation to the columns of (ax).
-          if(i==ibandx) go to 250
-          i2 = 1
-          i3 = i+1
-          do 230 j=i3,ibandx
-            i2 = i2+1
-            call fprota(cos,sin,h(j),ax(irot,i2))
- 230      continue
- 240    continue
- 250    if(nrold==number) go to 270
- 260    nrold = nrold+1
-        go to 150
- 270  continue
-      !  reduce the matrix (ay) to upper triangular form (ry) using givens
-      !  rotations. apply the same transformations to the columns of matrix g
-      !  to obtain the (ny-ky-1) x (nx-kx-1) matrix h.
+      givens: do it=1,mx
+         number = nrx(it)
+         inner: do
+           if(nrold==number) then
+              ! fetch a new row of matrix (spx).
+              h(ibandx) = zero
+              h(1:kx1) = spx(it,1:kx1)
+              ! find the appropriate column of q.
+              do j=1,my
+                 l = l+1
+                 right(j) = z(l)
+              end do
+              irot = number
+           elseif (p<=zero) then
+              nrold = nrold+1
+              cycle inner
+           else
+              ibandx = kx2
+              ! fetch a new row of matrix (bx).
+              n1 = nrold+1
+              h(1:kx2) = bx(n1,1:kx2)*pinv
+              ! find the appropriate column of q.
+              right(1:my) = zero
+              irot = nrold
+           endif
+
+           ! rotate the new row of matrix (ax) into triangle.
+           rot_new_row: do i=1,ibandx
+              irot = irot+1
+              piv = h(i)
+              if (piv==zero) cycle rot_new_row
+
+              ! calculate the parameters of the givens transformation.
+              call fpgivs(piv,ax(irot,1),cos,sin)
+              ! apply that transformation to the rows of matrix q.
+              iq = (irot-1)*my
+              call fprota(cos,sin,right(1:my),q(iq+1:iq+my))
+
+              ! apply that transformation to the columns of (ax).
+              if (i<ibandx) then
+                 i2 = 1
+                 i3 = i+1
+                 do j=i3,ibandx
+                    i2 = i2+1
+                    call fprota(cos,sin,h(j),ax(irot,i2))
+                 end do
+              endif
+           end do rot_new_row
+
+           if (nrold==number) exit inner
+
+           nrold = nrold+1
+         end do inner
+      end do givens
+
+      !  reduce the matrix (ay) to upper triangular form (ry) using givens rotations. apply the same
+      !  transformations to the columns of matrix g to obtain the (ny-ky-1) x (nx-kx-1) matrix h.
       !  store matrix (ry) into (ay) and h into c.
       ncof = nk1x*nk1y
+
       !  initialization.
       c(1:ncof) = zero
       ay(1:nk1y,1:ky2) = zero
       nrold = 0
+
       !  ibandy denotes the bandwidth of the matrices (ay) and (ry).
       ibandy = ky1
       do 420 it=1,my
@@ -6561,7 +6568,7 @@ module fitpack_core
       !  evaluate s(x,y) at the current grid point by making the sum of the
       !  cross products of the non-zero b-splines at (x,y), multiplied with
       !  the appropriate b-spline coefficients.
-          term = 0.
+          term = zero
           k1 = numx*nk1y+numy
           do 520 l1=1,kx1
             k2 = k1
