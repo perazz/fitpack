@@ -6403,9 +6403,9 @@ module fitpack_core
       nrold = 0
       !  ibandx denotes the bandwidth of the matrices (ax) and (rx).
       ibandx = kx1
-      givens: do it=1,mx
+      givens_ax: do it=1,mx
          number = nrx(it)
-         inner: do
+         inner_ax: do
            if(nrold==number) then
               ! fetch a new row of matrix (spx).
               h(ibandx) = zero
@@ -6418,7 +6418,7 @@ module fitpack_core
               irot = number
            elseif (p<=zero) then
               nrold = nrold+1
-              cycle inner
+              cycle inner_ax
            else
               ibandx = kx2
               ! fetch a new row of matrix (bx).
@@ -6452,11 +6452,11 @@ module fitpack_core
               endif
            end do rot_new_row
 
-           if (nrold==number) exit inner
+           if (nrold==number) exit inner_ax
 
            nrold = nrold+1
-         end do inner
-      end do givens
+         end do inner_ax
+      end do givens_ax
 
       !  reduce the matrix (ay) to upper triangular form (ry) using givens rotations. apply the same
       !  transformations to the columns of matrix g to obtain the (ny-ky-1) x (nx-kx-1) matrix h.
@@ -6470,79 +6470,88 @@ module fitpack_core
 
       !  ibandy denotes the bandwidth of the matrices (ay) and (ry).
       ibandy = ky1
-      do 420 it=1,my
-        number = nry(it)
- 300    if(nrold==number) go to 330
-        if(p<=0.) go to 410
-        ibandy = ky2
-      !  fetch a new row of matrix (by).
-        n1 = nrold+1
-        h(1:ky2) = by(n1,1:ky2)*pinv
+      givens_ay: do it=1,my
+         number = nry(it)
+         inner_ay: do
+            if (nrold==number) then
+                ! fetch a new row of matrix (spy)
+                h(ibandy) = zero
+                h(1:ky1) = spy(it,1:ky1)
+                ! find the appropriate row of g.
+                l = it
+                do j=1,nk1x
+                   right(j) = q(l)
+                   l = l+my
+                end do
+                irot = number
+            elseif (p<=zero) then
+                nrold = nrold+1
+                cycle inner_ay
+            else
+                ibandy = ky2
+                ! fetch a new row of matrix (by).
+                n1 = nrold+1
+                h(1:ky2) = by(n1,1:ky2)*pinv
+                ! find the appropriate row of g.
+                right(1:nk1x) = zero
+                irot = nrold
+            endif
 
-      !  find the appropriate row of g.
-        right(1:nk1x) = zero
-        irot = nrold
-        go to 360
-      !  fetch a new row of matrix (spy)
- 330    h(ibandy) = zero
-        h(1:ky1) = spy(it,1:ky1)
-      !  find the appropriate row of g.
-        l = it
-        do 350 j=1,nk1x
-          right(j) = q(l)
-          l = l+my
- 350    continue
-        irot = number
-      !  rotate the new row of matrix (ay) into triangle.
- 360    do 390 i=1,ibandy
-          irot = irot+1
-          piv = h(i)
-          if (piv==zero) go to 390
-      !  calculate the parameters of the givens transformation.
-          call fpgivs(piv,ay(irot,1),cos,sin)
-      !  apply that transformation to the columns of matrix g.
-          ic = irot
-          do 370 j=1,nk1x
-            call fprota(cos,sin,right(j),c(ic))
-            ic = ic+nk1y
- 370      continue
-      !  apply that transformation to the columns of matrix (ay).
-          if(i==ibandy) go to 400
-          i2 = 1
-          i3 = i+1
-          do 380 j=i3,ibandy
-            i2 = i2+1
-            call fprota(cos,sin,h(j),ay(irot,i2))
- 380      continue
- 390    continue
- 400    if(nrold==number) go to 420
- 410    nrold = nrold+1
-        go to 300
- 420  continue
+            ! rotate the new row of matrix (ay) into triangle.
+            rot_new_rowy: do i=1,ibandy
+               irot = irot+1
+               piv = h(i)
+               if (piv==zero) cycle rot_new_rowy
+
+               ! calculate the parameters of the givens transformation.
+               call fpgivs(piv,ay(irot,1),cos,sin)
+               ! apply that transformation to the columns of matrix g.
+               ic = irot
+               do j=1,nk1x
+                  call fprota(cos,sin,right(j),c(ic))
+                  ic = ic+nk1y
+               end do
+               ! apply that transformation to the columns of matrix (ay).
+               if (i<ibandy) then
+                   i2 = 1
+                   i3 = i+1
+                   do j=i3,ibandy
+                      i2 = i2+1
+                      call fprota(cos,sin,h(j),ay(irot,i2))
+                   end do
+               endif
+            end do rot_new_rowy
+            if (nrold==number) exit inner_ay
+            nrold = nrold+1
+         end do inner_ay
+      end do givens_ay
+
       !  backward substitution to obtain the b-spline coefficients as the
       !  solution of the linear system    (ry) c (rx)' = h.
       !  first step: solve the system  (ry) (c1) = h.
       k = 1
-      do 450 i=1,nk1x
+      do i=1,nk1x
         c(k:k+nk1y-1) = fpback(ay,c(k),nk1y,ibandy,ny)
         k = k+nk1y
- 450  continue
+      end do
+
       !  second step: solve the system  c (rx)' = (c1).
       k = 0
-      do 480 j=1,nk1y
-        k = k+1
-        l = k
-        do 460 i=1,nk1x
-          right(i) = c(l)
-          l = l+nk1y
- 460    continue
-        right(:nk1x) = fpback(ax,right,nk1x,ibandx,nx)
-        l = k
-        do 470 i=1,nk1x
-          c(l) = right(i)
-          l = l+nk1y
- 470    continue
- 480  continue
+      do j=1,nk1y
+         k = k+1
+         l = k
+         do i=1,nk1x
+            right(i) = c(l)
+            l = l+nk1y
+         end do
+         right(:nk1x) = fpback(ax,right,nk1x,ibandx,nx)
+         l = k
+         do i=1,nk1x
+            c(l) = right(i)
+            l = l+nk1y
+         end do
+      end do
+
       !  calculate the quantities
       !    res(i,j) = (z(i,j) - s(x(i),y(j)))**2 , i=1,2,..,mx;j=1,2,..,my
       !    fp = sumi=1,mx(sumj=1,my(res(i,j)))
@@ -6550,56 +6559,53 @@ module fitpack_core
       !                  tx(r+kx) <= x(i) <= tx(r+kx+1)
       !    fpy(r) = sumi=1,mx(sum''j(res(i,j))) , r=1,2,...,ny-2*ky-1
       !                  ty(r+ky) <= y(j) <= ty(r+ky+1)
-      fp  = zero
-      fpx = zero
-      fpy = zero
-      nk1y = ny-ky1
-      iz = 0
+      fp     = zero
+      fpx    = zero
+      fpy    = zero
+      nk1y   = ny-ky1
+      iz     = 0
       nroldx = 0
+
       !  main loop for the different grid points.
-      do 550 i1=1,mx
-        numx = nrx(i1)
-        numx1 = numx+1
-        nroldy = 0
-        do 540 i2=1,my
-          numy = nry(i2)
-          numy1 = numy+1
-          iz = iz+1
-      !  evaluate s(x,y) at the current grid point by making the sum of the
-      !  cross products of the non-zero b-splines at (x,y), multiplied with
-      !  the appropriate b-spline coefficients.
-          term = zero
-          k1 = numx*nk1y+numy
-          do 520 l1=1,kx1
-            k2 = k1
-            fac = spx(i1,l1)
-            do 510 l2=1,ky1
-              k2 = k2+1
-              term = term+fac*spy(i2,l2)*c(k2)
- 510        continue
-            k1 = k1+nk1y
- 520      continue
-      !  calculate the squared residual at the current grid point.
-          term = (z(iz)-term)**2
-      !  adjust the different parameters.
-          fp = fp+term
-          fpx(numx1) = fpx(numx1)+term
-          fpy(numy1) = fpy(numy1)+term
-          fac = term*half
-          if(numy==nroldy) go to 530
-          fpy(numy1) = fpy(numy1)-fac
-          fpy(numy) = fpy(numy)+fac
- 530      nroldy = numy
-          if(numx==nroldx) go to 540
-          fpx(numx1) = fpx(numx1)-fac
-          fpx(numx) = fpx(numx)+fac
- 540    continue
-        nroldx = numx
- 550  continue
+      grid_x: do i1=1,mx
+         numx = nrx(i1)
+         numx1 = numx+1
+         nroldy = 0
+         grid_y: do i2=1,my
+            numy = nry(i2)
+            numy1 = numy+1
+            iz = iz+1
+            ! evaluate s(x,y) at the current grid point by making the sum of the
+            ! cross products of the non-zero b-splines at (x,y), multiplied with
+            ! the appropriate b-spline coefficients.
+            term = zero
+            k1 = numx*nk1y+numy
+            do l1=1,kx1
+               term = term+spx(i1,l1)*dot_product(spy(i2,1:ky1),c(k1+1:k1+k1y))
+               k1 = k1+nk1y
+            end do
+
+            ! calculate the squared residual at the current grid point.
+            term = (z(iz)-term)**2
+            ! adjust the different parameters.
+            fp = fp+term
+            fpx(numx1) = fpx(numx1)+term
+            fpy(numy1) = fpy(numy1)+term
+            fac = term*half
+            if (numy/=nroldy) then
+               fpy(numy1) = fpy(numy1)-fac
+               fpy(numy)  = fpy(numy) +fac
+            endif
+            nroldy = numy
+            if (numx/=nroldx) then
+               fpx(numx1) = fpx(numx1)-fac
+               fpx(numx)  = fpx(numx) +fac
+            endif
+         end do grid_y
+         nroldx = numx
+      end do grid_x
       return
       end subroutine fpgrre
-
-
 
       recursive subroutine fpgrsp(ifsu,ifsv,ifbu,ifbv,iback,u,mu,v, &
        mv,r,mr,dr,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
