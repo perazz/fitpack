@@ -6581,7 +6581,7 @@ module fitpack_core
             term = zero
             k1 = numx*nk1y+numy
             do l1=1,kx1
-               term = term+spx(i1,l1)*dot_product(spy(i2,1:ky1),c(k1+1:k1+k1y))
+               term = term+spx(i1,l1)*dot_product(spy(i2,1:ky1),c(k1+1:k1+ky1))
                k1 = k1+nk1y
             end do
 
@@ -6773,64 +6773,42 @@ module fitpack_core
       dr11 = dr(4)
       a0(1,1:mv) = dr01
       a1(1,1:mv) = dr11
-      if(nv8==0 .or. p<=zero) go to 165
-      b0(1,1:nv8) = zero
-      b1(1,1:nv8) = zero
- 165  mvv = mv
-      if(iop0==0) go to 195
-      fac = (tu(5)-tu(4))/three
-      dr02 = dr(2)*fac
-      dr03 = dr(3)*fac
-      c0(1:nv4) = dr01+dr02*cosi(1,1:nv4)+dr03*cosi(2,1:nv4)
+      if (nv8/=0 .and. p>zero) then
+         b0(1,1:nv8) = zero
+         b1(1,1:nv8) = zero
+      endif
+      mvv = mv
+      if (iop0/=0) then
+          fac       = (tu(5)-tu(4))/three
+          c0(1:nv4) = dr01+fac*matmul(dr(2:3),cosi(:,:nv4))
 
-      do 180 i=1,mv
-         number = nrv(i)
-         fac = 0.
-         do 175 j=1,4
-            number = number+1
-            fac = fac+c0(number)*spv(i,j)
- 175     continue
-         a0(2,i) = fac
- 180  continue
-      if(nv8==0 .or. p<=zero) go to 195
-      do 190 i=1,nv8
-         number = i
-         fac = 0.
-         do 185 j=1,5
-            fac = fac+c0(number)*bv(i,j)
-            number = number+1
- 185     continue
-         b0(2,i) = fac*pinv
- 190  continue
-      mvv = mv+nv8
- 195  if(iop1==0) go to 225
-      fac = (tu(nu4)-tu(nu4+1))/three
-      dr12 = dr(5)*fac
-      dr13 = dr(6)*fac
-      c1(1:nv4) = dr11+dr12*cosi(1,1:nv4)+dr13*cosi(2,1:nv4)
-      do 210 i=1,mv
-         a1(2,i) = dot_product(c1(nrv(i)+1:nrv(i)+4),spv(i,1:4))
- 210  continue
-      if(nv8==0 .or. p<=zero) go to 225
-      do 220 i=1,nv8
-         number = i
-         fac = 0.
-         do 215 j=1,5
-            fac = fac+c1(number)*bv(i,j)
-            number = number+1
- 215     continue
-         b1(2,i) = fac*pinv
- 220  continue
-      mvv = mv+nv8
-      !  we first determine the matrices (auu) and (qq). then we reduce the
-      !  matrix (auu) to an unit upper triangular form (ru) using givens
-      !  rotations without square roots. we apply the same transformations to
-      !  the rows of matrix qq to obtain the mv x nuu matrix g.
+          forall (i=1:mv) a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
+
+          if (nv8/=0 .and. p>zero) then
+              forall (i=1:nv8) b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))*pinv
+              mvv = mv+nv8
+          endif
+      endif
+      if (iop1/=0) then
+          fac       = (tu(nu4)-tu(nu4+1))/three
+          c1(1:nv4) = dr11 + fac*matmul(dr(5:6),cosi(:,:nv4))
+
+          forall (i=1:mv) a1(2,i) = dot_product(c1(nrv(i)+1:nrv(i)+4),spv(i,1:4))
+
+          if (nv8/=0 .and. p>zero) then
+              forall (i=1:nv8) b1(2,i) = pinv*dot_product(bv(i,1:5),c1(i:i+4))
+              mvv = mv+nv8
+          endif
+      endif
+      !  we first determine the matrices (auu) and (qq). then we reduce the matrix (auu) to an unit
+      !  upper triangular form (ru) using givens rotations without square roots. we apply the same
+      !  transformations to the rows of matrix qq to obtain the mv x nuu matrix g.
       !  we store matrix (ru) into au and g into q.
- 225  l = mvv*nuu
+      l = mvv*nuu
       !  initialization.
-      sq = 0.
-      if(l==0) go to 245
+      sq = zero
+
+      if (l==0) go to 245
       q(1:l) = zero
       au(1:nuu,1:5) = zero
       l = 0
