@@ -6614,23 +6614,21 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) p,sq,fp
-      integer ifsu,ifsv,ifbu,ifbv,iback,mu,mv,mr,iop0,iop1,nu,nv,nc, &
-       mm,mvnu
+      real(RKIND) :: p,sq,fp
+      integer :: ifsu,ifsv,ifbu,ifbv,iback,mu,mv,mr,iop0,iop1,nu,nv,nc,mm,mvnu
       !  ..array arguments..
-      real(RKIND) u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv), &
-       spu(mu,4),spv(mv,4),right(mm),q(mvnu),au(nu,5),av1(nv,6),c0(nv), &
-       av2(nv,4),a0(2,mv),b0(2,nv),cosi(2,nv),bu(nu,5),bv(nv,5),c1(nv), &
-       a1(2,mv),b1(2,nv)
-      integer nru(mu),nrv(mv)
+      real(RKIND) :: u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv), &
+                     spu(mu,4),spv(mv,4),right(mm),q(mvnu),au(nu,5),av1(nv,6),c0(nv), &
+                     av2(nv,4),a0(2,mv),b0(2,nv),cosi(2,nv),bu(nu,5),bv(nv,5),c1(nv), &
+                     a1(2,mv),b1(2,nv)
+      integer :: nru(mu),nrv(mv)
       !  ..local scalars..
-      real(RKIND) arg,co,dr01,dr02,dr03,dr11,dr12,dr13,fac,fac0,fac1,pinv,piv, &
-       si,term
-      integer i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
-       j0,j1,k,k1,k2,l,l0,l1,l2,mvv,ncof,nrold,nroldu,nroldv,number, &
-       numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
+      real(RKIND) :: arg,co,dr01,dr11,fac,fac0,fac1,pinv,piv,si,term
+      integer :: i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
+                 j0,j1,k,k1,l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number, &
+                 numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),h1(5),h2(4)
+      real(RKIND) :: h(SIZ_K+1),h1(5),h2(4)
 
       !  let
       !               |     (spu)      |            |     (spv)      |
@@ -6800,6 +6798,7 @@ module fitpack_core
               mvv = mv+nv8
           endif
       endif
+
       !  we first determine the matrices (auu) and (qq). then we reduce the matrix (auu) to an unit
       !  upper triangular form (ru) using givens rotations without square roots. we apply the same
       !  transformations to the rows of matrix qq to obtain the mv x nuu matrix g.
@@ -6808,314 +6807,341 @@ module fitpack_core
       !  initialization.
       sq = zero
 
-      if (l==0) go to 245
-      q(1:l) = zero
-      au(1:nuu,1:5) = zero
-      l = 0
- 245  nrold = 0
-      n1 = nrold+1
-      do 420 it=1,mu
-        number = nru(it)
-      !  find the appropriate column of q.
- 250    right(1:mvv) = zero
-
-        if (nrold==number) then
-           !  fetch a new row of matrix (spu).
-           h(1:4) = spu(it,1:4)
-
-           !  find the appropriate column of q.
-           right(1:mv) = r(l+1:l+mv)
-           l  = l+mv
-           i0 = 1
-           i1 = 4
-        else
-
-           if(p<=zero) go to 410
-           !  fetch a new row of matrix (bu).
-           h(1:5) = bu(n1,1:5)*pinv
-           i0 = 1
-           i1 = 5
-        end if
-
-        j0 = n1
-        j1 = nu7-number
-      !  take into account that we eliminate the constraints (3)
- 315     if(j0-1>iop0) go to 335
-         fac0 = h(i0)
-         right(1:mv) = right(1:mv)-fac0*a0(j0,1:mv)
-         if(mv==mvv) go to 330
-         j = mv
-         do 325 jj=1,nv8
-            j = j+1
-            right(j) = right(j)-fac0*b0(j0,jj)
- 325     continue
- 330     j0 = j0+1
-         i0 = i0+1
-         go to 315
-      !  take into account that we eliminate the constraints (4)
- 335     if(j1-1>iop1) go to 360
-         fac1 = h(i1)
-         right(1:mv) = right(1:mv)-fac1*a1(j1,1:mv)
-         if(mv==mvv) go to 350
-         j = mv
-         do 345 jj=1,nv8
-            j = j+1
-            right(j) = right(j)-fac1*b1(j1,jj)
- 345     continue
- 350     j1 = j1+1
-         i1 = i1-1
-         go to 335
- 360     irot = nrold-iop0-1
-         if(irot<0) irot = 0
-      !  rotate the new row of matrix (auu) into triangle.
-        if(i0>i1) go to 390
-        do 385 i=i0,i1
-          irot = irot+1
-          piv = h(i)
-          if (piv==zero) go to 385
-      !  calculate the parameters of the givens transformation.
-          call fpgivs(piv,au(irot,1),co,si)
-      !  apply that transformation to the rows of matrix (qq).
-          iq = (irot-1)*mvv
-          do 370 j=1,mvv
-            iq = iq+1
-            call fprota(co,si,right(j),q(iq))
- 370      continue
-      !  apply that transformation to the columns of (auu).
-          if(i==i1) go to 385
-          i2 = 1
-          i3 = i+1
-          do 380 j=i3,i1
-            i2 = i2+1
-            call fprota(co,si,h(j),au(irot,i2))
- 380      continue
- 385    continue
-      !  we update the sum of squared residuals.
- 390    do 395 j=1,mvv
-          sq = sq+right(j)**2
- 395    continue
-        if(nrold==number) go to 420
- 410    nrold = n1
-        n1 = n1+1
-        go to 250
- 420  continue
-      if(nuu==0) go to 800
-      !  we determine the matrix (avv) and then we reduce her to an unit
-      !  upper triangular form (rv) using givens rotations without square
-      !  roots. we apply the same transformations to the columns of matrix
-      !  g to obtain the (nv-7) x (nu-6-iop0-iop1) matrix h.
-      !  we store matrix (rv) into av1 and av2, h into c.
-      !  the nv7 x nv7 triangular unit upper matrix (rv) has the form
-      !              | av1 '     |
-      !       (rv) = |     ' av2 |
-      !              |  0  '     |
-      !  with (av2) a nv7 x 4 matrix and (av1) a nv11 x nv11 unit upper
-      !  triangular matrix of bandwidth 5.
-      ncof = nuu*nv7
-      !  initialization.
-      c(:ncof) = zero
-      av1(1:nv4,1:5) = zero
-      av2(1:nv4,1:4) = zero
-      jper = 0
+      if (l/=0) then
+         q(1:l) = zero
+         au(1:nuu,1:5) = zero
+         l = 0
+      endif
       nrold = 0
-      do 770 it=1,mv
-        number = nrv(it)
- 450    if(nrold==number) go to 480
-        if(p<=0.) go to 760
-      !  fetch a new row of matrix (bv).
-        n1 = nrold+1
-        h(1:5) = bv(n1,1:5)*pinv
-      !  find the appropriate row of g.
-        right(1:nuu) = zero
-        if(mv==mvv) go to 510
-        l = mv+n1
-        do 470 j=1,nuu
-          right(j) = q(l)
-          l = l+mvv
- 470    continue
-        go to 510
-      !  fetch a new row of matrix (spv)
- 480    h(1:5) = [spv(it,1:4),zero]
-      !  find the appropriate row of g.
-        l = it
-        do 500 j=1,nuu
-          right(j) = q(l)
-          l = l+mvv
- 500    continue
-      !  test whether there are non-zero values in the new row of (avv)
-      !  corresponding to the b-splines n(j;v),j=nv7+1,...,nv4.
- 510     if(nrold<nv11) go to 710
-         if(jper/=0) go to 550
-      !  initialize the matrix (av2).
-         jk = nv11+1
-         do 540 i=1,4
-            ik = jk
-            do 520 j=1,5
-               if(ik<=0) go to 530
-               av2(ik,i) = av1(ik,j)
-               ik = ik-1
- 520        continue
- 530        jk = jk+1
- 540     continue
-         jper = 1
-      !  if one of the non-zero elements of the new row corresponds to one of
-      !  the b-splines n(j;v),j=nv7+1,...,nv4, we take account of condition
-      !  (2) for setting up this row of (avv). the row is stored in h1( the
-      !  part with respect to av1) and h2 (the part with respect to av2).
- 550     h1 = zero
-         h2 = zero
-         j = nrold-nv11
-         do 600 i=1,5
-            j = j+1
-            l0 = j
- 570        l1 = l0-4
-            if(l1<=0) go to 590
-            if(l1<=nv11) go to 580
-            l0 = l1-nv11
-            go to 570
- 580        h1(l1) = h(i)
-            go to 600
- 590        h2(l0) = h2(l0) + h(i)
- 600     continue
-      !  rotate the new row of (avv) into triangle.
-         if(nv11<=0) go to 670
-      !  rotations with the rows 1,2,...,nv11 of (avv).
-         do 660 j=1,nv11
-            piv = h1(1)
-            i2 = min0(nv11-j,4)
-            if (piv==zero) go to 640
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,av1(j,1),co,si)
-      !  apply that transformation to the columns of matrix g.
-            ic = j
-            do 610 i=1,nuu
-               call fprota(co,si,right(i),c(ic))
-               ic = ic+nv7
- 610        continue
-      !  apply that transformation to the rows of (avv) with respect to av2.
-            call fprota(co,si,h2(1:4),av2(j,1:4))
-      !  apply that transformation to the rows of (avv) with respect to av1.
-            if(i2==0) go to 670
-            do 630 i=1,i2
-               i1 = i+1
-               call fprota(co,si,h1(i1),av1(j,i1))
- 630        continue
- 640        h1(1:i2+1) = [h1(2:i2+1),zero]
+      n1 = nrold+1
+      auu_iterations: do it=1,mu
+         number = nru(it)
 
- 660     continue
-      !  rotations with the rows nv11+1,...,nv7 of avv.
- 670     do 700 j=1,4
-            ij = nv11+j
-            if(ij<=0) go to 700
-            piv = h2(j)
-            if (piv==zero) go to 700
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,av2(ij,j),co,si)
-      !  apply that transformation to the columns of matrix g.
-            ic = ij
-            do 680 i=1,nuu
-               call fprota(co,si,right(i),c(ic))
-               ic = ic+nv7
- 680        continue
-            if(j==4) go to 700
-      !  apply that transformation to the rows of (avv) with respect to av2.
-            j1 = j+1
-            call fprota(co,si,h2(j1:4),av2(ij,j1:4))
- 700     continue
-      !  we update the sum of squared residuals.
-         do 705 i=1,nuu
-           sq = sq+right(i)**2
- 705     continue
-         go to 750
-      !  rotation into triangle of the new row of (avv), in case the elements
-      !  corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
- 710     irot =nrold
-         do 740 i=1,5
-            irot = irot+1
-            piv = h(i)
-            if (piv==zero) go to 740
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,av1(irot,1),co,si)
-      !  apply that transformation to the columns of matrix g.
-            ic = irot
-            do 720 j=1,nuu
-               call fprota(co,si,right(j),c(ic))
-               ic = ic+nv7
- 720        continue
-      !  apply that transformation to the rows of (avv).
-            if(i==5) go to 740
-            i2 = 1
-            i3 = i+1
-            do 730 j=i3,5
-               i2 = i2+1
-               call fprota(co,si,h(j),av1(irot,i2))
- 730        continue
- 740     continue
-      !  we update the sum of squared residuals.
-         do 745 i=1,nuu
-           sq = sq+right(i)**2
- 745     continue
- 750     if(nrold==number) go to 770
- 760     nrold = nrold+1
-         go to 450
- 770  continue
-      !  test whether the b-spline coefficients must be determined.
-      if(iback/=0) return
-      !  backward substitution to obtain the b-spline coefficients as the
-      !  solution of the linear system    (rv) (cr) (ru)' = h.
-      !  first step: solve the system  (rv) (c1) = h.
-      k = 1
-      do 780 i=1,nuu
-         c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
-         k = k+nv7
- 780  continue
-      !  second step: solve the system  (cr) (ru)' = (c1).
-      k = 0
-      do 795 j=1,nv7
-        k = k+1
-        l = k
-        do 785 i=1,nuu
-          right(i) = c(l)
-          l = l+nv7
- 785    continue
-        right(:nuu) = fpback(au,right,nuu,5,nu)
-        l = k
-        do 790 i=1,nuu
-           c(l) = right(i)
-           l = l+nv7
- 790    continue
- 795  continue
+         auu_inner: do
+
+         ! find the appropriate column of q.
+         right(1:mvv) = zero
+
+         if (nrold==number) then
+            !  fetch a new row of matrix (spu).
+            h(1:4) = spu(it,1:4)
+
+            !  find the appropriate column of q.
+            right(1:mv) = r(l+1:l+mv)
+            l  = l+mv
+            i0 = 1
+            i1 = 4
+         else
+
+            if (p<=zero) then
+               nrold = n1
+               n1 = n1+1
+               cycle auu_inner
+            end if
+            !  fetch a new row of matrix (bu).
+            h(1:5) = bu(n1,1:5)*pinv
+            i0 = 1
+            i1 = 5
+         end if
+
+         j0 = n1
+         j1 = nu7-number
+
+         ! take into account that we eliminate the constraints (3)
+         do while (j0-1<=iop0)
+             fac0 = h(i0)
+             right(1:mv) = right(1:mv)-fac0*a0(j0,1:mv)
+             if (mv/=mvv) then
+                 j = mv
+                 do jj=1,nv8
+                    j = j+1
+                    right(j) = right(j)-fac0*b0(j0,jj)
+                 end do
+             endif
+             j0 = j0+1
+             i0 = i0+1
+         end do
+
+         ! take into account that we eliminate the constraints (4)
+         do while (j1-1<=iop1)
+            fac1 = h(i1)
+            right(1:mv) = right(1:mv)-fac1*a1(j1,1:mv)
+            if (mv/=mvv) then
+                j = mv
+                do jj=1,nv8
+                   j = j+1
+                   right(j) = right(j)-fac1*b1(j1,jj)
+                end do
+            endif
+            j1 = j1+1
+            i1 = i1-1
+         end do
+
+         irot = max(0,nrold-iop0-1)
+
+         ! rotate the new row of matrix (auu) into triangle.
+         if (i0<=i1) then
+            auu_rot: do i=i0,i1
+               irot = irot+1
+               piv = h(i)
+               if (piv==zero) cycle auu_rot
+               ! calculate the parameters of the givens transformation.
+               call fpgivs(piv,au(irot,1),co,si)
+               ! apply that transformation to the rows of matrix (qq).
+               iq = (irot-1)*mvv
+
+               do j=1,mvv
+                  iq = iq+1
+                  call fprota(co,si,right(j),q(iq))
+               end do
+               ! apply that transformation to the columns of (auu).
+               if (i<i1) then
+                  i2 = 1
+                  i3 = i+1
+                  do j=i3,i1
+                     i2 = i2+1
+                     call fprota(co,si,h(j),au(irot,i2))
+                  end do
+               endif
+           end do auu_rot
+         endif
+
+         ! we update the sum of squared residuals.
+         sq = sq+sum(right(:mvv)**2)
+         if (nrold==number) exit auu_inner
+         nrold = n1
+         n1 = n1+1
+         end do auu_inner
+      end do auu_iterations
+
+      if (nuu/=0) then
+          !  we determine the matrix (avv) and then we reduce her to an unit upper triangular form (rv)
+          !  using givens rotations without square roots. we apply the same transformations to the
+          !  columns of matrix g to obtain the (nv-7) x (nu-6-iop0-iop1) matrix h. we store matrix (rv)
+          !  into av1 and av2, h into c. the nv7 x nv7 triangular unit upper matrix (rv) has the form
+          !              | av1 '     |
+          !       (rv) = |     ' av2 |
+          !              |  0  '     |
+          !  with (av2) a nv7 x 4 matrix and (av1) a nv11 x nv11 unit upper triangular matrix of
+          !  bandwidth 5.
+          ncof = nuu*nv7
+          !  initialization.
+          c(:ncof) = zero
+          av1(1:nv4,1:5) = zero
+          av2(1:nv4,1:4) = zero
+          jper = 0
+          nrold = 0
+          avv_iterations: do it=1,mv
+             number = nrv(it)
+
+             avv_inner: do
+
+             if (nrold==number) then
+
+               ! fetch a new row of matrix (spv)
+               h(1:5) = [spv(it,1:4),zero]
+
+               ! find the appropriate row of g.
+               right(1:nuu) = q(it:it+(nuu-1)*mvv:mvv)
+
+            else
+
+               if (p<=zero) then
+                  nrold = nrold+1
+                  cycle avv_inner
+               endif
+               ! fetch a new row of matrix (bv).
+               n1 = nrold+1
+               h(1:5) = bv(n1,1:5)*pinv
+
+               ! find the appropriate row of g.
+               if(mv/=mvv) then
+                  l = mv+n1
+                  right(1:nuu) = q(l:l+(nuu-1)*mvv:mvv)
+               else
+                  right(1:nuu) = zero
+               endif
+
+            endif
+
+            ! test whether there are non-zero values in the new row of (avv)
+            ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4.
+            if (nrold<nv11) then
+
+               ! rotation into triangle of the new row of (avv), in case the elements
+               ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
+               do i=1,5
+                  irot = nrold+i
+                  piv  = h(i)
+
+                  if (piv==zero) cycle
+
+                  ! calculate the parameters of the givens transformation.
+                  call fpgivs(piv,av1(irot,1),co,si)
+
+                  ! apply that transformation to the columns of matrix g.
+                  ic = irot
+                  call fprota(co,si,right(1:nuu),c(ic:ic+(nuu-1)*nv7:nv7))
+
+                  ! apply that transformation to the rows of (avv).
+                  if (i<5) then
+                     i2 = 1
+                     i3 = i+1
+                     do j=i3,5
+                        i2 = i2+1
+                        call fprota(co,si,h(j),av1(irot,i2))
+                     end do
+                  endif
+               end do
+
+            else
+
+               ! initialize the matrix (av2).
+               if (jper==0) then
+
+                  jk = nv11+1
+                  do i=1,4
+                     ik = jk
+                     do j=1,5
+                         if (ik<=0) exit
+                         av2(ik,i) = av1(ik,j)
+                         ik = ik-1
+                     end do
+                     jk = jk+1
+                  end do
+                  jper = 1
+
+               endif
+
+               ! if one of the non-zero elements of the new row corresponds to one of the b-splines
+               ! n(j;v),j=nv7+1,...,nv4, we take account of condition (2) for setting up this row of
+               ! (avv). the row is stored in h1(the part with respect to av1) and h2 (the part with
+               ! respect to av2).
+               h1 = zero
+               h2 = zero
+               j = nrold-nv11
+               do i=1,5
+                   j = j+1
+                   l0 = j
+                   l1 = l0-4
+                   do while (l1>nv11)
+                      l0 = l1-nv11
+                      l1 = l0-4
+                   end do
+                   if (l1<=0) then
+                      h2(l0) = h2(l0) + h(i)
+                   else ! l1<=nv11
+                      h1(l1) = h(i)
+                   end if
+               end do
+
+               ! rotate the new row of (avv) into triangle.
+               if (nv11>0) then
+
+                  ! rotations with the rows 1,2,...,nv11 of (avv).
+                  do j=1,nv11
+                     piv = h1(1)
+                     i2 = min(nv11-j,4)
+                     if (piv/=zero) then
+
+                        ! calculate the parameters of the givens transformation.
+                        call fpgivs(piv,av1(j,1),co,si)
+
+                        ! apply that transformation to the columns of matrix g.
+                        call fprota(co,si,right(1:nuu),c(j:j+nv7*(nuu-1):nv7))
+
+                        ! apply that transformation to the rows of (avv) with respect to av2.
+                        call fprota(co,si,h2(1:4),av2(j,1:4))
+
+                        ! apply that transformation to the rows of (avv) with respect to av1.
+                        if (i2/=0) call fprota(co,si,h1(2:i2+1),av1(j,2:i2+1))
+
+                     endif
+                     h1(1:i2+1) = [h1(2:i2+1),zero]
+                  end do
+
+               endif
+
+               ! rotations with the rows nv11+1,...,nv7 of avv.
+               avv_rot: do j=1,4
+                  ij  = nv11+j
+                  j1  = j+1
+                  piv = h2(j)
+
+                  if (ij<=0 .or. piv==zero) cycle avv_rot
+
+                  ! calculate the parameters of the givens transformation.
+                  call fpgivs(piv,av2(ij,j),co,si)
+
+                  ! apply that transformation to the columns of matrix g.
+                  call fprota(co,si,right(1:nuu),c(ij:ij+nv7*(nuu-1):nv7))
+
+                  ! apply that transformation to the rows of (avv) with respect to av2.
+                  if (j<4) call fprota(co,si,h2(j1:4),av2(ij,j1:4))
+
+              end do avv_rot
+
+            end if
+
+            ! we update the sum of squared residuals.
+            sq = sq+sum(right(:nuu)**2)
+
+            if (nrold==number) exit avv_inner
+
+            nrold = nrold+1
+            end do avv_inner
+
+          end do avv_iterations
+
+          !  test whether the b-spline coefficients must be determined.
+          if (iback/=0) return
+          !  backward substitution to obtain the b-spline coefficients as the
+          !  solution of the linear system    (rv) (cr) (ru)' = h.
+          !  first step: solve the system  (rv) (c1) = h.
+          k = 1
+          do i=1,nuu
+             c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
+             k = k+nv7
+          end do
+
+          !  second step: solve the system  (cr) (ru)' = (c1).
+          do k=1,nv7
+            right(:nuu) = c(k:k+(nuu-1)*nv7)
+            right(:nuu) = fpback(au,right,nuu,5,nu)
+            c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
+          end do
+
+      endif
+
       !  calculate from the conditions (2)-(3)-(4), the remaining b-spline
       !  coefficients.
- 800  ncof = nu4*nv4
-      j = ncof
-      do 805 l=1,nv4
-         q(l) = dr01
-         q(j) = dr11
-         j = j-1
- 805  continue
+      ncof = nu4*nv4
+
+      q(1:nv4) = dr01
+      q(ncof-nv4+1:ncof) = dr11
+
       i = nv4
       j = 0
-      if(iop0==0) go to 815
-      do 810 l=1,nv4
-         i = i+1
-         q(i) = c0(l)
- 810  continue
- 815  if(nuu==0) go to 835
-      do 830 l=1,nuu
-         ii = i
-         do 820 k=1,nv7
-            i = i+1
-            j = j+1
-            q(i) = c(j)
- 820     continue
-         do 825 k=1,3
-            ii = ii+1
-            i = i+1
-            q(i) = q(ii)
- 825     continue
- 830  continue
- 835  if(iop1/=0) then
+      if (iop0/=0) then
+         q(i+1:i+nv4) = c0(1:nv4)
+         i = i+nv4
+      endif
+      if(nuu/=0) then
+         do l=1,nuu
+            ii = i
+            do k=1,nv7
+               i = i+1
+               j = j+1
+               q(i) = c(j)
+            end do
+            do k=1,3
+               ii = ii+1
+               i  = i+1
+               q(i) = q(ii)
+            end do
+         end do
+      endif
+      if(iop1/=0) then
           do l=1,nv4
              i = i+1
              q(i) = c1(l)
@@ -7134,46 +7160,45 @@ module fitpack_core
       fpv = zero
       ir = 0
       nroldu = 0
+
       !  main loop for the different grid points.
-      do 950 i1=1,mu
-        numu = nru(i1)
-        numu1 = numu+1
-        nroldv = 0
-        do 940 i2=1,mv
-          numv = nrv(i2)
-          numv1 = numv+1
-          ir = ir+1
-      !  evaluate s(u,v) at the current grid point by making the sum of the
-      !  cross products of the non-zero b-splines at (u,v), multiplied with
-      !  the appropriate b-spline coefficients.
-          term = zero
-          k1 = numu*nv4+numv
-          do 920 l1=1,4
-            k2 = k1
-            fac = spu(i1,l1)
-            do 910 l2=1,4
-              k2 = k2+1
-              term = term+fac*spv(i2,l2)*c(k2)
- 910        continue
-            k1 = k1+nv4
- 920      continue
-      !  calculate the squared residual at the current grid point.
-          term = (r(ir)-term)**2
-      !  adjust the different parameters.
-          fp = fp+term
-          fpu(numu1) = fpu(numu1)+term
-          fpv(numv1) = fpv(numv1)+term
-          fac = term*half
-          if(numv==nroldv) go to 930
-          fpv(numv1) = fpv(numv1)-fac
-          fpv(numv) = fpv(numv)+fac
- 930      nroldv = numv
-          if(numu==nroldu) go to 940
-          fpu(numu1) = fpu(numu1)-fac
-          fpu(numu) = fpu(numu)+fac
- 940    continue
-        nroldu = numu
- 950  continue
+      grid_u: do i1=1,mu
+         numu = nru(i1)
+         numu1 = numu+1
+         nroldv = 0
+         grid_v: do i2=1,mv
+            numv = nrv(i2)
+            numv1 = numv+1
+            ir = ir+1
+            ! evaluate s(u,v) at the current grid point by making the sum of the
+            ! cross products of the non-zero b-splines at (u,v), multiplied with
+            ! the appropriate b-spline coefficients.
+            term = zero
+            k1 = numu*nv4+numv
+            do l1 = 1,4
+               fac  = spu(i1,l1)
+               term = term+fac*dot_product(spv(i2,1:4),c(k1+1:k1+4))
+               k1   = k1+nv4
+            end do
+            ! calculate the squared residual at the current grid point.
+            term = (r(ir)-term)**2
+            ! adjust the different parameters.
+            fp = fp+term
+            fpu(numu1) = fpu(numu1)+term
+            fpv(numv1) = fpv(numv1)+term
+            fac = term*half
+            if (numv/=nroldv) then
+               fpv(numv1) = fpv(numv1)-fac
+               fpv(numv) = fpv(numv)+fac
+            endif
+            nroldv = numv
+            if (numu/=nroldu) then
+               fpu(numu1) = fpu(numu1)-fac
+               fpu(numu) = fpu(numu)+fac
+            endif
+         end do grid_v
+         nroldu = numu
+      end do grid_u
       return
       end subroutine fpgrsp
 
@@ -7745,11 +7770,8 @@ module fitpack_core
       sq = sq+sq0+sq1
       ! in case all derivative values dr(i) are given (step<=0) or in case
       ! we have spline interpolation, we accept this spline as a solution.
-      if(sq<=0.) return
-      if(step(1)<=0. .and. step(2)<=0.) return
-      do 10 i=1,6
-        drr(i) = dr(i)
-  10  continue
+      if(sq<=zero .or. all(step(1:2)<=zero)) return
+      drr = dr
       ! number denotes the number of derivative values dr(i) that still must
       ! be optimized. let us denote these parameters by g(j),j=1,...,number.
       number = 0
