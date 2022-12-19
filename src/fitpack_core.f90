@@ -9883,91 +9883,119 @@ module fitpack_core
       !  calculation of acc, the absolute tolerance for the root of f(p)=s.
       acc = tol*s
 
-      if(iopt1<0) go to 90
+
       numin = 9
       nvmin = 9+iopt2*(iopt2+1)
 
-      if(iopt1==0) go to 10
-      if(s<sup) then
-        if (nv<nvmin) go to 70
-        go to 90
-      endif
-      !  if iopt1 = 0 we begin by computing the weighted least-squares
-      !  polymomial of the form
-      !     s(u,v) = f(1)*(1-u**3)+f(2)*u**3+f(3)*(u**2-u**3)+f(4)*(u-u**3)
-      !  where f(4) = 0 if iopt2> 0 , f(3) = 0 if iopt2 > 1 and
-      !        f(2) = 0 if iopt3> 0.
-      !  the corresponding weighted sum of squared residuals gives the upper
-      !  bound sup for the smoothing factor s.
-  10  sup = zero
-      f(1:4) = zero
-      a(1:4,1:4) = zero
-      do 50 i=1,m
-         wi = w(i)
-         zi = z(i)*wi
-         uu = u(i)
-         u2 = uu*uu
-         u3 = uu*u2
-         h(1) = (one-u3)*wi
-         h(2) = u3*wi
-         h(3) = u2*(one-uu)*wi
-         h(4) = uu*(one-u2)*wi
-         if(iopt3/=0) h(2) = zero
-         if(iopt2>1) h(3) = zero
-         if(iopt2>0) h(4) = zero
-         do 40 j=1,4
-            piv = h(j)
-            if (piv==zero) go to 40
-            call fpgivs(piv,a(j,1),co,si)
-            call fprota(co,si,zi,f(j))
-            if(j==4) go to 40
-            j1 = j+1
-            j2 = 1
-            do 30 l=j1,4
-               j2 = j2+1
-               call fprota(co,si,h(l),a(j,j2))
-  30        continue
-  40     continue
-         sup = sup+zi*zi
-  50  continue
-      if(a(4,1)/=zero) f(4) = f(4)/a(4,1)
-      if(a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
-      if(a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
-      if(a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+      initialize: if (iopt1>0) then
 
-      !  find the b-spline representation of this least-squares polynomial
-      c1 = f(1)
-      c4 = f(2)
-      c2 = f(4)/three+c1
-      c3 = (f(3)+two*f(4))/three+c1
-      nu = 8
-      nv = 8
-      do 60 i=1,4
-         c(i)    = c1
-         c(i+4)  = c2
-         c(i+8)  = c3
-         c(i+12) = c4
-         tu(i)   = zero
-         tu(i+4) = one
-         rn      = 2*i-9
-         tv(i)   = rn*pi
-         rn      = 2*i-1
-         tv(i+4) = rn*pi
-  60  continue
-      fp = sup
-      !  test whether the least-squares polynomial is an acceptable solution
-      fpms = sup-s
-      if(fpms<acc) go to 960
-      !  test whether we cannot further increase the number of knots.
-  70  if(nuest<numin .or. nvest<nvmin) go to 950
-      !  find the initial set of interior knots of the spline in case iopt1=0.
-      nu = numin
-      nv = nvmin
-      tu(5) = half
-      nvv = nv-8
-      rn = nvv+1
-      fac = pi2/rn
-      forall (i=1:nvv) tv(i+4) = i*fac-pi
+          if (s<sup .and. nv<nvmin) then
+
+             !  test whether we cannot further increase the number of knots.
+             if (nuest<numin .or. nvest<nvmin) then
+                ier = FITPACK_INSUFFICIENT_STORAGE
+                return
+             end if
+
+             !  find the initial set of interior knots of the spline in case iopt1=0.
+             nu = numin
+             nv = nvmin
+             tu(5) = half
+             nvv = nv-8
+             rn = nvv+1
+             fac = pi2/rn
+             forall (i=1:nvv) tv(i+4) = i*fac-pi
+
+          endif
+
+      elseif (iopt1==0) then
+
+          !  if iopt1 = 0 we begin by computing the weighted least-squares polymomial of the form
+          !     s(u,v) = f(1)*(1-u**3)+f(2)*u**3+f(3)*(u**2-u**3)+f(4)*(u-u**3)
+          !  where f(4) = 0 if iopt2> 0 , f(3) = 0 if iopt2 > 1 and
+          !        f(2) = 0 if iopt3> 0.
+          !  the corresponding weighted sum of squared residuals gives the upper
+          !  bound sup for the smoothing factor s.
+      10  sup = zero
+          f(1:4) = zero
+          a(1:4,1:4) = zero
+          initial_poly: do i=1,m
+             wi = w(i)
+             zi = z(i)*wi
+             uu = u(i)
+             u2 = uu*uu
+             u3 = uu*u2
+             h(1) = (one-u3)*wi
+             h(2) = merge(u3*wi,zero,iopt3==0)
+             h(3) = merge(u2*(one-uu)*wi,zero,iopt2<=1)
+             h(4) = merge(uu*(one-u2)*wi,zero,iopt2<=0)
+             do j=1,4
+                piv = h(j)
+                if (piv==zero) cycle
+                call fpgivs(piv,a(j,1),co,si)
+                call fprota(co,si,zi,f(j))
+                if (j<4) then
+                    j1 = j+1
+                    j2 = 1
+                    do l=j1,4
+                       j2 = j2+1
+                       call fprota(co,si,h(l),a(j,j2))
+                    end do
+                endif
+             end do
+             sup = sup+zi*zi
+          end do initial_poly
+
+          if(a(4,1)/=zero) f(4) = f(4)/a(4,1)
+          if(a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
+          if(a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
+          if(a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+
+          !  find the b-spline representation of this least-squares polynomial
+          c1 = f(1)
+          c4 = f(2)
+          c2 = f(4)/three+c1
+          c3 = (f(3)+two*f(4))/three+c1
+          nu = 8
+          nv = 8
+          do i=1,4
+             c(i)    = c1
+             c(i+4)  = c2
+             c(i+8)  = c3
+             c(i+12) = c4
+             tu(i)   = zero
+             tu(i+4) = one
+             rn      = 2*i-9
+             tv(i)   = rn*pi
+             rn      = 2*i-1
+             tv(i+4) = rn*pi
+          end do
+          fp = sup
+
+          !  test whether the least-squares polynomial is an acceptable solution
+          fpms = sup-s
+          if (fpms<acc) then
+             ier = FITPACK_LEASTSQUARES_OK
+             return
+          end if
+
+          !  test whether we cannot further increase the number of knots.
+          if (nuest<numin .or. nvest<nvmin) then
+             ier = FITPACK_INSUFFICIENT_STORAGE
+             return
+          end if
+
+          !  find the initial set of interior knots of the spline in case iopt1=0.
+          nu = numin
+          nv = nvmin
+          tu(5) = half
+          nvv = nv-8
+          rn = nvv+1
+          fac = pi2/rn
+          forall (i=1:nvv) tv(i+4) = i*fac-pi
+
+      end if initialize
+
 
       !  ************************************************************************************************************
       !  part 1 : computation of least-squares bicubic splines.
@@ -10288,7 +10316,10 @@ module fitpack_core
         if(nuest<nu+1) l1=nuu+1
         if(nvest<nv+2) l2=nuu
       !  test whether we cannot further increase the number of knots.
-        if(l1>l2) go to 950
+        if (l1>l2) then
+           ier = FITPACK_INSUFFICIENT_STORAGE
+           return
+        end if
  500    fpmax = 0.
         l = 0
         do 510 i=l1,l2
@@ -10613,10 +10644,6 @@ module fitpack_core
  940  ier = FITPACK_MAXIT
       go to 990
  945  ier = FITPACK_S_TOO_SMALL
-      go to 990
- 950  ier = FITPACK_INSUFFICIENT_STORAGE
-      go to 990
- 960  ier = FITPACK_LEASTSQUARES_OK
       go to 990
  970  ier = FITPACK_INTERPOLATING_OK
       fp  = zero
@@ -17936,7 +17963,7 @@ module fitpack_core
         t4 = t5
         t5 = t(l+3)-t(l)
 
-      !  find a0 = s(t(l)), ah = s'(t(l)), b0 = s(t(l+1)) and bh = s'(t(l+1)).
+        !  find a0 = s(t(l)), ah = s'(t(l)), b0 = s(t(l+1)) and bh = s'(t(l+1)).
         c1 = c2
         c2 = c3
         c3 = c(l)
@@ -17947,8 +17974,8 @@ module fitpack_core
         b0 = (h2*d4+h1*d5)/t2
         bh = three*(h2*c4+h1*c5)/t2
 
-      !  calculate the coefficients a0,a1,a2 and a3 of the cubic polynomial
-      !  pl(x) = ql(y) = a0+a1*y+a2*y**2+a3*y**3 ; y = (x-t(l))/(t(l+1)-t(l)).
+        !  calculate the coefficients a0,a1,a2 and a3 of the cubic polynomial
+        !  pl(x) = ql(y) = a0+a1*y+a2*y**2+a3*y**3 ; y = (x-t(l))/(t(l+1)-t(l)).
         a1 = ah*h1
         b1 = bh*h1
         a2 = three*(b0-a0)-b1-two*a1
