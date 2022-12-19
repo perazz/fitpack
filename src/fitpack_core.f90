@@ -17954,40 +17954,39 @@ module fitpack_core
         a2 = three*(b0-a0)-b1-two*a1
         a3 = two*(a0-b0)+b1+a1
 
-      !  test whether or not pl(x) could have a zero in the range
-      !  t(l) <= x <= t(l+1).
-        z3  = .not.b1<zero
-        nz3 = .not.z3
-        if (a0*b0<=zero) go to 100
-
+        ! test whether or not pl(x) could have a zero in the range t(l) <= x <= t(l+1).
         z0  = .not.a0<zero
         nz0 = .not.z0
         z2  = .not.a2<zero
         nz2 = .not.z2
+        z3  = .not.b1<zero
+        nz3 = .not.z3
         z4  = .not.three*a3+a2<zero
         nz4 = .not.z4
 
         ! find the zeros of ql(y).
-        if (.not.((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and.z3.and.z4) &
-              .or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and.nz3.and.nz4)))) go to 200
+        zeroes: if (a0*b0<=zero .or. ((z0.and.(nz1.and.(z3.or.z2.and.nz4).or.nz2.and.z3.and.z4) &
+                                      .or.nz0.and.(z1.and.(nz3.or.nz2.and.z4).or.z2.and.nz3.and.nz4)))) then
 
- 100    call fpcuro(a3,a2,a1,a0,y,j)
+           call fpcuro(a3,a2,a1,a0,y,j)
 
-        if (j/=0) then
-            ! find which zeros of pl(x) are zeros of s(x).
-            which_zeros: do i=1,j
-              if(y(i)<zero .or. y(i)>one) cycle which_zeros
-              ! test whether the number of zeros of s(x) exceeds mest.
-              if (m>=mest) then
-                 ier = FITPACK_INSUFFICIENT_STORAGE
-                 return
-              end if
-              m = m+1
-              zeros(m) = t(l)+h1*y(i)
-            end do which_zeros
-        endif
+            if (j/=0) then
+                ! find which zeros of pl(x) are zeros of s(x).
+                which_zeros: do i=1,j
+                  if(y(i)<zero .or. y(i)>one) cycle which_zeros
+                  ! test whether the number of zeros of s(x) exceeds mest.
+                  if (m>=mest) then
+                     ier = FITPACK_INSUFFICIENT_STORAGE
+                     return
+                  end if
+                  m = m+1
+                  zeros(m) = t(l)+h1*y(i)
+                end do which_zeros
+            endif
 
- 200    a0 = b0
+        endif zeroes
+
+        a0 = b0
         ah = bh
         z1 = z3
         nz1 = nz3
