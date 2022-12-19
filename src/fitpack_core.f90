@@ -29,7 +29,7 @@ module fitpack_core
     ! Polar
     public :: evapol ! Evaluate polar spline s(u,v) at (x,y)
     public :: polar,pogrid,percur,cocosp,concon,concur,cualde
-    public :: dblint,parcur,pardtc
+    public :: dblint,parcur
 
     ! Fourier coefficients
     public :: fourco
@@ -49,6 +49,7 @@ module fitpack_core
     ! Bi-variate spline
     public :: parder  ! Evaluate 2d spline derivatives on a grid
     public :: pardeu  ! Evaluate 2d spline derivatives on a set of points
+    public :: pardtc  ! Turn 2d spline into one of its partial derivatives' spline
     public :: bispev  ! Evaluate 2d spline on a meshgrid
     public :: bispeu  ! Evaluate 2d spline on arbitrary (x,y) points
     public :: insert,sphere,spgrid
@@ -14349,28 +14350,21 @@ module fitpack_core
       end subroutine pardeu
 
 
-      recursive subroutine pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy, &
-         newc,ier)
+      pure subroutine pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ier)
 
-      !  subroutine pardtc takes the knots and coefficients of a bivariate
-      !  spline, and returns the coefficients for a new bivariate spline that
-      !  evaluates the partial derivative (order nux, nuy) of the original
-      !  spline.
+      !  subroutine pardtc takes the knots and coefficients of a bivariate spline, and returns the
+      !  coefficients for a new bivariate spline that evaluates the partial derivative (order nux, nuy) of
+      !  the original spline.
       !
       !  calling sequence:
       !     call pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ier)
       !
       !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the
-      !           knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
-      !           (hidden)
-      !   ty    : real array, length ny, which contains the position of the
-      !           knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
-      !           (hidden)
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the
-      !           b-spline coefficients.
+      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
+      !   nx    : integer, giving the total number of knots in the x-direction (hidden)
+      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
+      !   ny    : integer, giving the total number of knots in the y-direction (hidden)
+      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   nux   : integer values, specifying the order of the partial
       !   nuy     derivative. 0<=nux<kx, 0<=nuy<ky.
@@ -14379,8 +14373,6 @@ module fitpack_core
       !   newc  : real array containing the coefficients of the derivative.
       !           the dimension is (nx-nux-kx-1)*(ny-nuy-ky-1).
       !   ier   : integer error flag
-      !    ier=0 : normal return
-      !    ier=10: invalid input data (see restrictions)
       !
       !  restrictions:
       !   0 <= nux < kx, 0 <= nuy < kyc
@@ -14389,10 +14381,8 @@ module fitpack_core
       !    none
       !
       !  references :
-      !   de boor c  : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
+      !   de boor c  : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
+      !   dierckx p. : curve and surface fitting with splines, oxford university press, 1993.
       !
       !  based on the subroutine "parder" by Paul Dierckx.
       !
@@ -14402,108 +14392,98 @@ module fitpack_core
       !    Cross Campus Road, Rondebosch 7700, Cape Town, South Africa.
       !    e-mail : cong.ma@uct.ac.za
       !
-      !  latest update : may 2019
-      !
       !  ..scalar arguments..
-      integer nx,ny,kx,ky,nux,nuy,ier, nc
+      integer, intent(in) :: nx,ny,kx,ky,nux,nuy
+      integer, intent(out) :: ier
       !  ..array arguments..
-      real(RKIND) tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)), &
-       newc((nx-kx-1)*(ny-ky-1))
+      real(RKIND), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
+      real(RKIND), intent(out) :: newc((nx-kx-1)*(ny-ky-1))
       !  ..local scalars..
-      integer i,j,kx1,ky1,lx,ly,l1,l2,m,m0,m1, &
-       nkx1,nky1,nxx,nyy,newkx,newky
+      integer :: i,j,kx1,ky1,lx,ly,l1,l2,m,m0,m1,nkx1,nky1,nxx,nyy,newkx,newky,nc
       real(RKIND) ak,fac
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      ier = 10
-      if(nux<0 .or. nux>=kx) go to 400
-      if(nuy<0 .or. nuy>=ky) go to 400
-      kx1 = kx+1
-      ky1 = ky+1
+      ier     = FITPACK_INPUT_ERROR
+      if (nux<0 .or. nux>=kx) return
+      if (nuy<0 .or. nuy>=ky) return
+
+      kx1  = kx+1
+      ky1  = ky+1
       nkx1 = nx-kx1
       nky1 = ny-ky1
-      nc = nkx1*nky1
-      ier = 0
-      nxx = nkx1
-      nyy = nky1
+      nc   = nkx1*nky1
+
+      ier   = FITPACK_OK
+      nxx   = nkx1
+      nyy   = nky1
       newkx = kx
       newky = ky
-      !  the partial derivative of order (nux,nuy) of a bivariate spline of
-      !  degrees kx,ky is a bivariate spline of degrees kx-nux,ky-nuy.
-      !  we calculate the b-spline coefficients of this spline
+
+      !  the partial derivative of order (nux,nuy) of a bivariate spline of degrees kx,ky is a bivariate
+      !  spline of degrees kx-nux,ky-nuy. we calculate the b-spline coefficients of this spline
       !  that is to say newkx = kx - nux, newky = ky - nuy
-      do 70 i=1,nc
-        newc(i) = c(i)
-  70  continue
-      if(nux==0) go to 200
-      lx = 1
-      do 100 j=1,nux
-        ak = newkx
-        nxx = nxx-1
-        l1 = lx
-        m0 = 1
-        do 90 i=1,nxx
-          l1 = l1+1
-          l2 = l1+newkx
-          fac = tx(l2)-tx(l1)
-          if(fac<=0.) go to 90
-          do 80 m=1,nyy
-            m1 = m0+nyy
-            newc(m0) = (newc(m1)-newc(m0))*ak/fac
-            m0  = m0+1
-  80      continue
-  90    continue
-        lx = lx+1
-        newkx = newkx-1
- 100  continue
- 200  if(nuy==0) go to 400
-      ! orig: if(nuy==0) go to 300
-      ly = 1
-      do 230 j=1,nuy
-        ak = newky
-        nyy = nyy-1
-        l1 = ly
-        do 220 i=1,nyy
-          l1 = l1+1
-          l2 = l1+newky
-          fac = ty(l2)-ty(l1)
-          if(fac<=0.) go to 220
-          m0 = i
-          do 210 m=1,nxx
-            m1 = m0+1
-            newc(m0) = (newc(m1)-newc(m0))*ak/fac
-            m0  = m0+nky1
- 210      continue
- 220    continue
-        ly = ly+1
-        newky = newky-1
- 230  continue
-      m0 = nyy
-      m1 = nky1
-      do 250 m=2,nxx
-        do 240 i=1,nyy
-          m0 = m0+1
-          m1 = m1+1
-          newc(m0) = newc(m1)
- 240    continue
-        m1 = m1+nuy
- 250  continue
-      !300  iwx = 1+nxx*nyy
-      !     iwy = iwx+mx*(kx1-nux)
-      !
-      ! from parder.f:
-      !     call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,newc,newkx,newky,
-      !    * x,mx,y,my,z,newc(iwx),newc(iwy),iwrk(1),iwrk(mx+1))
-      !
-      ! from bispev.f:
-      !     call fpbisp(tx,       nx,      ty,       ny,      c,   kx,   ky,
-      !    * x,mx,y,my,z,wrk(1),   wrk(iw),  iwrk(1),iwrk(mx+1))
-      !
-      ! from fpbisp.f:
-      !          fpbisp(tx,       nx,      ty,       ny,      c,   kx,   ky,
-      !    * x,mx,y,my,z,wx,       wy,       lx,     ly)
- 400  return
+      newc(:nc) = c(:nc)
+
+      if (nux>0) then
+          lx = 1
+          x_deriv_order: do j=1,nux
+            ak  = newkx
+            nxx = nxx-1
+            l1  = lx
+            m0  = 1
+            do i=1,nxx
+              l1 = l1+1
+              l2 = l1+newkx
+              fac = tx(l2)-tx(l1)
+              if (fac>zero) then
+                 do m=1,nyy
+                    m1 = m0+nyy
+                    newc(m0) = (newc(m1)-newc(m0))*ak/fac
+                    m0  = m0+1
+                 end do
+              endif
+            end do
+            lx = lx+1
+            newkx = newkx-1
+          end do x_deriv_order
+      endif
+
+      if (nuy>0) then
+         ly = 1
+         y_deriv_order: do j=1,nuy
+            ak = newky
+            nyy = nyy-1
+            l1 = ly
+            do i=1,nyy
+               l1 = l1+1
+               l2 = l1+newky
+               fac = ty(l2)-ty(l1)
+               if (fac>zero) then
+                  m0 = i
+                  do m=1,nxx
+                     m1 = m0+1
+                     newc(m0) = (newc(m1)-newc(m0))*ak/fac
+                     m0  = m0+nky1
+                  end do
+               endif
+            end do
+            ly = ly+1
+            newky = newky-1
+         end do y_deriv_order
+         m0 = nyy
+         m1 = nky1
+         do m=2,nxx
+            do i=1,nyy
+               m0 = m0+1
+               m1 = m1+1
+               newc(m0) = newc(m1)
+            end do
+            m1 = m1+nuy
+         end do
+      endif
+
+      return
       end subroutine pardtc
 
 
