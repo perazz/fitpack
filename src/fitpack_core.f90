@@ -9361,77 +9361,80 @@ module fitpack_core
       end subroutine fpperi
 
 
-      recursive subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
-
-      !  subroutine fppocu finds a idim-dimensional polynomial curve p(u) =
-      !  (p1(u),p2(u),...,pidim(u)) of degree k, satisfying certain derivative
-      !  constraints at the end points a and b, i.e.
+      !  subroutine fppocu finds a idim-dimensional polynomial curve p(u) = (p1(u),p2(u),...,pidim(u)) of
+      !  degree k, satisfying certain derivative constraints at the end points a and b, i.e.
       !                  (l)
       !    if ib > 0 : pj   (a) = db(idim*l+j), l=0,1,...,ib-1
       !                  (l)
       !    if ie > 0 : pj   (b) = de(idim*l+j), l=0,1,...,ie-1
       !
-      !  the polynomial curve is returned in its b-spline representation
-      !  ( coefficients cp(j), j=1,2,...,np )
-      !  ..
+      !  the polynomial curve is returned in its b-spline representation ( cp(j), j=1,2,...,np )
+      pure subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
+
       !  ..scalar arguments..
-      integer idim,k,ib,nb,ie,ne,np
-      real(RKIND) a,b
+      integer, intent(in)      :: idim,k,ib,nb,ie,ne,np
+      real(RKIND), intent(in)  :: a,b
       !  ..array arguments..
-      real(RKIND) db(nb),de(ne),cp(np)
+      real(RKIND), intent(in)  :: db(nb),de(ne)
+      real(RKIND), intent(out) :: cp(np)
       !  ..local scalars..
-      real(RKIND) ab,aki
-      integer i,id,j,jj,l,ll,k1,k2
+      real(RKIND) :: ab,aki
+      integer     :: i,id,j,jj,l,ll,k1,k2
       !  ..local array..
-      real(RKIND) work(6,6)
+      real(RKIND) :: work(6,6)
       !  ..
       k1 = k+1
       k2 = 2*k1
       ab = b-a
-      do 110 id=1,idim
-        do 10 j=1,k1
-          work(j,1) = 0.
-  10    continue
-        if(ib==0) go to 50
-        l = id
-        do 20 i=1,ib
-          work(1,i) = db(l)
-          l = l+idim
-  20    continue
-        if(ib==1) go to 50
-        ll = ib
-        do 40 j=2,ib
-          ll =  ll-1
-          do 30 i=1,ll
-            aki = k1-i
-            work(j,i) = ab*work(j-1,i+1)/aki + work(j-1,i)
-  30      continue
-  40    continue
-  50    if(ie==0) go to 90
-        l = id
-        j = k1
-        do 60 i=1,ie
-          work(j,i) = de(l)
-          l = l+idim
-          j = j-1
-  60    continue
-        if(ie==1) go to 90
-        ll = ie
-        do 80 jj=2,ie
-          ll =  ll-1
-          j = k1+1-jj
-          do 70 i=1,ll
-            aki = k1-i
-            work(j,i) = work(j+1,i) - ab*work(j,i+1)/aki
-            j = j-1
-  70      continue
-  80    continue
-  90    l = (id-1)*k2
-        do 100 j=1,k1
-          l = l+1
-          cp(l) = work(j,1)
- 100    continue
- 110  continue
+
+      all_dims: do id=1,idim
+         ! Reset temporary storage
+         work(:k1,1) = zero
+
+         if (ib>0) then
+
+             work(1,1:ib) = db(id:id+(ib-1)*idim:idim)
+
+             if (ib>1) then ! probably unnecessary
+                 ll = ib
+                 do j=2,ib
+                    ll =  ll-1
+                    do i=1,ll
+                       aki = k1-i
+                       work(j,i) = ab*work(j-1,i+1)/aki + work(j-1,i)
+                    end do
+                 end do
+             endif
+
+         endif
+
+         if (ie>0) then
+            l = id
+            j = k1
+            do i=1,ie
+               work(j,i) = de(l)
+               l = l+idim
+               j = j-1
+            end do
+
+            if (ie>1) then ! probably unnecessary
+               ll = ie
+               do jj=2,ie
+                  ll =  ll-1
+                  j = k1+1-jj
+                  do i=1,ll
+                     aki = k1-i
+                     work(j,i) = work(j+1,i) - ab*work(j,i+1)/aki
+                     j = j-1
+                  end do
+               end do
+            endif
+         endif
+
+         l = (id-1)*k2
+         cp(l+1:l+k1) = work(:k1,1)
+
+      end do all_dims
       return
       end subroutine fppocu
 
