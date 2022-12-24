@@ -5986,8 +5986,8 @@ module fitpack_core
       integer, intent(in) :: idim,mu,mv,mz,nu,nv,nc,mm,mvnu ! sizes
 
       !  ..array arguments..
-      real(RKIND), intent(inout) :: c(nc*idim),right(mm*idim),q(mvnu),au(nu,5),av(nv,5)
-      real(RKIND), intent(in) :: u(mu),v(mv),z(mz*idim),tu(nu),tv(nv),au1(nu,4),av1(nv,4)
+      real(RKIND), intent(inout) :: c(nc*idim),right(mm*idim),q(mvnu),au(nu,5),av(nv,5),au1(nu,4),av1(nv,4)
+      real(RKIND), intent(in) :: u(mu),v(mv),z(mz*idim),tu(nu),tv(nv)
       integer,     intent(in) :: ipar(2)
 
       real(RKIND), intent(in)  :: p
@@ -10225,7 +10225,7 @@ module fitpack_core
         ! check whether the observation matrix is rank deficient.
         sigma = eps*dmax
 
-        if (all(a(i,1:ncof)>sigma)) then
+        if (all(a(1:ncof,1)>sigma)) then
 
            ! backward substitution in case of full rank.
            c(:ncof) = fpback(a,f,ncof,iband,ncc)
@@ -10518,16 +10518,14 @@ module fitpack_core
  750           h(j1) = bu(ii,l)
                j1 = j1+nvv
  760        continue
-            do 765 l=1,iband4
-              h(l) = h(l)*pinv
- 765        continue
-            zi = 0.
+            h(:iband4) = h(:iband4)*pinv
+            zi = zero
             jrot = 1
             if(ii>iopt2+1) jrot = ipar1+(ii-iopt2-2)*nvv+j
       !  rotate the new row into triangle by givens transformations.
             do 800 irot=jrot,ncof
               piv = h(1)
-              i2 = min0(iband3,ncof-irot)
+              i2 = min(iband3,ncof-irot)
               if (piv==zero) then
                 if (i2<=0) go to 811
                 go to 780
@@ -10549,38 +10547,37 @@ module fitpack_core
  800        continue
  811      continue
  810    continue
-      !  find dmax, the maximum value for the diagonal elements in the
-      !  reduced triangle.
-        dmax = 0.
-        do 820 i=1,ncof
-          if(q(i,1)<=dmax) go to 820
-          dmax = q(i,1)
- 820    continue
-      !  check whether the matrix is rank deficient.
+        ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
+        dmax = max(zero,maxval(q(1:ncof,1)))
+
+        ! check whether the matrix is rank deficient.
         sigma = eps*dmax
-        do 830 i=1,ncof
-          if(q(i,1)<=sigma) go to 840
- 830    continue
-      !  backward substitution in case of full rank.
-        c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
-        rank = ncof
-        go to 845
-      !  in case of rank deficiency, find the minimum norm solution.
- 840    lwest = ncof*iband4+ncof+iband4
-        if(lwrk<lwest) go to 925
-        lf = 1
-        lh = lf+ncof
-        la = lh+iband4
-        call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la), &
-         wrk(lf),wrk(lh))
- 845    do 850 i=1,ncof
-           q(i,1) = q(i,1)/dmax
- 850    continue
-      !  find the coefficients in the standard b-spline representation of
-      !  the polar spline.
+
+        if (all(q(1:ncof,1)>sigma)) then
+
+           ! backward substitution in case of full rank.
+           c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
+           rank = ncof
+
+        else
+
+           ! in case of rank deficiency, find the minimum norm solution.
+           lwest = ncof*iband4+ncof+iband4
+           if (lwest>lwrk) go to 925
+           lf = 1
+           lh = lf+ncof
+           la = lh+iband4
+           call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+
+        endif
+
+        q(:ncof,1) = q(:ncof,1)/dmax
+
+        ! find the coefficients in the standard b-spline representation of
+        ! the polar spline.
         call fprppo(nu,nv,iopt2,iopt3,cosi,ratio,c,ff,ncoff)
-      !  compute f(p).
-        fp = 0.
+        ! compute f(p).
+        fp = zero
         do 890 num = 1,nreg
           num1 = num-1
           lu = num1/nvv
@@ -13480,35 +13477,35 @@ module fitpack_core
 
 
       !  subroutine fptrpe reduces the (m+n-7) x (n-7) cyclic bandmatrix a to upper triangular form and
-      !  applies the same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the (n-7) x
-      !  (mm) x (idim) matrix q.
-      recursive subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
-
-
+      !  applies the same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the
+      !  (n-7) x (mm) x (idim) matrix q.
+      pure subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
       !  ..
       !  ..scalar arguments..
       real(RKIND), intent(in) :: p
       integer, intent(in) :: m,mm,idim,n
       !  ..array arguments..
-      real(RKIND) sp(m,4),b(n,5),z(m*mm*idim),a(n,5),aa(n,4),q((n-7)*mm*idim), right(mm*idim)
-      integer nr(m)
+      real(RKIND), intent(in) :: sp(m,4),b(n,5),z(m*mm*idim)
+      real(RKIND), intent(out) :: q((n-7)*mm*idim),right(mm*idim),a(n,5),aa(n,4)
+      integer, intent(in) :: nr(m)
+
       !  ..local scalars..
-      real(RKIND) co,pinv,piv,si
-      integer i,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
-      integer i1, ij,j1,jk,jper,l0,l1, ik
+      real(RKIND) :: co,pinv,piv,si
+      integer :: i,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
+      integer :: i1,ij,j1,jk,jper,l0,l1,ik
       !  ..local arrays..
-      real(RKIND) h(5),h1(5),h2(4)
-      !  ..subroutine references..
-      !    fpgivs,fprota
+      real(RKIND) :: h(5),h1(5),h2(4)
+
       !  ..
       pinv = merge(one/p,one,p>zero)
-      n4 = n-4
-      n7 = n-7
-      n11 = n-11
-      mid = mm*idim
-      m2 = m*mm
-      m3 = n7*mm
-      m1 = m-1
+      n4   = n-4
+      n7   = n-7
+      n11  = n-11
+      mid  = mm*idim
+      m2   = m*mm
+      m3   = n7*mm
+      m1   = m-1
+
       !  we determine the matrix (a) and then we reduce her to upper triangular form (r) using givens
       !  rotations. we apply the same transformations to the rows of matrix z to obtain the (mm) x (n-7)
       !  matrix g. we store matrix (r) into a and aa, g into q. the n7 x n7 upper triangular matrix (r)
@@ -13519,160 +13516,176 @@ module fitpack_core
       !  with (a2) a n7 x 4 matrix and (a1) a n11 x n11 upper triangular matrix of bandwidth 5.
 
       !  initialization.
-      nmd = n7*mid
-      q (1:nmd)    = zero
-      aa(1:n4,1:4) = zero
-      a (1:n4,1:5) = zero
-      jper = 0
+      jper  = 0
       nrold = 0
-      do 760 it=1,m1
-        number = nr(it)
- 120    if(nrold==number) go to 180
-        if(p<=zero) go to 740
-      !  fetch a new row of matrix (b).
-        n1 = nrold+1
-        h  = b(n1,:)*pinv
-      !  find the appropriate row of q.
-        right(:mid) = zero
-        go to 240
-      !  fetch a new row of matrix (sp)
- 180    h = [sp(it,:),zero]
-      !  find the appropriate row of q.
-        j = 0
-        do 220 ii=1,idim
-          l = (ii-1)*m2+(it-1)*mm
-          do jj=1,mm
-            j = j+1
-            l = l+1
-            right(j) = z(l)
-          end do
- 220    continue
-      !  test whether there are non-zero values in the new row of (a)
-      !  corresponding to the b-splines n(j,*),j=n7+1,...,n4.
- 240     if(nrold<n11) go to 640
-         if(jper/=0) go to 320
-      !  initialize the matrix (aa).
-         jk = n11+1
-         do 300 i=1,4
-            ik = jk
-            do 260 j=1,5
-               if(ik<=0) go to 280
-               aa(ik,i) = a(ik,j)
-               ik = ik-1
- 260        continue
- 280        jk = jk+1
- 300     continue
-         jper = 1
-      !  if one of the non-zero elements of the new row corresponds to one of
-      !  the b-splines n(j;*),j=n7+1,...,n4,we take account of the periodicity
-      !  conditions for setting up this row of (a).
- 320     h1 = zero
-         h2 = zero
-         j = nrold-n11
-         do 420 i=1,5
-            j = j+1
-            l0 = j
- 360        l1 = l0-4
-            if(l1<=0) go to 400
-            if(l1<=n11) go to 380
-            l0 = l1-n11
-            go to 360
- 380        h1(l1) = h(i)
-            go to 420
- 400        h2(l0) = h2(l0) + h(i)
- 420     continue
-      !  rotate the new row of (a) into triangle.
-         if(n11<=0) go to 560
-      !  rotations with the rows 1,2,...,n11 of (a).
-         do 540 irot=1,n11
-            piv = h1(1)
-            i2 = min0(n11-irot,4)
-            if (piv==zero) go to 500
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(irot,1),co,si)
-      !  apply that transformation to the columns of matrix q.
-            j = 0
-            do 440 ii=1,idim
-               l = (ii-1)*m3+irot
-               do jj=1,mm
-                 j = j+1
-                 call fprota(co,si,right(j),q(l))
-                 l = l+n7
-               end do
- 440        continue
-      !  apply that transformation to the rows of (a) with respect to aa.
-            do i=1,4
-               call fprota(co,si,h2(i),aa(irot,i))
-            end do
-      !  apply that transformation to the rows of (a) with respect to a.
-            if(i2==0) go to 560
-            do 480 i=1,i2
-               i1 = i+1
-               call fprota(co,si,h1(i1),a(irot,i1))
- 480        continue
- 500        do 520 i=1,i2
-               h1(i) = h1(i+1)
- 520        continue
-            h1(i2+1) = zero
- 540     continue
-      !  rotations with the rows n11+1,...,n7 of a.
- 560     do 620 irot=1,4
-            ij = n11+irot
-            if(ij<=0) go to 620
-            piv = h2(irot)
-            if (piv==zero) go to 620
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,aa(ij,irot),co,si)
-      !  apply that transformation to the columns of matrix q.
-            j = 0
-            do 580 ii=1,idim
-               l = (ii-1)*m3+ij
-               do jj=1,mm
-                 j = j+1
-                 call fprota(co,si,right(j),q(l))
-                 l = l+n7
-               end do
- 580        continue
-            if(irot==4) go to 620
-      !  apply that transformation to the rows of (a) with respect to aa.
-            j1 = irot+1
-            do 600 i=j1,4
-               call fprota(co,si,h2(i),aa(ij,i))
- 600        continue
- 620     continue
-         go to 720
-      !  rotation into triangle of the new row of (a), in case the elements
-      !  corresponding to the b-splines n(j;*),j=n7+1,...,n4 are all zero.
- 640     irot =nrold
-         do 700 i=1,5
-            irot = irot+1
-            piv = h(i)
-            if (piv==zero) go to 700
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(irot,1),co,si)
-      !  apply that transformation to the columns of matrix g.
-            j = 0
-            do ii=1,idim
-               l = (ii-1)*m3+irot
-               do jj=1,mm
-                 j = j+1
-                 call fprota(co,si,right(j),q(l))
-                 l = l+n7
-               end do
-            end do
-      !  apply that transformation to the rows of (a).
-            if(i==5) go to 700
-            i2 = 1
-            i3 = i+1
-            do 680 j=i3,5
-               i2 = i2+1
-               call fprota(co,si,h(j),a(irot,i2))
- 680        continue
- 700     continue
- 720     if(nrold==number) go to 760
- 740     nrold = nrold+1
-         go to 120
- 760  continue
+      nmd   = n7*mid
+      q (1:nmd)  = zero
+      aa(1:n4,:) = zero
+      a (1:n4,:) = zero
+
+      iterate: do it=1,m1
+         number = nr(it)
+         inner: do
+             if (nrold==number) then
+
+                ! fetch a new row of matrix (sp)
+                h = [sp(it,:),zero]
+                ! find the appropriate row of q.
+                j = 0
+                do ii=1,idim
+                   l = (ii-1)*m2+(it-1)*mm
+                   do jj=1,mm
+                      j = j+1
+                      l = l+1
+                      right(j) = z(l)
+                   end do
+                end do
+
+             elseif (p<=zero) then
+                nrold = nrold+1
+                cycle inner
+             else
+
+                ! fetch a new row of matrix (b).
+                n1 = nrold+1
+                h = b(n1,:)*pinv
+                ! find the appropriate row of q.
+                right(:mid) = zero
+
+             endif
+
+             ! test whether there are non-zero values in the new row of (a)
+             ! corresponding to the b-splines n(j,*),j=n7+1,...,n4.
+             if (nrold>=n11) then
+                 if (jper==0) then
+                    ! initialize the matrix (aa).
+                    jk = n11+1
+                    do i=1,4
+                       ik = jk
+                       do j=1,5
+                          if (ik<=0) exit
+                          aa(ik,i) = a(ik,j)
+                          ik = ik-1
+                       end do
+                       jk = jk+1
+                    end do
+                    jper = 1
+                 endif
+
+                 ! if one of the non-zero elements of the new row corresponds to one of
+                 ! the b-splines n(j;*),j=n7+1,...,n4,we take account of the periodicity
+                 ! conditions for setting up this row of (a).
+                 h1 = zero
+                 h2 = zero
+                 j  = nrold-n11
+                 do i=1,5
+                    j  = j+1
+                    l0 = j
+                    l1 = l0-4
+                    do while (l1>n11)
+                       l0 = l1-n11
+                       l1 = l0-4
+                    end do
+                    if (l1>0) then
+                       h1(l1) = h(i)
+                    else
+                       h2(l0) = h2(l0) + h(i)
+                    endif
+                 end do
+
+                 ! rotate the new row of (a) into triangle.
+                 if (n11>0) then
+                    ! rotations with the rows 1,2,...,n11 of (a).
+                    one_to_n11: do irot=1,n11
+                        piv = h1(1)
+                        i2  = min(n11-irot,4)
+                        if (piv/=zero) then
+                           ! calculate the parameters of the givens transformation.
+                           call fpgivs(piv,a(irot,1),co,si)
+                           ! apply that transformation to the columns of matrix q.
+                           j = 0
+                           do ii=1,idim
+                              l = (ii-1)*m3+irot
+                              do jj=1,mm
+                                 j = j+1
+                                 call fprota(co,si,right(j),q(l))
+                                 l = l+n7
+                              end do
+                           end do
+
+                           ! apply that transformation to the rows of (a) with respect to aa.
+                           call fprota(co,si,h2,aa(irot,:))
+
+                           ! apply that transformation to the rows of (a) with respect to a.
+                           if (i2==0) exit one_to_n11
+
+                           call fprota(co,si,h1(2:i2+1),a(irot,2:i2+1))
+
+                        endif
+                        h1(1:i2+1) = [h1(2:i2+1),zero]
+                    end do one_to_n11
+                 endif
+
+                 ! rotations with the rows n11+1,...,n7 of a.
+                 n11_to_n7: do irot=1,4
+
+                    ij  = n11+irot;  if (ij<=0)     cycle n11_to_n7
+                    piv = h2(irot);  if (piv==zero) cycle n11_to_n7
+
+                    ! calculate the parameters of the givens transformation.
+                    call fpgivs(piv,aa(ij,irot),co,si)
+
+                    ! apply that transformation to the columns of matrix q.
+                    j = 0
+                    do ii=1,idim
+                       l = (ii-1)*m3+ij
+                       do jj=1,mm
+                         j = j+1
+                         call fprota(co,si,right(j),q(l))
+                         l = l+n7
+                       end do
+                    end do
+
+                    ! apply that transformation to the rows of (a) with respect to aa.
+                    if (irot<4) call fprota(co,si,h2(irot+1:),aa(ij,irot+1:))
+
+                 end do n11_to_n7
+
+             else
+
+                ! rotation into triangle of the new row of (a), in case the elements
+                ! corresponding to the b-splines n(j;*),j=n7+1,...,n4 are all zero.
+                irot =nrold
+                all_zero: do i=1,5
+                    irot = irot+1
+                    piv = h(i)
+                    if (piv==zero) cycle all_zero
+
+                    ! calculate the parameters of the givens transformation.
+                    call fpgivs(piv,a(irot,1),co,si)
+                    ! apply that transformation to the columns of matrix g.
+                    j = 0
+                    do ii=1,idim
+                       l = (ii-1)*m3+irot
+                       do jj=1,mm
+                         j = j+1
+                         call fprota(co,si,right(j),q(l))
+                         l = l+n7
+                       end do
+                    end do
+
+                    ! apply that transformation to the rows of (a).
+                    if (i<5) call fprota(co,si,h(i+1:5),a(irot,1:5-i))
+
+                end do all_zero
+             endif
+
+             if (nrold==number) exit inner
+
+             nrold = nrold+1
+
+         end do inner
+      end do iterate
       return
       end subroutine fptrpe
 
