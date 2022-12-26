@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all le
-        do itest = 7,7
+        do itest = 24,24
            call add_test(perform_legacy_test(itest))
         end do
 

@@ -20,6 +20,7 @@
 module fitpack_tests
     use fitpack_core
     use fitpack_test_data
+    use iso_fortran_env, only: output_unit
     implicit none
     private
 
@@ -3734,36 +3735,46 @@ module fitpack_tests
       !c        mnsurf : surfit test program                                cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsurf(xyz,delta)
+      subroutine mnsurf(xyz,delta,iunit)
+
+         ! Surface points fetched from an external file
          real(RKIND), intent(in) :: xyz(:,:), delta
+         integer, optional, intent(in) :: iunit
+
+         ! Local variables
          real(RKIND), allocatable :: wrk1(:),wrk2(:)
          real(RKIND), dimension(size(xyz,2)) :: x,y,z,w
          real(RKIND) :: tx(15),ty(15),c(200)
          real(RKIND) :: ai,eps,fp,s,xb,xe,yb,ye,xx(11),yy(11),zz(121)
          integer :: iwrk(300),i,ier,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
-                    nmax,nx,nxest,ny,nyest
+                    nmax,nx,nxest,ny,nyest,useUnit
 
-         allocate(wrk1(12000),wrk2(6000))
+         ! Output unit
+         if (present(iunit)) then
+             useUnit = iunit
+         else
+             useUnit = output_unit
+         end if
 
          !  we fetch the number of data points
          m = size(xyz,2)
-         write(6,905) m
+         write(useUnit,905) m
 
          !  we fetch the co-ordinate and function values of each data point.
          x = xyz(1,:)
          y = xyz(2,:)
          z = xyz(3,:)
-         write(6,910)
+         write(useUnit,910)
 
          ! Only print half of the points
          do i=1,m
-            if((i/2)*2/=i)cycle
+            if (mod(i,2)/=0) cycle
             j = i-1
-            write(6,920) j,x(j),y(j),z(j),i,x(i),y(i),z(i)
+            write(useUnit,920) j,x(j),y(j),z(j),i,x(i),y(i),z(i)
          end do
 
          !  we fetch an estimate of the standard deviation of the data values.
-         write(6,930) delta
+         write(useUnit,930) delta
 
          !  the weights are set equal to delta**(-1)
          w = one/delta
@@ -3778,110 +3789,121 @@ module fitpack_tests
          mx = 11
          my = 11
          do i=1,11
-           ai = i-6
+           ai    = i-6
            xx(i) = ai*0.4
            yy(i) = xx(i)
          end do
 
-      !  we set up the dimension information
-      nxest = 15
-      nyest = 15
-      nmax = 15
-      kwrk = 300
-      lwrk1 = 12000
-      lwrk2 = 6000
-      !  we choose a value for eps
-      eps=0.1e-05
-      !  main loop for the different spline approximations.
-      do 300 is=1,6
-        go to (110,120,130,140,150,160),is
-      !  we start computing the least-squares bicubic polynomial (large s)
- 110    iopt = 0
-        kx = 3
-        ky = 3
-        s = 900000.
-        go to 200
-      !  iopt=1 from the second call on.
- 120    iopt = 1
-        s = 200.
-        go to 200
-      !  a value for s within its confidence interval
- 130    s = m
-        go to 200
-      !  overfitting (s too small)
- 140    s = 20.
-        go to 200
-      !  we change the degrees of the spline
- 150    iopt = 0
-        kx = 5
-        ky = 5
-        s = m
-        go to 200
-      !  finally, we also calculate a least-squares spline approximation
-      !  with specified knots.
- 160    iopt = -1
-        kx = 3
-        ky = 3
-        nx = 11
-        ny = 11
-        j = kx+2
-        do 170 i=1,3
-          ai = i-2
-          tx(j) = ai
-          ty(j) = ai
-          j = j+1
- 170    continue
-      !  determination of the spline approximation.
- 200    call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
-         nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-      !  printing of the fitting results.
-        if(iopt>=0) go to 210
-        write(6,935) kx,ky
-        go to 220
- 210    write(6,940) kx,ky
-        write(6,945) s
- 220    write(6,950) fp,ier
-        write(6,955) nx
-        write(6,960)
-        write(6,965) (tx(i),i=1,nx)
-        write(6,970) ny
-        write(6,960)
-        write(6,965) (ty(i),i=1,ny)
-        nc = (nx-kx-1)*(ny-ky-1)
-        write(6,975)
-        write(6,980) (c(i),i=1,nc)
-      !  evaluation of the spline approximation.
-        call bispev(tx,nx,ty,ny,c,kx,ky,xx,mx,yy,my,zz, &
-         wrk2,lwrk2,iwrk,kwrk,ier)
-        write(6,1000)
-        write(6,985) (xx(i),i=1,mx)
-        write(6,990)
-        do 230 j=1,my
-          write(6,995) yy(j),(zz(i),i=j,121,11)
- 230    continue
- 300  continue
-      stop
-      !  format statements.
- 905  format(1h1,i3,12h data points)
- 910  format(1h0,2(2x,1hi,5x,4hx(i),6x,4hy(i),6x,4hz(i),6x))
- 920  format(1x,2(i3,3f10.4,5x))
- 930  format(1x,40hestimate of standard deviation of z(i) =,e15.6)
- 935  format(32h0least-squares spline of degrees,2i3)
- 940  format(28h0smoothing spline of degrees,2i3)
- 945  format(20h smoothing factor s=,f9.0)
- 950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
- 955  format(1x,42htotal number of knots in the x-direction =,i3)
- 960  format(1x,22hposition of the knots )
- 965  format(5x,10f7.3)
- 970  format(1x,42htotal number of knots in the y-direction =,i3)
- 975  format(23h0b-spline coefficients )
- 980  format(5x,8f9.4)
- 985  format(1h0,1hx,2x,11f7.1)
- 990  format(3x,1hy)
- 995  format(1x,f4.1,11f7.3)
- 1000 format(1h0,33hspline evaluation on a given grid)
-      end subroutine mnsurf
+         ! we set up the dimension information
+         nxest = 15
+         nyest = 15
+         nmax  = 15
+         kwrk  = 300
+         lwrk1 = 12000
+         lwrk2 = 6000
+         allocate(wrk1(lwrk1),wrk2(lwrk2))
 
+         ! we choose a value for eps
+         eps=0.1e-05
+
+         ! main loop for the different spline approximations.
+         all_tests: do is=1,6
+
+            select case (is)
+
+               case (1) !  we start computing the least-squares bicubic polynomial (large s)
+                  iopt = 0
+                  kx = 3
+                  ky = 3
+                  s = 900000.
+
+               case (2) !  iopt=1 from the second call on.
+                  iopt = 1
+                  s = 200.
+
+               case (3) !  a value for s within its confidence interval
+                  s = m
+
+               case (4) !  overfitting (s too small)
+                  s = 20.
+
+               case (5) !  we change the degrees of the spline
+                  iopt = 0
+                  kx   = 5
+                  ky   = 5
+                  s    = m
+
+               case (6) !  calculate a least-squares spline approximation with specified knots.
+                  iopt = -1
+                  kx = 3
+                  ky = 3
+                  nx = 11
+                  ny = 11
+                  j = kx+2
+                  do i=1,3
+                     ai = i-2
+                     tx(j) = ai
+                     ty(j) = ai
+                     j = j+1
+                  end do
+
+            end select
+
+            ! determination of the spline approximation.
+            call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
+                        nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+            ! printing of the fitting results.
+            if (iopt>=0) then
+               write(useUnit,940) kx,ky
+               write(useUnit,945) s
+            else
+               write(useUnit,935) kx,ky
+            endif
+
+            write(useUnit,950) fp,ier
+            write(useUnit,955) nx
+            write(useUnit,960)
+            write(useUnit,965) (tx(i),i=1,nx)
+            write(useUnit,970) ny
+            write(useUnit,960)
+            write(useUnit,965) (ty(i),i=1,ny)
+            nc = (nx-kx-1)*(ny-ky-1)
+            write(useUnit,975)
+            write(useUnit,980) (c(i),i=1,nc)
+
+            ! evaluation of the spline approximation.
+            call bispev(tx,nx,ty,ny,c,kx,ky,xx,mx,yy,my,zz,wrk2,lwrk2,iwrk,kwrk,ier)
+
+            write(useUnit,1000)
+            write(useUnit,985) (xx(i),i=1,mx)
+            write(useUnit,990)
+            do j=1,my
+               write(useUnit,995) yy(j),(zz(i),i=j,121,11)
+            end do
+
+         end do all_tests
+
+         ! format statements.
+         905  format(1h1,i3,12h data points)
+         910  format(1h0,2(2x,1hi,5x,4hx(i),6x,4hy(i),6x,4hz(i),6x))
+         920  format(1x,2(i3,3f10.4,5x))
+         930  format(1x,40hestimate of standard deviation of z(i) =,e15.6)
+         935  format(32h0least-squares spline of degrees,2i3)
+         940  format(28h0smoothing spline of degrees,2i3)
+         945  format(20h smoothing factor s=,f9.0)
+         950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
+         955  format(1x,42htotal number of knots in the x-direction =,i3)
+         960  format(1x,22hposition of the knots )
+         965  format(5x,10f7.3)
+         970  format(1x,42htotal number of knots in the y-direction =,i3)
+         975  format(23h0b-spline coefficients )
+         980  format(5x,8f9.4)
+         985  format(1h0,1hx,2x,11f7.1)
+         990  format(3x,1hy)
+         995  format(1x,f4.1,11f7.3)
+         1000 format(1h0,33hspline evaluation on a given grid)
+
+      end subroutine mnsurf
 
 
 
