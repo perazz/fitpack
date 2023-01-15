@@ -26,45 +26,42 @@ module fitpack_core
     integer, parameter, public :: RKIND = real64
     integer, parameter, public :: RSIZE = int32
 
-    ! Polar
-    public :: evapol ! Evaluate polar spline s(u,v) at (x,y)
-    public :: polar,pogrid,cocosp,concon,concur,cualde
-    public :: dblint,parcur
+    ! Curve fitting routines
+    public :: curfit ! General curve fitting
+    public :: percur ! Curve fitting with periodic splines
+    public :: parcur ! Smoothing of parametric curves
+    public :: clocur ! Smoothing of closed curves
+    public :: concur ! Smoothing with end-point derivative constraints
+    public :: cocosp ! Least-squares fitting with convexity constraints
+    public :: concon ! Automated smoothing with convexity constraints
 
-    public :: percur  ! Periodic spline curve driver
+    ! Curve approximation routines
+    public :: splev  ! Evaluation of a spline function
+    public :: splder ! Derivative calculation of a spline function
+    public :: spalde ! All derivateives of a spline function
+    public :: curev  ! Evaluation of a spline curve
+    public :: cualde ! All derivatives of a spline curve
+    public :: insert ! Insert a knot into a given spline
+    public :: splint ! Integration of a spline function
+    public :: fourco ! Fourier coefficients of a cubic spline
+    public :: sproot ! The roots of a cubic spline
 
-    ! Fourier coefficients
-    public :: fourco
+    ! Surface fitting routines
+    public :: surfit ! Surface fitting to scattered data
+    public :: regrid ! Surface fitting to data on a rectangular grid
+    public :: polar  ! Surface fitting using generalized polar coordinates
+    public :: pogrid ! Surface fitting to data on a polar grid
+    public :: sphere ! Surface fitting using spherical coordinates
+    public :: spgrid ! Surface fitting to data on a spherical grid
+    public :: parsur ! Parametric surface fitting to data on a grid
 
-    ! Closed-curve
-    public :: clocur
-
-    ! Surface
-    public :: surfit
-
-    public :: parsur
-    public :: surev   ! Evaluate parametric surface on an (u(i),v(j)) grid
-
-    ! Curve
-    public :: curev,curfit
-
-    ! Bi-variate spline
-    public :: parder  ! Evaluate 2d spline derivatives on a grid
-    public :: pardeu  ! Evaluate 2d spline derivatives on a set of points
-    public :: pardtc  ! Turn 2d spline into one of its partial derivatives' spline
-    public :: bispev  ! Evaluate 2d spline on a meshgrid
-    public :: bispeu  ! Evaluate 2d spline on arbitrary (x,y) points
-    public :: insert,sphere,spgrid
-
-
-    public :: splev   ! Evaluate 1d spline value
-    public :: splder  ! Evaluate 1d spline derivative
-    public :: spalde  ! Evaluate all 1d derivatives at x
-    public :: splint  ! Evaluate integral below spline
-    public :: sproot  ! Find zeroes of a 1d spline
-
-    public :: regrid
-    public :: profil
+    ! Surface application routines
+    public :: bispev ! Evaluation of a bivariate spline function
+    public :: parder ! Partial derivatives of a bivariate spline
+    public :: dblint ! Integration of a bivariate spline
+    public :: profil ! Cross-section of a bivariate spline
+    public :: evapol ! Evaluation of a polar spline
+    public :: surev  ! Evaluation of a parametric spline surface
 
     ! Spline behavior for points not in the support
     integer, parameter, public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
@@ -9936,27 +9933,25 @@ module fitpack_core
  420  ier = 1
       go to 440
  430  ier = -1
-      fp = 0.
+      fp  = zero
  440  return
       end subroutine fppogr
 
 
-      recursive subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, &
-       nuest,nvest,eta,tol,maxit,ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv, &
-       tv,c,fp,sup,fpint,coord,f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h, &
-       index,nummer,wrk,lwrk,ier)
+      recursive subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, nuest,nvest,eta,tol,maxit, &
+                                  ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv,tv,c,fp,sup,fpint,coord, &
+                                  f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
 
       !  ..scalar arguments..
-      integer iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc, &
-       intest,nrest,lwrk,ier
-      integer, intent(inout) :: nu,nv
-      real(RKIND) s,eta,tol,fp,sup
+      integer, intent(in) :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer, intent(inout) :: ier,nu,nv
+      real(RKIND) :: s,eta,tol,fp,sup
       !  ..array arguments..
       integer :: index(nrest),nummer(m)
       real(RKIND) :: u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
                      cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4),spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
-      real(RKIND) :: rad
+      procedure(boundary) :: rad
       !  ..local scalars..
       real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,hui,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
@@ -10012,7 +10007,7 @@ module fitpack_core
           !        f(2) = 0 if iopt3> 0.
           !  the corresponding weighted sum of squared residuals gives the upper
           !  bound sup for the smoothing factor s.
-      10  sup = zero
+          sup = zero
           f(1:4) = zero
           a(1:4,1:4) = zero
           initial_poly: do i=1,m
@@ -10106,28 +10101,28 @@ module fitpack_core
       !  ************************************************************************************************************
       !  main loop for the different sets of knots. m is a save upper bound for the number of trials.
   90  do 570 iter=1,m
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(u,v).
+         ! find the position of the additional knots which are needed for the
+         ! b-spline representation of s(u,v).
          l1 = 4
          l2 = l1
          l3 = nv-3
          l4 = l3
          tv(l2) = -pi
          tv(l3) = pi
-         do 120 i=1,3
+         do i=1,3
             l1 = l1+1
             l2 = l2-1
             l3 = l3+1
             l4 = l4-1
             tv(l2) = tv(l4)-pi2
             tv(l3) = tv(l1)+pi2
- 120     continue
-        l = nu
-        do 130 i=1,4
-          tu(i) = zero
-          tu(l) = one
-          l = l-1
- 130    continue
+         end do
+         l = nu
+         do i=1,4
+           tu(i) = zero
+           tu(l) = one
+           l = l-1
+         end do
       !  find nrint, the total number of knot intervals and nreg, the number
       !  of panels in which the approximation domain is subdivided by the
       !  intersection of knots.
@@ -10149,34 +10144,29 @@ module fitpack_core
       !  the coefficients cosi are obtained from interpolation conditions
       !  at the knots tv(i),i=4,5,...nv-4.
         do 175 i=1,nvv
-           l2 = i+3
+           l2  = i+3
            arg = tv(l2)
            call fpbspl(tv,nv,3,arg,l2,hv)
-           do 145 j=1,nvv
-              row(j) = 0.
- 145       continue
+           row(1:nvv) = zero
            ll = i
-           do 150 j=1,3
+           do j=1,3
               if(ll>nvv) ll= 1
               row(ll) = row(ll)+hv(j)
               ll = ll+1
- 150       continue
+           end do
            co = cos(arg)
            si = sin(arg)
-           r = rad(arg)
-           cs(1) = co*r
-           cs(2) = si*r
-           if(iopt2==1) go to 155
-           cs(3) = cs(1)*cs(1)
-           cs(4) = cs(2)*cs(2)
-           cs(5) = cs(1)*cs(2)
- 155       do 170 j=1,nvv
+           r  = rad(arg)
+           cs(1:2) = [co,si]*r
+           if (iopt2/=1) cs(3:5) = [cs(:2)**2,cs(1)*cs(2)]
+
+           do 170 j=1,nvv
               piv = row(j)
               if (piv==zero) go to 170
               call fpgivs(piv,a(j,1),co,si)
-              do 160 l=1,ipar
-                 call fprota(co,si,cs(l),cosi(l,j))
- 160          continue
+
+              call fprota(co,si,cs(:ipar),cosi(:ipar,j))
+
               if(j==nvv) go to 175
               j1 = j+1
               j2 = 1
@@ -10186,10 +10176,10 @@ module fitpack_core
  165          continue
  170       continue
  175    continue
-         do 190 l=1,ipar
+         do l=1,ipar
             cs(1:nvv) = cosi(l,1:nvv)
             cosi(l,1:nvv) = fpback(a,cs,nvv,nvv,ncc)
- 190     continue
+         end do
       !  find ncof, the dimension of the spline and ncoff, the number
       !  of coefficients in the standard b-spline representation.
  195    nu4 = nu-4
@@ -10490,22 +10480,17 @@ module fitpack_core
       !  the b-splines at the knots tv(l),l=5,...,nv-4.
       call fpdisc(tv,nv,5,bv,nvest)
       !  initial value for p.
-      p1 = 0.
+      p1 = zero
       f1 = sup-s
       p3 = -one
       f3 = fpms
-      p = zero
-      do 590 i=1,ncof
-        p = p+a(i,1)
- 590  continue
-      rn = ncof
-      p = rn/p
+      p  = real(ncof,RKIND)/p
+
       !  find the bandwidth of the extended observation matrix.
-      iband4 = iband+ipar1
-      if(iband4>ncof) iband4 = ncof
+      iband4 = min(ncof,iband+ipar1)
       iband3 = iband4 -1
-      ich1 = 0
-      ich3 = 0
+      ich1   = 0
+      ich3   = 0
       nuu = nu4-iopt3-1
       !  iteration process to find the root of f(p)=s.
       do 920 iter=1,maxit
@@ -10710,7 +10695,7 @@ module fitpack_core
         p = p*con4
         if(p<=p1) p = p1*con9 + p2*con1
         go to 920
- 895    if(f2<0.) ich3 = 1
+ 895    if(f2<zero) ich3 = 1
  900    if(ich1/=0) go to 910
         if((f1-f2)>acc) go to 905
       !  our initial choice of p is too small
