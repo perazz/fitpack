@@ -9965,41 +9965,20 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpms = zero
-      ipar = iopt2*(iopt2+3)/2
-      ipar1 = ipar+1
-      eps = sqrt(eta)
+      fpms   = zero
+      ipar   = iopt2*(iopt2+3)/2
+      ipar1  = ipar+1
+      eps    = sqrt(eta)
       iband1 = 0
 
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
+      initialize: if (iopt1>=0) then
 
+          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+          numin = 9
+          nvmin = 9+iopt2*(iopt2+1)
 
-      numin = 9
-      nvmin = 9+iopt2*(iopt2+1)
-
-      initialize: if (iopt1>0) then
-
-          if (s<sup .and. nv<nvmin) then
-
-             !  test whether we cannot further increase the number of knots.
-             if (nuest<numin .or. nvest<nvmin) then
-                ier = FITPACK_INSUFFICIENT_STORAGE
-                return
-             end if
-
-             !  find the initial set of interior knots of the spline in case iopt1=0.
-             nu = numin
-             nv = nvmin
-             tu(5) = half
-             nvv = nv-8
-             rn = nvv+1
-             fac = pi2/rn
-             forall (i=1:nvv) tv(i+4) = i*fac-pi
-
-          endif
-
-      elseif (iopt1==0) then
+          if (iopt1==0 .or. (iopt1>0 .and. s>=sup)) then
 
           !  if iopt1 = 0 we begin by computing the weighted least-squares polymomial of the form
           !     s(u,v) = f(1)*(1-u**3)+f(2)*u**3+f(3)*(u**2-u**3)+f(4)*(u-u**3)
@@ -10070,22 +10049,28 @@ module fitpack_core
              return
           end if
 
-          !  test whether we cannot further increase the number of knots.
-          if (nuest<numin .or. nvest<nvmin) then
-             ier = FITPACK_INSUFFICIENT_STORAGE
-             return
-          end if
 
-          !  find the initial set of interior knots of the spline in case iopt1=0.
-          nu = numin
-          nv = nvmin
-          tu(5) = half
-          nvv = nv-8
-          rn = nvv+1
-          fac = pi2/rn
-          forall (i=1:nvv) tv(i+4) = i*fac-pi
+          ! Find the initial set of interior knots
+          initial_knots: if (iopt1==0 .or. (iopt1>0 .and. (s>=sup .or. (s<sup .and. nv<nvmin)))) then
 
-      end if initialize
+             !  test whether we cannot further increase the number of knots.
+             if (nuest<numin .or. nvest<nvmin) then
+                ier = FITPACK_INSUFFICIENT_STORAGE
+                return
+             end if
+
+             !  find the initial set of interior knots of the spline in case iopt1=0.
+             nu = numin
+             nv = nvmin
+             tu(5) = half
+             nvv = nv-8
+             rn = nvv+1
+             fac = pi2/rn
+             forall (i=1:nvv) tv(i+4) = i*fac-pi
+
+          endif initial_knots
+
+      endif initialize
 
 
       !  ************************************************************************************************************
