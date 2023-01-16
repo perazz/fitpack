@@ -5223,14 +5223,14 @@ module fitpack_core
               point = j
               go to 30
           endif
-      40  left(j) = i
+          left(j) = i
           go to 10
       50  l = right(k)
           if (point/=l) then
               k = l
               go to 50
           endif
-      60  right(k) = i
+          right(k) = i
           point = k
       endif
   70  i = right(point)
@@ -9938,25 +9938,29 @@ module fitpack_core
       end subroutine fppogr
 
 
-      recursive subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, nuest,nvest,eta,tol,maxit, &
-                                  ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv,tv,c,fp,sup,fpint,coord, &
-                                  f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
+      pure subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, nuest,nvest,eta,tol,maxit, &
+                             ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv,tv,c,fp,sup,fpint,coord, &
+                             f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
 
       !  ..scalar arguments..
-      integer, intent(in) :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
-      integer, intent(inout) :: ier,nu,nv
-      real(RKIND) :: s,eta,tol,fp,sup
+      integer    , intent(in)        :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer    , intent(inout)     :: ier,nu,nv
+      real(RKIND), intent(in)    :: s,eta,tol
+      real(RKIND), intent(inout) :: fp,sup
       !  ..array arguments..
-      integer :: index(nrest),nummer(m)
-      real(RKIND) :: u(m),v(m),z(m),w(m),tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
-                     cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4),spv(m,4),h(ib3),wrk(lwrk)
+      integer    , intent(inout) :: index(nrest),nummer(m)
+      real(RKIND), intent(in)    :: u(m),v(m),z(m),w(m)
+      real(RKIND), intent(inout) :: tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
+                                    cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4), &
+                                    spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
       procedure(boundary) :: rad
       !  ..local scalars..
-      real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,hui,huj,p,pinv,piv,p1,p2,p3, &
+      real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
       integer :: i,iband,iband3,iband4,ich1,ich3,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
-                 lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,iband1,jlu
+                 lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,&
+                 iband1,jlu
       !  ..local arrays..
       real(RKIND), dimension(SIZ_K+1) :: hu,hv
 
@@ -10467,33 +10471,27 @@ module fitpack_core
       !  restart the computations with the new set of knots.
       end do compute_knots
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 2: determination of the smoothing bicubic spline.               c
-      ! ******************************************************               c
-      ! we have determined the number of knots and their position. we now    c
-      ! compute the coefficients of the smoothing spline sp(u,v).            c
-      ! the observation matrix a is extended by the rows of a matrix, expres-c
-      ! sing that sp(u,v) must be a constant function in the variable        c
-      ! v and a cubic polynomial in the variable u. the corresponding        c
-      ! weights of these additional rows are set to 1/(p). iteratively       c
-      ! we than have to determine the value of p such that f(p) = sum((w(i)* c
-      ! (z(i)-sp(u(i),v(i))))**2)  be = s.                                   c
-      ! we already know that the least-squares polynomial corresponds to p=0,c
-      ! and that the least-squares bicubic spline corresponds to p=infin.    c
-      ! the iteration process makes use of rational interpolation. since f(p)c
-      ! is a convex and strictly decreasing function of p, it can be approx- c
-      ! imated by a rational function of the form r(p) = (u*p+v)/(p+w).      c
-      ! three values of p (p1,p2,p3) with corresponding values of f(p) (f1=  c
-      ! f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value   c
-      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zeroc
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  evaluate the discontinuity jumps of the 3-th order derivative of
-      !  the b-splines at the knots tu(l),l=5,...,nu-4.
- 580  call fpdisc(tu,nu,5,bu,nuest)
-      !  evaluate the discontinuity jumps of the 3-th order derivative of
-      !  the b-splines at the knots tv(l),l=5,...,nv-4.
-      call fpdisc(tv,nv,5,bv,nvest)
-      !  initial value for p.
+      ! ************************************************************************************************************
+      ! part 2: determination of the smoothing bicubic spline.
+      ! ************************************************************************************************************
+      ! we have determined the number of knots and their position. we now compute the coefficients of the
+      ! smoothing spline sp(u,v). the observation matrix a is extended by the rows of a matrix, expressing
+      ! that sp(u,v) must be a constant function in the variable v and a cubic polynomial in the variable u.
+      ! the corresponding weights of these additional rows are set to 1/(p). iteratively we than have to
+      ! determine the value of p such that f(p) = sum((w(i)*(z(i)-sp(u(i),v(i))))**2)  be = s.
+      ! we already know that the least-squares polynomial corresponds to p=0, and that the least-squares
+      ! bicubic spline corresponds to p=infinity. the iteration process makes use of rational interpolation.
+      ! since f(p) is a convex and strictly decreasing function of p, it can be approximated by a rational
+      ! function of the form r(p) = (u*p+v)/(p+w). three values of p (p1,p2,p3) with corresponding values of
+      ! f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value of p such that r(p)=s.
+      ! convergence is guaranteed by taking f1>0,f3<zero
+      ! ************************************************************************************************************
+
+      ! evaluate the discontinuity jumps of the 3-th order derivative of the b-splines at the knots:
+      call fpdisc(tu,nu,5,bu,nuest)   ! tu(l),l=5,...,nu-4.
+      call fpdisc(tv,nv,5,bv,nvest)   ! tv(l),l=5,...,nv-4.
+
+      ! initial value for p.
       p1 = zero
       f1 = sup-s
       p3 = -one
@@ -10507,241 +10505,253 @@ module fitpack_core
       ich3   = 0
       nuu = nu4-iopt3-1
       !  iteration process to find the root of f(p)=s.
-      do 920 iter=1,maxit
-        pinv = one/p
-      !  store the triangularized observation matrix into q.
-        ff(1:ncof) = f(1:ncof)
-        q(1:ncof,1:iband4) = zero
-        q(1:ncof,1:iband)  = a(1:ncof,1:iband)
+      iterations: do iter=1,maxit
+          pinv = one/p
+          ! store the triangularized observation matrix into q.
+          ff(1:ncof) = f(1:ncof)
+          q(1:ncof,1:iband4) = zero
+          q(1:ncof,1:iband)  = a(1:ncof,1:iband)
 
-      !  extend the observation matrix with the rows of a matrix, expressing
-      !  that for u=constant sp(u,v) must be a constant function.
-        do 720 i=5,nv4
-          ii = i-4
-          do 635 l=1,nvv
-             row(l) = 0.
- 635      continue
-          ll = ii
-          do 640  l=1,5
-             if(ll>nvv) ll=1
-             row(ll) = row(ll)+bv(ii,l)
-             ll = ll+1
- 640      continue
-          do 721 j=1,nuu
-      !  initialize the new row.
-            h(1:iband) = zero
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            if(j>iopt2) go to 665
-            if(j==2) go to 655
-            cs(1:2) = matmul(cosi(1:2,1:nvv),row(1:nvv))
-            h(1) = cs(1)
-            h(2) = cs(2)
-            jrot = 2
-            go to 675
- 655        cs(3:5) = matmul(cosi(3:5,1:nvv),row(1:nvv))
-            h(1) = cs(1)*ratio
-            h(2) = cs(2)*ratio
-            h(3) = cs(3)
-            h(4) = cs(4)
-            h(5) = cs(5)
-            jrot = 2
-            go to 675
- 665        h(1:nvv) = row(1:nvv)
-             jrot = ipar1+1+(j-iopt2-1)*nvv
- 675        h(1:iband) = h(1:iband)*pinv
-            zi = 0.
-      !  rotate the new row into triangle by givens transformations.
-            do 710 irot=jrot,ncof
-              piv = h(1)
-              i2 = min0(iband1,ncof-irot)
-              if (piv==zero) then
-                 if (i2<=0) go to 721
-                 go to 690
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),co,si)
-      !  apply that givens transformation to the right hand side.
-              call fprota(co,si,zi,ff(irot))
-              if(i2==0) go to 721
-      !  apply that givens transformation to the left hand side.
-              do 680 l=1,i2
-                l1 = l+1
-                call fprota(co,si,h(l1),q(irot,l1))
- 680          continue
- 690          do 700 l=1,i2
-                h(l) = h(l+1)
- 700          continue
-              h(i2+1) = zero
- 710        continue
- 721      continue
- 720    continue
-      !  extend the observation matrix with the rows of a matrix expressing
-      !  that for v=constant. sp(u,v) must be a cubic polynomial.
-        do 810 i=5,nu4
-          ii = i-4
-          do 811 j=1,nvv
-      !  initialize the new row
-            h(1:iband4) = zero
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            j1 = 1
-            do 760 l=1,5
-               il = ii+l-1
-               if(il==nu4 .and. iopt3/=0) go to 760
-               if(il>iopt2+1) go to 750
-               go to (735,740,745),il
- 735           h(1) = bu(ii,l)
-               j1 = j+1
-               go to 760
- 740           h(1) = h(1)+bu(ii,l)
-               h(2) = bu(ii,l)*cosi(1,j)
-               h(3) = bu(ii,l)*cosi(2,j)
-               j1 = j+3
-               go to 760
- 745           h(1) = h(1)+bu(ii,l)
-               h(2) = bu(ii,l)*cosi(1,j)*ratio
-               h(3) = bu(ii,l)*cosi(2,j)*ratio
-               h(4) = bu(ii,l)*cosi(3,j)
-               h(5) = bu(ii,l)*cosi(4,j)
-               h(6) = bu(ii,l)*cosi(5,j)
-               j1 = j+6
-               go to 760
- 750           h(j1) = bu(ii,l)
-               j1 = j1+nvv
- 760        continue
-            h(:iband4) = h(:iband4)*pinv
-            zi = zero
-            jrot = 1
-            if(ii>iopt2+1) jrot = ipar1+(ii-iopt2-2)*nvv+j
-      !  rotate the new row into triangle by givens transformations.
-            do 800 irot=jrot,ncof
-              piv = h(1)
-              i2 = min(iband3,ncof-irot)
-              if (piv==zero) then
-                if (i2<=0) go to 811
-                go to 780
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),co,si)
-      !  apply that givens transformation to the right hand side.
-              call fprota(co,si,zi,ff(irot))
-              if(i2==0) go to 811
-      !  apply that givens transformation to the left hand side.
-              do 770 l=1,i2
-                l1 = l+1
-                call fprota(co,si,h(l1),q(irot,l1))
- 770          continue
- 780          do 790 l=1,i2
-                h(l) = h(l+1)
- 790          continue
-              h(i2+1) = zero
- 800        continue
- 811      continue
- 810    continue
-        ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
-        dmax = max(zero,maxval(q(1:ncof,1)))
+          ! extend the observation matrix with the rows of a matrix, expressing
+          ! that for u=constant sp(u,v) must be a constant function.
+          u_constant: do i=5,nv4
+              ii = i-4
+              row(1:nvv) = zero
+              ll = ii
+              do l=1,5
+                  if(ll>nvv) ll=1
+                  row(ll) = row(ll)+bv(ii,l)
+                  ll = ll+1
+              end do
+              do j=1,nuu
 
-        ! check whether the matrix is rank deficient.
-        sigma = eps*dmax
+                  !  initialize the new row.
+                  h(1:iband) = zero
 
-        if (all(q(1:ncof,1)>sigma)) then
+                  !  fill in the non-zero elements of the row. jrot records the column
+                  !  number of the first non-zero element in the row.
+                  if (j>iopt2) then
 
-           ! backward substitution in case of full rank.
-           c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
-           rank = ncof
+                      h(1:nvv) = row(1:nvv)
+                      jrot = ipar1+1+(j-iopt2-1)*nvv
 
-        else
+                  elseif (j==2) then
 
-           ! in case of rank deficiency, find the minimum norm solution.
-           lwest = ncof*iband4+ncof+iband4
-           if (lwest>lwrk) then
-              ier = lwest
+                      cs(3:5) = matmul(cosi(3:5,1:nvv),row(1:nvv))
+                      h(1:2)  = cs(1:2)*ratio
+                      h(3:5)  = cs(3:5)
+                      jrot    = 2
+
+                  else
+
+                      cs(1:2) = matmul(cosi(1:2,1:nvv),row(1:nvv))
+                      h(1:2)  = cs(1:2)
+                      jrot    = 2
+
+                  end if
+
+                  h(1:iband) = h(1:iband)*pinv
+                  zi = zero
+
+                  ! rotate the new row into triangle by givens transformations.
+                  do irot=jrot,ncof
+                      piv = h(1)
+                      i2 = min(iband1,ncof-irot)
+                      if (piv==zero) then
+
+                         if (i2<=0) exit
+                         h(1:i2+1) = [h(2:i2+1),zero]
+
+                      else
+
+                         ! calculate the parameters of the givens transformation.
+                         call fpgivs(piv,q(irot,1),co,si)
+                         ! apply that givens transformation to the right hand side.
+                         call fprota(co,si,zi,ff(irot))
+
+                         if (i2==0) exit
+
+                         ! apply that givens transformation to the left hand side.
+                         call fprota(co,si,h(2:i2+1),q(irot,2:i2+1))
+                         h(1:i2+1) = [h(2:i2+1),zero]
+
+                      endif
+
+                   end do
+              end do
+          end do u_constant
+
+          !  extend the observation matrix with the rows of a matrix expressing
+          !  that for v=constant. sp(u,v) must be a cubic polynomial.
+          v_constant: do i=5,nu4
+              ii = i-4
+              do j=1,nvv
+
+                  ! initialize the new row
+                  h(1:iband4) = zero
+                  !  fill in the non-zero elements of the row. jrot records the column
+                  !  number of the first non-zero element in the row.
+                  j1 = 1
+                  fill_in: do l=1,5
+                     il = ii+l-1
+                     if (il==nu4 .and. iopt3/=0) then
+                        cycle fill_in
+                     elseif (il>iopt2+1) then
+                        h(j1)  = bu(ii,l)
+                        j1     = j1+nvv
+                     elseif (il<0) then
+                        h(1)   = bu(ii,l)
+                        j1     = j+1
+                     elseif (il==0) then
+                        h(1)   = h(1)+bu(ii,l)
+                        h(2:3) = bu(ii,l)*cosi(1:2,j)
+                        j1     = j+3
+                     elseif (il>0) then
+                        h(1)   = h(1)+bu(ii,l)
+                        h(2:3) = bu(ii,l)*cosi(1:2,j)*ratio
+                        h(4:6) = bu(ii,l)*cosi(3:5,j)
+                        j1     = j+6
+                     endif
+                  end do fill_in
+
+                  h(:iband4) = h(:iband4)*pinv
+                  zi   = zero
+                  jrot = merge(ipar1+(ii-iopt2-2)*nvv+j,1,ii>iopt2+1)
+
+                  ! rotate the new row into triangle by givens transformations.
+                  do irot=jrot,ncof
+                      piv = h(1)
+                      i2 = min(iband3,ncof-irot)
+                      if (piv==zero) then
+
+                         if (i2<=0) exit
+                         h(1:i2+1) = [h(2:i2+1),zero]
+
+                      else
+
+                         ! calculate the parameters of the givens transformation.
+                         call fpgivs(piv,q(irot,1),co,si)
+                         ! apply that givens transformation to the right hand side.
+                         call fprota(co,si,zi,ff(irot))
+
+                         if (i2==0) exit
+
+                         ! apply that givens transformation to the left hand side.
+                         call fprota(co,si,h(2:i2+1),q(irot,2:i2+1))
+                         h(1:i2+1) = [h(2:i2+1),zero]
+
+                      endif
+
+                  end do
+
+              end do
+          end do v_constant
+
+          ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
+          dmax = max(zero,maxval(q(1:ncof,1)))
+
+          ! check whether the matrix is rank deficient.
+          sigma = eps*dmax
+
+          if (all(q(1:ncof,1)>sigma)) then
+
+             ! backward substitution in case of full rank.
+             c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
+             rank = ncof
+
+          else
+
+             ! in case of rank deficiency, find the minimum norm solution.
+             lwest = ncof*iband4+ncof+iband4
+             if (lwest>lwrk) then
+                ier = lwest
+                return
+             end if
+             lf = 1
+             lh = lf+ncof
+             la = lh+iband4
+             call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+
+          endif
+
+          q(:ncof,1) = q(:ncof,1)/dmax
+
+          ! find the coefficients in the standard b-spline representation of the polar spline.
+          call fprppo(nu,nv,iopt2,iopt3,cosi,ratio,c,ff,ncoff)
+
+          ! compute f(p).
+          fp = zero
+          get_fp: do num = 1,nreg
+              num1 = num-1
+              lu = num1/nvv
+              lv = num1-lu*nvv
+              jrot = lu*nv4+lv
+              in = index(num)
+
+              do while (in/=0)
+                  store = zero
+                  i1 = jrot
+                  do i=1,4
+                     store = store + spu(in,i)*dot_product(spv(in,1:4),c(i1+1:i1+4))
+                     i1 = i1+nv4
+                  end do
+                  fp = fp+(w(in)*(z(in)-store))**2
+                  in = nummer(in)
+              end do
+          end do get_fp
+
+          ! test whether the approximation sp(u,v) is an acceptable solution
+          fpms = fp-s
+          if (abs(fpms)<=acc) then
+              if (ncof/=rank) ier = -rank
               return
-           end if
-           lf = 1
-           lh = lf+ncof
-           la = lh+iband4
-           call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+          end if
 
-        endif
+          ! carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
 
-        q(:ncof,1) = q(:ncof,1)/dmax
+          if (ich3==0) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle iterations
+             elseif (f2<zero) then
+                 ich3 = 1
+             endif
+          endif
 
-        ! find the coefficients in the standard b-spline representation of
-        ! the polar spline.
-        call fprppo(nu,nv,iopt2,iopt3,cosi,ratio,c,ff,ncoff)
-        ! compute f(p).
-        fp = zero
-        do 890 num = 1,nreg
-          num1 = num-1
-          lu = num1/nvv
-          lv = num1-lu*nvv
-          jrot = lu*nv4+lv
-          in = index(num)
- 860      if(in==0) go to 890
-          store = zero
-          i1 = jrot
-          do 880 i=1,4
-            hui = spu(in,i)
-            j1 = i1
-            do 870 j=1,4
-              j1 = j1+1
-              store = store+hui*spv(in,j)*c(j1)
- 870        continue
-            i1 = i1+nv4
- 880      continue
-          fp = fp+(w(in)*(z(in)-store))**2
-          in = nummer(in)
-          go to 860
- 890    continue
-      !  test whether the approximation sp(u,v) is an acceptable solution
-        fpms = fp-s
-        if(abs(fpms)<=acc) go to 980
-      !  test whether the maximum allowable number of iterations has been
-      !  reached.
-        if(iter==maxit) go to 940
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 900
-        if((f2-f3)>acc) go to 895
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 + p2*con1
-        go to 920
- 895    if(f2<zero) ich3 = 1
- 900    if(ich1/=0) go to 910
-        if((f1-f2)>acc) go to 905
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 920
-        if(p>=p3) p = p2*con1 +p3*con9
-        go to 920
- 905    if(f2>0.) ich1 = 1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 910    if(f2>=f1 .or. f2<=f3) go to 945
-      !  find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 920  continue
-      !  error codes and messages.
+          if (ich1==0) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle iterations
+             elseif (f2>zero) then
+                ich1 = 1
+             endif
+          endif
 
-      ! Rank deficiency
-      ier = lwest
-      go to 990
- 940  ier = FITPACK_MAXIT
-      go to 990
- 945  ier = FITPACK_S_TOO_SMALL
-      go to 990
- 970  ier = FITPACK_INTERPOLATING_OK
-      fp  = zero
- 980  if (ncof/=rank) ier = -rank
- 990  return
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
+
+      end do iterations
+
+      ! the maximum allowable number of iterations has been reached.
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fppola
 
 
@@ -15953,7 +15963,8 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,eps,fp
+      real(RKIND), intent(in)    :: s,eps
+      real(RKIND), intent(inout) :: fp
       integer,     intent(in)    :: m,nuest,nvest,lwrk1,lwrk2,kwrk
       integer,     intent(out)   :: nu,nv,ier
       !  ..array arguments..
