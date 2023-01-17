@@ -15699,8 +15699,8 @@ module fitpack_core
       ! the approximation problem is reduced to the determination of a bi-cubic spline s(u,v) fitting a
       ! corresponding set of data points (u(i),v(i),z(i)) on the rectangle 0<=u<=1,-pi<=v<=pi.
 
-      recursive subroutine polar(iopt,m,x,y,z,w,rad,s,nuest,nvest, &
-                                 eps,nu,tu,nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+      pure subroutine polar(iopt,m,x,y,z,w,rad,s,nuest,nvest, &
+                            eps,nu,tu,nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
       ! in order to have continuous partial derivatives
       !              i+j
