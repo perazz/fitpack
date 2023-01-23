@@ -9536,199 +9536,207 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer mu,mv,mz,nuest,nvest,maxit,nc,nu,nv,lastdi,nplusu,nplusv, &
-       lasttu,lwrk,ier
-      real(RKIND) z0,r,s,tol,fp,fp0,fpold,reducu,reducv,step
+      integer, intent(in) :: mu,mv,mz,nuest,nvest,nc,lwrk,maxit
+      integer :: nu,nv,lastdi,nplusu,nplusv,lasttu,ier
+      real(RKIND) :: z0,r,s,tol,fp,fp0,fpold,reducu,reducv,step
       !  ..array arguments..
-      integer iopt(3),ider(2),nrdatu(nuest),nrdatv(nvest),nru(mu), &
-       nrv(mv)
-      real(RKIND) u(mu),v(mv),z(mz),tu(nuest),tv(nvest),c(nc),fpintu(nuest), &
-       fpintv(nvest),dz(3),wrk(lwrk)
+      integer :: iopt(3),ider(2),nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
+      real(RKIND) :: u(mu),v(mv),z(mz),tu(nuest),tv(nvest),c(nc),fpintu(nuest),fpintv(nvest),dz(3),wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) acc,fpms,f1,f2,f3,p,per,pi,p1,p2,p3,vb,ve,zmax,zmin,rn
-      integer i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju, &
-       ktu,l,l1,l2,l3,l4,mpm,mumin,mu0,mu1,nn,nplu,nplv,npl1,nrintu, &
-       nrintv,nue,numax,nve,nvmax
+      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
+      integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,l1,l2,l3,l4,mpm,mumin,mu0,mu1,&
+                 nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
       !  ..local arrays..
-      integer idd(2)
-      real(RKIND) dzz(3)
+      integer :: idd(2)
+      real(RKIND) :: dzz(3)
 
       !   set constants
+      real(RKIND), parameter :: period = 2*pi
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       !   initialization
-      ifsu = 0
-      ifsv = 0
-      ifbu = 0
-      ifbv = 0
-      p = -one
-      mumin = 4-iopt(3)
-      if(ider(1)>=0) mumin = mumin-1
-      if(iopt(2)==1 .and. ider(2)==1) mumin = mumin-1
-      pi = datan2(0d0,-one)
-      per = pi+pi
-      vb = v(1)
-      ve = vb+per
+      ifsu  = 0
+      ifsv  = 0
+      ifbu  = 0
+      ifbv  = 0
+      p     = -one
+      mumin = 4-iopt(3) - merge(1,0,ider(1)>=0) - merge(1,0,iopt(2)==1 .and. ider(2)==1)
+
+      vb    = v(1)
+      ve    = vb+period
 
       !  acc denotes the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
+      acc   = tol*s
 
       !  numax and nvmax denote the number of knots needed for interpolation.
       numax = mu+5+iopt(2)+iopt(3)
       nvmax = mv+7
-      nue = min0(numax,nuest)
-      nve = min0(nvmax,nvest)
+      nue   = min(numax,nuest)
+      nve   = min(nvmax,nvest)
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 1: determination of the number of knots and their position.     c
-      ! ****************************************************************     c
-      !  given a set of knots we compute the least-squares spline sinf(u,v)  c
-      !  and the corresponding sum of squared residuals fp = f(p=inf).       c
-      !  if iopt(1)=-1  sinf(u,v) is the requested approximation.            c
-      !  if iopt(1)>=0  we check whether we can accept the knots:            c
-      !    if fp <= s we will continue with the current set of knots.        c
-      !    if fp >  s we will increase the number of knots and compute the   c
-      !       corresponding least-squares spline until finally fp <= s.      c
-      !    the initial choice of knots depends on the value of s and iopt.   c
-      !    if s=0 we have spline interpolation; in that case the number of   c
-      !     knots in the u-direction equals nu=numax=mu+5+iopt(2)+iopt(3)    c
-      !     and in the v-direction nv=nvmax=mv+7.                            c
-      !    if s>0 and                                                        c
-      !      iopt(1)=0 we first compute the least-squares polynomial,i.e. a  c
-      !       spline without interior knots : nu=8 ; nv=8.                   c
-      !      iopt(1)=1 we start with the set of knots found at the last call c
-      !       of the routine, except for the case that s > fp0; then we      c
-      !       compute the least-squares polynomial directly.                 c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      if(iopt(1)<0) go to 120
+      ! *****************************************************************************************************
+      ! part 1: determination of the number of knots and their position.
+      ! *****************************************************************************************************
+      !  given a set of knots we compute the least-squares spline sinf(u,v) and the corresponding sum of
+      !  squared residuals fp = f(p=inf).
+      !  if iopt(1)=-1  sinf(u,v) is the requested approximation.
+      !  if iopt(1)>=0  we check whether we can accept the knots:
+      !    if fp <= s we will continue with the current set of knots.
+      !    if fp >  s we will increase the number of knots and compute the corresponding least-squares spline
+      !       until finally fp <= s. the initial choice of knots depends on the value of s and iopt.
+      !    if s=0 we have spline interpolation; in that case the number of knots in the u-direction equals
+      !       nu=numax=mu+5+iopt(2)+iopt(3) and in the v-direction nv=nvmax=mv+7.
+      !    if s>0 and:
+      !       iopt(1)=0 we first compute the least-squares polynomial,i.e. a spline without interior knots:
+      !          nu=8 ; nv=8.
+      !       iopt(1)=1 we start with the set of knots found at the last call of the routine, except for the
+      !          case that s > fp0; then we compute the least-squares polynomial directly.
+      ! *****************************************************************************************************
+      if (iopt(1)>=0) go to 120
 
-      if(s>zero) go to 100
-      !  if s = 0, s(u,v) is an interpolating spline.
-      nu = numax
-      nv = nvmax
-      !  test whether the required storage space exceeds the available one.
-      if(nu>nuest .or. nv>nvest) go to 420
-      !  find the position of the knots in the v-direction.
-      do 10 l=1,mv
-        tv(l+3) = v(l)
-  10  continue
-      tv(mv+4) = ve
-      l1 = mv-2
-      l2 = mv+5
-      do 20 i=1,3
-         tv(i) = v(l1)-per
-         tv(l2) = v(i+1)+per
-         l1 = l1+1
-         l2 = l2+1
-  20  continue
-      !  if not all the derivative values g(i,j) are given, we will first
-      !  estimate these values by computing a least-squares spline
-      idd(1) = ider(1)
-      if(idd(1)==0) idd(1) = 1
-      if(idd(1)>0) dz(1) = z0
-      idd(2) = ider(2)
-      if(ider(1)<0) go to 30
-      if(iopt(2)==0 .or. ider(2)/=0) go to 70
-      ! we set up the knots in the u-direction for computing the least-squares
-      ! spline.
-  30  i1 = 3
-      i2 = mu-2
-      nu = 4
-      do 40 i=1,mu
-         if(i1>i2) go to 50
-         nu = nu+1
-         tu(nu) = u(i1)
-         i1 = i1+2
-  40  continue
-  50  do 60 i=1,4
-         tu(i) = 0.
-         nu = nu+1
-         tu(nu) = r
-  60  continue
-      ! we compute the least-squares spline for estimating the derivatives.
-      call fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,idd, &
-        tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
-        wrk,lwrk)
-      ifsu = 0
-      ! if all the derivatives at the origin are known, we compute the
-      ! interpolating spline.
-      ! we set up the knots in the u-direction, needed for interpolation.
-  70  nn = numax-8
-      if(nn==0) go to 95
-      ju = 2-iopt(2)
-      do 80 l=1,nn
-        tu(l+4) = u(ju)
-        ju = ju+1
-  80  continue
-      nu = numax
-      l = nu
-      do 90 i=1,4
-         tu(i) = 0.
-         tu(l) = r
-         l = l-1
-  90  continue
-      ! we compute the interpolating spline.
-  95  call fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,idd, &
-        tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
-        wrk,lwrk)
-      go to 430
-      !  if s>0 our initial choice of knots depends on the value of iopt(1).
- 100  ier = 0
-      if(iopt(1)==0) go to 115
-      step = -step
-      if(fp0<=s) go to 115
-      !  if iopt(1)=1 and fp0 > s we start computing the least-squares spline
-      !  according to the set of knots found at the last call of the routine.
-      !  we determine the number of grid coordinates u(i) inside each knot
-      !  interval (tu(l),tu(l+1)).
-      l = 5
-      j = 1
-      nrdatu(1) = 0
-      mu0 = 2-iopt(2)
-      mu1 = mu-2+iopt(3)
-      do 105 i=mu0,mu1
-        nrdatu(j) = nrdatu(j)+1
-        if(u(i)<tu(l)) go to 105
-        nrdatu(j) = nrdatu(j)-1
-        l = l+1
-        j = j+1
-        nrdatu(j) = 0
- 105  continue
-      !  we determine the number of grid coordinates v(i) inside each knot
-      !  interval (tv(l),tv(l+1)).
-      l = 5
-      j = 1
-      nrdatv(1) = 0
-      do 110 i=2,mv
-        nrdatv(j) = nrdatv(j)+1
-        if(v(i)<tv(l)) go to 110
-        nrdatv(j) = nrdatv(j)-1
-        l = l+1
-        j = j+1
-        nrdatv(j) = 0
- 110  continue
-      idd(1) = ider(1)
-      idd(2) = ider(2)
-      go to 120
-      !  if iopt(1)=0 or iopt(1)=1 and s >= fp0,we start computing the least-
-      !  squares polynomial (which is a spline without interior knots).
- 115  ier = -2
-      idd(1) = ider(1)
-      idd(2) = 1
-      nu = 8
-      nv = 8
-      nrdatu(1) = mu-3+iopt(2)+iopt(3)
-      nrdatv(1) = mv-1
-      lastdi = 0
-      nplusu = 0
-      nplusv = 0
-      fp0 = 0.
-      fpold = 0.
-      reducu = 0.
-      reducv = 0.
-      !  main loop for the different sets of knots.mpm=mu+mv is a save upper
-      !  bound for the number of trials.
+      if (s<=zero) then
+
+          !  if s = 0, s(u,v) is an interpolating spline.
+          nu = numax
+          nv = nvmax
+
+          !  test whether the required storage space exceeds the available one.
+          if (nu>nuest .or. nv>nvest) then
+             ier = FITPACK_INSUFFICIENT_STORAGE
+             return
+          end if
+
+          ! find the position of the knots in the v-direction.
+          tv(1:mv+7) = [v(mv-2:mv)-period,v(1:mv),v(1:4)+period]
+
+          ! if not all the derivative values g(i,j) are given, we will first
+          ! estimate these values by computing a least-squares spline
+          idd(1) = merge(ider(1),1,ider(1)==0)
+          idd(2) = ider(2)
+          if (idd(1)>0) dz(1) = z0
+
+          if (ider(1)<0 .or. (iopt(2)/=0 .and. ider(2)==0)) then
+
+              ! we set up the knots in the u-direction for computing the least-squares spline.
+              i1 = 3
+              i2 = mu-2
+              nu = 4
+              do i=1,mu
+                 if (i1>i2) exit
+                 nu = nu+1
+                 tu(nu) = u(i1)
+                 i1 = i1+2
+              end do
+              do i=1,4
+                 tu(i) = zero
+                 nu = nu+1
+                 tu(nu) = r
+              end do
+
+              ! we compute the least-squares spline for estimating the derivatives.
+              call fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,idd,            &
+                          tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
+                          wrk,lwrk)
+              ifsu = 0
+
+          endif
+
+          ! if all the derivatives at the origin are known, we compute the interpolating spline.
+          ! we set up the knots in the u-direction, needed for interpolation.
+          nn = numax-8
+          if (nn/=0) then
+              ju = 2-iopt(2)
+              do l=1,nn
+                 tu(l+4) = u(ju)
+                 ju = ju+1
+              end do
+              nu = numax
+              l = nu
+              do i=1,4
+                 tu(i) = zero
+                 tu(l) = r
+                 l = l-1
+              end do
+          endif
+
+          ! we compute the interpolating spline.
+          call fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,idd, &
+                      tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
+                      wrk,lwrk)
+
+          ier = FITPACK_INTERPOLATING_OK
+          fp  = zero
+          return
+
+      else
+
+          ! if s>0 our initial choice of knots depends on the value of iopt(1).
+          ier = FITPACK_OK
+
+          if (iopt(1)/=0) step = -step
+
+          if (iopt(1)/=0 .and. fp0>s) then
+
+              !  if iopt(1)=1 and fp0 > s we start computing the least-squares spline
+              !  according to the set of knots found at the last call of the routine.
+              !  we determine the number of grid coordinates u(i) inside each knot
+              !  interval (tu(l),tu(l+1)).
+              l = 5
+              j = 1
+              nrdatu(1) = 0
+              mu0 = 2-iopt(2)
+              mu1 = mu-2+iopt(3)
+              do i=mu0,mu1
+                  nrdatu(j) = nrdatu(j)+1
+                  if (u(i)>-tu(l)) then
+                      nrdatu(j) = nrdatu(j)-1
+                      l = l+1
+                      j = j+1
+                      nrdatu(j) = 0
+                  endif
+              end do
+              !  we determine the number of grid coordinates v(i) inside each knot
+              !  interval (tv(l),tv(l+1)).
+              l = 5
+              j = 1
+              nrdatv(1) = 0
+              do i=2,mv
+                  nrdatv(j) = nrdatv(j)+1
+                  if (v(i)>=tv(l)) then
+                      nrdatv(j) = nrdatv(j)-1
+                      l = l+1
+                      j = j+1
+                      nrdatv(j) = 0
+                  endif
+              end do
+              idd(1) = ider(1)
+              idd(2) = ider(2)
+
+          else
+
+              ! if iopt(1)=0 or iopt(1)=1 and s >= fp0,we start computing the least-
+              ! squares polynomial (which is a spline without interior knots).
+              ier = FITPACK_LEASTSQUARES_OK
+              idd(1:2)  = [ider(1),1]
+              nu        = 8
+              nv        = 8
+              nrdatu(1) = mu-3+iopt(2)+iopt(3)
+              nrdatv(1) = mv-1
+              lastdi    = 0
+              nplusu    = 0
+              nplusv    = 0
+              fp0       = zero
+              fpold     = zero
+              reducu    = zero
+              reducv    = zero
+          endif
+
+      endif
+
+      ! main loop for the different sets of knots.
+      ! mpm=mu+mv is a safe upper bound for the number of trials.
  120  mpm = mu+mv
       do 270 iter=1,mpm
       !  find nrintu (nrintv) which is the number of knot intervals in the
@@ -9754,8 +9762,8 @@ module fitpack_core
           l2 = l2-1
           l3 = l3+1
           l4 = l4-1
-          tv(l2) = tv(l4)-per
-          tv(l3) = tv(l1)+per
+          tv(l2) = tv(l4)-period
+          tv(l3) = tv(l1)+period
  140    continue
       !  find an estimate of the range of possible values for the optimal
       !  derivatives at the origin.
@@ -9789,7 +9797,10 @@ module fitpack_core
       !  increase the number of knots.
       !  if nu=nue and nv=nve we cannot further increase the number of knots
       !  because of the storage capacity limitation.
-        if(nu==nue .and. nv==nve) go to 420
+        if (nu==nue .and. nv==nve) then
+           ier = FITPACK_INSUFFICIENT_STORAGE
+           return
+        endif
         if(ider(1)==0) fpintu(1) = fpintu(1)+(z0-c(1))**2
         ier = 0
       !  adjust the parameter reducu or reducv according to the direction
@@ -9930,8 +9941,7 @@ module fitpack_core
       go to 440
  410  ier = 2
       go to 440
- 420  ier = 1
-      go to 440
+
  430  ier = -1
       fp  = zero
  440  return
@@ -11614,7 +11624,7 @@ module fitpack_core
       ifsv = 0
       ifbu = 0
       ifbv = 0
-      p = -one
+      p    = -one
 
       mumin = 4
       if (ider(1)>=0) mumin = mumin-1
