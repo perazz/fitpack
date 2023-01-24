@@ -9985,9 +9985,10 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
-      integer :: i,iband,iband3,iband4,ich1,ich3,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
+      integer :: i,iband,iband3,iband4,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
                  lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,&
                  iband1,jlu
+      logical :: check1,check3
       !  ..local arrays..
       real(RKIND), dimension(SIZ_K+1) :: hu,hv
 
@@ -10528,8 +10529,8 @@ module fitpack_core
       !  find the bandwidth of the extended observation matrix.
       iband4 = min(ncof,iband+ipar1)
       iband3 = iband4 -1
-      ich1   = 0
-      ich3   = 0
+      check1 = .false.
+      check3 = .false.
       nuu = nu4-iopt3-1
       !  iteration process to find the root of f(p)=s.
       iterations: do iter=1,maxit
@@ -10738,7 +10739,7 @@ module fitpack_core
           p2 = p
           f2 = fpms
 
-          if (ich3==0) then
+          if (.not.check3) then
              if (f2-f3<=acc) then
                  ! our initial choice of p is too large.
                  p3 = p2
@@ -10747,11 +10748,11 @@ module fitpack_core
                  if (p<=p1) p = p1*con9 +p2*con1
                  cycle iterations
              elseif (f2<zero) then
-                 ich3 = 1
+                 check3 = .true.
              endif
           endif
 
-          if (ich1==0) then
+          if (.not.check1) then
              if(f1-f2<=acc) then
                 ! our initial choice of p is too small
                 p1 = p2
@@ -10760,7 +10761,7 @@ module fitpack_core
                 if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
                 cycle iterations
              elseif (f2>zero) then
-                ich1 = 1
+                check1 = .true.
              endif
           endif
 
