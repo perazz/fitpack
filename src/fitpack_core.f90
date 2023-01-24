@@ -83,7 +83,7 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
 
     ! Internal Parameters
-    integer    , parameter, public :: SIZ_IDIM = 10                ! Max number of dimensions
+    integer    , parameter, public :: MAX_IDIM = 10                ! Max number of dimensions
     integer    , parameter, public :: SIZ_K    = 19                ! Max order (for array allocation)
     real(RKIND), parameter, public :: one    = 1.0_RKIND
     real(RKIND), parameter, public :: zero   = 0.0_RKIND
@@ -563,7 +563,7 @@ module fitpack_core
       ier = FITPACK_INPUT_ERROR
       if(iopt<(-1) .or. iopt>1) go to 90
       if(ipar<0 .or. ipar>1) go to 90
-      if(idim<=0 .or. idim>10) go to 90
+      if(idim<=0 .or. idim>MAX_IDIM) go to 90
       if(k<=0 .or. k>5) go to 90
       k1 = k+1
       k2 = k1+1
@@ -1353,7 +1353,7 @@ module fitpack_core
       !  are invalid, control is immediately repassed to the calling program.
       ier = FITPACK_INPUT_ERROR
       if(iopt<(-1) .or. iopt>1) go to 90
-      if(idim<=0 .or. idim>10) go to 90
+      if(idim<=0 .or. idim>MAX_IDIM) go to 90
       if(k<=0 .or. k>5) go to 90
       k1 = k+1
       kk = k1/2
@@ -2950,7 +2950,7 @@ module fitpack_core
 
 
       recursive subroutine fpclos(iopt,idim,m,u,mx,x,w,k,s,nest,tol, &
-        maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
+                                  maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
       !  ..
       !  ..scalar arguments..
@@ -2967,133 +2967,150 @@ module fitpack_core
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(SIZ_IDIM)
+      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(MAX_IDIM)
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 1: determination of the number of knots and their position     c
-      !  **************************************************************      c
-      !  given a set of knots we compute the least-squares closed curve      c
-      !  sinf(u). if the sum f(p=inf) <= s we accept the choice of knots.    c
-      !  if iopt=-1 sinf(u) is the requested curve                           c
-      !  if iopt=0 or iopt=1 we check whether we can accept the knots:       c
-      !    if fp <=s we will continue with the current set of knots.         c
-      !    if fp > s we will increase the number of knots and compute the    c
-      !       corresponding least-squares curve until finally fp<=s.         c
-      !  the initial choice of knots depends on the value of s and iopt.     c
-      !    if s=0 we have spline interpolation; in that case the number of   c
-      !    knots equals nmax = m+2*k.                                        c
-      !    if s > 0 and                                                      c
-      !      iopt=0 we first compute the least-squares polynomial curve of   c
-      !      degree k; n = nmin = 2*k+2. since s(u) must be periodic we      c
-      !      find that s(u) reduces to a fixed point.                        c
-      !      iopt=1 we start with the set of knots found at the last         c
-      !      call of the routine, except for the case that s > fp0; then     c
-      !      we compute directly the least-squares polynomial curve.         c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      m1 = m-1
-      kk = k
-      kk1 = k1
-      k3 = 3*k+1
+      ! **********************************************************************************************
+      !  part 1: determination of the number of knots and their position
+      ! **********************************************************************************************
+      !  given a set of knots we compute the least-squares closed curve sinf(u). if the sum
+      !  f(p=inf) <= s we accept the choice of knots.
+      !  if iopt=-1 sinf(u) is the requested curve
+      !  if iopt=0 or iopt=1 we check whether we can accept the knots:
+      !     if fp <=s we will continue with the current set of knots.
+      !     if fp > s we will increase the number of knots and compute the orresponding least-squares
+      !        curve until finally fp<=s.
+      !  the initial choice of knots depends on the value of s and iopt. if s=0 we have spline
+      !     interpolation; in that case the number of knots equals nmax = m+2*k.                                        c
+      !     if s > 0 and iopt=0 we first compute the least-squares polynomial curve of degree k;
+      !        n = nmin = 2*k+2. since s(u) must be periodic, s(u) reduces to a fixed point.                        c
+      !  if iopt=1 we start with the set of knots found at the last call of the routine, except for
+      !     the case that s > fp0; then we compute directly the least-squares polynomial curve.
+      ! **********************************************************************************************
+
+      m1   = m-1
+      kk   = k
+      kk1  = k1
+      k3   = 3*k+1
       nmin = 2*k1
+
       !  determine the length of the period of the splines.
       per = u(m)-u(1)
-      if(iopt<0) go to 50
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  determine nmax, the number of knots for periodic spline interpolation
-      nmax = m+2*k
-      if(s>zero .or. nmax==nmin) go to 30
-      !  if s=0, s(u) is an interpolating curve.
-      n = nmax
-      !  test whether the required storage space exceeds the available one.
-      if(n>nest) go to 620
-      !  find the position of the interior knots in case of interpolation.
-   5  if((k/2)*2 ==k) go to 20
-      do 10 i=2,m1
-        j = i+k
-        t(j) = u(i)
-  10  continue
-      if(s>0.) go to 50
-      kk = k-1
-      kk1 = k
-      if(kk>0) go to 50
-      t(1) = t(m)-per
-      t(2) = u(1)
-      t(m+1) = u(m)
-      t(m+2) = t(3)+per
-      jj = 0
-      do 15 i=1,m1
-        j = i
-        do 12 j1=1,idim
-          jj = jj+1
-          c(j) = x(jj)
-          j = j+n
-  12    continue
-  15  continue
-      jj = 1
-      j = m
-      do 17 j1=1,idim
-        c(j) = c(jj)
-        j = j+n
-        jj = jj+n
-  17  continue
-      fp = zero
-      fpint(n) = fp0
-      fpint(n-1) = zero
-      nrdata(n) = 0
-      go to 630
-  20  do 25 i=2,m1
-         j = i+k
-         t(j) = (u(i)+u(i-1))*half
-  25  continue
-      go to 50
-      !  if s > 0 our initial choice depends on the value of iopt.
-      !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
-      !  polynomial curve. (i.e. a constant point).
-      !  if iopt=1 and fp0>s we start computing the least-squares closed
-      !  curve according the set of knots found at the last call of the
-      !  routine.
-  30  if(iopt==0) go to 35
-      if(n==nmin) go to 35
-      fp0 = fpint(n)
-      fpold = fpint(n-1)
-      nplus = nrdata(n)
-      if(fp0>s) go to 50
-      !  the case that s(u) is a fixed point is treated separetely.
-      !  fp0 denotes the corresponding sum of squared residuals.
-  35  fp0 = zero
-      d1 = zero
-      z(1:idim) = zero
-      jj = 0
-      do 45 it=1,m1
-        wi = w(it)
-        call fpgivs(wi,d1,cos,sin)
-        do 40 j=1,idim
-          jj = jj+1
-          fac = wi*x(jj)
-          call fprota(cos,sin,fac,z(j))
-          fp0 = fp0+fac**2
-  40    continue
-  45  continue
-      z(1:idim) = z(1:idim)/d1
-      !  test whether that fixed point is a solution of our problem.
-      fpms = fp0-s
-      if(fpms<acc .or. nmax==nmin) go to 640
-      fpold = fp0
-      !  test whether the required storage space exceeds the available one.
-      if(n>=nest) go to 620
-      !  start computing the least-squares closed curve with one
-      !  interior knot.
-      nplus = 1
-      n = nmin+1
-      mm = (m+1)/2
-      t(k2) = u(mm)
-      nrdata(1) = mm-2
-      nrdata(2) = m1-mm
+      if (iopt>=0) then
+
+          ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          ! determine nmax, the number of knots for periodic spline interpolation
+          nmax = m+2*k
+
+          if (s<=zero .and. nmax/=nmin) then
+
+              ! if s=0, s(u) is an interpolating curve.
+              n = nmax
+
+              ! test whether the required storage space exceeds the available one.
+              if (n>nest) then
+                  ier = FITPACK_INSUFFICIENT_STORAGE
+                  return
+              end if
+
+              ! find the position of the interior knots in case of interpolation.
+           5  if (mod(k,2)/=0) then
+
+                  t(k+2:k+m1) = u(2:m1)
+
+                  if (s>zero) go to 50
+                  kk  = k-1
+                  kk1 = k
+                  if(kk>0) go to 50
+                  t(1) = t(m)-per
+                  t(2) = u(1)
+                  t(m+1) = u(m)
+                  t(m+2) = t(3)+per
+                  jj = 0
+                  do 15 i=1,m1
+                    j = i
+                    do 12 j1=1,idim
+                      jj = jj+1
+                      c(j) = x(jj)
+                      j = j+n
+              12    continue
+              15  continue
+                  jj = 1
+                  j = m
+                  do 17 j1=1,idim
+                    c(j) = c(jj)
+                    j = j+n
+                    jj = jj+n
+              17  continue
+                  fp = zero
+                  fpint(n) = fp0
+                  fpint(n-1) = zero
+                  nrdata(n) = 0
+                  go to 630
+
+              else
+
+                  t(k+2:k+m1) = half*(u(2:m1)+u(1:m1-1))
+                  go to 50
+              endif
+
+          endif
+
+          !  if s > 0 our initial choice depends on the value of iopt.
+          !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
+          !  polynomial curve. (i.e. a constant point).
+          !  if iopt=1 and fp0>s we start computing the least-squares closed
+          !  curve according the set of knots found at the last call of the
+          !  routine.
+          if(iopt==0) go to 35
+          if(n==nmin) go to 35
+          fp0 = fpint(n)
+          fpold = fpint(n-1)
+          nplus = nrdata(n)
+          if(fp0>s) go to 50
+          !  the case that s(u) is a fixed point is treated separetely.
+          !  fp0 denotes the corresponding sum of squared residuals.
+      35  fp0 = zero
+          d1 = zero
+          z(1:idim) = zero
+          jj = 0
+          do 45 it=1,m1
+            wi = w(it)
+            call fpgivs(wi,d1,cos,sin)
+            do 40 j=1,idim
+              jj = jj+1
+              fac = wi*x(jj)
+              call fprota(cos,sin,fac,z(j))
+              fp0 = fp0+fac**2
+      40    continue
+      45  continue
+          z(1:idim) = z(1:idim)/d1
+          !  test whether that fixed point is a solution of our problem.
+          fpms = fp0-s
+          if(fpms<acc .or. nmax==nmin) go to 640
+          fpold = fp0
+
+          !  test whether the required storage space exceeds the available one.
+          if (n>=nest) then
+             ier = FITPACK_INSUFFICIENT_STORAGE
+             return
+          end if
+          !  start computing the least-squares closed curve with one
+          !  interior knot.
+          nplus = 1
+          n = nmin+1
+          mm = (m+1)/2
+          t(k2) = u(mm)
+          nrdata(1) = mm-2
+          nrdata(2) = m1-mm
+
+      endif
+
       !  main loop for the different sets of knots. m is a save upper
       !  bound for the number of trials.
   50  do 340 iter=1,m
@@ -3311,7 +3328,10 @@ module fitpack_core
       !  increase the number of knots.
       !  if n=nest we cannot increase the number of knots because of the
       !  storage capacity limitation.
-        if(n==nest) go to 620
+        if (n==nest) then
+            ier = FITPACK_INSUFFICIENT_STORAGE
+            return
+        end if
       !  determine the number of knots nplus we are going to add.
         npl1 = nplus*2
         rn = nplus
@@ -3598,8 +3618,6 @@ module fitpack_core
       go to 660
  610  ier = FITPACK_S_TOO_SMALL
       go to 660
- 620  ier = FITPACK_INSUFFICIENT_STORAGE
-      go to 660
  630  ier = FITPACK_INTERPOLATING_OK
       go to 660
  640  ier = FITPACK_LEASTSQUARES_OK
@@ -3810,7 +3828,7 @@ module fitpack_core
       integer i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe, &
        l,li,lj,l0,mb,me,mm,new,nk1,nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),xi(SIZ_IDIM)
+      real(RKIND) h(SIZ_K+1),xi(MAX_IDIM)
 
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -11422,7 +11440,7 @@ module fitpack_core
           real(RKIND), intent(inout) :: a,b
 
           ! ..local scalars..
-          real(RKIND) stor1,stor2
+          real(RKIND) :: stor1,stor2
 
           !  ..
           stor1 = a
@@ -14134,7 +14152,7 @@ module fitpack_core
       ier = FITPACK_INPUT_ERROR
       if (iopt<(-1) .or. iopt>1)       return
       if (ipar<0 .or. ipar>1)          return
-      if (idim<=0 .or. idim>SIZ_IDIM)  return
+      if (idim<=0 .or. idim>MAX_IDIM)  return
       if (k<=0 .or. k>5)               return
 
       k1 = k+1
