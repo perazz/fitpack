@@ -1601,7 +1601,7 @@ module fitpack_core
         end do
 
         ! evaluate the non-zero b-splines at arg.
-        call fpbspl(t,n,k,arg,l,h)
+        h = fpbspl(t,n,k,arg,l)
 
         ! find the value of s(u) at u=arg.
         ll = l-k1
@@ -2639,7 +2639,7 @@ module fitpack_core
           l = l1
           l1 = l+1
         end do
-        call fpbspl(tx,nx,kx,arg,l,h)
+        h = fpbspl(tx,nx,kx,arg,l)
         lx(i) = l-kx1
         wx(i,1:kx1) = h(1:kx1)
       end do x_array
@@ -2659,7 +2659,7 @@ module fitpack_core
           l  = l1
           l1 = l+1
         end do
-        call fpbspl(ty,ny,ky,arg,l,h)
+        h = fpbspl(ty,ny,ky,arg,l)
         ly(i) = l-ky1
         wy(i,1:ky1) = h(1:ky1)
       end do y_array
@@ -2683,15 +2683,15 @@ module fitpack_core
       end subroutine fpbisp
 
 
-      !  subroutine fpbspl evaluates the (k+1) non-zero b-splines of degree k at t(l) <= x < t(l+1) using
+      !  function fpbspl evaluates the (k+1) non-zero b-splines of degree k at t(l) <= x < t(l+1) using
       !  the stable recurrence relation of de boor and cox.
       !  Travis Oliphant 2007 changed so that weighting of 0 is used when knots with multiplicity are present.
       !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
       !   Thus it is imperative that that k <= l <= n-k but this is not checked.
-      pure subroutine fpbspl(t,n,k,x,l,h)
+      pure function fpbspl(t,n,k,x,l) result(h)
          integer    , intent(in)  :: n,k,l
          real(RKIND), intent(in)  :: x,t(n)
-         real(RKIND), intent(out) :: h(SIZ_K+1)
+         real(RKIND) :: h(SIZ_K+1)
 
          ! Local variables
          real(RKIND) :: f,hh(SIZ_K+1)
@@ -2706,7 +2706,7 @@ module fitpack_core
              lj = li-j
              if (t(li)/=t(lj)) then
                 f = hh(i)/(t(li)-t(lj))
-                h(i) = h(i)+f*(t(li)-x)
+                h(i)   = h(i)+f*(t(li)-x)
                 h(i+1) = f*(x-t(lj))
              else
                 h(i+1) = zero
@@ -2714,7 +2714,7 @@ module fitpack_core
            end do
          end do
 
-      end subroutine fpbspl
+      end function fpbspl
 
       !  subroutine fpchec verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
       !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
@@ -3153,7 +3153,7 @@ module fitpack_core
           l = l+1
           go to 80
       !  evaluate the (k+1) non-zero b-splines at ui and store them in q.
-  85      call fpbspl(t,n,k,ui,l,h)
+  85      h = fpbspl(t,n,k,ui,l)
           do 90 i=1,k1
             q(it,i) = h(i)
             h(i) = h(i)*wi
@@ -3926,7 +3926,7 @@ module fitpack_core
           l = l+1
           go to 86
       !  evaluate the (k+1) non-zero b-splines at ui and store them in q.
-  90      call fpbspl(t,n,k,ui,l,h)
+  90      h = fpbspl(t,n,k,ui,l)
           do 92 i=1,k1
             q(it,i) = h(i)
             h(i) = h(i)*wi
@@ -4291,7 +4291,7 @@ module fitpack_core
           end do
 
           ! evaluate the four non-zero cubic b-splines nj(xi),j=l-3,...l.
-          call fpbspl(t,n,3,xi,l,h) ! h is a temporary
+          h = fpbspl(t,n,3,xi,l)
 
           ! store in q these values h(1),h(2),...h(4).
           q(i,1:4) = h(1:4)
@@ -4773,7 +4773,7 @@ module fitpack_core
           l = l+1
           go to 85
       !  evaluate the (k+1) non-zero b-splines at xi and store them in q.
-  90      call fpbspl(t,n,k,xi,l,h)
+  90      h = fpbspl(t,n,k,xi,l)
           do 95 i=1,k1
             q(it,i) = h(i)
             h(i) = h(i)*wi
@@ -5502,7 +5502,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            call fpbspl(tu,nu,3,arg,l,h)
+            h = fpbspl(tu,nu,3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
 
@@ -5525,7 +5525,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
              end do
-             call fpbspl(tv,nv,3,arg,l,h)
+             h = fpbspl(tv,nv,3,arg,l)
              spv(it,1:4) = h(1:4)
              nrv(it) = number
           end do
@@ -5538,7 +5538,7 @@ module fitpack_core
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
-                     call fpbspl(tv,nv,3,arg,l,h)
+                     h = fpbspl(tv,nv,3,arg,l)
                      av1(i,1:3) = h(1:3)
                      cosi(1,i) = cos(arg)
                      cosi(2,i) = sin(arg)
@@ -6067,7 +6067,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            call fpbspl(tu,nu,3,arg,l,h)
+            h = fpbspl(tu,nu,3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
           end do spu_rows
@@ -6089,7 +6089,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            call fpbspl(tv,nv,3,arg,l,h)
+            h = fpbspl(tv,nv,3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
           end do spv_rows
@@ -6354,7 +6354,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            call fpbspl(tx,nx,kx,arg,l,h)
+            h = fpbspl(tx,nx,kx,arg,l)
             spx(it,1:kx1) = h(1:kx1)
             nrx(it) = number
           end do get_nrx
@@ -6376,7 +6376,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
              end do
-            call fpbspl(ty,ny,ky,arg,l,h)
+            h = fpbspl(ty,ny,ky,arg,l)
             spy(it,1:ky1) = h(1:ky1)
             nry(it) = number
           end do get_nry
@@ -6702,7 +6702,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
             end do
-            call fpbspl(tu,nu,3,arg,l,h)
+            h = fpbspl(tu,nu,3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
           end do
@@ -6724,7 +6724,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
             end do
-            call fpbspl(tv,nv,3,arg,l,h)
+            h =  fpbspl(tv,nv,3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
           end do
@@ -6739,7 +6739,7 @@ module fitpack_core
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
-                     call fpbspl(tv,nv,3,arg,l,h)
+                     h = fpbspl(tv,nv,3,arg,l)
                      av1(i,1:3) = h(1:3)
                      cosi(:,i)  = [cos(arg),sin(arg)]
                   end do
@@ -8076,7 +8076,7 @@ module fitpack_core
            end do
 
            ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
-           call fpbspl(t,n,k,ui,l,h)
+           h = fpbspl(t,n,k,ui,l)
            q(it,1:k1) = h(1:k1)
            h(:k1) = wi*h(:k1)
 
@@ -8964,7 +8964,7 @@ module fitpack_core
             end do
 
             ! evaluate the (k+1) non-zero b-splines at xi and store them in q.
-            call fpbspl(t,n,k,xi,l,h)
+            h = fpbspl(t,n,k,xi,l)
 
             q(it,:k1) = h(:k1)
             h(:k1)    = h(:k1)*wi
@@ -10164,7 +10164,7 @@ module fitpack_core
               get_coefs: do i=1,nvv
                   l2  = i+3
                   arg = tv(l2)
-                  call fpbspl(tv,nv,3,arg,l2,hv)
+                  hv = fpbspl(tv,nv,3,arg,l2)
                   row(1:nvv) = zero
                   ll = i
                   do j=1,3
@@ -10232,10 +10232,10 @@ module fitpack_core
                 zi = z(in)*wi
 
                 ! evaluate for the u-direction, the 4 non-zero b-splines at u(in)
-                call fpbspl(tu,nu,3,u(in),l1,hu)
+                hu = fpbspl(tu,nu,3,u(in),l1)
 
                 ! evaluate for the v-direction, the 4 non-zero b-splines at v(in)
-                call fpbspl(tv,nv,3,v(in),l2,hv)
+                hv = fpbspl(tv,nv,3,v(in),l2)
 
                 ! store the value of these b-splines in spu and spv resp.
                 spu(in,:) = hu(1:4)
@@ -12239,7 +12239,7 @@ module fitpack_core
         do 150 i=1,npp
            l2 = i+3
            arg = tp(l2)
-           call fpbspl(tp,np,3,arg,l2,hp)
+           hp = fpbspl(tp,np,3,arg,l2)
            row(1:npp) = zero
            ll = i
            do 120 j=1,3
@@ -12303,9 +12303,9 @@ module fitpack_core
           wi = w(in)
           ri = r(in)*wi
       !  evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
-          call fpbspl(tt,nt,3,teta(in),l1,ht)
+          ht = fpbspl(tt,nt,3,teta(in),l1)
       !  evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
-          call fpbspl(tp,np,3,phi(in),l2,hp)
+          hp = fpbspl(tp,np,3,phi(in),l2)
       !  store the value of these b-splines in spt and spp resp.
           spp(in,1:4) = hp(1:4)
           spt(in,1:4) = ht(1:4)
@@ -12793,7 +12793,7 @@ module fitpack_core
            l = l1
            l1 = l+1
         end do
-        call fpbspl(tu,nu,3,arg,l,h)
+        h = fpbspl(tu,nu,3,arg,l)
         lu(i) = l-4
         wu(i,1:4) = h(1:4)
       end do
@@ -12810,7 +12810,7 @@ module fitpack_core
            l = l1
            l1 = l+1
          end do
-         call fpbspl(tv,nv,3,arg,l,h)
+         h = fpbspl(tv,nv,3,arg,l)
          lv(i) = l-4
          wv(i,1:4) = h(1:4)
       end do
@@ -12995,9 +12995,9 @@ module fitpack_core
           wi = w(in)
           zi = z(in)*wi
       !  evaluate for the x-direction, the (kx+1) non-zero b-splines at x(in).
-          call fpbspl(tx,nx,kx,x(in),l1,hx)
+          hx = fpbspl(tx,nx,kx,x(in),l1)
       !  evaluate for the y-direction, the (ky+1) non-zero b-splines at y(in).
-          call fpbspl(ty,ny,ky,y(in),l2,hy)
+          hy = fpbspl(ty,ny,ky,y(in),l2)
       !  store the value of these b-splines in spx and spy respectively.
           spx(in,1:kx1) = hx(1:kx1)
           spy(in,1:ky1) = hy(1:ky1)
@@ -16185,7 +16185,7 @@ module fitpack_core
                 l1 = l+1
              end do
 
-             call fpbspl(tx,nx,kx,u,l,h)
+             h = fpbspl(tx,nx,kx,u,l)
 
              m0 = (l-kx1)*nky1+1
              do i=1,nky1
@@ -16207,7 +16207,7 @@ module fitpack_core
                 l1 = l+1
              end do
 
-             call fpbspl(ty,ny,ky,u,l,h)
+             h = fpbspl(ty,ny,ky,u,l)
 
              m0 = l-ky
              do i=1,nkx1
@@ -17692,7 +17692,7 @@ module fitpack_core
 
         if (nonflat) then
            !  evaluate the non-zero b-splines of degree k-nu at arg.
-           call fpbspl(t,n,kk,arg,l,h)
+           h = fpbspl(t,n,kk,arg,l)
            !  find the value of the derivative at x=arg.
            y(i) = dot_product(h(1:k2),wrk(l-k:l-nu))
         else
@@ -17806,7 +17806,7 @@ module fitpack_core
         end do
 
         ! evaluate the non-zero b-splines at arg.
-        call fpbspl(t, n, k, arg, l, h)
+        h = fpbspl(t, n, k, arg, l)
 
         ! find the value of s(x) at x=arg.
         y(i) = dot_product(c(l-k:l),h(1:k1))
