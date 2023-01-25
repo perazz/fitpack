@@ -3404,242 +3404,248 @@ module fitpack_core
       !  restart the computations with the new set of knots.
       end do find_knots
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 2: determination of the smoothing closed curve sp(u).          c
-      !  **********************************************************          c
-      !  we have determined the number of knots and their position.          c
-      !  we now compute the b-spline coefficients of the smoothing curve     c
-      !  sp(u). the observation matrix a is extended by the rows of matrix   c
-      !  b expressing that the kth derivative discontinuities of sp(u) at    c
-      !  the interior knots t(k+2),...t(n-k-1) must be zero. the corres-     c
-      !  ponding weights of these additional rows are set to 1/p.            c
-      !  iteratively we then have to determine the value of p such that f(p),c
-      !  the sum of squared residuals be = s. we already know that the least-c
-      !  squares polynomial curve corresponds to p=0, and that the least-    c
-      !  squares periodic spline curve corresponds to p=infinity. the        c
-      !  iteration process which is proposed here, makes use of rational     c
-      !  interpolation. since f(p) is a convex and strictly decreasing       c
-      !  function of p, it can be approximated by a rational function        c
-      !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
-      !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
-      !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<zero                                 c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  evaluate the discontinuity jump of the kth derivative of the
-      !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
+      ! *****
+      !  part 2: determination of the smoothing closed curve sp(u).
+      ! *****
+      !  we have determined the number of knots and their position.
+      !  we now compute the b-spline coefficients of the smoothing curve sp(u). the observation matrix
+      !  a is extended by the rows of matrix b expressing that the kth derivative discontinuities of
+      !  sp(u) at the interior knots t(k+2),...t(n-k-1) must be zero. the corresponding weights of
+      !  these additional rows are set to 1/p. iteratively we then have to determine the value of p
+      !  such that f(p), the sum of squared residuals be = s. we already know that the least-squares
+      !  polynomial curve corresponds to p=0, and that the least-squares periodic spline curve
+      !  corresponds to p=infinity. the iteration process which is proposed here, makes use of rational
+      !  interpolation. since f(p) is a convex and strictly decreasing function of p, it can be
+      !  approximated by a rational function r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with
+      !  corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new
+      !  value of p such that r(p)=s. convergence is guaranteed by taking f1>0 and f3<zero
+      ! *****
+
+      !  evaluate the discontinuity jump of the kth derivative of the b-splines at the knots
+      !  t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
+
       !  initial value for p.
-      p1 = zero
-      f1 = fp0-s
-      p3 = -one
-      f3 = fpms
+      p1  = zero
+      f1  = fp0-s
+      p3  = -one
+      f3  = fpms
       n11 = n10-1
-      n8 = n7-1
-      p = zero
-      l = n7
-      do 352 i=1,k
+      n8  = n7-1
+      p   = zero
+      l   = n7
+      do i=1,k
          j = k+1-i
          p = p+a2(l,j)
          l = l-1
-         if(l==0) go to 356
- 352  continue
-      p = p + sum(a1(1:n10,1))
- 356  rn = n7
-      p = rn/p
+         if (l==0) exit
+      end do
+      if (l>0) p = p + sum(a1(1:n10,1))
+      rn   = n7
+      p    = rn/p
       ich1 = 0
       ich3 = 0
+
       !  iteration process to find the root of f(p) = s.
-      do 595 iter=1,maxit
-      !  form the matrix g  as the matrix a extended by the rows of matrix b.
-      !  the rows of matrix b with weight 1/p are rotated into
-      !  the triangularised observation matrix a.
-      !  after triangularisation our n7 x n7 matrix g takes the form
-      !            ! g1 '    !
-      !        g = !    ' g2 !
-      !            ! 0  '    !
-      !  with g2 a n7 x (k+1) matrix and g1 a n11 x n11 upper triangular
-      !  matrix of bandwidth k+2. ( n11 = n7-k-1)
-        pinv = one/p
-      !  store matrix a into g
-        do 358 i=1,nc
-          c(i) = z(i)
- 358    continue
-        do i=1,n7
-          g1(i,k1) = a1(i,k1)
-          g1(i,k2) = zero
-          g2(i,1) = zero
-          do j=1,k
-            g1(i,j) = a1(i,j)
-            g2(i,j+1) = a2(i,j)
+      find_root: do iter=1,maxit
+          !  form the matrix g  as the matrix a extended by the rows of matrix b.
+          !  the rows of matrix b with weight 1/p are rotated into
+          !  the triangularised observation matrix a.
+          !  after triangularisation our n7 x n7 matrix g takes the form
+          !            ! g1 '    !
+          !        g = !    ' g2 !
+          !            ! 0  '    !
+          !  with g2 a n7 x (k+1) matrix and g1 a n11 x n11 upper triangular
+          !  matrix of bandwidth k+2. ( n11 = n7-k-1)
+          pinv = one/p
+          ! store matrix a into g
+          c(:nc)         = z(:nc)
+          g1(1:n7,1:k1)  = a1(1:n7,1:k1)
+          g1(1:n7,k2)    = zero
+          g1(1:n7,1)     = zero
+          g2(1:n7,2:k1)  = a2(1:n7,1:k)
+
+          l = n10
+          do j=1,k1
+            if (l<=0) exit
+            g2(l,1) = a1(l,j)
+            l = l-1
           end do
-        end do
-        l = n10
-        do j=1,k1
-          if(l<=0) exit
-          g2(l,1) = a1(l,j)
-          l = l-1
-        end do
-        do 540 it=1,n8
-      !  fetch a new row of matrix b and store it in the arrays h1 (the part
-      !  with respect to g1) and h2 (the part with respect to g2).
-          xi(:idim) = zero
-          h1(:k1) = zero
-          h2(:k1) = zero
-          h1(k2) = zero
-          if(it>n11) go to 420
-          l = it
-          l0 = it
-          do 390 j=1,k2
-            if(l0==n10) go to 400
-            h1(j) = b(it,j)*pinv
-            l0 = l0+1
- 390      continue
-          go to 470
- 400      l0 = 1
-          do 410 l1=j,k2
-            h2(l0) = b(it,l1)*pinv
-            l0 = l0+1
- 410      continue
-          go to 470
- 420      l = 1
-          i = it-n10
-          do 460 j=1,k2
-            i = i+1
-            l0 = i
- 430        l1 = l0-k1
-            if(l1<=0) go to 450
-            if(l1<=n11) go to 440
-            l0 = l1-n11
-            go to 430
- 440        h1(l1) = b(it,j)*pinv
-            go to 460
- 450        h2(l0) = h2(l0)+b(it,j)*pinv
- 460      continue
-          if(n11<=0) go to 510
-      !  rotate this row into triangle by givens transformations
-      !  rotation with the rows l,l+1,...n11.
- 470      do 500 j=l,n11
-            piv = h1(1)
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,g1(j,1),cos,sin)
-      !  transformation to right hand side.
-            j1 = j
-            do 475 j2=1,idim
-              call fprota(cos,sin,xi(j2),c(j1))
-              j1 = j1+n
- 475        continue
-      !  transformation to the left hand side with respect to g2.
-            do 480 i=1,k1
-              call fprota(cos,sin,h2(i),g2(j,i))
- 480        continue
-            if(j==n11) go to 510
-            i2 = min0(n11-j,k1)
-      !  transformation to the left hand side with respect to g1.
-            do 490 i=1,i2
-              i1 = i+1
-              call fprota(cos,sin,h1(i1),g1(j,i1))
-              h1(i) = h1(i1)
- 490        continue
-            h1(i1) = zero
- 500      continue
-      !  rotation with the rows n11+1,...n7
- 510      do 530 j=1,k1
-            ij = n11+j
-            if(ij<=0) go to 530
-            piv = h2(j)
-      !  calculate the parameters of the givens transformation
-            call fpgivs(piv,g2(ij,j),cos,sin)
-      !  transformation to the right hand side.
-            j1 = ij
-            do 515 j2=1,idim
-              call fprota(cos,sin,xi(j2),c(j1))
-              j1 = j1+n
- 515        continue
-            if(j==k1) go to 540
-            j1 = j+1
-      !  transformation to the left hand side.
-            do 520 i=j1,k1
-              call fprota(cos,sin,h2(i),g2(ij,i))
- 520        continue
- 530      continue
- 540    continue
-      !  backward substitution to obtain the b-spline coefficients
+
+          n8_rows: do it=1,n8
+             ! fetch a new row of matrix b and store it in the arrays h1 (the part
+             ! with respect to g1) and h2 (the part with respect to g2).
+             xi(:idim) = zero
+             h1(:k1) = zero
+             h2(:k1) = zero
+             h1(k2) = zero
+             if (it<=n11) then
+                 l = it
+                 l0 = it
+                 storeh2: do j=1,k2
+                    if (l0==n10) then
+                       l0 = 1
+                       do l1=j,k2
+                          h2(l0) = b(it,l1)*pinv
+                          l0 = l0+1
+                       end do
+                       exit storeh2
+                    end if
+                    h1(j) = b(it,j)*pinv
+                    l0 = l0+1
+                 end do storeh2
+
+             else ! it>n11
+
+                l = 1
+                i = it-n10
+                do j=1,k2
+                    i = i+1
+                    l0 = i
+                    l1 = l0-k1
+                    do while (l1>n11)
+                       l0 = l1-n11
+                       l1 = l0-k1
+                    end do
+                    if (l1>0) then
+                       h1(l1) = b(it,j)*pinv
+                    else
+                       h2(l0) = h2(l0)+b(it,j)*pinv
+                    endif
+                end do
+
+             endif
+
+             ! rotate this row into triangle by givens transformations
+             ! rotation with the rows l,l+1,...n11.
+             rot_n11: do j=l,n11
+                 piv = h1(1)
+
+                 ! calculate the parameters of the givens transformation.
+                 call fpgivs(piv,g1(j,1),cos,sin)
+
+                 ! transformation to right hand side.
+                 call fprota(cos,sin,xi(1:idim),c(j:j+(idim-1)*n:n))
+
+                 ! transformation to the left hand side with respect to g2.
+                 call fprota(cos,sin,h2(1:k1),g2(j,1:k1))
+
+                 if (j==n11) exit rot_n11
+
+                 ! transformation to the left hand side with respect to g1.
+                 i2 = min(n11-j,k1)+1
+                 call fprota(cos,sin,h1(2:i2),g1(j,2:i2))
+                 h1(1:i2) = [h2(2:i2),zero]
+
+             end do rot_n11
+
+             ! rotation with the rows n11+1,...n7
+             rot_n10_n7: do j=1,k1
+                ij = n11+j
+                if (ij<=0) cycle rot_n10_n7
+                piv = h2(j)
+
+                ! calculate the parameters of the givens transformation
+                call fpgivs(piv,g2(ij,j),cos,sin)
+
+                ! transformation to the right hand side.
+                call fprota(cos,sin,xi(1:idim),c(ij:ij+(idim-1)*n:n))
+
+                if (j<k1) then
+                   ! transformation to the left hand side.
+                   j1 = j+1
+                   call fprota(cos,sin,h2(j1:k1),g2(ij,j1:k1))
+                endif
+             end do rot_n10_n7
+        end do n8_rows
+
+        ! backward substitution to obtain the b-spline coefficients
         j1 = 1
-        do 542 j2=1,idim
-          c(j1:j1+n-1) = fpbacp(g1,g2,c(j1),n7,k1,k2,nest)
-          j1 = j1+n
- 542    continue
-      !  calculate from condition (**) the remaining b-spline coefficients.
-        do 547 i=1,k
-          j1 = i
-          do 545 j=1,idim
-            j2 = j1+n7
-            c(j2) = c(j1)
-            j1 = j1+n
- 545      continue
- 547    continue
-      !  computation of f(p).
+        do j2=1,idim
+           c(j1:j1+n-1) = fpbacp(g1,g2,c(j1),n7,k1,k2,nest)
+           j1 = j1+n
+        end do
+
+        ! calculate from condition (**) the remaining b-spline coefficients.
+        do i=1,k
+           j1 = i
+           do j=1,idim
+              j2 = j1+n7
+              c(j2) = c(j1)
+              j1 = j1+n
+           end do
+        end do
+
+        ! computation of f(p).
         fp = zero
-        l = k1
+        l  = k1
         jj = 0
-        do 570 it=1,m1
-          if(u(it)<t(l)) go to 550
-          l = l+1
- 550      l0 = l-k2
-          term = zero
-          do 565 j2=1,idim
-            fac = zero
-            j1 = l0
-            do 560 j=1,k1
-              j1 = j1+1
-              fac = fac+c(j1)*q(it,j)
- 560        continue
-            jj = jj+1
-            term = term+(fac-x(jj))**2
-            l0 = l0+n
- 565      continue
-          fp = fp+term*w(it)**2
- 570    continue
-      !  test whether the approximation sp(u) is an acceptable solution.
+        do it=1,m1
+           if (u(it)>=t(l)) l = l+1
+           l0 = l-k2
+           term = zero
+           do j2=1,idim
+             fac = zero
+             j1 = l0
+             do j=1,k1
+                j1 = j1+1
+                fac = fac+c(j1)*q(it,j)
+             end do
+             jj = jj+1
+             term = term+(fac-x(jj))**2
+             l0 = l0+n
+           end do
+           fp = fp+term*w(it)**2
+        end do
+
+        ! test whether the approximation sp(u) is an acceptable solution.
         fpms = fp-s
-        if(abs(fpms)<acc) go to 660
-      !  test whether the maximal number of iterations is reached.
-        if (iter==maxit) go to 600
-      !  carry out one more step of the iteration process.
+        if(abs(fpms)<acc) return
+
+        ! carry out one more step of the iteration process.
         p2 = p
         f2 = fpms
-        if(ich3/=0) go to 580
-        if((f2-f3) > acc) go to 575
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 +p2*con1
-        go to 595
- 575    if(f2<0.) ich3 = 1
- 580    if(ich1/=0) go to 590
-        if((f1-f2) > acc) go to 585
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 595
-        if(p>=p3) p = p2*con1 +p3*con9
-        go to 595
- 585    if(f2>0.) ich1 = 1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 590    if(f2>=f1 .or. f2<=f3) go to 610
-      !  find the new value for p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 595  continue
-      !  error codes and messages.
- 600  ier = FITPACK_MAXIT
-      go to 660
- 610  ier = FITPACK_S_TOO_SMALL
-      go to 660
+        if (ich3==0) then
+           if (f2-f3<=acc) then
+               ! our initial choice of p is too large.
+               p3 = p2
+               f3 = f2
+               p  = p*con4
+               if (p<=p1) p = p1*con9 +p2*con1
+               cycle find_root
+           elseif (f2<zero) then
+               ich3 = 1
+           endif
+        endif
 
- 660  return
+        if (ich1==0) then
+           if(f1-f2<=acc) then
+              ! our initial choice of p is too small
+              p1 = p2
+              f1 = f2
+              p = p/con4
+              if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+              cycle find_root
+           elseif (f2>zero) then
+              ich1 = 1
+           endif
+        endif
+
+        ! test whether the iteration process proceeds as theoretically expected.
+        if (f2>=f1 .or. f2<=f3) then
+           ier = FITPACK_S_TOO_SMALL
+           return
+        else
+           ! find the new value for p.
+           call fprati(p1,f1,p2,f2,p3,f3,p)
+        endif
+
+      end do find_root
+
+      ! Too many iterations
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fpclos
 
       pure subroutine fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
@@ -9314,11 +9320,11 @@ module fitpack_core
          pinv = one/p
 
          !  store matrix a into g
-         c (1:n7)       = z(1:n7)
-         g1(1:n7,1:k1)  = a1(1:n7,1:k1)
-         g1(1:n7,k2)    = zero
-         g2(1:n7,1)     = zero
-         g2(1:n7,2:k+1) = a2(1:n7,1:k)
+         c (1:n7)      = z(1:n7)
+         g1(1:n7,1:k1) = a1(1:n7,1:k1)
+         g1(1:n7,k2)   = zero
+         g2(1:n7,1)    = zero
+         g2(1:n7,2:k1) = a2(1:n7,1:k)
 
          l = n10
          do j=1,k1
