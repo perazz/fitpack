@@ -2968,7 +2968,9 @@ module fitpack_core
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) h(SIZ_K+1),h1(7),h2(6),xi(MAX_IDIM)
+      real(RKIND) :: h(SIZ_K+1),h1(7),h2(6),xi(MAX_IDIM)
+      logical :: done
+
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
@@ -3008,7 +3010,7 @@ module fitpack_core
           ! determine nmax, the number of knots for periodic spline interpolation
           nmax = m+2*k
 
-          if (s<=zero .and. nmax/=nmin) then
+          interp_or_fit: if (s<=zero .and. nmax/=nmin) then
 
               ! if s=0, s(u) is an interpolating curve.
               n = nmax
@@ -3020,124 +3022,92 @@ module fitpack_core
               end if
 
               ! find the position of the interior knots in case of interpolation.
-           5  if (mod(k,2)/=0) then
+              call fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
 
-                  t(k+2:k+m1) = u(2:m1)
-
-                  if (s>zero) go to 50
-                  kk  = k-1
-                  kk1 = k
-                  if (kk>0) go to 50
-                  t(1) = t(m)-per
-                  t(2) = u(1)
-                  t(m+1) = u(m)
-                  t(m+2) = t(3)+per
-                  jj = 0
-                  do i=1,m1
-                      j = i
-                      do j1=1,idim
-                         jj = jj+1
-                         c(j) = x(jj)
-                         j = j+n
-                      end do
-                  end do
-                  jj = 1
-                  j = m
-                  do j1=1,idim
-                     c(j) = c(jj)
-                     j    = j+n
-                     jj   = jj+n
-                  end do
-                  fp = zero
-                  fpint(n-1:n) = [zero,fp0]
-                  nrdata(n) = 0
-
+              if (done) then
                   ier = FITPACK_INTERPOLATING_OK
                   return
-
-              else
-
-                  t(k+2:k+m1) = half*(u(2:m1)+u(1:m1-1))
-                  go to 50
-
               endif
 
-          endif
+          else interp_or_fit
 
-          !  if s > 0 our initial choice depends on the value of iopt.
-          !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
-          !  polynomial curve. (i.e. a constant point).
-          !  if iopt=1 and fp0>s we start computing the least-squares closed
-          !  curve according the set of knots found at the last call of the
-          !  routine.
-          if (iopt/=0 .and. n/=nmin) then
-              fp0   = fpint(n)
-              fpold = fpint(n-1)
-              nplus = nrdata(n)
-              if (fp0>s) go to 50
-          endif
+              !  if s > 0 our initial choice depends on the value of iopt.
+              !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
+              !  polynomial curve. (i.e. a constant point).
+              !  if iopt=1 and fp0>s we start computing the least-squares closed
+              !  curve according the set of knots found at the last call of the
+              !  routine.
+              if (iopt/=0 .and. n/=nmin) then
+                  fp0   = fpint(n)
+                  fpold = fpint(n-1)
+                  nplus = nrdata(n)
+              endif
 
-          !  the case that s(u) is a fixed point is treated separetely.
-          !  fp0 denotes the corresponding sum of squared residuals.
-      35  fp0 = zero
-          d1  = zero
-          z(1:idim) = zero
-          jj  = 0
-          do it=1,m1
-             wi = w(it)
-             call fpgivs(wi,d1,cos,sin)
-             do j=1,idim
-                 jj = jj+1
-                 fac = wi*x(jj)
-                 call fprota(cos,sin,fac,z(j))
-                 fp0 = fp0+fac**2
-             end do
-          end do
+              !  the case that s(u) is a fixed point is treated separetely.
+              !  fp0 denotes the corresponding sum of squared residuals.
+              if (iopt==0 .or. (iopt==1 .and. s>=fp0)) then
+                  fp0 = zero
+                  d1  = zero
+                  z(1:idim) = zero
+                  jj  = 0
+                  do it=1,m1
+                     wi = w(it)
+                     call fpgivs(wi,d1,cos,sin)
+                     do j=1,idim
+                         jj = jj+1
+                         fac = wi*x(jj)
+                         call fprota(cos,sin,fac,z(j))
+                         fp0 = fp0+fac**2
+                     end do
+                  end do
 
-          z(1:idim) = z(1:idim)/d1
+                  z(1:idim) = z(1:idim)/d1
 
-          ! test whether that fixed point is a solution of our problem.
-          fpms = fp0-s
-          is_constant: if (fpms<acc .or. nmax==nmin) then
+                  ! test whether that fixed point is a solution of our problem.
+                  fpms = fp0-s
+                  is_constant: if (fpms<acc .or. nmax==nmin) then
 
-              ier = FITPACK_LEASTSQUARES_OK
+                      ier = FITPACK_LEASTSQUARES_OK
 
-              !  the point (z(1),z(2),...,z(idim)) is a solution of our problem.
-              !  a constant function is a spline of degree k with all b-spline
-              !  coefficients equal to that constant.
-              do i=1,k1
-                 rn = k1-i
-                 t(i) = u(1)-rn*per
-                 j = i+k1
-                 rn = i-1
-                 t(j) = u(m)+rn*per
-              end do
+                      !  the point (z(1),z(2),...,z(idim)) is a solution of our problem.
+                      !  a constant function is a spline of degree k with all b-spline
+                      !  coefficients equal to that constant.
+                      do i=1,k1
+                         rn = k1-i
+                         t(i) = u(1)-rn*per
+                         j = i+k1
+                         rn = i-1
+                         t(j) = u(m)+rn*per
+                      end do
 
-              n = nmin
-              forall(j=1:idim,i=1:k1) c(n*(j-1)+i) = z(j)
+                      n = nmin
+                      forall(j=1:idim,i=1:k1) c(n*(j-1)+i) = z(j)
 
-              fp = fp0
-              fpint(n-1:n) = [zero,fp0]
-              nrdata(n) = 0
-              return
+                      fp = fp0
+                      fpint(n-1:n) = [zero,fp0]
+                      nrdata(n) = 0
+                      return
 
-          end if is_constant
+                  end if is_constant
 
-          fpold = fp0
+                  fpold = fp0
 
-          !  test whether the required storage space exceeds the available one.
-          if (n>=nest) then
-             ier = FITPACK_INSUFFICIENT_STORAGE
-             return
-          end if
+                  !  test whether the required storage space exceeds the available one.
+                  if (n>=nest) then
+                     ier = FITPACK_INSUFFICIENT_STORAGE
+                     return
+                  end if
 
-          !  start computing the least-squares closed curve with one interior knot.
-          nplus = 1
-          n = nmin+1
-          mm = (m+1)/2
-          t(k2) = u(mm)
-          nrdata(1) = mm-2
-          nrdata(2) = m1-mm
+                  !  start computing the least-squares closed curve with one interior knot.
+                  nplus = 1
+                  n = nmin+1
+                  mm = (m+1)/2
+                  t(k2) = u(mm)
+                  nrdata(1) = mm-2
+                  nrdata(2) = m1-mm
+              endif
+
+          endif interp_or_fit
 
       endif
 
@@ -3414,14 +3384,25 @@ module fitpack_core
           new = 0
  320    continue
         fpint(nrint) = fpint(nrint)+fpart
-        do 330 l=1,nplus
-      !  add a new knot
-          call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
-      !  if n=nmax we locate the knots as for interpolation
-          if(n==nmax) go to 5
-      !  test whether we cannot further increase the number of knots.
-          if(n==nest) cycle find_knots
- 330    continue
+        add_new_knots: do l=1,nplus
+            ! add a new knot
+            call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+
+            ! if n=nmax we locate the knots as for interpolation
+            if (n==nmax) then
+               call fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
+
+               if (done) then
+                  ier = FITPACK_INTERPOLATING_OK
+                  return
+               end if
+            else
+                cycle find_knots
+            endif
+
+            ! test whether we cannot further increase the number of knots.
+            if (n==nest) exit add_new_knots
+       end do add_new_knots
 
 
 
@@ -3665,6 +3646,61 @@ module fitpack_core
 
  660  return
       end subroutine fpclos
+
+      pure subroutine fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
+         integer, intent(in) :: idim,k,m,mx,n,nc,nest
+         integer, intent(inout) :: kk,kk1
+         real(RKIND), intent(in) :: u(m),x(mx),per,fp0,s
+         real(RKIND), intent(inout) :: t(nest),c(nc),fp,fpint(nest)
+         integer, intent(inout) :: nrdata(nest)
+         logical, intent(out) :: done
+
+         integer :: i,j,j1,jj,m1
+
+         m1 = m-1
+         done = .false.
+
+         k_is_odd: if (mod(k,2)/=0) then
+
+             t(k+2:k+m1) = u(2:m1)
+
+             if (s<=zero) then
+                 kk  = k-1
+                 kk1 = k
+                 if (kk<=0) then
+                    t(1:2)     = [t(m)-per,x(1)]
+                    t(m+1:m+2) = [u(m),t(3)+per]
+
+                    jj = 0
+                    do i=1,m1
+                        j = i
+                        do j1=1,idim
+                            jj = jj+1
+                            c(j) = x(jj)
+                            j = j+n
+                        end do
+                    end do
+                    jj = 1
+                    j = m
+                    do j1=1,idim
+                      c(j) = c(jj)
+                      j    = j+n
+                      jj   = jj+n
+                    end do
+                    fp = zero
+                    fpint(n-1:n) = [zero,fp0]
+                    nrdata(n) = 0
+                    done = .true.
+                 endif
+             endif
+
+         else k_is_odd
+
+             t(k+2:k+m1) = half*(u(2:m1)+u(1:m1-1))
+
+         endif k_is_odd
+
+      end subroutine fpclos_reset_interp
 
 
       recursive subroutine fpcoco(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,e,wrk,lwrk,iwrk,kwrk,ier)
@@ -9466,7 +9502,7 @@ module fitpack_core
          m1 = m-1
          done = .false.
 
-         k_is_odd: if ((k/2)*2 /= k) then
+         k_is_odd: if (mod(k,2)/=0) then
 
             t(k+2:k+m1) = x(2:m1)
 
