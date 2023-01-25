@@ -2964,7 +2964,7 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv, &
        p1,p2,p3,sin,store,term,ui,wi,rn
-      integer i,ich1,ich3,ij,ik,it,iter,i1,i2,i3,j,jj,jk,jper,j1,j2,kk, &
+      integer i,ich1,ich3,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk, &
        kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
        nrint,n10,n11,n7,n8
       !  ..local arrays..
@@ -3113,7 +3113,7 @@ module fitpack_core
 
       !  main loop for the different sets of knots. m is a save upper
       !  bound for the number of trials.
-  50  find_knots: do iter=1,m
+      find_knots: do iter=1,m
 
           ! find nrint, the number of knot intervals.
           nrint = n-nmin+1
@@ -3153,11 +3153,11 @@ module fitpack_core
           !  initialization.
           z(1:nc) = zero
           a1(1:nk1,1:kk1) = zero
-          n7 = nk1-k
-          n10 = n7-kk
+          n7   = nk1-k
+          n10  = n7-kk
           jper = 0
-          fp = zero
-          l = k1
+          fp   = zero
+          l    = k1
 
           get_coefs: do it=1,m1
               ! fetch the current data point u(it),x(it)
@@ -3221,59 +3221,50 @@ module fitpack_core
 
                   ! rotate the new row of the observation matrix into triangle
                   ! by givens transformations.
-                  if(n10<=0) go to 250
-              !  rotation with the rows 1,2,...n10 of matrix a.
-                  do 240 j=1,n10
-                    piv = h1(1)
-                    if(piv/=zero) go to 214
-                    do 212 i=1,kk
-                      h1(i) = h1(i+1)
-         212        continue
-                    h1(kk1) = zero
-                    go to 240
-              !  calculate the parameters of the givens transformation.
-         214        call fpgivs(piv,a1(j,1),cos,sin)
-              !  transformation to the right hand side.
-                    j1 = j
-                    do 217 j2=1,idim
-                      call fprota(cos,sin,xi(j2),z(j1))
-                      j1 = j1+n
-         217        continue
-              !  transformations to the left hand side with respect to a2.
-                    call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
-                    if(j==n10) go to 250
-                    i2 = min0(n10-j,kk)
-              !  transformations to the left hand side with respect to a1.
-                    do 230 i=1,i2
-                      i1 = i+1
-                      call fprota(cos,sin,h1(i1),a1(j,i1))
-                      h1(i) = h1(i1)
-         230        continue
-                    h1(i1) = zero
-         240      continue
-              !  rotation with the rows n10+1,...n7 of matrix a.
-         250      do 270 j=1,kk
-                    ij = n10+j
-                    if(ij<=0) go to 270
-                    piv = h2(j)
-                    if (piv==zero) go to 270
-              !  calculate the parameters of the givens transformation.
-                    call fpgivs(piv,a2(ij,j),cos,sin)
-              !  transformations to right hand side.
-                    j1 = ij
-                    do 255 j2=1,idim
-                      call fprota(cos,sin,xi(j2),z(j1))
-                      j1 = j1+n
-         255        continue
-                    if(j==kk) go to 280
-                    j1 = j+1
-              !  transformations to left hand side.
-                    call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
-         270      continue
-              !  add contribution of this row to the sum of squares of residual
-              !  right hand sides.
-         280      fp = fp+sum(xi(1:idim)**2)
-                  cycle get_coefs
+                  if (n10>0) then
+                      ! rotation with the rows 1,2,...n10 of matrix a.
+                      one_to_n10: do j=1,n10
+                          piv = h1(1)
+                          if (piv==zero) then
+                             h1(1:kk1) = [h1(2:kk+1),zero]
+                          else
+                             ! calculate the parameters of the givens transformation.
+                             call fpgivs(piv,a1(j,1),cos,sin)
+
+                             ! transformation to the right hand side.
+                             call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
+
+                             ! transformations to the left hand side with respect to a2.
+                             call fprota(cos,sin,h2(:kk),a2(j,:kk))
+
+                             if (j==n10) exit one_to_n10
+                             i2 = min(n10-j,kk)+1
+
+                             ! transformations to the left hand side with respect to a1.
+                             call fprota(cos,sin,h1(2:i2),a1(j,2:i2))
+                             h1(1:i2) = [h1(2:i2),zero]
+                          endif
+                      end do one_to_n10
+                  endif ! n10>0
+
+                  ! rotation with the rows n10+1,...n7 of matrix a.
+                  n10_to_n7: do j=1,kk
+                      ij = n10+j
+                      piv = h2(j)
+                      if (ij<=0 .or. piv==zero) cycle n10_to_n7
+
+                      ! calculate the parameters of the givens transformation.
+                      call fpgivs(piv,a2(ij,j),cos,sin)
+                      ! transformations to right hand side.
+                      call fprota(cos,sin,xi(1:idim),z(ij:ij+(idim-1)*n:n))
+
+                      if (j==kk) exit n10_to_n7
+
+                      ! transformations to left hand side.
+                      j1 = j+1
+                      call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
+
+                  end do n10_to_n7
 
               else all_zero
 
@@ -3290,121 +3281,125 @@ module fitpack_core
                       call fpgivs(piv,a1(j,1),cos,sin)
 
                       ! transformations to right hand side.
-                      j1 = j
-                      do j2=1,idim
-                          call fprota(cos,sin,xi(j2),z(j1))
-                          j1 = j1+n
-                      end do
+                      call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
 
                       if (i<kk1) call fprota(cos,sin,h(i+1:kk1),a1(j,1:kk1-i))
 
                   end do rot_zero
 
-                  ! add contribution of this row to the sum of squares of residual
-                  ! right hand sides.
-                  fp = fp + sum(xi(1:idim)**2)
               endif all_zero
 
+              ! add contribution of this row to the sum of squares of residual
+              ! right hand sides.
+              fp = fp + sum(xi(1:idim)**2)
+
           end do get_coefs
-        fpint(n) = fp0
-        fpint(n-1) = fpold
-        nrdata(n) = nplus
-      !  backward substitution to obtain the b-spline coefficients .
-        j1 = 1
-        do j2=1,idim
-           c(j1:j1+n-1) = fpbacp(a1,a2,z(j1),n7,kk,kk1,nest)
+
+          fpint(n-1:) = [fpold,fp0]
+          nrdata(n) = nplus
+
+          ! backward substitution to obtain the b-spline coefficients .
+          j1 = 1
+          do j2=1,idim
+           c(j1:j1+n7-1) = fpbacp(a1,a2,z(j1),n7,kk,kk1,nest)
            j1 = j1+n
-        end do
-      !  calculate from condition (**) the remaining coefficients.
-        do 297 i=1,k
-          j1 = i
-          do 295 j=1,idim
-            j2 = j1+n7
-            c(j2) = c(j1)
-            j1 = j1+n
- 295      continue
- 297    continue
-        if(iopt<0) go to 660
-      !  test whether the approximation sinf(u) is an acceptable solution.
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 660
-      !  if f(p=inf) < s accept the choice of knots.
-        if(fpms<zero) go to 350
-      !  if n=nmax, sinf(u) is an interpolating curve.
-        if (n==nmax) then
-           ier = FITPACK_INTERPOLATING_OK
-           return
-        end if
-      !  increase the number of knots.
-      !  if n=nest we cannot increase the number of knots because of the
-      !  storage capacity limitation.
-        if (n==nest) then
-            ier = FITPACK_INSUFFICIENT_STORAGE
-            return
-        end if
-      !  determine the number of knots nplus we are going to add.
-        npl1 = nplus*2
-        rn = nplus
-        if(fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
-        nplus = min0(nplus*2,max0(npl1,nplus/2,1))
-        fpold = fp
-      !  compute the sum of squared residuals for each knot interval
-      !  t(j+k) <= ui <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
-        fpart = zero
-        i = 1
-        l = k1
-        jj = 0
-        do 320 it=1,m1
-          if(u(it)<t(l)) go to 300
-          new = 1
-          l = l+1
- 300      term = zero
-          l0 = l-k2
-          do 310 j2=1,idim
-            fac = zero
-            j1 = l0
-            do 305 j=1,k1
-              j1 = j1+1
-              fac = fac+c(j1)*q(it,j)
- 305        continue
-            jj = jj+1
-            term = term+(w(it)*(fac-x(jj)))**2
-            l0 = l0+n
- 310      continue
-          fpart = fpart+term
-          if(new==0) go to 320
-          if(l>k2) go to 315
-          fpint(nrint) = term
-          new = 0
-          go to 320
- 315      store = term*half
-          fpint(i) = fpart-store
-          i = i+1
-          fpart = store
-          new = 0
- 320    continue
-        fpint(nrint) = fpint(nrint)+fpart
-        add_new_knots: do l=1,nplus
-            ! add a new knot
-            call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+          end do
 
-            ! if n=nmax we locate the knots as for interpolation
-            if (n==nmax) then
-               call fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
+          ! calculate from condition (**) the remaining coefficients.
+          do i=1,k
+              j1 = i
+              do j=1,idim
+                  j2 = j1+n7
+                  c(j2) = c(j1)
+                  j1 = j1+n
+              end do
+          end do
 
-               if (done) then
-                  ier = FITPACK_INTERPOLATING_OK
-                  return
-               end if
-            else
-                cycle find_knots
-            endif
+          ! test whether the approximation sinf(u) is an acceptable solution.
+          fpms = fp-s
+          if (iopt<0 .or. abs(fpms)<acc) return
 
-            ! test whether we cannot further increase the number of knots.
-            if (n==nest) exit add_new_knots
-       end do add_new_knots
+          ! if f(p=inf)<s accept the choice of knots.
+          if (fpms<zero) exit find_knots
 
+          ! if n=nmax, sinf(u) is an interpolating curve.
+          if (n==nmax) then
+             ier = FITPACK_INTERPOLATING_OK
+             return
+          end if
 
+          ! increase the number of knots.
+          ! if n=nest we cannot increase the number of knots because of the
+          ! storage capacity limitation.
+          if (n==nest) then
+              ier = FITPACK_INSUFFICIENT_STORAGE
+              return
+          end if
+
+          ! determine the number of knots nplus we are going to add.
+          rn    = nplus
+          npl1  = merge(int(rn*fpms/(fpold-fp)),nplus*2,fpold-fp>acc)
+          nplus = min(nplus*2,max(npl1,nplus/2,1))
+          fpold = fp
+
+          ! compute the sum of squared residuals for each knot interval
+          ! t(j+k) <= ui <= t(j+k+1) and store it in fpint(j),j=1,2,...nrint.
+          fpart = zero
+          i = 1
+          l = k1
+          jj = 0
+          do it=1,m1
+              if (u(it)>=t(l)) then
+                 new = 1
+                 l = l+1
+              endif
+              term = zero
+              l0 = l-k2
+              do j2=1,idim
+                 fac = zero
+                 j1 = l0
+                 do j=1,k1
+                   j1 = j1+1
+                   fac = fac+c(j1)*q(it,j)
+                 end do
+                 jj = jj+1
+                 term = term+(w(it)*(fac-x(jj)))**2
+                 l0 = l0+n
+              end do
+              fpart = fpart+term
+              if (new/=0) then
+                 if (l>k2) then
+                     store = term*half
+                     fpint(i) = fpart-store
+                     i = i+1
+                     fpart = store
+                 else
+                     fpint(nrint) = term
+                 end if
+                 new = 0
+              endif
+          end do
+          fpint(nrint) = fpint(nrint)+fpart
+
+          add_new_knots: do l=1,nplus
+              ! add a new knot
+              call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+
+              ! if n=nmax we locate the knots as for interpolation
+              if (n==nmax) then
+                 call fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
+
+                 if (done) then
+                    ier = FITPACK_INTERPOLATING_OK
+                    return
+                 end if
+              else
+                  cycle find_knots
+              endif
+
+              ! test whether we cannot further increase the number of knots.
+              if (n==nest) exit add_new_knots
+          end do add_new_knots
 
       !  restart the computations with the new set of knots.
       end do find_knots
@@ -3432,7 +3427,7 @@ module fitpack_core
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
- 350  call fpdisc(t,n,k2,b,nest)
+      call fpdisc(t,n,k2,b,nest)
       !  initial value for p.
       p1 = zero
       f1 = fp0-s
