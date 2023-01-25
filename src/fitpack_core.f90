@@ -2954,8 +2954,9 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,tol,fp
-      integer iopt,idim,m,mx,k,nest,maxit,k1,k2,n,nc,ier
+      real(RKIND) :: s,tol,fp
+      integer, intent(in) :: iopt,idim,m,mx,k,nest,maxit,k1,k2,nc
+      integer, intent(inout) :: n,ier
       !  ..array arguments..
       real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
        a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
@@ -3026,37 +3027,39 @@ module fitpack_core
                   if (s>zero) go to 50
                   kk  = k-1
                   kk1 = k
-                  if(kk>0) go to 50
+                  if (kk>0) go to 50
                   t(1) = t(m)-per
                   t(2) = u(1)
                   t(m+1) = u(m)
                   t(m+2) = t(3)+per
                   jj = 0
-                  do 15 i=1,m1
-                    j = i
-                    do 12 j1=1,idim
-                      jj = jj+1
-                      c(j) = x(jj)
-                      j = j+n
-              12    continue
-              15  continue
+                  do i=1,m1
+                      j = i
+                      do j1=1,idim
+                         jj = jj+1
+                         c(j) = x(jj)
+                         j = j+n
+                      end do
+                  end do
                   jj = 1
                   j = m
-                  do 17 j1=1,idim
-                    c(j) = c(jj)
-                    j = j+n
-                    jj = jj+n
-              17  continue
+                  do j1=1,idim
+                     c(j) = c(jj)
+                     j    = j+n
+                     jj   = jj+n
+                  end do
                   fp = zero
-                  fpint(n) = fp0
-                  fpint(n-1) = zero
+                  fpint(n-1:n) = [zero,fp0]
                   nrdata(n) = 0
-                  go to 630
+
+                  ier = FITPACK_INTERPOLATING_OK
+                  return
 
               else
 
                   t(k+2:k+m1) = half*(u(2:m1)+u(1:m1-1))
                   go to 50
+
               endif
 
           endif
@@ -3067,32 +3070,59 @@ module fitpack_core
           !  if iopt=1 and fp0>s we start computing the least-squares closed
           !  curve according the set of knots found at the last call of the
           !  routine.
-          if(iopt==0) go to 35
-          if(n==nmin) go to 35
-          fp0 = fpint(n)
-          fpold = fpint(n-1)
-          nplus = nrdata(n)
-          if(fp0>s) go to 50
+          if (iopt/=0 .and. n/=nmin) then
+              fp0   = fpint(n)
+              fpold = fpint(n-1)
+              nplus = nrdata(n)
+              if (fp0>s) go to 50
+          endif
+
           !  the case that s(u) is a fixed point is treated separetely.
           !  fp0 denotes the corresponding sum of squared residuals.
       35  fp0 = zero
-          d1 = zero
+          d1  = zero
           z(1:idim) = zero
-          jj = 0
-          do 45 it=1,m1
-            wi = w(it)
-            call fpgivs(wi,d1,cos,sin)
-            do 40 j=1,idim
-              jj = jj+1
-              fac = wi*x(jj)
-              call fprota(cos,sin,fac,z(j))
-              fp0 = fp0+fac**2
-      40    continue
-      45  continue
+          jj  = 0
+          do it=1,m1
+             wi = w(it)
+             call fpgivs(wi,d1,cos,sin)
+             do j=1,idim
+                 jj = jj+1
+                 fac = wi*x(jj)
+                 call fprota(cos,sin,fac,z(j))
+                 fp0 = fp0+fac**2
+             end do
+          end do
+
           z(1:idim) = z(1:idim)/d1
-          !  test whether that fixed point is a solution of our problem.
+
+          ! test whether that fixed point is a solution of our problem.
           fpms = fp0-s
-          if(fpms<acc .or. nmax==nmin) go to 640
+          is_constant: if (fpms<acc .or. nmax==nmin) then
+
+              ier = FITPACK_LEASTSQUARES_OK
+
+              !  the point (z(1),z(2),...,z(idim)) is a solution of our problem.
+              !  a constant function is a spline of degree k with all b-spline
+              !  coefficients equal to that constant.
+              do i=1,k1
+                 rn = k1-i
+                 t(i) = u(1)-rn*per
+                 j = i+k1
+                 rn = i-1
+                 t(j) = u(m)+rn*per
+              end do
+
+              n = nmin
+              forall(j=1:idim,i=1:k1) c(n*(j-1)+i) = z(j)
+
+              fp = fp0
+              fpint(n-1:n) = [zero,fp0]
+              nrdata(n) = 0
+              return
+
+          end if is_constant
+
           fpold = fp0
 
           !  test whether the required storage space exceeds the available one.
@@ -3100,8 +3130,8 @@ module fitpack_core
              ier = FITPACK_INSUFFICIENT_STORAGE
              return
           end if
-          !  start computing the least-squares closed curve with one
-          !  interior knot.
+
+          !  start computing the least-squares closed curve with one interior knot.
           nplus = 1
           n = nmin+1
           mm = (m+1)/2
@@ -3113,192 +3143,199 @@ module fitpack_core
 
       !  main loop for the different sets of knots. m is a save upper
       !  bound for the number of trials.
-  50  do 340 iter=1,m
-      !  find nrint, the number of knot intervals.
-        nrint = n-nmin+1
-      !  find the position of the additional knots which are needed for
-      !  the b-spline representation of s(u). if we take
-      !      t(k+1) = u(1), t(n-k) = u(m)
-      !      t(k+1-j) = t(n-k-j) - per, j=1,2,...k
-      !      t(n-k+j) = t(k+1+j) + per, j=1,2,...k
-      !  then s(u) will be a smooth closed curve if the b-spline
-      !  coefficients satisfy the following conditions
-      !      c((i-1)*n+n7+j) = c((i-1)*n+j), j=1,...k,i=1,2,...,idim (**)
-      !  with n7=n-2*k-1.
-        t(k1) = u(1)
-        nk1 = n-k1
-        nk2 = nk1+1
-        t(nk2) = u(m)
-        do 60 j=1,k
-          i1 = nk2+j
-          i2 = nk2-j
-          j1 = k1+j
-          j2 = k1-j
-          t(i1) = t(j1)+per
-          t(j2) = t(i2)-per
-  60    continue
-      !  compute the b-spline coefficients of the least-squares closed curve
-      !  sinf(u). the observation matrix a is built up row by row while
-      !  taking into account condition (**) and is reduced to triangular
-      !  form by givens transformations .
-      !  at the same time fp=f(p=inf) is computed.
-      !  the n7 x n7 triangularised upper matrix a has the form
-      !            ! a1 '    !
-      !        a = !    ' a2 !
-      !            ! 0  '    !
-      !  with a2 a n7 x k matrix and a1 a n10 x n10 upper triangular
-      !  matrix of bandwidth k+1 ( n10 = n7-k).
-      !  initialization.
-        z(1:nc) = zero
-        a1(1:nk1,1:kk1) = zero
-        n7 = nk1-k
-        n10 = n7-kk
-        jper = 0
-        fp = zero
-        l = k1
-        jj = 0
-        do 290 it=1,m1
-      !  fetch the current data point u(it),x(it)
-          ui = u(it)
-          wi = w(it)
-          do 75 j=1,idim
-            jj = jj+1
-            xi(j) = x(jj)*wi
-  75      continue
-      !  search for knot interval t(l) <= ui < t(l+1).
-  80      if(ui<t(l+1)) go to 85
-          l = l+1
-          go to 80
-      !  evaluate the (k+1) non-zero b-splines at ui and store them in q.
-  85      h = fpbspl(t,n,k,ui,l)
-          do 90 i=1,k1
-            q(it,i) = h(i)
-            h(i) = h(i)*wi
-  90      continue
-          l5 = l-k1
-      !  test whether the b-splines nj,k+1(u),j=1+n7,...nk1 are all zero at ui
-          if(l5<n10) go to 285
-          if(jper/=0) go to 160
-      !  initialize the matrix a2.
-          a2(1:n7,1:kk) = zero
-          jk = n10+1
-          do 110 i=1,kk
-            ik = jk
-            do 100 j=1,kk1
-              if(ik<=0) go to 105
-              a2(ik,i) = a1(ik,j)
-              ik = ik-1
- 100        continue
- 105        jk = jk+1
- 110      continue
-          jper = 1
-      !  if one of the b-splines nj,k+1(u),j=n7+1,...nk1 is not zero at ui
-      !  we take account of condition (**) for setting up the new row
-      !  of the observation matrix a. this row is stored in the arrays h1
-      !  (the part with respect to a1) and h2 (the part with
-      !  respect to a2).
- 160      do 170 i=1,kk
-            h1(i) = zero
-            h2(i) = zero
- 170      continue
-          h1(kk1) = zero
-          j = l5-n10
-          do 210 i=1,kk1
-            j = j+1
-            l0 = j
- 180        l1 = l0-kk
-            if(l1<=0) go to 200
-            if(l1<=n10) go to 190
-            l0 = l1-n10
-            go to 180
- 190        h1(l1) = h(i)
-            go to 210
- 200        h2(l0) = h2(l0)+h(i)
- 210      continue
-      !  rotate the new row of the observation matrix into triangle
-      !  by givens transformations.
-          if(n10<=0) go to 250
-      !  rotation with the rows 1,2,...n10 of matrix a.
-          do 240 j=1,n10
-            piv = h1(1)
-            if(piv/=zero) go to 214
-            do 212 i=1,kk
-              h1(i) = h1(i+1)
- 212        continue
-            h1(kk1) = zero
-            go to 240
-      !  calculate the parameters of the givens transformation.
- 214        call fpgivs(piv,a1(j,1),cos,sin)
-      !  transformation to the right hand side.
-            j1 = j
-            do 217 j2=1,idim
-              call fprota(cos,sin,xi(j2),z(j1))
-              j1 = j1+n
- 217        continue
-      !  transformations to the left hand side with respect to a2.
-            call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
-            if(j==n10) go to 250
-            i2 = min0(n10-j,kk)
-      !  transformations to the left hand side with respect to a1.
-            do 230 i=1,i2
-              i1 = i+1
-              call fprota(cos,sin,h1(i1),a1(j,i1))
-              h1(i) = h1(i1)
- 230        continue
-            h1(i1) = zero
- 240      continue
-      !  rotation with the rows n10+1,...n7 of matrix a.
- 250      do 270 j=1,kk
-            ij = n10+j
-            if(ij<=0) go to 270
-            piv = h2(j)
-            if (piv==zero) go to 270
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a2(ij,j),cos,sin)
-      !  transformations to right hand side.
-            j1 = ij
-            do 255 j2=1,idim
-              call fprota(cos,sin,xi(j2),z(j1))
-              j1 = j1+n
- 255        continue
-            if(j==kk) go to 280
-            j1 = j+1
-      !  transformations to left hand side.
-            call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
- 270      continue
-      !  add contribution of this row to the sum of squares of residual
-      !  right hand sides.
- 280      fp = fp+sum(xi(1:idim)**2)
-          go to 290
-      !  rotation of the new row of the observation matrix into
-      !  triangle in case the b-splines nj,k+1(u),j=n7+1,...n-k-1 are all zero
-      !  at ui.
- 285      j = l5
-          do 140 i=1,kk1
-            j = j+1
-            piv = h(i)
-            if (piv==zero) go to 140
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a1(j,1),cos,sin)
-      !  transformations to right hand side.
-            j1 = j
-            do 125 j2=1,idim
-              call fprota(cos,sin,xi(j2),z(j1))
-              j1 = j1+n
- 125        continue
-            if(i==kk1) go to 150
-            i2 = 1
-            i3 = i+1
-      !  transformations to left hand side.
-            do 130 i1=i3,kk1
-              i2 = i2+1
-              call fprota(cos,sin,h(i1),a1(j,i2))
- 130        continue
- 140      continue
-      !  add contribution of this row to the sum of squares of residual
-      !  right hand sides.
- 150      fp = fp + sum(xi(1:idim)**2)
- 290    continue
+  50  find_knots: do iter=1,m
+
+          ! find nrint, the number of knot intervals.
+          nrint = n-nmin+1
+
+          ! find the position of the additional knots which are needed for
+          !  the b-spline representation of s(u). if we take
+          !      t(k+1) = u(1), t(n-k) = u(m)
+          !      t(k+1-j) = t(n-k-j) - per, j=1,2,...k
+          !      t(n-k+j) = t(k+1+j) + per, j=1,2,...k
+          !  then s(u) will be a smooth closed curve if the b-spline
+          !  coefficients satisfy the following conditions
+          !      c((i-1)*n+n7+j) = c((i-1)*n+j), j=1,...k,i=1,2,...,idim (**)
+          !  with n7=n-2*k-1.
+          t(k1)  = u(1)
+          nk1    = n-k1
+          nk2    = nk1+1
+          t(nk2) = u(m)
+          do j=1,k
+              i1 = nk2+j
+              i2 = nk2-j
+              j1 = k1+j
+              j2 = k1-j
+              t(i1) = t(j1)+per
+              t(j2) = t(i2)-per
+          end do
+
+          !  compute the b-spline coefficients of the least-squares closed curve sinf(u). the
+          !  observation matrix a is built up row by row while taking into account condition (**)
+          !  and is reduced to triangular form by givens transformations.
+          !  at the same time fp=f(p=inf) is computed.
+          !  the n7 x n7 triangularised upper matrix a has the form
+          !            ! a1 '    !
+          !        a = !    ' a2 !
+          !            ! 0  '    !
+          !  with a2 a n7 x k matrix and a1 a n10 x n10 upper triangular matrix of bandwidth k+1 (
+          !  (n10 = n7-k).
+          !  initialization.
+          z(1:nc) = zero
+          a1(1:nk1,1:kk1) = zero
+          n7 = nk1-k
+          n10 = n7-kk
+          jper = 0
+          fp = zero
+          l = k1
+
+          get_coefs: do it=1,m1
+              ! fetch the current data point u(it),x(it)
+              ui = u(it)
+              wi = w(it)
+              xi(:idim) = wi*x(idim*(it-1)+1:idim*it)
+
+              ! search for knot interval t(l) <= ui < t(l+1).
+              do while (ui>=t(l+1))
+                  l = l+1
+              end do
+
+              ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
+              h = fpbspl(t,n,k,ui,l)
+
+              q(it,:k1) = h(:k1)
+              h(:k1)    = h(:k1)*wi
+
+              ! test whether the b-splines nj,k+1(u),j=1+n7,...nk1 are all zero at ui
+              l5 = l-k1
+
+              all_zero: if (l5>=n10) then
+
+                  ! initialize the matrix a2.
+                  if (jper==0) then
+                      a2(1:n7,1:kk) = zero
+                      jk = n10+1
+                      do i=1,kk
+                         ik = jk
+                         do j=1,kk1
+                            if (ik<=0) exit
+                            a2(ik,i) = a1(ik,j)
+                            ik = ik-1
+                         end do
+                         jk = jk+1
+                      end do
+                      jper = 1
+                  endif
+
+                  ! if one of the b-splines nj,k+1(u),j=n7+1,...nk1 is not zero at ui we take account
+                  ! of condition (**) for setting up the new row of the observation matrix a. this row
+                  ! is stored in the arrays h1 (the part with respect to a1) and h2 (the part with
+                  ! respect to a2).
+                  h1 = zero
+                  h2 = zero
+                  j  = l5-n10
+                  do i=1,kk1
+                     j  = j+1
+                     l0 = j
+                     l1 = l0-kk
+                     do while (l1>n10)
+                       l0 = l1-n10
+                       l1 = l0-kk
+                     end do
+                     if (l1>0) then
+                        h1(l1) = h(i)
+                     else
+                        h2(l0) = h2(l0)+h(i)
+                     end if
+                  end do
+
+                  ! rotate the new row of the observation matrix into triangle
+                  ! by givens transformations.
+                  if(n10<=0) go to 250
+              !  rotation with the rows 1,2,...n10 of matrix a.
+                  do 240 j=1,n10
+                    piv = h1(1)
+                    if(piv/=zero) go to 214
+                    do 212 i=1,kk
+                      h1(i) = h1(i+1)
+         212        continue
+                    h1(kk1) = zero
+                    go to 240
+              !  calculate the parameters of the givens transformation.
+         214        call fpgivs(piv,a1(j,1),cos,sin)
+              !  transformation to the right hand side.
+                    j1 = j
+                    do 217 j2=1,idim
+                      call fprota(cos,sin,xi(j2),z(j1))
+                      j1 = j1+n
+         217        continue
+              !  transformations to the left hand side with respect to a2.
+                    call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
+                    if(j==n10) go to 250
+                    i2 = min0(n10-j,kk)
+              !  transformations to the left hand side with respect to a1.
+                    do 230 i=1,i2
+                      i1 = i+1
+                      call fprota(cos,sin,h1(i1),a1(j,i1))
+                      h1(i) = h1(i1)
+         230        continue
+                    h1(i1) = zero
+         240      continue
+              !  rotation with the rows n10+1,...n7 of matrix a.
+         250      do 270 j=1,kk
+                    ij = n10+j
+                    if(ij<=0) go to 270
+                    piv = h2(j)
+                    if (piv==zero) go to 270
+              !  calculate the parameters of the givens transformation.
+                    call fpgivs(piv,a2(ij,j),cos,sin)
+              !  transformations to right hand side.
+                    j1 = ij
+                    do 255 j2=1,idim
+                      call fprota(cos,sin,xi(j2),z(j1))
+                      j1 = j1+n
+         255        continue
+                    if(j==kk) go to 280
+                    j1 = j+1
+              !  transformations to left hand side.
+                    call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
+         270      continue
+              !  add contribution of this row to the sum of squares of residual
+              !  right hand sides.
+         280      fp = fp+sum(xi(1:idim)**2)
+                  cycle get_coefs
+
+              else all_zero
+
+                  ! rotation of the new row of the observation matrix into triangle in case
+                  ! the b-splines nj,k+1(u),j=n7+1,...n-k-1 are all zero at ui.
+                  j = l5
+                  rot_zero: do i=1,kk1
+                      j = j+1
+                      piv = h(i)
+
+                      if (piv==zero) cycle rot_zero
+
+                      ! calculate the parameters of the givens transformation.
+                      call fpgivs(piv,a1(j,1),cos,sin)
+
+                      ! transformations to right hand side.
+                      j1 = j
+                      do j2=1,idim
+                          call fprota(cos,sin,xi(j2),z(j1))
+                          j1 = j1+n
+                      end do
+
+                      if (i<kk1) call fprota(cos,sin,h(i+1:kk1),a1(j,1:kk1-i))
+
+                  end do rot_zero
+
+                  ! add contribution of this row to the sum of squares of residual
+                  ! right hand sides.
+                  fp = fp + sum(xi(1:idim)**2)
+              endif all_zero
+
+          end do get_coefs
         fpint(n) = fp0
         fpint(n-1) = fpold
         nrdata(n) = nplus
@@ -3324,7 +3361,10 @@ module fitpack_core
       !  if f(p=inf) < s accept the choice of knots.
         if(fpms<zero) go to 350
       !  if n=nmax, sinf(u) is an interpolating curve.
-        if(n==nmax) go to 630
+        if (n==nmax) then
+           ier = FITPACK_INTERPOLATING_OK
+           return
+        end if
       !  increase the number of knots.
       !  if n=nest we cannot increase the number of knots because of the
       !  storage capacity limitation.
@@ -3380,10 +3420,14 @@ module fitpack_core
       !  if n=nmax we locate the knots as for interpolation
           if(n==nmax) go to 5
       !  test whether we cannot further increase the number of knots.
-          if(n==nest) go to 340
+          if(n==nest) cycle find_knots
  330    continue
+
+
+
       !  restart the computations with the new set of knots.
- 340  continue
+      end do find_knots
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  part 2: determination of the smoothing closed curve sp(u).          c
       !  **********************************************************          c
@@ -3618,27 +3662,7 @@ module fitpack_core
       go to 660
  610  ier = FITPACK_S_TOO_SMALL
       go to 660
- 630  ier = FITPACK_INTERPOLATING_OK
-      go to 660
- 640  ier = FITPACK_LEASTSQUARES_OK
-      !  the point (z(1),z(2),...,z(idim)) is a solution of our problem.
-      !  a constant function is a spline of degree k with all b-spline
-      !  coefficients equal to that constant.
-      do 650 i=1,k1
-        rn = k1-i
-        t(i) = u(1)-rn*per
-        j = i+k1
-        rn = i-1
-        t(j) = u(m)+rn*per
- 650  continue
 
-      n = nmin
-      forall(j=1:idim,i=1:k1) c(n*(j-1)+i) = z(j)
-
-      fp = fp0
-      fpint(n) = fp0
-      fpint(n-1) = zero
-      nrdata(n) = 0
  660  return
       end subroutine fpclos
 
@@ -4611,58 +4635,58 @@ module fitpack_core
       end subroutine fpcosp
 
 
-      pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
-
       !  fpcsin calculates the integrals ress=integral((b-x)**3*sin(par*x))
       !  and resc=integral((b-x)**3*cos(par*x)) over the interval (a,b),
       !  given sia=sin(par*a),coa=cos(par*a),sib=sin(par*b) and cob=cos(par*b)
-      !  ..
-      !  ..scalar arguments..
-      real(RKIND), intent(in)  :: a,b,par,sia,coa,sib,cob
-      real(RKIND), intent(out) :: ress,resc
-      !  ..local scalars..
-      integer :: i,j
-      real(RKIND) :: ab,ab4,ai,alfa,beta,b2,b4,fac,f1,f2
-      real(RKIND), parameter :: eps = smallnum10
+      pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
 
-      ab   = b-a
-      ab4  = ab**4
-      alfa = ab*par
-      ! the way of calculating the integrals ress and resc depends on
-      ! the value of alfa = (b-a)*par.
+          !  ..scalar arguments..
+          real(RKIND), intent(in)  :: a,b,par,sia,coa,sib,cob
+          real(RKIND), intent(out) :: ress,resc
 
-      if(abs(alfa)<=one) then
-         ! ress and resc are found by evaluating a series expansion.
-         fac = fourth
-         f1  = fac
-         f2  = zero
-         i   = 4
-         series: do j=1,5
-           i   = i+1
-           ai  = i
-           fac = fac*alfa/ai
-           f2  = f2+fac
-           if (abs(fac)<=eps) exit series
-           i   = i+1
-           ai  = i
-           fac = -fac*alfa/ai
-           f1  = f1+fac
-           if (abs(fac)<=eps) exit series
-         end do series
-         ress = ab4*(coa*f2+sia*f1)
-         resc = ab4*(coa*f1-sia*f2)
+          !  ..local scalars..
+          integer :: i,j
+          real(RKIND) :: ab,ab4,ai,alfa,beta,b2,b4,fac,f1,f2
+          real(RKIND), parameter :: eps = smallnum10
 
-      else
-         ! integration by parts.
-         beta = one/alfa
-         b2   = beta**2
-         b4   = six*b2**2
-         f1   = three*b2*(one-two*b2)
-         f2   = beta*(one-six*b2)
-         ress = ab4*(coa*f2+sia*f1+sib*b4)
-         resc = ab4*(coa*f1-sia*f2+cob*b4)
-         return
-      endif
+          ab   = b-a
+          ab4  = ab**4
+          alfa = ab*par
+          ! the way of calculating the integrals ress and resc depends on
+          ! the value of alfa = (b-a)*par.
+
+          if(abs(alfa)<=one) then
+             ! ress and resc are found by evaluating a series expansion.
+             fac = fourth
+             f1  = fac
+             f2  = zero
+             i   = 4
+             series: do j=1,5
+               i   = i+1
+               ai  = i
+               fac = fac*alfa/ai
+               f2  = f2+fac
+               if (abs(fac)<=eps) exit series
+               i   = i+1
+               ai  = i
+               fac = -fac*alfa/ai
+               f1  = f1+fac
+               if (abs(fac)<=eps) exit series
+             end do series
+             ress = ab4*(coa*f2+sia*f1)
+             resc = ab4*(coa*f1-sia*f2)
+
+          else
+             ! integration by parts.
+             beta = one/alfa
+             b2   = beta**2
+             b4   = six*b2**2
+             f1   = three*b2*(one-two*b2)
+             f2   = beta*(one-six*b2)
+             ress = ab4*(coa*f2+sia*f1+sib*b4)
+             resc = ab4*(coa*f1-sia*f2+cob*b4)
+             return
+          endif
 
       end subroutine fpcsin
 
@@ -9728,8 +9752,7 @@ module fitpack_core
                           nrdatv(j) = 0
                       endif
                   end do
-                  idd(1) = ider(1)
-                  idd(2) = ider(2)
+                  idd = ider
 
               else
 
