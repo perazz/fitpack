@@ -1606,7 +1606,7 @@ module fitpack_core
         ! find the value of s(u) at u=arg.
         ll = l-k1
         do j1=1,idim
-          x(idim,m) = dot_product(h(1:k1),c(ll+1:ll+k1))
+          x(j1,i) = dot_product(h(1:k1),c(ll+1:ll+k1))
           ll = ll+n
         end do
       end do eval_points
