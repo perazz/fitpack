@@ -2949,24 +2949,27 @@ module fitpack_core
       end function fpchep
 
 
-      recursive subroutine fpclos(iopt,idim,m,u,mx,x,w,k,s,nest,tol, &
-                                  maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
+      pure subroutine fpclos(iopt,idim,m,u,mx,x,w,k,s,nest,tol, &
+                             maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) :: s,tol,fp
-      integer, intent(in) :: iopt,idim,m,mx,k,nest,maxit,k1,k2,nc
-      integer, intent(inout) :: n,ier
+      real(RKIND), intent(in)    :: s,tol
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,idim,m,mx,k,nest,maxit,k1,k2,nc
+      integer,     intent(inout) :: n,ier
+
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
-       a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
-      integer nrdata(nest)
+      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
+      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
+                                    a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
+      integer,     intent(inout) :: nrdata(nest)
+
       !  ..local scalars..
-      real(RKIND) acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv, &
-       p1,p2,p3,sin,store,term,ui,wi,rn
-      integer i,ich1,ich3,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk, &
-       kk1,k3,l,l0,l1,l5,mm,m1,new,nk1,nk2,nmax,nmin,nplus,npl1, &
-       nrint,n10,n11,n7,n8
+      real(RKIND) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
+                     term,ui,wi,rn
+      integer :: i,ich1,ich3,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+                 nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(RKIND) :: h(SIZ_K+1),h1(7),h2(6),xi(MAX_IDIM)
       logical :: done
@@ -8854,6 +8857,7 @@ module fitpack_core
       real(RKIND), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a1(nest,k1),a2(nest,k), &
                                     b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
       integer, intent(inout) :: nrdata(nest)
+
       !  ..local scalars..
       real(RKIND) :: acc,cos,c1,d1,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
                      term,wi,xi,yi,rn
