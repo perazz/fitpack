@@ -99,6 +99,7 @@ module fitpack_core
     real(RKIND), parameter, public :: pi2    = 2*pi
     real(RKIND), parameter, public :: pi4    = 4*pi
     real(RKIND), parameter, public :: smallnum03 = 1.0e-03_RKIND
+    real(RKIND), parameter, public :: smallnum08 = 1.0e-08_RKIND
     real(RKIND), parameter, public :: smallnum10 = 1.0e-10_RKIND
 
     abstract interface
@@ -1015,35 +1016,33 @@ module fitpack_core
       end subroutine concon
 
 
-      recursive subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
-       ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
 
-      !  given the ordered set of m points x(i) in the idim-dimensional space
-      !  and given also a corresponding set of strictly increasing values u(i)
-      !  and the set of positive numbers w(i),i=1,2,...,m, subroutine concur
-      !  determines a smooth approximating spline curve s(u), i.e.
+      !  given the ordered set of m points x(i) in the idim-dimensional space and given also a
+      !  corresponding set of strictly increasing values u(i) and the set of positive numbers
+      !  w(i),i=1,2,...,m, subroutine concur determines a smooth approximating spline curve s(u), i.e.
       !      x1 = s1(u)
       !      x2 = s2(u)      ub = u(1) <= u <= u(m) = ue
       !      .........
       !      xidim = sidim(u)
-      !  with sj(u),j=1,2,...,idim spline functions of odd degree k with
-      !  common knots t(j),j=1,2,...,n.
-      !  in addition these splines will satisfy the following boundary
-      !  constraints        (l)
+      !  with sj(u),j=1,2,...,idim spline functions of odd degree k with common knots
+      !  t(j),j=1,2,...,n.
+      !  in addition these splines will satisfy the following boundary constraints
+      !                     (l)
       !      if ib > 0 :  sj   (u(1)) = db(idim*l+j) ,l=0,1,...,ib-1
       !  and                (l)
       !      if ie > 0 :  sj   (u(m)) = de(idim*l+j) ,l=0,1,...,ie-1.
-      !  if iopt=-1 concur calculates the weighted least-squares spline curve
-      !  according to a given set of knots.
-      !  if iopt>=0 the number of knots of the splines sj(u) and the position
-      !  t(j),j=1,2,...,n is chosen automatically by the routine. the smooth-
-      !  ness of s(u) is then achieved by minimalizing the discontinuity
-      !  jumps of the k-th derivative of s(u) at the knots t(j),j=k+2,k+3,...,
-      !  n-k-1. the amount of smoothness is determined by the condition that
-      !  f(p)=sum((w(i)*dist(x(i),s(u(i))))**2) be <= s, with s a given non-
-      !  negative constant, called the smoothing factor.
-      !  the fit s(u) is given in the b-spline representation and can be
-      !  evaluated by means of subroutine curev.
+      !  if iopt=-1 concur calculates the weighted least-squares spline curve according to a given set
+      !    of knots.
+      !  if iopt>=0 the number of knots of the splines sj(u) and the position t(j),j=1,2,...,n is
+      !    chosen automatically by the routine. the smoothness of s(u) is then achieved by minimalizing
+      !    the discontinuity jumps of the k-th derivative of s(u) at the knots t(j),j=k+2,k+3,...,
+      !    n-k-1. the amount of smoothness is determined by the condition that
+      !    f(p)=sum((w(i)*dist(x(i),s(u(i))))**2) be <= s, with s a given non-negative constant,
+      !    called the smoothing factor. the fit s(u) is given in the b-spline representation and can
+      !    be evaluated by means of subroutine curev.
+
+      recursive subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
+                                  ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
       !
       !  calling sequence:
       !     call concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb,ie,de,ne,k,s,nest,n,
@@ -1297,8 +1296,7 @@ module fitpack_core
       real(RKIND) s,fp
       integer iopt,idim,m,mx,ib,nb,ie,ne,k,nest,n,nc,np,lwrk,ier
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),xx(mx),db(nb),de(ne),w(m),t(nest),c(nc),wrk(lwrk &
-      )
+      real(RKIND) u(m),x(mx),xx(mx),db(nb),de(ne),w(m),t(nest),c(nc),wrk(lwrk)
       real(RKIND) cp(np)
       integer iwrk(nest)
       !  ..local scalars..
@@ -2422,48 +2420,48 @@ module fitpack_core
       real(RKIND) :: co(5),si(5),hs(5),hc(5),rs(3),rc(3)
       !  ..
       !  initialization.
-      real(RKIND), parameter ::  eps = 0.1e-07_RKIND
+      real(RKIND), parameter ::  eps = smallnum08
       real(RKIND), parameter :: con1 = 0.5e-01_RKIND
       real(RKIND), parameter :: con2 = 0.12e+03_RKIND
       nm3 = n-3
       nm7 = n-7
 
-      term = merge(six/par,zero,par/=zero)
-      beta = par*t(4)
+      term  = merge(six/par,zero,par/=zero)
+      beta  = par*t(4)
       co(1) = cos(beta)
       si(1) = sin(beta)
 
-      !  calculate the integrals ress(j) and resc(j), j=1,2,3 by setting up a divided difference table.
+      ! calculate the integrals ress(j) and resc(j), j=1,2,3 by setting up a divided difference table.
       left: do j=1,3
-        jp1 = j+1
-        jp4 = j+4
-        beta = par*t(jp4)
-        co(jp1) = cos(beta)
-        si(jp1) = sin(beta)
-        call fpcsin(t(4),t(jp4),par,si(1),co(1),si(jp1),co(jp1),rs(j),rc(j))
-        i = 5-j
-        hs(i) = zero
-        hc(i) = zero
-        do jj=1,j
-          ipj = i+jj
-          hs(ipj) = rs(jj)
-          hc(ipj) = rc(jj)
-        end do
-        do jj=1,3
-          if (i<jj) i = jj
-          k = 5
-          li = jp4
-          do ll=i,4
-            lj = li-jj
-            fac = t(li)-t(lj)
-            hs(k) = (hs(k)-hs(k-1))/fac
-            hc(k) = (hc(k)-hc(k-1))/fac
-            k = k-1
-            li = li-1
+          jp1     = j+1
+          jp4     = j+4
+          beta    = par*t(jp4)
+          co(jp1) = cos(beta)
+          si(jp1) = sin(beta)
+          call fpcsin(t(4),t(jp4),par,si(1),co(1),si(jp1),co(jp1),rs(j),rc(j))
+          i = 5-j
+          hs(i) = zero
+          hc(i) = zero
+          do jj=1,j
+             ipj = i+jj
+             hs(ipj) = rs(jj)
+             hc(ipj) = rc(jj)
           end do
-        end do
-        ress(j) = hs(5)-hs(4)
-        resc(j) = hc(5)-hc(4)
+          do jj=1,3
+             if (i<jj) i = jj
+             k = 5
+             li = jp4
+             do ll=i,4
+               lj = li-jj
+               fac = t(li)-t(lj)
+               hs(k) = (hs(k)-hs(k-1))/fac
+               hc(k) = (hc(k)-hc(k-1))/fac
+               k = k-1
+               li = li-1
+             end do
+          end do
+          ress(j) = hs(5)-hs(4)
+          resc(j) = hc(5)-hc(4)
       end do left
 
       !  calculate the integrals ress(j) and resc(j),j=4,5,...,n-7.
@@ -3836,95 +3834,117 @@ module fitpack_core
 
 
       recursive subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
-        tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
+                                  tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !cc         c XXX: mmnin/nmin variables on line 61
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,tol,fp
-      integer mx,ib,ie,k,nest,maxit,k1,k2,n,nc
-      integer, intent(in)    :: iopt,idim,m
-      integer, intent(inout) :: ier
+      real(RKIND), intent(in)    :: s,tol
+      real(RKIND), intent(inout) :: fp
+      integer, intent(in)    :: ib,ie,iopt,idim,k,k1,k2,m,mx,maxit,nc,nest
+      integer, intent(inout) :: n,ier
       !  ..array arguments..
       real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer nrdata(nest)
+      integer :: nrdata(nest)
       !  ..local scalars..
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe, &
-       l,li,lj,l0,mb,me,mm,new,nk1,nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
+      integer :: i,ich1,ich3,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,new,nk1,&
+                 nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       !  ..local arrays..
-      real(RKIND) h(MAX_ORDER+1),xi(MAX_IDIM)
+      real(RKIND) :: h(MAX_ORDER+1),xi(MAX_IDIM)
 
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 1: determination of the number of knots and their position     c
-      !  **************************************************************      c
-      !  given a set of knots we compute the least-squares curve sinf(u),    c
-      !  and the corresponding sum of squared residuals fp=f(p=inf).         c
-      !  if iopt=-1 sinf(u) is the requested curve.                          c
-      !  if iopt=0 or iopt=1 we check whether we can accept the knots:       c
-      !    if fp <=s we will continue with the current set of knots.         c
-      !    if fp > s we will increase the number of knots and compute the    c
-      !       corresponding least-squares curve until finally fp<=s.         c
-      !    the initial choice of knots depends on the value of s and iopt.   c
-      !    if s=0 we have spline interpolation; in that case the number of   c
-      !    knots equals nmax = m+k+1-max(0,ib-1)-max(0,ie-1)                 c
-      !    if s > 0 and                                                      c
-      !      iopt=0 we first compute the least-squares polynomial curve of   c
-      !      degree k; n = nmin = 2*k+2                                      c
-      !      iopt=1 we start with the set of knots found at the last         c
-      !      call of the routine, except for the case that s > fp0; then     c
-      !      we compute directly the polynomial curve of degree k.           c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      !  ******************************************************************************************
+      !  part 1: determination of the number of knots and their position
+      !  ******************************************************************************************
+      !  given a set of knots we compute the least-squares curve sinf(u), and the corresponding sum of
+      !  squared residuals fp=f(p=inf).
+      !  if iopt=-1 sinf(u) is the requested curve.
+      !  if iopt=0 or iopt=1 we check whether we can accept the knots:
+      !    if fp <=s we will continue with the current set of knots.
+      !    if fp > s we will increase the number of knots and compute the corresponding least-squares
+      !       curve until finally fp<=s. the initial choice of knots depends on the value of s and iopt.
+      !    if s=0 we have spline interpolation; in that case the number of knots equals
+      !    nmax = m+k+1-max(0,ib-1)-max(0,ie-1)
+      !    if s > 0 and
+      !      iopt=0 we first compute the least-squares polynomial curve of degree k; n = nmin = 2*k+2
+      !      iopt=1 we start with the set of knots found at the last call of the routine, except for
+      !      the case that s > fp0; then we compute directly the polynomial curve of degree k.
+      !  ******************************************************************************************
+
       !  determine nmin, the number of knots for polynomial approximation.
       nmin = 2*k1
+
       !  find which data points are to be considered.
       mb = merge(2,1,ib>0)
       jb = merge(ib,1,ib>0)
       me = merge(m-1,m,ie>0)
       je = merge(ie,1,ie>0)
 
-      if(iopt<0) go to 60
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  determine nmax, the number of knots for spline interpolation.
-      kbe = k1-jb-je
-      mmin = kbe+2
-      mm = m-mmin
-      nmax = nmin+mm
-      if(s>zero) go to 40
-      !  if s=0, s(u) is an interpolating curve.
-      !  test whether the required storage space exceeds the available one.
-      n = nmax
-      if(nmax>nest) go to 420
-      !  find the position of the interior knots in case of interpolation.
-      if(mm==0) go to 60
-  25  i = k2
-      j = 3-jb+k/2
-      do 30 l=1,mm
-        t(i) = u(j)
-        i = i+1
-        j = j+1
-  30  continue
-      go to 60
-      !  if s>0 our initial choice of knots depends on the value of iopt.
-      !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
-      !  polynomial curve which is a spline curve without interior knots.
-      !  if iopt=1 and fp0>s we start computing the least squares spline curve
-      !  according to the set of knots found at the last call of the routine.
-  40  if(iopt==0) go to 50
-      if(n==nmin) go to 50
-      fp0 = fpint(n)
-      fpold = fpint(n-1)
-      nplus = nrdata(n)
-      if(fp0>s) go to 60
-  50  n = nmin
-      fpold = zero
-      nplus = 0
-      nrdata(1) = m-2
-      !  main loop for the different sets of knots. m is a save upper bound
-      !  for the number of trials.
+      bootstrap: if (iopt>=0) then
+
+          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          !  determine nmax, the number of knots for spline interpolation.
+          kbe  = k1-jb-je
+          mmin = kbe+2
+          mm   = m-mmin
+          nmax = nmin+mm
+
+          interpolating: if (s<=zero) then
+
+              !  if s=0, s(u) is an interpolating curve.
+              !  test whether the required storage space exceeds the available one.
+              n = nmax
+              if (nmax>nest) then
+                 ier = FITPACK_INSUFFICIENT_STORAGE
+                 return
+              endif
+
+              ! find the position of the interior knots in case of interpolation.
+              if (mm/=0) then
+                  i = k2
+                  j = 3-jb+k/2
+                  do l=1,mm
+                    t(i) = u(j)
+                    i = i+1
+                    j = j+1
+                  end do
+              endif
+
+          else interpolating
+
+              !  if s>0 our initial choice of knots depends on the value of iopt.
+              !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
+              !  polynomial curve which is a spline curve without interior knots.
+              !  if iopt=1 and fp0>s we start computing the least squares spline curve
+              !  according to the set of knots found at the last call of the routine.
+              use_last_call: if (iopt/=0 .and. n/=nmin) then
+                  fp0   = fpint(n)
+                  fpold = fpint(n-1)
+                  nplus = nrdata(n)
+                  if (fp0<=s) then
+                      n = nmin
+                      fpold = zero
+                      nplus = 0
+                      nrdata(1) = m-2
+                  end if
+              else use_last_call
+                  n = nmin
+                  fpold = zero
+                  nplus = 0
+                  nrdata(1) = m-2
+              endif use_last_call
+
+          endif interpolating
+
+      endif bootstrap
+
+      ! main loop for the different sets of knots. m is a save upper bound
+      ! for the number of trials.
   60  do 200 iter = 1,m
         if(n==nmin) ier = -2
       !  find nrint, tne number of knot intervals.
@@ -4083,7 +4103,20 @@ module fitpack_core
       !  add a new knot.
           call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
       !  if n=nmax we locate the knots as for interpolation
-          if(n==nmax) go to 25
+          if (n==nmax) then
+              i = k2
+              j = 3-jb+k/2
+              do jj=1,mm
+                t(i) = u(j)
+                i = i+1
+                j = j+1
+              end do
+
+              ! Restart main loop
+              !iter = 0
+              go to 60
+
+          end if
       !  test whether we cannot further increase the number of knots.
           if(n==nest) go to 200
  190    continue
