@@ -3945,36 +3945,38 @@ module fitpack_core
 
       ! main loop for the different sets of knots. m is a save upper bound
       ! for the number of trials.
-  60  do 200 iter = 1,m
-        if(n==nmin) ier = -2
-      !  find nrint, tne number of knot intervals.
-        nrint = n-nmin+1
-      !  find the position of the additional knots which are needed for
-      !  the b-spline representation of s(u).
-        nk1 = n-k1
-        i = n
-        do 70 j=1,k1
-          t(j) = u(1)
-          t(i) = u(m)
-          i = i-1
-  70    continue
-      !  compute the b-spline coefficients of the least-squares spline curve
-      !  sinf(u). the observation matrix a is built up row by row and
-      !  reduced to upper triangular form by givens transformations.
-      !  at the same time fp=f(p=inf) is computed.
-        fp = zero
-      !  nn denotes the dimension of the splines
-        nn = nk1-ib-ie
-      !  initialize the b-spline coefficients and the observation matrix a.
-        do 75 i=1,nc
-          z(i) = zero
-          c(i) = zero
-  75    continue
-        if(me<mb) go to 134
-        if(nn==0) go to 82
-        a(1:nn,1:k1) = zero
-  82    l = k1
-        jj = (mb-1)*idim
+      iter = 0
+      main_loop: do while (iter<m)
+
+         iter = iter+1
+
+         if (n==nmin) ier = FITPACK_LEASTSQUARES_OK
+
+         ! find nrint, tne number of knot intervals.
+         nrint = n-nmin+1
+         ! find the position of the additional knots which are needed for
+         ! the b-spline representation of s(u).
+         nk1        = n-k1
+         t(1:k1)    = u(1)
+         t(nk1+1:n) = u(m)
+
+         ! compute the b-spline coefficients of the least-squares spline curve
+         ! sinf(u). the observation matrix a is built up row by row and
+         ! reduced to upper triangular form by givens transformations.
+         ! at the same time fp=f(p=inf) is computed.
+         fp = zero
+
+         ! nn denotes the dimension of the splines
+         nn = nk1-ib-ie
+         ! initialize the b-spline coefficients and the observation matrix a.
+         z(1:nc) = zero
+         c(1:nc) = zero
+
+         if (me<mb) go to 134
+
+         if (nn>0) a(1:nn,1:k1) = zero
+         l = k1
+         jj = (mb-1)*idim
         do 130 it=mb,me
       !  fetch the current data point u(it),x(it).
           ui = u(it)
@@ -4028,16 +4030,14 @@ module fitpack_core
  110      continue
       !  add contribution of this row to the sum of squares of residual
       !  right hand sides.
- 120      do 125 j2=1,idim
-             fp  = fp+xi(j2)**2
- 125      continue
+ 120      fp = fp + sum(xi(1:idim)**2)
  130    continue
-        if(ier==(-2)) fp0 = fp
+        if (ier==(-2)) fp0 = fp
         fpint(n) = fp0
         fpint(n-1) = fpold
         nrdata(n) = nplus
       !  backward substitution to obtain the b-spline coefficients.
-        if(nn==0) go to 134
+        if (nn==0) go to 134
         j1 = 1
         do 132 j2=1,idim
            j3 = j1+ib
@@ -4113,15 +4113,15 @@ module fitpack_core
               end do
 
               ! Restart main loop
-              !iter = 0
-              go to 60
+              iter = 0
+              cycle main_loop
 
           end if
       !  test whether we cannot further increase the number of knots.
-          if(n==nest) go to 200
+          if (n==nest) cycle main_loop
  190    continue
       !  restart the computations with the new set of knots.
- 200  continue
+      end do main_loop
       !  test whether the least-squares kth degree polynomial curve is a
       !  solution of our approximation problem.
  250  if(ier==(-2)) go to 440
@@ -8127,7 +8127,7 @@ module fitpack_core
         nrint = n-nmin+1
         ! find the position of the additional knots which are needed for
         ! the b-spline representation of s(u).
-        nk1 = n-k1
+        nk1        = n-k1
         t(1:k1)    = ub
         t(nk1+1:n) = ue
 
