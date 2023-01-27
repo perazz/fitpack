@@ -5451,21 +5451,23 @@ module fitpack_core
 
 
       ! Compute spline coefficients on a rectangular grid
-      recursive subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,iback,u,mu,v, &
-       mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
-       mvnu,spu,spv,right,q,au,av1,av2,bu,bv,aa,bb,cc,cosi,nru,nrv)
+      pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,iback,u,mu,v, &
+                             mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
+                             mvnu,spu,spv,right,q,au,av1,av2,bu,bv,aa,bb,cc,cosi,nru,nrv)
 
       !  ..
       !  ..scalar arguments..
       real(RKIND), intent(out)   :: sq
       real(RKIND), intent(inout) :: fp  ! computed if iback==0
       real(RKIND), intent(out)   :: p
-      integer :: ifsu,ifsv,ifbu,ifbv,iback,mu,mv,mz,iop0,iop1,nu,nv,nc,mm,mvnu
+      integer    , intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      integer    , intent(in)    :: iback,mu,mv,mz,iop0,iop1,nu,nv,nc,mm,mvnu
       !  ..array arguments..
-      real(RKIND), intent(inout) :: fpu(nu),fpv(nv) ! if iback==0
-      real(RKIND) :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv),c(nc), &
-                     spu(mu,4),spv(mv,4),right(mm),q(mvnu),au(nu,5),av1(nv,6), &
-                     av2(nv,4),aa(2,mv),bb(2,nv),cc(nv),cosi(2,nv),bu(nu,5),bv(nv,5)
+      real(RKIND), intent(inout) :: fpu(nu),fpv(nv)   ! if iback==0
+      real(RKIND), intent(inout) :: bu(nu,5),bv(nv,5) ! ifbu,ifbv
+      real(RKIND), intent(in)    :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv)
+      real(RKIND), intent(inout) :: spu(mu,4),spv(mv,4),cosi(2,nv),au(nu,5),av1(nv,6),av2(nv,4),right(mm), &
+                                    aa(2,mv),bb(2,nv),c(nc),cc(nv),q(mvnu)
       integer, intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
       real(RKIND) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
@@ -7565,18 +7567,20 @@ module fitpack_core
       !    - the function  f(p)=sumi=1,mu(sumj=1,mv((z(i,j)-sp(u(i),v(j)))**2) is continuous and
       !      strictly decreasing for p>0.
       !
-      recursive subroutine fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,ider,tu,nu,tv,nv,&
-                                  nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
+      pure subroutine fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,ider,tu,nu,tv,nv,&
+                              nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
 
       !
       !  ..scalar arguments..
-      integer, intent(inout) :: ifsu,ifsv,ifbu,ifbv
-      integer, intent(in)    :: mu,mv,mz,nu,nv,nc,lwrk,nuest,nvest
-      real(RKIND) :: z0,p,step,fp
+      integer,     intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      integer,     intent(in)    :: mu,mv,mz,nu,nv,nc,lwrk,nuest,nvest
+      real(RKIND), intent(in)    :: z0,step
+      real(RKIND), intent(inout) :: fp,p
       !  ..array arguments..
-      integer ider(2),nru(mu),nrv(mv),iopt(3)
-      real(RKIND) u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv),c(nc),fpu(nu),fpv(nv)
-      real(RKIND), intent(inout) :: wrk(lwrk)
+      integer    , intent(in)    :: ider(2),iopt(3)
+      integer    , intent(inout) :: nru(mu),nrv(mv)
+      real(RKIND), intent(in)    :: u(mu),v(mv),z(mz),tu(nu),tv(nv)
+      real(RKIND), intent(inout) :: c(nc),dz(3),fpu(nu),fpv(nv),wrk(lwrk)
       !  ..local scalars..
       real(RKIND) res,sq,sqq,step1,step2
       integer i,id0,iop0,iop1,i1,j,l,laa,lau,lav1,lav2,lbb,lbu,lbv, &
@@ -9571,19 +9575,22 @@ module fitpack_core
       end subroutine fppocu
 
 
-      recursive subroutine fppogr(iopt,ider,u,mu,v,mv,z,mz,z0,r,s, &
-                                  nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
-                                  reducv,fpintu,fpintv,dz,step,lastdi,nplusu,nplusv,lasttu,nru, &
-                                  nrv,nrdatu,nrdatv,wrk,lwrk,ier)
+      pure subroutine fppogr(iopt,ider,u,mu,v,mv,z,mz,z0,r,s, &
+                             nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
+                             reducv,fpintu,fpintv,dz,step,lastdi,nplusu,nplusv,lasttu,nru, &
+                             nrv,nrdatu,nrdatv,wrk,lwrk,ier)
 
       !  ..
       !  ..scalar arguments..
-      integer, intent(in) :: mu,mv,mz,nuest,nvest,nc,lwrk,maxit
-      integer :: nu,nv,lastdi,nplusu,nplusv,lasttu,ier
-      real(RKIND) :: z0,r,s,tol,fp,fp0,fpold,reducu,reducv,step
+      integer,     intent(in)    :: mu,mv,mz,nuest,nvest,nc,lwrk,maxit
+      integer,     intent(inout) :: nu,nv,lastdi,nplusu,nplusv,lasttu,ier
+      real(RKIND), intent(in)    :: z0,r,s,tol
+      real(RKIND), intent(inout) :: fp,fp0,fpold,step,reducu,reducv
       !  ..array arguments..
-      integer :: iopt(3),ider(2),nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
-      real(RKIND) :: u(mu),v(mv),z(mz),tu(nuest),tv(nvest),c(nc),fpintu(nuest),fpintv(nvest),dz(3),wrk(lwrk)
+      integer, intent(in) :: iopt(3),ider(2)
+      integer, intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
+      real(RKIND), intent(in) :: u(mu),v(mv),z(mz)
+      real(RKIND), intent(inout) :: c(nc),tu(nuest),tv(nvest),dz(3),wrk(lwrk),fpintu(nuest),fpintv(nvest)
       !  ..local scalars..
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
       integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
