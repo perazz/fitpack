@@ -56,8 +56,11 @@ module fitpack_core
     public :: parsur ! Parametric surface fitting to data on a grid
 
     ! Surface application routines
+    public :: bispeu ! Evaluation of a bivariate spline function
     public :: bispev ! Evaluation of a bivariate spline function
     public :: parder ! Partial derivatives of a bivariate spline
+    public :: pardeu ! Partial derivatives of a bivariate spline
+    public :: pardtc ! Create partial derivative splane of a bivariate spline
     public :: dblint ! Integration of a bivariate spline
     public :: profil ! Cross-section of a bivariate spline
     public :: evapol ! Evaluation of a polar spline
@@ -1041,8 +1044,8 @@ module fitpack_core
       !    called the smoothing factor. the fit s(u) is given in the b-spline representation and can
       !    be evaluated by means of subroutine curev.
 
-      recursive subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
-                                  ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
+      pure subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
+                             ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
       !
       !  calling sequence:
       !     call concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb,ie,de,ne,k,s,nest,n,
@@ -1293,84 +1296,107 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,fp
-      integer iopt,idim,m,mx,ib,nb,ie,ne,k,nest,n,nc,np,lwrk,ier
+      real(RKIND), intent(in)    :: s
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,idim,m,mx,ib,nb,ie,ne,k,nest,nc,np,lwrk
+      integer,     intent(inout) :: n
+      integer,     intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND) u(m),x(mx),xx(mx),db(nb),de(ne),w(m),t(nest),c(nc),wrk(lwrk)
-      real(RKIND) cp(np)
-      integer iwrk(nest)
+      real(RKIND), intent(in)    :: u(m),x(mx),db(nb),de(ne),w(m)
+      real(RKIND), intent(inout) :: xx(mx),t(nest),c(nc),cp(np),wrk(lwrk)
+      integer    , intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      real(RKIND) tol
-      integer i,ib1,ie1,ja,jb,jfp,jg,jq,jz,j,k1,k2,lwest,maxit,nmin, &
-       ncc,kk,mmin,nmax,mxx
+      integer :: ib1,ie1,ja,jb,jfp,jg,jq,jz,k1,k2,lwest,nmin,ncc,kk,mmin,nmax,mxx
       !  ..
       !  we set up the parameters tol and maxit
-      maxit = 20
-      tol = smallnum03
+      real(RKIND), parameter :: tol = smallnum03
+      integer, parameter :: maxit = 20
+
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = FITPACK_INPUT_ERROR
-      if(iopt<(-1) .or. iopt>1) go to 90
-      if(idim<=0 .or. idim>MAX_IDIM) go to 90
-      if(k<=0 .or. k>5) go to 90
-      k1 = k+1
-      kk = k1/2
-      if(kk*2/=k1) go to 90
-      k2 = k1+1
-      if(ib<0 .or. ib>kk) go to 90
-      if(ie<0 .or. ie>kk) go to 90
-      nmin = 2*k1
-      ib1 = max0(0,ib-1)
-      ie1 = max0(0,ie-1)
-      mmin = k1-ib1-ie1
-      if(m<mmin .or. nest<nmin) go to 90
-      if(nb<(idim*ib) .or. ne<(idim*ie)) go to 90
-      if(np<(2*k1*idim)) go to 90
-      mxx = m*idim
-      ncc = nest*idim
-      if(mx<mxx .or. nc<ncc) go to 90
+      ier   = FITPACK_INPUT_ERROR
+
+      k1    = k+1
+      k2    = k+2
+      kk    = k1/2
+      nmin  = 2*k1
+      ib1   = max(0,ib-1)
+      ie1   = max(0,ie-1)
+      mmin  = k1-ib1-ie1
+      mxx   = m*idim
+      ncc   = nest*idim
       lwest = m*k1+nest*(6+idim+3*k)
-      if (lwrk<lwest) go to 90
-      if (any(w<=zero)) go to 90
-      if (any(u(1:m-1)>=u(2:m))) goto 90
-      if(iopt>=0) go to 30
-      if(n<nmin .or. n>nest) go to 90
-      j = n
-      do 20 i=1,k1
-         t(i) = u(1)
-         t(j) = u(m)
-         j = j-1
-  20  continue
-      call fpched(u,m,t,n,k,ib,ie,ier)
-      if (ier==FITPACK_OK) go to 40
-      go to 90
-  30  if(s<zero) go to 90
-      nmax = m+k1+ib1+ie1
-      if(s==zero .and. nest<nmax) go to 90
-      ier = 0
-      if(iopt>0) go to 70
-      !  we determine a polynomial curve satisfying the boundary constraints.
-  40  call fppocu(idim,k,u(1),u(m),ib,db,nb,ie,de,ne,cp,np)
-      !  we generate new data points which will be approximated by a spline
-      !  with zero derivative constraints.
-      wrk(1:k1) = u(1)
-      wrk(nmin-k1+1:nmin) = u(m)
-      !  evaluate the polynomial curve
-      call curev(idim,wrk,nmin,cp,np,k,u,m,xx,mxx,ier)
-      !  subtract from the old data, the values of the polynomial curve
-      xx(1:mxx) = x(1:mxx)-xx(1:mxx)
+
+      if (iopt<(-1) .or. iopt>1)          return
+      if (idim<=0 .or. idim>MAX_IDIM)     return
+      if (k<=0 .or. k>5)                  return
+      if (kk*2/=k1)                       return
+      if (ib<0 .or. ib>kk)                return
+      if (ie<0 .or. ie>kk)                return
+      if (m<mmin .or. nest<nmin)          return
+      if (nb<(idim*ib) .or. ne<(idim*ie)) return
+      if (np<(2*k1*idim))                 return
+      if (mx<mxx .or. nc<ncc)             return
+
+      if (lwrk<lwest)                     return
+      if (any(w<=zero))                   return
+      if (any(u(1:m-1)>=u(2:m)))         return
+
+      if (iopt<0) then
+          if (n<nmin .or. n>nest)         return
+
+          t(1:k1)  = u(1)
+          t(n-k:n) = u(m)
+
+          call fpched(u,m,t,n,k,ib,ie,ier)
+
+          if (ier/=FITPACK_OK) return
+
+      else
+
+          nmax = m+k1+ib1+ie1
+
+          if (s<zero) return
+          if (s==zero .and. nest<nmax) return
+
+          ier = FITPACK_OK
+
+      endif
+
+      if (iopt<=0) then
+
+          !  we determine a polynomial curve satisfying the boundary constraints.
+          call fppocu(idim,k,u(1),u(m),ib,db,nb,ie,de,ne,cp,np)
+
+          !  we generate new data points which will be approximated by a spline
+          !  with zero derivative constraints.
+
+          wrk(1:k1) = u(1)
+          wrk(nmin-k1+1:nmin) = u(m)
+
+          !  evaluate the polynomial curve
+          call curev(idim,wrk,nmin,cp,np,k,u,m,xx,mxx,ier)
+
+          !  subtract from the old data, the values of the polynomial curve
+          xx(1:mxx) = x(1:mxx)-xx(1:mxx)
+
+      endif
+
       ! we partition the working space and determine the spline curve.
-  70  jfp = 1
-      jz = jfp+nest
-      ja = jz+ncc
-      jb = ja+nest*k1
-      jg = jb+nest*k2
-      jq = jg+nest*k2
+      jfp = 1
+      jz  = jfp+nest
+      ja  = jz+ncc
+      jb  = ja+nest*k1
+      jg  = jb+nest*k2
+      jq  = jg+nest*k2
+
       call fpcons(iopt,idim,m,u,mxx,xx,w,ib,ie,k,s,nest,tol,maxit,k1, &
-       k2,n,t,ncc,c,fp,wrk(jfp),wrk(jz),wrk(ja),wrk(jb),wrk(jg),wrk(jq),iwrk,ier)
+                  k2,n,t,ncc,c,fp,wrk(jfp),wrk(jz),wrk(ja),wrk(jb),wrk(jg),wrk(jq),iwrk,ier)
+
       !  add the polynomial curve to the calculated spline.
       call fpadpo(idim,t,n,c,ncc,k,cp,np,wrk(jz),wrk(ja),wrk(jb))
-  90  return
+
+      return
       end subroutine concur
 
 
@@ -3833,18 +3859,19 @@ module fitpack_core
       end subroutine fpcoco
 
 
-      recursive subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
-                                  tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
+      pure subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
+                             tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !cc         c XXX: mmnin/nmin variables on line 61
       !  ..
       !  ..scalar arguments..
       real(RKIND), intent(in)    :: s,tol
       real(RKIND), intent(inout) :: fp
-      integer, intent(in)    :: ib,ie,iopt,idim,k,k1,k2,m,mx,maxit,nc,nest
-      integer, intent(inout) :: n,ier
+      integer,     intent(in)    :: ib,ie,iopt,idim,k,k1,k2,m,mx,maxit,nc,nest
+      integer,     intent(inout) :: n,ier
       !  ..array arguments..
-      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer :: nrdata(nest)
+      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
+      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      integer,     intent(inout) :: nrdata(nest)
       !  ..local scalars..
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer :: i,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
