@@ -4955,7 +4955,7 @@ module fitpack_core
       if (ier==FITPACK_LEASTSQUARES_OK) return
 
       ! *****
-      !  part 2: determination of the smoothing spline spline sp(x).
+      !  part 2: determination of the smoothing spline sp(x).
       ! *****
       !  we have determined the number of knots and their position.
       !  we now compute the b-spline coefficients of the smoothing spline sp(x). the observation matrix a
@@ -8797,79 +8797,88 @@ module fitpack_core
       !  test whether the least-squares polynomial is a solution of our
       !  approximation problem.
       if (ier==FITPACK_LEASTSQUARES_OK) return
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 2: determination of the smoothing spline sp(u,v)                c
-      ! *****************************************************                c
-      !  we have determined the number of knots and their position. we now   c
-      !  compute the b-spline coefficients of the smoothing spline sp(u,v).  c
-      !  this smoothing spline varies with the parameter p in such a way thatc
-      !  f(p)=suml=1,idim(sumi=1,mu(sumj=1,mv((z(i,j,l)-sp(u(i),v(j),l))**2) c
-      !  is a continuous, strictly decreasing function of p. moreover the    c
-      !  least-squares polynomial corresponds to p=0 and the least-squares   c
-      !  spline to p=infinity. iteratively we then have to determine the     c
-      !  positive value of p such that f(p)=s. the process which is proposed c
-      !  here makes use of rational interpolation. f(p) is approximated by a c
-      !  rational function r(p)=(u*p+v)/(p+w); three values of p (p1,p2,p3)  c
-      !  with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s)c
-      !  are used to calculate the new value of p such that r(p)=s.          c
-      !  convergence is guaranteed by taking f1 > 0 and f3 < 0.              c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  initial value for p.
-      p1 = 0.
+
+      ! **********************************************************************************************
+      ! part 2: determination of the smoothing spline sp(u,v)
+      ! **********************************************************************************************
+      !  we have determined the number of knots and their position. we now compute the b-spline
+      !  coefficients of the smoothing spline sp(u,v). this smoothing spline varies with the parameter
+      !  p in such a way that
+      !    f(p)= suml=1,idim(sumi=1,mu(sumj=1,mv((z(i,j,l)-sp(u(i),v(j),l))**2)
+      !  is a continuous, strictly decreasing function of p. moreover the least-squares polynomial
+      !  corresponds to p=0 and the least-squares spline to p=infinity. iteratively we then have to
+      !  determine the positive value of p such that f(p)=s. the process which is proposed here makes
+      !  use of rational interpolation. f(p) is approximated by a rational function r(p)=(u*p+v)/(p+w);
+      !  three values of p (p1,p2,p3) with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,
+      !  f3=f(p3)-s) are used to calculate the new value of p such that r(p)=s.
+      !  convergence is guaranteed by taking f1 > 0 and f3 < 0.
+      ! **********************************************************************************************
+
+      ! initial value for p.
+      p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p = one
+      p  = one
       ich1 = 0
       ich3 = 0
       !  iteration process to find the root of f(p)=s.
-      do 350 iter = 1,maxit
-      !  find the smoothing spline sp(u,v) and the corresponding sum of
-      !  squared residuals fp.
-        call fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu, &
-        nu,tv,nv,p,c,nc,fp,fpintu,fpintv,mm,mvnu,wrk(lsu),wrk(lsv), &
-        wrk(lri),wrk(lq),wrk(lau),wrk(lau1),wrk(lav),wrk(lav1), &
-        wrk(lbu),wrk(lbv),nru,nrv)
-      !  test whether the approximation sp(u,v) is an acceptable solution.
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 440
-      !  test whether the maximum allowable number of iterations has been
-      !  reached.
-        if(iter==maxit) go to 400
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 320
-        if((f2-f3)>acc) go to 310
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 + p2*con1
-        go to 350
- 310    if(f2<0.) ich3 = 1
- 320    if(ich1/=0) go to 340
-        if((f1-f2)>acc) go to 330
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 350
-        if(p>=p3) p = p2*con1 + p3*con9
-        go to 350
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 330    if(f2>zero) ich1 = 1
- 340    if(f2>=f1 .or. f2<=f3) go to 410
-      !  find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 350  continue
-      !  error codes and messages.
- 400  ier = 3
-      go to 440
- 410  ier = 2
-      go to 440
- 440  return
+      root_iterations: do iter = 1,maxit
+          ! find the smoothing spline sp(u,v) and the corresponding sum of
+          ! squared residuals fp.
+          call fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu, &
+                      nu,tv,nv,p,c,nc,fp,fpintu,fpintv,mm,mvnu,wrk(lsu),wrk(lsv), &
+                      wrk(lri),wrk(lq),wrk(lau),wrk(lau1),wrk(lav),wrk(lav1), &
+                      wrk(lbu),wrk(lbv),nru,nrv)
+
+          !  test whether the approximation sp(u,v) is an acceptable solution.
+          fpms = fp-s; if (abs(fpms)<acc) return
+
+          ! carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
+
+          if (ich3==0) then
+             if ((f2-f3)>acc .and. f2<zero) then
+                ich3 = 1
+             else
+                ! our initial choice of p is too large.
+                p3 = p2
+                f3 = f2
+                p  = p*con4
+                if (p<=p1) p=p1*con9 + p2*con1
+                cycle root_iterations
+             endif
+          endif
+
+          if (ich1==0) then
+             if ((f1-f2)>acc .and. f2>zero) then
+                 ich1 = 1
+             else
+                 ! our initial choice of p is too small
+                 p1 = p2
+                 f1 = f2
+                 p = p/con4
+                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                 cycle root_iterations
+             endif
+          endif
+
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+              ier = FITPACK_S_TOO_SMALL
+              return
+          end if
+
+          ! find the new value of p.
+          call fprati(p1,f1,p2,f2,p3,f3,p)
+
+      end do root_iterations
+
+      ! Maximum number of iterations reached.
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fppasu
 
 
