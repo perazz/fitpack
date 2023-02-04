@@ -8480,7 +8480,7 @@ module fitpack_core
       !  ..local scalars
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,peru,perv,ub,ue,vb,ve
       integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
-                 lsv,l1,l2,l3,l4,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
+                 lsv,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
                  nrintu,nrintv,nue,nuk,nve,nuu,nvv
       logical :: periodic_u,periodic_v
 
@@ -8639,153 +8639,164 @@ module fitpack_core
 
       endif bootstrap
 
-      mpm = mu+mv
+      mpm  = mu+mv
       ifsu = 0
       ifsv = 0
       ifbu = 0
       ifbv = 0
-      p = -one
-      !  main loop for the different sets of knots.mpm=mu+mv is a save upper
+      p    = -one
+
+      !  main loop for the different sets of knots. mpm=mu+mv is a safe upper
       !  bound for the number of trials.
-      do 250 iter=1,mpm
-        if(nu==nminu .and. nv==nminv) ier = -2
-      !  find nrintu (nrintv) which is the number of knot intervals in the
-      !  u-direction (v-direction).
-        nrintu = nu-nminu+1
-        nrintv = nv-nminv+1
-      !  find ncof, the number of b-spline coefficients for the current set
-      !  of knots.
-        nk1u = nu-4
-        nk1v = nv-4
-        ncof = nk1u*nk1v
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(u,v).
-        if(ipar(1)/=0) go to 110
-        i = nu
-        do 105 j=1,4
-          tu(j) = ub
-          tu(i) = ue
-          i = i-1
- 105    continue
-        go to 120
- 110    l1 = 4
-        l2 = l1
-        l3 = nu-3
-        l4 = l3
-        tu(l2) = ub
-        tu(l3) = ue
-        do 115 j=1,3
-          l1 = l1+1
-          l2 = l2-1
-          l3 = l3+1
-          l4 = l4-1
-          tu(l2) = tu(l4)-peru
-          tu(l3) = tu(l1)+peru
- 115    continue
- 120    if(ipar(2)/=0) go to 130
-        i = nv
-        do 125 j=1,4
-          tv(j) = vb
-          tv(i) = ve
-          i = i-1
- 125    continue
-        go to 140
- 130    l1 = 4
-        l2 = l1
-        l3 = nv-3
-        l4 = l3
-        tv(l2) = vb
-        tv(l3) = ve
-        do 135 j=1,3
-          l1 = l1+1
-          l2 = l2-1
-          l3 = l3+1
-          l4 = l4-1
-          tv(l2) = tv(l4)-perv
-          tv(l3) = tv(l1)+perv
- 135    continue
-      !  find the least-squares spline sinf(u,v) and calculate for each knot
-      !  interval tu(j+3)<=u<=tu(j+4) (tv(j+3)<=v<=tv(j+4)) the sum
-      !  of squared residuals fpintu(j),j=1,2,...,nu-7 (fpintv(j),j=1,2,...
-      !  ,nv-7) for the data points having their absciss (ordinate)-value
-      !  belonging to that interval.
-      !  fp gives the total sum of squared residuals.
- 140    call fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu, &
-        nu,tv,nv,p,c,nc,fp,fpintu,fpintv,mm,mvnu,wrk(lsu),wrk(lsv), &
-        wrk(lri),wrk(lq),wrk(lau),wrk(lau1),wrk(lav),wrk(lav1), &
-        wrk(lbu),wrk(lbv),nru,nrv)
-        if(ier==(-2)) fp0 = fp
-      !  test whether the least-squares spline is an acceptable solution.
-        if(iopt<0) go to 440
-        fpms = fp-s
-        if(abs(fpms) < acc) go to 440
-      !  if f(p=inf) < s, we accept the choice of knots.
-        if(fpms<0.) go to 300
-      !  if nu=nmaxu and nv=nmaxv, sinf(u,v) is an interpolating spline.
-        if(nu==nmaxu .and. nv==nmaxv) go to 430
-      !  increase the number of knots.
-      !  if nu=nue and nv=nve we cannot further increase the number of knots
-      !  because of the storage capacity limitation.
-        if(nu==nue .and. nv==nve) go to 420
-        ier = 0
-      !  adjust the parameter reducu or reducv according to the direction
-      !  in which the last added knots were located.
-        if (lastdi<0) go to 150
-        if (lastdi==0) go to 170
-        go to 160
- 150    reducu = fpold-fp
-        go to 170
- 160    reducv = fpold-fp
-      !  store the sum of squared residuals for the current set of knots.
- 170    fpold = fp
-      !  find nplu, the number of knots we should add in the u-direction.
-        nplu = 1
-        if(nu==nminu) go to 180
-        npl1 = nplusu*2
-        rn = nplusu
-        if(reducu>acc) npl1 = int(rn*fpms/reducu)
-        nplu = min0(nplusu*2,max0(npl1,nplusu/2,1))
-      !  find nplv, the number of knots we should add in the v-direction.
- 180    nplv = 1
-        if(nv==nminv) go to 190
-        npl1 = nplusv*2
-        rn = nplusv
-        if(reducv>acc) npl1 = int(rn*fpms/reducv)
-        nplv = min0(nplusv*2,max0(npl1,nplusv/2,1))
- 190    if (nplu<nplv) go to 210
-        if (nplu==nplv) go to 200
-        go to 230
- 200    if(lastdi<0) go to 230
- 210    if(nu==nue) go to 230
-      !  addition in the u-direction.
-        lastdi = -1
-        nplusu = nplu
-        ifsu = 0
-        do 220 l=1,nplusu
-      !  add a new knot in the u-direction
-          call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,1)
-      !  test whether we cannot further increase the number of knots in the
-      !  u-direction.
-          if(nu==nue) go to 250
- 220    continue
-        go to 250
- 230    if(nv==nve) go to 210
-      !  addition in the v-direction.
-        lastdi = 1
-        nplusv = nplv
-        ifsv = 0
-        do 240 l=1,nplusv
-      !  add a new knot in the v-direction.
-          call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
-      !  test whether we cannot further increase the number of knots in the
-      !  v-direction.
-          if(nv==nve) go to 250
- 240    continue
+      iter = 0
+      main_loop: do while (iter<=mpm)
+
+         iter = iter+1
+
+         if (nu==nminu .and. nv==nminv) ier = FITPACK_LEASTSQUARES_OK
+
+         ! find nrintu (nrintv) which is the number of knot intervals in the
+         ! u-direction (v-direction).
+         nrintu = nu-nminu+1
+         nrintv = nv-nminv+1
+
+         ! find ncof, the number of b-spline coefficients for the current set of knots.
+         nk1u = nu-4
+         nk1v = nv-4
+         ncof = nk1u*nk1v
+
+         ! find the position of the additional knots which are needed for the
+         ! b-spline representation of s(u,v).
+         if (periodic_u) then
+            tu(1:4)     = [tu(nu-6:nu-4)-peru,ub]
+            tu(nu-3:nu) = [ue,tu(5:7)+peru]
+         else
+            tu(1:4)     = ub
+            tu(nu-3:nu) = ue
+         endif
+
+         if (periodic_v) then
+            tv(1:4)     = [tv(nv-6:nv-4)-perv,vb]
+            tv(nv-3:nv) = [ve,tu(5:7)+perv]
+         else
+            tv(1:4)     = vb
+            tv(nv-3:nv) = ve
+         end if
+
+         !  find the least-squares spline sinf(u,v) and calculate for each knot interval
+         !  tu(j+3)<=u<=tu(j+4) (tv(j+3)<=v<=tv(j+4)) the sum of squared residuals
+         !  fpintu(j),j=1,2,...,nu-7 (fpintv(j),j=1,2,...,nv-7) for the data points having their
+         !  absciss (ordinate)-value belonging to that interval.
+         !  fp gives the total sum of squared residuals.
+         call fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu,           &
+                     nu,tv,nv,p,c,nc,fp,fpintu,fpintv,mm,mvnu,wrk(lsu),wrk(lsv), &
+                     wrk(lri),wrk(lq),wrk(lau),wrk(lau1),wrk(lav),wrk(lav1),     &
+                     wrk(lbu),wrk(lbv),nru,nrv)
+
+         if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
+
+         ! SUCCESS! the least-squares spline is an acceptable solution.
+         fpms = fp-s
+         if (iopt<0 .or. abs(fpms)<acc) return
+
+         ! if f(p=inf) < s, we accept the choice of knots.
+         if (fpms<zero) exit main_loop
+
+         ! if nu=nmaxu and nv=nmaxv, sinf(u,v) is an interpolating spline.
+         if (nu==nmaxu .and. nv==nmaxv) then
+             ier = FITPACK_INTERPOLATING_OK
+             fp = zero
+             return
+         end if
+
+         ! increase the number of knots.
+         ! if nu=nue and nv=nve we cannot further increase the number of knots
+         ! because of the storage capacity limitation.
+         if (nu==nue .and. nv==nve) then
+             ier = FITPACK_INSUFFICIENT_STORAGE
+             return
+         end if
+
+         ier = FITPACK_OK
+
+         ! adjust the parameter reducu or reducv according to the direction
+         ! in which the last added knots were located.
+
+         if (lastdi<0) then
+             reducu = fpold-fp
+         elseif (lastdi>0) then
+             reducv = fpold-fp
+         end if
+
+         ! store the sum of squared residuals for the current set of knots.
+         fpold = fp
+
+         ! find nplu, the number of knots we should add in the u-direction.
+         nplu = 1
+         if (nu/=nminu) then
+            npl1 = nplusu*2
+            rn = nplusu
+            if (reducu>acc) npl1 = int(rn*fpms/reducu)
+            nplu = min(nplusu*2,max(npl1,nplusu/2,1))
+         endif
+
+         ! find nplv, the number of knots we should add in the v-direction.
+         nplv = 1
+         if (nv/=nminv) then
+            npl1 = nplusv*2
+            rn = nplusv
+            if (reducv>acc) npl1 = int(rn*fpms/reducv)
+            nplv = min(nplusv*2,max(npl1,nplusv/2,1))
+         endif
+
+         ! test whether we are going to add knots in the u- or v-direction.
+         ! lastdi = last knot direction: lastdi==0  = not yet set
+         !                               lastdi==1  = v direction
+         !                               lastdi==-1 = u direction
+        choose_dir: if ( nv<nve .and. &
+                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi>=0)) &
+                          .or. nplu>nplv &
+                          .or. (nplu==nplv .and. lastdi<0) )) then
+
+            ! addition in the v-direction.
+            lastdi = 1
+            nplusv = nplv
+            ifsv   = 0
+
+            add_v_knots: do l=1,nplusv
+
+               ! add a new knot in the v-direction.
+               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
+
+               ! test whether we cannot further increase the number of knots in the v-direction.
+               if (nv==nve) exit add_v_knots
+
+            end do add_v_knots
+
+        else choose_dir
+
+            ! addition in the u-direction.
+            lastdi = -1
+            nplusu = nplu
+            ifsu   = 0
+            add_u_knots: do l=1,nplusu
+
+               ! add a new knot in the u-direction
+               call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,1)
+
+               ! test whether we cannot further increase the number of knots in the u-direction.
+               if (nu==nue) exit add_u_knots
+
+            end do add_u_knots
+
+        endif choose_dir
+
       !  restart the computations with the new set of knots.
- 250  continue
+      end do main_loop
+
       !  test whether the least-squares polynomial is a solution of our
       !  approximation problem.
- 300  if(ier==(-2)) go to 440
+      if (ier==FITPACK_LEASTSQUARES_OK) return
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 2: determination of the smoothing spline sp(u,v)                c
       ! *****************************************************                c
@@ -8858,10 +8869,6 @@ module fitpack_core
       go to 440
  410  ier = 2
       go to 440
- 420  ier = 1
-      go to 440
- 430  ier = -1
-      fp = 0.
  440  return
       end subroutine fppasu
 
