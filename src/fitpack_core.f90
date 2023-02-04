@@ -4671,25 +4671,28 @@ module fitpack_core
       end subroutine fpcsin
 
 
-      recursive subroutine fpcurf(iopt,x,y,w,m,xb,xe,k,s,nest,tol, &
-                                  maxit,k1,k2,n,t,c,fp,fpint,z,a,b,g,q,nrdata,ier)
+      pure subroutine fpcurf(iopt,x,y,w,m,xb,xe,k,s,nest,tol, &
+                             maxit,k1,k2,n,t,c,fp,fpint,z,a,b,g,q,nrdata,ier)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) xb,xe,s,tol,fp
-      integer iopt,m,k,nest,maxit,k1,k2,n,ier
+      real(RKIND), intent(in)  :: xb,xe,s,tol
+      real(RKIND), intent(out) :: fp
+      integer,     intent(in)  :: iopt,m,k,nest,maxit,k1,k2
+      integer,     intent(out) :: n,ier
+
       !  ..array arguments..
-      real(RKIND) x(m),y(m),w(m),t(nest),c(nest),fpint(nest), &
-       z(nest),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer nrdata(nest)
+      real(RKIND), intent(in)    :: x(m),y(m),w(m)
+      real(RKIND), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a(nest,k1),b(nest,k2),&
+                                    g(nest,k2),q(m,k1)
+      integer,     intent(inout) :: nrdata(nest)
       !  ..local scalars..
-      real(RKIND) acc,cos,fpart,fpms,fpold,fp0,f1,f2,f3, &
-       p,pinv,piv,p1,p2,p3,rn,sin,store,term,wi,xi,yi
-      integer i,ich1,ich3,it,iter,i1,i2,j,k3,l,l0, &
-       mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      real(RKIND) :: acc,cos,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,&
+                     term,wi,xi,yi
+      integer :: i,it,iter,i2,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) h(MAX_ORDER+1)
-      logical :: new
+      real(RKIND) :: h(MAX_ORDER+1)
+      logical :: new,check1,check3
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -4951,129 +4954,134 @@ module fitpack_core
       !  of our approximation problem.
       if (ier==FITPACK_LEASTSQUARES_OK) return
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 2: determination of the smoothing spline sp(x).                c
-      !  ***************************************************                 c
-      !  we have determined the number of knots and their position.          c
-      !  we now compute the b-spline coefficients of the smoothing spline    c
-      !  sp(x). the observation matrix a is extended by the rows of matrix   c
-      !  b expressing that the kth derivative discontinuities of sp(x) at    c
-      !  the interior knots t(k+2),...t(n-k-1) must be zero. the corres-     c
-      !  ponding weights of these additional rows are set to 1/p.            c
-      !  iteratively we then have to determine the value of p such that      c
-      !  f(p)=sum((w(i)*(y(i)-sp(x(i))))**2) be = s. we already know that    c
-      !  the least-squares kth degree polynomial corresponds to p=0, and     c
-      !  that the least-squares spline corresponds to p=infinity. the        c
-      !  iteration process which is proposed here, makes use of rational     c
-      !  interpolation. since f(p) is a convex and strictly decreasing       c
-      !  function of p, it can be approximated by a rational function        c
-      !  r(p) = (u*p+v)/(p+w). three values of p(p1,p2,p3) with correspond-  c
-      !  ing values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used      c
-      !  to calculate the new value of p such that r(p)=s. convergence is    c
-      !  guaranteed by taking f1>0 and f3<zero                                 c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      ! *****
+      !  part 2: determination of the smoothing spline spline sp(x).
+      ! *****
+      !  we have determined the number of knots and their position.
+      !  we now compute the b-spline coefficients of the smoothing spline sp(x). the observation matrix a
+      !  is extended by the rows of matrix b expressing that the kth derivative discontinuities of sp(x)
+      !  at the interior knots t(k+2),...t(n-k-1) must be zero. the corresponding weights of these
+      !  additional rows are set to 1/p.
+      !  iteratively we then have to determine the value of p such that f(p), the sum of squared
+      !  residuals be = s. we already know that the least squares kth degree polynomial corresponds
+      !  to p=0, and that the least-squares spline corresponds to p=infinity. the iteration process
+      !  which is proposed here, makes use of rational interpolation. since f(p) is a convex and strictly
+      !  decreasing function of p, it can be approximated by a rational function r(p) = (u*p+v)/(p+w).
+      !  three values of p(p1,p2,p3) with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s)
+      !  are used to calculate the new value of p such that r(p)=s. convergence is guaranteed by taking
+      !  f1>0 and f3<zero
+      ! *****
+
       !  evaluate the discontinuity jump of the kth derivative of the
       !  b-splines at the knots t(l),l=k+2,...n-k-1 and store in b.
       call fpdisc(t,n,k2,b,nest)
+
       !  initial value for p.
       p1 = zero
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p = 0.
-      do 255 i=1,nk1
-         p = p+a(i,1)
- 255  continue
+      p  = sum(a(1:nk1,1))
       rn = nk1
-      p = rn/p
-      ich1 = 0
-      ich3 = 0
+      p  = rn/p
+      check1 = .false.
+      check3 = .false.
       n8 = n-nmin
+
       !  iteration process to find the root of f(p) = s.
-      do 360 iter=1,maxit
-      !  the rows of matrix b with weight 1/p are rotated into the
-      !  triangularised observation matrix a which is stored in g.
-        pinv = one/p
-        c(1:nk1) = z(1:nk1)
-        g(1:nk1,1:k1) = a(1:nk1,1:k1)
-        g(1:nk1,  k2) = zero
-        do 300 it=1,n8
-      !  the row of matrix b is rotated into triangle by givens transformation
-          h(1:k2) = b(it,1:k2)*pinv
-          yi = zero
-          do 290 j=it,nk1
-            piv = h(1)
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,g(j,1),cos,sin)
-      !  transformations to right hand side.
-            call fprota(cos,sin,yi,c(j))
-            if(j==nk1) go to 300
-            i2 = k1
-            if(j>n8) i2 = nk1-j
-            do 280 i=1,i2
-      !  transformations to left hand side.
-              i1 = i+1
-              call fprota(cos,sin,h(i1),g(j,i1))
-              h(i) = h(i1)
- 280        continue
-            h(i2+1) = zero
- 290      continue
- 300    continue
-      !  backward substitution to obtain the b-spline coefficients.
-        c(:nk1) = fpback(g,c,nk1,k2,nest)
-      !  computation of f(p).
-        fp = zero
-        l = k2
-        do 330 it=1,m
-          if(x(it)<t(l) .or. l>nk1) go to 310
-          l = l+1
- 310      l0 = l-k2
-          term = zero
-          do 320 j=1,k1
-            l0 = l0+1
-            term = term+c(l0)*q(it,j)
- 320      continue
-          fp = fp+(w(it)*(term-y(it)))**2
- 330    continue
-      !  test whether the approximation sp(x) is an acceptable solution.
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 440
-      !  test whether the maximal number of iterations is reached.
-        if(iter==maxit) go to 400
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 340
-        if((f2-f3)>acc) go to 335
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p=p1*con9 + p2*con1
-        go to 360
- 335    if(f2<zero) ich3=1
- 340    if(ich1/=0) go to 350
-        if((f1-f2)>acc) go to 345
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 360
-        if(p>=p3) p = p2*con1 + p3*con9
-        go to 360
- 345    if(f2>zero) ich1=1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 350    if(f2>=f1 .or. f2<=f3) go to 410
-      !  find the new value for p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 360  continue
-      !  error codes and messages.
- 400  ier = 3
-      go to 440
- 410  ier = 2
-      go to 440
- 440  return
+      iter = 0
+      find_root: do while (iter<maxit)
+
+          iter = iter+1
+
+          !  the rows of matrix b with weight 1/p are rotated into the
+          !  triangularised observation matrix a which is stored in g.
+          pinv = one/p
+          c(1:nk1) = z(1:nk1)
+          g(1:nk1,1:k1) = a(1:nk1,1:k1)
+          g(1:nk1,  k2) = zero
+          b_rows: do it=1,n8
+              ! the row of matrix b is rotated into triangle by givens transformation
+              h(1:k2) = b(it,1:k2)*pinv
+              yi = zero
+              b_cols: do j=it,nk1
+                  piv = h(1)
+
+                  ! calculate the parameters of the givens transformation.
+                  call fpgivs(piv,g(j,1),cos,sin)
+
+                  ! transformations to right hand side.
+                  call fprota(cos,sin,yi,c(j))
+                  if (j==nk1) cycle b_rows
+
+                  ! transformations to left hand side.
+                  i2 = merge(nk1-j,k1,j>n8)+1
+                  call fprota(cos,sin,h(2:i2),g(j,2:i2))
+                  h(1:i2) = [h(2:i2),zero]
+              end do b_cols
+          end do b_rows
+
+          ! backward substitution to obtain the b-spline coefficients.
+          c(:nk1) = fpback(g,c,nk1,k2,nest)
+
+          ! computation of f(p).
+          fp = zero
+          l = k2
+
+          get_fp: do it=1,m
+              if (x(it)>=t(l) .and. l<=nk1) l = l+1
+              l0   = l-k2
+              term = dot_product(c(l0+1:l0+k1),q(it,:))
+              fp   = fp+(w(it)*(term-y(it)))**2
+          end do get_fp
+
+          ! SUCCESS! the approximation sp(x) is an acceptable solution.
+          fpms = fp-s; if (abs(fpms)<acc) return
+
+         ! Reinitialize p to carry out one more iteration
+         p2 = p
+         f2 = fpms
+         if (.not.check3) then
+            if ((f2-f3)>acc .and. f2<zero) then
+               check3=.true.
+            else
+               ! our initial choice of p is too large.
+               p3 = p2
+               f3 = f2
+               p  = p*con4
+               if (p<=p1) p=p1*con9 + p2*con1
+               cycle find_root
+            endif
+         endif
+
+         if (.not.check1) then
+            if ((f1-f2)>acc .and. f2>zero) then
+                check1 = .true.
+            else
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p  = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                cycle find_root
+            endif
+         endif
+
+         ! test whether the iteration process proceeds as theoretically expected.
+         if (f2>=f1 .or. f2<=f3) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+         endif
+
+         ! find the new value for p.
+         call fprati(p1,f1,p2,f2,p3,f3,p)
+
+      end do find_root
+
+      ! Maximum number of iterations reached
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fpcurf
 
 
@@ -8374,12 +8382,9 @@ module fitpack_core
                if (j==nk1) cycle b_rows
 
                !  transformations to left hand side.
-               i2 = merge(nk1-j,k1,j>n8)
-               do i=1,i2
-                  call fprota(cos,sin,h(i+1),g(j,i+1))
-                  h(i) = h(i+1)
-               end do
-               h(i2+1) = zero
+               i2 = merge(nk1-j,k1,j>n8)+1
+               call fprota(cos,sin,h(2:i2),g(j,2:i2))
+               h(1:i2) = [h(2:i2),zero]
             end do b_cols
          end do b_rows
 
