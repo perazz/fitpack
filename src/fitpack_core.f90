@@ -11179,174 +11179,192 @@ module fitpack_core
 
 
       recursive subroutine fpregr(iopt,x,mx,y,my,z,mz,xb,xe,yb,ye, &
-       kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
-       reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
-       nrdatx,nrdaty,wrk,lwrk,ier)
+                                  kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
+                                  reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
+                                  nrdatx,nrdaty,wrk,lwrk,ier)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) xb,xe,yb,ye,s,tol,fp,fp0,fpold,reducx,reducy
-      integer iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,nx,ny,lastdi, &
-       nplusx,nplusy,lwrk,ier
+      real(RKIND) :: xb,xe,yb,ye,s,tol,fp,fp0,fpold,reducx,reducy
+      integer :: iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,nx,ny,lastdi,nplusx,nplusy,lwrk,ier
       !  ..array arguments..
-      real(RKIND) x(mx),y(my),z(mz),tx(nxest),ty(nyest),c(nc),fpintx(nxest), &
-       fpinty(nyest),wrk(lwrk)
-      integer nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
+      real(RKIND) :: x(mx),y(my),z(mz),tx(nxest),ty(nyest),c(nc),fpintx(nxest),fpinty(nyest),wrk(lwrk)
+      integer :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
       !  ..local scalars
-      real(RKIND) acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
-      integer i,ich1,ich3,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2, &
-       k3,l,lax,lay,lbx,lby,lq,lri,lsx,lsy,mk1,mm,mpm,mynx,ncof, &
-       nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
-       nrinty,nxe,nxk,nye
+      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
+      integer :: i,ich1,ich3,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
+                 lsy,mk1,mm,mpm,mynx,ncof,nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
+                 nrinty,nxe,nxk,nye
 
       !   set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      !  we partition the working space.
-      kx1 = kx+1
-      ky1 = ky+1
-      kx2 = kx1+1
-      ky2 = ky1+1
-      lsx = 1
-      lsy = lsx+mx*kx1
-      lri = lsy+my*ky1
-      mm = max0(nxest,my)
-      lq = lri+mm
+      ! we partition the working space.
+      kx1  = kx+1
+      ky1  = ky+1
+      kx2  = kx1+1
+      ky2  = ky1+1
+      lsx  = 1
+      lsy  = lsx+mx*kx1
+      lri  = lsy+my*ky1
+      mm   = max(nxest,my)
+      lq   = lri+mm
       mynx = nxest*my
-      lax = lq+mynx
-      nxk = nxest*kx2
-      lbx = lax+nxk
-      lay = lbx+nxk
-      lby = lay+nyest*ky2
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 1: determination of the number of knots and their position.     c
-      ! ****************************************************************     c
-      !  given a set of knots we compute the least-squares spline sinf(x,y), c
-      !  and the corresponding sum of squared residuals fp=f(p=inf).         c
-      !  if iopt=-1  sinf(x,y) is the requested approximation.               c
-      !  if iopt=0 or iopt=1 we check whether we can accept the knots:       c
-      !    if fp <=s we will continue with the current set of knots.         c
-      !    if fp > s we will increase the number of knots and compute the    c
-      !       corresponding least-squares spline until finally fp<=s.        c
-      !    the initial choice of knots depends on the value of s and iopt.   c
-      !    if s=0 we have spline interpolation; in that case the number of   c
-      !    knots equals nmaxx = mx+kx+1  and  nmaxy = my+ky+1.               c
-      !    if s>0 and                                                        c
-      !     *iopt=0 we first compute the least-squares polynomial of degree  c
-      !      kx in x and ky in y; nx=nminx=2*kx+2 and ny=nymin=2*ky+2.       c
-      !     *iopt=1 we start with the knots found at the last call of the    c
-      !      routine, except for the case that s > fp0; then we can compute  c
-      !      the least-squares polynomial directly.                          c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      lax  = lq+mynx
+      nxk  = nxest*kx2
+      lbx  = lax+nxk
+      lay  = lbx+nxk
+      lby  = lay+nyest*ky2
+
+      ! *****
+      ! part 1: determination of the number of knots and their position.
+      ! *****
+      !  given a set of knots we compute the least-squares spline sinf(x,y) and the corresponding sum of
+      !  squared residuals fp = f(p=inf).
+      !  if iopt(1)=-1  sinf(x,y) is the requested approximation.
+      !  if iopt(1)>=0  we check whether we can accept the knots:
+      !    if fp <= s we will continue with the current set of knots.
+      !    if fp >  s we will increase the number of knots and compute the corresponding least-squares
+      !               spline until finally fp <= s.
+      !    the initial choice of knots depends on the value of s and iopt.
+      !    if s=0 we have spline interpolation; in that case the number of knots equals
+      !     nmaxx = mx+kx+1  and  nmaxy = my+ky+1.
+      !    if s>0 and
+      !      iopt(1)=0 we first compute the least-squares polynomial of degree kx in x and ky in y;
+      !                nx=nminx=2*kx+2 and ny=nymin=2*ky+2.
+      !      iopt(1)=1 we start with the set of knots found at the last call of the routine, except for the
+      !                case that s > fp0; then we compute the least-squares polynomial directly.
+      ! *****
+
       !  determine the number of knots for polynomial approximation.
       nminx = 2*kx1
       nminy = 2*ky1
-      if(iopt<0) go to 120
-      !  acc denotes the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      !  find nmaxx and nmaxy which denote the number of knots in x- and y-
-      !  direction in case of spline interpolation.
-      nmaxx = mx+kx1
-      nmaxy = my+ky1
-      !  find nxe and nye which denote the maximum number of knots
-      !  allowed in each direction
-      nxe = min0(nmaxx,nxest)
-      nye = min0(nmaxy,nyest)
-      if(s>0.) go to 100
-      !  if s = 0, s(x,y) is an interpolating spline.
-      nx = nmaxx
-      ny = nmaxy
-      !  test whether the required storage space exceeds the available one.
-      if(ny>nyest .or. nx>nxest) go to 420
-      !  find the position of the interior knots in case of interpolation.
-      !  the knots in the x-direction.
-      mk1 = mx-kx1
-      if(mk1==0) go to 60
-      k3 = kx/2
-      i = kx1+1
-      j = k3+2
-      if(k3*2==kx) go to 40
-      do 30 l=1,mk1
-        tx(i) = x(j)
-        i = i+1
-        j = j+1
-  30  continue
-      go to 60
-  40  do 50 l=1,mk1
-        tx(i) = (x(j)+x(j-1))*half
-        i = i+1
-        j = j+1
-  50  continue
-      !  the knots in the y-direction.
-  60  mk1 = my-ky1
-      if(mk1==0) go to 120
-      k3 = ky/2
-      i = ky1+1
-      j = k3+2
-      if(k3*2==ky) go to 80
-      do 70 l=1,mk1
-        ty(i) = y(j)
-        i = i+1
-        j = j+1
-  70  continue
-      go to 120
-  80  do 90 l=1,mk1
-        ty(i) = (y(j)+y(j-1))*half
-        i = i+1
-        j = j+1
-  90  continue
-      go to 120
-      !  if s > 0 our initial choice of knots depends on the value of iopt.
- 100  if(iopt==0) go to 115
-      if(fp0<=s) go to 115
-      !  if iopt=1 and fp0 > s we start computing the least- squares spline
-      !  according to the set of knots found at the last call of the routine.
-      !  we determine the number of grid coordinates x(i) inside each knot
-      !  interval (tx(l),tx(l+1)).
-      l = kx2
-      j = 1
-      nrdatx(1) = 0
-      mpm = mx-1
-      do 105 i=2,mpm
-        nrdatx(j) = nrdatx(j)+1
-        if(x(i)<tx(l)) go to 105
-        nrdatx(j) = nrdatx(j)-1
-        l = l+1
-        j = j+1
-        nrdatx(j) = 0
- 105  continue
-      !  we determine the number of grid coordinates y(i) inside each knot
-      !  interval (ty(l),ty(l+1)).
-      l = ky2
-      j = 1
-      nrdaty(1) = 0
-      mpm = my-1
-      do 110 i=2,mpm
-        nrdaty(j) = nrdaty(j)+1
-        if(y(i)<ty(l)) go to 110
-        nrdaty(j) = nrdaty(j)-1
-        l = l+1
-        j = j+1
-        nrdaty(j) = 0
- 110  continue
-      go to 120
-      !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
-      !  polynomial of degree kx in x and ky in y (which is a spline without
-      !  interior knots).
- 115  nx = nminx
-      ny = nminy
-      nrdatx(1) = mx-2
-      nrdaty(1) = my-2
-      lastdi = 0
-      nplusx = 0
-      nplusy = 0
-      fp0 = 0.
-      fpold = 0.
-      reducx = 0.
-      reducy = 0.
- 120  mpm = mx+my
+
+      bootstrap: if (iopt>=0) then
+
+          !  acc denotes the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          !  find nmaxx and nmaxy which denote the number of knots in x- and y-
+          !  direction in case of spline interpolation.
+          nmaxx = mx+kx1
+          nmaxy = my+ky1
+
+          !  find nxe and nye which denote the maximum number of knots allowed in each direction
+          nxe = min(nmaxx,nxest)
+          nye = min(nmaxy,nyest)
+
+          interpolating: if (s<=zero) then
+
+              ! if s = 0, s(x,y) is an interpolating spline.
+              nx = nmaxx
+              ny = nmaxy
+
+              ! test whether the required storage space exceeds the available one.
+              if (ny>nyest .or. nx>nxest) then
+                 ier = FITPACK_INSUFFICIENT_STORAGE
+                 return
+              end if
+
+              !  find the position of the interior knots in case of interpolation.
+              !  the knots in the x-direction.
+              mk1 = mx-kx1
+
+              if (mk1/=0) then
+
+                  k3 = kx/2
+                  i = kx1+1
+                  j = k3+2
+
+                  do l=1,mk1
+                     tx(i) = merge( x(j) , (x(j)+x(j-1))*half , k3*2/=kx)
+                     i = i+1
+                     j = j+1
+                  end do
+
+              endif
+
+              !  the knots in the y-direction.
+              mk1 = my-ky1
+
+              if (mk1/=0) then
+                  k3 = ky/2
+                  i  = ky1+1
+                  j  = k3+2
+
+                  do l=1,mk1
+                     ty(i) = merge( y(j) , (y(j)+y(j-1))*half , k3*2/=ky)
+                     i = i+1
+                     j = j+1
+                  end do
+
+              endif
+
+          else interpolating
+
+              !  if s > 0 our initial choice of knots depends on the value of iopt.
+              use_last_call: if (iopt/=0 .and. fp0>s) then
+
+                  !  if iopt=1 and fp0 > s we start computing the least- squares spline
+                  !  according to the set of knots found at the last call of the routine.
+                  !  we determine the number of grid coordinates x(i) inside each knot
+                  !  interval (tx(l),tx(l+1)).
+                  l = kx2
+                  j = 1
+                  nrdatx(1) = 0
+                  mpm = mx-1
+                  do i=2,mpm
+                     nrdatx(j) = nrdatx(j)+1
+                     if (x(i)>=tx(l)) then
+                         nrdatx(j) = nrdatx(j)-1
+                         l = l+1
+                         j = j+1
+                         nrdatx(j) = 0
+                     endif
+                  end do
+
+                  !  we determine the number of grid coordinates y(i) inside each knot
+                  !  interval (ty(l),ty(l+1)).
+                  l = ky2
+                  j = 1
+                  nrdaty(1) = 0
+                  mpm = my-1
+                  do i=2,mpm
+                     nrdaty(j) = nrdaty(j)+1
+                     if (y(i)>=ty(l)) then
+                         nrdaty(j) = nrdaty(j)-1
+                         l = l+1
+                         j = j+1
+                         nrdaty(j) = 0
+                     endif
+                  end do
+
+              else use_last_call
+
+                  !  if iopt=0 or iopt=1 and s>=fp0, we start computing the least-squares
+                  !  polynomial of degree kx in x and ky in y (which is a spline without
+                  !  interior knots).
+                  nx        = nminx
+                  ny        = nminy
+                  nrdatx(1) = mx-2
+                  nrdaty(1) = my-2
+                  lastdi = 0
+                  nplusx = 0
+                  nplusy = 0
+                  fp0    = zero
+                  fpold  = zero
+                  reducx = zero
+                  reducy = zero
+
+              endif use_last_call
+
+          endif interpolating
+
+      endif bootstrap
+
+      mpm = mx+my
       ifsx = 0
       ifsy = 0
       ifbx = 0
