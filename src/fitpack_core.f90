@@ -6405,18 +6405,21 @@ module fitpack_core
       !       bx,by  : the (nx-2*kx-1) x (nx-kx-1) and (ny-2*ky-1) x (ny-ky-1) matrices which contain
       !                the discontinuity jumps of the derivatives of the b-splines in the x- and
       !                y-direction.
-      recursive subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
-                                  kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
-                                  spx,spy,right,q,ax,ay,bx,by,nrx,nry)
+      pure subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
+                             kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
+                             spx,spy,right,q,ax,ay,bx,by,nrx,nry)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) ::p,fp
-      integer :: ifsx,ifsy,ifbx,ifby,mx,my,mz,kx,ky,nx,ny,nc,mm,mynx,kx1,kx2,ky1,ky2
+      real(RKIND), intent(in)    :: p
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: mx,my,mz,kx,ky,nx,ny,nc,mm,mynx,kx1,kx2,ky1,ky2
+      integer,     intent(inout) :: ifsx,ifsy,ifbx,ifby
       !  ..array arguments..
-      real(RKIND) :: x(mx),y(my),z(mz),tx(nx),ty(ny),c(nc),spx(mx,kx1),spy(my,ky1),&
-                     right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
-      integer :: nrx(mx),nry(my)
+      real(RKIND), intent(in)    :: x(mx),y(my),z(mz),tx(nx),ty(ny)
+      real(RKIND), intent(inout) :: c(nc),spx(mx,kx1),spy(my,ky1),right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),&
+                                    ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
+      integer    , intent(inout) :: nrx(mx),nry(my)
       !  ..local scalars..
       real(RKIND) :: arg,cos,fac,pinv,piv,sin,term
       integer :: i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,l,l1,ncof,nk1x,nk1y,&
@@ -11178,18 +11181,21 @@ module fitpack_core
       end subroutine fprati
 
 
-      recursive subroutine fpregr(iopt,x,mx,y,my,z,mz,xb,xe,yb,ye, &
-                                  kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
-                                  reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
-                                  nrdatx,nrdaty,wrk,lwrk,ier)
+      pure subroutine fpregr(iopt,x,mx,y,my,z,mz,xb,xe,yb,ye, &
+                             kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
+                             reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
+                             nrdatx,nrdaty,wrk,lwrk,ier)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) :: xb,xe,yb,ye,s,tol,fp,fp0,fpold,reducx,reducy
-      integer :: iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,nx,ny,lastdi,nplusx,nplusy,lwrk,ier
+      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,tol
+      real(RKIND), intent(inout) :: fp,fp0,fpold,reducx,reducy
+      integer    , intent(in)    :: iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,lwrk
+      integer    , intent(inout) :: nx,ny,lastdi,nplusx,nplusy,ier
       !  ..array arguments..
-      real(RKIND) :: x(mx),y(my),z(mz),tx(nxest),ty(nyest),c(nc),fpintx(nxest),fpinty(nyest),wrk(lwrk)
-      integer :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
+      real(RKIND), intent(in)    :: x(mx),y(my),z(mz)
+      real(RKIND), intent(inout) :: c(nc),tx(nxest),ty(nyest),fpintx(nxest),fpinty(nyest),wrk(lwrk)
+      integer    , intent(inout) :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
       !  ..local scalars
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
       integer :: i,ich1,ich3,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
@@ -11490,7 +11496,7 @@ module fitpack_core
 
         else choose_dir
 
-            ! addition in the u-direction.
+            ! addition in the x-direction.
             lastdi = -1
             nplusx = nplx
             ifsx   = 0
@@ -11512,79 +11518,90 @@ module fitpack_core
       !  test whether the least-squares polynomial is a solution of our
       !  approximation problem.
       if (ier==FITPACK_LEASTSQUARES_OK) return
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 2: determination of the smoothing spline sp(x,y)                c
-      ! *****************************************************                c
-      !  we have determined the number of knots and their position. we now   c
-      !  compute the b-spline coefficients of the smoothing spline sp(x,y).  c
-      !  this smoothing spline varies with the parameter p in such a way thatc
-      !    f(p) = sumi=1,mx(sumj=1,my((z(i,j)-sp(x(i),y(j)))**2)             c
-      !  is a continuous, strictly decreasing function of p. moreover the    c
-      !  least-squares polynomial corresponds to p=0 and the least-squares   c
-      !  spline to p=infinity. iteratively we then have to determine the     c
-      !  positive value of p such that f(p)=s. the process which is proposed c
-      !  here makes use of rational interpolation. f(p) is approximated by a c
-      !  rational function r(p)=(u*p+v)/(p+w); three values of p (p1,p2,p3)  c
-      !  with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s)c
-      !  are used to calculate the new value of p such that r(p)=s.          c
-      !  convergence is guaranteed by taking f1 > 0 and f3 < 0.              c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      ! **********************************************************************************************
+      ! part 2: determination of the smoothing spline sp(x,y)
+      ! **********************************************************************************************
+      !  we have determined the number of knots and their position. we now compute the b-spline
+      !  coefficients of the smoothing spline sp(x,y). this smoothing spline varies with the parameter
+      !  p in such a way that
+      !    f(p) = sumi=1,mx(sumj=1,my((z(i,j)-sp(x(i),y(j)))**2)
+      !  is a continuous, strictly decreasing function of p. moreover the least-squares polynomial
+      !  corresponds to p=0 and the least-squares spline to p=infinity. iteratively we then have to
+      !  determine the positive value of p such that f(p)=s. the process which is proposed here makes
+      !  use of rational interpolation. f(p) is approximated by a rational function r(p)=(u*p+v)/(p+w);
+      !  three values of p (p1,p2,p3) with corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,
+      !  f3=f(p3)-s) are used to calculate the new value of p such that r(p)=s.
+      !  convergence is guaranteed by taking f1 > 0 and f3 < 0.
+      ! **********************************************************************************************
+
       !  initial value for p.
-      p1 = 0.
-      f1 = fp0-s
-      p3 = -one
-      f3 = fpms
-      p = one
+      p1   = zero
+      f1   = fp0-s
+      p3   = -one
+      f3   = fpms
+      p    = one
       ich1 = 0
       ich3 = 0
-      !  iteration process to find the root of f(p)=s.
-      do 350 iter = 1,maxit
-      !  find the smoothing spline sp(x,y) and the corresponding sum of
-      !  squared residuals fp.
-        call fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz,kx,ky,tx,nx,ty, &
-        ny,p,c,nc,fp,fpintx,fpinty,mm,mynx,kx1,kx2,ky1,ky2,wrk(lsx), &
-        wrk(lsy),wrk(lri),wrk(lq),wrk(lax),wrk(lay),wrk(lbx),wrk(lby), &
-        nrx,nry)
-      !  test whether the approximation sp(x,y) is an acceptable solution.
-        fpms = fp-s
-        if(abs(fpms)<acc) go to 440
-      !  test whether the maximum allowable number of iterations has been
-      !  reached.
-        if(iter==maxit) go to 400
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 320
-        if((f2-f3)>acc) go to 310
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 + p2*con1
-        go to 350
- 310    if(f2<0.) ich3 = 1
- 320    if(ich1/=0) go to 340
-        if((f1-f2)>acc) go to 330
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 350
-        if(p>=p3) p = p2*con1 + p3*con9
-        go to 350
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 330    if(f2>0.) ich1 = 1
- 340    if(f2>=f1 .or. f2<=f3) go to 410
-        ! find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 350  continue
-      !  error codes and messages.
- 400  ier = 3
-      go to 440
- 410  ier = 2
-      go to 440
- 440  return
+
+      ! iteration process to find the root of f(p)=s.
+      root_iterations: do iter = 1,maxit
+
+          ! find the smoothing spline sp(x,y) and the corresponding sum of
+          ! squared residuals fp.
+          call fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz,kx,ky,tx,nx,ty, &
+                      ny,p,c,nc,fp,fpintx,fpinty,mm,mynx,kx1,kx2,ky1,ky2,wrk(lsx), &
+                      wrk(lsy),wrk(lri),wrk(lq),wrk(lax),wrk(lay),wrk(lbx),wrk(lby), &
+                      nrx,nry)
+
+          ! test whether the approximation sp(x,y) is an acceptable solution.
+          fpms = fp-s; if (abs(fpms)<acc) return
+
+          ! carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
+
+          if (ich3==0) then
+             if ((f2-f3)>acc .and. f2<zero) then
+                ich3 = 1
+             else
+                ! our initial choice of p is too large.
+                p3 = p2
+                f3 = f2
+                p  = p*con4
+                if (p<=p1) p=p1*con9 + p2*con1
+                cycle root_iterations
+             endif
+          endif
+
+          if (ich1==0) then
+             if ((f1-f2)>acc .and. f2>zero) then
+                 ich1 = 1
+             else
+                 ! our initial choice of p is too small
+                 p1 = p2
+                 f1 = f2
+                 p = p/con4
+                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                 cycle root_iterations
+             endif
+          endif
+
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+              ier = FITPACK_S_TOO_SMALL
+              return
+          end if
+
+          ! find the new value of p.
+          call fprati(p1,f1,p2,f2,p3,f3,p)
+
+      end do root_iterations
+
+      ! Maximum number of iterations reached.
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fpregr
 
       ! subroutine fprota applies a givens rotation to a and b.
