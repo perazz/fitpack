@@ -11364,121 +11364,154 @@ module fitpack_core
 
       endif bootstrap
 
-      mpm = mx+my
+      mpm  = mx+my
       ifsx = 0
       ifsy = 0
       ifbx = 0
       ifby = 0
-      p = -one
+      p    = -one
+
       !  main loop for the different sets of knots.mpm=mx+my is a save upper
       !  bound for the number of trials.
-      do 250 iter=1,mpm
-        if(nx==nminx .and. ny==nminy) ier = -2
-      !  find nrintx (nrinty) which is the number of knot intervals in the
-      !  x-direction (y-direction).
-        nrintx = nx-nminx+1
-        nrinty = ny-nminy+1
-      !  find ncof, the number of b-spline coefficients for the current set
-      !  of knots.
-        nk1x = nx-kx1
-        nk1y = ny-ky1
-        ncof = nk1x*nk1y
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(x,y).
-        i = nx
-        do 130 j=1,kx1
-          tx(j) = xb
-          tx(i) = xe
-          i = i-1
- 130    continue
-        i = ny
-        do 140 j=1,ky1
-          ty(j) = yb
-          ty(i) = ye
-          i = i-1
- 140    continue
-      !  find the least-squares spline sinf(x,y) and calculate for each knot
-      !  interval tx(j+kx)<=x<=tx(j+kx+1) (ty(j+ky)<=y<=ty(j+ky+1)) the sum
-      !  of squared residuals fpintx(j),j=1,2,...,nx-2*kx-1 (fpinty(j),j=1,2,
-      !  ...,ny-2*ky-1) for the data points having their absciss (ordinate)-
-      !  value belonging to that interval.
-      !  fp gives the total sum of squared residuals.
-        call fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz,kx,ky,tx,nx,ty, &
-        ny,p,c,nc,fp,fpintx,fpinty,mm,mynx,kx1,kx2,ky1,ky2,wrk(lsx), &
-        wrk(lsy),wrk(lri),wrk(lq),wrk(lax),wrk(lay),wrk(lbx),wrk(lby), &
-        nrx,nry)
-        if(ier==(-2)) fp0 = fp
-      !  test whether the least-squares spline is an acceptable solution.
-        if(iopt<0) go to 440
-        fpms = fp-s
-        if(abs(fpms) < acc) go to 440
-      !  if f(p=inf) < s, we accept the choice of knots.
-        if(fpms<0.) go to 300
-      !  if nx=nmaxx and ny=nmaxy, sinf(x,y) is an interpolating spline.
-        if(nx==nmaxx .and. ny==nmaxy) go to 430
-      !  increase the number of knots.
-      !  if nx=nxe and ny=nye we cannot further increase the number of knots
-      !  because of the storage capacity limitation.
-        if(nx==nxe .and. ny==nye) go to 420
-        ier = 0
-      !  adjust the parameter reducx or reducy according to the direction
-      !  in which the last added knots were located.
-        if (lastdi<0) go to 150
-        if (lastdi==0) go to 170
-        go to 160
- 150    reducx = fpold-fp
-        go to 170
- 160    reducy = fpold-fp
-      !  store the sum of squared residuals for the current set of knots.
- 170    fpold = fp
-      !  find nplx, the number of knots we should add in the x-direction.
-        nplx = 1
-        if(nx==nminx) go to 180
-        npl1 = nplusx*2
-        rn = nplusx
-        if(reducx>acc) npl1 = int(rn*fpms/reducx)
-        nplx = min0(nplusx*2,max0(npl1,nplusx/2,1))
-      !  find nply, the number of knots we should add in the y-direction.
- 180    nply = 1
-        if(ny==nminy) go to 190
-        npl1 = nplusy*2
-        rn = nplusy
-        if(reducy>acc) npl1 = int(rn*fpms/reducy)
-        nply = min0(nplusy*2,max0(npl1,nplusy/2,1))
- 190    if (nplx<nply) go to 210
-        if (nplx==nply) go to 200
-        go to 230
- 200    if(lastdi<0) go to 230
- 210    if(nx==nxe) go to 230
-      !  addition in the x-direction.
-        lastdi = -1
-        nplusx = nplx
-        ifsx = 0
-        do 220 l=1,nplusx
-      !  add a new knot in the x-direction
-          call fpknot(x,mx,tx,nx,fpintx,nrdatx,nrintx,nxest,1)
-      !  test whether we cannot further increase the number of knots in the
-      !  x-direction.
-          if(nx==nxe) go to 250
- 220    continue
-        go to 250
- 230    if(ny==nye) go to 210
-      !  addition in the y-direction.
-        lastdi = 1
-        nplusy = nply
-        ifsy = 0
-        do 240 l=1,nplusy
-      !  add a new knot in the y-direction.
-          call fpknot(y,my,ty,ny,fpinty,nrdaty,nrinty,nyest,1)
-      !  test whether we cannot further increase the number of knots in the
-      !  y-direction.
-          if(ny==nye) go to 250
- 240    continue
+      iter = 0
+      main_loop: do while (iter<=mpm)
+
+          iter = iter+1
+
+          if (nx==nminx .and. ny==nminy) ier = FITPACK_LEASTSQUARES_OK
+
+          ! find nrintx (nrinty) which is the number of knot intervals in the
+          ! x-direction (y-direction).
+          nrintx = nx-nminx+1
+          nrinty = ny-nminy+1
+
+          ! find ncof, the number of b-spline coefficients for the current set of knots.
+          nk1x = nx-kx1
+          nk1y = ny-ky1
+          ncof = nk1x*nk1y
+
+          ! find the position of the additional knots which are needed for the
+          ! b-spline representation of s(x,y).
+          tx(1:kx1)     = xb
+          tx(nk1x+1:nx) = xe
+
+          ty(1:ky1)     = yb
+          ty(nk1y+1:ny) = ye
+
+          ! find the least-squares spline sinf(x,y) and calculate for each knot
+          ! interval tx(j+kx)<=x<=tx(j+kx+1) (ty(j+ky)<=y<=ty(j+ky+1)) the sum
+          ! of squared residuals fpintx(j),j=1,2,...,nx-2*kx-1 (fpinty(j),j=1,2,
+          ! ...,ny-2*ky-1) for the data points having their absciss (ordinate)-
+          ! value belonging to that interval.
+          ! fp gives the total sum of squared residuals.
+          call fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz,kx,ky,tx,nx,ty, &
+                      ny,p,c,nc,fp,fpintx,fpinty,mm,mynx,kx1,kx2,ky1,ky2,wrk(lsx), &
+                      wrk(lsy),wrk(lri),wrk(lq),wrk(lax),wrk(lay),wrk(lbx),wrk(lby), &
+                      nrx,nry)
+
+          if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
+
+          ! SUCCESS! the least-squares spline is an acceptable solution.
+          fpms = fp-s
+          if (iopt<0 .or. abs(fpms)<acc) return
+
+          ! if f(p=inf) < s, we accept the choice of knots.
+          if (fpms<zero) exit main_loop
+
+          ! if nx=nmaxx and ny=nmaxy, sinf(x,y) is an interpolating spline.
+          if (nx==nmaxx .and. ny==nmaxy) then
+             ier = FITPACK_INTERPOLATING_OK
+             fp = zero
+             return
+          end if
+
+          ! increase the number of knots.
+          ! if nx=nxe and ny=nye we cannot further increase the number of knots
+          ! because of the storage capacity limitation.
+          if (nx==nxe .and. ny==nye) then
+              ier = FITPACK_INSUFFICIENT_STORAGE
+              return
+          end if
+
+          ier = FITPACK_OK
+
+          ! adjust the parameter reducx or reducy according to the direction
+          ! in which the last added knots were located.
+          if (lastdi<0) then
+             reducx = fpold-fp
+          elseif (lastdi>0) then
+             reducy = fpold-fp
+          endif
+
+          ! store the sum of squared residuals for the current set of knots.
+          fpold = fp
+
+          ! find nplx, the number of knots we should add in the x-direction.
+          nplx = 1
+          if (nx/=nminx) then
+              npl1 = nplusx*2
+              rn = nplusx
+              if (reducx>acc) npl1 = int(rn*fpms/reducx)
+              nplx = min(nplusx*2,max(npl1,nplusx/2,1))
+          endif
+
+          ! find nply, the number of knots we should add in the y-direction.
+          nply = 1
+          if (ny/=nminy) then
+              npl1 = nplusy*2
+              rn = nplusy
+              if (reducy>acc) npl1 = int(rn*fpms/reducy)
+              nply = min(nplusy*2,max(npl1,nplusy/2,1))
+          endif
+
+         ! test whether we are going to add knots in the x- or x-direction.
+         ! lastdi = last knot direction: lastdi==0  = not yet set
+         !                               lastdi==1  = y direction
+         !                               lastdi==-1 = x direction
+        choose_dir: if ( ny<nye .and. &
+                         ((nx==nxe .and. nplx<nply .or. (nplx==nply .and. lastdi>=0)) &
+                          .or. nplx>nply &
+                          .or. (nplx==nply .and. lastdi<0) )) then
+
+            ! addition in the y-direction.
+            lastdi = 1
+            nplusy = nply
+            ifsy   = 0
+
+            add_y_knots: do l=1,nplusy
+
+               ! add a new knot in the v-direction.
+               call fpknot(y,my,ty,ny,fpinty,nrdaty,nrinty,nyest,1)
+
+               ! test whether we cannot further increase the number of knots in the y-direction.
+               if (ny==nye) exit add_y_knots
+
+            end do add_y_knots
+
+        else choose_dir
+
+            ! addition in the u-direction.
+            lastdi = -1
+            nplusx = nplx
+            ifsx   = 0
+            add_x_knots: do l=1,nplusx
+
+               ! add a new knot in the u-direction
+               call fpknot(x,mx,tx,nx,fpintx,nrdatx,nrintx,nxest,1)
+
+               ! test whether we cannot further increase the number of knots in the x-direction.
+               if (nx==nxe) exit add_x_knots
+
+            end do add_x_knots
+
+        endif choose_dir
+
       !  restart the computations with the new set of knots.
- 250  continue
+      end do main_loop
+
       !  test whether the least-squares polynomial is a solution of our
       !  approximation problem.
- 300  if(ier==(-2)) go to 440
+      if (ier==FITPACK_LEASTSQUARES_OK) return
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 2: determination of the smoothing spline sp(x,y)                c
       ! *****************************************************                c
@@ -11551,10 +11584,6 @@ module fitpack_core
       go to 440
  410  ier = 2
       go to 440
- 420  ier = 1
-      go to 440
- 430  ier = -1
-      fp = 0.
  440  return
       end subroutine fpregr
 
