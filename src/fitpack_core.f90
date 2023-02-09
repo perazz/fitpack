@@ -5285,62 +5285,85 @@ module fitpack_core
       !  ..
       !  ..scalar arguments..
       integer, intent(in)  :: maxtr,nbind
-      integer, intent(inout) :: merk
+      integer, intent(out) :: merk
       !  ..array arguments..
       integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr)
-      !  ..local scalars ..
-      integer i,j,k,l,level,point
-      !  ..
+
+      ! ..local scalars ..
+      integer :: i,j,k,l,level,point
+
+      ! Begin from root node
       i     = 1
       level = 0
-  10  do
-         point = i
-         i = left(point)
-         if (i==0) exit
-         level = level+1
-      end do
-      if(level/=nbind) then
-      30  i = right(point)
-          j = up(point)
-          up(point) = 0
-          k = left(j)
-          if (point/=k) go to 50
-          if (i==0) then
-              level = level-1
-              if (level==0) go to 80
-              point = j
-              go to 30
-          endif
-          left(j) = i
-          go to 10
-      50  l = right(k)
-          if (point/=l) then
-              k = l
-              go to 50
-          endif
-          right(k) = i
-          point = k
-      endif
-  70  i = right(point)
-      if (i/=0) go to 10
-      i = up(point)
-      level = level-1
-      if (level/=0) then
-         point = i
-         go to 70
-      endif
-  80  k = 1
+      new_branch: do
+
+          ! Descend leftward until there are points
+          move_left: do
+              point = i
+              i = left(point)
+              if (i==0) exit move_left
+              level = level+1
+          end do move_left
+
+          ! Stopped at an intermediate level
+          if (level/=nbind)then
+
+              clear_node: do
+                  i = right(point)
+                  j = up(point)
+
+                  ! Free node
+                  up (point) = 0
+
+                  k = left(j)
+                  if (point/=k) then
+                      descend_right: do
+                         l = right(k)
+                         if (point==l) exit descend_right
+                         k = l
+                      end do descend_right
+                      right(k) = i
+                      point = k
+                      exit clear_node
+                  elseif (i/=0) then
+                      ! Attach this node to the right
+                      left(j) = i
+                      cycle new_branch
+                  else
+                      level = level-1
+                      if (level==0) exit new_branch
+                      point = j
+                      ! cycle clear_node
+                  endif
+              end do clear_node
+
+          endif ! level/=nbind
+
+          ! Move up until we find a right branch;
+          ! restart from that branch if found
+          move_up: do
+             if (right(point)/=0) exit move_up
+
+             ! Move up onw level
+             i     = up(point)
+             level = level-1
+             if (level==0) exit new_branch
+             ! Restart from upper level
+             point = i
+          end do move_up
+
+      end do new_branch
+
+      k = 1
       l = left(k)
-      if (up(l)/=0) then
-          do while (k/=0)
-             merk = k
-             k = left(k)
-          end do
-      endif
+      merk = 1
+      if (up(l)==0) return
+      find_merk: do while (k/=0)
+         merk = k
+         k = left(k)
+      end do find_merk
       return
-
       end subroutine fpdeno
-
 
       !  subroutine fpdisc calculates the discontinuity jumps of the kth
       !  derivative of the b-splines of degree k at the knots t(k+2)..t(n-k-1)
