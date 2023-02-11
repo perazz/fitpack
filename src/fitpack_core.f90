@@ -5437,70 +5437,77 @@ module fitpack_core
          i = 1
          k = 0
          l = 0
-      20 march_left: do while (j/=level)
-            l = left(i)
-            if (l==0) exit march_left
-            i = l
-            j = j+1
-         end do march_left
-      30 if (i<count .or. l==0) then
-             ! continue
-         elseif (i==count) then
-             count = count+1
-             ! continue
-         elseif (up(count)==0) then
-             up   (count) = up   (i)
-             left (count) = left (i)
-             right(count) = right(i)
-             info (count) = info (i)
-             if( merk==i) merk  = count
-             if(point==i) point = count
-             if (k==0) then
-                n = up(i)
-                left(n) = count
-             else
-                right(k) = count
-             endif
-             l = left(i)
-             do while (l/=0)
-               up(l) = count
-               l = right(l)
-             end do
-             up(i) = 0
-             i = count
-             count = count+1
-         else
-             count = count+1
-             go to 30
-         endif
 
-         hundred10: do
-             l = right(i)
-             k = i
+         inner : do
 
-             if (l==0) then
-                 l = up(i)
-                 j = j-1
-                 if (j==0) then
-                     exit hundred10
-                 else
-                     i = l
-                     cycle hundred10
-                 endif
-             else
-                 i = l
-                 go to 20
-             endif
-         end do hundred10
+            march_left: do while (j/=level)
+               l = left(i)
+               if (l==0) exit march_left
+               i = l
+               j = j+1
+            end do march_left
+   
+            do
+               if (i<count .or. l==0) then
+                   exit
+               elseif (i==count) then
+                   count = count+1
+                   exit
+               elseif (up(count)==0) then
+                   up   (count) = up   (i)
+                   left (count) = left (i)
+                   right(count) = right(i)
+                   info (count) = info (i)
+                   if( merk==i) merk  = count
+                   if(point==i) point = count
+                   if (k==0) then
+                      n = up(i)
+                      left(n) = count
+                   else
+                      right(k) = count
+                   endif
+                   l = left(i)
+                   do while (l/=0)
+                      up(l) = count
+                      l = right(l)
+                   end do
+                   up(i) = 0
+                   i = count
+                   count = count+1
+                   exit
+               else
+                   count = count+1
+               endif
+            end do
+   
+            hundred10: do
+                l = right(i)
+                k = i
+   
+                if (l==0) then
+                    l = up(i)
+                    j = j-1
+                    if (j==0) then
+                        exit inner
+                    else
+                        i = l
+                        cycle hundred10
+                    endif
+                else
+                    i = l
+                    cycle inner
+                endif
+            end do hundred10
+
+         end do inner
 
          level = level+1
 
       end do free_nodes_left
 
       if(count<=maxtr) ier = FITPACK_OK
-      return
-      end subroutine fpfrno
 
+      end subroutine fpfrno
 
       !  subroutine fpgivs calculates the parameters of a givens transformation .
       elemental subroutine fpgivs(piv,ww,cos,sin)
@@ -15984,7 +15991,7 @@ module fitpack_core
       !  function f(x,y) can be evaluated by means of function program evapol.
       !
       ! calling sequence:
-      !     call polar(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu, &Œ
+      !     call polar(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu, &
       !                nv,tv,u,v,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       !
       ! parameters:
