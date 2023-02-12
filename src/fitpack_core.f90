@@ -15015,8 +15015,8 @@ module fitpack_core
 
 
 
-      recursive subroutine parsur(iopt,ipar,idim,mu,u,mv,v,f,s,nuest, &
-       nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      pure subroutine parsur(iopt,ipar,idim,mu,u,mv,v,f,s,nuest, &
+                             nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  given the set of ordered points f(i,j) in the idim-dimensional space,
       !  corresponding to grid values (u(i),v(j)) ,i=1,...,mu ; j=1,...,mv,
@@ -15284,125 +15284,120 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,fp
-      integer iopt,idim,mu,mv,nuest,nvest,nu,nv,lwrk,kwrk,ier
+      real(RKIND), intent(in)    :: s
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,idim,mu,mv,nuest,nvest,lwrk,kwrk
+      integer,     intent(inout) :: nu,nv
+      integer,     intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND) u(mu),v(mv),f(mu*mv*idim),tu(nuest),tv(nvest), &
-       c((nuest-4)*(nvest-4)*idim),wrk(lwrk)
-      integer ipar(2),iwrk(kwrk)
+      real(RKIND), intent(in)    :: u(mu),v(mv),f(mu*mv*idim)
+      real(RKIND), intent(inout) :: tu(nuest),tv(nvest),c((nuest-4)*(nvest-4)*idim),wrk(lwrk)
+      integer,     intent(in)    :: ipar(2)
+      integer,     intent(inout) :: iwrk(kwrk)
       !  ..local scalars..
-      real(RKIND) tol,ub,ue,vb,ve,peru,perv
-      integer i,j,jwrk,kndu,kndv,knru,knrv,kwest,l1,l2,l3,l4, &
-       lfpu,lfpv,lwest,lww,maxit,nc,mf,mumin,mvmin
+      real(RKIND) :: ub,ue,vb,ve,peru,perv
+      integer :: jwrk,kndu,kndv,knru,knrv,kwest,lfpu,lfpv,lwest,lww,nc,mf,mumin,mvmin
       !  ..subroutine references..
       !    fppasu,fpchec,fpchep
       !  ..
       !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+      integer,     parameter :: maxit = 20
+      real(RKIND), parameter :: tol = smallnum03
+
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
-      if(iopt<(-1) .or. iopt>1) go to 200
-      if(ipar(1)<0 .or. ipar(1)>1) go to 200
-      if(ipar(2)<0 .or. ipar(2)>1) go to 200
-      if(idim<=0 .or. idim>3) go to 200
+      ier = FITPACK_INPUT_ERROR
       mumin = 4-2*ipar(1)
-      if(mu<mumin .or. nuest<8) go to 200
       mvmin = 4-2*ipar(2)
-      if(mv<mvmin .or. nvest<8) go to 200
-      mf = mu*mv
-      nc = (nuest-4)*(nvest-4)
-      lwest = 4+nuest*(mv*idim+11+4*ipar(1))+nvest*(11+4*ipar(2))+ &
-       4*(mu+mv)+max0(nuest,mv)*idim
+      mf    = mu*mv
+      nc    = (nuest-4)*(nvest-4)
+      lwest = 4+nuest*(mv*idim+11+4*ipar(1))+nvest*(11+4*ipar(2))+4*(mu+mv)+max(nuest,mv)*idim
       kwest = 3+mu+mv+nuest+nvest
-      if(lwrk<lwest .or. kwrk<kwest) go to 200
-      do 10 i=2,mu
-        if(u(i-1)>=u(i)) go to 200
-  10  continue
-      do 20 i=2,mv
-        if(v(i-1)>=v(i)) go to 200
-  20  continue
-      if(iopt>=0) go to 100
-      if(nu<8 .or. nu>nuest) go to 200
-      ub = u(1)
-      ue = u(mu)
-      if (ipar(1)/=0) go to 40
-      j = nu
-      do 30 i=1,4
-        tu(i) = ub
-        tu(j) = ue
-        j = j-1
-  30  continue
-      call fpchec(u,mu,tu,nu,3,ier)
-      if(ier/=0) go to 200
-      go to 60
-  40  l1 = 4
-      l2 = l1
-      l3 = nu-3
-      l4 = l3
-      peru = ue-ub
-      tu(l2) = ub
-      tu(l3) = ue
-      do 50 j=1,3
-        l1 = l1+1
-        l2 = l2-1
-        l3 = l3+1
-        l4 = l4-1
-        tu(l2) = tu(l4)-peru
-        tu(l3) = tu(l1)+peru
-  50  continue
-      ier = fpchep(u,mu,tu,nu,3)
-      if(ier/=0) go to 200
-  60  if(nv<8 .or. nv>nvest) go to 200
-      vb = v(1)
-      ve = v(mv)
-      if (ipar(2)/=0) go to 80
-      j = nv
-      do 70 i=1,4
-        tv(i) = vb
-        tv(j) = ve
-        j = j-1
-  70  continue
-      call fpchec(v,mv,tv,nv,3,ier)
-      if(ier/=0) go to 200
-      go to 150
-  80  l1 = 4
-      l2 = l1
-      l3 = nv-3
-      l4 = l3
-      perv = ve-vb
-      tv(l2) = vb
-      tv(l3) = ve
-      do 90 j=1,3
-        l1 = l1+1
-        l2 = l2-1
-        l3 = l3+1
-        l4 = l4-1
-        tv(l2) = tv(l4)-perv
-        tv(l3) = tv(l1)+perv
-  90  continue
-      ier = fpchep(v,mv,tv,nv,3)
-      if (ier==0) go to 150
-      go to 200
- 100  if(s<0.) go to 200
-      if(s==zero .and. (nuest<(mu+4+2*ipar(1)) .or. &
-       nvest<(mv+4+2*ipar(2))) )go to 200
-      ier = 0
+
+      if (iopt<(-1) .or. iopt>1)      return
+      if (any(ipar<0 .or. ipar>1))    return
+      if (idim<=0 .or. idim>3)        return
+      if (mu<mumin .or. nuest<8)      return
+      if (mv<mvmin .or. nvest<8)      return
+      if (lwrk<lwest .or. kwrk<kwest) return
+      if (any(u(:mu-1)>=u(2:mu)))     return
+      if (any(v(:mv-1)>=v(2:mv)))     return
+
+      if (iopt<0) then
+
+          if (nu<8 .or. nu>nuest) return
+
+          ub = u(1)
+          ue = u(mu)
+
+          if (ipar(1)==0) then
+
+              tu(1:4)     = ub
+              tu(nu-3:nu) = ue
+
+              call fpchec(u,mu,tu,nu,3,ier)
+
+          else
+
+              peru        = ue-ub
+              tu(1:4)     = [tu(nu-6:nu-4)-peru, ub]
+              tu(nu-3:nu) = [ue, tu(5:7)+peru]
+
+              ier = fpchep(u,mu,tu,nu,3)
+
+          endif
+          if (ier/=FITPACK_OK) return
+
+
+          if (nv<8 .or. nv>nvest) return
+
+
+          vb = v(1)
+          ve = v(mv)
+
+          if (ipar(2)==0) then
+
+              tv(1:4)     = vb
+              tv(nv-3:nv) = ve
+
+              call fpchec(v,mv,tv,nv,3,ier)
+
+          else
+
+              perv        = ve-vb
+              tv(1:4)     = [tv(nv-6:nv-4)-perv, vb]
+              tv(nu-3:nu) = [ve, tv(5:7)+perv]
+
+              ier = fpchep(v,mv,tv,nv,3)
+
+          endif
+
+          if (ier/=FITPACK_OK) return
+
+      else
+
+          if(s<zero) return
+          if(s==zero .and. (nuest<(mu+4+2*ipar(1)) .or. &
+                            nvest<(mv+4+2*ipar(2))) )return
+
+          ier = FITPACK_OK
+
+      endif
+
       !  we partition the working space and determine the spline approximation
- 150  lfpu = 5
+      lfpu = 5
       lfpv = lfpu+nuest
-      lww = lfpv+nvest
+      lww  = lfpv+nvest
       jwrk = lwrk-4-nuest-nvest
       knru = 4
       knrv = knru+mu
       kndu = knrv+mv
       kndv = kndu+nuest
       call fppasu(iopt,ipar,idim,u,mu,v,mv,f,mf,s,nuest,nvest, &
-       tol,maxit,nc,nu,tu,nv,tv,c,fp,wrk(1),wrk(2),wrk(3),wrk(4), &
-       wrk(lfpu),wrk(lfpv),iwrk(1),iwrk(2),iwrk(3),iwrk(knru), &
-       iwrk(knrv),iwrk(kndu),iwrk(kndv),wrk(lww),jwrk,ier)
- 200  return
+                  tol,maxit,nc,nu,tu,nv,tv,c,fp,wrk(1),wrk(2),wrk(3),wrk(4), &
+                  wrk(lfpu),wrk(lfpv),iwrk(1),iwrk(2),iwrk(3),iwrk(knru), &
+                  iwrk(knrv),iwrk(kndu),iwrk(kndv),wrk(lww),jwrk,ier)
+      return
       end subroutine parsur
 
 
@@ -15556,12 +15551,12 @@ module fitpack_core
 
       !  ..
       !  we set up the parameters tol and maxit
-      integer, parameter :: maxit = 20
+      integer,     parameter :: maxit = 20
       real(RKIND), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = FITPACK_INPUT_ERROR
+      ier   = FITPACK_INPUT_ERROR
       k1    = k+1
       k2    = k1+1
       nmin  = 2*k1
