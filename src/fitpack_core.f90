@@ -2843,6 +2843,10 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
+      fpold = 0.0_RKIND
+      fp0 = 0.0_RKIND
+      nplus = 0
+
       ! **********************************************************************************************
       !  part 1: determination of the number of knots and their position
       ! **********************************************************************************************
@@ -3790,6 +3794,10 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
+      fpold = 0.0_RKIND
+      fp0 = 0.0_RKIND
+      nplus = 0
+
       !  ******************************************************************************************
       !  part 1: determination of the number of knots and their position
       !  ******************************************************************************************
@@ -4698,6 +4706,10 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
+      fpold = 0.0_RKIND
+      fp0 = 0.0_RKIND
+      nplus = 0
 
       ! *****
       !  part 1: determination of the number of knots and their position
@@ -8089,6 +8101,10 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
+      fpold = 0.0_RKIND
+      fp0 = 0.0_RKIND
+      nplus = 0
+
       ! *****
       !  part 1: determination of the number of knots and their position
       ! *****
@@ -8944,6 +8960,10 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
+      fpold = 0.0_RKIND
+      fp0 = 0.0_RKIND
+      nplus = 0
 
       ! *****
       !  part 1: determination of the number of knots and their position
