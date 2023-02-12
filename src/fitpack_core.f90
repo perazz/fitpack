@@ -10480,14 +10480,7 @@ module fitpack_core
           ! check whether the observation matrix is rank deficient.
           sigma = eps*dmax
 
-          if (all(a(1:ncof,1)>sigma)) then
-
-             ! backward substitution in case of full rank.
-             c(:ncof) = fpback(a,f,ncof,iband,ncc)
-             rank = ncof
-             q(1:ncof,1) = a(1:ncof,1)/dmax
-
-          else
+          if (any(a(1:ncof,1)<sigma)) then
 
              ! in case of rank deficiency, find the minimum norm solution.
              lwest = ncof*iband+ncof+iband
@@ -10506,6 +10499,13 @@ module fitpack_core
 
              ! add to the sum of squared residuals, the contribution of reducing the rank.
              fp = fp+sq
+
+          else
+
+             ! backward substitution in case of full rank.
+             c(:ncof) = fpback(a,f,ncof,iband,ncc)
+             rank = ncof
+             q(1:ncof,1) = a(1:ncof,1)/dmax
 
           endif
 
@@ -12637,141 +12637,185 @@ module fitpack_core
 
           !  find dmax, the maximum value for the diagonal elements in the reduced triangle.
           dmax = max(zero,maxval(a(:ncof,1)))
+
           ! check whether the observation matrix is rank deficient.
-            sigma = eps*dmax
-            if (any(a(1:ncof,1)<=sigma)) then
+          sigma = eps*dmax
+
+          if (any(a(1:ncof,1)<=sigma)) then
+
+                ! in case of rank deficiency, find the minimum norm solution.
                 lwest = ncof*iband+ncof+iband
-                if(lwrk<lwest) go to 925
+                if (lwest>lwrk) then
+                   ier = lwest
+                   return
+                end if
+
                 lf = 1
                 lh = lf+ncof
                 la = lh+iband
                 ff(1:ncof) = zero
                 q(1:ncof,1:iband) = a(1:ncof,1:iband)
-                call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la), &
-                 wrk(lf),wrk(lh))
-                 q(1:ncof,1) = q(1:ncof,1)/dmax
-              !  add to the sum of squared residuals, the contribution of reducing
-              !  the rank.
+                call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+                q(1:ncof,1) = q(1:ncof,1)/dmax
+
+                ! add to the sum of squared residuals, the contribution of reducing the rank.
                 fp = fp+sq
             else
-              !  backward substitution in case of full rank.
+
+                ! backward substitution in case of full rank.
                 c(:ncof) = fpback(a,f,ncof,iband,ncc)
                 rank = ncof
                 q(1:ncof,1) = a(1:ncof,1)/dmax
-            endif
-          !  in case of rank deficiency, find the minimum norm solution.
 
-          !  find the coefficients in the standard b-spline representation of
-          !  the spherical spline.
+            endif
+
+            ! find the coefficients in the standard b-spline representation of the spherical spline.
             call fprpsp(nt,np,coco,cosi,c,ff,ncoff)
-          !  test whether the least-squares spline is an acceptable solution.
-            if(iopt<0) then
-              if (fp<=0) go to 970
-              go to 980
-            endif
+
+            ! test whether the least-squares spline is an acceptable solution.
             fpms = fp-s
-            if(abs(fpms)<=acc) then
-              if (fp<=0) go to 970
-              go to 980
+            if (iopt<0 .or. abs(fpms)<=acc) then
+              if (fp<=zero) then
+                  ier = FITPACK_INTERPOLATING_OK
+                  fp  = zero
+              else
+                  if(ncof/=rank) ier = -rank
+              endif
+              return
             endif
-          !  if f(p=inf) < s, accept the choice of knots.
-            if(fpms<zero) go to 580
-          !  test whether we cannot further increase the number of knots.
-            if(ncof>m) go to 935
-          !  search where to add a new knot.
-          !  find for each interval the sum of squared residuals fpint for the
-          !  data points having the coordinate belonging to that knot interval.
-          !  calculate also coord which is the same sum, weighted by the position
-          !  of the data points considered.
+
+            ! if f(p=inf) < s, accept the choice of knots.
+            if (fpms<zero) exit compute_knots
+
+            ! test whether we cannot further increase the number of knots.
+            if (m<ncof) then
+                ier = FITPACK_TOO_MANY_KNOTS
+                return
+            end if
+
+            ! search where to add a new knot.
+            ! find for each interval the sum of squared residuals fpint for the data points having the
+            ! coordinate belonging to that knot interval. calculate also coord which is the same sum,
+            ! weighted by the position of the data points considered.
             fpint(:nrint) = zero
             coord(:nrint) = zero
-            do 490 num=1,nreg
-              num1 = num-1
-              lt = num1/npp
-              l1 = lt+1
-              lp = num1-lt*npp
-              l2 = lp+1+ntt
-              jrot = lt*np4+lp
-              in = index(num)
-     460      if(in==0) go to 490
-              store = 0.
-              i1 = jrot
-              do 480 i=1,4
-                hti = spt(in,i)
-                j1 = i1
-                do 470 j=1,4
-                  j1 = j1+1
-                  store = store+hti*spp(in,j)*c(j1)
-     470        continue
-                i1 = i1+np4
-     480      continue
-              store = (w(in)*(r(in)-store))**2
-              fpint(l1) = fpint(l1)+store
-              coord(l1) = coord(l1)+store*teta(in)
-              fpint(l2) = fpint(l2)+store
-              coord(l2) = coord(l2)+store*phi(in)
-              in = nummer(in)
-              go to 460
-     490    continue
-          !  find the interval for which fpint is maximal on the condition that
-          !  there still can be added a knot.
-            l1 = 1
-            l2 = nrint
-            if(ntest<nt+1) l1=ntt+1
-            if(npest<np+2) l2=ntt
-          !  test whether we cannot further increase the number of knots.
+
+            do num=1,nreg
+                num1 = num-1
+                lt   = num1/npp
+                l1   = lt+1
+                lp   = num1-lt*npp
+                l2   = lp+1+ntt
+                jrot = lt*np4+lp
+                in   = index(num)
+
+                do while (in/=0)
+                  store = zero
+                  i1 = jrot
+                  do i=1,4
+                     store = store + spt(in,i)*dot_product(spp(in,1:4),c(i1+1:i1+4))
+                     i1 = i1+np4
+                  end do
+
+                  store = (w(in)*(r(in)-store))**2
+                  fpint(l1) = fpint(l1)+store
+                  coord(l1) = coord(l1)+store*teta(in)
+                  fpint(l2) = fpint(l2)+store
+                  coord(l2) = coord(l2)+store*phi(in)
+                  in = nummer(in)
+                end do
+            end do
+
+            ! find the interval for which fpint is maximal on the condition that
+            ! there still can be added a knot.
+            l1 = merge(ntt+1,    1,ntest<nt+1)
+            l2 = merge(ntt  ,nrint,npest<np+2)
+
+            ! test whether we cannot further increase the number of knots.
             if (l1>l2) then
                 ier = FITPACK_INSUFFICIENT_STORAGE
                 return
             end if
-     500    fpmax = zero
-            l = 0
-            do 510 i=l1,l2
-              if(fpmax>=fpint(i)) go to 510
-              l = i
-              fpmax = fpint(i)
-     510    continue
-            if(l==0) go to 930
-          !  calculate the position of the new knot.
-            arg = coord(l)/fpint(l)
-          !  test in what direction the new knot is going to be added.
-            if(l>ntt) go to 530
-          !  addition in the teta-direction
-            l4 = l+4
-            fpint(l) = zero
-            fac1 = tt(l4)-arg
-            fac2 = arg-tt(l4-1)
-            if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
-            j = nt
-            do 520 i=l4,nt
-              tt(j+1) = tt(j)
-              j = j-1
-     520    continue
-            tt(l4) = arg
-            nt = nt+1
-            cycle compute_knots
-          !  addition in the phi-direction
-     530    l4 = l+4-ntt
-            if(arg<pi) go to 540
-            arg = arg-pi
-            l4 = l4-nrr
-     540    fpint(l) = zero
-            fac1 = tp(l4)-arg
-            fac2 = arg-tp(l4-1)
-            if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
-            ll = nrr+4
-            j = ll
-            do 550 i=l4,ll
-              tp(j+1) = tp(j)
-              j = j-1
-     550    continue
-            tp(l4) = arg
-            np = np+2
-            nrr = nrr+1
-            do 560 i=5,ll
-              j = i+nrr
-              tp(j) = tp(i)+pi
-     560    continue
+
+            add_knot: do
+
+                i     = maxloc(fpint(l1:l2),1,fpint(l1:l2)>zero)
+                l     = l1+i-1
+
+                if (i==0) then
+                    ier = FITPACK_OVERLAPPING_KNOTS
+                    return
+                end if
+
+                fpmax = fpint(l)
+
+                ! calculate the position of the new knot.
+                arg = coord(l)/fpint(l)
+
+                ! test in what direction the new knot is going to be added.
+                choose_direction: if (l<=ntt) then
+
+                   ! addition in the teta-direction
+                   l4 = l+4
+                   fpint(l) = zero
+                   fac1 = tt(l4)-arg
+                   fac2 = arg-tt(l4-1)
+
+                else choose_direction
+
+                   ! addition in the phi-direction
+                   l4 = l+4-ntt
+                   if (arg>=pi) then
+                      arg = arg-pi
+                      l4 = l4-nrr
+                   endif
+
+                   fpint(l) = zero
+                   fac1 = tp(l4)-arg
+                   fac2 = arg-tp(l4-1)
+
+                endif choose_direction
+
+                ! Suitable location
+                if (fac1<=(ten*fac2) .and. fac2<=(ten*fac1)) then
+
+                    ! Place knot
+                    place_knot: if (l<=ntt) then
+
+                        ! Place in teta coordinate
+                        j = nt
+                        do i=l4,nt
+                           tt(j+1) = tt(j)
+                           j = j-1
+                        end do
+                        tt(l4) = arg
+                        nt = nt+1
+
+                    else place_knot
+
+                        ! Place in phi coordinate
+                        ll = nrr+4
+                        j = ll
+                        do i=l4,ll
+                           tp(j+1) = tp(j)
+                           j = j-1
+                        end do
+                        tp(l4) = arg
+                        np = np+2
+                        nrr = nrr+1
+                        do i=5,ll
+                           j = i+nrr
+                           tp(j) = tp(i)+pi
+                        end do
+
+                    endif place_knot
+
+                    exit add_knot
+
+                end if
+
+            end do add_knot
+
       !  restart the computations with the new set of knots.
       end do compute_knots
 
@@ -12797,7 +12841,7 @@ module fitpack_core
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !  evaluate the discontinuity jumps of the 3-th order derivative of
       !  the b-splines at the knots tt(l),l=5,...,nt-4.
- 580  call fpdisc(tt,nt,5,bt,ntest)
+      call fpdisc(tt,nt,5,bt,ntest)
       !  evaluate the discontinuity jumps of the 3-th order derivative of
       !  the b-splines at the knots tp(l),l=5,...,np-4.
       call fpdisc(tp,np,5,bp,npest)
@@ -12938,7 +12982,10 @@ module fitpack_core
         go to 845
       !  in case of rank deficiency, find the minimum norm solution.
         lwest = ncof*iband4+ncof+iband4
-        if(lwrk<lwest) go to 925
+        if (lwest>lwrk) then
+           ier = lwest
+           return
+        end if
         lf = 1
         lh = lf+ncof
         la = lh+iband4
@@ -12974,7 +13021,10 @@ module fitpack_core
  890    continue
       !  test whether the approximation sp(teta,phi) is an acceptable solution
         fpms = fp-s
-        if(abs(fpms)<=acc) go to 980
+        if (abs(fpms)<=acc) then
+           if (ncof/=rank) ier = -rank
+           return
+        end if
       !  test whether the maximum allowable number of iterations has been
       !  reached.
         if(iter==maxit) go to 940
@@ -13007,19 +13057,10 @@ module fitpack_core
         call fprati(p1,f1,p2,f2,p3,f3,p)
  920  continue
       !  error codes and messages.
- 925  ier = lwest
-      go to 990
- 930  ier = 5
-      go to 990
- 935  ier = 4
-      go to 990
  940  ier = 3
       go to 990
  945  ier = 2
       go to 990
- 970  ier = -1
-      fp = zero
- 980  if(ncof/=rank) ier = -rank
  990  return
       end subroutine fpsphe
 
