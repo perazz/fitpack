@@ -10692,7 +10692,9 @@ module fitpack_core
       nuu = nu4-iopt3-1
       !  iteration process to find the root of f(p)=s.
       iterations: do iter=1,maxit
+
           pinv = one/p
+
           ! store the triangularized observation matrix into q.
           ff(1:ncof) = f(1:ncof)
           q(1:ncof,1:iband4) = zero
@@ -10705,7 +10707,7 @@ module fitpack_core
               row(1:nvv) = zero
               ll = ii
               do l=1,5
-                  if(ll>nvv) ll=1
+                  if (ll>nvv) ll=1
                   row(ll) = row(ll)+bv(ii,l)
                   ll = ll+1
               end do
@@ -10740,13 +10742,12 @@ module fitpack_core
                   zi = zero
 
                   ! rotate the new row into triangle by givens transformations.
-                  do irot=jrot,ncof
+                  rot_new_row: do irot=jrot,ncof
                       piv = h(1)
                       i2 = min(iband1,ncof-irot)
                       if (piv==zero) then
 
-                         if (i2<=0) exit
-                         h(1:i2+1) = [h(2:i2+1),zero]
+                         if (i2<=0) exit rot_new_row
 
                       else
 
@@ -10755,15 +10756,16 @@ module fitpack_core
                          ! apply that givens transformation to the right hand side.
                          call fprota(co,si,zi,ff(irot))
 
-                         if (i2==0) exit
+                         if (i2==0) exit rot_new_row
 
                          ! apply that givens transformation to the left hand side.
                          call fprota(co,si,h(2:i2+1),q(irot,2:i2+1))
-                         h(1:i2+1) = [h(2:i2+1),zero]
 
                       endif
 
-                   end do
+                      h(1:i2+1) = [h(2:i2+1),zero]
+
+                   end do rot_new_row
               end do
           end do u_constant
 
@@ -12305,9 +12307,9 @@ module fitpack_core
       end subroutine fpspgr
 
 
-      recursive subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
-       ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
-       ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
+      pure subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
+                             ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
+                             ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
 
       !  ..
       !  ..scalar arguments..
@@ -12326,11 +12328,11 @@ module fitpack_core
       integer,     intent(inout) ::  index(nrest),nummer(m)
 
       !  ..local scalars..
-      real(RKIND) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,hti,htj, &
+      real(RKIND) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,htj, &
                      p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
-      integer :: i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,  &
-                 la,lf,lh,ll,lp,lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
-                 num1,rank
+      integer :: i,iband,iband1,iband3,iband4,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,&
+                 lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num,num1,rank
+      logical :: check1,check3
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hp,ht
 
@@ -12819,32 +12821,26 @@ module fitpack_core
       !  restart the computations with the new set of knots.
       end do compute_knots
 
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 2: determination of the smoothing spherical spline.             c
-      ! ********************************************************             c
-      ! we have determined the number of knots and their position. we now    c
-      ! compute the coefficients of the smoothing spline sp(teta,phi).       c
-      ! the observation matrix a is extended by the rows of a matrix, expres-c
-      ! sing that sp(teta,phi) must be a constant function in the variable   c
-      ! phi and a cubic polynomial in the variable teta. the corresponding   c
-      ! weights of these additional rows are set to 1/(p). iteratively       c
-      ! we than have to determine the value of p such that f(p) = sum((w(i)* c
-      ! (r(i)-sp(teta(i),phi(i))))**2)  be = s.                              c
-      ! we already know that the least-squares polynomial corresponds to p=0,c
-      ! and that the least-squares spherical spline corresponds to p=infin.  c
-      ! the iteration process makes use of rational interpolation. since f(p)c
-      ! is a convex and strictly decreasing function of p, it can be approx- c
-      ! imated by a rational function of the form r(p) = (u*p+v)/(p+w).      c
-      ! three values of p (p1,p2,p3) with corresponding values of f(p) (f1=  c
-      ! f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value   c
-      ! of p such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zeroc
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  evaluate the discontinuity jumps of the 3-th order derivative of
-      !  the b-splines at the knots tt(l),l=5,...,nt-4.
-      call fpdisc(tt,nt,5,bt,ntest)
-      !  evaluate the discontinuity jumps of the 3-th order derivative of
-      !  the b-splines at the knots tp(l),l=5,...,np-4.
-      call fpdisc(tp,np,5,bp,npest)
+      ! ************************************************************************************************************
+      ! part 2: determination of the smoothing spherical spline.
+      ! ************************************************************************************************************
+      ! we have determined the number of knots and their position. we now compute the coefficients of the
+      ! smoothing spline sp(teta,phi). the observation matrix a is extended by the rows of a matrix, expres-
+      ! sing that sp(teta,phi) must be a constant function in the variable phi and a cubic polynomial in the
+      ! variable teta. the corresponding weights of these additional rows are set to 1/(p). iteratively we then have
+      ! to determine the value of p such that f(p) = sum((w(i)*(z(i)-sp(teta(i),phi(i))))**2)  be = s.
+      ! we already know that the least-squares polynomial corresponds to p=0, and that the least-squares
+      ! spherical spline corresponds to p=infinity. the iteration process makes use of rational interpolation.
+      ! since f(p) is a convex and strictly decreasing function of p, it can be approximated by a rational
+      ! function of the form r(p) = (u*p+v)/(p+w). three values of p (p1,p2,p3) with corresponding values of
+      ! f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value of p such that r(p)=s.
+      ! convergence is guaranteed by taking f1>0,f3<zero
+      ! ************************************************************************************************************
+
+      ! evaluate the discontinuity jumps of the 3-th order derivative of the b-splines at the knots
+      call fpdisc(tt,nt,5,bt,ntest) ! tt(l),l=5,...,nt-4.
+      call fpdisc(tp,np,5,bp,npest) ! tp(l),l=5,...,np-4.
+
       !  initial value for p.
       p1 = zero
       f1 = sup-s
@@ -12852,216 +12848,256 @@ module fitpack_core
       f3 = fpms
       p  = sum(a(1:ncof,1))
       rn = ncof
-      p = rn/p
-      !  find the bandwidth of the extended observation matrix.
-      iband4 = iband+3
-      if (ntt<=4) iband4 = ncof
+      p  = rn/p
+
+      ! find the bandwidth of the extended observation matrix.
+      iband4 = merge(ncof,iband+3,ntt<=4)
       iband3 = iband4 -1
-      ich1 = 0
-      ich3 = 0
-      !  iteration process to find the root of f(p)=s.
-      do 920 iter=1,maxit
-        pinv = one/p
-      !  store the triangularized observation matrix into q.
-        ff(1:ncof) = f(1:ncof)
-        q(1:ncof,1:iband4) = zero
-        q(1:ncof,1:iband) = q(1:ncof,1:iband)
-      !  extend the observation matrix with the rows of a matrix, expressing
-      !  that for teta=cst. sp(teta,phi) must be a constant function.
-        nt6 = nt-6
-        do 720 i=5,np4
-          ii = i-4
-          row(1:npp) = zero
-          ll = ii
-          do 620  l=1,5
-             if(ll>npp) ll=1
-             row(ll) = row(ll)+bp(ii,l)
-             ll = ll+1
- 620      continue
-          facc = dot_product(row(1:npp),coco(1:npp))
-          facs = dot_product(row(1:npp),cosi(1:npp))
-          do 721 j=1,nt6
-      !  initialize the new row.
-            h(1:iband) = zero
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            jrot = 4+(j-2)*npp
-            if(j>1 .and. j<nt6) then
-                h(1:npp) = row(1:npp)
-            else
-                h(1) = facc
-                h(2) = facs
-                if(j==1) jrot = 2
-            endif
-            h(1:iband) = h(1:iband)*pinv
-            ri = zero
-      !  rotate the new row into triangle by givens transformations.
-            do 710 irot=jrot,ncof
-              piv = h(1)
-              i2 = min0(iband1,ncof-irot)
-              if (piv==zero) then
-                if (i2<=0) go to 721
-                go to 690
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),co,si)
-      !  apply that givens transformation to the right hand side.
-              call fprota(co,si,ri,ff(irot))
-              if(i2==0) go to 721
-      !  apply that givens transformation to the left hand side.
-              do 680 l=1,i2
-                l1 = l+1
-                call fprota(co,si,h(l1),q(irot,l1))
- 680          continue
- 690          h(1:i2+1) = [h(2:i2+1),zero]
- 710        continue
- 721      continue
- 720    continue
-      !  extend the observation matrix with the rows of a matrix expressing
-      !  that for phi=cst. sp(teta,phi) must be a cubic polynomial.
-        do 810 i=5,nt4
-          ii = i-4
-          do 811 j=1,npp
-      !  initialize the new row
-          h(1:iband4) = zero
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            j1 = 1
-            do 760 l=1,5
-               il = ii+l
-               ij = npp
-               if(il/=3 .and. il/=nt4) go to 750
-               j1 = j1+3-j
-               j2 = j1-2
-               ij = 0
-               if(il/=3) go to 740
-               j1 = 1
-               j2 = 2
-               ij = j+2
- 740           h(j2) = bt(ii,l)*coco(j)
-               h(j2+1) = bt(ii,l)*cosi(j)
- 750           h(j1) = h(j1)+bt(ii,l)
-               j1 = j1+ij
- 760        continue
-            do 765 l=1,iband4
-               h(l) = h(l)*pinv
- 765        continue
-            ri = zero
-            jrot = 1
-            if(ii>2) jrot = 3+j+(ii-3)*npp
-      !  rotate the new row into triangle by givens transformations.
-            do 800 irot=jrot,ncof
-              piv = h(1)
-              i2 = min0(iband3,ncof-irot)
-              if (piv==zero) then
-                if (i2<=0) go to 811
-                go to 780
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),co,si)
-      !  apply that givens transformation to the right hand side.
-              call fprota(co,si,ri,ff(irot))
-              if(i2==0) go to 811
-      !  apply that givens transformation to the left hand side.
-              do 770 l=1,i2
-                l1 = l+1
-                call fprota(co,si,h(l1),q(irot,l1))
- 770          continue
- 780          h(1:i2+1) = [h(2:i2+1),zero]
- 800        continue
- 811      continue
- 810    continue
-      !  find dmax, the maximum value for the diagonal elements in the
-      !  reduced triangle.
-        dmax  = max(zero,maxval(q(1:ncof,1)))
-      !  check whether the matrix is rank deficient.
-        sigma = max(eps*dmax,maxval(q(1:ncof,1)))
-      !  backward substitution in case of full rank.
-        c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
-        rank = ncof
-        go to 845
-      !  in case of rank deficiency, find the minimum norm solution.
-        lwest = ncof*iband4+ncof+iband4
-        if (lwest>lwrk) then
-           ier = lwest
-           return
-        end if
-        lf = 1
-        lh = lf+ncof
-        la = lh+iband4
-        call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la), &
-         wrk(lf),wrk(lh))
- 845    q(1:ncof,1) = q(1:ncof,1)/dmax
-      !  find the coefficients in the standard b-spline representation of
-      !  the spherical spline.
-        call fprpsp(nt,np,coco,cosi,c,ff,ncoff)
-      !  compute f(p).
-        fp = zero
-        do 890 num = 1,nreg
-          num1 = num-1
-          lt = num1/npp
-          lp = num1-lt*npp
-          jrot = lt*np4+lp
-          in = index(num)
- 860      if(in==0) go to 890
-          store = zero
-          i1 = jrot
-          do 880 i=1,4
-            hti = spt(in,i)
-            j1 = i1
-            do 870 j=1,4
-              j1 = j1+1
-              store = store+hti*spp(in,j)*c(j1)
- 870        continue
-            i1 = i1+np4
- 880      continue
-          fp = fp+(w(in)*(r(in)-store))**2
-          in = nummer(in)
-          go to 860
- 890    continue
-      !  test whether the approximation sp(teta,phi) is an acceptable solution
-        fpms = fp-s
-        if (abs(fpms)<=acc) then
-           if (ncof/=rank) ier = -rank
-           return
-        end if
-      !  test whether the maximum allowable number of iterations has been
-      !  reached.
-        if(iter==maxit) go to 940
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 900
-        if((f2-f3)>acc) go to 895
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 + p2*con1
-        go to 920
- 895    if(f2<zero) ich3 = 1
- 900    if(ich1/=0) go to 910
-        if((f1-f2)>acc) go to 905
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<0.) go to 920
-        if(p>=p3) p = p2*con1 +p3*con9
-        go to 920
- 905    if(f2>0.) ich1 = 1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 910    if(f2>=f1 .or. f2<=f3) go to 945
-      !  find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 920  continue
-      !  error codes and messages.
- 940  ier = 3
-      go to 990
- 945  ier = 2
-      go to 990
- 990  return
+      check1 = .false.
+      check3 = .false.
+
+      ! iteration process to find the root of f(p)=s.
+      iterations: do iter=1,maxit
+
+          pinv = one/p
+
+          ! store the triangularized observation matrix into q.
+          ff(1:ncof) = f(1:ncof)
+          q(1:ncof,1:iband4) = zero
+          q(1:ncof,1:iband)  = a(1:ncof,1:iband)
+
+          ! extend the observation matrix with the rows of a matrix, expressing
+          ! that for teta=cst. sp(teta,phi) must be a constant function.
+          nt6 = nt-6
+          const_teta: do i=5,np4
+              ii = i-4
+              row(1:npp) = zero
+              ll = ii
+              do l=1,5
+                 if (ll>npp) ll=1
+                 row(ll) = row(ll)+bp(ii,l)
+                 ll = ll+1
+              end do
+              facc = dot_product(row(1:npp),coco(1:npp))
+              facs = dot_product(row(1:npp),cosi(1:npp))
+
+              do j=1,nt6
+                  ! initialize the new row.
+                  h(1:iband) = zero
+
+                  ! fill in the non-zero elements of the row. jrot records the column
+                  ! number of the first non-zero element in the row.
+                  jrot = 4+(j-2)*npp
+                  if (j>1 .and. j<nt6) then
+                      h(1:npp) = row(1:npp)
+                  else
+                      h(1:2) = [facc,facs]
+                      if(j==1) jrot = 2
+                  endif
+
+                  h(1:iband) = h(1:iband)*pinv
+                  ri = zero
+
+                  ! rotate the new row into triangle by givens transformations.
+                  rot_new_row: do irot=jrot,ncof
+                      piv = h(1)
+                      i2 = min(iband1,ncof-irot)
+
+                      if (piv==zero) then
+
+                          if (i2<=0) exit rot_new_row
+
+                      else
+
+                          ! calculate the parameters of the givens transformation.
+                          call fpgivs(piv,q(irot,1),co,si)
+
+                          ! apply that givens transformation to the right hand side.
+                          call fprota(co,si,ri,ff(irot))
+
+                          if (i2==0) exit rot_new_row
+
+                          ! apply that givens transformation to the left hand side.
+                          call fprota(co,si,h(2:i2+1),q(irot,2:i2+1))
+
+                      endif
+
+                      h(1:i2+1) = [h(2:i2+1),zero]
+
+                  end do rot_new_row
+              end do
+          end do const_teta
+
+          ! extend the observation matrix with the rows of a matrix expressing
+          ! that for phi=cst. sp(teta,phi) must be a cubic polynomial.
+          const_phi: do i=5,nt4
+              ii = i-4
+              do j=1,npp
+                  ! initialize the new row
+                  h(1:iband4) = zero
+
+                  ! fill in the non-zero elements of the row. jrot records the column
+                  ! number of the first non-zero element in the row.
+                  j1 = 1
+                  fill_in: do l=1,5
+                      il = ii+l
+                      ij = npp
+
+                      if (il==3 .or. il==nt4) then
+                          if (il==3) then
+                              j1 = 1
+                              j2 = 2
+                              ij = j+2
+                          else
+                              j1 = j1+3-j
+                              j2 = j1-2
+                              ij = 0
+                          endif
+                          h(j2:j2+1) = bt(ii,l)*[coco(j),cosi(j)]
+                      endif
+                      h(j1) = h(j1)+bt(ii,l)
+                      j1 = j1+ij
+                  end do fill_in
+
+                  h(:iband4) = pinv*h(:iband4)
+                  ri = zero
+                  jrot = merge(3+j+(ii-3)*npp,1,ii>2)
+
+                  ! rotate the new row into triangle by givens transformations.
+                  rot_new_phi: do irot=jrot,ncof
+                      piv = h(1)
+                      i2 = min(iband3,ncof-irot)
+                      if (piv==zero) then
+
+                         if (i2<=0) exit rot_new_phi
+
+                      else
+
+                         ! calculate the parameters of the givens transformation.
+                         call fpgivs(piv,q(irot,1),co,si)
+
+                         ! apply that givens transformation to the right hand side.
+                         call fprota(co,si,ri,ff(irot))
+
+                         if (i2==0) exit rot_new_phi
+
+                         ! apply that givens transformation to the left hand side.
+                         call fprota(co,si,h(2:i2+1),q(irot,2:i2+1))
+
+                      endif
+
+                      h(1:i2+1) = [h(2:i2+1),zero]
+
+                  end do rot_new_phi
+
+              end do
+          end do const_phi
+
+          ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
+          dmax  = max(zero,maxval(q(1:ncof,1)))
+
+          ! check whether the matrix is rank deficient.
+          sigma = eps*dmax
+
+          if (all(q(1:ncof,1)>sigma)) then
+
+              ! backward substitution in case of full rank.
+              c(:ncof) = fpback(q,ff,ncof,iband4,ncc)
+              rank = ncof
+
+          else
+
+              ! In case of rank deficiency, find the minimum norm solution
+              lwest = ncof*iband4+ncof+iband4
+              if (lwest>lwrk) then
+                 ier = lwest
+                 return
+              end if
+              lf = 1
+              lh = lf+ncof
+              la = lh+iband4
+              call fprank(q,ff,ncof,iband4,ncc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+
+          end if
+
+          q(1:ncof,1) = q(1:ncof,1)/dmax
+
+          ! find the coefficients in the standard b-spline representation of the spherical spline.
+          call fprpsp(nt,np,coco,cosi,c,ff,ncoff)
+
+          ! compute f(p).
+          fp = zero
+          get_fp: do num = 1,nreg
+              num1 = num-1
+              lt   = num1/npp
+              lp   = num1-lt*npp
+              jrot = lt*np4+lp
+              in   = index(num)
+
+              do while (in/=0)
+                  store = zero
+                  i1 = jrot
+                  do i=1,4
+                     store = store+spt(in,i)*dot_product(spp(in,1:4),c(i1+1:i1+4))
+                     i1 = i1+np4
+                  end do
+                  fp = fp+(w(in)*(r(in)-store))**2
+                  in = nummer(in)
+              end do
+          end do get_fp
+
+          ! test whether the approximation sp(teta,phi) is an acceptable solution
+          fpms = fp-s
+          if (abs(fpms)<=acc) then
+              if (ncof/=rank) ier = -rank
+              return
+          end if
+
+          ! carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
+
+          if (.not.check3) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle iterations
+             elseif (f2<zero) then
+                 check3 = .true.
+             endif
+          endif
+
+          if (.not.check1) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle iterations
+             elseif (f2>zero) then
+                check1 = .true.
+             endif
+          endif
+
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
+
+      end do iterations
+
+      ! the maximum allowable number of iterations has been reached.
+      ier = FITPACK_MAXIT
+      return
+
       end subroutine fpsphe
 
 
