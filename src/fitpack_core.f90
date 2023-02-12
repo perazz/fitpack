@@ -2843,8 +2843,8 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpold = 0.0_RKIND
-      fp0 = 0.0_RKIND
+      fpold = zero
+      fp0 = zero
       nplus = 0
 
       ! **********************************************************************************************
@@ -3794,8 +3794,8 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpold = 0.0_RKIND
-      fp0 = 0.0_RKIND
+      fpold = zero
+      fp0 = zero
       nplus = 0
 
       !  ******************************************************************************************
@@ -4707,8 +4707,8 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpold = 0.0_RKIND
-      fp0 = 0.0_RKIND
+      fpold = zero
+      fp0 = zero
       nplus = 0
 
       ! *****
@@ -8101,8 +8101,8 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpold = 0.0_RKIND
-      fp0 = 0.0_RKIND
+      fpold = zero
+      fp0 = zero
       nplus = 0
 
       ! *****
@@ -8961,8 +8961,8 @@ module fitpack_core
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
-      fpold = 0.0_RKIND
-      fp0 = 0.0_RKIND
+      fpold = zero
+      fp0 = zero
       nplus = 0
 
       ! *****
