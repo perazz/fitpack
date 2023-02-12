@@ -5446,7 +5446,7 @@ module fitpack_core
                i = l
                j = j+1
             end do march_left
-   
+
             do
                if (i<count .or. l==0) then
                    exit
@@ -5479,11 +5479,11 @@ module fitpack_core
                    count = count+1
                endif
             end do
-   
+
             hundred10: do
                 l = right(i)
                 k = i
-   
+
                 if (l==0) then
                     l = up(i)
                     j = j-1
@@ -5491,11 +5491,11 @@ module fitpack_core
                         exit inner
                     else
                         i = l
-                        cycle hundred10
+                        ! cycle hundred10
                     endif
                 else
                     i = l
-                    cycle inner
+                    exit hundred10
                 endif
             end do hundred10
 
@@ -12312,23 +12312,26 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer iopt,m,ntest,npest,maxit,ib1,ib3,nc,ncc,intest,nrest, &
-       nt,np,lwrk,ier
-      real(RKIND) s,eta,tol,fp,sup
+      integer,     intent(in)    :: iopt,m,ntest,npest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer,     intent(out)   :: ier
+      integer,     intent(inout) :: nt,np
+      real(RKIND), intent(in)    :: s,eta,tol
+      real(RKIND), intent(inout) :: fp,sup
+
       !  ..array arguments..
-      real(RKIND) teta(m),phi(m),r(m),w(m),tt(ntest),tp(npest),c(nc), &
-       fpint(intest),coord(intest),f(ncc),ff(nc),row(npest),coco(npest), &
-       cosi(npest),a(ncc,ib1),q(ncc,ib3),bt(ntest,5),bp(npest,5), &
-       spt(m,4),spp(m,4),h(ib3),wrk(lwrk)
-      integer index(nrest),nummer(m)
+      real(RKIND), intent(in)    :: teta(m),phi(m),r(m),w(m)
+      real(RKIND), intent(inout) :: tt(ntest),tp(npest),c(nc),f(ncc),&
+                                    row(npest),coco(npest),cosi(npest), &
+                                    fpint(intest),coord(intest),ff(nc),bt(ntest,5),bp(npest,5),&
+                                    a(ncc,ib1),q(ncc,ib3),spt(m,4),spp(m,4),h(ib3),wrk(lwrk)
+      integer,     intent(inout) ::  index(nrest),nummer(m)
+
       !  ..local scalars..
-      real(RKIND) aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,facc,facs,fac1,fac2,fn, &
-       fpmax,fpms,f1,f2,f3,hti,htj,p,pinv,piv,p1,p2,p3,ri,si, &
-       sigma,sq,store,wi,rn
-      integer i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot, &
-       iter,i1,i2,i3,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,lt,lwest,l1,l2, &
-       l3,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
-       num1,rank
+      real(RKIND) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,hti,htj, &
+                     p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
+      integer :: i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot,iter,i1,i2,i3,j,jlt,jrot,j1,j2,l,  &
+                 la,lf,lh,ll,lp,lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
+                 num1,rank
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hp,ht
 
@@ -12336,405 +12339,426 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
       eps = sqrt(eta)
 
       ! Initializations
-      lwest = 0
-      ntt   = 0
+      lwest  = 0
+      ntt    = 0
       iband1 = 0
 
+      bootstrap: if (iopt>=0) then
 
-      if(iopt<0) go to 70
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      if(iopt==0) go to 10
-      if(s<sup) then
-        if (np<11) go to 60
-        go to 70
-      endif
-      !  if iopt=0 we begin by computing the weighted least-squares polynomial
-      !  of the form
-      !     s(teta,phi) = c1*f1(teta) + cn*fn(teta)
-      !  where f1(teta) and fn(teta) are the cubic polynomials satisfying
-      !     f1(0) = 1, f1(pi) = f1'(0) = f1'(pi) = 0 ; fn(teta) = 1-f1(teta).
-      !  the corresponding weighted sum of squared residuals gives the upper
-      !  bound sup for the smoothing factor s.
-  10  sup = zero
-      d1 = zero
-      d2 = zero
-      c1 = zero
-      cn = zero
-      fac1 = pi*(one + half)
-      fac2 = (one + one)/pi**3
-      aa = zero
-      do 40 i=1,m
-         wi = w(i)
-         ri = r(i)*wi
-         arg = teta(i)
-         fn = fac2*arg*arg*(fac1-arg)
-         f1 = (one-fn)*wi
-         fn = fn*wi
-         if(fn==zero) go to 20
-         call fpgivs(fn,d1,co,si)
-         call fprota(co,si,f1,aa)
-         call fprota(co,si,ri,cn)
- 20      if(f1==zero) go to 30
-         call fpgivs(f1,d2,co,si)
-         call fprota(co,si,ri,c1)
- 30      sup = sup+ri*ri
- 40   continue
-      if(d2/=zero) c1 = c1/d2
-      if(d1/=zero) cn = (cn-aa*c1)/d1
-      !  find the b-spline representation of this least-squares polynomial
-      nt = 8
-      np = 8
-      c(1:8)   = c1
-      c(9:16)  = cn
-      tt(1:4)  = zero
-      tt(5:8)  = pi
-      tp(1:4)  = zero
-      tp(5:8)  = pi2
-      fp = sup
-      !  test whether the least-squares polynomial is an acceptable solution
-      fpms = sup-s
-      if(fpms<acc) go to 960
-      !  test whether we cannot further increase the number of knots.
-  60  if(npest<11 .or. ntest<9) go to 950
-      !  find the initial set of interior knots of the spherical spline in
-      !  case iopt = 0.
-      np = 11
-      tp(5:7) = pi*[half,one,onep5]
-      nt = 9
-      tt(5) = tp(5)
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  part 1 : computation of least-squares spherical splines.            c
-      !  ********************************************************            c
-      !  if iopt < 0 we compute the least-squares spherical spline according c
-      !  to the given set of knots.                                          c
-      !  if iopt >=0 we compute least-squares spherical splines with increas-c
-      !  ing numbers of knots until the corresponding sum f(p=inf)<=s.       c
-      !  the initial set of knots then depends on the value of iopt:         c
-      !    if iopt=0 we start with one interior knot in the teta-direction   c
-      !              (pi/2) and three in the phi-direction (pi/2,pi,3*pi/2). c
-      !    if iopt>0 we start with the set of knots found at the last call   c
-      !              of the routine.                                         c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      !  main loop for the different sets of knots. m is a save upper bound
-      !  for the number of trials.
-  70  do 570 iter=1,m
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(teta,phi).
-         l1 = 4
-         l2 = l1
-         l3 = np-3
-         l4 = l3
-         tp(l2) = 0.
-         tp(l3) = pi2
-         do 80 i=1,3
-            l1 = l1+1
-            l2 = l2-1
-            l3 = l3+1
-            l4 = l4-1
-            tp(l2) = tp(l4)-pi2
-            tp(l3) = tp(l1)+pi2
-  80     continue
-        tt(1:4)     = zero
-        tt(nt-3:nt) = pi
-      !  find nrint, the total number of knot intervals and nreg, the number
-      !  of panels in which the approximation domain is subdivided by the
-      !  intersection of knots.
-        ntt = nt-7
-        npp = np-7
-        nrr = npp/2
-        nr1 = nrr+1
-        nrint = ntt+npp
-        nreg = ntt*npp
-      !  arrange the data points according to the panel they belong to.
-        call fporde(teta,phi,m,3,3,tt,nt,tp,np,nummer,index,nreg)
-      !  find the b-spline coefficients coco and cosi of the cubic spline
-      !  approximations sc(phi) and ss(phi) for cos(phi) and sin(phi).
-        coco(1:npp) = zero
-        cosi(1:npp) = zero
-        a(1:npp,1:npp) = zero
-      !  the coefficients coco and cosi are obtained from the conditions
-      !  sc(tp(i))=cos(tp(i)),resp. ss(tp(i))=sin(tp(i)),i=4,5,...np-4.
-        do 150 i=1,npp
-           l2 = i+3
-           arg = tp(l2)
-           hp = fpbspl(tp,np,3,arg,l2)
-           row(1:npp) = zero
-           ll = i
-           do 120 j=1,3
-              if(ll>npp) ll= 1
-              row(ll) = row(ll)+hp(j)
-              ll = ll+1
- 120       continue
-           facc = cos(arg)
-           facs = sin(arg)
-           do 140 j=1,npp
-              piv = row(j)
-              if (piv==zero) go to 140
-              call fpgivs(piv,a(j,1),co,si)
-              call fprota(co,si,facc,coco(j))
-              call fprota(co,si,facs,cosi(j))
-              if(j==npp) go to 150
-              j1 = j+1
-              i2 = 1
-              do 130 l=j1,npp
-                 i2 = i2+1
-                 call fprota(co,si,row(l),a(j,i2))
- 130          continue
- 140       continue
- 150    continue
-        coco(:npp) = fpback(a,coco,npp,npp,ncc)
-        cosi(:npp) = fpback(a,cosi,npp,npp,ncc)
-      !  find ncof, the dimension of the spherical spline and ncoff, the
-      !  number of coefficients in the standard b-spline representation.
-        nt4 = nt-4
-        np4 = np-4
-        ncoff = nt4*np4
-        ncof = 6+npp*(ntt-1)
-      !  find the bandwidth of the observation matrix a.
-        iband = 4*npp
-        if(ntt==4) iband = 3*(npp+1)
-        if(ntt<4) iband = ncof
-        iband1 = iband-1
-      !  initialize the observation matrix a.
-        f(1:ncof) = zero
-        a(1:ncof,1:iband) = zero
-      !  initialize the sum of squared residuals.
-        fp = zero
-      !  fetch the data points in the new order. main loop for the
-      !  different panels.
-        do 340 num=1,nreg
-      !  fix certain constants for the current panel; jrot records the column
-      !  number of the first non-zero element in a row of the observation
-      !  matrix according to a data point of the panel.
-          num1 = num-1
-          lt = num1/npp
-          l1 = lt+4
-          lp = num1-lt*npp+1
-          l2 = lp+3
-          lt = lt+1
-          jrot = 0
-          if(lt>2) jrot = 3+(lt-3)*npp
-      !  test whether there are still data points in the current panel.
-          in = index(num)
- 170      if(in==0) go to 340
-      !  fetch a new data point.
-          wi = w(in)
-          ri = r(in)*wi
-      !  evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
-          ht = fpbspl(tt,nt,3,teta(in),l1)
-      !  evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
-          hp = fpbspl(tp,np,3,phi(in),l2)
-      !  store the value of these b-splines in spt and spp resp.
-          spp(in,1:4) = hp(1:4)
-          spt(in,1:4) = ht(1:4)
-      !  initialize the new row of observation matrix.
-         h(1:iband) = zero
-      !  calculate the non-zero elements of the new row by making the cross
-      !  products of the non-zero b-splines in teta- and phi-direction and
-      !  by taking into account the conditions of the spherical splines.
-         row(1:npp) = zero
-      !  take into account the condition (3) of the spherical splines.
-          ll = lp
-          do 210 i=1,4
-             if(ll>npp) ll=1
-             row(ll) = row(ll)+hp(i)
-             ll = ll+1
- 210      continue
-          ! take into account the other conditions of the spherical splines.
-          if(lt<=2 .or. lt>=(ntt-1)) then
-             facc = dot_product(row(:npp),coco(:npp))
-             facs = dot_product(row(:npp),cosi(:npp))
-          else
-             facc = zero
-             facs = zero
+          ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          !  if iopt=0 we begin by computing the weighted least-squares polynomial of the form
+          !     s(teta,phi) = c1*f1(teta) + cn*fn(teta)
+          !  where f1(teta) and fn(teta) are the cubic polynomials satisfying
+          !     f1(0) = 1, f1(pi) = f1'(0) = f1'(pi) = 0 ; fn(teta) = 1-f1(teta).
+          !  the corresponding weighted sum of squared residuals gives the upper
+          !  bound sup for the smoothing factor s.
+          if (iopt==0 .or. (iopt>0 .and. s>=sup)) then
+
+              sup  = zero
+              d1   = zero
+              d2   = zero
+              c1   = zero
+              cn   = zero
+              aa   = zero
+              fac1 = pi*(one + half)
+              fac2 = two/pi**3
+              initial_poly: do i=1,m
+                  wi  = w(i)
+                  ri  = r(i)*wi
+                  arg = teta(i)
+                  fn  = fac2*(fac1-arg)*arg**2
+                  f1  = (one-fn)*wi
+                  fn  = fn*wi
+                  if (fn/=zero) then
+                      call fpgivs(fn,d1,co,si)
+                      call fprota(co,si,f1,aa)
+                      call fprota(co,si,ri,cn)
+                  endif
+                  if (f1/=zero) then
+                      call fpgivs(f1,d2,co,si)
+                      call fprota(co,si,ri,c1)
+                  endif
+                  sup = sup+ri*ri
+              end do initial_poly
+
+              if (d2/=zero) c1 = c1/d2
+              if (d1/=zero) cn = (cn-aa*c1)/d1
+
+              !  find the b-spline representation of this least-squares polynomial
+              nt       = 8
+              np       = 8
+              c(1:8)   = c1
+              c(9:16)  = cn
+              tt(1:4)  = zero
+              tt(5:8)  = pi
+              tp(1:4)  = zero
+              tp(5:8)  = pi2
+              fp       = sup
+
+              ! test whether the least-squares polynomial is an acceptable solution
+              fpms = sup-s
+              if (fpms<acc) then
+                  ier = FITPACK_LEASTSQUARES_OK
+                  return
+              end if
+
           endif
-         ! fill in the non-zero elements of the new row.
-         j1 = 0
-         new_row: do j =1,4
-            jlt = j+lt
-            htj = ht(j)
-            if (jlt==3) then
-                h(1:3) = [h(1)+htj,facc*htj,facs*htj]
-                j1 = 3
-            elseif (jlt==nt4) then
-                h(j1+1:j1+3) = htj*[facc,facs,one]
-                j1 = j1+2
-            elseif (jlt>2 .and. jlt<=nt4) then
-                h(j1+1:j1+1:npp) = row(1:npp)*htj
-                j1 = j1+npp
-            else
-                j1 = j1+1
-                h(j1) = h(j1)+htj
-            endif
-          end do new_row
-          h(:iband) = h(:iband1)*wi
-      !  rotate the row into triangle by givens transformations.
-          irot = jrot
-          do 310 i=1,iband
-            irot = irot+1
-            piv = h(i)
-            if (piv==zero) go to 310
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(irot,1),co,si)
-      !  apply that transformation to the right hand side.
-            call fprota(co,si,ri,f(irot))
-            if(i==iband) go to 320
-      !  apply that transformation to the left hand side.
-            i2 = 1
-            i3 = i+1
-            do 300 j=i3,iband
-              i2 = i2+1
-              call fprota(co,si,h(j),a(irot,i2))
- 300        continue
- 310      continue
-      !  add the contribution of the row to the sum of squares of residual
-      !  right hand sides.
- 320      fp = fp+ri**2
-      !  find the number of the next data point in the panel.
-          in = nummer(in)
-          go to 170
- 340    continue
-      !  find dmax, the maximum value for the diagonal elements in the reduced
-      !  triangle.
-        dmax = max(zero,maxval(a(:ncof,1),a(:ncof,1)>=zero))
-      !  check whether the observation matrix is rank deficient.
-        sigma = eps*dmax
-        if (any(a(1:ncof,1)<=sigma)) then
-            lwest = ncof*iband+ncof+iband
-            if(lwrk<lwest) go to 925
-            lf = 1
-            lh = lf+ncof
-            la = lh+iband
-            ff(1:ncof) = zero
-            q(1:ncof,1:iband) = a(1:ncof,1:iband)
-            call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la), &
-             wrk(lf),wrk(lh))
-             q(1:ncof,1) = q(1:ncof,1)/dmax
-          !  add to the sum of squared residuals, the contribution of reducing
-          !  the rank.
-            fp = fp+sq
-        else
-          !  backward substitution in case of full rank.
-            c(:ncof) = fpback(a,f,ncof,iband,ncc)
-            rank = ncof
-            q(1:ncof,1) = a(1:ncof,1)/dmax
-        endif
-      !  in case of rank deficiency, find the minimum norm solution.
 
-      !  find the coefficients in the standard b-spline representation of
-      !  the spherical spline.
-        call fprpsp(nt,np,coco,cosi,c,ff,ncoff)
-      !  test whether the least-squares spline is an acceptable solution.
-        if(iopt<0) then
-          if (fp<=0) go to 970
-          go to 980
-        endif
-        fpms = fp-s
-        if(abs(fpms)<=acc) then
-          if (fp<=0) go to 970
-          go to 980
-        endif
-      !  if f(p=inf) < s, accept the choice of knots.
-        if(fpms<zero) go to 580
-      !  test whether we cannot further increase the number of knots.
-        if(ncof>m) go to 935
-      !  search where to add a new knot.
-      !  find for each interval the sum of squared residuals fpint for the
-      !  data points having the coordinate belonging to that knot interval.
-      !  calculate also coord which is the same sum, weighted by the position
-      !  of the data points considered.
-        fpint(:nrint) = zero
-        coord(:nrint) = zero
-        do 490 num=1,nreg
-          num1 = num-1
-          lt = num1/npp
-          l1 = lt+1
-          lp = num1-lt*npp
-          l2 = lp+1+ntt
-          jrot = lt*np4+lp
-          in = index(num)
- 460      if(in==0) go to 490
-          store = 0.
-          i1 = jrot
-          do 480 i=1,4
-            hti = spt(in,i)
-            j1 = i1
-            do 470 j=1,4
-              j1 = j1+1
-              store = store+hti*spp(in,j)*c(j1)
- 470        continue
-            i1 = i1+np4
- 480      continue
-          store = (w(in)*(r(in)-store))**2
-          fpint(l1) = fpint(l1)+store
-          coord(l1) = coord(l1)+store*teta(in)
-          fpint(l2) = fpint(l2)+store
-          coord(l2) = coord(l2)+store*phi(in)
-          in = nummer(in)
-          go to 460
- 490    continue
-      !  find the interval for which fpint is maximal on the condition that
-      !  there still can be added a knot.
-        l1 = 1
-        l2 = nrint
-        if(ntest<nt+1) l1=ntt+1
-        if(npest<np+2) l2=ntt
-      !  test whether we cannot further increase the number of knots.
-        if(l1>l2) go to 950
- 500    fpmax = zero
-        l = 0
-        do 510 i=l1,l2
-          if(fpmax>=fpint(i)) go to 510
-          l = i
-          fpmax = fpint(i)
- 510    continue
-        if(l==0) go to 930
-      !  calculate the position of the new knot.
-        arg = coord(l)/fpint(l)
-      !  test in what direction the new knot is going to be added.
-        if(l>ntt) go to 530
-      !  addition in the teta-direction
-        l4 = l+4
-        fpint(l) = zero
-        fac1 = tt(l4)-arg
-        fac2 = arg-tt(l4-1)
-        if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
-        j = nt
-        do 520 i=l4,nt
-          tt(j+1) = tt(j)
-          j = j-1
- 520    continue
-        tt(l4) = arg
-        nt = nt+1
-        go to 570
-      !  addition in the phi-direction
- 530    l4 = l+4-ntt
-        if(arg<pi) go to 540
-        arg = arg-pi
-        l4 = l4-nrr
- 540    fpint(l) = zero
-        fac1 = tp(l4)-arg
-        fac2 = arg-tp(l4-1)
-        if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
-        ll = nrr+4
-        j = ll
-        do 550 i=l4,ll
-          tp(j+1) = tp(j)
-          j = j-1
- 550    continue
-        tp(l4) = arg
-        np = np+2
-        nrr = nrr+1
-        do 560 i=5,ll
-          j = i+nrr
-          tp(j) = tp(i)+pi
- 560    continue
+          !  test whether we cannot further increase the number of knots.
+          sixty: if (iopt==0 .or. (iopt>0 .and. (s>=sup .or. np<11))) then
+
+              if (npest<11 .or. ntest<9) then
+                  ier = FITPACK_INSUFFICIENT_STORAGE
+                  return
+              end if
+
+              !  find the initial set of interior knots of the spherical spline in case iopt = 0.
+              np      = 11
+              tp(5:7) = pi*[half,one,onep5]
+              nt      = 9
+              tt(5)   = tp(5)
+          endif sixty
+
+      endif bootstrap
+
+
+      !  ************************************************************************************************************
+      !  part 1 : computation of least-squares spherical splines.
+      !  ************************************************************************************************************
+      !  if iopt1<0 we compute the least-squares spherical spline according to the given set of knots.
+      !  if iopt1>=0 we compute least-squares spherical splines with increasing numbers of knots until the
+      !  corresponding sum f(p=inf)<=s.
+      !  the initial set of knots then depends on the value of iopt1:
+      !    if iopt1=0 we start with one interior knot in the teta-direction (pi/2) and and three in the
+      !               phi-direction (pi/2,pi,3*pi/2).
+      !    if iopt1>0 we start with the set of knots found at the last call of the routine.
+      !  ************************************************************************************************************
+
+      !  main loop for the different sets of knots. m is a safe upper bound for the number of trials.
+      compute_knots: do iter=1,m
+
+          ! find the position of the additional knots which are needed for the
+          ! b-spline representation of s(teta,phi).
+          tp(1:4)     = [tp(np-6:np-4)-pi2, zero]
+          tp(np-3:np) = [pi2, tp(5:7)+pi2]
+
+          tt(1:4)     = zero
+          tt(nt-3:nt) = pi
+
+          ! find nrint, the total number of knot intervals and nreg, the number
+          ! of panels in which the approximation domain is subdivided by the
+          ! intersection of knots.
+          ntt   = nt-7
+          npp   = np-7
+          nrr   = npp/2
+          nr1   = nrr+1
+          nrint = ntt+npp
+          nreg  = ntt*npp
+
+          ! arrange the data points according to the panel they belong to.
+          call fporde(teta,phi,m,3,3,tt,nt,tp,np,nummer,index,nreg)
+
+          ! find the b-spline coefficients coco and cosi of the cubic spline
+          ! approximations sc(phi) and ss(phi) for cos(phi) and sin(phi).
+          coco(1:npp) = zero
+          cosi(1:npp) = zero
+          a(1:npp,1:npp) = zero
+
+          ! the coefficients coco and cosi are obtained from the conditions
+          ! sc(tp(i))=cos(tp(i)),resp. ss(tp(i))=sin(tp(i)),i=4,5,...np-4.
+          get_coefs: do i=1,npp
+              l2 = i+3
+              arg = tp(l2)
+              hp = fpbspl(tp,np,3,arg,l2)
+
+              row(1:npp) = zero
+              ll = i
+              do j=1,3
+                 if (ll>npp) ll = 1
+                 row(ll) = row(ll)+hp(j)
+                 ll = ll+1
+              end do
+
+              facc = cos(arg)
+              facs = sin(arg)
+
+              do j=1,npp
+                  piv = row(j)
+                  if (piv==zero) cycle
+
+                  call fpgivs(piv,a(j,1),co,si)
+                  call fprota(co,si,facc,coco(j))
+                  call fprota(co,si,facs,cosi(j))
+                  if (j<npp) then
+                      j1 = j+1
+                      i2 = 1
+                      do l=j1,npp
+                         i2 = i2+1
+                         call fprota(co,si,row(l),a(j,i2))
+                      end do
+                  endif
+              end do
+          end do get_coefs
+
+          coco(:npp) = fpback(a,coco,npp,npp,ncc)
+          cosi(:npp) = fpback(a,cosi,npp,npp,ncc)
+          !  find ncof, the dimension of the spherical spline and ncoff, the
+          !  number of coefficients in the standard b-spline representation.
+            nt4 = nt-4
+            np4 = np-4
+            ncoff = nt4*np4
+            ncof = 6+npp*(ntt-1)
+          !  find the bandwidth of the observation matrix a.
+            iband = 4*npp
+            if(ntt==4) iband = 3*(npp+1)
+            if(ntt<4) iband = ncof
+            iband1 = iband-1
+          !  initialize the observation matrix a.
+            f(1:ncof) = zero
+            a(1:ncof,1:iband) = zero
+          !  initialize the sum of squared residuals.
+            fp = zero
+          !  fetch the data points in the new order. main loop for the
+          !  different panels.
+            do 340 num=1,nreg
+          !  fix certain constants for the current panel; jrot records the column
+          !  number of the first non-zero element in a row of the observation
+          !  matrix according to a data point of the panel.
+              num1 = num-1
+              lt = num1/npp
+              l1 = lt+4
+              lp = num1-lt*npp+1
+              l2 = lp+3
+              lt = lt+1
+              jrot = 0
+              if(lt>2) jrot = 3+(lt-3)*npp
+          !  test whether there are still data points in the current panel.
+              in = index(num)
+     170      if(in==0) go to 340
+          !  fetch a new data point.
+              wi = w(in)
+              ri = r(in)*wi
+          !  evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
+              ht = fpbspl(tt,nt,3,teta(in),l1)
+          !  evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
+              hp = fpbspl(tp,np,3,phi(in),l2)
+          !  store the value of these b-splines in spt and spp resp.
+              spp(in,1:4) = hp(1:4)
+              spt(in,1:4) = ht(1:4)
+          !  initialize the new row of observation matrix.
+             h(1:iband) = zero
+          !  calculate the non-zero elements of the new row by making the cross
+          !  products of the non-zero b-splines in teta- and phi-direction and
+          !  by taking into account the conditions of the spherical splines.
+             row(1:npp) = zero
+          !  take into account the condition (3) of the spherical splines.
+              ll = lp
+              do 210 i=1,4
+                 if(ll>npp) ll=1
+                 row(ll) = row(ll)+hp(i)
+                 ll = ll+1
+     210      continue
+              ! take into account the other conditions of the spherical splines.
+              if(lt<=2 .or. lt>=(ntt-1)) then
+                 facc = dot_product(row(:npp),coco(:npp))
+                 facs = dot_product(row(:npp),cosi(:npp))
+              else
+                 facc = zero
+                 facs = zero
+              endif
+             ! fill in the non-zero elements of the new row.
+             j1 = 0
+             new_row: do j =1,4
+                jlt = j+lt
+                htj = ht(j)
+                if (jlt==3) then
+                    h(1:3) = [h(1)+htj,facc*htj,facs*htj]
+                    j1 = 3
+                elseif (jlt==nt4) then
+                    h(j1+1:j1+3) = htj*[facc,facs,one]
+                    j1 = j1+2
+                elseif (jlt>2 .and. jlt<=nt4) then
+                    h(j1+1:j1+1:npp) = row(1:npp)*htj
+                    j1 = j1+npp
+                else
+                    j1 = j1+1
+                    h(j1) = h(j1)+htj
+                endif
+              end do new_row
+              h(:iband) = h(:iband1)*wi
+          !  rotate the row into triangle by givens transformations.
+              irot = jrot
+              do 310 i=1,iband
+                irot = irot+1
+                piv = h(i)
+                if (piv==zero) go to 310
+          !  calculate the parameters of the givens transformation.
+                call fpgivs(piv,a(irot,1),co,si)
+          !  apply that transformation to the right hand side.
+                call fprota(co,si,ri,f(irot))
+                if(i==iband) go to 320
+          !  apply that transformation to the left hand side.
+                i2 = 1
+                i3 = i+1
+                do 300 j=i3,iband
+                  i2 = i2+1
+                  call fprota(co,si,h(j),a(irot,i2))
+     300        continue
+     310      continue
+          !  add the contribution of the row to the sum of squares of residual
+          !  right hand sides.
+     320      fp = fp+ri**2
+          !  find the number of the next data point in the panel.
+              in = nummer(in)
+              go to 170
+     340    continue
+          !  find dmax, the maximum value for the diagonal elements in the reduced
+          !  triangle.
+            dmax = max(zero,maxval(a(:ncof,1),a(:ncof,1)>=zero))
+          !  check whether the observation matrix is rank deficient.
+            sigma = eps*dmax
+            if (any(a(1:ncof,1)<=sigma)) then
+                lwest = ncof*iband+ncof+iband
+                if(lwrk<lwest) go to 925
+                lf = 1
+                lh = lf+ncof
+                la = lh+iband
+                ff(1:ncof) = zero
+                q(1:ncof,1:iband) = a(1:ncof,1:iband)
+                call fprank(q,ff,ncof,iband,ncc,sigma,c,sq,rank,wrk(la), &
+                 wrk(lf),wrk(lh))
+                 q(1:ncof,1) = q(1:ncof,1)/dmax
+              !  add to the sum of squared residuals, the contribution of reducing
+              !  the rank.
+                fp = fp+sq
+            else
+              !  backward substitution in case of full rank.
+                c(:ncof) = fpback(a,f,ncof,iband,ncc)
+                rank = ncof
+                q(1:ncof,1) = a(1:ncof,1)/dmax
+            endif
+          !  in case of rank deficiency, find the minimum norm solution.
+
+          !  find the coefficients in the standard b-spline representation of
+          !  the spherical spline.
+            call fprpsp(nt,np,coco,cosi,c,ff,ncoff)
+          !  test whether the least-squares spline is an acceptable solution.
+            if(iopt<0) then
+              if (fp<=0) go to 970
+              go to 980
+            endif
+            fpms = fp-s
+            if(abs(fpms)<=acc) then
+              if (fp<=0) go to 970
+              go to 980
+            endif
+          !  if f(p=inf) < s, accept the choice of knots.
+            if(fpms<zero) go to 580
+          !  test whether we cannot further increase the number of knots.
+            if(ncof>m) go to 935
+          !  search where to add a new knot.
+          !  find for each interval the sum of squared residuals fpint for the
+          !  data points having the coordinate belonging to that knot interval.
+          !  calculate also coord which is the same sum, weighted by the position
+          !  of the data points considered.
+            fpint(:nrint) = zero
+            coord(:nrint) = zero
+            do 490 num=1,nreg
+              num1 = num-1
+              lt = num1/npp
+              l1 = lt+1
+              lp = num1-lt*npp
+              l2 = lp+1+ntt
+              jrot = lt*np4+lp
+              in = index(num)
+     460      if(in==0) go to 490
+              store = 0.
+              i1 = jrot
+              do 480 i=1,4
+                hti = spt(in,i)
+                j1 = i1
+                do 470 j=1,4
+                  j1 = j1+1
+                  store = store+hti*spp(in,j)*c(j1)
+     470        continue
+                i1 = i1+np4
+     480      continue
+              store = (w(in)*(r(in)-store))**2
+              fpint(l1) = fpint(l1)+store
+              coord(l1) = coord(l1)+store*teta(in)
+              fpint(l2) = fpint(l2)+store
+              coord(l2) = coord(l2)+store*phi(in)
+              in = nummer(in)
+              go to 460
+     490    continue
+          !  find the interval for which fpint is maximal on the condition that
+          !  there still can be added a knot.
+            l1 = 1
+            l2 = nrint
+            if(ntest<nt+1) l1=ntt+1
+            if(npest<np+2) l2=ntt
+          !  test whether we cannot further increase the number of knots.
+            if (l1>l2) then
+                ier = FITPACK_INSUFFICIENT_STORAGE
+                return
+            end if
+     500    fpmax = zero
+            l = 0
+            do 510 i=l1,l2
+              if(fpmax>=fpint(i)) go to 510
+              l = i
+              fpmax = fpint(i)
+     510    continue
+            if(l==0) go to 930
+          !  calculate the position of the new knot.
+            arg = coord(l)/fpint(l)
+          !  test in what direction the new knot is going to be added.
+            if(l>ntt) go to 530
+          !  addition in the teta-direction
+            l4 = l+4
+            fpint(l) = zero
+            fac1 = tt(l4)-arg
+            fac2 = arg-tt(l4-1)
+            if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
+            j = nt
+            do 520 i=l4,nt
+              tt(j+1) = tt(j)
+              j = j-1
+     520    continue
+            tt(l4) = arg
+            nt = nt+1
+            cycle compute_knots
+          !  addition in the phi-direction
+     530    l4 = l+4-ntt
+            if(arg<pi) go to 540
+            arg = arg-pi
+            l4 = l4-nrr
+     540    fpint(l) = zero
+            fac1 = tp(l4)-arg
+            fac2 = arg-tp(l4-1)
+            if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 500
+            ll = nrr+4
+            j = ll
+            do 550 i=l4,ll
+              tp(j+1) = tp(j)
+              j = j-1
+     550    continue
+            tp(l4) = arg
+            np = np+2
+            nrr = nrr+1
+            do 560 i=5,ll
+              j = i+nrr
+              tp(j) = tp(i)+pi
+     560    continue
       !  restart the computations with the new set of knots.
- 570  continue
+      end do compute_knots
+
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 2: determination of the smoothing spherical spline.             c
       ! ********************************************************             c
@@ -12976,10 +13000,6 @@ module fitpack_core
  940  ier = 3
       go to 990
  945  ier = 2
-      go to 990
- 950  ier = 1
-      go to 990
- 960  ier = -2
       go to 990
  970  ier = -1
       fp = zero
