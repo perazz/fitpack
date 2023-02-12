@@ -10374,13 +10374,12 @@ module fitpack_core
              !  fix certain constants for the current panel; jrot records the column number of the first
              ! non-zero element in a row of the observation matrix according to a data point of the panel.
              num1 = num-1
-             lu = num1/nvv
-             l1 = lu+4
-             lv = num1-lu*nvv+1
-             l2 = lv+3
-             jrot = 0
-             if(lu>iopt2) jrot = ipar1+(lu-iopt2-1)*nvv
-             lu = lu+1
+             lu   = num1/nvv
+             l1   = lu+4
+             lv   = num1-lu*nvv+1
+             l2   = lv+3
+             jrot = merge(ipar1+(lu-iopt2-1)*nvv,0,lu>iopt2)
+             lu   = lu+1
 
              !  test whether there are still data points in the current panel.
              in = index(num)
@@ -12329,7 +12328,7 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,hti,htj, &
                      p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
-      integer :: i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot,iter,i1,i2,i3,j,jlt,jrot,j1,j2,l,  &
+      integer :: i,iband,iband1,iband3,iband4,ich1,ich3,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,  &
                  la,lf,lh,ll,lp,lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num, &
                  num1,rank
       !  ..local arrays..
@@ -12508,120 +12507,137 @@ module fitpack_core
 
           coco(:npp) = fpback(a,coco,npp,npp,ncc)
           cosi(:npp) = fpback(a,cosi,npp,npp,ncc)
-          !  find ncof, the dimension of the spherical spline and ncoff, the
-          !  number of coefficients in the standard b-spline representation.
-            nt4 = nt-4
-            np4 = np-4
-            ncoff = nt4*np4
-            ncof = 6+npp*(ntt-1)
-          !  find the bandwidth of the observation matrix a.
-            iband = 4*npp
-            if(ntt==4) iband = 3*(npp+1)
-            if(ntt<4) iband = ncof
-            iband1 = iband-1
-          !  initialize the observation matrix a.
-            f(1:ncof) = zero
-            a(1:ncof,1:iband) = zero
-          !  initialize the sum of squared residuals.
-            fp = zero
-          !  fetch the data points in the new order. main loop for the
-          !  different panels.
-            do 340 num=1,nreg
-          !  fix certain constants for the current panel; jrot records the column
-          !  number of the first non-zero element in a row of the observation
-          !  matrix according to a data point of the panel.
+
+          ! find ncof, the dimension of the spherical spline and ncoff, the
+          ! number of coefficients in the standard b-spline representation.
+          nt4 = nt-4
+          np4 = np-4
+          ncoff = nt4*np4
+          ncof = 6+npp*(ntt-1)
+
+          ! find the bandwidth of the observation matrix a.
+          if (ntt<4) then
+             iband = ncof
+          elseif (ntt==4) then
+             iband = 3*(npp+1)
+          else
+             iband = 4*npp
+          end if
+          iband1 = iband-1
+
+          ! initialize the observation matrix a.
+          f(1:ncof) = zero
+          a(1:ncof,1:iband) = zero
+
+          ! initialize the sum of squared residuals.
+          fp = zero
+
+          ! fetch the data points in the new order. main loop for the different panels.
+          panels: do num=1,nreg
+              ! fix certain constants for the current panel; jrot records the column
+              ! number of the first non-zero element in a row of the observation
+              ! matrix according to a data point of the panel.
               num1 = num-1
-              lt = num1/npp
-              l1 = lt+4
-              lp = num1-lt*npp+1
-              l2 = lp+3
-              lt = lt+1
-              jrot = 0
-              if(lt>2) jrot = 3+(lt-3)*npp
-          !  test whether there are still data points in the current panel.
+              lt   = num1/npp
+              l1   = lt+4
+              lp   = num1-lt*npp+1
+              l2   = lp+3
+              lt   = lt+1
+              jrot = merge(3+(lt-3)*npp,0,lt>2)
+
+              ! test whether there are still data points in the current panel.
               in = index(num)
-     170      if(in==0) go to 340
-          !  fetch a new data point.
-              wi = w(in)
-              ri = r(in)*wi
-          !  evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
-              ht = fpbspl(tt,nt,3,teta(in),l1)
-          !  evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
-              hp = fpbspl(tp,np,3,phi(in),l2)
-          !  store the value of these b-splines in spt and spp resp.
-              spp(in,1:4) = hp(1:4)
-              spt(in,1:4) = ht(1:4)
-          !  initialize the new row of observation matrix.
-             h(1:iband) = zero
-          !  calculate the non-zero elements of the new row by making the cross
-          !  products of the non-zero b-splines in teta- and phi-direction and
-          !  by taking into account the conditions of the spherical splines.
-             row(1:npp) = zero
-          !  take into account the condition (3) of the spherical splines.
-              ll = lp
-              do 210 i=1,4
-                 if(ll>npp) ll=1
-                 row(ll) = row(ll)+hp(i)
-                 ll = ll+1
-     210      continue
-              ! take into account the other conditions of the spherical splines.
-              if(lt<=2 .or. lt>=(ntt-1)) then
-                 facc = dot_product(row(:npp),coco(:npp))
-                 facs = dot_product(row(:npp),cosi(:npp))
-              else
-                 facc = zero
-                 facs = zero
-              endif
-             ! fill in the non-zero elements of the new row.
-             j1 = 0
-             new_row: do j =1,4
-                jlt = j+lt
-                htj = ht(j)
-                if (jlt==3) then
-                    h(1:3) = [h(1)+htj,facc*htj,facs*htj]
-                    j1 = 3
-                elseif (jlt==nt4) then
-                    h(j1+1:j1+3) = htj*[facc,facs,one]
-                    j1 = j1+2
-                elseif (jlt>2 .and. jlt<=nt4) then
-                    h(j1+1:j1+1:npp) = row(1:npp)*htj
-                    j1 = j1+npp
-                else
-                    j1 = j1+1
-                    h(j1) = h(j1)+htj
-                endif
-              end do new_row
-              h(:iband) = h(:iband1)*wi
-          !  rotate the row into triangle by givens transformations.
-              irot = jrot
-              do 310 i=1,iband
-                irot = irot+1
-                piv = h(i)
-                if (piv==zero) go to 310
-          !  calculate the parameters of the givens transformation.
-                call fpgivs(piv,a(irot,1),co,si)
-          !  apply that transformation to the right hand side.
-                call fprota(co,si,ri,f(irot))
-                if(i==iband) go to 320
-          !  apply that transformation to the left hand side.
-                i2 = 1
-                i3 = i+1
-                do 300 j=i3,iband
-                  i2 = i2+1
-                  call fprota(co,si,h(j),a(irot,i2))
-     300        continue
-     310      continue
-          !  add the contribution of the row to the sum of squares of residual
-          !  right hand sides.
-     320      fp = fp+ri**2
-          !  find the number of the next data point in the panel.
-              in = nummer(in)
-              go to 170
-     340    continue
-          !  find dmax, the maximum value for the diagonal elements in the reduced
-          !  triangle.
-            dmax = max(zero,maxval(a(:ncof,1),a(:ncof,1)>=zero))
-          !  check whether the observation matrix is rank deficient.
+              points_left: do while (in/=0)
+                  ! fetch a new data point.
+                  wi = w(in)
+                  ri = r(in)*wi
+
+                  ! evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
+                  ht = fpbspl(tt,nt,3,teta(in),l1)
+
+                  ! evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
+                  hp = fpbspl(tp,np,3,phi(in),l2)
+
+                  ! store the value of these b-splines in spt and spp resp.
+                  spp(in,1:4) = hp(1:4)
+                  spt(in,1:4) = ht(1:4)
+
+                  ! initialize the new row of observation matrix.
+                  h(1:iband) = zero
+
+                  ! calculate the non-zero elements of the new row by making the cross
+                  ! products of the non-zero b-splines in teta- and phi-direction and
+                  ! by taking into account the conditions of the spherical splines.
+                  row(1:npp) = zero
+
+                  ! take into account the condition (3) of the spherical splines.
+                  ll = lp
+                  do i=1,4
+                     if (ll>npp) ll=1
+                     row(ll) = row(ll)+hp(i)
+                     ll = ll+1
+                  end do
+
+                  ! take into account the other conditions of the spherical splines.
+                  if (lt<=2 .or. lt>=(ntt-1)) then
+                     facc = dot_product(row(:npp),coco(:npp))
+                     facs = dot_product(row(:npp),cosi(:npp))
+                  else
+                     facc = zero
+                     facs = zero
+                  endif
+
+                  ! fill in the non-zero elements of the new row.
+                  j1 = 0
+                  new_row: do j =1,4
+                     jlt = j+lt
+                     htj = ht(j)
+                     if (jlt==3) then
+                         h(1:3) = [h(1)+htj,facc*htj,facs*htj]
+                         j1 = 3
+                     elseif (jlt==nt4) then
+                         h(j1+1:j1+3) = htj*[facc,facs,one]
+                         j1 = j1+2
+                     elseif (jlt>2 .and. jlt<=nt4) then
+                         h(j1+1:j1+1:npp) = row(1:npp)*htj
+                         j1 = j1+npp
+                     else
+                         j1 = j1+1
+                         h(j1) = h(j1)+htj
+                     endif
+                  end do new_row
+                  h(:iband) = h(:iband)*wi
+
+                  ! rotate the row into triangle by givens transformations.
+                  irot = jrot
+                  rotate: do i=1,iband
+                    irot = irot+1
+                    piv  = h(i)
+                    if (piv==zero) cycle rotate
+
+                    ! calculate the parameters of the givens transformation.
+                    call fpgivs(piv,a(irot,1),co,si)
+
+                    ! apply that transformation to the right hand side.
+                    call fprota(co,si,ri,f(irot))
+
+                    ! apply that transformation to the left hand side.
+                    if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
+
+                  end do rotate
+
+                  ! add the contribution of the row to the sum of squares of residual
+                  ! right hand sides.
+                  fp = fp+ri**2
+
+                  ! find the number of the next data point in the panel.
+                  in = nummer(in)
+              end do points_left
+          end do panels
+
+          !  find dmax, the maximum value for the diagonal elements in the reduced triangle.
+          dmax = max(zero,maxval(a(:ncof,1)))
+          ! check whether the observation matrix is rank deficient.
             sigma = eps*dmax
             if (any(a(1:ncof,1)<=sigma)) then
                 lwest = ncof*iband+ncof+iband
