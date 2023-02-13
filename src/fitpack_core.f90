@@ -15611,8 +15611,8 @@ module fitpack_core
       end subroutine percur
 
 
-      recursive subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
-       nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      pure subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
+                             nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  subroutine pogrid fits a function f(x,y) to a set of data points
       !  z(i,j) given at the nodes (x,y)=(u(i)*cos(v(j)),u(i)*sin(v(j))),
@@ -15930,140 +15930,140 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) z0,r,s,fp
-      integer mu,mv,nuest,nvest,nu,nv,lwrk,kwrk,ier
+      real(RKIND), intent(in)    :: z0,r,s
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
+      integer,     intent(out)   :: ier
+      integer,     intent(inout) :: nu,nv
       !  ..array arguments..
-      integer iopt(3),ider(2),iwrk(kwrk)
-      real(RKIND) u(mu),v(mv),z(mu*mv),c((nuest-4)*(nvest-4)),tu(nuest), &
-       tv(nvest),wrk(lwrk)
+      integer,     intent(in)    :: iopt(3),ider(2)
+      integer,     intent(inout) :: iwrk(kwrk)
+      real(RKIND), intent(in)    :: u(mu),v(mv),z(mu*mv)
+      real(RKIND), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
+
       !  ..local scalars..
-      real(RKIND) per,tol,uu,ve,zmax,zmin,rn,zb
-      integer i,i1,i2,j,jwrk,j1,j2,kndu,kndv,knru,knrv,kwest,l, &
-       ldz,lfpu,lfpv,lwest,lww,m,maxit,mumin,muu,nc
+      real(RKIND) :: uu,ve,zmax,zmin,zb
+      integer :: jwrk,kndu,kndv,knru,knrv,kwest,l,ldz,lfpu,lfpv,lwest,lww,m,mumin,muu,nc
 
       !  set constants
-      per = pi+pi
+      integer,     parameter :: maxit = 20
+      real(RKIND), parameter :: tol = smallnum03
+      real(RKIND), parameter :: per = pi2
+
       ve = v(1)+per
       !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+
       !  before starting computations, a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
-      if(iopt(1)<(-1) .or. iopt(1)>1) go to 200
-      if(iopt(2)<0 .or. iopt(2)>1) go to 200
-      if(iopt(3)<0 .or. iopt(3)>1) go to 200
-      if(ider(1)<(-1) .or. ider(1)>1) go to 200
-      if(ider(2)<0 .or. ider(2)>1) go to 200
-      if(ider(2)==1 .and. iopt(2)==0) go to 200
-      mumin = 4-iopt(3)-ider(2)
-      if(ider(1)>=0) mumin = mumin-1
-      if(mu<mumin .or. mv<4) go to 200
-      if(nuest<8 .or. nvest<8) go to 200
-      m = mu*mv
-      nc = (nuest-4)*(nvest-4)
-      lwest = 8+nuest*(mv+nvest+3)+21*nvest+4*mu+6*mv+ &
-       max0(nuest,mv+nvest)
+      ier = FITPACK_INPUT_ERROR
+
+      mumin = 4-iopt(3)-ider(2) - merge(1,0,ider(1)>=0)
+      m     = mu*mv
+      nc    = (nuest-4)*(nvest-4)
+      lwest = 8+nuest*(mv+nvest+3)+21*nvest+4*mu+6*mv+max(nuest,mv+nvest)
       kwest = 4+mu+mv+nuest+nvest
-      if(lwrk<lwest .or. kwrk<kwest) go to 200
-      if(u(1)<=0. .or. u(mu)>r) go to 200
-      if(iopt(3)==0) go to 10
-      if(u(mu)==r) go to 200
-  10  if(mu==1) go to 30
-      do 20 i=2,mu
-        if(u(i-1)>=u(i)) go to 200
-  20  continue
-  30  if(v(1)< (-pi) .or. v(1)>=pi ) go to 200
-      if(v(mv)>=v(1)+per) go to 200
-      do 40 i=2,mv
-        if(v(i-1)>=v(i)) go to 200
-  40  continue
-      if(iopt(1)>0) go to 140
-      !  if not given, we compute an estimate for z0.
-      if(ider(1)<0) go to 50
-      zb = z0
-      go to 70
-  50  zb = sum(z(1:mv))
-      rn = mv
-      zb = zb/rn
-      !  we determine the range of z-values.
-  70  zmin = zb
-      zmax = zb
-      do 80 i=1,m
-         if(z(i)<zmin) zmin = z(i)
-         if(z(i)>zmax) zmax = z(i)
-  80  continue
-      wrk(5) = zb
-      wrk(6) = zero
-      wrk(7) = zero
-      wrk(8) = zmax -zmin
-      iwrk(4) = mu
-      if(iopt(1)==0) go to 140
-      if(nu<8 .or. nu>nuest) go to 200
-      if(nv<11 .or. nv>nvest) go to 200
-      j = nu
-      do 90 i=1,4
-        tu(i) = zero
-        tu(j) = r
-        j = j-1
-  90  continue
-      l = 9
-      wrk(l) = zero
-      if(iopt(2)==0) go to 100
-      l = l+1
-      uu = u(1)
-      if(uu>tu(5)) uu = tu(5)
-      wrk(l) = uu*half
- 100  do 110 i=1,mu
-        l = l+1
-        wrk(l) = u(i)
- 110  continue
-      if(iopt(3)==0) go to 120
-      l = l+1
-      wrk(l) = r
- 120  muu = l-8
-      ier = fpchec(wrk(9),muu,tu,nu,3)
-      if(ier/=0) go to 200
-      j1 = 4
-      tv(j1) = v(1)
-      i1 = nv-3
-      tv(i1) = ve
-      j2 = j1
-      i2 = i1
-      do 130 i=1,3
-        i1 = i1+1
-        i2 = i2-1
-        j1 = j1+1
-        j2 = j2-1
-        tv(j2) = tv(i2)-per
-        tv(i1) = tv(j1)+per
- 130  continue
-      l = 9
-      do 135 i=1,mv
-        wrk(l) = v(i)
-        l = l+1
- 135  continue
-      wrk(l) = ve
-      ier = fpchep(wrk(9),mv+1,tv,nv,3)
-      if (ier==0) go to 150
-      go to 200
- 140  if(s<zero) go to 200
-      if(s==zero .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) go to 200
+
+      if (iopt(1)<(-1) .or. iopt(1)>1) return
+      if (iopt(2)<0 .or. iopt(2)>1)    return
+      if (iopt(3)<0 .or. iopt(3)>1)    return
+      if (ider(1)<(-1) .or. ider(1)>1) return
+      if (ider(2)<0 .or. ider(2)>1)    return
+      if (ider(2)==1 .and. iopt(2)==0) return
+      if (mu<mumin .or. mv<4)          return
+      if (nuest<8 .or. nvest<8)        return
+      if (lwrk<lwest .or. kwrk<kwest)  return
+      if (u(1)<=0. .or. u(mu)>r)       return
+
+      if (iopt(3)/=0 .and. u(mu)==r)   return
+
+      if (mu>1) then
+         if (any(u(1:mu-1)>=u(2:mu)))  return
+      endif
+
+      if (v(1)<(-pi) .or. v(1)>=pi)    return
+      if (v(mv)>=v(1)+per)             return
+      if (any(v(1:mv-1)>=v(2:mv)))     return
+
+      if (iopt(1)<=0) then
+
+         ! if not given, we compute an estimate for z0.
+         if (ider(1)<0) then
+            zb = sum(z(1:mv))/mv
+         else
+            zb = z0
+         end if
+
+         !  we determine the range of z-values.
+         zmin = min(zb,minval(z(:m)))
+         zmax = max(zb,maxval(z(:m)))
+
+         wrk(5) = zb
+         wrk(6) = zero
+         wrk(7) = zero
+         wrk(8) = zmax -zmin
+         iwrk(4) = mu
+
+      endif
+
+      if (iopt(1)<0) then
+
+          if (nu<8 .or.  nu>nuest) return
+          if (nv<11 .or. nv>nvest) return
+
+          tu(1:4)     = zero
+          tu(nu-3:nu) = r
+
+          l = 9
+          wrk(l) = zero
+          if (iopt(2)/=0) then
+              uu     = min(u(1),tu(5))
+              l      = l+1
+              wrk(l) = uu*half
+          endif
+
+          wrk(l+1:l+mu) = u
+          l = l+mu
+
+          if (iopt(3)/=0) then
+             l      = l+1
+             wrk(l) = r
+          endif
+
+          muu = l-8
+          ier = fpchec(wrk(9),muu,tu,nu,3); if(ier/=FITPACK_OK) return
+
+          tv(1:4)     = [tv(nv-6:nv-4)-per, v(1)]
+          tv(nv-3:nv) = [ve, tv(5:7)+per]
+
+          l = 9
+          wrk(l:l+mv) = [v,ve]
+
+          ier = fpchep(wrk(9),mv+1,tv,nv,3)
+          if (ier/=FITPACK_OK) return
+
+      endif
+
+      if (iopt(1)>=0) then
+          if (s<zero) return
+          if (s==zero .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
+      endif
+
       !  we partition the working space and determine the spline approximation
- 150  ldz = 5
+      ldz  = 5
       lfpu = 9
       lfpv = lfpu+nuest
-      lww = lfpv+nvest
+      lww  = lfpv+nvest
       jwrk = lwrk-8-nuest-nvest
       knru = 5
       knrv = knru+mu
       kndu = knrv+mv
       kndv = kndu+nuest
+
       call fppogr(iopt,ider,u,mu,v,mv,z,m,zb,r,s,nuest,nvest,tol,maxit, &
-       nc,nu,tu,nv,tv,c,fp,wrk(1),wrk(2),wrk(3),wrk(4),wrk(lfpu), &
-       wrk(lfpv),wrk(ldz),wrk(8),iwrk(1),iwrk(2),iwrk(3),iwrk(4), &
-       iwrk(knru),iwrk(knrv),iwrk(kndu),iwrk(kndv),wrk(lww),jwrk,ier)
- 200  return
+                  nc,nu,tu,nv,tv,c,fp,wrk(1),wrk(2),wrk(3),wrk(4),wrk(lfpu), &
+                  wrk(lfpv),wrk(ldz),wrk(8),iwrk(1),iwrk(2),iwrk(3),iwrk(4), &
+                  iwrk(knru),iwrk(knrv),iwrk(kndu),iwrk(kndv),wrk(lww),jwrk,ier)
+      return
       end subroutine pogrid
 
 
