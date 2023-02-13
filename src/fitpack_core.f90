@@ -733,7 +733,7 @@ module fitpack_core
       if (any(w<=zero))               return
       if (any(x(1:m-1)>=x(2:m)))      return
 
-      call fpchec(x,m,t,n,3,ier); if (ier/=FITPACK_OK) return
+      ier = fpchec(x,m,t,n,3); if (ier/=FITPACK_OK) return
 
       !  set numbers e(i)
       where(e/=zero) e = sign(one,e)
@@ -1228,7 +1228,7 @@ module fitpack_core
           t(1:k1)  = u(1)
           t(n-k:n) = u(m)
 
-          call fpched(u,m,t,n,k,ib,ie,ier)
+          ier = fpched(u,m,t,n,k,ib,ie)
 
           if (ier/=FITPACK_OK)            return
 
@@ -1725,7 +1725,7 @@ module fitpack_core
              t(j) = xe
              j = j-1
           end do
-          call fpchec(x,m,t,n,k,ier); if (ier/=0) return
+          ier = fpchec(x,m,t,n,k); if (ier/=0) return
       endif
 
       ier = FITPACK_OK
@@ -2584,10 +2584,9 @@ module fitpack_core
       !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
       !  If all of the following conditions are fulfilled, the error parameter ier is set to zero. if one
       !  of the conditions is violated, an error flag is returned.
-      pure subroutine fpchec(x,m,t,n,k,ier)
+      pure integer function fpchec(x,m,t,n,k) result(ier)
          integer,     intent(in)  :: m,n,k
          real(RKIND), intent(in) :: x(m),t(n)
-         integer,     intent(out) :: ier
 
          ! Local variables
          integer :: i,j,k1,k2,l,nk1,nk2,nk3
@@ -2648,10 +2647,10 @@ module fitpack_core
          ! All checks passed
          ier = FITPACK_OK
 
-      end subroutine fpchec
+      end function fpchec
 
 
-      pure subroutine fpched(x,m,t,n,k,ib,ie,ier)
+      pure integer function fpched(x,m,t,n,k,ib,ie) result(ier)
 
       !  subroutine fpched verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
       !  of degree k,with ib derative constraints at x(1) and ie constraints at x(m), in relation to the
@@ -2661,7 +2660,6 @@ module fitpack_core
       !  ..
       !  ..scalar arguments..
       integer, intent(in) :: m,n,k,ib,ie
-      integer, intent(out) :: ier
       !  ..array arguments..
       real(RKIND), intent(in) :: x(m),t(n)
       !  ..local scalars..
@@ -2722,7 +2720,7 @@ module fitpack_core
       ! Success! all checks passed
       ier = FITPACK_OK
       return
-      end subroutine fpched
+      end function fpched
 
       ! subroutine fpchep verifies the number and the position of the knots t(j),j=1,2,...,n of a
       ! periodic spline of degree k, in relation to the number and the position of the data points
@@ -14527,7 +14525,7 @@ module fitpack_core
              t(j) = ue
              j = j-1
           end do
-          call fpchec(u,m,t,n,k,ier); if (ier/=FITPACK_OK) return
+          ier = fpchec(u,m,t,n,k); if (ier/=FITPACK_OK) return
 
       else
 
@@ -15335,7 +15333,7 @@ module fitpack_core
               tu(1:4)     = ub
               tu(nu-3:nu) = ue
 
-              call fpchec(u,mu,tu,nu,3,ier)
+              ier = fpchec(u,mu,tu,nu,3)
 
           else
 
@@ -15360,7 +15358,7 @@ module fitpack_core
               tv(1:4)     = vb
               tv(nv-3:nv) = ve
 
-              call fpchec(v,mv,tv,nv,3,ier)
+              ier = fpchec(v,mv,tv,nv,3)
 
           else
 
@@ -16024,7 +16022,7 @@ module fitpack_core
       l = l+1
       wrk(l) = r
  120  muu = l-8
-      call fpchec(wrk(9),muu,tu,nu,3,ier)
+      ier = fpchec(wrk(9),muu,tu,nu,3)
       if(ier/=0) go to 200
       j1 = 4
       tv(j1) = v(1)
@@ -16823,12 +16821,12 @@ module fitpack_core
           if (nx<nminx .or. nx>nxest) return
           tx(1:kx1)    = xb
           tx(nx-kx:nx) = xe
-          call fpchec(x,mx,tx,nx,kx,ier); if (ier/=FITPACK_OK) return
+          ier = fpchec(x,mx,tx,nx,kx); if (ier/=FITPACK_OK) return
 
           if (ny<nminy .or. ny>nyest) return
           ty(1:ky1)    = yb
           ty(ny-ky:ny) = ye
-          call fpchec(y,my,ty,ny,ky,ier); if (ier/=FITPACK_OK) return
+          ier = fpchec(y,my,ty,ny,ky); if (ier/=FITPACK_OK) return
 
       else
 
@@ -17384,7 +17382,7 @@ module fitpack_core
  120  l = l+1
       wrk(l) = pi
       muu = l-12
-      call fpchec(wrk(13),muu,tu,nu,3,ier)
+      ier = fpchec(wrk(13),muu,tu,nu,3)
       if(ier/=0) go to 200
       j1 = 4
       tv(j1) = v(1)
