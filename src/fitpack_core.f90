@@ -13200,22 +13200,26 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND) xb,xe,yb,ye,s,eta,tol,fp,fp0
-      integer iopt,m,kxx,kyy,nxest,nyest,maxit,nmax,km1,km2,ib1,ib3, &
-       nc,intest,nrest,nx0,ny0,lwrk,ier
+      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,eta,tol
+      real(RKIND), intent(inout) :: fp,fp0
+      integer,     intent(in)    :: iopt,m,kxx,kyy,nxest,nyest,maxit,nmax,km1,km2,ib1,ib3, &
+                                    nc,intest,nrest,lwrk
+      integer,     intent(inout) :: nx0,ny0,ier
       !  ..array arguments..
-      real(RKIND) x(m),y(m),z(m),w(m),tx(nmax),ty(nmax),c(nc),fpint(intest), &
-       coord(intest),f(nc),ff(nc),a(nc,ib1),q(nc,ib3),bx(nmax,km2), &
-       by(nmax,km2),spx(m,km1),spy(m,km1),h(ib3),wrk(lwrk)
-      integer index(nrest),nummer(m)
+      real(RKIND), intent(in)    :: z(m),w(m)
+      real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),fpint(intest),coord(intest),&
+                                    f(nc),ff(nc),a(nc,ib1),q(nc,ib3),bx(nmax,km2),by(nmax,km2), &
+                                    spx(m,km1),spy(m,km1),h(ib3),wrk(lwrk)
+      integer,     intent(inout) :: index(nrest),nummer(m)
+
       !  ..local scalars..
-      real(RKIND) acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv, &
-       piv,p1,p2,p3,sigma,sin,sq,store,wi,x0,x1,y0,y1,zi,eps, &
-       rn
-      integer i,iband,iband1,iband3,iband4,ibb,ichang,ich1,ich3,ii, &
-       in,irot,iter,i1,i2,i3,j,jrot,jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l, &
-       la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,nminy,nreg, &
-       nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,n1,rank
+      real(RKIND) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
+                     sin,sq,store,wi,x0,x1,y0,y1,zi,eps,rn
+      integer :: i,iband,iband1,iband3,iband4,ibb,ich1,ich3,ii,in,irot,iter,i1,i2,i3,j,jrot,&
+                 jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
+                 nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,n1,rank
+      logical :: interchanged
+
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hx,hy
 
@@ -13246,8 +13250,8 @@ module fitpack_core
       ! system to be solved.                                                 c
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      ! ichang denotes whether(1) or not(-1) the directions have been inter changed.
-      ichang = -1
+      ! interchanged denotes whether or not the directions have been inter changed.
+      interchanged = .false.
       x0 = xb
       x1 = xe
       y0 = yb
@@ -13304,7 +13308,7 @@ module fitpack_core
         l = ky*(nx-kx1)+kx
         if(iband1<=l) go to 130
         iband1 = l
-        ichang = -ichang
+        interchanged = .not.interchanged
         call swap_RKIND(x,y)
         call swap_RKIND(x0,y0)
         call swap_RKIND(x1,y1)
@@ -13746,7 +13750,7 @@ module fitpack_core
       fp = zero
  820  if(ncof/=rank) ier = -rank
       !  test whether x and y are in the original order.
- 830  if(ichang<0) go to 930
+ 830  if(.not.interchanged) go to 930
       !  if not, interchange x and y once more.
       l1 = 1
       do i=1,nk1x
@@ -18644,12 +18648,17 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: xb,xe,yb,ye,s,eps,fp
-      integer, intent(in) :: iopt
-      integer :: m,kx,ky,nxest,nyest,nmax,nx,ny,lwrk1,lwrk2,kwrk,ier
+      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,eps
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,m,kx,ky,nxest,nyest,nmax,lwrk1,lwrk2,kwrk
+      integer,     intent(inout) :: nx,ny
+      integer,     intent(out)   :: ier
+
       !  ..array arguments..
-      real(RKIND) :: x(m),y(m),z(m),w(m),tx(nmax),ty(nmax),c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),wrk2(lwrk2)
-      integer :: iwrk(kwrk)
+      real(RKIND), intent(in)    :: z(m),w(m)
+      real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),&
+                                    wrk2(lwrk2)
+      integer,     intent(inout) :: iwrk(kwrk)
       !  ..local scalars..
       integer :: ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx,lby,lco,lf,lff,lfp,lh,lq,lsx,lsy, &
                  lwest,ncest,nest,nek,nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
