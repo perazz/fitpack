@@ -2842,7 +2842,7 @@ module fitpack_core
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       fpold = zero
-      fp0 = zero
+      fp0   = zero
       nplus = 0
 
       ! **********************************************************************************************
@@ -13227,28 +13227,26 @@ module fitpack_core
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
       real(RKIND), parameter :: con9 = 0.9e0_RKIND
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 1: determination of the number of knots and their position.     c
-      ! ****************************************************************     c
-      ! given a set of knots we compute the least-squares spline sinf(x,y),  c
-      ! and the corresponding weighted sum of squared residuals fp=f(p=inf). c
-      ! if iopt=-1  sinf(x,y) is the requested approximation.                c
-      ! if iopt=0 or iopt=1 we check whether we can accept the knots:        c
-      !   if fp <=s we will continue with the current set of knots.          c
-      !   if fp > s we will increase the number of knots and compute the     c
-      !      corresponding least-squares spline until finally  fp<=s.        c
-      ! the initial choice of knots depends on the value of s and iopt.      c
-      !   if iopt=0 we first compute the least-squares polynomial of degree  c
-      !     kx in x and ky in y; nx=nminx=2*kx+2 and ny=nminy=2*ky+2.        c
-      !     fp0=f(0) denotes the corresponding weighted sum of squared       c
-      !     residuals                                                        c
-      !   if iopt=1 we start with the knots found at the last call of the    c
-      !     routine, except for the case that s>=fp0; then we can compute    c
-      !     the least-squares polynomial directly.                           c
-      ! eventually the independent variables x and y (and the corresponding  c
-      ! parameters) will be switched if this can reduce the bandwidth of the c
-      ! system to be solved.                                                 c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      ! **********************************************************************************************
+      !  part 1: determination of the number of knots and their position
+      ! **********************************************************************************************
+      !  given a set of knots we compute the least-squares spline sinf(x,y), and the corresponding
+      !  weighted sum of squared residuals fp=f(p=inf).
+      !  if iopt=-1 sinf(x,y) is the requested approximation.
+      !  if iopt=0 or iopt=1 we check whether we can accept the knots:
+      !     if fp <=s we will continue with the current set of knots.
+      !     if fp > s we will increase the number of knots and compute the orresponding least-squares
+      !        spline until finally fp<=s.
+      !  the initial choice of knots depends on the value of s and iopt.
+      !  if iopt=0 we first compute the least-squares polynomial of degree kx in x and ky in y;
+      !     nx=nminx=2*kx+2 and ny=nminy=2*ky+2.
+      !     fp0=f(0) denotes the corresponding weighted sum of squared residuals
+      !  if iopt=1 we start with the set of knots found at the last call of the routine, except for
+      !     the case that s >=fp0; then we compute the least-squares polynomial directly.
+      !  eventually the independent variables x and y (and the corresponding parameters) will be
+      !  switched if this can reduce the bandwidth of the system to be solved.
+      ! **********************************************************************************************
 
       ! interchanged denotes whether or not the directions have been inter changed.
       interchanged = .false.
@@ -13263,23 +13261,38 @@ module fitpack_core
       nxe = nxest
       nye = nyest
       eps = sqrt(eta)
-      if(iopt<0) go to 20
-      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-      acc = tol*s
-      if(iopt==0) go to 10
-      if(fp0>s) go to 20
-      !  initialization for the least-squares polynomial.
-  10  nminx = 2*kx1
-      nminy = 2*ky1
-      nx = nminx
-      ny = nminy
-      ier = -2
-      go to 30
-  20  nx = nx0
-      ny = ny0
+
+      bootstrap: if (iopt>=0) then
+
+          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+          acc = tol*s
+
+          if (iopt>0 .or. fp0<=s) then
+
+              nx = nx0
+              ny = ny0
+
+          else
+
+              !  initialization for the least-squares polynomial.
+              nminx = 2*kx1
+              nminy = 2*ky1
+              nx    = nminx
+              ny    = nminy
+              ier   = FITPACK_INTERPOLATING_OK
+
+          end if
+
+      else bootstrap
+
+          nx = nx0
+          ny = ny0
+
+      endif bootstrap
+
       !  main loop for the different sets of knots. m is a save upper bound
       !  for the number of trials.
-  30  do 420 iter=1,m
+      do 420 iter=1,m
       !  find the position of the additional knots which are needed for the
       !  b-spline representation of s(x,y).
         l = nx
