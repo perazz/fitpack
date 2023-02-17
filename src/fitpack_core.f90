@@ -16938,8 +16938,8 @@ module fitpack_core
       end subroutine spalde
 
 
-      recursive subroutine spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s, &
-       nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      pure subroutine spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s, &
+                             nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  given the function values r(i,j) on the latitude-longitude grid
       !  (u(i),v(j)), i=1,...,mu ; j=1,...,mv , spgrid determines a smooth
@@ -17266,155 +17266,149 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) r0,r1,s,fp
-      integer mu,mv,nuest,nvest,nu,nv,lwrk,kwrk,ier
+      real(RKIND), intent(in)    :: r0,r1,s
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
+      integer,     intent(inout) :: nu,nv
+      integer,     intent(out)   :: ier
+
       !  ..array arguments..
-      integer iopt(3),ider(4),iwrk(kwrk)
-      real(RKIND) u(mu),v(mv),r(mu*mv),c((nuest-4)*(nvest-4)),tu(nuest), &
-       tv(nvest),wrk(lwrk)
+      integer,     intent(in)    :: iopt(3),ider(4)
+      integer,     intent(inout) :: iwrk(kwrk)
+      real(RKIND), intent(in)    :: u(mu),v(mv),r(mu*mv)
+      real(RKIND), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
+
       !  ..local scalars..
-      real(RKIND) per,tol,uu,ve,rmax,rmin,rn,rb,re
-      integer i,i1,i2,j,jwrk,j1,j2,kndu,kndv,knru,knrv,kwest,l, &
-       ldr,lfpu,lfpv,lwest,lww,m,maxit,mumin,muu,nc
+      real(RKIND) :: uu,ve,rmax,rmin,rb,re,rn
+      integer :: i,jwrk,kndu,kndv,knru,knrv,kwest,l,ldr,lfpu,lfpv,lwest,lww,m,mumin,muu,nc
 
       !  set constants
-      per = pi+pi
-      ve = v(1)+per
-      !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+      real(RKIND), parameter :: per = pi2
+      real(RKIND), parameter :: tol = smallnum03
+      integer,     parameter :: maxit = 20
+
+      ve    = v(1)+per
+      mumin = 4
+      m     = mu*mv
+      nc    = (nuest-4)*(nvest-4)
+      lwest = 12+nuest*(mv+nvest+3)+24*nvest+4*mu+8*mv+max(nuest,mv+nvest)
+      kwest = 5+mu+mv+nuest+nvest
+
       !  before starting computations, a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = 10
-      if(iopt(1)<(-1) .or. iopt(1)>1) go to 200
-      if(iopt(2)<0 .or. iopt(2)>1) go to 200
-      if(iopt(3)<0 .or. iopt(3)>1) go to 200
-      if(ider(1)<(-1) .or. ider(1)>1) go to 200
-      if(ider(2)<0 .or. ider(2)>1) go to 200
-      if(ider(2)==1 .and. iopt(2)==0) go to 200
-      if(ider(3)<(-1) .or. ider(3)>1) go to 200
-      if(ider(4)<0 .or. ider(4)>1) go to 200
-      if(ider(4)==1 .and. iopt(3)==0) go to 200
-      mumin = 4
-      if(ider(1)>=0) mumin = mumin-1
-      if(iopt(2)==1 .and. ider(2)==1) mumin = mumin-1
-      if(ider(3)>=0) mumin = mumin-1
-      if(iopt(3)==1 .and. ider(4)==1) mumin = mumin-1
-      if(mumin==0) mumin = 1
-      if(mu<mumin .or. mv<4) go to 200
-      if(nuest<8 .or. nvest<8) go to 200
-      m = mu*mv
-      nc = (nuest-4)*(nvest-4)
-      lwest = 12+nuest*(mv+nvest+3)+24*nvest+4*mu+8*mv+ &
-       max0(nuest,mv+nvest)
-      kwest = 5+mu+mv+nuest+nvest
-      if(lwrk<lwest .or. kwrk<kwest) go to 200
-      if(u(1)<=0. .or. u(mu)>=pi) go to 200
-      if(mu==1) go to 30
-      do 20 i=2,mu
-        if(u(i-1)>=u(i)) go to 200
-  20  continue
-  30  if(v(1)< (-pi) .or. v(1)>=pi ) go to 200
-      if(v(mv)>=v(1)+per) go to 200
-      do 40 i=2,mv
-        if(v(i-1)>=v(i)) go to 200
-  40  continue
-      if(iopt(1)>0) go to 140
-      !  if not given, we compute an estimate for r0.
-      rn = mv
-      if(ider(1)<0) go to 45
-      rb = r0
-      go to 55
-  45  rb = sum(r(1:mv))/rn
-      !  if not given, we compute an estimate for r1.
-  55  if(ider(3)<0) go to 60
-      re = r1
-      go to 70
-  60  re = zero
-      j = m
-      do 65 i=1,mv
-         re = re+r(j)
-         j = j-1
-  65  continue
-      re = re/rn
-      !  we determine the range of r-values.
-  70  rmin = rb
-      rmax = re
-      do 80 i=1,m
-         if(r(i)<rmin) rmin = r(i)
-         if(r(i)>rmax) rmax = r(i)
-  80  continue
-      wrk(5) = rb
-      wrk(6) = zero
-      wrk(7) = zero
-      wrk(8) = re
-      wrk(9) = zero
-      wrk(10) = zero
-      wrk(11) = rmax -rmin
-      wrk(12) = wrk(11)
-      iwrk(4) = mu
-      iwrk(5) = mu
-      if(iopt(1)==0) go to 140
-      if(nu<8 .or. nu>nuest) go to 200
-      if(nv<11 .or. nv>nvest) go to 200
-      j = nu
-      do 90 i=1,4
-        tu(i) = zero
-        tu(j) = pi
-        j = j-1
-  90  continue
-      l = 13
-      wrk(l) = zero
-      if(iopt(2)==0) go to 100
-      l = l+1
-      uu = u(1)
-      if(uu>tu(5)) uu = tu(5)
-      wrk(l) = uu*half
- 100  do 110 i=1,mu
-        l = l+1
-        wrk(l) = u(i)
- 110  continue
-      if(iopt(3)==0) go to 120
-      l = l+1
-      uu = u(mu)
-      if(uu<tu(nu-4)) uu = tu(nu-4)
-      wrk(l) = uu+(pi-uu)*half
- 120  l = l+1
-      wrk(l) = pi
-      muu = l-12
-      ier = fpchec(wrk(13),muu,tu,nu,3)
-      if(ier/=0) go to 200
-      j1 = 4
-      tv(j1) = v(1)
-      i1 = nv-3
-      tv(i1) = ve
-      j2 = j1
-      i2 = i1
-      do 130 i=1,3
-        i1 = i1+1
-        i2 = i2-1
-        j1 = j1+1
-        j2 = j2-1
-        tv(j2) = tv(i2)-per
-        tv(i1) = tv(j1)+per
- 130  continue
-      l = 13
-      do 135 i=1,mv
-        wrk(l) = v(i)
-        l = l+1
- 135  continue
-      wrk(l) = ve
-      ier = fpchep(wrk(13),mv+1,tv,nv,3)
-      if (ier==0) go to 150
-      go to 200
- 140  if(s<0.) go to 200
-      if(s==zero .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. &
-       nvest<(mv+7)) ) go to 200
-      !  we partition the working space and determine the spline approximation
- 150  ldr = 5
+      ier = FITPACK_INPUT_ERROR
+
+      if (iopt(1)<(-1) .or. iopt(1)>1) return
+      if (iopt(2)<0 .or. iopt(2)>1)    return
+      if (iopt(3)<0 .or. iopt(3)>1)    return
+      if (ider(1)<(-1) .or. ider(1)>1) return
+      if (ider(2)<0 .or. ider(2)>1)    return
+      if (ider(2)==1 .and. iopt(2)==0) return
+      if (ider(3)<(-1) .or. ider(3)>1) return
+      if (ider(4)<0 .or. ider(4)>1)    return
+      if (ider(4)==1 .and. iopt(3)==0) return
+
+
+      if (ider(1)>=0) mumin = mumin-1
+      if (iopt(2)==1 .and. ider(2)==1) mumin = mumin-1
+      if (ider(3)>=0) mumin = mumin-1
+      if (iopt(3)==1 .and. ider(4)==1) mumin = mumin-1
+      if (mumin==0) mumin = 1
+      if (mu<mumin .or. mv<4)          return
+      if (nuest<8 .or. nvest<8)        return
+      if (lwrk<lwest .or. kwrk<kwest)  return
+      if (u(1)<=zero .or. u(mu)>=pi)     return
+      if (mu>1 .and. any(u(1:mu-1)>=u(2:mu))) return
+      if (v(1)< (-pi) .or. v(1)>=pi ) return
+      if (v(mv)>=v(1)+per)             return
+      if (any(v(1:mv-1)>=v(2:mv)))     return
+
+
+      if (iopt(1)<=0) then
+
+          rn = one/mv
+
+          !  if not given, we compute an estimate for r0.
+          if (ider(1)>=0) then
+             rb = r0
+          else
+             rb = sum(r(1:mv))*rn
+          endif
+
+          !  if not given, we compute an estimate for r1.
+          if (ider(3)>=0) then
+              re = r1
+          else
+              re = sum(r(m-mv+1:m))*rn
+          endif
+
+          ! we determine the range of r-values.
+          rmin = min(rb,minval(r))
+          rmax = max(re,maxval(r))
+
+          wrk(5)  = rb
+          wrk(6)  = zero
+          wrk(7)  = zero
+          wrk(8)  = re
+          wrk(9)  = zero
+          wrk(10) = zero
+          wrk(11) = rmax -rmin
+          wrk(12) = wrk(11)
+          iwrk(4) = mu
+          iwrk(5) = mu
+
+      endif
+
+      if (iopt(1)<0) then
+
+          if (nu<8 .or. nu>nuest) return
+          if (nv<11 .or. nv>nvest) return
+
+          ! Init tu: use wrk(13:) as working space
+          tu(1:4)     = zero
+          tu(nu-3:nu) = pi
+
+          l = 13
+          wrk(l) = zero
+          if (iopt(2)/=0) then
+              l      = l+1
+              uu     = min(u(1), tu(5))
+              wrk(l) = uu*half
+          endif
+
+          do i=1,mu
+            l = l+1
+            wrk(l) = u(i)
+          end do
+
+          if (iopt(3)/=0) then
+              l = l+1
+              uu = max(u(mu), tu(nu-4))
+              wrk(l) = uu+(pi-uu)*half
+          endif
+          l      = l+1
+          wrk(l) = pi
+          muu    = l-12
+          ier    = fpchec(wrk(13),muu,tu,nu,3); if (ier/=FITPACK_OK) return
+
+          ! Init tv: use wrk(13:) as working space
+          tv(1:4)       = [tv(nv-6:nv-4)-per, v(1)]
+          tv(nv-3:nv)   = [ve, tv(5:7)+per]
+          wrk(13:13+mv) = [v, ve]
+          ier = fpchep(wrk(13),mv+1,tv,nv,3); if (ier/=FITPACK_OK) return
+
+      else
+
+          if (s<zero) return
+          if (s==zero .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
+
+      endif
+
+      ! we partition the working space and determine the spline approximation
+      ldr  = 5
       lfpu = 13
       lfpv = lfpu+nuest
-      lww = lfpv+nvest
+      lww  = lfpv+nvest
       jwrk = lwrk-12-nuest-nvest
       knru = 6
       knrv = knru+mu
@@ -17425,7 +17419,7 @@ module fitpack_core
                   wrk(lfpv),wrk(ldr),wrk(11),iwrk(1),iwrk(2),iwrk(3),iwrk(4), &
                   iwrk(5),iwrk(knru),iwrk(knrv),iwrk(kndu),iwrk(kndv),wrk(lww), &
                   jwrk,ier)
- 200  return
+      return
       end subroutine spgrid
 
 
