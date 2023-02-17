@@ -17423,8 +17423,8 @@ module fitpack_core
       end subroutine spgrid
 
 
-      recursive subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
-        eps,nt,tt,np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+      pure subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
+                             eps,nt,tt,np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
       !  subroutine sphere determines a smooth bicubic spherical spline
       !  approximation s(teta,phi), 0 <= teta <= pi ; 0 <= phi <= 2*pi
@@ -17732,70 +17732,83 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) s,eps,fp
-      integer iopt,m,ntest,npest,nt,np,lwrk1,lwrk2,kwrk,ier
+      real(RKIND), intent(in)    :: s,eps
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,m,ntest,npest,lwrk1,lwrk2,kwrk
+      integer,     intent(inout) :: nt,np
+      integer,     intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND) teta(m),phi(m),r(m),w(m),tt(ntest),tp(npest), &
-       c((ntest-4)*(npest-4)),wrk1(lwrk1),wrk2(lwrk2)
-      integer iwrk(kwrk)
-      !  ..local scalars..
-      real(RKIND) tol
-      integer i,ib1,ib3,ki,kn,kwest,la,lbt,lcc,lcs,lro,j, &
-       lbp,lco,lf,lff,lfp,lh,lq,lst,lsp,lwest,maxit,ncest,ncc,ntt, &
-       npp,nreg,nrint,ncof,nt4,np4
+      real(RKIND), intent(in)    :: teta(m),phi(m),r(m),w(m)
+      real(RKIND), intent(inout) :: tt(ntest),tp(npest),c((ntest-4)*(npest-4)),wrk1(lwrk1),wrk2(lwrk2)
+      integer,     intent(inout) :: iwrk(kwrk)
 
-      !  we set up the parameters tol and maxit.
-      maxit = 20
-      tol = smallnum03
+      !  ..local scalars..
+      integer :: i,ib1,ib3,ki,kn,kwest,la,lbt,lcc,lcs,lro,j,lbp,lco,lf,lff,lfp,lh,lq,lst,lsp,lwest, &
+                 ncest,ncc,ntt,npp,nreg,nrint,ncof,nt4,np4
+
+      ! we set up the parameters tol and maxit.
+      real(RKIND), parameter :: tol = smallnum03
+      integer    , parameter :: maxit = 20
+
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
-      ier = 10
-      if(eps<=0. .or. eps>=1.) go to 80
-      if(iopt<(-1) .or. iopt>1) go to 80
-      if(m<2) go to 80
-      if(ntest<8 .or. npest<8) go to 80
-      nt4 = ntest-4
-      np4 = npest-4
+      ier = FITPACK_INPUT_ERROR
+
+      nt4   = ntest-4
+      np4   = npest-4
       ncest = nt4*np4
-      ntt = ntest-7
-      npp = npest-7
-      ncc = 6+npp*(ntt-1)
+      ntt   = ntest-7
+      npp   = npest-7
+      ncc   = 6+npp*(ntt-1)
       nrint = ntt+npp
-      nreg = ntt*npp
-      ncof = 6+3*npp
-      ib1 = 4*npp
-      ib3 = ib1+3
-      if(ncof>ib1) ib1 = ncof
-      if(ncof>ib3) ib3 = ncof
+      nreg  = ntt*npp
+      ncof  = 6+3*npp
+      ib1   = max(4*npp, ncof)
+      ib3   = max(ib1+3, ncof)
       lwest = 185+52*npp+10*ntt+14*ntt*npp+8*(m+(ntt-1)*npp**2)
       kwest = m+nreg
-      if(lwrk1<lwest .or. kwrk<kwest) go to 80
-      if(iopt>0) go to 60
 
-      do 20 i=1,m
-        if(w(i)<=0.) go to 80
-        if(teta(i)<0. .or. teta(i)>pi) go to 80
-        if(phi(i) <zero .or. phi(i)>pi2) go to 80
-  20  continue
-      if(iopt==0) go to 60
-      ntt = nt-8
-      if(ntt<0 .or. nt>ntest) go to 80
-      if(ntt==0) go to 40
-      tt(4) = zero
-      do 30 i=1,ntt
-         j = i+4
-         if(tt(j)<=tt(j-1) .or. tt(j)>=pi) go to 80
-  30  continue
-  40  npp = np-8
-      if(npp<1 .or. np>npest) go to 80
-      tp(4) = zero
-      do 50 i=1,npp
-         j = i+4
-         if(tp(j)<=tp(j-1) .or. tp(j)>=pi2) go to 80
-  50  continue
-      go to 70
-  60  if(s<zero) go to 80
-  70  ier = 0
+      if (.not.(eps>0 .and. eps<one))      return
+      if (iopt<(-1) .or. iopt>1)           return
+      if (m<2)                             return
+      if (ntest<8 .or. npest<8)            return
+      if (lwrk1<lwest .or. kwrk<kwest)     return
+
+      if (iopt<=0) then
+
+          if (any(w<=zero))                return
+          if (any(teta<zero .or. teta>pi)) return
+          if (any(phi<zero .or. phi>pi2))  return
+
+      endif
+
+      if (iopt<0) then
+
+          ntt = nt-8
+          if (ntt<0 .or. nt>ntest)         return
+
+          if (ntt>0) then
+              tt(4) = zero
+              do i=1,ntt
+                 j = i+4
+                 if(tt(j)<=tt(j-1) .or. tt(j)>=pi) return
+              end do
+          endif
+
+          npp = np-8
+          if (npp<1 .or. np>npest) return
+          tp(4) = zero
+          do i=1,npp
+             j = i+4
+             if(tp(j)<=tp(j-1) .or. tp(j)>=pi2) return
+          end do
+
+      endif
+
+      if (iopt>=0 .and. s<zero) return
+
+      ier = FITPACK_OK
+
       !  we partition the working space and determine the spline approximation
       kn = 1
       ki = kn+m
@@ -17814,11 +17827,11 @@ module fitpack_core
       lst = lcs+npest
       lsp = lst+m*4
       call fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eps,tol,maxit, &
-       ib1,ib3,ncest,ncc,nrint,nreg,nt,tt,np,tp,c,fp,wrk1(1),wrk1(lfp), &
-       wrk1(lco),wrk1(lf),wrk1(lff),wrk1(lro),wrk1(lcc),wrk1(lcs), &
-       wrk1(la),wrk1(lq),wrk1(lbt),wrk1(lbp),wrk1(lst),wrk1(lsp), &
-       wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
-  80  return
+                  ib1,ib3,ncest,ncc,nrint,nreg,nt,tt,np,tp,c,fp,wrk1(1),wrk1(lfp), &
+                  wrk1(lco),wrk1(lf),wrk1(lff),wrk1(lro),wrk1(lcc),wrk1(lcs), &
+                  wrk1(la),wrk1(lq),wrk1(lbt),wrk1(lbp),wrk1(lst),wrk1(lsp), &
+                  wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
+      return
       end subroutine sphere
 
 
