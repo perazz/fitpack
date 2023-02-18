@@ -84,6 +84,7 @@ module fitpack_core
     integer, parameter, public :: FITPACK_OVERLAPPING_KNOTS    = 5
     integer, parameter, public :: FITPACK_INVALID_RANGE        = 6
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
+    integer, parameter, public :: FITPACK_TEST_ERROR           = 11
 
     ! Internal Parameters
     integer    , parameter, public :: MAX_IDIM  = 10        ! Max number of dimensions
@@ -131,6 +132,7 @@ module fitpack_core
             case (FITPACK_OVERLAPPING_KNOTS); msg = 'Overlapping knots found'
             case (FITPACK_INVALID_RANGE); msg = 'Invalid variable range'
             case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
+            case (FITPACK_TEST_ERROR); msg = 'Test(s) failed'
             case default; msg = 'UNKNOWN ERROR'
          end select
 

@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all le
-        do itest = 24,24
+        do itest = 1,1
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -61,13 +61,14 @@ program test
     end subroutine run_legacy_tests
 
     ! Perform FITPACK's i-th legacy test case
-    logical function perform_legacy_test(itest) result(success)
+    logical function perform_legacy_test(itest,iunit) result(success)
         integer, intent(in) :: itest
+        integer, optional, intent(in) :: iunit
 
         success = .true.
 
         select case (itest)
-            case (1);  call mnbisp
+            case (1);  success = mnbisp(iunit)
             case (2);  call mncloc
             case (3);  call mncoco
             case (4);  call mnconc
