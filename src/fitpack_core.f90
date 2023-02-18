@@ -10475,13 +10475,8 @@ module fitpack_core
                   call fprota(co,si,zi,f(irot))
 
                   ! apply that transformation to the left hand side.
-                  if (i<iband) then
-                      i2 = 1
-                      do j=i+1,iband
-                        i2 = i2+1
-                        call fprota(co,si,h(j),a(irot,i2))
-                      end do
-                  endif
+                  if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
+
                 end do rotate
 
                 ! add the contribution of the row to the sum of squares of residual right hand sides.
@@ -10574,7 +10569,7 @@ module fitpack_core
                     store = store + spu(in,i)*dot_product(spv(in,1:4),c(i1+1:i1+4))
                     i1 = i1+nv4
                   end do
-                  store = (w(in)*(z(in)-store))**2
+                  store     = (w(in)*(z(in)-store))**2
                   fpint(l1) = fpint(l1)+store
                   coord(l1) = coord(l1)+store*u(in)
                   fpint(l2) = fpint(l2)+store
@@ -13215,9 +13210,9 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
                      sin,sq,store,wi,x0,x1,y0,y1,zi,eps,rn
-      integer :: i,iband,iband1,iband3,iband4,ibb,ich1,ich3,ii,in,irot,iter,i1,i2,i3,j,jrot,&
+      integer :: i,iband,iband1,iband3,iband4,ibb,ich1,ich3,ii,in,irot,iter,i1,i2,j,jrot,&
                  jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
-                 nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,n1,rank
+                 nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,rank
       logical :: interchanged
 
       !  ..local arrays..
@@ -13290,252 +13285,306 @@ module fitpack_core
 
       endif bootstrap
 
-      !  main loop for the different sets of knots. m is a save upper bound
-      !  for the number of trials.
-      do 420 iter=1,m
-      !  find the position of the additional knots which are needed for the
-      !  b-spline representation of s(x,y).
-        l = nx
-        do 40 i=1,kx1
-          tx(i) = x0 ! 1, 2, ..., kx1
-          tx(l) = x1 ! nx, nx-1, ..., nx+1-kx1
-          l = l-1
-  40    continue
-        l = ny
-        do 50 i=1,ky1
-          ty(i) = y0
-          ty(l) = y1
-          l = l-1
-  50    continue
-      !  find nrint, the total number of knot intervals and nreg, the number
-      !  of panels in which the approximation domain is subdivided by the
-      !  intersection of knots.
-        nxx = nx-2*kx1+1
-        nyy = ny-2*ky1+1
-        nrint = nxx+nyy
-        nreg = nxx*nyy
-      !  find the bandwidth of the observation matrix a.
-      !  if necessary, interchange the variables x and y, in order to obtain
-      !  a minimal bandwidth.
-        iband1 = kx*(ny-ky1)+ky
-        l = ky*(nx-kx1)+kx
-        if(iband1<=l) go to 130
-        iband1 = l
-        interchanged = .not.interchanged
-        call swap_RKIND(x,y)
-        call swap_RKIND(x0,y0)
-        call swap_RKIND(x1,y1)
-        n  = min(nx,ny)
-        n1 = n+1
-        call swap_RKIND(tx ,ty)
-        call swap_int  (nx ,ny)
-        call swap_int  (nxe,nye)
-        call swap_int  (nxx,nyy)
-        call swap_int  (kx ,ky)
-        kx1 = kx+1
-        ky1 = ky+1
- 130    iband = iband1+1
-      !  arrange the data points according to the panel they belong to.
-        call fporde(x,y,m,kx,ky,tx,nx,ty,ny,nummer,index,nreg)
-      !  find ncof, the number of b-spline coefficients.
-        nk1x = nx-kx1
-        nk1y = ny-ky1
-        ncof = nk1x*nk1y
-      !  initialize the observation matrix a.
-        f(1:ncof) = zero
-        a(1:ncof,1:iband) = zero
-      !  initialize the sum of squared residuals.
-        fp = zero
-      !  fetch the data points in the new order. main loop for the
-      !  different panels.
-        do 250 num=1,nreg
-      !  fix certain constants for the current panel; jrot records the column
-      !  number of the first non-zero element in a row of the observation
-      !  matrix according to a data point of the panel.
-          num1 = num-1
-          lx = num1/nyy
-          l1 = lx+kx1
-          ly = num1-lx*nyy
-          l2 = ly+ky1
-          jrot = lx*nk1y+ly
-      !  test whether there are still data points in the panel.
-          in = index(num)
- 150      if(in==0) go to 250
-      !  fetch a new data point.
-          wi = w(in)
-          zi = z(in)*wi
-      !  evaluate for the x-direction, the (kx+1) non-zero b-splines at x(in).
-          hx = fpbspl(tx,nx,kx,x(in),l1)
-      !  evaluate for the y-direction, the (ky+1) non-zero b-splines at y(in).
-          hy = fpbspl(ty,ny,ky,y(in),l2)
-      !  store the value of these b-splines in spx and spy respectively.
-          spx(in,1:kx1) = hx(1:kx1)
-          spy(in,1:ky1) = hy(1:ky1)
-      !  initialize the new row of observation matrix.
-          h(1:iband) = zero
+      !  main loop for the different sets of knots. m is a safe upper bound for the number of trials.
+      compute_knots: do iter=1,m
 
-      !  calculate the non-zero elements of the new row by making the cross
-      !  products of the non-zero b-splines in x- and y-direction.
-          i1 = 0
-          do 200 i=1,kx1
-            hxi = hx(i)
-            j1 = i1
-            do 190 j=1,ky1
-              j1 = j1+1
-              h(j1) = hxi*hy(j)*wi
- 190        continue
-            i1 = i1+nk1y
- 200      continue
-      !  rotate the row into triangle by givens transformations .
-          irot = jrot
-          do 220 i=1,iband
-            irot = irot+1
-            piv = h(i)
-            if (piv==zero) go to 220
-      !  calculate the parameters of the givens transformation.
-            call fpgivs(piv,a(irot,1),cos,sin)
-      !  apply that transformation to the right hand side.
-            call fprota(cos,sin,zi,f(irot))
-            if(i==iband) go to 230
-      !  apply that transformation to the left hand side.
-            i2 = 1
-            i3 = i+1
-            do 210 j=i3,iband
-              i2 = i2+1
-              call fprota(cos,sin,h(j),a(irot,i2))
- 210        continue
- 220      continue
-      !  add the contribution of the row to the sum of squares of residual
-      !  right hand sides.
- 230      fp = fp+zi**2
-      !  find the number of the next data point in the panel.
-          in = nummer(in)
-          go to 150
- 250    continue
-      !  find dmax, the maximum value for the diagonal elements in the reduced triangle.
-        dmax = max(zero,maxval(a(1:ncof,1)))
-      !  check whether the observation matrix is rank deficient.
-        sigma = eps*dmax
-        if (all(a(1:ncof,1)>sigma)) then
-            ! backward substitution in case of full rank.
-            c(:ncof) = fpback(a,f,ncof,iband,nc)
-            rank = ncof
-            q(:ncof,1) = a(:ncof,1)/dmax
-        else
-            ! in case of rank deficiency, find the minimum norm solution.
-            !  check whether there is sufficient working space
-            lwest = ncof*iband+ncof+iband
-            if(lwrk<lwest) go to 780
-            ff(1:ncof) = f(1:ncof)
-            q(1:ncof,1:iband)=a(1:ncof,1:iband)
-            lf =1
-            lh = lf+ncof
-            la = lh+iband
-            call fprank(q,ff,ncof,iband,nc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
-            q(1:ncof,1)=q(1:ncof,1)/dmax
-            !  add to the sum of squared residuals, the contribution of reducing the rank.
-            fp = fp+sq
-        endif
-        if(ier==(-2)) fp0 = fp
-      !  test whether the least-squares spline is an acceptable solution.
-        if(iopt<0) go to 820
-        fpms = fp-s
-        if(abs(fpms)<=acc) then
-          if (fp<=0) go to 815
-          go to 820
-        endif
-      !  test whether we can accept the choice of knots.
-        if(fpms<0.) go to 430
-      !  test whether we cannot further increase the number of knots.
-        if(ncof>m) go to 790
-        ier = 0
-      !  search where to add a new knot.
-      !  find for each interval the sum of squared residuals fpint for the
-      !  data points having the coordinate belonging to that knot interval.
-      !  calculate also coord which is the same sum, weighted by the position
-      !  of the data points considered.
-        fpint(:nrint) = zero
-        coord(:nrint) = zero
-        do 360 num=1,nreg
-          num1 = num-1
-          lx = num1/nyy
-          l1 = lx+1
-          ly = num1-lx*nyy
-          l2 = ly+1+nxx
-          jrot = lx*nk1y+ly
-          in = index(num)
- 330      if(in==0) go to 360
-          store = zero
-          i1 = jrot
-          do 350 i=1,kx1
-            hxi = spx(in,i)
-            j1 = i1
-            do 340 j=1,ky1
-              j1 = j1+1
-              store = store+hxi*spy(in,j)*c(j1)
- 340        continue
-            i1 = i1+nk1y
- 350      continue
-          store = (w(in)*(z(in)-store))**2
-          fpint(l1) = fpint(l1)+store
-          coord(l1) = coord(l1)+store*x(in)
-          fpint(l2) = fpint(l2)+store
-          coord(l2) = coord(l2)+store*y(in)
-          in = nummer(in)
-          go to 330
- 360    continue
-      !  find the interval for which fpint is maximal on the condition that
-      !  there still can be added a knot.
- 370    l = 0
-        fpmax = zero
-        l1 = 1
-        l2 = nrint
-        if(nx==nxe) l1 = nxx+1
-        if(ny==nye) l2 = nxx
-        if(l1>l2) go to 810
-        do 380 i=l1,l2
-          if(fpmax>=fpint(i)) go to 380
-          l = i
-          fpmax = fpint(i)
- 380    continue
-      !  test whether we cannot further increase the number of knots.
-        if(l==0) go to 785
-      !  calculate the position of the new knot.
-        arg = coord(l)/fpint(l)
-      !  test in what direction the new knot is going to be added.
-        if(l>nxx) go to 400
-      !  addition in the x-direction.
-        jxy = l+kx1
-        fpint(l) = zero
-        fac1 = tx(jxy)-arg
-        fac2 = arg-tx(jxy-1)
-        if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 370
-        j = nx
-        do 390 i=jxy,nx
-          tx(j+1) = tx(j)
-          j = j-1
- 390    continue
-        tx(jxy) = arg
-        nx = nx+1
-        go to 420
-      !  addition in the y-direction.
- 400    jxy = l+ky1-nxx
-        fpint(l) = zero
-        fac1 = ty(jxy)-arg
-        fac2 = arg-ty(jxy-1)
-        if(fac1>(ten*fac2) .or. fac2>(ten*fac1)) go to 370
-        j = ny
-        do 410 i=jxy,ny
-          ty(j+1) = ty(j)
-          j = j-1
- 410    continue
-        ty(jxy) = arg
-        ny = ny+1
-      !  restart the computations with the new set of knots.
- 420  continue
+          !  find the position of the additional knots which are needed for the
+          !  b-spline representation of s(x,y).
+          tx(1:kx1)       = x0
+          tx(nx+1-kx1:nx) = x1
+          ty(1:ky1)       = y0
+          ty(ny+1-ky1:ny) = y1
+
+          !  find nrint, the total number of knot intervals and nreg, the number
+          !  of panels in which the approximation domain is subdivided by the
+          !  intersection of knots.
+          nxx   = nx-2*kx1+1
+          nyy   = ny-2*ky1+1
+          nrint = nxx+nyy
+          nreg  = nxx*nyy
+
+          !  find the bandwidth of the observation matrix a.
+          !  if necessary, interchange the variables x and y, in order to obtain a minimal bandwidth.
+          iband1 = kx*(ny-ky1)+ky
+          l = ky*(nx-kx1)+kx
+
+          do_interchange: if (iband1>l) then
+              iband1 = l
+              interchanged = .not.interchanged
+              call swap_RKIND(x,y)
+              call swap_RKIND(x0,y0)
+              call swap_RKIND(x1,y1)
+              n  = min(nx,ny)
+              call swap_RKIND(tx ,ty)
+              call swap_int  (nx ,ny)
+              call swap_int  (nxe,nye)
+              call swap_int  (nxx,nyy)
+              call swap_int  (kx ,ky)
+              kx1 = kx+1
+              ky1 = ky+1
+          endif do_interchange
+
+          iband = iband1+1
+
+          ! arrange the data points according to the panel they belong to.
+          call fporde(x,y,m,kx,ky,tx,nx,ty,ny,nummer,index,nreg)
+
+          ! find ncof, the number of b-spline coefficients.
+          nk1x = nx-kx1
+          nk1y = ny-ky1
+          ncof = nk1x*nk1y
+
+          !  initialize the observation matrix a.
+          f(1:ncof) = zero
+          a(1:ncof,1:iband) = zero
+
+          !  initialize the sum of squared residuals.
+          fp = zero
+
+          !  fetch the data points in the new order. main loop for the
+          !  different panels.
+          panels: do num=1,nreg
+
+              !  fix certain constants for the current panel; jrot records the column
+              !  number of the first non-zero element in a row of the observation
+              !  matrix according to a data point of the panel.
+              num1 = num-1
+              lx   = num1/nyy
+              l1   = lx+kx1
+              ly   = num1-lx*nyy
+              l2   = ly+ky1
+              jrot = lx*nk1y+ly
+
+              !  test whether there are still data points in the panel.
+              in = index(num)
+              points_left: do while (in/=0)
+
+                  ! fetch a new data point.
+                  wi = w(in)
+                  zi = z(in)*wi
+
+                  ! evaluate for the x-direction, the (kx+1) non-zero b-splines at x(in).
+                  hx = fpbspl(tx,nx,kx,x(in),l1)
+
+                  ! evaluate for the y-direction, the (ky+1) non-zero b-splines at y(in).
+                  hy = fpbspl(ty,ny,ky,y(in),l2)
+
+                  ! store the value of these b-splines in spx and spy respectively.
+                  spx(in,1:kx1) = hx(1:kx1)
+                  spy(in,1:ky1) = hy(1:ky1)
+
+                  ! initialize the new row of observation matrix.
+                  h(1:iband) = zero
+
+                  ! calculate the non-zero elements of the new row by making the cross
+                  ! products of the non-zero b-splines in x- and y-direction.
+                  i1 = 0
+                  do i=1,kx1
+                      hxi = hx(i)
+                      j1 = i1
+                      do j=1,ky1
+                          j1 = j1+1
+                          h(j1) = hxi*hy(j)*wi
+                      end do
+                      i1 = i1+nk1y
+                  end do
+
+                  ! rotate the row into triangle by givens transformations .
+                  irot = jrot
+                  rotate: do i=1,iband
+                      irot = irot+1
+                      piv = h(i)
+                      if (piv==zero) cycle rotate
+
+                      ! calculate the parameters of the givens transformation.
+                      call fpgivs(piv,a(irot,1),cos,sin)
+
+                      ! apply that transformation to the right hand side.
+                      call fprota(cos,sin,zi,f(irot))
+
+                      ! apply that transformation to the left hand side.
+                      if (i<iband) call fprota(cos,sin,h(i+1:iband),a(irot,2:1+iband-i))
+
+                  end do rotate
+
+                  ! add the contribution of the row to the sum of squares of residual right hand sides.
+                  fp = fp+zi**2
+
+                  ! find the number of the next data point in the panel.
+                  in = nummer(in)
+              end do points_left
+          end do panels
+
+          !  find dmax, the maximum value for the diagonal elements in the reduced triangle.
+          dmax = max(zero,maxval(a(1:ncof,1)))
+
+          ! check whether the observation matrix is rank deficient.
+          sigma = eps*dmax
+
+          if (all(a(1:ncof,1)>sigma)) then
+
+             ! backward substitution in case of full rank.
+             c(:ncof) = fpback(a,f,ncof,iband,nc)
+             rank = ncof
+             q(:ncof,1) = a(:ncof,1)/dmax
+
+          else
+
+             ! in case of rank deficiency, find the minimum norm solution.
+             ! check whether there is sufficient working space
+             lwest = ncof*iband+ncof+iband
+             if (lwest>lwrk) then
+                 ier = lwest
+                 go to 830
+             end if
+
+             ff(1:ncof) = f(1:ncof)
+             q(1:ncof,1:iband)=a(1:ncof,1:iband)
+             lf = 1
+             lh = lf+ncof
+             la = lh+iband
+             call fprank(q,ff,ncof,iband,nc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+             q(1:ncof,1)=q(1:ncof,1)/dmax
+
+             ! add to the sum of squared residuals, the contribution of reducing the rank.
+             fp = fp+sq
+
+          endif
+
+          if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
+
+          !  test whether the least-squares spline is an acceptable solution.
+          fpms = fp-s
+          if (iopt<0 .or. abs(fpms)<=acc) then
+              if (fp<=zero) then
+                 ier = FITPACK_INTERPOLATING_OK
+                 fp = zero
+              endif
+              if (ncof/=rank) ier = -rank
+              go to 830
+          endif
+
+          ! test whether we can accept the choice of knots.
+          if (fpms<zero) exit compute_knots
+
+          ! test whether we cannot further increase the number of knots.
+          if (m<ncof) then
+              ier = FITPACK_TOO_MANY_KNOTS
+              go to 830
+          endif
+
+          ier = FITPACK_OK
+
+          !  search where to add a new knot.
+          !  find for each interval the sum of squared residuals fpint for the
+          !  data points having the coordinate belonging to that knot interval.
+          !  calculate also coord which is the same sum, weighted by the position
+          !  of the data points considered.
+          fpint(:nrint) = zero
+          coord(:nrint) = zero
+          do num=1,nreg
+              num1 = num-1
+              lx = num1/nyy
+              l1 = lx+1
+              ly = num1-lx*nyy
+              l2 = ly+1+nxx
+              jrot = lx*nk1y+ly
+              in = index(num)
+              do while (in/=0)
+                  store = zero
+                  i1 = jrot
+                  do i=1,kx1
+                    store = store+spx(in,i)*dot_product(spy(in,1:ky1),c(i1+1:i1+ky1))
+                    i1 = i1+nk1y
+                  end do
+                  store     = (w(in)*(z(in)-store))**2
+                  fpint(l1) = fpint(l1)+store
+                  coord(l1) = coord(l1)+store*x(in)
+                  fpint(l2) = fpint(l2)+store
+                  coord(l2) = coord(l2)+store*y(in)
+                  in = nummer(in)
+              end do
+          end do
+
+          !  find the interval for which fpint is maximal on the condition that
+          !  there still can be added a knot.
+
+          add_knot: do
+
+              l = 0
+              fpmax = zero
+              l1 = merge(nxx+1,1  ,nx==nxe)
+              l2 = merge(nxx,nrint,ny==nye)
+
+              if (l1>l2) then
+                 ier = FITPACK_INSUFFICIENT_STORAGE
+                 go to 830
+              endif
+
+              l = 0
+              do i=l1,l2
+                  if (fpmax<fpint(i)) then
+                     l = i
+                     fpmax = fpint(i)
+                  endif
+              end do
+
+              ! test whether we cannot further increase the number of knots.
+              if (l==0) then
+                  ier = FITPACK_OVERLAPPING_KNOTS
+                  go to 830
+              end if
+
+              ! calculate the position of the new knot.
+              arg = coord(l)/fpint(l)
+
+              ! test in what direction the new knot is going to be added.
+              choose_direction: if (l<=nxx) then
+                  ! addition in the x-direction.
+                  jxy      = l+kx1
+                  fpint(l) = zero
+                  fac1     = tx(jxy)-arg
+                  fac2     = arg-tx(jxy-1)
+              else choose_direction
+                  ! addition in the y-direction.
+                  jxy      = l+ky1-nxx
+                  fpint(l) = zero
+                  fac1     = ty(jxy)-arg
+                  fac2     = arg-ty(jxy-1)
+              endif choose_direction
+
+              ! Suitable location
+              if (fac1<=(ten*fac2) .and. fac2<=(ten*fac1)) then
+
+                  ! Place knot
+                  place_knot: if (l<=nxx) then
+                      j = nx
+                      do i=jxy,nx
+                         tx(j+1) = tx(j)
+                         j = j-1
+                      end do
+                      tx(jxy) = arg
+                      nx = nx+1
+                  else place_knot
+                      j = ny
+                      do i=jxy,ny
+                         ty(j+1) = ty(j)
+                         j = j-1
+                      end do
+                      ty(jxy) = arg
+                      ny = ny+1
+                  end if place_knot
+
+                  exit add_knot
+
+              end if
+
+          end do add_knot
+          !  restart the computations with the new set of knots.
+      end do compute_knots
       !  test whether the least-squares polynomial is a solution of our
       !  approximation problem.
- 430  if(ier==(-2)) go to 830
+      if(ier==(-2)) go to 830
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! part 2: determination of the smoothing spline sp(x,y)                c
       ! *****************************************************                c
@@ -13680,7 +13729,10 @@ module fitpack_core
         go to 675
       !  in case of rank deficiency, find the minimum norm solution.
         lwest = ncof*iband4+ncof+iband4
-        if(lwrk<lwest) go to 780
+        if (lwrk<lwest) then
+           ier = lwest
+           go to 830
+        end if
         lf = 1
         lh = lf+ncof
         la = lh+iband4
@@ -13714,7 +13766,10 @@ module fitpack_core
  720    continue
       !  test whether the approximation sp(x,y) is an acceptable solution.
         fpms = fp-s
-        if(abs(fpms)<=acc) go to 820
+        if (abs(fpms)<=acc) then
+           if (ncof/=rank) ier = -rank
+           goto 830
+        end if
       !  test whether the maximum allowable number of iterations has been
       !  reached.
         if(iter==maxit) go to 795
@@ -13747,59 +13802,42 @@ module fitpack_core
         call fprati(p1,f1,p2,f2,p3,f3,p)
  770  continue
       !  error codes and messages.
- 780  ier = lwest
-      go to 830
- 785  ier = 5
-      go to 830
- 790  ier = 4
-      go to 830
+
  795  ier = 3
       go to 830
  800  ier = 2
       go to 830
- 810  ier = 1
-      go to 830
- 815  ier = -1
-      fp = zero
- 820  if(ncof/=rank) ier = -rank
-      !  test whether x and y are in the original order.
- 830  if(.not.interchanged) go to 930
-      !  if not, interchange x and y once more.
-      l1 = 1
-      do i=1,nk1x
-        l2 = i
-        do j=1,nk1y
-          f(l2) = c(l1)
-          l1 = l1+1
-          l2 = l2+nk1x
-        end do
-      end do
-      c(1:ncof) = f(1:ncof)
-      do i=1,m
-        store = x(i)
-        x(i) = y(i)
-        y(i) = store
-      end do
-      n = min0(nx,ny)
-      do i=1,n
-        store = tx(i)
-        tx(i) = ty(i)
-        ty(i) = store
-      end do
-      n1 = n+1
-      if (nx<ny) go to 880
-      if (nx==ny) go to 920
-      go to 900
- 880  tx(n1:ny) = ty(n1:ny)
-      go to 920
- 900  ty(n1:nx) = tx(n1:nx)
- 920  l = nx ! Swap nx,ny
-      nx = ny
-      ny = l
- 930  if(iopt<0) go to 940
-      nx0 = nx
-      ny0 = ny
- 940  return
+
+      ! test whether x and y are in the original order.
+ 830  restore_xy: if (interchanged) then
+
+          ! if not, interchange x and y once more.
+
+          ! Sort c using f as a temporary array
+          l1 = 1
+          do i=1,nk1x
+            l2 = i
+            do j=1,nk1y
+              f(l2) = c(l1)
+              l1 = l1+1
+              l2 = l2+nk1x
+            end do
+          end do
+          c(1:ncof) = f(1:ncof)
+
+          n = min(nx,ny)
+          call swap_RKIND(x,y)
+          call swap_RKIND(tx,ty)
+          call swap_int  (nx,ny)
+
+      endif restore_xy
+
+      if (iopt>=0) then
+         nx0 = nx
+         ny0 = ny
+      endif
+      return
+
       end subroutine fpsurf
 
 
