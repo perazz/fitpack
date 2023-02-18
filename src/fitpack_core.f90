@@ -1479,7 +1479,7 @@ module fitpack_core
       end subroutine curev
 
 
-      recursive subroutine curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
+      pure subroutine curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
 
       !  given the set of data points (x(i),y(i)) and the set of positive
       !  numbers w(i),i=1,2,...,m,subroutine curfit determines a smooth spline
@@ -1688,13 +1688,17 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND) xb,xe,s,fp
-      integer iopt,m,k,nest,n,lwrk,ier
+      real(RKIND), intent(in)    :: xb,xe,s
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: iopt,m,k,nest,lwrk
+      integer,     intent(out)   :: ier
+      integer,     intent(inout) :: n
       !  ..array arguments..
-      real(RKIND) x(m),y(m),w(m),t(nest),c(nest),wrk(lwrk)
-      integer iwrk(nest)
+      real(RKIND), intent(in)    :: x(m),y(m),w(m)
+      real(RKIND), intent(inout) :: t(nest),c(nest),wrk(lwrk)
+      integer,     intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      integer i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin
+      integer :: i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin
       !  ..
       !  we set up the parameters tol and maxit
       real(RKIND), parameter :: tol = smallnum03
@@ -8077,16 +8081,19 @@ module fitpack_core
 
 
 
-      subroutine fppara(iopt,idim,m,u,mx,x,w,ub,ue,k,s,nest,tol,maxit, &
-                        k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
+      pure subroutine fppara(iopt,idim,m,u,mx,x,w,ub,ue,k,s,nest,tol,maxit, &
+                             k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
       !  ..scalar arguments..
-      real(RKIND) :: ub,ue,s,tol,fp
-      integer, intent(in) :: idim,maxit
-      integer :: iopt,m,mx,k,nest,k1,k2,n,nc,ier
+      real(RKIND), intent(in)    :: ub,ue,s,tol
+      real(RKIND), intent(inout) :: fp
+      integer,     intent(in)    :: idim,maxit,iopt,m,mx,k,k1,k2,nest
+      integer,     intent(inout) :: n,nc,ier
       !  ..array arguments..
-      real(RKIND) :: u(m),x(mx),w(m),t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer :: nrdata(nest)
+      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
+      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      integer,     intent(inout) :: nrdata(nest)
+
       !  ..local scalars..
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
@@ -13188,10 +13195,10 @@ module fitpack_core
       end subroutine fpsuev
 
 
-      recursive subroutine fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kxx,kyy, &
-       s,nxest, nyest,eta,tol,maxit,nmax,km1,km2,ib1,ib3,nc,intest, &
-       nrest,nx0,tx,ny0,ty,c,fp,fp0,fpint,coord,f,ff,a,q,bx,by,spx, &
-       spy,h,index,nummer,wrk,lwrk,ier)
+      pure subroutine fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kxx,kyy, &
+                             s,nxest, nyest,eta,tol,maxit,nmax,km1,km2,ib1,ib3,nc,intest, &
+                             nrest,nx0,tx,ny0,ty,c,fp,fp0,fpint,coord,f,ff,a,q,bx,by,spx, &
+                             spy,h,index,nummer,wrk,lwrk,ier)
 
       !  ..
       !  ..scalar arguments..
@@ -13210,10 +13217,10 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
                      sin,sq,store,wi,x0,x1,y0,y1,zi,eps,rn
-      integer :: i,iband,iband1,iband3,iband4,ibb,ich1,ich3,ii,in,irot,iter,i1,i2,j,jrot,&
+      integer :: i,iband,iband1,iband3,iband4,ii,in,irot,iter,i1,i2,j,jrot,&
                  jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
                  nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,rank
-      logical :: interchanged
+      logical :: interchanged,check1,check3
 
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hx,hy
@@ -13435,7 +13442,8 @@ module fitpack_core
              lwest = ncof*iband+ncof+iband
              if (lwest>lwrk) then
                  ier = lwest
-                 go to 830
+                 call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+                 return
              end if
 
              ff(1:ncof) = f(1:ncof)
@@ -13461,7 +13469,8 @@ module fitpack_core
                  fp = zero
               endif
               if (ncof/=rank) ier = -rank
-              go to 830
+              call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+              return
           endif
 
           ! test whether we can accept the choice of knots.
@@ -13470,7 +13479,8 @@ module fitpack_core
           ! test whether we cannot further increase the number of knots.
           if (m<ncof) then
               ier = FITPACK_TOO_MANY_KNOTS
-              go to 830
+              call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+              return
           endif
 
           ier = FITPACK_OK
@@ -13518,7 +13528,8 @@ module fitpack_core
 
               if (l1>l2) then
                  ier = FITPACK_INSUFFICIENT_STORAGE
-                 go to 830
+                 call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+                 return
               endif
 
               l = 0
@@ -13532,7 +13543,8 @@ module fitpack_core
               ! test whether we cannot further increase the number of knots.
               if (l==0) then
                   ier = FITPACK_OVERLAPPING_KNOTS
-                  go to 830
+                  call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+                  return
               end if
 
               ! calculate the position of the new knot.
@@ -13582,265 +13594,314 @@ module fitpack_core
           end do add_knot
           !  restart the computations with the new set of knots.
       end do compute_knots
-      !  test whether the least-squares polynomial is a solution of our
-      !  approximation problem.
-      if(ier==(-2)) go to 830
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ! part 2: determination of the smoothing spline sp(x,y)                c
-      ! *****************************************************                c
-      ! we have determined the number of knots and their position. we now    c
-      ! compute the b-spline coefficients of the smoothing spline sp(x,y).   c
-      ! the observation matrix a is extended by the rows of a matrix,        c
-      ! expressing that sp(x,y) must be a polynomial of degree kx in x and   c
-      ! ky in y. the corresponding weights of these additional rows are set  c
-      ! to 1./p.  iteratively we than have to determine the value of p       c
-      ! such that f(p)=sum((w(i)*(z(i)-sp(x(i),y(i))))**2) be = s.           c
-      ! we already know that the least-squares polynomial corresponds to     c
-      ! p=0  and that the least-squares spline corresponds to p=infinity.    c
-      ! the iteration process which is proposed here makes use of rational   c
-      ! interpolation. since f(p) is a convex and strictly decreasing        c
-      ! function of p, it can be approximated by a rational function r(p)=   c
-      ! (u*p+v)/(p+w). three values of p(p1,p2,p3) with corresponding values c
-      ! of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the c
-      ! new value of p such that r(p)=s. convergence is guaranteed by taking c
-      ! f1 > 0 and f3 < 0.                                                   c
-      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      ! test whether the least-squares polynomial is a solution of our approximation problem.
+      if (ier==FITPACK_LEASTSQUARES_OK) then
+          call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+          return
+      endif
+
+      ! **********************************************************************************************
+      ! part 2: determination of the smoothing spline sp(x,y)
+      ! **********************************************************************************************
+      !  we have determined the number of knots and their position. we now compute the b-spline
+      !  coefficients of the smoothing spline sp(x,y). the observation matrix a is extended by the
+      !  rows of a matrix, expressing that sp(x,y) must be a polynomial of degree kx in x and ky in y.
+      !  the corresponding weights of these additional rows are set to 1./p.  iteratively we than have
+      !  to determine the value of p such that f(p)=sum((w(i)*(z(i)-sp(x(i),y(i))))**2) be = s.
+      !  we already know that the least-squares polynomial corresponds to p=0  and that the least-squares
+      !  spline corresponds to p=infinity. the iteration process which is proposed here makes use of
+      !  rational interpolation. since f(p) is a convex and strictly decreasing function of p, it can be
+      !  approximated by a rational function r(p)=(u*p+v)/(p+w). three values of p(p1,p2,p3) with
+      !  corresponding values of f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the
+      !  new value of p such that r(p)=s. convergence is guaranteed by taking f1 > 0 and f3 < 0.                                                   c
+      ! **********************************************************************************************
+
       kx2 = kx1+1
-      !  test whether there are interior knots in the x-direction.
-      if(nk1x==kx1) go to 440
+      ky2 = ky1+1
+
+      !  if there are interior knots in the x-direction,
       !  evaluate the discotinuity jumps of the kx-th order derivative of
       !  the b-splines at the knots tx(l),l=kx+2,...,nx-kx-1.
-      call fpdisc(tx,nx,kx2,bx,nmax)
- 440  ky2 = ky1 + 1
-      !  test whether there are interior knots in the y-direction.
-      if(nk1y==ky1) go to 450
+      if (nk1x/=kx1) call fpdisc(tx,nx,kx2,bx,nmax)
+
+      !  if there are interior knots in the y-direction,
       !  evaluate the discontinuity jumps of the ky-th order derivative of
       !  the b-splines at the knots ty(l),l=ky+2,...,ny-ky-1.
-      call fpdisc(ty,ny,ky2,by,nmax)
+      if (nk1y/=ky1) call fpdisc(ty,ny,ky2,by,nmax)
+
       !  initial value for p.
- 450  p1 = zero
-      f1 = fp0-s
-      p3 = -one
-      f3 = fpms
-      p = sum(a(:ncof,1))
-      rn = ncof
-      p = rn/p
+      p1  = zero
+      f1  = fp0-s
+      p3  = -one
+      f3  = fpms
+      p   = sum(a(:ncof,1))
+      rn  = ncof
+      p   = rn/p
+
       !  find the bandwidth of the extended observation matrix.
       iband3 = kx1*nk1y
       iband4 = iband3 +1
-      ich1 = 0
-      ich3 = 0
-      !  iteration process to find the root of f(p)=s.
-      do 770 iter=1,maxit
-        pinv = one/p
-      !  store the triangularized observation matrix into q.
-        ff(1:ncof) = f(1:ncof)
-        do i=1,ncof
-          q(i,1:iband) = a(i,1:iband)
-          ibb = iband+1
-          q(i,ibb:iband4) = zero
-        end do
+      check1 = .false.
+      check3 = .false.
 
-        if(nk1y==ky1) go to 560
-      !  extend the observation matrix with the rows of a matrix, expressing
-      !  that for x=cst. sp(x,y) must be a polynomial in y of degree ky.
-        do 550 i=ky2,nk1y
-          ii = i-ky1
-          do 551 j=1,nk1x
-      !  initialize the new row.
-            h(1:iband) = zero
+      ! iteration process to find the root of f(p)=s.
+      root_iterations: do iter=1,maxit
+          pinv = one/p
 
+          ! store the triangularized observation matrix into q.
+          ff(1:ncof) = f(1:ncof)
+          q(1:ncof,1:iband) = a(1:ncof,1:iband)
+          q(1:ncof,iband+1:iband4) = zero
 
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            h(1:ky2) = by(ii,1:ky2)*pinv
-            zi   = zero
-            jrot = (j-1)*nk1y+ii
-      !  rotate the new row into triangle by givens transformations without
-      !  square roots.
-            do 540 irot=jrot,ncof
-              piv = h(1)
-              i2 = min0(iband1,ncof-irot)
-              if (piv==zero) then
-                if (i2<=0) go to 551
-                go to 520
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),cos,sin)
-      !  apply that givens transformation to the right hand side.
-              call fprota(cos,sin,zi,ff(irot))
-              if(i2==0) go to 551
-      !  apply that givens transformation to the left hand side.
-              do 510 l=1,i2
-                l1 = l+1
-                call fprota(cos,sin,h(l1),q(irot,l1))
- 510          continue
- 520          h(1:i2+1) = [h(2:i2+1),zero]
- 540        continue
- 551      continue
- 550    continue
- 560    if(nk1x==kx1) go to 640
-      !  extend the observation matrix with the rows of a matrix expressing
-      !  that for y=cst. sp(x,y) must be a polynomial in x of degree kx.
-        do 630 i=kx2,nk1x
-          ii = i-kx1
-          do 631 j=1,nk1y
-      !  initialize the new row
-            h(1:iband4) = zero
-      !  fill in the non-zero elements of the row. jrot records the column
-      !  number of the first non-zero element in the row.
-            j1 = 1
-            do 580 l=1,kx2
-              h(j1) = bx(ii,l)*pinv
-              j1 = j1+nk1y
- 580        continue
-            zi = zero
-            jrot = (i-kx2)*nk1y+j
-      !  rotate the new row into triangle by givens transformations .
-            do 620 irot=jrot,ncof
-              piv = h(1)
-              i2 = min0(iband3,ncof-irot)
-              if (piv==zero) then
-                if (i2<=0) go to 631
-                go to 600
-              endif
-      !  calculate the parameters of the givens transformation.
-              call fpgivs(piv,q(irot,1),cos,sin)
-      !  apply that givens transformation to the right hand side.
-              call fprota(cos,sin,zi,ff(irot))
-              if(i2==0) go to 631
-      !  apply that givens transformation to the left hand side.
-              do 590 l=1,i2
-                l1 = l+1
-                call fprota(cos,sin,h(l1),q(irot,l1))
- 590          continue
- 600          h(1:i2+1) = [h(2:i2+1),zero]
- 620        continue
- 631      continue
- 630    continue
-      !  find dmax, the maximum value for the diagonal elements in the
-      !  reduced triangle.
- 640    dmax = max(zero,maxval(q(1:ncof,1),1))
-      !  check whether the matrix is rank deficient.
-        sigma = max(eps*dmax,maxval(q(1:ncof,1),1))
-      !  backward substitution in case of full rank.
-        c(:ncof) = fpback(q,ff,ncof,iband4,nc)
-        rank = ncof
-        go to 675
-      !  in case of rank deficiency, find the minimum norm solution.
-        lwest = ncof*iband4+ncof+iband4
-        if (lwrk<lwest) then
-           ier = lwest
-           go to 830
-        end if
-        lf = 1
-        lh = lf+ncof
-        la = lh+iband4
-        call fprank(q,ff,ncof,iband4,nc,sigma,c,sq,rank,wrk(la), &
-         wrk(lf),wrk(lh))
- 675    q(1:ncof,1) = q(1:ncof,1)/dmax
+          constant_x: if (nk1y/=ky1) then
 
-        !  compute f(p).
-        fp = zero
-        do 720 num = 1,nreg
-          num1 = num-1
-          lx = num1/nyy
-          ly = num1-lx*nyy
-          jrot = lx*nk1y+ly
-          in = index(num)
- 690      if(in==0) go to 720
-          store = zero
-          i1 = jrot
-          do 710 i=1,kx1
-            hxi = spx(in,i)
-            j1 = i1
-            do 700 j=1,ky1
-              j1 = j1+1
-              store = store+hxi*spy(in,j)*c(j1)
- 700        continue
-            i1 = i1+nk1y
- 710      continue
-          fp = fp+(w(in)*(z(in)-store))**2
-          in = nummer(in)
-          go to 690
- 720    continue
-      !  test whether the approximation sp(x,y) is an acceptable solution.
-        fpms = fp-s
-        if (abs(fpms)<=acc) then
-           if (ncof/=rank) ier = -rank
-           goto 830
-        end if
-      !  test whether the maximum allowable number of iterations has been
-      !  reached.
-        if(iter==maxit) go to 795
-      !  carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if(ich3/=0) go to 740
-        if((f2-f3)>acc) go to 730
-      !  our initial choice of p is too large.
-        p3 = p2
-        f3 = f2
-        p = p*con4
-        if(p<=p1) p = p1*con9 + p2*con1
-        go to 770
- 730    if(f2<zero) ich3 = 1
- 740    if(ich1/=0) go to 760
-        if((f1-f2)>acc) go to 750
-      !  our initial choice of p is too small
-        p1 = p2
-        f1 = f2
-        p = p/con4
-        if(p3<zero) go to 770
-        if(p>=p3) p = p2*con1 + p3*con9
-        go to 770
- 750    if(f2>zero) ich1 = 1
-      !  test whether the iteration process proceeds as theoretically
-      !  expected.
- 760    if(f2>=f1 .or. f2<=f3) go to 800
-      !  find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
- 770  continue
-      !  error codes and messages.
+              ! extend the observation matrix with the rows of a matrix, expressing
+              ! that for x=cst. sp(x,y) must be a polynomial in y of degree ky.
+              do i=ky2,nk1y
+                  ii = i-ky1
+                  do j=1,nk1x
 
- 795  ier = 3
-      go to 830
- 800  ier = 2
-      go to 830
+                      ! initialize the new row.
+                      h(1:iband) = zero
+
+                      ! fill in the non-zero elements of the row. jrot records the column
+                      ! number of the first non-zero element in the row.
+                      h(1:ky2) = by(ii,1:ky2)*pinv
+                      zi   = zero
+                      jrot = (j-1)*nk1y+ii
+
+                      ! rotate the new row into triangle by givens transformations without square roots.
+                      rot_new_row: do irot=jrot,ncof
+                          piv = h(1)
+                          i2 = min(iband1,ncof-irot)
+
+                          if (piv==zero) then
+
+                              if (i2<=0) exit rot_new_row
+
+                          else
+                              ! calculate the parameters of the givens transformation.
+                              call fpgivs(piv,q(irot,1),cos,sin)
+
+                              ! apply that givens transformation to the right hand side.
+                              call fprota(cos,sin,zi,ff(irot))
+
+                              if (i2==0) exit rot_new_row
+
+                              ! apply that givens transformation to the left hand side.
+                              call fprota(cos,sin,h(2:i2+1),q(irot,2:i2+1))
+
+                          endif
+
+                          h(1:i2+1) = [h(2:i2+1),zero]
+                      end do rot_new_row
+                  end do
+              end do
+
+          end if constant_x
+
+          constant_y: if (nk1x/=kx1) then
+
+              ! extend the observation matrix with the rows of a matrix expressing
+              ! that for y=cst. sp(x,y) must be a polynomial in x of degree kx.
+              do i=kx2,nk1x
+                  ii = i-kx1
+                  do j=1,nk1y
+                      ! initialize the new row
+                      h(1:iband4) = zero
+
+                      ! fill in the non-zero elements of the row. jrot records the column
+                      ! number of the first non-zero element in the row.
+                      j1 = 1
+                      do l=1,kx2
+                          h(j1) = bx(ii,l)*pinv
+                          j1 = j1+nk1y
+                      end do
+
+                      zi = zero
+                      jrot = (i-kx2)*nk1y+j
+
+                      !  rotate the new row into triangle by givens transformations .
+                      rot_new_rowy: do irot=jrot,ncof
+                          piv = h(1)
+                          i2 = min(iband3,ncof-irot)
+
+                          if (piv==zero) then
+
+                              if (i2<=0) exit rot_new_rowy
+
+                          else
+                              ! calculate the parameters of the givens transformation.
+                              call fpgivs(piv,q(irot,1),cos,sin)
+
+                              ! apply that givens transformation to the right hand side.
+                              call fprota(cos,sin,zi,ff(irot))
+
+                              if (i2==0) exit rot_new_rowy
+
+                              ! apply that givens transformation to the left hand side.
+                              call fprota(cos,sin,h(2:i2+1),q(irot,2:i2+1))
+
+                          endif
+
+                          h(1:i2+1) = [h(2:i2+1),zero]
+
+                      end do rot_new_rowy
+                  end do ! 631
+
+              end do
+
+          endif constant_y
+
+          ! find dmax, the maximum value for the diagonal elements in the reduced triangle.
+          dmax = max(zero,maxval(q(1:ncof,1),1))
+
+          ! check whether the matrix is rank deficient.
+          sigma = eps*dmax
+
+          if (all(q(1:ncof,1)>sigma)) then
+
+             ! backward substitution in case of full rank.
+             c(:ncof) = fpback(q,ff,ncof,iband4,nc)
+             rank = ncof
+
+          else
+
+             ! in case of rank deficiency, find the minimum norm solution.
+             lwest = ncof*iband4+ncof+iband4
+             if (lwest>lwrk) then
+                ier = lwest
+                call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+                return
+             end if
+
+             lf = 1
+             lh = lf+ncof
+             la = lh+iband4
+             call fprank(q,ff,ncof,iband4,nc,sigma,c,sq,rank,wrk(la),wrk(lf),wrk(lh))
+
+          endif
+
+          q(1:ncof,1) = q(1:ncof,1)/dmax
+
+          ! compute f(p).
+          fp = zero
+          get_fp: do num = 1,nreg
+              num1 = num-1
+              lx = num1/nyy
+              ly = num1-lx*nyy
+              jrot = lx*nk1y+ly
+              in = index(num)
+              do while (in/=0)
+                  store = zero
+                  i1 = jrot
+                  do i=1,kx1
+                    store = store+spx(in,i)*dot_product(spy(in,1:ky1),c(i1+1:i1+ky1))
+                    i1 = i1+nk1y
+                  end do
+                  fp = fp+(w(in)*(z(in)-store))**2
+                  in = nummer(in)
+              end do
+          end do get_fp
+
+          ! test whether the approximation sp(x,y) is an acceptable solution.
+          fpms = fp-s
+          if (abs(fpms)<=acc) then
+             if (ncof/=rank) ier = -rank
+             call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+             return
+          end if
+
+          ! carry out one more step of the iteration process.
+          if (.not.check3) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle root_iterations
+             elseif (f2<zero) then
+                 check3 = .true.
+             endif
+          endif
+
+          if (.not.check1) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle root_iterations
+             elseif (f2>zero) then
+                check1 = .true.
+             endif
+          endif
+
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+             ier = FITPACK_S_TOO_SMALL
+             call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
+
+      end do root_iterations
+
+      ! the maximum allowable number of iterations has been reached.
+      ier = FITPACK_MAXIT
 
       ! test whether x and y are in the original order.
- 830  restore_xy: if (interchanged) then
-
-          ! if not, interchange x and y once more.
-
-          ! Sort c using f as a temporary array
-          l1 = 1
-          do i=1,nk1x
-            l2 = i
-            do j=1,nk1y
-              f(l2) = c(l1)
-              l1 = l1+1
-              l2 = l2+nk1x
-            end do
-          end do
-          c(1:ncof) = f(1:ncof)
-
-          n = min(nx,ny)
-          call swap_RKIND(x,y)
-          call swap_RKIND(tx,ty)
-          call swap_int  (nx,ny)
-
-      endif restore_xy
-
-      if (iopt>=0) then
-         nx0 = nx
-         ny0 = ny
-      endif
+      call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
       return
 
+      contains
+
+          ! Ensure x,y are returned in the original order, if they were interchanged
+          pure subroutine sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
+              logical, intent(in) :: interchanged
+              integer, intent(in) :: m,nmax,nc,iopt,nk1x,nk1y
+              integer, intent(inout) :: l1,l2,nx,ny,nx0,ny0
+              real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),f(nc)
+
+              integer :: i,j,n,ncof
+
+              restore_xy: if (interchanged) then
+
+                  ! if not, interchange x and y once more.
+                  ncof = nk1x*nk1y
+
+                  ! Sort c using f as a temporary array
+                  l1 = 1
+                  do i=1,nk1x
+                    l2 = i
+                    do j=1,nk1y
+                      f(l2) = c(l1)
+                      l1 = l1+1
+                      l2 = l2+nk1x
+                    end do
+                  end do
+                  c(1:ncof) = f(1:ncof)
+
+                  n = min(nx,ny)
+                  call swap_RKIND(x,y)
+                  call swap_RKIND(tx,ty)
+                  call swap_int  (nx,ny)
+
+              endif restore_xy
+
+              if (iopt>=0) then
+                 nx0 = nx
+                 ny0 = ny
+              endif
+
+          end subroutine sort_xy
+
       end subroutine fpsurf
-
-
 
       ! subroutine fpsysy solves a linear n x n symmetric system   (a) * (b) = (g), with n<=6
       ! on input, vector g contains the right hand side ; on output it will contain the solution (b).
@@ -14330,7 +14391,7 @@ module fitpack_core
       end subroutine insert
 
 
-      recursive subroutine parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
+      pure subroutine parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
 
       !  given the ordered set of m points x(i) in the idim-dimensional space and given also a corresponding
       !  set of strictly increasing values u(i) and the set of positive numbers w(i),i=1,2,...,m, subroutine
@@ -14523,8 +14584,9 @@ module fitpack_core
       !  ..scalar arguments..
       real(RKIND), intent(inout) :: ub,ue,s
       real(RKIND), intent(out) :: fp
-      integer, intent(in) :: iopt,ipar,idim,m,mx,k,nest,n,lwrk,nc
-      integer, intent(out) :: ier
+      integer, intent(in)    :: iopt,ipar,idim,m,mx,k,nest,lwrk,nc
+      integer, intent(inout) :: n
+      integer, intent(out)   :: ier
       !  ..array arguments..
       real(RKIND), intent(in) :: x(idim,m)
       real(RKIND), intent(inout) :: u(m),w(m),t(nest),c(nc),wrk(lwrk)
@@ -18483,8 +18545,8 @@ module fitpack_core
       end subroutine surev
 
 
-      recursive subroutine surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx,tx,ny,ty,&
-                                  c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+      pure subroutine surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx,tx,ny,ty,&
+                             c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
       ! given the set of data points (x(i),y(i),z(i)) and the set of positive numbers w(i),i=1,...,m,
       ! subroutine surfit determines a smooth bivariate spline approximation s(x,y) of degrees kx and
@@ -18730,53 +18792,53 @@ module fitpack_core
 
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
+      ier   = FITPACK_INPUT_ERROR
 
-      ier = FITPACK_INPUT_ERROR
-
-      if (.not.(eps>zero .and. eps<one))         goto 1
-      if (.not.(kx>0 .and. kx<=5))               goto 1
-      if (.not.(ky>0 .and. ky<=5))               goto 1
-      if (.not.(iopt>=(-1) .and. iopt<=1))       goto 1
-      if (.not.m>=(kx1*ky1))                     goto 1
-      if (.not.(nxest>=nminx .and. nxest<=nmax)) goto 1
-      if (.not.(nyest>=nminy .and. nyest<=nmax)) goto 1
-      nest = max(nxest,nyest)
-      nxk = nxest-kx1
-      nyk = nyest-ky1
+      nest  = max(nxest,nyest)
+      nxk   = nxest-kx1
+      nyk   = nyest-ky1
       ncest = nxk*nyk
-      nmx = nxest-nminx+1
-      nmy = nyest-nminy+1
+      nmx   = nxest-nminx+1
+      nmy   = nyest-nminy+1
       nrint = nmx+nmy
-      nreg = nmx*nmy
-      jb1 = ky*nxk+kx1
-      ib1 = min(kx*nyk+ky1,jb1)
-      ib3 = kx1*nyk+1
+      nreg  = nmx*nmy
+      jb1   = ky*nxk+kx1
+      ib1   = min(kx*nyk+ky1,jb1)
+      ib3   = kx1*nyk+1
       lwest = ncest*(2+ib1+ib3)+2*(nrint+nest*km2+m*km1)+ib3
       kwest = m+nreg
-      if (.not.(lwrk1>=lwest .and. kwrk>=kwest)) goto 1
-      if (.not.(xb<xe .and. yb<ye))              goto 1
-      if (any(w<=zero))                          goto 1
-      if (any(x<xb .or. x>xe))                   goto 1
-      if (any(y<xb .or. y>xe))                   goto 1
+
+      if (.not.(eps>zero .and. eps<one))         return
+      if (.not.(kx>0 .and. kx<=5))               return
+      if (.not.(ky>0 .and. ky<=5))               return
+      if (.not.(iopt>=(-1) .and. iopt<=1))       return
+      if (.not.m>=(kx1*ky1))                     return
+      if (.not.(nxest>=nminx .and. nxest<=nmax)) return
+      if (.not.(nyest>=nminy .and. nyest<=nmax)) return
+      if (.not.(lwrk1>=lwest .and. kwrk>=kwest)) return
+      if (.not.(xb<xe .and. yb<ye))              return
+      if (any(w<=zero))                          return
+      if (any(x<xb .or. x>xe))                   return
+      if (any(y<xb .or. y>xe))                   return
 
       if (iopt>=0) then
 
-          if (s<zero)                            goto 1
+          if (s<zero)                            return
 
       else
 
           ! Check that the pre-existing x, y knot locations are monotonic
-          if (nx<nminx .or. nx>nxest)            goto 1
+          if (nx<nminx .or. nx>nxest)            return
           nxk       = nx-kx1
           tx(kx1)   = xb
           tx(nxk+1) = xe
-          if (any(tx(kx1+1:nxk+1)<=tx(kx1:nxk))) goto 2
+          if (any(tx(kx1+1:nxk+1)<=tx(kx1:nxk))) return
 
-          if (ny<nminy .or. ny>nyest)            goto 1
+          if (ny<nminy .or. ny>nyest)            return
           nyk       = ny-ky1
           ty(ky1)   = yb
           ty(nyk+1) = ye
-          if (any(ty(ky1+1:nyk+1)<=ty(ky1:nyk))) goto 3
+          if (any(ty(ky1+1:nyk+1)<=ty(ky1:nyk))) return
 
       endif
 
@@ -18784,20 +18846,21 @@ module fitpack_core
       ier = FITPACK_OK
 
       !  we partition the working space and determine the spline approximation
-      kn = 1
-      ki = kn+m
-      lq = 2
-      la = lq+ncest*ib3
-      lf = la+ncest*ib1
+      kn  = 1
+      ki  = kn+m
+      lq  = 2
+      la  = lq+ncest*ib3
+      lf  = la+ncest*ib1
       lff = lf+ncest
       lfp = lff+ncest
       lco = lfp+nrint
-      lh = lco+nrint
+      lh  = lco+nrint
       lbx = lh+ib3
       nek = nest*km2
       lby = lbx+nek
       lsx = lby+nek
       lsy = lsx+m*km1
+
       call fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
                   eps,tol,maxit,nest,km1,km2,ib1,ib3,ncest,nrint,nreg,nx,tx, &
                   ny,ty,c,fp,wrk1(1),wrk1(lfp),wrk1(lco),wrk1(lf),wrk1(lff), &
@@ -18805,20 +18868,6 @@ module fitpack_core
                   wrk1(lh),iwrk(ki),iwrk(kn),wrk2,lwrk2,ier)
       return
 
-      ! Input parameter error
-  1   if (verbose) then
-         print "('[fitpack] surfit input parameter error: ')"
-         print "('[fitpack] iopt=',i0,' kx=',i0,' ky=',i0,' m=',i0)", iopt,kx,ky,m
-         print "('[fitpack] nxest=',i0,' nyest=',i0,' nmax=',i0)", nxest,nyest,nmax
-         print "('[fitpack] lwrk1=',i0,' lwrk2=',i0,' kwrk=',i0)", lwrk1,lwrk2,kwrk
-         print "('[fitpack] xbounts=[',g0,',',g0,'] ybounds=[',g0,',',g0,']')",xb,xe,yb,ye
-         print "('[fitpack] eps=',g0,' s=',g0)", eps,s
-      endif
-      return
-  2   if (verbose) print "('[fitpack] x knot locations are not monotonic: '/,10x,'tx=',*(1x,g0))", tx
-      return
-  3   if (verbose) print "('[fitpack] y knot locations are not monotonic: '/,10x,'ty=',*(1x,g0))", ty
-      return
       end subroutine surfit
 
       ! Swap two real numbers
