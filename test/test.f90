@@ -51,8 +51,8 @@ program test
 
         integer :: itest
 
-        ! Perform all le
-        do itest = 1,1
+        ! Perform all legacy tests
+        do itest = 1,2
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -69,7 +69,7 @@ program test
 
         select case (itest)
             case (1);  success = mnbisp(iunit)
-            case (2);  call mncloc
+            case (2);  success = mncloc(iunit)
             case (3);  call mncoco
             case (4);  call mnconc
             case (5);  call mncosp

@@ -539,6 +539,7 @@ module fitpack_core
 
       ! Normalized cumulative length parameter coordinate along the curve
       if (ipar==0 .and. iopt<=0) then
+
           i1   = 0
           i2   = idim
 
@@ -2282,7 +2283,7 @@ module fitpack_core
          i = i-1
          store = c(i)
          i1 = k
-         if(j<=k) i1=j-1
+         if (j<=k) i1=j-1
          l = i
          do l0=1,i1
            l = l+1
@@ -2920,7 +2921,7 @@ module fitpack_core
 
               !  the case that s(u) is a fixed point is treated separetely.
               !  fp0 denotes the corresponding sum of squared residuals.
-              if (iopt==0 .or. (iopt==1 .and. s>=fp0)) then
+              if (iopt==0 .or. (iopt/=0 .and. s>=fp0)) then
                   fp0 = zero
                   d1  = zero
                   z(1:idim) = zero
@@ -2988,7 +2989,11 @@ module fitpack_core
 
       !  main loop for the different sets of knots. m is a save upper
       !  bound for the number of trials.
-      find_knots: do iter=1,m
+      iter = 0
+      find_knots: do while (iter<m)
+
+          ! Increment iteration
+          iter = iter+1
 
           ! find nrint, the number of knot intervals.
           nrint = n-nmin+1
@@ -3038,7 +3043,7 @@ module fitpack_core
               ! fetch the current data point u(it),x(it)
               ui = u(it)
               wi = w(it)
-              xi(:idim) = wi*x(idim*(it-1)+1:idim*it)
+              xi(1:idim) = wi*x(idim*(it-1)+1:idim*it)
 
               ! search for knot interval t(l) <= ui < t(l+1).
               do while (ui>=t(l+1))
@@ -3048,8 +3053,8 @@ module fitpack_core
               ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
               h = fpbspl(t,n,k,ui,l)
 
-              q(it,:k1) = h(:k1)
-              h(:k1)    = h(:k1)*wi
+              q(it,1:k1) = h(1:k1)
+              h(1:k1)    = h(1:k1)*wi
 
               ! test whether the b-splines nj,k+1(u),j=1+n7,...nk1 are all zero at ui
               l5 = l-k1
@@ -3076,14 +3081,15 @@ module fitpack_core
                   ! of condition (**) for setting up the new row of the observation matrix a. this row
                   ! is stored in the arrays h1 (the part with respect to a1) and h2 (the part with
                   ! respect to a2).
-                  h1 = zero
-                  h2 = zero
+                  h1(:kk1) = zero
+                  h2(:kk)  = zero
                   j  = l5-n10
                   do i=1,kk1
                      j  = j+1
                      l0 = j
                      l1 = l0-kk
-                     do while (l1>n10)
+
+                     do while (l1>max(0,n10))
                        l0 = l1-n10
                        l1 = l0-kk
                      end do
@@ -3101,7 +3107,7 @@ module fitpack_core
                       one_to_n10: do j=1,n10
                           piv = h1(1)
                           if (piv==zero) then
-                             h1(1:kk1) = [h1(2:kk+1),zero]
+                             h1(1:kk1) = [h1(2:kk1),zero]
                           else
                              ! calculate the parameters of the givens transformation.
                              call fpgivs(piv,a1(j,1),cos,sin)
@@ -3110,7 +3116,7 @@ module fitpack_core
                              call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
 
                              ! transformations to the left hand side with respect to a2.
-                             call fprota(cos,sin,h2(:kk),a2(j,:kk))
+                             call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
 
                              if (j==n10) exit one_to_n10
                              i2 = min(n10-j,kk)+1
@@ -3158,7 +3164,7 @@ module fitpack_core
                       ! transformations to right hand side.
                       call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
 
-                      if (i<kk1) call fprota(cos,sin,h(i+1:kk1),a1(j,1:kk1-i))
+                      if (i<kk1) call fprota(cos,sin,h(i+1:kk1),a1(j,2:1+kk1-i))
 
                   end do rot_zero
 
@@ -3170,14 +3176,14 @@ module fitpack_core
 
           end do get_coefs
 
-          fpint(n-1:) = [fpold,fp0]
+          fpint(n-1:n) = [fpold,fp0]
           nrdata(n) = nplus
 
           ! backward substitution to obtain the b-spline coefficients .
           j1 = 1
           do j2=1,idim
-           c(j1:j1+n7-1) = fpbacp(a1,a2,z(j1),n7,kk,kk1,nest)
-           j1 = j1+n
+             c(j1:j1+n7-1) = fpbacp(a1,a2,z(j1),n7,kk,kk1,nest)
+             j1 = j1+n
           end do
 
           ! calculate from condition (**) the remaining coefficients.
@@ -3267,9 +3273,12 @@ module fitpack_core
                  if (done) then
                     ier = FITPACK_INTERPOLATING_OK
                     return
-                 end if
-              else
-                  cycle find_knots
+                 endif
+
+                 ! Restart iteration
+                 iter = 0
+                 cycle find_knots
+
               endif
 
               ! test whether we cannot further increase the number of knots.
@@ -3337,7 +3346,7 @@ module fitpack_core
           c(:nc)         = z(:nc)
           g1(1:n7,1:k1)  = a1(1:n7,1:k1)
           g1(1:n7,k2)    = zero
-          g1(1:n7,1)     = zero
+          g2(1:n7,1)     = zero
           g2(1:n7,2:k1)  = a2(1:n7,1:k)
 
           l = n10
@@ -3351,9 +3360,8 @@ module fitpack_core
              ! fetch a new row of matrix b and store it in the arrays h1 (the part
              ! with respect to g1) and h2 (the part with respect to g2).
              xi(:idim) = zero
-             h1(:k1) = zero
+             h1(:k2) = zero
              h2(:k1) = zero
-             h1(k2) = zero
              if (it<=n11) then
                  l = it
                  l0 = it
@@ -3410,7 +3418,7 @@ module fitpack_core
                  ! transformation to the left hand side with respect to g1.
                  i2 = min(n11-j,k1)+1
                  call fprota(cos,sin,h1(2:i2),g1(j,2:i2))
-                 h1(1:i2) = [h2(2:i2),zero]
+                 h1(1:i2) = [h1(2:i2),zero]
 
              end do rot_n11
 
@@ -3437,7 +3445,7 @@ module fitpack_core
         ! backward substitution to obtain the b-spline coefficients
         j1 = 1
         do j2=1,idim
-           c(j1:j1+n-1) = fpbacp(g1,g2,c(j1),n7,k1,k2,nest)
+           c(j1:j1+n7-1) = fpbacp(g1,g2,c(j1),n7,k1,k2,nest)
            j1 = j1+n
         end do
 
@@ -3471,11 +3479,12 @@ module fitpack_core
              l0 = l0+n
            end do
            fp = fp+term*w(it)**2
+
         end do
 
         ! test whether the approximation sp(u) is an acceptable solution.
         fpms = fp-s
-        if(abs(fpms)<acc) return
+        if (abs(fpms)<acc) return
 
         ! carry out one more step of the iteration process.
         p2 = p
@@ -3544,7 +3553,7 @@ module fitpack_core
                  kk  = k-1
                  kk1 = k
                  if (kk<=0) then
-                    t(1:2)     = [t(m)-per,x(1)]
+                    t(1:2)     = [t(m)-per,u(1)]
                     t(m+1:m+2) = [u(m),t(3)+per]
 
                     jj = 0
@@ -5389,7 +5398,7 @@ module fitpack_core
       integer, intent(in) :: n,k2,nest
       !  ..array arguments..
       real(RKIND), intent(in) :: t(n)
-      real(RKIND), intent(out) :: b(nest,k2)
+      real(RKIND), intent(inout) :: b(nest,k2)
       !  ..local scalars..
       real(RKIND) :: an,fac,prod
       integer i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
@@ -5408,7 +5417,7 @@ module fitpack_core
             ik = j+k1
             lj = l+j
             lk = lj-k2
-            h(j) = t(l)-t(lk)
+            h(j)  = t(l)-t(lk)
             h(ik) = t(l)-t(lj)
          end do
          lp = lmk
@@ -9184,7 +9193,7 @@ module fitpack_core
                   j  = j+1
                   l0 = j
                   l1 = l0-kk
-                  do while (l1>n10)
+                  do while (l1>max(0,n10))
                     l0 = l1-n10
                     l1 = l0-kk
                   end do
