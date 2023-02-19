@@ -395,6 +395,8 @@ module fitpack_tests
               useUnit = output_unit
           end if
 
+          success = .true.
+
           !  the absciss values of the data points.
           x = [0.1,0.3,0.5,0.7,0.9,1.25,1.75,2.25,2.75,3.5,4.5,5.5,6.5,7.5,8.5,9.5]
           !  the ordinate values of the data points.
