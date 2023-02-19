@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,2
+        do itest = 1,3
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -70,7 +70,7 @@ program test
         select case (itest)
             case (1);  success = mnbisp(iunit)
             case (2);  success = mncloc(iunit)
-            case (3);  call mncoco
+            case (3);  success = mncoco(iunit)
             case (4);  call mnconc
             case (5);  call mncosp
             case (6);  call mncual

@@ -945,7 +945,7 @@ module fitpack_core
           ! Non-monotonic x
           if (any(x(2:m)<=x(1:m-1))) return
 
-          v = sign(one,v)
+          where (v/=zero) v = sign(one,v)
 
       endif
 
@@ -2090,7 +2090,7 @@ module fitpack_core
       level  = 1
       k       = left(point)
       is_left = .true.
-      loop: do while (k/=0 .and. info(k)-jbind(level)<=0)
+      loop: do while (k/=0 .and. info(max(1,k))-jbind(level)<=0)
           point = k
           if (info(k)-jbind(level)<0) then
               k       = right(point)
@@ -4274,8 +4274,8 @@ module fitpack_core
       real(RKIND), intent(in)  :: x(m),y(m),w(m),t(n),e(n)
       real(RKIND), intent(inout) :: c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
       integer, intent(inout)   :: info(maxtr),up(maxtr),left(maxtr),right(maxtr)
-      integer, intent(out)     :: ibind(mb),jbind(mb)
-      logical, intent(out)     :: bind(n)
+      integer, intent(inout)   :: ibind(mb),jbind(mb)
+      logical, intent(inout)   :: bind(n)
       !  ..local scalars..
       integer :: count,i,i1,j,j1,j2,j3,k,kdim,k1,k2,k3,k4,k5,k6,l,l1,l2,l3,merk,nbind,violated,n1,n4,n6
       real(RKIND) :: f,wi,xi
@@ -4468,7 +4468,7 @@ module fitpack_core
                           k1 = k1+1
                        end do
                     endif
-                    b(k1,j) = -f*merge(one/b(k1,i),one,i/=j)
+                    b(k1,j) = merge(-f/b(k1,i),-f,i/=j)
                  end do
               end do factor
 
@@ -4576,48 +4576,64 @@ module fitpack_core
             end if
           end do test_constraints
 
-          !  test whether the solution of the least-squares problem with equality
-          !  constraints is a feasible solution.
-          if (violated==0) then
+          ! test whether the solution of the least-squares problem with equality constraints is a
+          ! feasible solution.
+          test_feasible: do
 
-              !  test whether the feasible solution is optimal.
-              bind(1:n6) = .false.
-              if (nbind>0) bind(ibind(1:nbind)) = u(1:nbind)>zero
+              if (violated/=0) then
 
-              if (all(.not.bind(1:n6))) exit least_squares
+                  ! test whether there are still cases with nbind constraints in equality form to be considered.
+                  violated = 0
 
-          end if
+                  !  test whether there are still cases with nbind constraints in
+                  !  equality form to be considered.
+                  if (merk<=1) then
+                     nbind = n1
+                     !  test whether the number of knots where s''(x)=0 exceeds maxbin.
+                     if(nbind>maxbin) then
+                        ier = 1
+                        return
+                     end if
+                     n1 = n1+1
+                     ibind(n1) = 0
+                     !  search which cases with nbind constraints in equality form
+                     !  are going to be considered.
+                     call fpdeno(maxtr,up,left,right,nbind,merk)
+                     !  test whether the quadratic programming problem has a solution.
+                     if (merk==1) then
+                        ier = 3
+                        return
+                     end if
+                  endif
 
-          !  test whether there are still cases with nbind constraints in
-          !  equality form to be considered.
-          if (merk<=1) then
-              nbind = n1
-              !  test whether the number of knots where s''(x)=0 exceeds maxbin.
-              if(nbind>maxbin) then
-                 ier = 1
-                 return
-              end if
-              n1 = n1+1
-              ibind(n1) = 0
-              !  search which cases with nbind constraints in equality form
-              !  are going to be considered.
-              call fpdeno(maxtr,up,left,right,nbind,merk)
-              !  test whether the quadratic programming problem has a solution.
-              if (merk==1) then
-                 ier = 3
-                 return
-              end if
-          endif
+                  ! find a new case with nbind constraints in equality form.
+                  call fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
-          ! find a new case with nbind constraints in equality form.
-          call fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
+                  exit test_feasible ! cycle least_squares
+
+             else
+
+                  !  test whether the feasible solution is optimal.
+                  ier = FITPACK_OK
+
+                  bind(1:n6) = .false.
+                  test_optimal: do i=1,nbind
+                      if (u(i)<=zero) then
+                          violated = 1
+                          exit test_optimal
+                      endif
+                      j = ibind(i)
+                      bind(j) = .true.
+                  end do test_optimal
+
+                  ! SUCCESS!
+                  exit least_squares
+
+             endif
+
+          end do test_feasible
 
       end do least_squares
-
-      !  test whether the feasible solution is optimal.
-      ier = FITPACK_OK
-      bind(1:n6) = .false.
-      if (nbind>0) bind(ibind(1:nbind)) = u(1:nbind)>zero
 
       !  evaluate s(x) at the data points x(i) and calculate the weighted
       !  sum of squared residual right hand sides sq.
@@ -5320,7 +5336,8 @@ module fitpack_core
       ! Begin from root node
       i     = 1
       level = 0
-      new_branch: do
+
+      new_branch: do ! 10
 
           ! Descend leftward until there are points
           move_left: do
@@ -5349,6 +5366,7 @@ module fitpack_core
                       end do descend_right
                       right(k) = i
                       point = k
+                      i = right(point)
                       exit clear_node
                   elseif (i/=0) then
                       ! Attach this node to the right
@@ -5367,7 +5385,9 @@ module fitpack_core
           ! Move up until we find a right branch;
           ! restart from that branch if found
           move_up: do
-             if (right(point)/=0) exit move_up
+
+             i = right(point)
+             if (i/=0) exit move_up
 
              ! Move up onw level
              i     = up(point)
