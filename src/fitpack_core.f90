@@ -988,7 +988,7 @@ module fitpack_core
       !    called the smoothing factor. the fit s(u) is given in the b-spline representation and can
       !    be evaluated by means of subroutine curev.
 
-      pure subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
+      subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
                              ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
       !
       !  calling sequence:
@@ -3782,7 +3782,7 @@ module fitpack_core
       end subroutine fpcoco
 
 
-      pure subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
+      subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
                              tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !cc         c XXX: mmnin/nmin variables on line 61
       !  ..
@@ -3905,6 +3905,7 @@ module fitpack_core
 
          iter = iter+1
 
+
          if (n==nmin) ier = FITPACK_LEASTSQUARES_OK
 
          ! find nrint, tne number of knot intervals.
@@ -3966,14 +3967,14 @@ module fitpack_core
                  ! rotate the new row of the observation matrix into triangle.
                  rotate_row: do i=li,lj
                      j   = j+1
-                   piv = h(i)
-                    if (piv==zero) cycle rotate_row
+                     piv = h(i)
+                     if (piv==zero) cycle rotate_row
 
-                    ! calculate the parameters of the givens transformation.
-                    call fpgivs(piv,a(j,1),cos,sin)
+                     ! calculate the parameters of the givens transformation.
+                     call fpgivs(piv,a(j,1),cos,sin)
 
-                    ! transformations to right hand side.
-                    call fprota(cos,sin,xi(1:idim),z(j:j+n*(idim-1):n))
+                     ! transformations to right hand side.
+                     call fprota(cos,sin,xi(1:idim),z(j:j+n*(idim-1):n))
 
                     ! transformations to left hand side.
                     not_last: if (i<lj) then
@@ -4098,7 +4099,7 @@ module fitpack_core
            end if
 
            ! test whether we cannot further increase the number of knots.
-           if (n==nest) cycle main_loop
+           if (n==nest) exit add_new_knots
         end do add_new_knots
       ! restart the computations with the new set of knots.
       end do main_loop
@@ -4220,8 +4221,8 @@ module fitpack_core
         p2 = p
         f2 = fpms
         if (.not.check3) then
-           if ((f2-f3)>acc .and. f2<zero) then
-              check3=.true.
+           if ((f2-f3)>acc) then
+              check3=f2<zero
            else
               ! our initial choice of p is too large.
               p3 = p2
@@ -4233,8 +4234,8 @@ module fitpack_core
         endif
 
         if (.not.check1) then
-           if ((f1-f2)>acc .and. f2>zero) then
-               check1 = .true.
+           if ((f1-f2)>acc) then
+               check1 = f2>zero
            else
                ! our initial choice of p is too small
                p1 = p2
@@ -5079,43 +5080,43 @@ module fitpack_core
           ! SUCCESS! the approximation sp(x) is an acceptable solution.
           fpms = fp-s; if (abs(fpms)<acc) return
 
-         ! Reinitialize p to carry out one more iteration
-         p2 = p
-         f2 = fpms
-         if (.not.check3) then
-            if ((f2-f3)>acc .and. f2<zero) then
-               check3=.true.
-            else
-               ! our initial choice of p is too large.
-               p3 = p2
-               f3 = f2
-               p  = p*con4
-               if (p<=p1) p=p1*con9 + p2*con1
-               cycle find_root
-            endif
-         endif
-
-         if (.not.check1) then
-            if ((f1-f2)>acc .and. f2>zero) then
-                check1 = .true.
-            else
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p  = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+          ! Reinitialize p to carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
+          if (.not.check3) then
+             if ((f2-f3)>acc) then
+                check3=f2<zero
+             else
+                ! our initial choice of p is too large.
+                p3 = p2
+                f3 = f2
+                p  = p*con4
+                if (p<=p1) p=p1*con9 + p2*con1
                 cycle find_root
-            endif
-         endif
+             endif
+          endif
 
-         ! test whether the iteration process proceeds as theoretically expected.
-         if (f2>=f1 .or. f2<=f3) then
-            ier = FITPACK_S_TOO_SMALL
-            return
-         endif
+          if (.not.check1) then
+             if ((f1-f2)>acc) then
+                 check1 = f2>zero
+             else
+                 ! our initial choice of p is too small
+                 p1 = p2
+                 f1 = f2
+                 p  = p/con4
+                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                 cycle find_root
+             endif
+          endif
 
-         ! find the new value for p.
-         call fprati(p1,f1,p2,f2,p3,f3,p)
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+             ier = FITPACK_S_TOO_SMALL
+             return
+          endif
+
+          ! find the new value for p.
+          call fprati(p1,f1,p2,f2,p3,f3,p)
 
       end do find_root
 
@@ -7393,10 +7394,11 @@ module fitpack_core
       real(RKIND), intent(in) :: x
       !  ..array arguments..
       real(RKIND), intent(in)  :: t(nest),c(nest)
-      real(RKIND), intent(out) :: tt(nest),cc(nest)
+      real(RKIND), intent(inout) :: tt(nest),cc(nest)
       !  ..local scalars..
       real(RKIND) :: fac,per
       integer :: i,i1,j,k1,m,mk,nk,nk1,nl,ll
+
       !  ..
       k1  = k+1
       nk1 = n-k1
@@ -8500,34 +8502,34 @@ module fitpack_core
          ! SUCCESS! the approximation sp(u) is an acceptable solution.
          fpms = fp-s; if (abs(fpms)<acc) return
 
-         ! Reinitialize p to carry out one more iteration
-         p2 = p
-         f2 = fpms
-         if (.not.check3) then
-            if ((f2-f3)>acc .and. f2<zero) then
-               check3=.true.
-            else
-               ! our initial choice of p is too large.
-               p3 = p2
-               f3 = f2
-               p  = p*con4
-               if (p<=p1) p=p1*con9 + p2*con1
-               cycle find_root
-            endif
-         endif
-
-         if (.not.check1) then
-            if ((f1-f2)>acc .and. f2>zero) then
-                check1 = .true.
-            else
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p  = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+          ! Reinitialize p to carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
+          if (.not.check3) then
+             if ((f2-f3)>acc) then
+                check3=f2<zero
+             else
+                ! our initial choice of p is too large.
+                p3 = p2
+                f3 = f2
+                p  = p*con4
+                if (p<=p1) p=p1*con9 + p2*con1
                 cycle find_root
-            endif
-         endif
+             endif
+          endif
+
+          if (.not.check1) then
+             if ((f1-f2)>acc) then
+                 check1 = f2>zero
+             else
+                 ! our initial choice of p is too small
+                 p1 = p2
+                 f1 = f2
+                 p  = p/con4
+                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                 cycle find_root
+             endif
+          endif
 
          ! test whether the iteration process proceeds as theoretically expected.
          if (f2>=f1 .or. f2<=f3) then
@@ -9674,11 +9676,11 @@ module fitpack_core
       pure subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
 
       !  ..scalar arguments..
-      integer, intent(in)      :: idim,k,ib,nb,ie,ne,np
-      real(RKIND), intent(in)  :: a,b
+      integer, intent(in)        :: idim,k,ib,nb,ie,ne,np
+      real(RKIND), intent(in)    :: a,b
       !  ..array arguments..
-      real(RKIND), intent(in)  :: db(nb),de(ne)
-      real(RKIND), intent(out) :: cp(np)
+      real(RKIND), intent(in)    :: db(nb),de(ne)
+      real(RKIND), intent(inout) :: cp(np)
       !  ..local scalars..
       real(RKIND) :: ab,aki
       integer     :: i,id,j,jj,l,ll,k1,k2
@@ -10950,29 +10952,32 @@ module fitpack_core
           p2 = p
           f2 = fpms
 
+          ! Reinitialize p to carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
           if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle iterations
-             elseif (f2<zero) then
-                 check3 = .true.
+             if ((f2-f3)>acc) then
+                check3=f2<zero
+             else
+                ! our initial choice of p is too large.
+                p3 = p2
+                f3 = f2
+                p  = p*con4
+                if (p<=p1) p=p1*con9 + p2*con1
+                cycle iterations
              endif
           endif
 
           if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle iterations
-             elseif (f2>zero) then
-                check1 = .true.
+             if ((f1-f2)>acc) then
+                 check1 = f2>zero
+             else
+                 ! our initial choice of p is too small
+                 p1 = p2
+                 f1 = f2
+                 p  = p/con4
+                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
+                 cycle iterations
              endif
           endif
 

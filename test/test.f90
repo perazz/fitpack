@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,3
+        do itest = 1,4
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -71,7 +71,7 @@ program test
             case (1);  success = mnbisp(iunit)
             case (2);  success = mncloc(iunit)
             case (3);  success = mncoco(iunit)
-            case (4);  call mnconc
+            case (4);  success = mnconc(iunit)
             case (5);  call mncosp
             case (6);  call mncual
             case (7);  success = mncurf()
@@ -98,7 +98,7 @@ program test
             case (28); call mnpasu(dapasu)
             case (29); call mnspgr(daspgr_u,daspgr_v,daspgr_r)
             case default;
-                 print *, 'invalid test ID'
+                 print *, 'invalid test ID: try 1-29'
                  success = .false.
         end select
 
