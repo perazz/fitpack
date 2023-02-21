@@ -748,7 +748,7 @@ module fitpack_tests
           real(RKIND) :: x(m),y(m),w(m),sx(m),s2(m),t(20),c(20),e(20),wrk(550)
           integer     :: iwrk(450)
           logical     :: bind(20)
-          integer     :: i,ier,is,j,j3,n,n4,n6,useUnit
+          integer     :: i,ier,is,j,n,n4,n6,useUnit
           real(RKIND) :: sq
 
           !  initialization.
@@ -875,7 +875,7 @@ module fitpack_tests
 
           real(RKIND) :: t(m),c(nc),u(m),sp(nc),d(nd),cof(2,6)
           integer     :: i,ier,ii,ip,i1,i2,j,jj,jn,j1,j2,j3,j4,k,kk,k1,l,l1,n,nk,nk1,useUnit
-          real(RKIND) :: ai,aj,arg,fac,per,pol,tt,uu
+          real(RKIND) :: aj,arg,fac,per,pol,tt,uu
 
           !  initialization.
           success = .true.
@@ -946,7 +946,7 @@ module fitpack_tests
                   arg = u(i)
 
                   ! search for knot interval t(l)<=u(i)<t(l+1).
-          40      search_knot: do while (arg>=t(l1) .and. l/=nk1)
+                  search_knot: do while (arg>=t(l1) .and. l/=nk1)
                       !  a new knot interval.
                       l = l1
                       l1 = l+1
@@ -1663,7 +1663,7 @@ module fitpack_tests
 
           real(RKIND) :: t1(nest),c1(nest),t2(nest),c2(nest),x(m),y(m),y1(m),y2(m)
           integer :: i,ier,iopt,ip,i1,i2,j,j1,j2,k,k1,nk,n1,n1k1,n2,n2k1,useUnit
-          real(RKIND) :: ai,per
+          real(RKIND) :: per
 
           ! Initialization.
           if (present(iunit)) then
