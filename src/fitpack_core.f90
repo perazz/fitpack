@@ -2089,10 +2089,10 @@ module fitpack_core
 
       !  ..
       point   = 1
-      level  = 1
+      level   = 1
       k       = left(point)
       is_left = .true.
-      loop: do while (k/=0 .and. info(max(1,k))-jbind(level)<=0)
+      loop: do while (k/=0 .and. info(max(1,k))-jbind(min(level,n1))<=0)
           point = k
           if (info(k)-jbind(level)<0) then
               k       = right(point)
