@@ -31,7 +31,7 @@ module fitpack_tests
     public :: mncosp ! test cocosp: least-squares fitting with convexity constraints
     public :: mncual ! test cualde: derivatives of a closed planar spline curve
     public :: mncurf ! test curfit: General curve fitting
-    public :: mnfour
+    public :: mnfour ! test fourco: Fourier coefficient calculation
     public :: mnist
     public :: mnpade
     public :: mnparc
@@ -1498,117 +1498,153 @@ module fitpack_tests
       !c                 mnfour : fourco test program                       cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnfour
-      real(RKIND) ::c(20),t(20),wrk1(20),wrk2(20),alfa(10),ress(10),resc(10)
-      integer i,ier,j,k,k1,m,n,nk1
-      real(RKIND) ::ak,rc,rs
-      !  as an example we calculate some integrals of the form
-      !          / 1                               / 1
-      !         !    x * sin(alfa*x) dx  and      !   x * cos(alfa*x) dx
-      !      0 /                               0 /
-      !
-      !  we will represent y = x as a cubic spline.
-      k = 3
-      k1 = k+1
-      !  we fetch the knots of the cubic spline
-      n = 2*k1+4
-      !  the boundary knots
-      j = n
-      do 10 i=1,k1
-         t(i) = 0.
-         t(j) = 0.1e+01
-         j = j-1
-  10  continue
-      !  the interior knots
-      t(5) = 0.1e+0
-      t(6) = 0.3e+0
-      t(7) = 0.4e+0
-      t(8) = 0.8e+0
-      !  find the b-spline representation of y=x
-      nk1 = n-k1
-      ak = k
-      c(1) = 0.
-      do 20 i=2,nk1
-         j = i+k
-         c(i) = c(i-1)+(t(j)-t(i))/ak
-  20  continue
-      !  print the data for the spline.
-      write(6,900) k
-      write(6,905)
-      write(6,910) (t(i),i=1,n)
-      write(6,915)
-      write(6,920) (c(i),i=1,nk1)
-      !  fetch the different values for alfa
-      m = 8
-      alfa(1) = 0.
-      alfa(2) = 0.1e-02
-      do 30 i=3,m
-        alfa(i) = -alfa(i-1)*0.1e+02
-  30  continue
-      !  calculate the fourier integrals of the cubic spline
-      call fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
-      !  print the results
-      write(6,925)
-      do 40 i=1,m
-      !  fetch the exact values of the integrals
-        call exfour(alfa(i),rs,rc)
-        write(6,930) alfa(i),ress(i),rs,resc(i),rc
-  40  continue
-      stop
-      !  format statements.
- 900  format(25h0degree of the spline k =,i2)
- 905  format(1x,21hposition of the knots)
- 910  format(5x,12f5.1)
- 915  format(1x,21hb-spline coefficients)
- 920  format(5x,8f9.5)
- 925  format(1h0,2x,4halfa,9x,4hress,9x,4hexas,9x,4hresc,9x,4hexac)
- 930  format(1x,e8.1,4f13.5)
-      end subroutine mnfour
+      logical function mnfour(iunit) result(success)
+          integer, optional, intent(in) :: iunit
 
-      subroutine exfour(alfa,rs,rc)
-      !  subroutine exfour calculates the integrals
+          real(RKIND) :: c(20),t(20),wrk1(20),wrk2(20),alfa(10),ress(10),resc(10)
+          integer     :: i,ier,j,k,k1,m,n,nk1,useUnit
+          real(RKIND) :: ak,rc,rs
+
+          ! Initialization.
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  as an example we calculate some integrals of the form
+          !          / 1                               / 1
+          !         !    x * sin(alfa*x) dx  and      !   x * cos(alfa*x) dx
+          !      0 /                               0 /
+          !
+          !  we will represent y = x as a cubic spline.
+          k = 3
+          k1 = k+1
+          !  we fetch the knots of the cubic spline
+          n = 2*k1+4
+          !  the boundary knots
+          j = n
+          t(1:k1)  = zero
+          t(n-k:n) = one
+
+          !  the interior knots
+          t(5:8) = [real(RKIND) :: 0.1, 0.3, 0.4, 0.8]
+
+          !  find the b-spline representation of y=x
+          nk1  = n-k1
+          ak   = k
+          c(1) = zero
+          do i=2,nk1
+             j    = i+k
+             c(i) = c(i-1)+(t(j)-t(i))/ak
+          end do
+
+          !  print the data for the spline.
+          write(6,900) k
+          write(6,905)
+          write(6,910) (t(i),i=1,n)
+          write(6,915)
+          write(6,920) (c(i),i=1,nk1)
+
+          !  fetch the different values for alfa
+          m = 8
+          alfa(1) = zero
+          alfa(2) = 0.001_RKIND
+          do i=3,m
+              alfa(i) = -alfa(i-1)*0.1e+02
+          end do
+
+          !  calculate the fourier integrals of the cubic spline
+          call fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
+
+          if (.not.FITPACK_SUCCESS(ier)) then
+             success = .false.
+             write(useUnit,1000) FITPACK_MESSAGE(ier)
+          end if
+
+          !  print the results
+          write(6,925)
+          do i=1,m
+              ! fetch the exact values of the integrals
+              call exfour(alfa(i),rs,rc)
+              write(6,930) alfa(i),ress(i),rs,resc(i),rc
+
+              ! Check that the exact values match the numerical ones
+              if (.not.abs(ress(i)-rs)<smallnum10+smallnum06*abs(rs)) then
+                 write(useUnit,1000)'int{x * sin(alfa*x) dx} values do not match'
+                 success = .false.
+              end if
+              if (.not.abs(resc(i)-rc)<smallnum10+smallnum06*abs(rc)) then
+                 write(useUnit,1000)'int{x * cos(alfa*x) dx} values do not match'
+                 success = .false.
+              end if
+
+          end do
+
+          return
+
+          !  format statements.
+          900  format(25h0degree of the spline k =,i2)
+          905  format(1x,21hposition of the knots)
+          910  format(5x,12f5.1)
+          915  format(1x,21hb-spline coefficients)
+          920  format(5x,8f9.5)
+          925  format(1h0,2x,4halfa,9x,4hress,9x,4hexas,9x,4hresc,9x,4hexac)
+          930  format(1x,e8.1,4f13.5)
+         1000  format('[mnfour] fourier integral error: ',a)
+      end function mnfour
+
+      !  subroutine exfour calculates the exact values of the integrals
       !                 / 1
       !      rs =      !    x*sin(alfa*x) dx    and
       !             0 /
       !                 / 1
       !      rc =      !    x*cos(alfa*x) dx
       !             0 /
-      integer k,k2
-      real(RKIND) ::aa,ak,alfa,cc,c1,rc,rs,ss,s1
+      elemental subroutine exfour(alfa,rs,rc)
 
-      if(abs(alfa)<one) go to 10
-      !  integration by parts
-      aa = one/alfa
-      cc = cos(alfa)
-      ss = sin(alfa)
-      rs = (ss*aa-cc)*aa
-      rc = ((cc-one)*aa+ss)*aa
-      go to 50
-      !  using the series expansions of sin(alfa*x) and cos(alfa*x)
-  10  rs = 0.
-      rc = half
-      if(alfa==0.) go to 50
-      rs = alfa/three
-      ss = rs
-      cc = rc
-      aa = -alfa*alfa
-      do 20 k=1,21
-        k2 = 2*(k-1)
-        ak = (k2+2)*(k2+5)
-        ss = ss*aa/ak
-        s1 = rs+ss
-        if(s1==rs)go to 30
-        rs = s1
-  20  continue
-  30  do 40 k=1,21
-        k2 = 2*(k-1)
-        ak = (k2+1)*(k2+4)
-        cc = cc*aa/ak
-        c1 = rc+cc
-        if(c1==rc)go to 50
-        rc = c1
-  40  continue
-  50  return
+          real(RKIND), intent(in) :: alfa
+          real(RKIND), intent(out) :: rs,rc
+
+          integer :: k,k2
+          real(RKIND) :: aa,ak,cc,c1,ss,s1
+
+          if (alfa==zero) then
+              rs = zero
+              rc = half
+          elseif (abs(alfa)>=one) then
+              !  integration by parts
+              aa = one/alfa
+              cc = cos(alfa)
+              ss = sin(alfa)
+              rs = (ss*aa-cc)*aa
+              rc = ((cc-one)*aa+ss)*aa
+          else
+              !  using the series expansions of sin(alfa*x) and cos(alfa*x)
+              rc = half
+              rs = alfa/three
+              ss = rs
+              cc = rc
+              aa = -alfa**2
+              do k=1,21
+                 k2 = 2*(k-1)
+                 ak = (k2+2)*(k2+5)
+                 ss = ss*aa/ak
+                 s1 = rs+ss
+                 if (s1==rs) exit
+                 rs = s1
+              end do
+              do k=1,21
+                 k2 = 2*(k-1)
+                 ak = (k2+1)*(k2+4)
+                 cc = cc*aa/ak
+                 c1 = rc+cc
+                 if (c1==rc) exit
+                 rc = c1
+              end do
+          endif
+          return
       end subroutine exfour
 
 
