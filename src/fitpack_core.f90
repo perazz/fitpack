@@ -14386,14 +14386,14 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in) :: iopt,n,k,nest
-      integer, intent(out) :: nn,ier
-      real(RKIND), intent(in) :: x
+      integer, intent(in)      :: iopt,n,k,nest
+      integer, intent(out)     :: nn,ier
+      real(RKIND), intent(in)  :: x
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(nest),c(nest)
+      real(RKIND), intent(in)  :: t(nest),c(nest)
       real(RKIND), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
-      integer :: kk,k1,l,nk
+      integer :: kk,k1,l,nk,nk1
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -14403,15 +14403,10 @@ module fitpack_core
       nk = n-k
       if (x<t(k1) .or. x>t(nk)) return
       !  search for knot interval t(l) <= x < t(l+1).
+      nk1 = nk-1
       l = k1
-      do while (l<nk .and. .not.x<t(l+1))
+      do while (x>=t(l+1) .and. l/=nk1)
          l = l+1
-      end do
-      !  if no interval found above, then reverse the search and
-      !  look for knot interval t(l) < x <= t(l+1).
-      l = nk-1
-      do while (l>k .and. .not.x>t(l))
-        l = l-1
       end do
 
       !  no interval found in whole range
