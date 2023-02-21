@@ -29,7 +29,7 @@ module fitpack_tests
     public :: mncoco ! test concon: smoothing with convexity constraints
     public :: mnconc ! test concur: smoothing with endpoint derivative constraints
     public :: mncosp ! test cocosp: least-squares fitting with convexity constraints
-    public :: mncual
+    public :: mncual ! test cualde: derivatives of a closed planar spline curve
     public :: mncurf
     public :: mnfour
     public :: mnist
@@ -863,155 +863,175 @@ module fitpack_tests
       !c                    in each knot interval.                          cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mncual
-      real(RKIND) ::t(20),c(40),u(20),sp(40),d(12),cof(2,6)
-      integer i,idim,ier,ii,ip,i1,i2,j,jj,jn,j1,j2,j3,j4,k,kk,k1, &
-       l,l1,m,n,nc,nd,nk,nk1
-      real(RKIND) ::ai,aj,arg,fac,per,pol,tt,uu
-      !  we have a planar curve
-      idim = 2
-      !  set up the dimension information
-      nc = 40
-      nd = 12
-      !  set up the points where the curve will be evaluated.
-      m = 20
-      do 10 i=1,m
-        ai = i-1
-        u(i) = ai*0.5e-01
-  10  continue
-      !  main loop for the different spline degrees.
-      do 120 k=3,5,2
-      !  the order of the spline.
-        k1 = k+1
-      !  n denotes the total number of knots.
-        n = 2*k1+4
-      !  set up the knots of the spline
-        t(k1) = 0.
-        t(k1+1) = 0.1e0
-        t(k1+2) = 0.3e0
-        t(k1+3) = 0.4e0
-        t(k1+4) = 0.8e0
-        t(k1+5) = 0.1e+01
-      !  fetch the b-spline coefficients for sx(u)
-        c(1) = 0.1e+01
-        c(2) = 0.3e+01
-        c(3) = 0.4e+01
-        c(4) = 0.5e+01
-        c(5) = -0.1e+01
-      !  fetch the b-spline coefficients for sy(u)
-        c(n+1) = 0.1e+01
-        c(n+2) = 0.2e+01
-        c(n+3) = -0.3e+01
-        c(n+4) = 0.2e+01
-        c(n+5) = 0.4e+01
-      !  incorporate the boundary conditions for periodic splines
-        nk = n-k
-        per = t(nk)-t(k1)
-        do 20 j=1,k
-      !  the boundary knots
-          i1 = nk+j
-          i2 = nk-j
-          j1 = k1+j
-          j2 = k1-j
-          t(i1) = t(j1)+per
-          t(j2) = t(i2)-per
-      !  the boundary coefficients
-          jn = j+n
-          c(j+5) = c(j)
-          c(jn+5) = c(jn)
-  20    continue
-      !  print the data for the spline.
-        write(6,900) k
-        write(6,905)
-        write(6,910) (t(i),i=1,n)
-        write(6,915)
-        nk1 = n-k1
-        write(6,920) (c(i),i=1,nk1)
-        write(6,925)
-        i1 = n+1
-        i2 = n+nk1
-        write(6,920) (c(i),i=i1,i2)
-        l = k
-        l1 = k1
-        kk = k1*idim
-      !  main loop for the different points of evaluation.
-        ip = 0
-        do 100 i=1,m
-          arg = u(i)
-      !  search for knot interval t(l)<=u(i)<t(l+1).
-  40      if(arg<t(l1) .or. l==nk1) go to 70
-      !  a new knot interval.
-          l = l1
-          l1 = l+1
-          if(t(l)==t(l1)) go to 40
-          write(6,930) t(l),t(l1)
-      !  calculate the spline derivatives at the midpoint tt of the interval
-          tt = (t(l)+t(l1))*0.5e0
-          call cualde(idim,t,n,c,nc,k1,tt,d,nd,ier)
-          write(6,935)
-          write(6,940) (d(j),j=1,kk)
-      !  calculate the coefficients cof in the polynomial representation of
-      !  the spline curve in the current knot interval,i.e.
-      !    sx(u) = cof(1,1)+cof(1,2)*(u-tt)+...+cof(1,k1)*(u-tt)**k
-      !    sy(u) = cof(2,1)+cof(2,2)*(u-tt)+...+cof(2,k1)*(u-tt)**k
-          fac = 0.1e01
-          jj = 0
-          do 60 j=1,k1
-            do 50 ii=1,idim
-              jj = jj+1
-              cof(ii,j) = d(jj)/fac
-  50        continue
-            aj = j
-            fac = fac*aj
-  60      continue
-          write(6,945)
-          write(6,950) (cof(1,j),j=1,k1)
-          write(6,955)
-          write(6,950) (cof(2,j),j=1,k1)
-          go to 40
-      !  evaluate the polynomial curve
-  70      uu = arg-tt
-          do 90 ii=1,idim
-            pol = cof(ii,k1)
-            jj = k1
-            do 80 j=1,k
-              jj = jj-1
-              pol = pol*uu+cof(ii,jj)
-  80        continue
-            ip = ip+1
-            sp(ip) = pol
-  90      continue
- 100    continue
-        write(6,960)
-        i2 = 0
-        j4 = 0
-        do 110 j=1,10
-          i1 = i2+1
-          i2 = i1+1
-          j1 = j4+1
-          j2 = j1+1
-          j3 = j2+1
-          j4 = j3+1
-          write(6,965) i1,u(i1),sp(j1),sp(j2),i2,u(i2),sp(j3),sp(j4)
- 110    continue
- 120  continue
-      stop
-      !  format statements.
- 900  format(31h0degree of the spline curve k =,i2)
- 905  format(1x,21hposition of the knots)
- 910  format(5x,12f6.1)
- 915  format(1x,30hb-spline coefficients of sx(u))
- 920  format(5x,14f5.0)
- 925  format(1x,30hb-spline coefficients of sy(u))
- 930  format(16h0knot interval (,f4.1,1h,,f4.1,1h))
- 935  format(1x,49hcurve derivatives at the midpoint of the interval)
- 940  format(1x,3(1x,2e12.4))
- 945  format(1x,50hcoefficients in the polynomial represent. of sx(u))
- 950  format(2x,6e13.5)
- 955  format(1x,50hcoefficients in the polynomial represent. of sy(u))
- 960  format(1x,2(5x,1hi,3x,4hu(i),4x,8hsx(u(i)),4x,8hsy(u(i))))
- 965  format(1x,2(i6,f7.2,2f12.5))
-      end subroutine mncual
+      logical function mncual(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          !  we have a planar curve
+          integer, parameter :: idim = 2
+          !  set up the dimension information
+          integer, parameter :: nc = 40
+          integer, parameter :: nd = 12
+          integer, parameter :: m = 20
+
+          real(RKIND) :: t(m),c(nc),u(m),sp(nc),d(nd),cof(2,6)
+          integer     :: i,ier,ii,ip,i1,i2,j,jj,jn,j1,j2,j3,j4,k,kk,k1,l,l1,n,nk,nk1,useUnit
+          real(RKIND) :: ai,aj,arg,fac,per,pol,tt,uu
+
+          !  initialization.
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  set up the points where the curve will be evaluated.
+          u = 0.05_RKIND*[(i-1,i=1,m)]
+
+          !  main loop for the different spline degrees.
+          spline_degree: do k=3,5,2
+
+              ! the order of the spline.
+              k1 = k+1
+
+              ! n denotes the total number of knots.
+              n = 2*k1+4
+
+              ! set up the knots of the spline
+              t(k1:k1+5) = [ real(RKIND) :: zero,0.1,0.3,0.4,0.8,one]
+
+              ! fetch the b-spline coefficients for sx(u)
+              c(1:5) = [one,three,four,five,-one]
+
+              ! fetch the b-spline coefficients for sy(u)
+              c(n+1:n+5) = [one,two,-three,two,four]
+
+              ! incorporate the boundary conditions for periodic splines
+              nk  = n-k
+              per = t(nk)-t(k1)
+
+              bc: do j=1,k
+                 !  the boundary knots
+                 i1 = nk+j
+                 i2 = nk-j
+                 j1 = k1+j
+                 j2 = k1-j
+                 t(i1) = t(j1)+per
+                 t(j2) = t(i2)-per
+
+                 ! the boundary coefficients
+                 jn = j+n
+                 c(j+5) = c(j)
+                 c(jn+5) = c(jn)
+              end do bc
+
+              ! print the data for the spline.
+              write(useUnit,900) k
+              write(useUnit,905)
+              write(useUnit,910) (t(i),i=1,n)
+              write(useUnit,915)
+              nk1 = n-k1
+              write(useUnit,920) (c(i),i=1,nk1)
+              write(useUnit,925)
+              i1 = n+1
+              i2 = n+nk1
+              write(useUnit,920) (c(i),i=i1,i2)
+              l = k
+              l1 = k1
+              kk = k1*idim
+
+              ! main loop for the different points of evaluation.
+              ip = 0
+              evaluate_spline: do i=1,m
+                  arg = u(i)
+
+                  ! search for knot interval t(l)<=u(i)<t(l+1).
+          40      search_knot: do while (arg>=t(l1) .and. l/=nk1)
+                      !  a new knot interval.
+                      l = l1
+                      l1 = l+1
+                      if (t(l)==t(l1)) cycle search_knot
+
+                      write(useUnit,930) t(l),t(l1)
+
+                      ! calculate the spline derivatives at the midpoint tt of the interval
+                      tt = (t(l)+t(l1))*half
+                      call cualde(idim,t,n,c,nc,k1,tt,d,nd,ier)
+
+                      if (.not.FITPACK_SUCCESS(ier)) then
+                          success = .false.
+                          write(useUnit,1000) k,FITPACK_MESSAGE(ier)
+                      end if
+
+                      write(useUnit,935)
+                      write(useUnit,940) (d(j),j=1,kk)
+
+                      !  calculate the coefficients cof in the polynomial representation of
+                      !  the spline curve in the current knot interval,i.e.
+                      !    sx(u) = cof(1,1)+cof(1,2)*(u-tt)+...+cof(1,k1)*(u-tt)**k
+                      !    sy(u) = cof(2,1)+cof(2,2)*(u-tt)+...+cof(2,k1)*(u-tt)**k
+                      fac = one
+                      jj = 0
+                      do j=1,k1
+                        do ii=1,idim
+                          jj = jj+1
+                          cof(ii,j) = d(jj)/fac
+                        end do
+                        aj  = j
+                        fac = fac*aj
+                      end do
+
+                      write(useUnit,945)
+                      write(useUnit,950) (cof(1,j),j=1,k1)
+                      write(useUnit,955)
+                      write(useUnit,950) (cof(2,j),j=1,k1)
+                  end do search_knot
+
+                  ! evaluate the polynomial curve
+                  uu = arg-tt
+                  eval_curve: do ii=1,idim
+                      pol = cof(ii,k1)
+                      jj = k1
+                      do j=1,k
+                         jj = jj-1
+                         pol = pol*uu+cof(ii,jj)
+                      end do
+                      ip = ip+1
+                      sp(ip) = pol
+                  end do eval_curve
+              end do evaluate_spline
+
+              write(useUnit,960)
+              i2 = 0
+              j4 = 0
+              do j=1,10
+                 i1 = i2+1
+                 i2 = i1+1
+                 j1 = j4+1
+                 j2 = j1+1
+                 j3 = j2+1
+                 j4 = j3+1
+                 write(useUnit,965) i1,u(i1),sp(j1),sp(j2),i2,u(i2),sp(j3),sp(j4)
+              end do
+          end do spline_degree
+
+          !  format statements.
+          900  format(31h0degree of the spline curve k =,i2)
+          905  format(1x,21hposition of the knots)
+          910  format(5x,12f6.1)
+          915  format(1x,30hb-spline coefficients of sx(u))
+          920  format(5x,14f5.0)
+          925  format(1x,30hb-spline coefficients of sy(u))
+          930  format(16h0knot interval (,f4.1,1h,,f4.1,1h))
+          935  format(1x,49hcurve derivatives at the midpoint of the interval)
+          940  format(1x,3(1x,2e12.4))
+          945  format(1x,50hcoefficients in the polynomial represent. of sx(u))
+          950  format(2x,6e13.5)
+          955  format(1x,50hcoefficients in the polynomial represent. of sy(u))
+          960  format(1x,2(5x,1hi,3x,4hu(i),4x,8hsx(u(i)),4x,8hsy(u(i))))
+          965  format(1x,2(i6,f7.2,2f12.5))
+         1000  format(1x,'[mncual] closed planar curve with order ',i0,' failed: ',a)
+      end function mncual
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

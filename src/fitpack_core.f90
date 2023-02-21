@@ -97,6 +97,7 @@ module fitpack_core
     real(RKIND), parameter, public :: two    = 2.0_RKIND
     real(RKIND), parameter, public :: three  = 3.0_RKIND
     real(RKIND), parameter, public :: four   = 4.0_RKIND
+    real(RKIND), parameter, public :: five   = 5.0_RKIND
     real(RKIND), parameter, public :: six    = 6.0_RKIND
     real(RKIND), parameter, public :: ten    = 10.0_RKIND
     real(RKIND), parameter, public :: pi     = atan2(zero,-one)
