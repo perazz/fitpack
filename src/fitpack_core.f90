@@ -14666,7 +14666,7 @@ module fitpack_core
       endif
 
       if (ub>u(1) .or. ue<u(m) .or. w(1)<=zero) return
-      if (any(u(2:)>=u(:m-1) .or. w(2:)<=zero)) return
+      if (any(u(1:m-1)>=u(2:) .or. w(2:)<=zero)) return
       if (iopt<0) then
           if (n<nmin .or. n>nest) return
           j = n
