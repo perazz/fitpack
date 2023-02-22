@@ -2,6 +2,7 @@ program test
     use fitpack_tests
     use fitpack_test_data
     use fitpack_curve_tests
+    use iso_fortran_env, only: output_unit
     implicit none
 
     integer :: passed,failed
@@ -52,7 +53,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,11
+        do itest = 1,12
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -65,7 +66,17 @@ program test
         integer, intent(in) :: itest
         integer, optional, intent(in) :: iunit
 
+        integer :: useUnit
+
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+
         success = .true.
+
+        print "(///)"
 
         select case (itest)
             case (1);  success = mnbisp(iunit)
@@ -79,7 +90,7 @@ program test
             case (9);  success = mnist (iunit)
             case (10); success = mnpade(iunit)
             case (11); success = mnparc(iunit)
-            case (12); call mnperc
+            case (12); success = mnperc(iunit)
             case (13); call mnpogr(dapogr)
             case (14); call mnpola(dapola)
             case (15); call mnprof
@@ -98,9 +109,11 @@ program test
             case (28); call mnpasu(dapasu)
             case (29); call mnspgr(daspgr_u,daspgr_v,daspgr_r)
             case default;
-                 print *, 'invalid test ID: try 1-29'
+                 write(useUnit,*) '[fitpack] invalid test ID: try 1-29'
                  success = .false.
         end select
+
+
 
     end function perform_legacy_test
 

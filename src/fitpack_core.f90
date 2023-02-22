@@ -8990,11 +8990,11 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,cos,c1,d1,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
                      term,wi,xi,yi,rn
-      integer :: i,ich1,ich3,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+      integer :: i,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1),h1(7),h2(6)
-      logical :: done
+      logical :: done,check1,check3
 
       !  set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -9002,7 +9002,7 @@ module fitpack_core
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       fpold = zero
-      fp0 = zero
+      fp0   = zero
       nplus = 0
 
       ! *****
@@ -9068,7 +9068,7 @@ module fitpack_core
 
              ! the case that s(x) is a constant function is treated separetely.
              ! find the least-squares constant c1 and compute fp0 at the same time.
-             if (iopt==0 .or. (iopt==1 .and. s>=fp0)) then
+             if (iopt==0 .or. n==nmin .or. (iopt/=0 .and. n/=nmin .and. s>=fp0)) then
                 fp0 = zero
                 d1 = zero
                 c1 = zero
@@ -9083,6 +9083,7 @@ module fitpack_core
 
                 ! test whether that constant function is a solution of our problem.
                 fpms = fp0-s
+
                 is_constant: if (fpms<acc .or. nmax==nmin) then
 
                    ier = FITPACK_LEASTSQUARES_OK
@@ -9100,6 +9101,7 @@ module fitpack_core
                    fp = fp0
                    fpint(n-1:n) = [zero,fp0]
                    nrdata(n) = 0
+                   return
 
                 endif is_constant
 
@@ -9124,7 +9126,10 @@ module fitpack_core
       endif
 
       !  main loop for the different sets of knots. m is a save upper bound for the number of trials.
-      update_knots: do iter=1,m
+      iter = 0
+      update_knots: do while (iter<m)
+
+         iter = iter+1
 
          ! find nrint, the number of knot intervals.
          nrint = n-nmin+1
@@ -9227,6 +9232,7 @@ module fitpack_core
                      h2(l0) = h2(l0)+h(i)
                   end if
                end do
+
                ! rotate the new row of the observation matrix into triangle
                ! by givens transformations.
 
@@ -9235,7 +9241,7 @@ module fitpack_core
                  one_to_n10: do j=1,n10
                     piv = h1(1)
                     if (piv==zero) then
-                       h1(1:kk1) = [h1(2:kk+1),zero]
+                       h1(1:kk1) = [h1(2:kk1),zero]
                     else
 
                        ! calculate the parameters of the givens transformation.
@@ -9389,6 +9395,8 @@ module fitpack_core
                   ier = FITPACK_INTERPOLATING_OK
                   return
                else
+                  ! Restart iteration
+                  iter = 0
                   cycle update_knots
                end if
 
@@ -9436,11 +9444,11 @@ module fitpack_core
          l = l-1
          if (l==0) exit
       end do
-      if (l>0) p = p+sum(a1(1:n10,1))
+      if (l/=0) p = p+sum(a1(1:n10,1))
       rn = n7
       p = rn/p
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
 
       ! iteration process to find the root of f(p) = s.
       find_root: do iter=1,maxit
@@ -9502,7 +9510,7 @@ module fitpack_core
                   i = i+1
                   l0 = i
                   l1 = l0-k1
-                  do while (l1>n11)
+                  do while (l1>max(0,n11))
                      l0 = l1-n11
                      l1 = l0-k1
                   end do
@@ -9569,6 +9577,7 @@ module fitpack_core
          l = k1
          do it=1,m1
             if (x(it)>=t(l)) l = l+1
+            l0 = l-k2
             term = dot_product(c(l0+1:l0+k1),q(it,1:k1))
             fp = fp+(w(it)*(term-y(it)))**2
          end do
@@ -9584,43 +9593,42 @@ module fitpack_core
          end if
 
          ! carry out one more step of the iteration process.
-         p2 = p
-         f2 = fpms
+        p2 = p
+        f2 = fpms
+        if (.not.check3) then
+           if ((f2-f3)>acc) then
+              check3=f2<zero
+           else
+              ! our initial choice of p is too large.
+              p3 = p2
+              f3 = f2
+              p  = p*con4
+              if (p<=p1) p=p1*con9 + p2*con1
+              cycle find_root
+           endif
+        endif
 
-         if (ich3==0) then
-            if (f2-f3<=acc) then
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p = p1*con9 +p2*con1
-                cycle find_root
-            elseif (f2<zero) then
-                ich3 = 1
-            endif
-         endif
-
-         if (ich1==0) then
-            if(f1-f2<=acc) then
+        if (.not.check1) then
+           if ((f1-f2)>acc) then
+               check1 = f2>zero
+           else
                ! our initial choice of p is too small
                p1 = p2
                f1 = f2
-               p = p/con4
-               if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+               p  = p/con4
+               if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
                cycle find_root
-            elseif (f2>zero) then
-               ich1 = 1
-            endif
-         endif
+           endif
+        endif
 
-         ! test whether the iteration process proceeds as theoretically expected.
-         if (f2>=f1 .or. f2<=f3) then
-            ier = FITPACK_S_TOO_SMALL
-            return
-         else
-            ! find the new value for p.
-            call fprati(p1,f1,p2,f2,p3,f3,p)
-         endif
+        ! test whether the iteration process proceeds as theoretically expected.
+        if (f2>=f1 .or. f2<=f3) then
+           ier = FITPACK_S_TOO_SMALL
+           return
+        endif
+
+        ! find the new value for p.
+        call fprati(p1,f1,p2,f2,p3,f3,p)
 
       end do find_root
 
