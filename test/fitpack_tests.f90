@@ -2454,200 +2454,252 @@ module fitpack_tests
       !c                  mnpogr : pogrid test program                      cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnpogr(datafile)
-        real(RKIND), intent(in) :: datafile(*)
+      logical function mnpogr(datafile,iunit) result(success)
+          real(RKIND), intent(in) :: datafile(:)
+          integer, optional, intent(in) :: iunit
 
-        !  ..local scalars..
-        real(RKIND) ::cv,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,ai,s
-        integer i,ier,is,j,k,kwrk,lwrk,m,nc,nuest,nu,nvest,nv,pos
+          !  ..local scalars..
+          real(RKIND) :: cv,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,s
+          integer :: i,ier,is,j,k,m,nc,nu,nv,pos,useUnit
 
-        ! number of u (radius)-values of the grid.
-        integer, parameter :: mu = 9
+          ! number of u (radius)-values of the grid.
+          integer, parameter :: mu = 9
 
-        ! number of v (angle)-values of the grid
-        integer, parameter :: mv = 20
+          ! number of v (angle)-values of the grid
+          integer, parameter :: mv = 20
 
-        ! ..local arrays..
-        integer :: ider(2),iopt(3),iwrk(100),iw(29)
-        real(RKIND) :: u(mu),v(mv),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
-                       exact(180),err(mu),sp(mu),wrk(1600)
+          !  we set up the dimension information
+          integer, parameter :: nuest = 16
+          integer, parameter :: nvest = 27
+          integer, parameter :: kwrk = 100
+          integer, parameter :: lwrk = 1600
 
-        ! Store a pointer to the data array
-        pos = 0
+          ! ..local arrays..
+          integer :: ider(2),iopt(3),iwrk(kwrk),iw(29)
+          real(RKIND) :: u(mu),v(mv),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
+                         exact(180),err(mu),sp(mu),wrk(lwrk)
 
-        ! we set up the radius of the disc
-        r = one
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
 
-        ! set up the u-coordinates of the grid.
-        forall(i=1:mu) u(i) = 0.1_RKIND*i
+          ! Store a pointer to the data array
+          pos = 0
 
-        ! we set up the v-coordinates of the grid.
-        forall(j=1:mv) v(j) = (j-1)*pi*0.1_RKIND -pi
+          ! we set up the radius of the disc
+          r = one
 
-        ! we fetch the data values at the grid points.
-        m = mu*mv
-        z(1:m) = datafile(pos+1:pos+m); pos = pos+m
+          ! set up the u-coordinates of the grid.
+          forall(i=1:mu) u(i) = 0.1_RKIND*i
 
-        ! we fetch the data value at the origin.
-        z0     = datafile(pos+1)      ; pos = pos+1
+          ! we set up the v-coordinates of the grid.
+          forall(j=1:mv) v(j) = (j-1)*pi*0.1_RKIND -pi
 
-      ! we print the data values at the grid points. we also compute and print
-      ! the exact value of the test function underlying the data.
-      write(6,905)
-      write(6,910) (i,i=1,mu)
-      write(6,915)
-      exz0 = tespog(zero,zero)
-      er0 = abs(exz0-z0)
-      ermax = er0
-      sum = er0
-      do 40 j=1,mv
-         cv = cos(v(j))
-         sv = sin(v(j))
-         k = j
-         do 30 i=1,mu
-            x = u(i)*cv
-            y = u(i)*sv
-            exact(k) = tespog(x,y)
-            err(i) = abs(exact(k)-z(k))
-            sum = sum+err(i)
-            if(err(i)>ermax) ermax = err(i)
-            k = k+mv
-  30     continue
-         write(6,920) j,(z(k),k=j,m,mv)
-         write(6,925) (exact(k),k=j,m,mv)
-  40  continue
-      ai = m+1
-      sum = sum/ai
-      write(6,930) z0,exz0
-      write(6,935) sum,ermax
-      !  we set up the dimension information
-      nuest = 16
-      nvest = 27
-      kwrk = 100
-      lwrk = 1600
-      ! main loop for the different spline approximations
-      do 300 is=1,6
-        go to (110,120,130,140,150,160),is
-      !  we start computing a set of spline approximations with
-      !  only c0-continuity at the origin,
- 110    iopt(2) = 0
-        ider(2) = 0
-      !  non-vanishing at the boundary of the disc,
-        iopt(3) = 0
-      !  with a data value at the origin.
-        ider(1) = 0
-      !  initialisation
-        iopt(1) = 0
-      !  a large value for s for computing the least-squares polynomial
-        s = 5.
-        go to 200
-      !  iopt(1) = 1 from the second call on
- 120    s = 0.1
-        iopt(1) = 1
-        go to 200
-      !  an interpolating spline
- 130    s = 0.
-        go to 200
-      !  a second set of approximations with c1-continuity at the origin
- 140    iopt(2) = 1
-      !  vanishing at the boundary of the disc.
-        iopt(3) = 1
-      !  exact value at the origin.
-        ider(1) = 1
-        z0 = exz0
-      ! reinitialization
-        iopt(1) = 0
-        s = 0.1
-        go to 200
-      !  no data value at the origin
- 150    ider(1) = -1
-      !  vanishing partial derivatives at the origin
-        ider(2) = 1
-      ! reinitialization
-        iopt(1) = 0
-        go to 200
-      ! finally we calculate the least-squares spline according to the current
-      !  set of knots
- 160    iopt(1) = -1
- 200    call pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest, &
-          nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      ! printing of the fitting results.
-        if(iopt(1)>=0) go to 210
-        write(6,940)
-        go to 220
- 210    write(6,945) s
- 220    write(6,950) iopt(2)
-        if(ider(2)==1) write(6,955)
-        if(iopt(3)==1) write(6,960)
-        write(6,965) fp,ier
-        write(6,970) nu
-        write(6,975)
-        write(6,980) (tu(i),i=1,nu)
-        write(6,985) nv
-        write(6,975)
-        write(6,980) (tv(i),i=1,nv)
-        nc = (nu-4)*(nv-4)
-        write(6,990)
-        write(6,980) (c(i),i=1,nc)
-      !  evaluation of the spline approximation
-        call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,116,iw,29,ier)
-        write(6,995)
-        write(6,910) (i,i=1,mu,2)
-        write(6,915)
-        er0 = abs(exz0-c(1))
-        ermax = er0
-        sum = er0
-        do 240 j=1,mv
-          k = j
-          do 230 i=1,mu
-            sp(i) = f(k)
-            err(i) = abs(exact(k)-f(k))
-            sum = sum+err(i)
-            if(err(i)>ermax) ermax = err(i)
-            k = k+mv
- 230      continue
-          if( (j/3)*3 .ne.j ) go to 240
-          write(6,920) j,(sp(i),i=1,mu,2)
-          write(6,925) (err(i),i=1,mu,2)
- 240    continue
-        sum = sum/ai
-        write(6,1000) c(1),er0
-        write(6,935) sum,ermax
- 300  continue
-      stop
- 905  format(49h1data value (exact function value) at grid points)
- 910  format(8h u(i),i=,3x,9(i1,7x))
- 915  format(8h v(j),j=)
- 920  format(1x,i5,9(2x,f6.3))
- 925  format(7x,9(2h (,f5.3,1h)))
- 930  format(23h0data value at (0,0) = ,f7.3,5x,14hexact value = ,f7.3)
- 935  format(19h0mean abs. error = ,f9.3,5x,18hmax. abs. error = ,f9.3)
- 940  format(21h0least-squares spline)
- 945  format(25h0smoothing spline with s=,f7.2)
- 950  format(1x,35horder of continuity at the origin =,i3)
- 955  format(1x,43hvanishing partial derivatives at the origin)
- 960  format(1x,37hvanishing at the boundary of the disc)
- 965  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
- 970  format(1x,42htotal number of knots in the u-direction =,i3)
- 975  format(1x,22hposition of the knots )
- 980  format(5x,8f9.4)
- 985  format(1x,42htotal number of knots in the v-direction =,i3)
- 990  format(23h0b-spline coefficients )
- 995  format(50h0spline value (approximation error) at grid points)
-1000  format(25h0spline value at (0,0) = ,f7.3,5x,8herror = ,f7.3)
-      end subroutine mnpogr
-      !
-      real(RKIND) function tespog(x,y)
-      ! function program tespog calculates the value of the test function
-      ! underlying the data.
-      !  ..
-      !  ..scalar arguments..
-      real(RKIND) ::x,y,f
-      !  ..
-      f = 1.-((3.*x-1.)**2+(3.*y-1.)**2)/(11.-6.*(x+y))
-      tespog = f-(1.-x**2-y**2)*(x+y)*54./121.
-      return
-      end function tespog
+          ! we fetch the data values at the grid points.
+          m = mu*mv
+          z(1:m) = datafile(pos+1:pos+m); pos = pos+m
+
+          ! we fetch the data value at the origin.
+          z0     = datafile(pos+1)      ; pos = pos+1
+
+          ! we print the data values at the grid points.
+          write(useUnit,905)
+          write(useUnit,910) (i,i=1,mu)
+          write(useUnit,915)
+
+          ! we also compute and print
+          ! the exact value of the test function underlying the data.
+          exz0  = tespog(zero,zero)
+          er0   = abs(exz0-z0)
+          ermax = er0
+          sum   = er0
+          exact_data: do j=1,mv
+             cv = cos(v(j))
+             sv = sin(v(j))
+             k = j
+             do i=1,mu
+                x = u(i)*cv
+                y = u(i)*sv
+                exact(k) = tespog(x,y)
+                err(i) = abs(exact(k)-z(k))
+                sum = sum+err(i)
+                if(err(i)>ermax) ermax = err(i)
+                k = k+mv
+             end do
+             write(useUnit,920) j,(z(k),k=j,m,mv)
+             write(useUnit,925) (exact(k),k=j,m,mv)
+          end do exact_data
+
+          sum = sum/(m+1)
+          write(useUnit,930) z0,exz0
+          write(useUnit,935) sum,ermax
+
+          ! main loop for the different spline approximations
+          approximations: do is=1,6
+
+              select case (is)
+                  case (1)
+
+                      !  we start computing a set of spline approximations with
+                      !  only c0-continuity at the origin,
+                      iopt(2) = 0
+                      ider(2) = 0
+                      !  non-vanishing at the boundary of the disc,
+                      iopt(3) = 0
+                      !  with a data value at the origin.
+                      ider(1) = 0
+                      !  initialisation
+                      iopt(1) = 0
+                      !  a large value for s for computing the least-squares polynomial
+                      s = 5.
+
+                  case (2)
+                      !  iopt(1) = 1 from the second call on
+                      s = 0.1
+                      iopt(1) = 1
+
+                  case (3)
+
+                      !  an interpolating spline
+                      s = 0.
+
+                  case (4)
+
+                      !  a second set of approximations with c1-continuity at the origin
+                      iopt(2) = 1
+                      !  vanishing at the boundary of the disc.
+                      iopt(3) = 1
+                      !  exact value at the origin.
+                      ider(1) = 1
+                      z0 = exz0
+                      ! reinitialization
+                      iopt(1) = 0
+                      s = 0.1
+
+                  case (5)
+
+                      !  no data value at the origin
+                      ider(1) = -1
+                      !  vanishing partial derivatives at the origin
+                      ider(2) = 1
+                      ! reinitialization
+                      iopt(1) = 0
+
+                  case (6)
+
+                      ! finally we calculate the least-squares spline according to the current
+                      !  set of knots
+                      iopt(1) = -1
+
+              end select
+
+              call pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1100) is,FITPACK_MESSAGE(ier)
+                  stop
+              end if
+
+              ! printing of the fitting results.
+              if (iopt(1)>=0) then
+                 write(useUnit,945) s
+              else
+                 write(useUnit,940)
+              endif
+              write(useUnit,950) iopt(2)
+              if(ider(2)==1) write(useUnit,955)
+              if(iopt(3)==1) write(useUnit,960)
+              write(useUnit,965) fp,ier
+              write(useUnit,970) nu
+              write(useUnit,975)
+              write(useUnit,980) (tu(i),i=1,nu)
+              write(useUnit,985) nv
+              write(useUnit,975)
+              write(useUnit,980) (tv(i),i=1,nv)
+              nc = (nu-4)*(nv-4)
+              write(useUnit,990)
+              write(useUnit,980) (c(i),i=1,nc)
+
+              !  evaluation of the spline approximation
+              call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,116,iw,29,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1100) is,FITPACK_MESSAGE(ier)
+              end if
+
+              write(useUnit,995)
+              write(useUnit,910) (i,i=1,mu,2)
+              write(useUnit,915)
+
+              ! Check error against analytical solution
+              er0 = abs(exz0-c(1))
+              ermax = er0
+              sum = er0
+              do j=1,mv
+                  k = j
+                  do i=1,mu
+                      sp(i) = f(k)
+                      err(i) = abs(exact(k)-f(k))
+                      sum = sum+err(i)
+                      if (err(i)>ermax) ermax = err(i)
+                      k = k+mv
+                  end do
+                  if( (j/3)*3 ==j ) then
+                      write(useUnit,920) j,(sp(i),i=1,mu,2)
+                      write(useUnit,925) (err(i),i=1,mu,2)
+                  endif
+              end do
+              sum = sum/(m+1)
+              write(useUnit,1000) c(1),er0
+              write(useUnit,935) sum,ermax
+          end do approximations
+
+          ! Format statements
+          905  format(49h1data value (exact function value) at grid points)
+          910  format(8h u(i),i=,3x,9(i1,7x))
+          915  format(8h v(j),j=)
+          920  format(1x,i5,9(2x,f6.3))
+          925  format(7x,9(2h (,f5.3,1h)))
+          930  format(23h0data value at (0,0) = ,f7.3,5x,14hexact value = ,f7.3)
+          935  format(19h0mean abs. error = ,f9.3,5x,18hmax. abs. error = ,f9.3)
+          940  format(21h0least-squares spline)
+          945  format(25h0smoothing spline with s=,f7.2)
+          950  format(1x,35horder of continuity at the origin =,i3)
+          955  format(1x,43hvanishing partial derivatives at the origin)
+          960  format(1x,37hvanishing at the boundary of the disc)
+          965  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
+          970  format(1x,42htotal number of knots in the u-direction =,i3)
+          975  format(1x,22hposition of the knots )
+          980  format(5x,8f9.4)
+          985  format(1x,42htotal number of knots in the v-direction =,i3)
+          990  format(23h0b-spline coefficients )
+          995  format(50h0spline value (approximation error) at grid points)
+          1000 format(25h0spline value at (0,0) = ,f7.3,5x,8herror = ,f7.3)
+          1100 format('[mnpogr] spline test case ',i0,' failed: ',a)
+
+          contains
+
+          ! function program tespog calculates the value of the test function underlying the data.
+          elemental real(RKIND) function tespog(x,y)
+              !  ..scalar arguments..
+              real(RKIND), intent(in) :: x,y
+
+              real(RKIND) :: f
+              !  ..
+              f = one-((3*x-one)**2+(3*y-one)**2)/(11.-6*(x+y))
+              tespog = f-(one-x**2-y**2)*(x+y)*54.0_RKIND/121.0_RKIND
+              return
+          end function tespog
+
+
+      end function mnpogr
+
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3535,7 +3587,7 @@ module fitpack_tests
             if(err(j)>ermax) ermax = err(j)
             k = k+1
  230      continue
-          if( (i/2)*2 .ne.i ) go to 240
+          if( (i/2)*2 /=i ) go to 240
           write(6,925) i,(sp(j),j=1,mv,2)
           write(6,930) (err(j),j=1,mv,2)
  240    continue

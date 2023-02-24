@@ -53,7 +53,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,12
+        do itest = 1,13
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -91,7 +91,7 @@ program test
             case (10); success = mnpade(iunit)
             case (11); success = mnparc(iunit)
             case (12); success = mnperc(iunit)
-            case (13); call mnpogr(dapogr)
+            case (13); success = mnpogr(dapogr,iunit)
             case (14); call mnpola(dapola)
             case (15); call mnprof
             case (16); call mnregr(daregr_x,daregr_y,daregr_z)

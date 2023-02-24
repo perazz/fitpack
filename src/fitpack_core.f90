@@ -5597,7 +5597,7 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
 
-      integer :: i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jj,jk,jper,j0,k,k1,&
+      integer :: i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jk,jper,j0,k,k1,&
                  l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number,numu,numu1,numv,&
                  numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
 
@@ -5699,7 +5699,7 @@ module fitpack_core
           end do
           ifsv = 1
 
-          if (iop0==0) then
+          if (iop0/=0) then
               !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
               cosi(:,:nv4) = zero
               if (nv7>=4) then
@@ -5708,8 +5708,7 @@ module fitpack_core
                      arg = tv(l)
                      h = fpbspl(tv,nv,3,arg,l)
                      av1(i,1:3) = h(1:3)
-                     cosi(1,i) = cos(arg)
-                     cosi(2,i) = sin(arg)
+                     cosi(:,i) = [cos(arg),sin(arg)]
                   end do
                   call fpcyt1(av1,nv7,nv)
                   do j=1,2
@@ -5777,8 +5776,11 @@ module fitpack_core
 
          ! find the appropriate column of q.
          inner: do
+
             right(1:mvv) = zero
+
             if (nrold/=number) then
+
                if (p<=zero) then
                   nrold = n1
                   n1 = n1+1
@@ -5799,6 +5801,7 @@ module fitpack_core
 
                i0 = 1
                i1 = 4
+
             endif
             if (nu7-number == iop1) i1 = i1-1
             j0 = n1
@@ -5806,14 +5809,13 @@ module fitpack_core
             ! take into account that we eliminate the constraints (3)
             do while (j0-1<=iop0)
                fac0 = h(i0)
-               right(1:mv) = right(1:mv)-fac0*aa(j0,1:mv)
-               if (mv/=mvv) forall(jj=1:nv8) right(mv+jj) = right(mv+jj)-fac0*bb(j0,jj)
+                            right(1:mv)        = right(1:mv)     -fac0*aa(j0,1:mv)
+               if (mv/=mvv) right(mv+1:mv+nv8) = right(mv+1:mv+8)-fac0*bb(j0,1:nv8)
                j0 = j0+1
                i0 = i0+1
             end do
 
             irot = max(0,nrold-iop0-1)
-            if(irot<0) irot = 0
 
             ! rotate the new row of matrix (auu) into triangle.
             rotate_auu: do i=i0,i1
@@ -5857,7 +5859,7 @@ module fitpack_core
       ncof = nuu*nv7
 
       !  initialization.
-      c  (1:ncof) = zero
+      c  (1:ncof)    = zero
       av1(1:nv4,1:5) = zero
       av2(1:nv4,1:4) = zero
       jper = 0
@@ -5924,7 +5926,7 @@ module fitpack_core
                 j  = nrold-nv11+i
                 l0 = j
                 l1 = l0-4
-                do while (l1>nv11)
+                do while (l1>max(0,nv11))
                    l0 = l1-nv11
                    l1 = l0-4
                 end do
@@ -5940,7 +5942,7 @@ module fitpack_core
                 ! rotations with the rows 1,2,...,nv11 of (avv).
                 avv_rot: do j=1,nv11
                    piv = h1(1)
-                   i2 = min0(nv11-j,4)
+                   i2 = min(nv11-j,4)
 
                    if (piv/=zero) then
 
@@ -7699,7 +7701,7 @@ module fitpack_core
       !      strictly decreasing for p>0.
       !
       pure subroutine fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,ider,tu,nu,tv,nv,&
-                              nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
+                             nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
 
       !
       !  ..scalar arguments..
@@ -8279,7 +8281,7 @@ module fitpack_core
               call fpgivs(piv,a(j,1),cos,sin)
 
               ! transformations to right hand side.
-              call fprota(cos,sin,xi,z(j:j+idim*n:n))
+              call fprota(cos,sin,xi,z(j:j+(idim-1)*n:n))
 
               ! transformations to left hand side.
               not_last: if (i<k1) then
@@ -9771,8 +9773,9 @@ module fitpack_core
       real(RKIND), intent(inout) :: c(nc),tu(nuest),tv(nvest),dz(3),wrk(lwrk),fpintu(nuest),fpintv(nvest)
       !  ..local scalars..
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
-      integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
+      integer :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
                  nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
+      logical :: check1,check3
       !  ..local arrays..
       integer :: idd(2)
       real(RKIND) :: dzz(3)
@@ -9784,6 +9787,8 @@ module fitpack_core
       real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       !   initialization
+      nplu  = 0
+      nplv  = 0
       ifsu  = 0
       ifsv  = 0
       ifbu  = 0
@@ -9793,15 +9798,6 @@ module fitpack_core
 
       vb    = v(1)
       ve    = vb+period
-
-      !  acc denotes the absolute tolerance for the root of f(p)=s.
-      acc   = tol*s
-
-      !  numax and nvmax denote the number of knots needed for interpolation.
-      numax = mu+5+iopt(2)+iopt(3)
-      nvmax = mv+7
-      nue   = min(numax,nuest)
-      nve   = min(nvmax,nvest)
 
       ! *****************************************************************************************************
       ! part 1: determination of the number of knots and their position.
@@ -9823,6 +9819,15 @@ module fitpack_core
       ! *****************************************************************************************************
       if (iopt(1)>=0) then
 
+          !  acc denotes the absolute tolerance for the root of f(p)=s.
+          acc   = tol*s
+
+          !  numax and nvmax denote the number of knots needed for interpolation.
+          numax = mu+5+iopt(2)+iopt(3)
+          nvmax = mv+7
+          nue   = min(numax,nuest)
+          nve   = min(nvmax,nvest)
+
           if (s<=zero) then
 
               !  if s = 0, s(u,v) is an interpolating spline.
@@ -9836,11 +9841,11 @@ module fitpack_core
               end if
 
               ! find the position of the knots in the v-direction.
-              tv(1:mv+7) = [v(mv-2:mv)-period,v(1:mv),v(1:4)+period]
+              tv(1:mv+7) = [v(mv-2:mv)-period,v(1:mv),ve,v(2:4)+period]
 
               ! if not all the derivative values g(i,j) are given, we will first
               ! estimate these values by computing a least-squares spline
-              idd(1) = merge(ider(1),1,ider(1)==0)
+              idd(1) = merge(ider(1),1,ider(1)/=0)
               idd(2) = ider(2)
               if (idd(1)>0) dz(1) = z0
 
@@ -9917,13 +9922,14 @@ module fitpack_core
                   mu1 = mu-2+iopt(3)
                   do i=mu0,mu1
                       nrdatu(j) = nrdatu(j)+1
-                      if (u(i)>-tu(l)) then
+                      if (u(i)>=tu(l)) then
                           nrdatu(j) = nrdatu(j)-1
                           l = l+1
                           j = j+1
                           nrdatu(j) = 0
                       endif
                   end do
+
                   !  we determine the number of grid coordinates v(i) inside each knot
                   !  interval (tv(l),tv(l+1)).
                   l = 5
@@ -9944,8 +9950,8 @@ module fitpack_core
 
                   ! if iopt(1)=0 or iopt(1)=1 and s >= fp0,we start computing the least-
                   ! squares polynomial (which is a spline without interior knots).
-                  ier = FITPACK_LEASTSQUARES_OK
-                  idd(1:2)  = [ider(1),1]
+                  ier       = FITPACK_LEASTSQUARES_OK
+                  idd       = [ider(1),1]
                   nu        = 8
                   nv        = 8
                   nrdatu(1) = mu-3+iopt(2)+iopt(3)
@@ -9967,6 +9973,7 @@ module fitpack_core
       ! mpm=mu+mv is a safe upper bound for the number of trials.
       mpm = mu+mv
       iterations: do iter=1,mpm
+
           ! number of knot intervals in the u (v) directions.
           nrintu = nu-7
           nrintv = nv-7
@@ -9994,22 +10001,22 @@ module fitpack_core
                       tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
                       wrk,lwrk)
 
-           step = abs(step)
-           if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
+          step = abs(step)
+          if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
 
-           ! test whether the least-squares spline is an acceptable solution.
-           fpms = fp-s
-           if (iopt(1)<0 .or. abs(fpms)<acc) return
+          ! test whether the least-squares spline is an acceptable solution.
+          fpms = fp-s
+          if (iopt(1)<0 .or. abs(fpms)<acc) return
 
-           ! if f(p=inf) < s, we accept the choice of knots.
-           if (fpms<zero) exit iterations
+          ! if f(p=inf) < s, we accept the choice of knots.
+          if (fpms<zero) exit iterations
 
-           ! if nu=numax and nv=nvmax, sinf(u,v) is an interpolating spline
-           if (nu==numax .and. nv==nvmax) then
-              fp  = zero
-              ier = FITPACK_INTERPOLATING_OK
-              return
-           end if
+          ! if nu=numax and nv=nvmax, sinf(u,v) is an interpolating spline
+          if (nu==numax .and. nv==nvmax) then
+             fp  = zero
+             ier = FITPACK_INTERPOLATING_OK
+             return
+          end if
 
            ! *** increase the number of knots. ***
            ! if nu=nue and nv=nve we cannot further increase the number of knots
@@ -10065,7 +10072,8 @@ module fitpack_core
            choose_dir: if ( nv<nve .and. &
                             (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi>=0)) &
                              .or. nplu>nplv &
-                             .or. (nplu==nplv .and. lastdi<0) )) then
+                             .or. (nplu==nplv .and. lastdi<0) ) .or. &
+                             lastdi==0) then
 
                ! addition in the v-direction.
                lastdi = 1
@@ -10130,8 +10138,8 @@ module fitpack_core
       f3 = fpms
       p  = one
       dzz(1:3) = dz(1:3)
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
 
       !  iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
@@ -10148,40 +10156,41 @@ module fitpack_core
           p2 = p
           f2 = fpms
 
-          if (ich3==0) then
-             if ((f2-f3)>acc .and. f2<zero) then
-                ich3 = 1
-             else
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p=p1*con9 + p2*con1
-                cycle root_iterations
+          ! carry out one more step of the iteration process.
+          if (.not.check3) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle root_iterations
+             elseif (f2<zero) then
+                 check3 = .true.
              endif
           endif
 
-          if (ich1==0) then
-             if ((f1-f2)>acc .and. f2>zero) then
-                 ich1 = 1
-             else
-                 ! our initial choice of p is too small
-                 p1 = p2
-                 f1 = f2
-                 p = p/con4
-                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle root_iterations
+          if (.not.check1) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle root_iterations
+             elseif (f2>zero) then
+                check1 = .true.
              endif
           endif
 
           ! test whether the iteration process proceeds as theoretically expected.
           if (f2>=f1 .or. f2<=f3) then
-              ier = FITPACK_S_TOO_SMALL
-              return
-          end if
-
-          ! find the new value of p.
-          call fprati(p1,f1,p2,f2,p3,f3,p)
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
 
       end do root_iterations
 
@@ -11295,9 +11304,10 @@ module fitpack_core
       integer    , intent(inout) :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
       !  ..local scalars
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
-      integer :: i,ich1,ich3,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
+      integer :: i,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
                  lsy,mk1,mm,mpm,mynx,ncof,nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
                  nrinty,nxe,nxk,nye
+      logical :: check1, check3
 
       !   set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -11638,8 +11648,8 @@ module fitpack_core
       p3   = -one
       f3   = fpms
       p    = one
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
 
       ! iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
@@ -11658,40 +11668,41 @@ module fitpack_core
           p2 = p
           f2 = fpms
 
-          if (ich3==0) then
-             if ((f2-f3)>acc .and. f2<zero) then
-                ich3 = 1
-             else
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p=p1*con9 + p2*con1
-                cycle root_iterations
+          ! carry out one more step of the iteration process.
+          if (.not.check3) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle root_iterations
+             elseif (f2<zero) then
+                 check3 = .true.
              endif
           endif
 
-          if (ich1==0) then
-             if ((f1-f2)>acc .and. f2>zero) then
-                 ich1 = 1
-             else
-                 ! our initial choice of p is too small
-                 p1 = p2
-                 f1 = f2
-                 p = p/con4
-                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle root_iterations
+          if (.not.check1) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle root_iterations
+             elseif (f2>zero) then
+                check1 = .true.
              endif
           endif
 
           ! test whether the iteration process proceeds as theoretically expected.
           if (f2>=f1 .or. f2<=f3) then
-              ier = FITPACK_S_TOO_SMALL
-              return
-          end if
-
-          ! find the new value of p.
-          call fprati(p1,f1,p2,f2,p3,f3,p)
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
 
       end do root_iterations
 
@@ -15769,7 +15780,7 @@ module fitpack_core
       end subroutine percur
 
 
-      pure subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
+       subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
                              nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  subroutine pogrid fits a function f(x,y) to a set of data points
@@ -16130,7 +16141,7 @@ module fitpack_core
       if (mu<mumin .or. mv<4)          return
       if (nuest<8 .or. nvest<8)        return
       if (lwrk<lwest .or. kwrk<kwest)  return
-      if (u(1)<=0. .or. u(mu)>r)       return
+      if (u(1)<=zero .or. u(mu)>r)       return
 
       if (iopt(3)/=0 .and. u(mu)==r)   return
 
@@ -18931,6 +18942,5 @@ module fitpack_core
          b   = tmp
 
       end subroutine swap_int
-
 
 end module fitpack_core
