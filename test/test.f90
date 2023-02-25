@@ -40,7 +40,6 @@ program test
 
     subroutine run_interface_tests()
 
-
         ! Sine function interpolant: test f(x) and df/dx
         call add_test(test_sine_fit())
 
@@ -53,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,16
+        do itest = 1,17
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -95,7 +94,7 @@ program test
             case (14); success = mnpola(dapola,iunit)
             case (15); success = mnprof(iunit)
             case (16); success = mnregr(daregr_x,daregr_y,daregr_z,iunit)
-            case (17); call mnspal
+            case (17); success = mnspal(iunit)
             case (18); call mnspde
             case (19); call mnspev
             case (20); call mnsphe(dasphe)
