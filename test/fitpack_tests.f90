@@ -42,7 +42,7 @@ module fitpack_tests
     public :: mnregr ! test regrid: Surface fitting to data on a rectangular grid
     public :: mnspal ! test spalde: evaluation of a spline function
     public :: mnspde ! test splder: derivative calculation of a spline function
-    public :: mnspev
+    public :: mnspev ! test splev : evaluation of a spline function
     public :: mnsphe
     public :: mnspin
     public :: mnspro
@@ -3483,68 +3483,82 @@ module fitpack_tests
       !c                 mnspev : splev test program                        cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnspev
-      real(RKIND) ::x(21),y(21),t(20),c(20)
-      integer i,i1,i2,ier,j,k,k1,m,n,nk1
-      real(RKIND) ::ai
-      !  set up the points where the splines will be evaluated.
-      m = 21
-      do 10 i=1,m
-        ai = i-1
-        x(i) = ai*0.5e-01
-  10  continue
-      !  main loop for the different spline degrees.
-      do 50 k=1,5
-        k1 = k+1
-      !  n denotes the total number of knots.
-        n = 2*k1+4
-      !  set up the knots of the spline
-        j = n
-      !  the boundary knots
-        do 20 i=1,k1
-          t(i) = 0.
-          t(j) = 0.1e+01
-          j = j-1
-  20    continue
-      !  the interior knots
-        t(k1+1) = 0.1e+0
-        t(k1+2) = 0.3e+0
-        t(k1+3) = 0.4e+0
-        t(k1+4) = 0.8e+0
-      !  generate the b-spline coefficients.
-        nk1 = n-k1
-        do 30 i=1,nk1
-          ai = i
-          c(i) = 0.1e-01*ai*(ai-0.5e01)
-  30    continue
-      !  evaluate the spline.
-        call splev(t,n,c,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
-      !  print the results.
-        write(6,900) k
-        write(6,905)
-        write(6,910) (t(i),i=1,n)
-        write(6,915)
-        write(6,920) (c(i),i=1,nk1)
-        write(6,925) ier
-        write(6,930)
-        i2 = 0
-        do 40 j=1,7
-          i1 = i2+1
-          i2 = i1+2
-          write(6,935) (i,x(i),y(i),i=i1,i2)
-  40    continue
-  50  continue
-      stop
-      !  format statements.
- 900  format(25h0degree of the spline k =,i2)
- 905  format(1x,21hposition of the knots)
- 910  format(5x,15f5.1)
- 915  format(1x,21hb-spline coefficients)
- 920  format(5x,8f9.5)
- 925  format(1x,16herror flag ier =,i3)
- 930  format(1x,3(7x,1hi,3x,4hx(i),4x,7hs(x(i))))
- 935  format(1x,3(i8,f7.2,f11.5))
-      end subroutine mnspev
+      logical function mnspev(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          real(RKIND) :: x(21),y(21),t(20),c(20)
+          integer     :: i,i1,i2,ier,j,k,k1,m,n,nk1,useUnit
+          real(RKIND) :: ai
+
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  set up the points where the splines will be evaluated.
+          m = 21
+          x = [(0.05_RKIND*(i-1),i=1,m)]
+
+          !  main loop for the different spline degrees.
+          spline_degrees: do k=1,5
+              k1 = k+1
+
+              !  n denotes the total number of knots.
+              n = 2*k1+4
+
+              !  set up the knots of the spline
+              j = n
+
+              !  the boundary knots
+              t(:k1) = zero
+              t(n-k:n) = one
+
+              !  the interior knots
+              t(k+1:k+4) = [0.1,0.3,0.4,0.8]
+
+              !  generate the b-spline coefficients.
+              nk1 = n-k1
+              c(:nk1) = [(0.01_RKIND*i*(i-5),i=1,nk1)]
+
+              !  evaluate the spline.
+              call splev(t,n,c,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1000) k,FITPACK_MESSAGE(ier)
+              end if
+
+              !  print the results.
+              write(useUnit,900) k
+              write(useUnit,905)
+              write(useUnit,910) (t(i),i=1,n)
+              write(useUnit,915)
+              write(useUnit,920) (c(i),i=1,nk1)
+              write(useUnit,925) ier
+              write(useUnit,930)
+
+              i2 = 0
+              do j=1,7
+                  i1 = i2+1
+                  i2 = i1+2
+                  write(useUnit,935) (i,x(i),y(i),i=i1,i2)
+              end do
+          end do spline_degrees
+
+          !  format statements.
+           900  format(25h0degree of the spline k =,i2)
+           905  format(1x,21hposition of the knots)
+           910  format(5x,15f5.1)
+           915  format(1x,21hb-spline coefficients)
+           920  format(5x,8f9.5)
+           925  format(1x,16herror flag ier =,i3)
+           930  format(1x,3(7x,1hi,3x,4hx(i),4x,7hs(x(i))))
+           935  format(1x,3(i8,f7.2,f11.5))
+          1000  format('[mnspev] evaluation failed with spline degree ',i0,': ',a)
+      end function mnspev
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
