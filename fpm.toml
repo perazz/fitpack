@@ -1,10 +1,11 @@
 name        = "fitpack"
+version     = "0.1.0"
 author      = "Federico Perini"
 copyright   = "Copyright (c) 2022, Federico Perini" 
 license     = "BSD-3"
 description = "Modern Fortran FITPACK"
 homepage    = "https://github.com/perazz/fitpack"
-keywords    = ["curve fitting","spline","interpolation"]
+keywords    = ["curve fitting","spline","interpolation","smoothing","splines","surface fitting"]
 
 [build]
 auto-executables = false
