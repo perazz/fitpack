@@ -6578,7 +6578,7 @@ module fitpack_core
       l = my*nk1x
       !  initialization.
       q(1:l) = zero
-      ax(1:nk1x,kx2) = zero
+      ax(1:nk1x,1:kx2) = zero
       l = 0
       nrold = 0
       !  ibandx denotes the bandwidth of the matrices (ax) and (rx).
@@ -11513,10 +11513,10 @@ module fitpack_core
           ! find the position of the additional knots which are needed for the
           ! b-spline representation of s(x,y).
           tx(1:kx1)     = xb
-          tx(nk1x+1:nx) = xe
+          tx(nx-kx:nx)  = xe
 
           ty(1:ky1)     = yb
-          ty(nk1y+1:ny) = ye
+          ty(ny-ky:ny)  = ye
 
           ! find the least-squares spline sinf(x,y) and calculate for each knot
           ! interval tx(j+kx)<=x<=tx(j+kx+1) (ty(j+ky)<=y<=ty(j+ky+1)) the sum
@@ -11557,11 +11557,8 @@ module fitpack_core
 
           ! adjust the parameter reducx or reducy according to the direction
           ! in which the last added knots were located.
-          if (lastdi<0) then
-             reducx = fpold-fp
-          elseif (lastdi>0) then
-             reducy = fpold-fp
-          endif
+          if (lastdi<0) reducx = fpold-fp
+          if (lastdi>0) reducy = fpold-fp
 
           ! store the sum of squared residuals for the current set of knots.
           fpold = fp

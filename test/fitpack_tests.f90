@@ -3083,137 +3083,178 @@ module fitpack_tests
       !c               mnregr : regrid test program                         cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnregr(x,y,z)
-        real(RKIND), intent(in) :: x(:),y(:),z(size(x)*size(y))
-        real(RKIND) :: tx(17),ty(17),c(300),wrk(850),f(121), wk(132)
-        integer iwrk(60),iw(22)
-        real(RKIND) ::ai,fp,s,xb,xe,yb,ye
-        integer kx,ky,kwrk,lwrk,m,mx,my,m1,m2,nc,nx,nxest,ny,nyest,i,ier,is,iopt,j
+      logical function mnregr(x,y,z,iunit) result(success)
+          real(RKIND), intent(in) :: x(:),y(:),z(size(x)*size(y))
+          integer, optional, intent(in) :: iunit
 
-        ! fetch the grid size.
-        mx = size(x)
-        my = size(y)
-        m  = mx*my
+          !  we set up the dimension information
+          integer, parameter :: nxest = 17
+          integer, parameter :: nyest = 17
+          integer, parameter :: lwrk = 850
+          integer, parameter :: kwrk = 60
 
-        !  printing of the input data.
-        write(6,915)
-        write(6,920) (y(i),i=1,6)
-        write(6,925)
-        m1 = 1
-        do i=1,mx
-          m2 = m1+5
-          write(6,930) x(i),(z(j),j=m1,m2)
-          m1 = m1+my
-        end do
+          real(RKIND) :: tx(nxest),ty(nyest),c(300),wrk(lwrk),f(121), wk(132)
+          integer     :: iwrk(kwrk),iw(22)
+          real(RKIND) :: ai,fp,s,xb,xe,yb,ye
+          integer     :: kx,ky,m,mx,my,m1,m2,nc,nx,ny,i,ier,is,iopt,j,useUnit
 
-        write(6,920) (y(i),i=7,my)
-        write(6,925)
-      m1 = 7
-      do 20 i=1,mx
-        m2 = m1+4
-        write(6,930) x(i),(z(j),j=m1,m2)
-        m1 = m1+my
-  20  continue
-      !  we set up the boundaries of the approximation domain.
-      xb = x(1)
-      yb = y(1)
-      xe = x(mx)
-      ye = y(my)
-      !  we set up the dimension information
-      nxest = 17
-      nyest = 17
-      lwrk = 850
-      kwrk = 60
-      !  main loop for the different spline approximations
-      do 300 is=1,6
-        go to (110,120,130,140,150,160),is
-      !  we start computing the least-squares bicubic polynomial
- 110    iopt = 0
-        kx = 3
-        ky = 3
-        s = 10.
-        go to 200
-      !  iopt=1 from the second call on
- 120    iopt = 1
-        s = 0.22
-        go to 200
-      !  overfitting (s too small)
- 130    s = 0.1
-        go to 200
-      !  an interpolating spline
- 140    s = 0.
-        go to 200
-      !  we change the degrees of the spline
- 150    kx = 5
-        ky = 5
-        s = 0.2
-        iopt = 0
-        go to 200
-      !  finally we also calculate a least-squares spline approximation
-      !  with specified knots.
- 160    iopt = -1
-        kx = 3
-        ky = 3
-        nx = 11
-        ny = 11
-        j = kx+2
-        do 170 i=1,3
-          ai = i-2
-          tx(j) = ai*0.5
-          ty(j) = tx(j)
-          j = j+1
- 170    continue
-      !  determination of the spline approximation.
- 200    call regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest, &
-         nyest,nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      !  printing of the fitting results.
-        if(iopt>=0) go to 210
-        write(6,935) kx,ky
-        go to 220
- 210    write(6,940) kx,ky
-        write(6,945) s
- 220    write(6,950) fp,ier
-        write(6,955) nx
-        write(6,960)
-        write(6,965) (tx(i),i=1,nx)
-        write(6,970) ny
-        write(6,960)
-        write(6,965) (ty(i),i=1,ny)
-        nc = (nx-kx-1)*(ny-ky-1)
-        write(6,975)
-        write(6,980) (c(i),i=1,nc)
-      !  evaluation of the spline approximation.
-        call bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,f, &
-         wk,132,iw,22,ier)
-        write(6,985)
-        write(6,920) (y(i),i=1,my,2)
-        write(6,925)
-        m1 = 1
-        do 230 i=1,mx,2
-          m2 = m1+my-1
-          write(6,930) x(i),(f(j),j=m1,m2,2)
-          m1 = m1+2*my
- 230    continue
- 300  continue
-      stop
-      !  format statements.
- 915  format(15h1the input data)
- 920  format(1h0,8x,1hy,4x,6(4x,f4.1))
- 925  format(1h ,7x,1hx)
- 930  format(6x,f4.1,5x,6f8.4)
- 935  format(32h0least-squares spline of degrees,2i3)
- 940  format(28h0smoothing spline of degrees,2i3)
- 945  format(20h smoothing factor s=,f7.2)
- 950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
- 955  format(1x,42htotal number of knots in the x-direction =,i3)
- 960  format(1x,22hposition of the knots )
- 965  format(5x,10f6.2)
- 970  format(1x,42htotal number of knots in the y-direction =,i3)
- 975  format(23h0b-spline coefficients )
- 980  format(5x,8f9.4)
- 985  format(1h0,37hspline values at selected grid points)
-      end subroutine mnregr
+          ! Initialization.
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
 
+          ! fetch the grid size.
+          mx = size(x)
+          my = size(y)
+          m  = mx*my
+
+          !  printing of the input data.
+          write(useUnit,915)
+          write(useUnit,920) (y(i),i=1,6)
+          write(useUnit,925)
+          m1 = 1
+          do i=1,mx
+              m2 = m1+5
+              write(useUnit,930) x(i),(z(j),j=m1,m2)
+              m1 = m1+my
+          end do
+
+          write(useUnit,920) (y(i),i=7,my)
+          write(useUnit,925)
+
+          m1 = 7
+          do i=1,mx
+              m2 = m1+4
+              write(useUnit,930) x(i),(z(j),j=m1,m2)
+              m1 = m1+my
+          end do
+
+          !  we set up the boundaries of the approximation domain.
+          xb = x(1)
+          yb = y(1)
+          xe = x(mx)
+          ye = y(my)
+
+          !  main loop for the different spline approximations
+          approximations: do is=1,6
+
+              select case (is)
+                  case (1)
+
+                      !  we start computing the least-squares bicubic polynomial
+                      iopt = 0
+                      kx = 3
+                      ky = 3
+                      s = 10.
+
+                  case (2)
+
+                      !  iopt=1 from the second call on
+                      iopt = 1
+                      s = 0.22
+
+                  case (3)
+
+                      !  overfitting (s too small)
+                      s = 0.1
+
+                  case (4)
+
+                      !  an interpolating spline
+                      s = 0.
+
+                  case (5)
+
+                      !  we change the degrees of the spline
+                      kx = 5
+                      ky = 5
+                      s = 0.2
+                      iopt = 0
+
+                  case (6)
+
+                      !  finally we also calculate a least-squares spline approximation
+                      !  with specified knots.
+                      iopt = -1
+                      kx = 3
+                      ky = 3
+                      nx = 11
+                      ny = 11
+                      j  = kx+2
+
+                      tx(kx+2:kx+4) = [(half*(i-2),i=1,3)]
+                      ty(kx+2:kx+4) = tx(kx+2:kx+4)
+
+              end select
+
+              !  determination of the spline approximation.
+              call regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nx,tx,ny,ty,c,fp,&
+                          wrk,lwrk,iwrk,kwrk,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
+              end if
+
+              !  printing of the fitting results.
+              if (iopt<0) then
+                  write(useUnit,935) kx,ky
+              else
+                  write(useUnit,940) kx,ky
+                  write(useUnit,945) s
+              endif
+
+              write(useUnit,950) fp,ier
+              write(useUnit,955) nx
+              write(useUnit,960)
+              write(useUnit,965) (tx(i),i=1,nx)
+              write(useUnit,970) ny
+              write(useUnit,960)
+              write(useUnit,965) (ty(i),i=1,ny)
+              nc = (nx-kx-1)*(ny-ky-1)
+              write(useUnit,975)
+              write(useUnit,980) (c(i),i=1,nc)
+
+              !  evaluation of the spline approximation.
+              call bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,f,wk,132,iw,22,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
+              end if
+
+              write(useUnit,985)
+              write(useUnit,920) (y(i),i=1,my,2)
+              write(useUnit,925)
+              m1 = 1
+              do i=1,mx,2
+                  m2 = m1+my-1
+                  write(useUnit,930) x(i),(f(j),j=m1,m2,2)
+                  m1 = m1+2*my
+              end do
+          end do approximations
+
+          !  format statements.
+          915  format(15h1the input data)
+          920  format(1h0,8x,1hy,4x,6(4x,f4.1))
+          925  format(1h ,7x,1hx)
+          930  format(6x,f4.1,5x,6f8.4)
+          935  format(32h0least-squares spline of degrees,2i3)
+          940  format(28h0smoothing spline of degrees,2i3)
+          945  format(20h smoothing factor s=,f7.2)
+          950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
+          955  format(1x,42htotal number of knots in the x-direction =,i3)
+          960  format(1x,22hposition of the knots )
+          965  format(5x,10f6.2)
+          970  format(1x,42htotal number of knots in the y-direction =,i3)
+          975  format(23h0b-spline coefficients )
+          980  format(5x,8f9.4)
+          985  format(1h0,37hspline values at selected grid points)
+         1000  format('[mnregr] approximation ',i0,' failed with message ',a)
+      end function mnregr
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
