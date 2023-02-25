@@ -32,7 +32,7 @@ program test
 
 
     1 format('[fitpack] there are ',i0,' passed, ',i0,' failed ',a,' tests.')
-    2 format(//'[fitpack] SUCCESS! ',i0,' test passed, none failed.')
+    2 format(//'[fitpack] SUCCESS! ',i0,' tests passed, none failed.')
 
 
     contains
@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,17
+        do itest = 1,18
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -95,7 +95,7 @@ program test
             case (15); success = mnprof(iunit)
             case (16); success = mnregr(daregr_x,daregr_y,daregr_z,iunit)
             case (17); success = mnspal(iunit)
-            case (18); call mnspde
+            case (18); success = mnspde(iunit)
             case (19); call mnspev
             case (20); call mnsphe(dasphe)
             case (21); call mnspin

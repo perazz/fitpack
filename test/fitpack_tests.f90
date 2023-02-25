@@ -41,7 +41,7 @@ module fitpack_tests
     public :: mnprof ! test profil: Tensor product splines
     public :: mnregr ! test regrid: Surface fitting to data on a rectangular grid
     public :: mnspal ! test spalde: evaluation of a spline function
-    public :: mnspde
+    public :: mnspde ! test splder: derivative calculation of a spline function
     public :: mnspev
     public :: mnsphe
     public :: mnspin
@@ -3391,79 +3391,91 @@ module fitpack_tests
       !c                 mnspde : splder test program                       cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnspde
-      real(RKIND) ::x(7),y(42),t(20),c(20),wrk(20),d(6)
-      integer i,ier,j,k,k1,l,m,n,nk1,nu
-      real(RKIND) ::ai
-      !  set up the points where the spline derivatives will be evaluated.
-      m = 7
-      x(1) = 0.
-      ai = 0.5e-01
-      do 10 i=2,m
-        x(i) = x(i-1)+ai
-        ai = ai+0.5e-01
-  10  continue
-      x(m) = 0.1e+01
-      !  main loop for the different spline degrees.
-      do 70 k=1,5
-        k1 = k+1
-      !  n denotes the total number of knots.
-        n = 2*k1+4
-      !  set up the knots of the spline
-        j = n
-      !  the boundary knots
-        do 20 i=1,k1
-          t(i) = 0.
-          t(j) = 0.1e+01
-          j = j-1
-  20    continue
-      !  the interior knots
-        t(k1+1) = 0.1e+0
-        t(k1+2) = 0.3e+0
-        t(k1+3) = 0.4e+0
-        t(k1+4) = 0.8e+0
-      !  generate the b-spline coefficients.
-        nk1 = n-k1
-        do 30 i=1,nk1
-          ai = i
-          c(i) = 0.1e-01*ai*(ai-0.5e01)
-  30    continue
-      !  evaluate the spline derivatives.
-        j = 1
-        do 40 i=1,k1
-      !  nu denotes the order of the derivative
-          nu = i-1
-          call splder(t,n,c,k,nu,x,y(j),m,OUTSIDE_EXTRAPOLATE,wrk,ier)
-          j = j+m
-  40    continue
-      !  print the results.
-        write(6,900) k
-        write(6,905)
-        write(6,910) (t(i),i=1,n)
-        write(6,915)
-        write(6,920) (c(i),i=1,nk1)
-        write(6,925) (i,i=1,5)
-        write(6,930)
-        do 60 i=1,m
-          j = i
-          do 50 l=1,k1
-            d(l) = y(j)
-            j = j+m
-  50      continue
-          write(6,935) i,x(i),(d(l),l=1,k1)
-  60    continue
-  70  continue
-      stop
-      !  format statements.
- 900  format(25h0degree of the spline k =,i2)
- 905  format(1x,21hposition of the knots)
- 910  format(5x,15f5.1)
- 915  format(1x,21hb-spline coefficients)
- 920  format(5x,8f9.5)
- 925  format(21x,5(i4,8x))
- 930  format(1x,1hi,6h  x(i),3x,8hs(x(i)) ,5(4x,8hs (x(i))))
- 935  format(1x,i1,f6.2,6e12.4)
-      end subroutine mnspde
+      logical function mnspde(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          real(RKIND) :: x(7),y(42),t(20),c(20),wrk(20),d(6)
+          integer     :: i,ier,j,k,k1,l,m,n,nk1,nu,useUnit
+          real(RKIND) :: ai
+
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  set up the points where the spline derivatives will be evaluated.
+          m    = 7
+          x    = [(0.05_RKIND*(i-1),i=1,m)]
+          x(m) = one
+
+          !  main loop for the different spline degrees.
+          spline_degrees: do k=1,5
+              k1 = k+1
+
+              !  n denotes the total number of knots.
+              n = 2*k1+4
+
+              !  set up the knots of the spline
+              j = n
+
+              !  the boundary knots
+              t(:k1) = zero
+              t(n-k:n) = one
+
+              !  the interior knots
+              t(k+1:k+4) = [0.1,0.3,0.4,0.8]
+
+              !  generate the b-spline coefficients.
+              nk1 = n-k1
+              c(:nk1) = [(0.01_RKIND*i*(i-5),i=1,nk1)]
+
+              !  evaluate the spline derivatives.
+              j = 1
+              derivatives: do i=1,k1
+                  !  nu denotes the order of the derivative
+                  nu = i-1
+                  call splder(t,n,c,k,nu,x,y(j),m,OUTSIDE_EXTRAPOLATE,wrk,ier)
+                  j = j+m
+
+                  if (.not.FITPACK_SUCCESS(ier)) then
+                      success = .false.
+                      write(useUnit,1000) i,k,FITPACK_MESSAGE(ier)
+                  end if
+
+              end do derivatives
+
+              !  print the results.
+              write(useUnit,900) k
+              write(useUnit,905)
+              write(useUnit,910) (t(i),i=1,n)
+              write(useUnit,915)
+              write(useUnit,920) (c(i),i=1,nk1)
+              write(useUnit,925) (i,i=1,5)
+              write(useUnit,930)
+              do i=1,m
+                  j = i
+                  do l=1,k1
+                      d(l) = y(j)
+                      j = j+m
+                  end do
+                  write(useUnit,935) i,x(i),(d(l),l=1,k1)
+              end do
+          end do spline_degrees
+
+          !  format statements.
+           900  format(25h0degree of the spline k =,i2)
+           905  format(1x,21hposition of the knots)
+           910  format(5x,15f5.1)
+           915  format(1x,21hb-spline coefficients)
+           920  format(5x,8f9.5)
+           925  format(21x,5(i4,8x))
+           930  format(1x,1hi,6h  x(i),3x,8hs(x(i)) ,5(4x,8hs (x(i))))
+           935  format(1x,i1,f6.2,6e12.4)
+          1000  format('[mnspde] ',i0,'-th derivative failed with spline degree ',i0,': ',a)
+      end function mnspde
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
