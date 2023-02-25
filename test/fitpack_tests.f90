@@ -697,12 +697,6 @@ module fitpack_tests
 
       end function mnconc
 
-      !  test function for the polar package
-      elemental real(RKIND) function testpo(x,y)
-          real(RKIND), intent(in) ::x,y
-          testpo=(x**2+y**2)/((x+y)**2+half)
-      end function testpo
-
       pure real(RKIND) function r1(v)
           real(RKIND), intent(in) :: v
           r1 = one
@@ -2316,8 +2310,8 @@ module fitpack_tests
 
           real(RKIND) :: x(m),y(m),w(m),t(nest),c(nest),wrk(lwrk),sp(m)
           integer     :: iwrk(nest)
-          real(RKIND) :: al,fp,s
-          integer     :: i,ier,iopt,is,j,k,l,l1,l2,m1,n,nk1,useUnit
+          real(RKIND) :: fp,s
+          integer     :: i,ier,iopt,is,k,l,l1,l2,m1,n,nk1,useUnit
 
           ! Initialization
           success = .true.
@@ -2707,194 +2701,224 @@ module fitpack_tests
       !c                 mnpola : polar test program                        cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnpola(datafile)
-        integer, parameter :: m1 = 200
-        integer, parameter :: m2 = 90
+      logical function mnpola(datafile,iunit) result(success)
+          real(RKIND), intent(in) :: datafile(:)
+          integer, optional, intent(in) :: iunit
 
-        real(RKIND), intent(in) :: datafile(:)
+          !  we set up the dimension information
+          integer, parameter :: nuest = 15
+          integer, parameter :: nvest = 19
+          integer, parameter :: lwrk1 = 15000
+          integer, parameter :: lwrk2 = 5700
+          integer, parameter :: kwrk  = 500
+          integer, parameter :: m1 = 200
+          integer, parameter :: m2 = 90
 
-        real(RKIND), dimension(m1) :: x,y,z,w,u,v,exact,f
-        real(RKIND) :: tu(30),tv(30),c(300),s,fp,eps,sum,ermax,error,ai
-        real(RKIND), allocatable :: wrk1(:),wrk2(:)
-        integer :: iopt(3),iwrk(500)
-        integer :: i,is,ier,kwrk,l,lwrk1,lwrk2,l1,l2,m,nc,nu,nv,nuest,nvest,pos
+          !  we choose a value for eps
+          real(RKIND), parameter :: eps = 0.1e-05_RKIND
 
-        allocate(wrk1(15000),wrk2(5700))
-        pos = 0
+          real(RKIND), dimension(m1) :: x,y,z,w,u,v,exact,f
+          real(RKIND) :: tu(30),tv(30),c(300),s,fp,avg,ermax
+          real(RKIND), allocatable :: wrk1(:),wrk2(:)
+          integer :: iopt(3),iwrk(500)
+          integer :: i,is,ier,l,m,nc,nu,nv,pos,useUnit
 
-      !  we fetch and print the coordinates and function values of the data.
-      write(6,900)
-      write(6,905)
-      l2 = 0
-      do 10 i=1,50
-         l1 = l2+1
-         l2 = l2+4
+          ! Initialization.
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
 
-         do l=l1,l2
-            pos = pos+1; x(l) = datafile(pos)
-            pos = pos+1; y(l) = datafile(pos)
-            pos = pos+1; z(l) = datafile(pos)
-         end do
+          allocate(wrk1(15000),wrk2(5700))
+          pos = 0
 
-         !read(5,910) (x(l),y(l),z(l),l=l1,l2)
-  10  continue
-      write(6,915)(x(l),y(l),z(l),l=1,m1)
-      !  we calculate the exact function values and set up the weights w(i)=
-      !  (0.01)**(-1) (0.01 is an estimate for the standard deviation of the
-      !  error in z(i)). at the same time we calculate the mean and maximum
-      !  errors for the data values.
-      sum = 0.
-      ermax = 0.
-      do 20 i=1,m1
-         w(i) = 0.1e03
-         exact(i) = testpo(x(i),y(i))
-         error = abs(z(i)-exact(i))
-         sum = sum+error
-         if(error>ermax) ermax = error
-  20  continue
-      ai = m1
-      sum = sum/ai
-      write(6,920) sum,ermax
-      !  we set up the dimension information
-      nuest = 15
-      nvest = 19
-      lwrk1 = 15000
-      lwrk2 = 5700
-      kwrk = 500
-      !  we choose a value for eps
-      eps = 0.1e-05
-      !  main loop for the different spline approximations
-      do 400 is=1,5
-        go to (110,120,130,140,160),is
-      !  we determine a number of smoothing spline approximations on the unit
-      !  disk x**2+y**2 <= 1.
-      !  all the data points are considered.
- 110    m = m1
-      !  we set up the smoothing factor.
-        s = 1500.
-      !  the approximations are not restricted at the boundaries of the disk
-        iopt(3) = 0
-      !  we request c2-continuity at the origin.
-        iopt(2) = 2
-      !  at the first call of polar iopt(1) must be zero.
-        iopt(1) = 0
-        go to 200
-      !  iopt(1) = 1 from the second call on
- 120    iopt(1) = 1
-        s = 200.
-        go to 200
- 130    s = 170.
-        go to 200
-      !  we determine a smoothing spline approximation on the ellips
-      !  3*x**2+3*y**2-4*x*y<=1.
-      !  we only consider the data points inside this domain.
- 140    m = m2
-        ai = m
-      !  the given function has a constant value 0.4 at the boundary of the
-      !  ellips. we calculate new data values by substracting this constant
-      !  from the old ones.
-        do 150 i=1,m
-          z(i) = z(i)-0.4
- 150    continue
-      !  given these data we will then determine approximations which are
-      !  identically zero at the boundary of the ellips.
-        iopt(3) = 1
-      !  we still request c2-continuity at the origin.
-        iopt(2) = 2
-      !  reinitialization for the knots.
-        iopt(1) = 0
-      !  we set up the smoothing factor.
-        s = 90.
-        go to 250
-      !  at the last call we will determine the least-squares spline
-      !  approximation corresponding to the current set of knots
- 160    iopt(1) = -1
-        go to 250
-      !  determination of the spline approximation on the disk
- 200    call polar(iopt,m,x,y,z,w,rad1,s,nuest,nvest,eps,nu,tu, &
-         nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-        nc = (nu-4)*(nv-4)
-      !  we calculate the function values at the different points.
-        do 220 i=1,m
-            f(i) = evapol(tu,nu,tv,nv,c,rad1,x(i),y(i))
- 220    continue
-        write(6,925) s
-        go to 300
-      !  determination of the spline approximation on the ellips.
- 250    call polar(iopt,m,x,y,z,w,rad2,s,nuest,nvest,eps,nu,tu, &
-         nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-      !  we determine the b-spline coefficients for the spline approximations
-      !  of the given function.
-        nc = (nu-4)*(nv-4)
-        do 260 i=1,nc
-            c(i) = c(i)+0.4
- 260    continue
-      !  we calculate the function values at the different points.
-        do 270 i=1,m
-            f(i) = evapol(tu,nu,tv,nv,c,rad2,x(i),y(i))
- 270    continue
-        if(iopt(1)<0) go to 280
-        write(6,930) s
-        go to 300
- 280    write(6,935)
- 300    write(6,940) fp,ier
-        write(6,945) nu
-        write(6,950)
-        write(6,955) (tu(i),i=1,nu)
-        write(6,960) nv
-        write(6,950)
-        write(6,955) (tv(i),i=1,nv)
-        write(6,965)
-        write(6,970) (c(i),i=1,nc)
-      !  we determine mean and maximum errors.
-        sum = 0.
-        ermax = 0.
-        do 350 i=1,m
-          error = abs(f(i)-exact(i))
-          sum = sum+error
-          if(error>ermax) ermax = error
- 350    continue
-        sum = sum/ai
-        write(6,975)
-        write(6,980)
-        write(6,915)(x(l),y(l),f(l),l=2,m,3)
-        write(6,920) sum,ermax
- 400  continue
-      stop
-      !  format statements
- 900  format(15h1the input data)
- 905  format(1h0,3(3x,1hx,6x,1hy,6x,1hz,5x))
- 915  format(1h ,3(3f7.3,2x))
- 920  format(14h0mean error = ,f7.4,5x,13hmax. error = ,f7.4)
- 925  format(38h0smoothing spline on the disk with s =,f5.0)
- 930  format(40h0smoothing spline on the ellips with s =,f5.0)
- 935  format(35h0least-squares spline on the ellips)
- 940  format(27h0sum of squared residuals =,e15.6,5x,12herror flag =,i5)
- 945  format(1x,42htotal number of knots in the u-direction =,i3)
- 950  format(1x,22hposition of the knots )
- 955  format(5x,8f8.4)
- 960  format(1x,42htotal number of knots in the v-direction =,i3)
- 965  format(23h0b-spline coefficients )
- 970  format(5x,8f9.4)
- 975  format(33h0spline values at selected points)
- 980  format(1h0,3(3x,1hx,6x,1hy,6x,1hf,5x))
-      end subroutine mnpola
+          !  we fetch and print the coordinates and function values of the data.
+          write(useUnit,900)
+          write(useUnit,905)
+          x = datafile(1:3*m1-2:3)
+          y = datafile(2:3*m1-1:3)
+          z = datafile(3:3*m1  :3)
+          write(useUnit,915)(x(l),y(l),z(l),l=1,m1)
+
+          !  we calculate the exact function values and set up the weights w(i)=(0.01)**(-1)
+          !  (0.01 is an estimate for the standard deviation of the error in z(i)). at the same time
+          !  we calculate the mean and maximum errors for the data values.
+          w     = 0.1e3_RKIND
+          exact = testpo(x,y)
+          avg   = sum(abs(z-exact))/m1
+          ermax = maxval(abs(z-exact),1)
+          write(useUnit,920) avg,ermax
+
+          !  main loop for the different spline approximations
+          approximations: do is=1,5
+
+              select case (is)
+                  case (1)
+
+                      !  we determine a number of smoothing spline approximations on the unit
+                      !  disk x**2+y**2 <= 1.
+                      !  all the data points are considered.
+                      m = m1
+
+                      !  we set up the smoothing factor.
+                      s = 1500.
+
+                      !  the approximations are not restricted at the boundaries of the disk
+                      iopt(3) = 0
+
+                      !  we request c2-continuity at the origin.
+                      iopt(2) = 2
+
+                      !  at the first call of polar iopt(1) must be zero.
+                      iopt(1) = 0
+
+                  case (2)
+
+                      !  iopt(1) = 1 from the second call on
+                      iopt(1) = 1
+                      s = 200.
+
+                  case (3)
+
+                      s = 170.
+
+                  case (4)
+
+                      !  we determine a smoothing spline approximation on the ellips
+                      !  3*x**2+3*y**2-4*x*y<=1.
+                      !  we only consider the data points inside this domain.
+                      m = m2
+
+                      !  the given function has a constant value 0.4 at the boundary of the
+                      !  ellips. we calculate new data values by substracting this constant
+                      !  from the old ones.
+                      z = z-0.4
+
+                      !  given these data we will then determine approximations which are
+                      !  identically zero at the boundary of the ellips.
+                      iopt(3) = 1
+
+                      !  we still request c2-continuity at the origin.
+                      iopt(2) = 2
+
+                      !  reinitialization for the knots.
+                      iopt(1) = 0
+
+                      !  we set up the smoothing factor.
+                      s = 90.
+
+                  case (5)
+
+                      !  at the last call we will determine the least-squares spline
+                      !  approximation corresponding to the current set of knots
+                      iopt(1) = -1
+
+              end select
 
 
-      !  the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
-      pure real(RKIND) function rad1(v)
-         real(RKIND), intent(in) :: v
-         rad1 = one
-         return
-      end function rad1
+              select case (is)
+                 case (1,2,3)
 
-      ! the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
-      pure real(RKIND) function rad2(v)
-         real(RKIND), intent(in) :: v
-         rad2 = one/sqrt(three-two*sin(2*v))
-         return
-      end function rad2
+                     !  determination of the spline approximation on the disk
+                     call polar(iopt,m,x,y,z,w,rad1,s,nuest,nvest,eps,nu,tu, &
+                                nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
+                     nc = (nu-4)*(nv-4)
+
+                     ! we calculate the function values at the different points.
+                     forall(i=1:m) f(i) = evapol(tu,nu,tv,nv,c,rad1,x(i),y(i))
+                     write(useUnit,925) s
+
+                 case (4,5)
+
+                     !  determination of the spline approximation on the ellips.
+                     call polar(iopt,m,x,y,z,w,rad2,s,nuest,nvest,eps,nu,tu, &
+                                nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+
+                     !  we determine the b-spline coefficients for the spline approximations
+                     !  of the given function.
+                     nc = (nu-4)*(nv-4)
+                     c = c+0.4
+
+                     !  we calculate the function values at the different points.
+                     forall(i=1:m)  f(i) = evapol(tu,nu,tv,nv,c,rad2,x(i),y(i))
+
+                     if (iopt(1)<0) then
+                        write(useUnit,935)
+                     else
+                        write(useUnit,930) s
+                     endif
+
+              end select
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
+                  success = .false.
+              end if
+
+              write(useUnit,940) fp,FITPACK_MESSAGE(ier)
+              write(useUnit,945) nu
+              write(useUnit,950)
+              write(useUnit,955) (tu(i),i=1,nu)
+              write(useUnit,960) nv
+              write(useUnit,950)
+              write(useUnit,955) (tv(i),i=1,nv)
+              write(useUnit,965)
+              write(useUnit,970) (c(i),i=1,nc)
+
+              !  we determine mean and maximum errors.
+              avg = sum(abs(f(:m)-exact(:m)))/m
+              ermax = maxval(abs(f(:m)-exact(:m)),1)
+              write(useUnit,975)
+              write(useUnit,980)
+              write(useUnit,915)(x(l),y(l),f(l),l=2,m,3)
+              write(useUnit,920) avg,ermax
+          end do approximations
+
+          !  format statements
+          900  format(15h1the input data)
+          905  format(1h0,3(3x,1hx,6x,1hy,6x,1hz,5x))
+          915  format(1h ,3(3f7.3,2x))
+          920  format(14h0mean error = ,f7.4,5x,13hmax. error = ,f7.4)
+          925  format(38h0smoothing spline on the disk with s =,f5.0)
+          930  format(40h0smoothing spline on the ellips with s =,f5.0)
+          935  format(35h0least-squares spline on the ellips)
+          940  format(27h0sum of squared residuals =,e15.6,5x,12herror flag =,a)
+          945  format(1x,42htotal number of knots in the u-direction =,i3)
+          950  format(1x,22hposition of the knots )
+          955  format(5x,8f8.4)
+          960  format(1x,42htotal number of knots in the v-direction =,i3)
+          965  format(23h0b-spline coefficients )
+          970  format(5x,8f9.4)
+          975  format(33h0spline values at selected points)
+          980  format(1h0,3(3x,1hx,6x,1hy,6x,1hf,5x))
+         1000  format('[mnpola] test ',i0,' failed with message ',a)
+
+          contains
+
+          !  test function for the polar package
+          elemental real(RKIND) function testpo(x,y)
+              real(RKIND), intent(in) ::x,y
+              testpo=(x**2+y**2)/((x+y)**2+half)
+          end function testpo
+
+          !  the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
+          pure real(RKIND) function rad1(v)
+             real(RKIND), intent(in) :: v
+             rad1 = one
+             return
+          end function rad1
+
+          ! the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
+          pure real(RKIND) function rad2(v)
+             real(RKIND), intent(in) :: v
+             rad2 = one/sqrt(three-two*sin(2*v))
+             return
+          end function rad2
+
+      end function mnpola
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !c                                                                    cc

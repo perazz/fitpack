@@ -1877,12 +1877,13 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in) :: nu,nv
+      integer,     intent(in) :: nu,nv
       real(RKIND), intent(in) :: x,y
       !  ..array arguments..
       real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
       !  ..user specified function
       procedure(boundary) :: rad
+
       !  ..local scalars..
       integer :: ier
       integer, parameter :: liwrk = 2, lwrk = 8
@@ -1901,6 +1902,7 @@ module fitpack_core
          if (r>zero) &
          u(1) = min(sqrt(dist)/r,one)
       endif
+
       ! evaluate s(u,v)
       call bispev(tu,nu,tv,nv,c,3,3,u,1,v,1,f,wrk,lwrk,iwrk,liwrk,ier)
 
@@ -10206,8 +10208,8 @@ module fitpack_core
                              f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
 
       !  ..scalar arguments..
-      integer    , intent(in)        :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
-      integer    , intent(inout)     :: ier,nu,nv
+      integer    , intent(in)    :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer    , intent(inout) :: ier,nu,nv
       real(RKIND), intent(in)    :: s,eta,tol
       real(RKIND), intent(inout) :: fp,sup
       !  ..array arguments..
@@ -10242,11 +10244,11 @@ module fitpack_core
       initialize: if (iopt1>=0) then
 
           !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
+          acc   = tol*s
           numin = 9
           nvmin = 9+iopt2*(iopt2+1)
 
-          if (iopt1==0 .or. (iopt1>0 .and. s>=sup)) then
+          if (iopt1==0 .or. s>=sup) then
 
               !  if iopt1 = 0 we begin by computing the weighted least-squares polymomial of the form
               !     s(u,v) = f(1)*(1-u**3)+f(2)*u**3+f(3)*(u**2-u**3)+f(4)*(u-u**3)
@@ -10258,11 +10260,11 @@ module fitpack_core
               f(1:4) = zero
               a(1:4,1:4) = zero
               initial_poly: do i=1,m
-                 wi = w(i)
-                 zi = z(i)*wi
-                 uu = u(i)
-                 u2 = uu*uu
-                 u3 = uu*u2
+                 wi   = w(i)
+                 zi   = z(i)*wi
+                 uu   = u(i)
+                 u2   = uu*uu
+                 u3   = uu*u2
                  h(1) = (one-u3)*wi
                  h(2) = merge(u3*wi,zero,iopt3==0)
                  h(3) = merge(u2*(one-uu)*wi,zero,iopt2<=1)
@@ -10284,10 +10286,10 @@ module fitpack_core
                  sup = sup+zi*zi
               end do initial_poly
 
-              if(a(4,1)/=zero) f(4) = f(4)/a(4,1)
-              if(a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
-              if(a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
-              if(a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+              if (a(4,1)/=zero) f(4) = f(4)/a(4,1)
+              if (a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
+              if (a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
+              if (a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
 
               !  find the b-spline representation of this least-squares polynomial
               c1 = f(1)
@@ -10329,12 +10331,12 @@ module fitpack_core
              end if
 
              !  find the initial set of interior knots of the spline in case iopt1=0.
-             nu = numin
-             nv = nvmin
+             nu    = numin
+             nv    = nvmin
              tu(5) = half
-             nvv = nv-8
-             rn = nvv+1
-             fac = pi2/rn
+             nvv   = nv-8
+             rn    = nvv+1
+             fac   = pi2/rn
              forall (i=1:nvv) tv(i+4) = i*fac-pi
 
           endif initial_knots
@@ -10404,7 +10406,7 @@ module fitpack_core
                   row(1:nvv) = zero
                   ll = i
                   do j=1,3
-                     if(ll>nvv) ll= 1
+                     if (ll>nvv) ll= 1
                      row(ll) = row(ll)+hv(j)
                      ll = ll+1
                   end do
@@ -10430,12 +10432,14 @@ module fitpack_core
               end do
 
           endif
+
           ! find ncof, the dimension of the spline and ncoff, the number
           ! of coefficients in the standard b-spline representation.
           nu4 = nu-4
           nv4 = nv-4
           ncoff = nu4*nv4
           ncof = ipar1+nvv*(nu4-1-iopt2-iopt3)
+
           ! find the bandwidth of the observation matrix a.
           iband = merge(ncof,4*nvv,nuu-iopt2-iopt3<=1)
           iband1 = iband-1
@@ -10505,17 +10509,20 @@ module fitpack_core
                       if (jlu>nu4 .and. iopt3/=0) cycle new_row
                       h(j1+1:j1+nvv) = row(1:nvv)*huj
                       j1 = j1+nvv
-                  elseif (jlu==1 .or. jlu==2) then
-                      h(1) = huj
-                      j1 = 1
-                  elseif (jlu==3) then
-                      h(1:3) = [h(1)+huj,huj*cs(1:2)]
-                      j1 = 3
-                  elseif (jlu==4) then
-                      h(1)   = h(1)+huj
-                      h(2:3) = h(2:3)+huj*ratio*cs(1:2)
-                      h(4:6) = huj*cs(3:5)
-                      j1 = 6
+                  else
+                      select case (jlu)
+                         case (1,2)
+                             h(1) = huj
+                             j1 = 1
+                         case (3)
+                             h(1:3) = [h(1)+huj,huj*cs(1:2)]
+                             j1 = 3
+                         case (4)
+                             h(1)   = h(1)+huj
+                             h(2:3) = h(2:3)+huj*ratio*cs(1:2)
+                             h(4:6) = huj*cs(3:5)
+                             j1 = 6
+                      end select
                   endif
                 end do new_row
                 h(1:iband) = wi*h(1:iband)
@@ -10552,7 +10559,7 @@ module fitpack_core
           ! check whether the observation matrix is rank deficient.
           sigma = eps*dmax
 
-          if (any(a(1:ncof,1)<sigma)) then
+          if (any(a(1:ncof,1)<=sigma)) then
 
              ! in case of rank deficiency, find the minimum norm solution.
              lwest = ncof*iband+ncof+iband
@@ -10754,14 +10761,14 @@ module fitpack_core
       f1 = sup-s
       p3 = -one
       f3 = fpms
-      p  = real(ncof,RKIND)/p
+      p  = sum(a(:ncof,1))/real(ncof,RKIND)
 
       !  find the bandwidth of the extended observation matrix.
       iband4 = min(ncof,iband+ipar1)
       iband3 = iband4 -1
       check1 = .false.
       check3 = .false.
-      nuu = nu4-iopt3-1
+      nuu    = nu4-iopt3-1
       !  iteration process to find the root of f(p)=s.
       iterations: do iter=1,maxit
 
