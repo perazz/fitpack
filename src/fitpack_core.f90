@@ -89,20 +89,24 @@ module fitpack_core
     ! Internal Parameters
     integer    , parameter, public :: MAX_IDIM  = 10        ! Max number of dimensions
     integer    , parameter, public :: MAX_ORDER = 19        ! Max spline order (for array allocation)
-    real(RKIND), parameter, public :: one    = 1.0_RKIND
-    real(RKIND), parameter, public :: zero   = 0.0_RKIND
-    real(RKIND), parameter, public :: half   = 0.5_RKIND
-    real(RKIND), parameter, public :: onep5  = 1.5_RKIND
-    real(RKIND), parameter, public :: fourth = 0.25_RKIND
-    real(RKIND), parameter, public :: two    = 2.0_RKIND
-    real(RKIND), parameter, public :: three  = 3.0_RKIND
-    real(RKIND), parameter, public :: four   = 4.0_RKIND
-    real(RKIND), parameter, public :: five   = 5.0_RKIND
-    real(RKIND), parameter, public :: six    = 6.0_RKIND
-    real(RKIND), parameter, public :: ten    = 10.0_RKIND
-    real(RKIND), parameter, public :: pi     = atan2(zero,-one)
-    real(RKIND), parameter, public :: pi2    = 2*pi
-    real(RKIND), parameter, public :: pi4    = 4*pi
+    real(RKIND), parameter, public :: one     = 1.0_RKIND
+    real(RKIND), parameter, public :: zero    = 0.0_RKIND
+    real(RKIND), parameter, public :: half    = 0.5_RKIND
+    real(RKIND), parameter, public :: onep5   = 1.5_RKIND
+    real(RKIND), parameter, public :: fourth  = 0.25_RKIND
+    real(RKIND), parameter, public :: two     = 2.0_RKIND
+    real(RKIND), parameter, public :: three   = 3.0_RKIND
+    real(RKIND), parameter, public :: four    = 4.0_RKIND
+    real(RKIND), parameter, public :: five    = 5.0_RKIND
+    real(RKIND), parameter, public :: six     = 6.0_RKIND
+    real(RKIND), parameter, public :: ten     = 10.0_RKIND
+    real(RKIND), parameter, public :: pi      = atan2(zero,-one)
+    real(RKIND), parameter, public :: pi2     = 2*pi
+    real(RKIND), parameter, public :: pi4     = 4*pi
+    real(RKIND), parameter, public :: pio2    = half*pi
+    real(RKIND), parameter, public :: pio4    = fourth*pi
+    real(RKIND), parameter, public :: pio8    = 0.125_RKIND*pi
+    real(RKIND), parameter, public :: deg2rad = pi/180.0_RKIND
     real(RKIND), parameter, public :: smallnum03 = 1.0e-03_RKIND
     real(RKIND), parameter, public :: smallnum06 = 1.0e-06_RKIND
     real(RKIND), parameter, public :: smallnum08 = 1.0e-08_RKIND
@@ -12682,7 +12686,7 @@ module fitpack_core
                          h(j1+1:j1+3) = htj*[facc,facs,one]
                          j1 = j1+2
                      elseif (jlt>2 .and. jlt<=nt4) then
-                         h(j1+1:j1+1:npp) = row(1:npp)*htj
+                         h(j1+1:j1+npp) = row(1:npp)*htj
                          j1 = j1+npp
                      else
                          j1 = j1+1
@@ -17957,6 +17961,7 @@ module fitpack_core
 
       if (iopt<0) then
 
+          ! Check teta knots monotonic
           ntt = nt-8
           if (ntt<0 .or. nt>ntest)         return
 
@@ -17968,6 +17973,7 @@ module fitpack_core
               end do
           endif
 
+          ! Check phi knots monotonic
           npp = np-8
           if (npp<1 .or. np>npest) return
           tp(4) = zero
@@ -17991,7 +17997,7 @@ module fitpack_core
       lff = lf+ncc
       lfp = lff+ncest
       lco = lfp+nrint
-      lh = lco+nrint
+      lh  = lco+nrint
       lbt = lh+ib3
       lbp = lbt+5*ntest
       lro = lbp+5*npest

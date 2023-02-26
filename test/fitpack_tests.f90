@@ -43,7 +43,7 @@ module fitpack_tests
     public :: mnspal ! test spalde: evaluation of a spline function
     public :: mnspde ! test splder: derivative calculation of a spline function
     public :: mnspev ! test splev : evaluation of a spline function
-    public :: mnsphe
+    public :: mnsphe ! test sphere: surface fitting using spherical coordinates
     public :: mnspin
     public :: mnspro
     public :: mnsuev
@@ -707,20 +707,7 @@ module fitpack_tests
           r2 = (one+cos(v)**2)*half
       end function r2
 
-      ! calculate the value of a test function for the sphere package.
-      elemental real(RKIND) function testsp(v,u)
-          real(RKIND), intent(in) :: u,v
-          real(RKIND) ::cu,cv,rad1,rad2,rad3,su,sv
-          cu = cos(u)
-          cv = cos(v)
-          su = sin(u)
-          sv = sin(v)
-          rad1 = (cu*sv*0.2)**2+(su*sv)**2+(cv*0.5)**2
-          rad2 = (cu*sv)**2+(su*sv*0.5)**2+(cv*0.2)**2
-          rad3 = (cu*sv*0.5)**2+(su*sv*0.2)**2+cv**2
-          testsp = 1./sqrt(rad1) + 1./sqrt(rad2) + 1./sqrt(rad3)
-          return
-      end function testsp
+
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !c                                                                    cc
@@ -3396,7 +3383,6 @@ module fitpack_tests
 
           real(RKIND) :: x(7),y(42),t(20),c(20),wrk(20),d(6)
           integer     :: i,ier,j,k,k1,l,m,n,nk1,nu,useUnit
-          real(RKIND) :: ai
 
           ! Initialization
           success = .true.
@@ -3488,7 +3474,6 @@ module fitpack_tests
 
           real(RKIND) :: x(21),y(21),t(20),c(20)
           integer     :: i,i1,i2,ier,j,k,k1,m,n,nk1,useUnit
-          real(RKIND) :: ai
 
           ! Initialization
           success = .true.
@@ -3766,150 +3751,174 @@ module fitpack_tests
       !c             mnsphe : sphere test program                           cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsphe(datafile)
-        real(RKIND), intent(in) :: datafile(:)
-        real(RKIND) :: teta(192),phi(192),r(192),w(192),tp(30),tt(30),c(300), &
-                       p(9),t(9),f(81),eps,fp,s,scale,scp,sct,ai
-        real(RKIND), allocatable :: wrk1(:),wrk2(:)
-        integer :: i,ier,iopt,j,kwrk,lwrk1,lwrk2,l1,l2,l,m,np,npest,nt,ntest, &
-                   is,i1,i2,nc,ntt,npp,iwrk(300),pos
+      logical function mnsphe(datafile,iunit) result(success)
+          real(RKIND), intent(in) :: datafile(:)
+          integer, optional, intent(in) :: iunit
 
-      allocate(wrk1(12000),wrk2(72))
+          !  we fetch the number of data points.
+          integer, parameter :: m = 192
 
+          ! we set up the dimension information
+          integer, parameter :: ntest = 15
+          integer, parameter :: npest = 19
+          integer, parameter :: lwrk1 = 12000
+          integer, parameter :: lwrk2 = 72
+          integer, parameter :: kwrk = 300
 
+          real(RKIND) :: teta(m),phi(m),r(m),w(m),tp(30),tt(30),c(300), &
+                         p(9),t(9),f(81),eps,fp,s
+          real(RKIND), allocatable :: wrk1(:),wrk2(:)
+          integer :: i,ier,iopt,j,l2,l,np,nt,is,i1,i2,nc,ntt,npp,iwrk(kwrk),pos,useUnit
 
-      !  set constants
-      scale = pi4/0.45e+02
-      !  we fetch the number of data points.
-      m = 192
-      !  we fetch and print the latitude - longitude coordinates of the data
-      !  points (in degrees).
-      write(6,900)
-      write(6,905)
-      l2 = 0
-      pos = 0
-      do 10 i=1,48
-         l1 = l2+1
-         l2 = l2+4
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
 
-         do l=l1,l2
-            teta(l) = datafile(pos+1); pos = pos+1
-            phi (l) = datafile(pos+1); pos = pos+1
-         end do
+          allocate(wrk1(12000),wrk2(72))
 
-         write(6,915)(teta(l),phi(l),l=l1,l2)
-  10  continue
-      !  we set up the weights, scale into radians the latitude-longitude
-      !  coordinates and calculate the function values.
-      do 20 i=1,m
-         w(i) = 0.1e+01
-         teta(i) = teta(i)*scale
-         phi(i) = phi(i)*scale
-         if(teta(i)>pi) teta(i) = pi
-         if(phi(i)>pi2) phi(i) = pi2
-         r(i) = testsp(teta(i),phi(i))
-  20  continue
-      !  we set up the coordinates of the grid points for the evaluation of
-      !  the spline approximations.
-      sct = pi/8
-      scp = pi2/8
-      do 30 i=1,8
-         ai = i-1
-         t(i) = ai*sct
-         p(i) = ai*scp
-  30  continue
-      t(9) = pi
-      p(9) = pi2
-      ! we set up the dimension information
-      ntest = 15
-      npest = 19
-      lwrk1 = 12000
-      lwrk2 = 72
-      kwrk = 300
-      !  we choose a value for eps
-      eps = 0.1e-05
-      !  main loop for the different spline approximations
-      do 300 is=1,4
-        go to (110,120,130,140),is
-      !  we start computing the least-squares constrained polynomial (large s)
- 110    iopt = 0
-        s = 500.
-        go to 200
-      !  iopt = 1 from the second call on.
- 120    iopt = 1
-        s = 135.
-        go to 200
- 130    s = 15.
-        go to 200
-      !  a least-squares spherical spline with specified knots.
- 140    iopt = -1
-      !  we set up the number of knots.
-        nt = 11
-        np = 15
-      !  we set up the position of the interior knots of the spline.
-        ntt = nt-8
-        do 150 i=1,ntt
-          ai = i
-          j = i+4
-          tt(j) = ai*pi4
- 150    continue
-        npp = np-8
-        do 160 i=1,npp
-          ai = i
-          j = i+4
-          tp(j) = ai*pi4
- 160    continue
-      !  determination of the spline approximation.
- 200    call sphere(iopt,m,teta,phi,r,w,s,ntest,npest,eps,nt,tt, &
-         np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-      !  printing of the fitting results.
-        if(iopt>=0) go to 210
-        write(6,920)
-        go to 220
- 210    write(6,925)
-        write(6,930) s
- 220    write(6,935) fp,ier
-        write(6,940) nt
-        write(6,945)
-        write(6,950) (tt(i),i=1,nt)
-        write(6,955) np
-        write(6,945)
-        write(6,950) (tp(i),i=1,np)
-        nc = (nt-4)*(np-4)
-        write(6,960)
-        write(6,965) (c(i),i=1,nc)
-      !  evaluation of the spline approximation.
-        call bispev(tt,nt,tp,np,c,3,3,t,9,p,9,f,wrk2,lwrk2, &
-         iwrk,kwrk,ier)
-        write(6,970) (p(i),i=1,9)
-        write(6,975)
-        i2 = 0
-        do 230 i=1,9
-          i1 = i2+1
-          i2 = i2+9
-          write(6,980) t(i),(f(j),j=i1,i2)
- 230    continue
- 300  continue
-      stop
-      !  format statements.
- 900  format(55h1latitude-longitude values of the data points (degrees))
- 905  format(1h0,4(3x,10hteta   phi,3x))
- 915  format(1h ,4(3x,f4.0,2x,f4.0,3x))
- 920  format(50h0least-squares spline approximation on the sphere.)
- 925  format(32h0smoothing spline on the sphere.)
- 930  format(20h smoothing factor s=,f9.0)
- 935  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
- 940  format(1x,45htotal number of knots in the teta-direction =,i3)
- 945  format(1x,22hposition of the knots )
- 950  format(5x,8f8.4)
- 955  format(1x,44htotal number of knots in the phi-direction =,i3)
- 960  format(23h0b-spline coefficients )
- 965  format(5x,8f9.4)
- 970  format(9h      phi,9f7.3)
- 975  format(6h  teta)
- 980  format(1h ,f6.3,2x,9f7.3)
+          !  we fetch and print the latitude - longitude coordinates of the data points (in degrees).
+          write(useUnit,900)
+          write(useUnit,905)
+          l2 = 0
+          pos = 0
 
-      end subroutine mnsphe
+          teta = datafile(1:192*2-1:2)
+          phi  = datafile(2:192*2:2)
+          write(useUnit,915)(teta(l),phi(l),l=1,192)
+
+          !  we set up the weights, scale into radians the latitude-longitude
+          !  coordinates and calculate the function values.
+          w = one
+          teta = min(deg2rad*teta,pi)
+          phi  = min(deg2rad*phi,pi2)
+          r    = testsp(teta,phi)
+
+          !  we set up the coordinates of the grid points for the evaluation of
+          !  the spline approximations.
+          t = [(i*pio8,i=0,8)]; t(9) = pi
+          p = [(i*pio4,i=0,8)]; p(9) = pi2
+
+          !  we choose a value for eps
+          eps = 0.1e-05_RKIND
+
+          !  main loop for the different spline approximations
+          approximations: do is=1,4
+
+              select case (is)
+                  case (1)
+
+                      !  we start computing the least-squares constrained polynomial (large s)
+                      iopt = 0
+                      s = 500.
+
+                  case (2)
+
+                      !  iopt = 1 from the second call on.
+                      iopt = 1
+                      s = 135.
+
+                  case (3)
+
+                      s = 15.
+
+                  case (4)
+
+                      !  a least-squares spherical spline with specified knots.
+                      iopt = -1
+
+                      !  we set up the number of knots.
+                      nt = 11
+                      np = 15
+
+                      !  we set up the position of the interior knots of the spline.
+                      ntt = nt-8
+                      npp = np-8
+                      tt(5:ntt+4) = [(i*pio4,i=1,ntt)]
+                      tp(5:npp+4) = [(i*pio4,i=1,npp)]
+
+              end select
+
+              !  determination of the spline approximation.
+              call sphere(iopt,m,teta,phi,r,w,s,ntest,npest,eps,nt,tt, &
+                          np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
+                  stop
+              end if
+
+              !  printing of the fitting results.
+              if (iopt>=0) then
+                  write(useUnit,925)
+                  write(useUnit,930) s
+              else
+                  write(useUnit,920)
+              end if
+
+              write(useUnit,935) fp,FITPACK_MESSAGE(ier)
+              write(useUnit,940) nt
+              write(useUnit,945)
+              write(useUnit,950) (tt(i),i=1,nt)
+              write(useUnit,955) np
+              write(useUnit,945)
+              write(useUnit,950) (tp(i),i=1,np)
+              nc = (nt-4)*(np-4)
+              write(useUnit,960)
+              write(useUnit,965) (c(i),i=1,nc)
+
+              !  evaluation of the spline approximation.
+              call bispev(tt,nt,tp,np,c,3,3,t,9,p,9,f,wrk2,lwrk2,iwrk,kwrk,ier)
+              write(useUnit,970) (p(i),i=1,9)
+              write(useUnit,975)
+              i2 = 0
+              do i=1,9
+                 i1 = i2+1
+                 i2 = i2+9
+                 write(useUnit,980) t(i),(f(j),j=i1,i2)
+              end do
+
+          end do approximations
+
+          !  format statements.
+          900  format(55h1latitude-longitude values of the data points (degrees))
+          905  format(1h0,4(3x,10hteta   phi,3x))
+          915  format(1h ,4(3x,f4.0,2x,f4.0,3x))
+          920  format(50h0least-squares spline approximation on the sphere.)
+          925  format(32h0smoothing spline on the sphere.)
+          930  format(20h smoothing factor s=,f9.0)
+          935  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,a)
+          940  format(1x,45htotal number of knots in the teta-direction =,i3)
+          945  format(1x,22hposition of the knots )
+          950  format(5x,8f8.4)
+          955  format(1x,44htotal number of knots in the phi-direction =,i3)
+          960  format(23h0b-spline coefficients )
+          965  format(5x,8f9.4)
+          970  format(9h      phi,9f7.3)
+          975  format(6h  teta)
+          980  format(1h ,f6.3,2x,9f7.3)
+         1000  format('[mnsphe] appxoximation ',i0,' failed: ',a)
+
+      end function mnsphe
+
+      ! calculate the value of a test function for the sphere package.
+      elemental real(RKIND) function testsp(v,u)
+          real(RKIND), intent(in) :: u,v
+          real(RKIND) :: cu,cv,rad1,rad2,rad3,su,sv
+          cu = cos(u)
+          cv = cos(v)
+          su = sin(u)
+          sv = sin(v)
+          rad1 = (cu*sv*0.2)**2+(su*sv)**2+(cv*0.5)**2
+          rad2 = (cu*sv)**2+(su*sv*0.5)**2+(cv*0.2)**2
+          rad3 = (cu*sv*0.5)**2+(su*sv*0.2)**2+cv**2
+          testsp = 1./sqrt(rad1) + 1./sqrt(rad2) + 1./sqrt(rad3)
+          return
+      end function testsp
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       !c                                                                    cc
