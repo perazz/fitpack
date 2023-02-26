@@ -7507,8 +7507,8 @@ module fitpack_core
       !  the integration limits are arranged in increasing order.
       if (x==y) return
 
-      a = max(x,y)
-      b = min(x,y)
+      a = min(x,y)
+      b = max(x,y)
       lmin = x>y
 
       a = max(t(k1),a)
