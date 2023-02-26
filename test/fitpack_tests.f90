@@ -46,7 +46,7 @@ module fitpack_tests
     public :: mnsphe ! test sphere: surface fitting using spherical coordinates
     public :: mnspin ! test splint: integration of a spline function
     public :: mnspro ! test sproot: the roots of a cubic spline
-    public :: mnsuev
+    public :: mnsuev ! test surev : valuation of a parametric spline surface
     public :: mnsurf
     public :: mncuev
     public :: mndbin
@@ -4062,16 +4062,16 @@ module fitpack_tests
           c(20:22) = c(14:16)
 
           !  print the data of the spline curve.
-          write(6,900) k
-          write(6,905)
-          write(6,910) (t(i),i=1,n)
-          write(6,915)
+          write(useUnit,900) k
+          write(useUnit,905)
+          write(useUnit,910) (t(i),i=1,n)
+          write(useUnit,915)
           nk1 = n-k1
-          write(6,920) (c(i),i=1,nk1)
-          write(6,925)
+          write(useUnit,920) (c(i),i=1,nk1)
+          write(useUnit,925)
           i1 = n+1
           i2 = n+nk1
-          write(6,920) (c(i),i=i1,i2)
+          write(useUnit,920) (c(i),i=i1,i2)
 
           !  loop for the different lines.
           lines: do is=1,5
@@ -4097,7 +4097,7 @@ module fitpack_tests
               end select
 
               ! print the parameters of the straight line.
-              write(6,930) alfa,beta,gamma
+              write(useUnit,930) alfa,beta,gamma
 
               !  calculate the coefficients of s(u) = sx(u)*alfa + sy(u)*beta - gamma
               do i=1,nk1
@@ -4107,10 +4107,10 @@ module fitpack_tests
 
               !  find the zeros of s(u)
               call sproot(t,n,cc,zeros,mest,m,ier)
-              write(6,935) m
+              write(useUnit,935) m
 
               if (.not.FITPACK_SUCCESS(ier)) then
-                  write(6,1000)is,FITPACK_MESSAGE(ier)
+                  write(useUnit,1000)is,FITPACK_MESSAGE(ier)
                   success = .false.
               endif
 
@@ -4119,12 +4119,12 @@ module fitpack_tests
                   call curev(idim,t,n,c,nc,k,zeros,m,sp,nc,ier)
 
                   !  print the intersection points
-                  write(6,940)
+                  write(useUnit,940)
                   l2 = 0
                   do i=1,m
                      l1 = l2+1
                      l2 = l1+1
-                     write(6,945) i,zeros(i),sp(l1),sp(l2)
+                     write(useUnit,945) i,zeros(i),sp(l1),sp(l2)
                   end do
               end if has_roots
           end do lines
@@ -4150,144 +4150,156 @@ module fitpack_tests
       !c              mnsuev : surev test program                           cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsuev
-      real(RKIND) ::fac
-      integer i,idim,ier,j,m,mu,mv,m0,m1,m2,m3,nc,nu4,nv4,nu,nv,l
-      real(RKIND) ::tu(11),tv(10),c(126),u(6),v(6),f(108),wrk(48)
-      integer iwrk(12)
-      !  we set up the grid points for evaluating the spline surface.
-      mu = 6
-      mv = 6
-      do 10 i=1,6
-      u(i) = (i-1)*0.2
-      v(i) = u(i)
-  10  continue
-      !  the interior knots with respect to the u-variable.
-      tu(5) = 0.4
-      tu(6) = 0.7
-      tu(7) = 0.9
-      nu = 11
-      !  the interior knots with respect to the v-variable.
-      tv(5) = 0.3
-      tv(6) = 0.8
-      nv = 10
-      !  the boundary knots
-      do 20 i=1,4
-        tu(i) = 0.
-        tv(i) = 0.
-        tu(i+7) = 1.
-        tv(i+6) = 1.
-  20  continue
-      !  we generate the b-spline coefficients for the test surface
-      !        x = u*v    y = v**2    z = u+v     0 <= u,v <= 1
-      !  the dimension of the surface
-      idim = 3
-      !  the number of b-spline coefficients for each co-ordinate
-      nu4 = nu-4
-      nv4 = nv-4
-      nc = nu4*nv4
-      !  the coefficients for x = u*v
-      do 30 i=1,nv4
-        c(i) = 0.
-  30  continue
-      do 40 i=2,nu4
-        c((i-1)*nv4+1) = 0.
-  40  continue
-      m0 = 1
-      do 60 i=2,nu4
-        m1 = m0+nv4
-        fac = (tu(i+3)-tu(i))/9.
-        do 50 j=2,nv4
-          m2 = m0+1
-          m3 = m1+1
-          c(m3) = c(m1)+c(m2)-c(m0)+fac*(tv(j+3)-tv(j))
-          m0 = m0+1
-          m1 = m1+1
-  50    continue
-        m0 = m0+1
-  60  continue
-      !  the coefficients for y = v**2.
-      l = nc
-      m0 = l+1
-      m1 = m0+1
-      c(m0) = 0.
-      c(m1) = 0.
-      do 70 i=3,nv4
-        c(m1+1) = c(m1)+(tv(i+3)-tv(i))*((c(m1)-c(m0))/(tv(i+2)-tv(i-1)) &
-          +(tv(i+2)-tv(i))/3.)
-        m0 = m1
-        m1 = m0+1
-  70  continue
-      do i=1,nv4
-        m0 = l+i
-        fac = c(m0)
-        do j=1,nu4
-          m0 = m0+nv4
-          c(m0) = fac
-        end do
-      end do
-      !  the coefficients for z = u+v
-      l = l+nc
-      m0 = l+1
-      c(m0) = 0.
-      do 90 i=2,nv4
-        m1 = m0+1
-        c(m1) = c(m0)+(tv(i+3)-tv(i))/3.
-        m0 = m1
-  90  continue
-      do i=1,nv4
-        m0 = l+i
-        do j=2,nu4
-          m1 = m0+nv4
-          c(m1) = c(m0)+(tu(j+3)-tu(j))/3.
-          m0 = m1
-        end do
-      end do
-      !  evaluation of the spline surface
-      call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,108,wrk,48,iwrk,12,ier)
-      !  printing of the results
-      write(6,900)
-      write(6,910)
-      write(6,920) (tu(i),i=1,nu)
-      write(6,930)
-      write(6,920) (tv(i),i=1,nv)
-      write(6,940)
-      m1 = 0
-      do 110 l=1,idim
-        m0 = m1+1
-        m1 = m1+nc
-        write(6,950) (c(j),j=m0,m1)
- 110  continue
-      write(6,960)
-      write(6,970) (v(i),i=1,mv)
-      write(6,980)
-      m = mu*mv
-      m0 = 0
-      do 130 i=1,mu
-        write(6,990) u(i)
-        m1 = m0
-        do 120 l=1,idim
-          m2 = m1+1
-          m3 = m1+mv
-          write(6,995) (f(j),j=m2,m3)
-          m1 = m1+m
- 120    continue
-        m0 = m0+mv
- 130  continue
-      stop
-      !  format statements.
- 900  format(23h0bicubic spline surface)
- 910  format(1x,40hposition of the knots in the u-direction)
- 920  format(1x,15f5.1)
- 930  format(1x,40hposition of the knots in the v-direction)
- 940  format(23h b-spline coefficients )
- 950  format(5x,8f9.4)
- 960  format(1h0,37hspline values at selected grid points)
- 970  format(1h0,2x,1hv,6(3x,f4.1))
- 980  format(1h ,1x,1hu)
- 990  format(1h ,f4.1)
- 995  format(5x,6f7.3)
-      end subroutine mnsuev
+      logical function mnsuev(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          real(RKIND) :: fac
+          integer     :: i,idim,ier,j,m,mu,mv,m0,m1,m2,m3,nc,nu4,nv4,nu,nv,l,useUnit
+          real(RKIND) :: tu(11),tv(10),c(126),u(6),v(6),f(108),wrk(48)
+          integer     :: iwrk(12)
+
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  we set up the grid points for evaluating the spline surface.
+          mu = 6
+          mv = 6
+
+          u = 0.2_RKIND*[(i,i=0,5)]
+          v = u
+
+          !  the knots with respect to the u-variable.
+          tu(1:4)  = zero           ! boundary
+          tu(5:7)  = [0.4,0.7,0.9]  ! interior
+          tu(8:11) = one            ! boundary
+          nu = 11
+
+          !  the knots with respect to the v-variable.
+          tv(1:4) = zero           ! boundary
+          tv(5:6) = [0.3,0.8]      ! interior
+          tv(7:10) = one           ! boundary
+          nv = 10
+
+          !  we generate the b-spline coefficients for the test surface
+          !        x = u*v    y = v**2    z = u+v     0 <= u,v <= 1
+          !  the dimension of the surface
+          idim = 3
+          !  the number of b-spline coefficients for each co-ordinate
+          nu4 = nu-4
+          nv4 = nv-4
+          nc = nu4*nv4
+          !  the coefficients for x = u*v
+          c = zero
+
+          m0 = 1
+          do i=2,nu4
+            m1 = m0+nv4
+            fac = (tu(i+3)-tu(i))/9
+            do j=2,nv4
+              m2 = m0+1
+              m3 = m1+1
+              c(m3) = c(m1)+c(m2)-c(m0)+fac*(tv(j+3)-tv(j))
+              m0 = m0+1
+              m1 = m1+1
+            end do
+            m0 = m0+1
+          end do
+
+          !  the coefficients for y = v**2.
+          l = nc
+          m0 = l+1
+          m1 = m0+1
+          c(m0) = zero
+          c(m1) = zero
+          do i=3,nv4
+              c(m1+1) = c(m1)+(tv(i+3)-tv(i))*((c(m1)-c(m0))/(tv(i+2)-tv(i-1)) +(tv(i+2)-tv(i))/3)
+              m0 = m1
+              m1 = m0+1
+          end do
+          do i=1,nv4
+              m0 = l+i
+              fac = c(m0)
+              do j=1,nu4
+                  m0 = m0+nv4
+                  c(m0) = fac
+              end do
+          end do
+
+          !  the coefficients for z = u+v
+          l = l+nc
+          m0 = l+1
+          c(m0) = zero
+          do i=2,nv4
+              m1 = m0+1
+              c(m1) = c(m0)+(tv(i+3)-tv(i))/3
+              m0 = m1
+          end do
+          do i=1,nv4
+              m0 = l+i
+              do j=2,nu4
+                 m1 = m0+nv4
+                 c(m1) = c(m0)+(tu(j+3)-tu(j))/3
+                 m0 = m1
+              end do
+          end do
+
+          !  evaluation of the spline surface
+          call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,108,wrk,48,iwrk,12,ier)
+
+          if (.not.FITPACK_SUCCESS(ier)) then
+              success = .false.
+              write(useUnit,1000) FITPACK_MESSAGE(ier)
+          end if
+
+          !  printing of the results
+          write(useUnit,900)
+          write(useUnit,910)
+          write(useUnit,920) (tu(i),i=1,nu)
+          write(useUnit,930)
+          write(useUnit,920) (tv(i),i=1,nv)
+          write(useUnit,940)
+          m1 = 0
+          do l=1,idim
+            m0 = m1+1
+            m1 = m1+nc
+            write(useUnit,950) (c(j),j=m0,m1)
+          end do
+          write(useUnit,960)
+          write(useUnit,970) (v(i),i=1,mv)
+          write(useUnit,980)
+          m = mu*mv
+          m0 = 0
+          do i=1,mu
+              write(useUnit,990) u(i)
+              m1 = m0
+              do l=1,idim
+                  m2 = m1+1
+                  m3 = m1+mv
+                  write(useUnit,995) (f(j),j=m2,m3)
+                  m1 = m1+m
+              end do
+              m0 = m0+mv
+          end do
+
+          !  format statements.
+          900  format(23h0bicubic spline surface)
+          910  format(1x,40hposition of the knots in the u-direction)
+          920  format(1x,15f5.1)
+          930  format(1x,40hposition of the knots in the v-direction)
+          940  format(23h b-spline coefficients )
+          950  format(5x,8f9.4)
+          960  format(1h0,37hspline values at selected grid points)
+          970  format(1h0,2x,1hv,6(3x,f4.1))
+          980  format(1h ,1x,1hu)
+          990  format(1h ,f4.1)
+          995  format(5x,6f7.3)
+         1000  format('[mnsuev] surface evaluation failed: ',a)
+      end function mnsuev
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
