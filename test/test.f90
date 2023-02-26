@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,21
+        do itest = 1,22
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -99,7 +99,7 @@ program test
             case (19); success = mnspev(iunit)
             case (20); success = mnsphe(dasphe,iunit)
             case (21); success = mnspin(iunit)
-            case (22); call mnspro
+            case (22); success = mnspro(iunit)
             case (23); call mnsuev
             case (24); call mnsurf(dasurf_xyz,dasurf_delta)
             case (25); call mncuev

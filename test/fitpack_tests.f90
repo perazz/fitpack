@@ -44,8 +44,8 @@ module fitpack_tests
     public :: mnspde ! test splder: derivative calculation of a spline function
     public :: mnspev ! test splev : evaluation of a spline function
     public :: mnsphe ! test sphere: surface fitting using spherical coordinates
-    public :: mnspin
-    public :: mnspro
+    public :: mnspin ! test splint: integration of a spline function
+    public :: mnspro ! test sproot: the roots of a cubic spline
     public :: mnsuev
     public :: mnsurf
     public :: mncuev
@@ -4014,118 +4014,135 @@ module fitpack_tests
       !c      a straight line   alfa*x + beta*y = gamma                     cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnspro
-      real(RKIND) ::t(13),c(26),zero(20),sp(40),cc(13)
-      integer i,idim,ier,is,i1,i2,j,k,k1,l1,l2,m,mest,n,nc,nk1
-      real(RKIND) ::alfa,beta,gamma,per
-      !  we have a planar curve
-      idim = 2
-      !  we have a cubic spline curve.
-      k = 3
-      k1 = k+1
-      !  set up the dimension information
-      nc = 26
-      mest = 20
-      !  n denotes the total number of knots.
-      n = 13
-      !  set up the knots of the spline curve
-      t(4) = 0.
-      t(5) = 0.2e0
-      t(6) = 0.3e0
-      t(7) = 0.5e0
-      t(8) = 0.6e0
-      t(9) = 0.7e0
-      t(10) = 0.1e+01
-      !  fetch the b-spline coefficients for sx(u)
-      c(1) = 0.1e+01
-      c(2) = 0.3e+01
-      c(3) = 0.4e+01
-      c(4) = 0.5e+01
-      c(5) = 0.3e+01
-      c(6) = -0.1e+01
-      !  fetch the b-spline coefficients for sy(u)
-      c(14) = 0.1e+01
-      c(15) = 0.2e+01
-      c(16) = -0.3e+01
-      c(17) = 0.2e+01
-      c(18) = 0.1e+01
-      c(19) = 0.4e+01
-      !  we have a closed curve.
-      !  incorporate the boundary conditions for periodic splines
-      per = t(10)-t(4)
-      do 10 i=1,3
-      !  the boundary knots
-        t(i) = t(i+6)-per
-        t(i+10) = t(i+4)+per
-      !  the boundary coefficients
-        c(i+6) = c(i)
-        c(i+19) = c(i+13)
-  10  continue
-      !  print the data of the spline curve.
-      write(6,900) k
-      write(6,905)
-      write(6,910) (t(i),i=1,n)
-      write(6,915)
-      nk1 = n-k1
-      write(6,920) (c(i),i=1,nk1)
-      write(6,925)
-      i1 = n+1
-      i2 = n+nk1
-      write(6,920) (c(i),i=i1,i2)
-      !  loop for the different lines.
-      do 200 is=1,5
-        go to (110,120,130,140,150),is
-      !  fetch the parameters of the straight line.
- 110    alfa = 0.
-        beta = 0.1e+01
-        gamma = 0.
-        go to 160
- 120    alfa = 0.1e+01
-        beta = 0.
-        go to 160
- 130    beta = -0.1e+01
-        go to 160
- 140    alfa = 0.4e0
-        beta = 0.3e0
-        gamma = 0.12e+01
-        go to 160
- 150    beta = 0.4e0
-        gamma = 0.
-      !  print the parameters of the straight line.
- 160    write(6,930) alfa,beta,gamma
-      !  calculate the coefficients of s(u) = sx(u)*alfa + sy(u)*beta - gamma
-        do 170 i=1,nk1
-          j = i+n
-          cc(i) = alfa*c(i)+beta*c(j)-gamma
- 170    continue
-      !  find the zeros of s(u)
-        call sproot(t,n,cc,zero,mest,m,ier)
-        write(6,935) m
-        if(m==0) go to 200
-      !  find the intersection points
-        call curev(idim,t,n,c,nc,k,zero,m,sp,nc,ier)
-      !  print the intersection points
-        write(6,940)
-        l2 = 0
-        do 180 i=1,m
-          l1 = l2+1
-          l2 = l1+1
-          write(6,945) i,zero(i),sp(l1),sp(l2)
- 180    continue
- 200  continue
-      stop
-      !  format statements.
- 900  format(31h0degree of the spline curve k =,i2)
- 905  format(1x,21hposition of the knots)
- 910  format(5x,7f6.1)
- 915  format(1x,30hb-spline coefficients of sx(u))
- 920  format(5x,14f5.0)
- 925  format(1x,30hb-spline coefficients of sy(u))
- 930  format(18h0intersection with,f6.1,5h *x +,f5.1,5h *y =,f5.1)
- 935  format(1x,33hnumber of intersection points m =,i3)
- 940  format(6x,1hi,7x,4hu(i),5x,8hsx(u(i)),4x,8hsy(u(i)))
- 945  format(1x,i6,3f12.5)
-      end subroutine mnspro
+      logical function mnspro(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          real(RKIND) :: t(13),c(26),zeros(20),sp(40),cc(13)
+          integer     :: i,idim,ier,is,i1,i2,j,k,k1,l1,l2,m,mest,n,nc,nk1,useUnit
+          real(RKIND) :: alfa,beta,gamma,per
+
+          ! Initialization
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  we have a planar curve
+          idim = 2
+          !  we have a cubic spline curve.
+          k  = 3
+          k1 = k+1
+          !  set up the dimension information
+          nc   = 26
+          mest = 20
+          !  n denotes the total number of knots.
+          n = 13
+
+          !  set up the knots of the spline curve
+          t(4:10) = [0.0,0.2,0.3,0.5,0.6,0.7,1.0]
+
+          !  fetch the b-spline coefficients for sx(u)
+          c(1:6) = [1.0,3.0,4.0,5.0,6.0,-1.0]
+
+          !  fetch the b-spline coefficients for sy(u)
+          c(14:19) = [1.0,2.0,-3.0,2.0,1.0,4.0]
+
+          !  we have a closed curve.
+          !  incorporate the boundary conditions for periodic splines
+          per = t(10)-t(4)
+
+          !  the boundary knots
+          t(1:3)   = t(7:9)-per
+          t(11:13) = t(5:7)+per
+
+          ! The boundary coefficients
+          c(7:9)   = c(1:3)
+          c(20:22) = c(14:16)
+
+          !  print the data of the spline curve.
+          write(6,900) k
+          write(6,905)
+          write(6,910) (t(i),i=1,n)
+          write(6,915)
+          nk1 = n-k1
+          write(6,920) (c(i),i=1,nk1)
+          write(6,925)
+          i1 = n+1
+          i2 = n+nk1
+          write(6,920) (c(i),i=i1,i2)
+
+          !  loop for the different lines.
+          lines: do is=1,5
+
+              !  fetch the parameters of the straight line.
+              select case (is)
+                 case (1)
+                    alfa  = zero
+                    beta  = one
+                    gamma = zero
+                 case (2)
+                    alfa  = one
+                    beta  = zero
+                 case (3)
+                    beta  = -one
+                 case (4)
+                    alfa  = 0.4_RKIND
+                    beta  = 0.3_RKIND
+                    gamma = 1.2_RKIND
+                 case (5)
+                    beta  = 0.4_RKIND
+                    gamma = zero
+              end select
+
+              ! print the parameters of the straight line.
+              write(6,930) alfa,beta,gamma
+
+              !  calculate the coefficients of s(u) = sx(u)*alfa + sy(u)*beta - gamma
+              do i=1,nk1
+                 j = i+n
+                 cc(i) = alfa*c(i)+beta*c(j)-gamma
+              end do
+
+              !  find the zeros of s(u)
+              call sproot(t,n,cc,zeros,mest,m,ier)
+              write(6,935) m
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  write(6,1000)is,FITPACK_MESSAGE(ier)
+                  success = .false.
+              endif
+
+              has_roots: if (m>0) then
+                  !  find the intersection points
+                  call curev(idim,t,n,c,nc,k,zeros,m,sp,nc,ier)
+
+                  !  print the intersection points
+                  write(6,940)
+                  l2 = 0
+                  do i=1,m
+                     l1 = l2+1
+                     l2 = l1+1
+                     write(6,945) i,zeros(i),sp(l1),sp(l2)
+                  end do
+              end if has_roots
+          end do lines
+
+          !  format statements.
+          900  format(31h0degree of the spline curve k =,i2)
+          905  format(1x,21hposition of the knots)
+          910  format(5x,7f6.1)
+          915  format(1x,30hb-spline coefficients of sx(u))
+          920  format(5x,14f5.0)
+          925  format(1x,30hb-spline coefficients of sy(u))
+          930  format(18h0intersection with,f6.1,5h *x +,f5.1,5h *y =,f5.1)
+          935  format(1x,33hnumber of intersection points m =,i3)
+          940  format(6x,1hi,7x,4hu(i),5x,8hsx(u(i)),4x,8hsy(u(i)))
+          945  format(1x,i6,3f12.5)
+         1000  format('[mnspro] error finding spline root for line ',i0,': ',a)
+
+      end function mnspro
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
