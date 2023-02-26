@@ -8092,11 +8092,11 @@ module fitpack_core
       integer :: im,k,kx1,ky1,k1,l,l1,nk1x,nk1y,num,nyy
 
       !  ..
-      kx1 = kx+1
-      ky1 = ky+1
+      kx1  = kx+1
+      ky1  = ky+1
       nk1x = nx-kx1
       nk1y = ny-ky1
-      nyy = nk1y-ky
+      nyy  = nk1y-ky
       index = 0
 
       points: do im=1,m
@@ -10161,8 +10161,6 @@ module fitpack_core
           ! carry out one more step of the iteration process.
           p2 = p
           f2 = fpms
-
-          ! carry out one more step of the iteration process.
           if (.not.check3) then
              if (f2-f3<=acc) then
                  ! our initial choice of p is too large.
@@ -10979,10 +10977,6 @@ module fitpack_core
           end if
 
           ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-
-          ! Reinitialize p to carry out one more step of the iteration process.
           p2 = p
           f2 = fpms
           if (.not.check3) then
@@ -12342,7 +12336,7 @@ module fitpack_core
                      fpintv,nru,nrv,wrk,lwrk)
 
          ! test whether the approximation sp(u,v) is an acceptable solution.
-         fpms = fp-s; if(abs(fpms)<acc) return ! success
+         fpms = fp-s; if (abs(fpms)<=acc) return ! success
 
          ! carry out one more step of the iteration process.
          p2 = p
@@ -13335,18 +13329,19 @@ module fitpack_core
           acc = tol*s
 
           if (iopt>0 .or. fp0<=s) then
-
-              nx = nx0
-              ny = ny0
-
-          else
+          if (iopt==0 .or. fp0<=s) then
 
               !  initialization for the least-squares polynomial.
               nminx = 2*kx1
               nminy = 2*ky1
               nx    = nminx
               ny    = nminy
-              ier   = FITPACK_INTERPOLATING_OK
+              ier   = FITPACK_LEASTSQUARES_OK
+
+          else
+
+              nx = nx0
+              ny = ny0
 
           end if
 
@@ -13357,15 +13352,16 @@ module fitpack_core
 
       endif bootstrap
 
+
       !  main loop for the different sets of knots. m is a safe upper bound for the number of trials.
       compute_knots: do iter=1,m
 
           !  find the position of the additional knots which are needed for the
           !  b-spline representation of s(x,y).
-          tx(1:kx1)       = x0
-          tx(nx+1-kx1:nx) = x1
-          ty(1:ky1)       = y0
-          ty(ny+1-ky1:ny) = y1
+          tx(1:kx1)    = x0
+          tx(nx-kx:nx) = x1
+          ty(1:ky1)    = y0
+          ty(ny-ky:ny) = y1
 
           !  find nrint, the total number of knot intervals and nreg, the number
           !  of panels in which the approximation domain is subdivided by the
@@ -13378,7 +13374,7 @@ module fitpack_core
           !  find the bandwidth of the observation matrix a.
           !  if necessary, interchange the variables x and y, in order to obtain a minimal bandwidth.
           iband1 = kx*(ny-ky1)+ky
-          l = ky*(nx-kx1)+kx
+          l      = ky*(nx-kx1)+kx
 
           do_interchange: if (iband1>l) then
               iband1 = l
@@ -13528,6 +13524,7 @@ module fitpack_core
 
           !  test whether the least-squares spline is an acceptable solution.
           fpms = fp-s
+
           if (iopt<0 .or. abs(fpms)<=acc) then
               if (fp<=zero) then
                  ier = FITPACK_INTERPOLATING_OK
@@ -13559,12 +13556,12 @@ module fitpack_core
           coord(:nrint) = zero
           do num=1,nreg
               num1 = num-1
-              lx = num1/nyy
-              l1 = lx+1
-              ly = num1-lx*nyy
-              l2 = ly+1+nxx
+              lx   = num1/nyy
+              l1   = lx+1
+              ly   = num1-lx*nyy
+              l2   = ly+1+nxx
               jrot = lx*nk1y+ly
-              in = index(num)
+              in   = index(num)
               do while (in/=0)
                   store = zero
                   i1 = jrot
@@ -13588,8 +13585,8 @@ module fitpack_core
 
               l = 0
               fpmax = zero
-              l1 = merge(nxx+1,1  ,nx==nxe)
-              l2 = merge(nxx,nrint,ny==nye)
+              l1 = merge(nxx+1,    1,nx==nxe)
+              l2 = merge(nxx  ,nrint,ny==nye)
 
               if (l1>l2) then
                  ier = FITPACK_INSUFFICIENT_STORAGE
@@ -13700,9 +13697,7 @@ module fitpack_core
       f1  = fp0-s
       p3  = -one
       f3  = fpms
-      p   = sum(a(:ncof,1))
-      rn  = ncof
-      p   = rn/p
+      p   = sum(a(:ncof,1))/ncof
 
       !  find the bandwidth of the extended observation matrix.
       iband3 = kx1*nk1y
@@ -13879,6 +13874,8 @@ module fitpack_core
           end if
 
           ! carry out one more step of the iteration process.
+          p2 = p
+          f2 = fpms
           if (.not.check3) then
              if (f2-f3<=acc) then
                  ! our initial choice of p is too large.

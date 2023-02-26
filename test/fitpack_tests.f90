@@ -47,7 +47,7 @@ module fitpack_tests
     public :: mnspin ! test splint: integration of a spline function
     public :: mnspro ! test sproot: the roots of a cubic spline
     public :: mnsuev ! test surev : valuation of a parametric spline surface
-    public :: mnsurf
+    public :: mnsurf ! test surfit: Surface fitting to scattered data
     public :: mncuev
     public :: mndbin
     public :: mnevpo
@@ -4307,7 +4307,7 @@ module fitpack_tests
       !c        mnsurf : surfit test program                                cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnsurf(xyz,delta,iunit)
+      logical function mnsurf(xyz,delta,iunit) result(success)
 
          ! Surface points fetched from an external file
          real(RKIND), intent(in) :: xyz(:,:), delta
@@ -4321,7 +4321,8 @@ module fitpack_tests
          integer :: iwrk(300),i,ier,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
                     nmax,nx,nxest,ny,nyest,useUnit
 
-         ! Output unit
+         ! Initialization.
+         success = .true.
          if (present(iunit)) then
              useUnit = iunit
          else
@@ -4373,7 +4374,7 @@ module fitpack_tests
          kwrk  = 300
          lwrk1 = 12000
          lwrk2 = 6000
-         allocate(wrk1(lwrk1),wrk2(lwrk2))
+         allocate(wrk1(lwrk1),wrk2(lwrk2),source=zero)
 
          ! we choose a value for eps
          eps=0.1e-05
@@ -4424,6 +4425,7 @@ module fitpack_tests
             ! determination of the spline approximation.
             call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
                         nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+
             ! printing of the fitting results.
             if (iopt>=0) then
                write(useUnit,940) kx,ky
@@ -4442,6 +4444,11 @@ module fitpack_tests
             nc = (nx-kx-1)*(ny-ky-1)
             write(useUnit,975)
             write(useUnit,980) (c(i),i=1,nc)
+
+            if (.not.FITPACK_SUCCESS(ier)) then
+                success = .false.
+                write(useUnit,1100) is,FITPACK_MESSAGE(ier)
+            end if
 
             ! evaluation of the spline approximation.
             call bispev(tx,nx,ty,ny,c,kx,ky,xx,mx,yy,my,zz,wrk2,lwrk2,iwrk,kwrk,ier)
@@ -4474,8 +4481,9 @@ module fitpack_tests
          990  format(3x,1hy)
          995  format(1x,f4.1,11f7.3)
          1000 format(1h0,33hspline evaluation on a given grid)
+         1100 format('[mnsurf] surfit case ',i0,' returned error ',a)
 
-      end subroutine mnsurf
+      end function mnsurf
 
 
 
