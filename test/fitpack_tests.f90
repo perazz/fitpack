@@ -49,7 +49,7 @@ module fitpack_tests
     public :: mnsuev ! test surev : valuation of a parametric spline surface
     public :: mnsurf ! test surfit: Surface fitting to scattered data
     public :: mncuev ! test curev : Evaluation of a spline curve
-    public :: mndbin
+    public :: mndbin ! test dblint: Integration of a bivariate spline
     public :: mnevpo
     public :: mnpasu
     public :: mnspgr
@@ -1267,102 +1267,106 @@ module fitpack_tests
       !c              mndbin : dblint test program                          cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mndbin
-      real(RKIND) ::fac,facx,aint,exint,xb,xe,yb,ye
-      integer i,j,kx,kx1,ky,ky1,mx,my,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny
-      real(RKIND) ::tx(15),ty(15),c(100),x(6),y(6),wrk(50)
-      !  we set up the end points of the integration domains.
-      mx = 6
-      my = 6
-      do 10 i=1,6
-      x(i) = (i-1)*0.2
-      y(i) = x(i)
-  10  continue
-      !  loop for different spline degrees with respect to the x-variable
-      do 300 kx=1,5,2
-      !  the knots in the x-direction
-        tx(kx+2) = 0.4
-        tx(kx+3) = 0.7
-        tx(kx+4) = 0.9
-        kx1 = kx+1
-        nx = 3+2*kx1
-        j = nx
-        do 20 i=1,kx1
-          tx(i) = 0.
-          tx(j) = 1.
-          j = j-1
-  20    continue
-      !  loop for different spline degrees with respect to the y-variable
-      do 200 ky=2,3
-      !  the knots in the y-direction
-        ty(ky+2) = 0.3
-        ty(ky+3) = 0.8
-        ky1 = ky+1
-        ny = 2+2*ky1
-        j = ny
-        do 30 i=1,ky1
-          ty(i) = 0.
-          ty(j) = 1.
-          j = j-1
-  30    continue
-      !  we generate the b-spline coefficients for the test function x*y
-        nkx1 = nx-kx1
-        nky1 = ny-ky1
-        do 40 i=1,nky1
-          c(i) = 0.
-  40    continue
-        do 50 i=2,nkx1
-          c((i-1)*nky1+1) = 0.
-  50    continue
-        fac = kx*ky
-        m0 = 1
-        do 70 i=2,nkx1
-          m1 = m0+nky1
-          facx = (tx(i+kx)-tx(i))/fac
-          do 60 j=2,nky1
-            m2 = m0+1
-            m3 = m1+1
-            c(m3) = c(m1)+c(m2)-c(m0)+facx*(ty(j+ky)-ty(j))
-            m0 = m0+1
-            m1 = m1+1
-  60      continue
-          m0 = m0+1
-  70    continue
-      !  printing of the spline information
-        write(6,900) kx,ky
-        write(6,910)
-        write(6,920) (tx(i),i=1,nx)
-        write(6,930)
-        write(6,920) (ty(i),i=1,ny)
-        nc = nkx1*nky1
-        write(6,940)
-        write(6,950) (c(i),i=1,nc)
-      !  integration of the tensor product spline
-        write(6,960)
-        j = 6
-        do 100 i=1,3
-          xb = x(i)
-          yb = xb
-          xe = x(j)
-          ye = xe
-          j = j-1
-          aint = dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk)
-          exint = (xe-xb)*(xe+xb)*(ye-yb)*(ye+yb)*0.25
-          write(6,970) xb,xe,yb,ye,aint,exint
- 100    continue
- 200    continue
- 300  continue
-      stop
-      !  format statements.
- 900  format(33h0tensor product spline of degrees,2i3)
- 910  format(1x,40hposition of the knots in the x-direction)
- 920  format(1x,15f5.1)
- 930  format(1x,40hposition of the knots in the y-direction)
- 940  format(23h b-spline coefficients )
- 950  format(1x,8f9.4)
- 960  format(1h0,5x,2hxb,5x,2hxe,5x,2hyb,5x,2hye,6x,6hdblint,7x,5hexint)
- 970  format(1x,4f7.1,2f12.5)
-      end subroutine mndbin
+      logical function mndbin(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+          real(RKIND) :: fac,facx,aint,exint,xb,xe,yb,ye
+          integer     :: i,j,kx,kx1,ky,ky1,mx,my,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
+          real(RKIND) :: tx(15),ty(15),c(100),x(6),y(6),wrk(50)
+
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  we set up the end points of the integration domains.
+          mx = 6
+          my = 6
+
+          x = [0.0,0.2,0.4,0.6,0.8,1.0]
+          y = x
+
+          !  loop for different spline degrees with respect to the x-variable
+          x_degrees: do kx=1,5,2
+
+              !  the knots in the x-direction
+              kx1 = kx+1
+              nx  = 3+2*kx1
+              tx(1:kx1)     = zero
+              tx(kx+2:kx+4) = [0.4,0.7,0.9]
+              tx(nx-kx:nx)  = one
+
+              !  loop for different spline degrees with respect to the y-variable
+              y_degrees: do ky=2,3
+
+                  !  the knots in the y-direction
+                  ky1 = ky+1
+                  ny = 2+2*ky1
+                  ty(1:ky1)     = zero
+                  ty(ky+2:ky+3) = [0.3,0.8]
+                  ty(ny-ky:ny)  = one
+
+                  !  we generate the b-spline coefficients for the test function x*y
+                  nkx1 = nx-kx1
+                  nky1 = ny-ky1
+                  c = zero
+
+                  fac = kx*ky
+                  m0 = 1
+                  do i=2,nkx1
+                      m1 = m0+nky1
+                      facx = (tx(i+kx)-tx(i))/fac
+                      do j=2,nky1
+                          m2 = m0+1
+                          m3 = m1+1
+                          c(m3) = c(m1)+c(m2)-c(m0)+facx*(ty(j+ky)-ty(j))
+                          m0 = m0+1
+                          m1 = m1+1
+                      end do
+                      m0 = m0+1
+                  end do
+
+                  !  printing of the spline information
+                  write(useUnit,900) kx,ky
+                  write(useUnit,910)
+                  write(useUnit,920) (tx(i),i=1,nx)
+                  write(useUnit,930)
+                  write(useUnit,920) (ty(i),i=1,ny)
+                  nc = nkx1*nky1
+                  write(useUnit,940)
+                  write(useUnit,950) (c(i),i=1,nc)
+
+                  !  integration of the tensor product spline
+                  write(useUnit,960)
+                  j = 6
+                  do i=1,3
+                      xb = x(i)
+                      yb = xb
+                      xe = x(j)
+                      ye = xe
+                      j = j-1
+                      aint  = dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk)
+                      exint = (xe-xb)*(xe+xb)*(ye-yb)*(ye+yb)*0.25
+                      write(useUnit,970) xb,xe,yb,ye,aint,exint
+
+                      ! Check that analytical and spline integrals match
+                      if (.not.abs(aint-exint)<smallnum06*abs(exint)) success = .false.
+
+                  end do
+              end do y_degrees
+          end do x_degrees
+
+          !  format statements.
+          900  format(33h0tensor product spline of degrees,2i3)
+          910  format(1x,40hposition of the knots in the x-direction)
+          920  format(1x,15f5.1)
+          930  format(1x,40hposition of the knots in the y-direction)
+          940  format(23h b-spline coefficients )
+          950  format(1x,8f9.4)
+          960  format(1h0,5x,2hxb,5x,2hxe,5x,2hyb,5x,2hye,6x,6hdblint,7x,5hexint)
+          970  format(1x,4f7.1,2f12.5)
+      end function mndbin
 
 
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
