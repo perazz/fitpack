@@ -50,7 +50,7 @@ module fitpack_tests
     public :: mnsurf ! test surfit: Surface fitting to scattered data
     public :: mncuev ! test curev : Evaluation of a spline curve
     public :: mndbin ! test dblint: Integration of a bivariate spline
-    public :: mnevpo
+    public :: mnevpo ! test evapol: Evaluation of a polar spline
     public :: mnpasu
     public :: mnspgr
 
@@ -1374,114 +1374,150 @@ module fitpack_tests
       !c              mnevpo : evapol test program                          cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnevpo
-      real(RKIND) ::fac
-      integer i,ir,j,m,mx,my,m0,m1,m2,nc,nu4,nv4,nu,nv
-      real(RKIND) ::tu(11),tv(10),c(42),x(6),y(6),f(36)
-      !  we set up the grid points for evaluating the polar spline.
-      mx = 6
-      my = 6
-      do 10 i=1,6
-      x(i) = (2*i-7)*0.1
-      y(i) = x(i)
-  10  continue
-      !  the interior knots with respect to the u-variable.
-      tu(5) = 0.4
-      tu(6) = 0.7
-      tu(7) = 0.9
-      nu = 11
-      !  the interior knots with respect to the v-variable.
-      tv(5) = 0.3
-      tv(6) = 0.8
-      nv = 10
-      !  the boundary knots
-      do 20 i=1,4
-        tu(i) = 0.
-        tv(i) = 0.
-        tu(i+7) = 1.
-        tv(i+6) = 1.
-  20  continue
-      !  the number of b-spline coefficients
-      nu4 = nu-4
-      nv4 = nv-4
-      nc = nu4*nv4
-      !  we generate the b-spline coefficients for the function s(u,v)=u**2
-      m0 = 1
-      m1 = m0+nv4
-      c(m0) = 0.
-      c(m1) = 0.
-      do 70 i=3,nu4
-        m2 = m1+nv4
-        c(m2) = c(m1)+(tu(i+3)-tu(i))*((c(m1)-c(m0))/(tu(i+2)-tu(i-1)) &
-          +(tu(i+2)-tu(i))/3.)
-        m0 = m1
-        m1 = m2
-  70  continue
-      do 80 i=1,nu4
-        m0 = (i-1)*nv4+1
-        fac = c(m0)
-        do j=2,nv4
-          m0 = m0+1
-          c(m0) = fac
-        end do
-  80  continue
-      write(6,900)
-      write(6,910)
-      write(6,920) (tu(i),i=1,nu)
-      write(6,930)
-      write(6,920) (tv(i),i=1,nv)
-      write(6,940)
-      write(6,950) (c(j),j=1,nc)
-      ! the spline s(u,v) defines a function f(x,y) through the transformation
-      !    x = r(v)*u*cos(v)   y = r(v)*u*sin(v)
-      ! we consider two different functions r(v)
-      do 300 ir=1,2
-        go to (110,130),ir
-      ! if r(v) =1 and s(u,v) = u**2 then f(x,y) = x**2+y**2
-      ! evaluation of f(x,y)
- 110    m = 0
-        do i=1,my
-          do j=1,mx
-            m = m+1
-            f(m) = evapol(tu,nu,tv,nv,c,r1,x(j),y(i))
+      logical function mnevpo(iunit) result(success)
+          integer, optional, intent(in) :: iunit
+
+          real(RKIND) :: fac
+          integer     :: i,ir,j,m,mx,my,m0,m1,m2,nc,nu4,nv4,nu,nv,useUnit
+          real(RKIND) :: tu(11),tv(10),c(42),x(6),y(6),f(36),fa(36)
+
+          success = .true.
+          if (present(iunit)) then
+              useUnit = iunit
+          else
+              useUnit = output_unit
+          end if
+
+          !  we set up the grid points for evaluating the polar spline.
+          mx = 6
+          my = 6
+
+          x = [((2*i-7)*0.1_RKIND,i=1,6)]
+          y = x
+
+          !  the knots with respect to the u-variable.
+          nu = 11
+          tu(1:4)  = zero          ! boundary
+          tu(5:7)  = [0.4,0.7,0.9] ! interior
+          tu(8:11) = one           ! boundary
+
+          !  the knots with respect to the v-variable.
+          nv = 10
+          tv(1:4)  = zero      ! boundary
+          tv(5:6)  = [0.3,0.8] ! interior
+          tv(7:10) = one       ! boundary
+
+          !  the number of b-spline coefficients
+          nu4 = nu-4
+          nv4 = nv-4
+          nc  = nu4*nv4
+
+          !  we generate the b-spline coefficients for the function s(u,v)=u**2
+          m0 = 1
+          m1 = m0+nv4
+          c(m0) = zero
+          c(m1) = zero
+          do i=3,nu4
+              m2 = m1+nv4
+              c(m2) = c(m1)+(tu(i+3)-tu(i))*((c(m1)-c(m0))/(tu(i+2)-tu(i-1)) &
+                    + (tu(i+2)-tu(i))/3)
+              m0 = m1
+              m1 = m2
           end do
-        end do
-        write(6,960)
-        go to 200
-      ! if r(v) = (1+cos(v)**2)/2 and s(u,v) = u**2 then f(x,y) =
-      !    4*(x**2+y**2)**3/(4*x**4 +y**4 +4*x**2*y**2)
-      ! evaluation of f(x,y)
- 130    m = 0
-        do i=1,my
-          do j=1,mx
-            m = m+1
-            f(m) = evapol(tu,nu,tv,nv,c,r2,x(j),y(i))
+          do i=1,nu4
+              m0 = (i-1)*nv4+1
+              fac = c(m0)
+              do j=2,nv4
+                  m0 = m0+1
+                  c(m0) = fac
+              end do
           end do
-        end do
-        write(6,965)
- 200    write(6,970) (x(i),i=1,mx)
-        write(6,975)
-        m1 = 0
-        do 210 j=1,my
-          m0 = m1+1
-          m1 = m1+mx
-          write(6,980) y(j),(f(m),m=m0,m1)
- 210    continue
- 300  continue
-      stop
-      !  format statements.
- 900  format(24h0polar spline evaluation)
- 910  format(1x,40hposition of the knots in the u-direction)
- 920  format(1x,15f5.1)
- 930  format(1x,40hposition of the knots in the v-direction)
- 940  format(23h b-spline coefficients )
- 950  format(5x,8f9.4)
- 960  format(1h0,30hf(x,y) corresponding to r(v)=1)
- 965  format(1h0,44hf(x,y) corresponding to r(v)=(1+cos(v)**2)/2)
- 970  format(1h0,1hx,2x,6f7.1)
- 975  format(3x,1hy)
- 980  format(1x,f4.1,6f7.3)
-      end subroutine mnevpo
+          write(6,900)
+          write(6,910)
+          write(6,920) (tu(i),i=1,nu)
+          write(6,930)
+          write(6,920) (tv(i),i=1,nv)
+          write(6,940)
+          write(6,950) (c(j),j=1,nc)
+
+          ! the spline s(u,v) defines a function f(x,y) through the transformation
+          !    x = r(v)*u*cos(v)   y = r(v)*u*sin(v)
+          ! we consider two different functions r(v)
+          r_function: do ir=1,2
+
+              select case (ir)
+
+                  ! if r(v) =1 and s(u,v) = u**2 then f(x,y) = x**2+y**2
+                  case (1)
+
+                      ! evaluation of f(x,y)
+                      m = 0
+                      do i=1,my
+                         do j=1,mx
+                            m = m+1
+                            f (m) = evapol(tu,nu,tv,nv,c,r1,x(j),y(i))
+                            fa(m) = f1(x(j),y(i))
+                         end do
+                      end do
+                      write(6,960)
+
+                  ! if r(v) = (1+cos(v)**2)/2 and s(u,v) = u**2 then
+                  ! f(x,y) = 4*(x**2+y**2)**3/(4*x**4 +y**4 +4*x**2*y**2)
+                  case (2)
+
+                      ! evaluation of f(x,y)
+                      m = 0
+                      do i=1,my
+                         do j=1,mx
+                            m = m+1
+                            f(m)  = evapol(tu,nu,tv,nv,c,r2,x(j),y(i))
+                            fa(m) = f2(x(j),y(i))
+                         end do
+                      end do
+                      write(6,965)
+
+              end select
+
+              write(6,970) (x(i),i=1,mx)
+              write(6,975)
+              m1 = 0
+              do j=1,my
+                  m0 = m1+1
+                  m1 = m1+mx
+                  write(6,980) y(j),(f (m),m=m0,m1)
+              end do
+
+              ! Check that all evaluations match the analytical result
+              if (.not.all(abs(f-fa)<smallnum06*abs(fa))) success = .false.
+
+          end do r_function
+
+          !  format statements.
+          900  format(24h0polar spline evaluation)
+          910  format(1x,40hposition of the knots in the u-direction)
+          920  format(1x,15f5.1)
+          930  format(1x,40hposition of the knots in the v-direction)
+          940  format(23h b-spline coefficients )
+          950  format(5x,8f9.4)
+          960  format(1h0,30hf(x,y) corresponding to r(v)=1)
+          965  format(1h0,44hf(x,y) corresponding to r(v)=(1+cos(v)**2)/2)
+          970  format(1h0,1hx,2x,6f7.1)
+          975  format(3x,1hy)
+          980  format(1x,f4.1,6f7.3)
+
+          contains
+
+             elemental real(RKIND) function f1(x,y)
+                 real(RKIND), intent(in) :: x,y
+                 f1 = x**2+y**2
+             end function f1
+
+             elemental real(RKIND) function f2(x,y)
+                 real(RKIND), intent(in) :: x,y
+                 f2 = 4*(x**2+y**2)**3/(4*x**4 +y**4 +4*x**2*y**2)
+             end function f2
+
+      end function mnevpo
 
 
 
