@@ -1432,13 +1432,13 @@ module fitpack_tests
                   c(m0) = fac
               end do
           end do
-          write(6,900)
-          write(6,910)
-          write(6,920) (tu(i),i=1,nu)
-          write(6,930)
-          write(6,920) (tv(i),i=1,nv)
-          write(6,940)
-          write(6,950) (c(j),j=1,nc)
+          write(useUnit,900)
+          write(useUnit,910)
+          write(useUnit,920) (tu(i),i=1,nu)
+          write(useUnit,930)
+          write(useUnit,920) (tv(i),i=1,nv)
+          write(useUnit,940)
+          write(useUnit,950) (c(j),j=1,nc)
 
           ! the spline s(u,v) defines a function f(x,y) through the transformation
           !    x = r(v)*u*cos(v)   y = r(v)*u*sin(v)
@@ -1459,7 +1459,7 @@ module fitpack_tests
                             fa(m) = f1(x(j),y(i))
                          end do
                       end do
-                      write(6,960)
+                      write(useUnit,960)
 
                   ! if r(v) = (1+cos(v)**2)/2 and s(u,v) = u**2 then
                   ! f(x,y) = 4*(x**2+y**2)**3/(4*x**4 +y**4 +4*x**2*y**2)
@@ -1474,17 +1474,17 @@ module fitpack_tests
                             fa(m) = f2(x(j),y(i))
                          end do
                       end do
-                      write(6,965)
+                      write(useUnit,965)
 
               end select
 
-              write(6,970) (x(i),i=1,mx)
-              write(6,975)
+              write(useUnit,970) (x(i),i=1,mx)
+              write(useUnit,975)
               m1 = 0
               do j=1,my
                   m0 = m1+1
                   m1 = m1+mx
-                  write(6,980) y(j),(f (m),m=m0,m1)
+                  write(useUnit,980) y(j),(f (m),m=m0,m1)
               end do
 
               ! Check that all evaluations match the analytical result
@@ -1570,11 +1570,11 @@ module fitpack_tests
           end do
 
           !  print the data for the spline.
-          write(6,900) k
-          write(6,905)
-          write(6,910) (t(i),i=1,n)
-          write(6,915)
-          write(6,920) (c(i),i=1,nk1)
+          write(useUnit,900) k
+          write(useUnit,905)
+          write(useUnit,910) (t(i),i=1,n)
+          write(useUnit,915)
+          write(useUnit,920) (c(i),i=1,nk1)
 
           !  fetch the different values for alfa
           m = 8
@@ -1593,11 +1593,11 @@ module fitpack_tests
           end if
 
           !  print the results
-          write(6,925)
+          write(useUnit,925)
           do i=1,m
               ! fetch the exact values of the integrals
               call exfour(alfa(i),rs,rc)
-              write(6,930) alfa(i),ress(i),rs,resc(i),rc
+              write(useUnit,930) alfa(i),ress(i),rs,resc(i),rc
 
               ! Check that the exact values match the numerical ones
               if (.not.abs(ress(i)-rs)<smallnum10+smallnum06*abs(rs)) then
@@ -3634,16 +3634,25 @@ module fitpack_tests
       !c                  mnspgr : spgrid test program                      cc
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mnspgr(u,v,r)
+      logical function mnspgr(u,v,r,iunit) result(success)
         real(RKIND), intent(in) :: u(:),v(:),r(size(u)*size(v))
+        integer, optional, intent(in) :: iunit
 
         !  ..local scalars..
         real(RKIND) :: ermax,erf,exr0,exr1,fp,sum,r0,r1,ai,s
-        integer i,ier,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv
+        integer     :: i,ier,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv,useUnit
         !  ..local arrays..
-        integer ider(4),iopt(3),iwrk(70)
+        integer     :: ider(4),iopt(3),iwrk(70)
         real(RKIND) :: c(300),tu(25),tv(25),f(154),wk(100),exact(154),err(14),sp(14),wrk(1500)
 
+
+        ! Initialization
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
 
         ! set up the number of u (latitude)-values of the grid.
         mu = size(u)
@@ -3655,177 +3664,218 @@ module fitpack_tests
 
         ! we print the data values at the grid points. we also compute and print
         ! the exact value of the test function underlying the data.
-        write(6,910)
-        write(6,915) (j,j=1,mv,2)
-        write(6,920)
-        exr0 = tesspg(zero,zero)
-        exr1 = tesspg(pi,zero)
+        write(useUnit,910)
+        write(useUnit,915) (j,j=1,mv,2)
+        write(useUnit,920)
+        exr0  = tesspg(zero,zero)
+        exr1  = tesspg(pi,zero)
         ermax = zero
-        sum = zero
-      l = 0
-      do 40 i=1,mu
-        l = (i-1)*mv+1
-        k = 1
-        do 30 j=1,7
-          exact(l) = tesspg(u(i),v(k))
-          erf = abs(exact(l)-r(l))
-          sum = sum+erf
-          if(erf>ermax) ermax = erf
-          sp(j) = exact(l)
-          err(j) = r(l)
-          l = l+2
-          k = k+2
-  30    continue
-        write(6,925) i,(err(j),j=1,7)
-        write(6,930) (sp(j),j=1,7)
-  40  continue
-      write(6,915) (j,j=2,mv,2)
-      write(6,920)
-      do 60 i=1,mu
-        l = (i-1)*mv+2
-        k = 2
-        do 50 j=1,7
-          exact(l) = tesspg(u(i),v(k))
-          erf = abs(exact(l)-r(l))
-          sum = sum+erf
-          if(erf>ermax) ermax = erf
-          sp(j) = exact(l)
-          err(j) = r(l)
-          l = l+2
-          k = k+2
-  50    continue
-        write(6,925) i,(err(j),j=1,7)
-        write(6,930) (sp(j),j=1,7)
-  60  continue
-      ai = m
-      sum = sum/ai
-      write(6,935) sum,ermax
-      write(6,940) exr0,exr1
-      !  we set up the dimension information
-      nuest = 19
-      nvest = 21
-      kwrk = 70
-      lwrk = 1500
-      ! main loop for the different spline approximations
-      do 300 is=1,6
-        go to (110,120,130,140,150,160),is
-      !  we start computing a set of spline approximations with
-      !  only c0-continuity at the poles,
- 110    iopt(2) = 0
-        ider(2) = 0
-        iopt(3) = 0
-        ider(4) = 0
-      !  with no data values at the poles.
-        ider(1) = -1
-        ider(3) = -1
-      !  initialisation
-        iopt(1) = 0
-      !  a large value for s for computing the least-squares polynomial
-        s = 60.
-        go to 200
-      !  iopt(1) = 1 from the second call on
- 120    s = 0.05
-        iopt(1) = 1
-        go to 200
-      !  an interpolating spline
- 130    s = zero
-        go to 200
-      !  a second set of approximations with c1-continuity at the poles
- 140    iopt(2) = 1
-        iopt(3) = 1
-      !  exact values at the poles.
-        ider(1) = 1
-        ider(3) = 1
-        r0 = exr0
-        r1 = exr1
-      ! reinitialization
-        iopt(1) = 0
-        s = 0.05
-        go to 200
-      !  vanishing derivatives at the poles
- 150    ider(2) = 1
-        ider(4) = 1
-      ! reinitialization
-        iopt(1) = 0
-        go to 200
-      ! finally we calculate the least-squares spline according to the current
-      !  set of knots
- 160    iopt(1) = -1
- 200    call spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s,nuest,nvest, &
-          nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      ! printing of the fitting results.
-        if(iopt(1)>=0) go to 210
-        write(6,945)
-        go to 220
- 210    write(6,950) s
- 220    write(6,955) iopt(2),iopt(3)
-        if(ider(2)==1) write(6,960)
-        if(ider(4)==1) write(6,965)
-        write(6,970) fp,ier
-        write(6,975) nu
-        write(6,980)
-        write(6,985) (tu(i),i=1,nu)
-        write(6,990) nv
-        write(6,980)
-        write(6,985) (tv(i),i=1,nv)
-        nc = (nu-4)*(nv-4)
-        write(6,995)
-        write(6,985) (c(i),i=1,nc)
-      !  evaluation of the spline approximation
-        call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iwrk,70,ier)
-        write(6,1000)
-        write(6,915) (j,j=1,mv,2)
-        write(6,920)
-        ermax = zero
-        sum = zero
-        do 240 i=1,mu
-          k = i
-          do 230 j=1,mv
-            sp(j) = f(k)
-            err(j) = abs(exact(k)-f(k))
-            sum = sum+err(j)
-            if(err(j)>ermax) ermax = err(j)
-            k = k+1
- 230      continue
-          if( (i/2)*2 /=i ) go to 240
-          write(6,925) i,(sp(j),j=1,mv,2)
-          write(6,930) (err(j),j=1,mv,2)
- 240    continue
-        sum = sum/ai
-        write(6,935) sum,ermax
-        write(6,1005) c(1),c(nc)
- 300  continue
-      stop
- 910  format(49h1data value (exact function value) at grid points)
- 915  format(8h0v(j),j=,3x,7(i2,6x))
- 920  format(8h u(i),i=)
- 925  format(1x,i5,7(2x,f6.3))
- 930  format(7x,7(2h (,f5.3,1h)))
- 935  format(19h0mean abs. error = ,f9.3,5x,18hmax. abs. error = ,f9.3)
- 940  format(30h function values at the poles ,f7.3,5x,f7.3)
- 945  format(21h0least-squares spline)
- 950  format(25h0smoothing spline with s=,f7.2)
- 955  format(1x,34horder of continuity at the poles =,2i5)
- 960  format(1x,37hvanishing derivatives at the pole u=0)
- 965  format(1x,38hvanishing derivatives at the pole u=pi)
- 970  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
- 975  format(1x,42htotal number of knots in the u-direction =,i3)
- 980  format(1x,22hposition of the knots )
- 985  format(5x,8f9.4)
- 990  format(1x,42htotal number of knots in the v-direction =,i3)
- 995  format(23h0b-spline coefficients )
-1000  format(50h0spline value (approximation error) at grid points)
-1005  format(28h spline values at the poles ,f7.3,5x,f7.3)
-      end subroutine mnspgr
+        sum   = zero
 
-      !
-      real(RKIND) function tesspg(u,v)
-      ! function program tesspg calculates the value of the test function
-      ! underlying the data.
-      real(RKIND) ::u,v,sin,cos
-      tesspg = 2./(4.1+cos(3.*u)+3.*cos(v+v+u*0.25)*sin(u)**2)
-      return
-      end function tesspg
+        l = 0
+        do i=1,mu
+            l = (i-1)*mv+1
+            k = 1
+            do j=1,7
+                exact(l) = tesspg(u(i),v(k))
+                erf = abs(exact(l)-r(l))
+                sum = sum+erf
+                if (erf>ermax) ermax = erf
+                sp(j) = exact(l)
+                err(j) = r(l)
+                l = l+2
+                k = k+2
+            end do
+            write(useUnit,925) i,(err(j),j=1,7)
+            write(useUnit,930) (sp(j),j=1,7)
+        end do
+        write(useUnit,915) (j,j=2,mv,2)
+        write(useUnit,920)
+
+        do i=1,mu
+            l = (i-1)*mv+2
+            k = 2
+            do j=1,7
+                exact(l) = tesspg(u(i),v(k))
+                erf = abs(exact(l)-r(l))
+                sum = sum+erf
+                if(erf>ermax) ermax = erf
+                sp(j) = exact(l)
+                err(j) = r(l)
+                l = l+2
+                k = k+2
+            end do
+            write(useUnit,925) i,(err(j),j=1,7)
+            write(useUnit,930) (sp(j),j=1,7)
+        end do
+        ai = m
+        sum = sum/ai
+        write(useUnit,935) sum,ermax
+        write(useUnit,940) exr0,exr1
+
+        !  we set up the dimension information
+        nuest = 19
+        nvest = 21
+        kwrk = 70
+        lwrk = 1500
+
+        ! main loop for the different spline approximations
+        approximations: do is=1,6
+            select case (is)
+                case (1)
+
+                  !  we start computing a set of spline approximations with
+                  !  only c0-continuity at the poles,
+                  iopt(2) = 0
+                  ider(2) = 0
+                  iopt(3) = 0
+                  ider(4) = 0
+
+                  !  with no data values at the poles.
+                  ider(1) = -1
+                  ider(3) = -1
+
+                  !  initialisation
+                  iopt(1) = 0
+
+                  !  a large value for s for computing the least-squares polynomial
+                  s = 60.
+
+                case (2)
+
+                  !  iopt(1) = 1 from the second call on
+                  s = 0.05
+                  iopt(1) = 1
+
+                case (3)
+
+                  !  an interpolating spline
+                  s = zero
+
+                case (4)
+
+                  !  a second set of approximations with c1-continuity at the poles
+                  iopt(2) = 1
+                  iopt(3) = 1
+
+                  !  exact values at the poles.
+                  ider(1) = 1
+                  ider(3) = 1
+                  r0 = exr0
+                  r1 = exr1
+
+                  ! reinitialization
+                  iopt(1) = 0
+                  s = 0.05
+
+                case (5)
+
+                  !  vanishing derivatives at the poles
+                  ider(2) = 1
+                  ider(4) = 1
+
+                  ! reinitialization
+                  iopt(1) = 0
+
+                case (6)
+
+                  ! finally we calculate the least-squares spline according to the current
+                  !  set of knots
+                  iopt(1) = -1
+
+            end select
+
+            call spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s,nuest,nvest, &
+                        nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+
+            if (.not.FITPACK_SUCCESS(ier)) then
+                success = .false.
+                write(useUnit,1100) is,FITPACK_MESSAGE(ier)
+            end if
+
+            ! printing of the fitting results.
+            if (iopt(1)>=0) then
+                write(useUnit,950) s
+            else
+                write(useUnit,945)
+            end if
+
+            write(useUnit,955) iopt(2),iopt(3)
+            if(ider(2)==1) write(useUnit,960)
+            if(ider(4)==1) write(useUnit,965)
+            write(useUnit,970) fp,FITPACK_MESSAGE(ier)
+            write(useUnit,975) nu
+            write(useUnit,980)
+            write(useUnit,985) (tu(i),i=1,nu)
+            write(useUnit,990) nv
+            write(useUnit,980)
+            write(useUnit,985) (tv(i),i=1,nv)
+            nc = (nu-4)*(nv-4)
+            write(useUnit,995)
+            write(useUnit,985) (c(i),i=1,nc)
+
+            !  evaluation of the spline approximation
+            call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iwrk,70,ier)
+            write(useUnit,1000)
+            write(useUnit,915) (j,j=1,mv,2)
+            write(useUnit,920)
+            ermax = zero
+            sum = zero
+            do i=1,mu
+                k = i
+                do j=1,mv
+                    sp(j) = f(k)
+                    err(j) = abs(exact(k)-f(k))
+                    sum = sum+err(j)
+                    if(err(j)>ermax) ermax = err(j)
+                    k = k+1
+                end do
+                if( (i/2)*2 /=i ) cycle
+                write(useUnit,925) i,(sp(j),j=1,mv,2)
+                write(useUnit,930) (err(j),j=1,mv,2)
+            end do
+            sum = sum/ai
+            write(useUnit,935) sum,ermax
+            write(useUnit,1005) c(1),c(nc)
+        end do approximations
+
+       ! Formats statements
+         910  format(49h1data value (exact function value) at grid points)
+         915  format(8h0v(j),j=,3x,7(i2,6x))
+         920  format(8h u(i),i=)
+         925  format(1x,i5,7(2x,f6.3))
+         930  format(7x,7(2h (,f5.3,1h)))
+         935  format(19h0mean abs. error = ,f9.3,5x,18hmax. abs. error = ,f9.3)
+         940  format(30h function values at the poles ,f7.3,5x,f7.3)
+         945  format(21h0least-squares spline)
+         950  format(25h0smoothing spline with s=,f7.2)
+         955  format(1x,34horder of continuity at the poles =,2i5)
+         960  format(1x,37hvanishing derivatives at the pole u=0)
+         965  format(1x,38hvanishing derivatives at the pole u=pi)
+         970  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,a)
+         975  format(1x,42htotal number of knots in the u-direction =,i3)
+         980  format(1x,22hposition of the knots )
+         985  format(5x,8f9.4)
+         990  format(1x,42htotal number of knots in the v-direction =,i3)
+         995  format(23h0b-spline coefficients )
+        1000  format(50h0spline value (approximation error) at grid points)
+        1005  format(28h spline values at the poles ,f7.3,5x,f7.3)
+        1100  format('[mnspgr] test ',i0,' failed: ',a)
+
+
+      contains
+
+          ! function program tesspg calculates the value of the test function
+          ! underlying the data.
+          elemental real(RKIND) function tesspg(u,v)
+              real(RKIND), intent(in) :: u,v
+              tesspg = 2.0_RKIND/(4.1_RKIND+cos(3*u)+3*cos(v+v+u*0.25_RKIND)*sin(u)**2)
+              return
+          end function tesspg
+
+
+      end function mnspgr
+
 
 
 

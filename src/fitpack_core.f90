@@ -12005,7 +12005,7 @@ module fitpack_core
               end if
 
               !  find the position of the knots in the v-direction.
-              tv(1:mv+7) = [v(mv-2:mv)-period,v(1:mv),v(1:4)+period]
+              tv(1:mv+7) = [v(mv-2:mv)-period,v(1:mv),ve,v(2:4)+period]
 
               !  if not all the derivative values g(i,j) are given, we will first
               !  estimate these values by computing a least-squares spline
