@@ -42,6 +42,7 @@ module fitpack_core
     public :: curev  ! Evaluation of a spline curve
     public :: cualde ! All derivatives of a spline curve
     public :: insert ! Insert a knot into a given spline
+    public :: insert_inplace
     public :: splint ! Integration of a spline function
     public :: fourco ! Fourier coefficients of a cubic spline
     public :: sproot ! The roots of a cubic spline
@@ -7405,7 +7406,7 @@ module fitpack_core
       real(RKIND), intent(in) :: x
       !  ..array arguments..
       real(RKIND), intent(in)  :: t(nest),c(nest)
-      real(RKIND), intent(inout) :: tt(nest),cc(nest)
+      real(RKIND), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
       real(RKIND) :: fac,per
       integer :: i,i1,j,k1,m,mk,nk,nk1,nl,ll
@@ -8591,8 +8592,8 @@ module fitpack_core
       nmaxu = mu+4+2*ipar(1)
       nmaxv = mv+4+2*ipar(2)
 
-      periodic_u = ipar(1)/=0
-      periodic_v = ipar(2)/=0
+      periodic_u = ipar(1)==1
+      periodic_v = ipar(2)==1
 
       !  find nue and nve which denote the maximum number of knots
       !  allowed in each direction
@@ -8618,10 +8619,6 @@ module fitpack_core
       lav  = lbu+nuk
       nuk  = nvest*5
       lbv  = lav+nuk
-!      laa  = lbv+nuk+merge(4*nuest,0,periodic_u)
-!      lau1 = merge(lbv+nuk,lau,periodic_u)
-!      lav1 = merge(laa,lav,periodic_v)
-
       laa = lbv+nuk
       lau1 = lau
       if (ipar(1)/=0) then
@@ -13283,7 +13280,7 @@ module fitpack_core
 
       !  ..local scalars..
       real(RKIND) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
-                     sin,sq,store,wi,x0,x1,y0,y1,zi,eps,rn
+                     sin,sq,store,wi,x0,x1,y0,y1,zi,eps
       integer :: i,iband,iband1,iband3,iband4,ii,in,irot,iter,i1,i2,j,jrot,&
                  jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
                  nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,rank
@@ -14343,7 +14340,7 @@ module fitpack_core
                     end do
 
                     ! apply that transformation to the rows of (a).
-                    if (i<5) call fprota(co,si,h(i+1:5),a(irot,1:5-i))
+                    if (i<5) call fprota(co,si,h(i+1:5),a(irot,2:6-i))
 
                 end do all_zero
              endif
@@ -14454,6 +14451,31 @@ module fitpack_core
       call fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
 
       end subroutine insert
+
+      ! Subroutine insert_inplace was created to avoid alising issues with the original package
+      ! that called subroutine insert with the same variables as input and output arguments
+      pure subroutine insert_inplace(iopt,t,n,c,k,x,nest,ier)
+
+          integer, intent(in)        :: iopt,k,nest
+          integer, intent(out)       :: ier
+          real(RKIND), intent(in)    :: x
+          integer, intent(inout)     :: n
+          !  ..array arguments..
+          real(RKIND), intent(inout) :: t(nest),c(nest)
+
+          ! Temporary storage
+          real(RKIND) :: tt(nest),cc(nest)
+          integer :: nn
+
+          ! Call insert
+          call insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
+
+          ! Return values
+          t = tt
+          c = cc
+          n = nn
+
+      end subroutine insert_inplace
 
 
       pure subroutine parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)

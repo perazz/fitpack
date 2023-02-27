@@ -1755,7 +1755,7 @@ module fitpack_tests
                       !  if iopt=0 we insert k knots at the boundaries of the interval to
                       !  find the representation with coincident boundary knots
                       do j=1,k
-                         call insert(iopt,t1,n1,c1,k,one,t1,n1,c1,nest,ier)
+                         call insert_inplace(iopt,t1,n1,c1,k,one,nest,ier)
                          n1 = n1-1
 
                          if (.not.FITPACK_SUCCESS(ier)) then
@@ -1763,7 +1763,7 @@ module fitpack_tests
                              write(useUnit,1000) iopt,j,1,FITPACK_MESSAGE(ier)
                          end if
 
-                         call insert(iopt,t1,n1,c1,k,zero,t1,n1,c1,nest,ier)
+                         call insert_inplace(iopt,t1,n1,c1,k,zero,nest,ier)
                          n1 = n1-1
 
                          if (.not.FITPACK_SUCCESS(ier)) then
@@ -1777,7 +1777,7 @@ module fitpack_tests
                       end do
 
                       do j=1,k
-                          call insert(iopt,t2,n2,c2,k,one,t2,n2,c2,nest,ier)
+                          call insert_inplace(iopt,t2,n2,c2,k,one,nest,ier)
                           n2 = n2-1
 
                           if (.not.FITPACK_SUCCESS(ier)) then
@@ -1785,7 +1785,7 @@ module fitpack_tests
                               write(useUnit,1000) iopt,j,2,FITPACK_MESSAGE(ier)
                           end if
 
-                          call insert(iopt,t2,n2,c2,k,zero,t2,n2,c2,nest,ier)
+                          call insert_inplace(iopt,t2,n2,c2,k,zero,nest,ier)
                           n2 = n2-1
 
                           if (.not.FITPACK_SUCCESS(ier)) then
@@ -1813,20 +1813,20 @@ module fitpack_tests
                   call splev(t2,n2,c2,k,x,y2,m,OUTSIDE_EXTRAPOLATE,ier)
 
                   !  insert the knots of the second spline into those of the first one
-                  call insert(iopt,t1,n1,c1,k,0.1_RKIND,t1,n1,c1,nest,ier)
+                  call insert_inplace(iopt,t1,n1,c1,k,0.1_RKIND,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,1,FITPACK_MESSAGE(ier)
                   end if
 
-                  call insert(iopt,t1,n1,c1,k,0.8_RKIND,t1,n1,c1,nest,ier)
+                  call insert_inplace(iopt,t1,n1,c1,k,0.8_RKIND,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+2,1,FITPACK_MESSAGE(ier)
                   end if
 
                   !  insert the knots of the first spline into those of the second one
-                  call insert(iopt,t2,n2,c2,k,0.9_RKIND,t2,n2,c2,nest,ier)
+                  call insert_inplace(iopt,t2,n2,c2,k,0.9_RKIND,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,2,FITPACK_MESSAGE(ier)
@@ -4094,10 +4094,10 @@ module fitpack_tests
               t(n-k:n) = one
 
               !  insert a number of knots
-              call insert(0,t,n,c,k,0.8_RKIND,t,n,c,20,ier)
-              call insert(0,t,n,c,k,0.4_RKIND,t,n,c,20,ier)
-              call insert(0,t,n,c,k,0.3_RKIND,t,n,c,20,ier)
-              call insert(0,t,n,c,k,0.1_RKIND,t,n,c,20,ier)
+              call insert_inplace(0,t,n,c,k,0.8_RKIND,20,ier)
+              call insert_inplace(0,t,n,c,k,0.4_RKIND,20,ier)
+              call insert_inplace(0,t,n,c,k,0.3_RKIND,20,ier)
+              call insert_inplace(0,t,n,c,k,0.1_RKIND,20,ier)
 
               !  print the data for the spline.
               write(useUnit,900) k
