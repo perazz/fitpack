@@ -12170,16 +12170,16 @@ module fitpack_core
          ! find an estimate of the range of possible values for the optimal derivatives at the origin.
          ktu = max(mumin,nrdatu(1)+2-iopt(2))
          if (ktu/=lastu0) then
-             l       = mv*ktu
-             rmin    = min(r0,minval(r(:l)))
-             rmax    = max(r0,maxval(r(:l)))
+             l       = min(mr,mv*ktu)
+             rmin    = min(r0,minval(r(1:l)))
+             rmax    = max(r0,maxval(r(1:l)))
              step(1) = rmax-rmin
              lastu0  = ktu
          endif
 
          ktu = max(mumin,nrdatu(nrintu)+2-iopt(3))
          if (ktu/=lastu1) then
-            l = mv*ktu
+            l    = min(mr,mv*ktu)
             rmin = min(r1,minval(r(mr-l+1:mr)))
             rmax = max(r1,maxval(r(mr-l+1:mr)))
             step(2) = rmax-rmin
@@ -17533,8 +17533,8 @@ module fitpack_core
           endif
 
           ! we determine the range of r-values.
-          rmin = min(rb,minval(r))
-          rmax = max(re,maxval(r))
+          rmin = min(rb,minval(r(:m)))
+          rmax = max(re,maxval(r(:m)))
 
           wrk(5)  = rb
           wrk(6)  = zero
