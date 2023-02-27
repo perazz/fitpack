@@ -6969,7 +6969,7 @@ module fitpack_core
           forall (i=1:mv) a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
 
           if (nv8/=0 .and. p>zero) then
-              forall (i=1:nv8) b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))*pinv
+              forall (i=1:nv8) b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))
               mvv = mv+nv8
           endif
       endif
@@ -7156,8 +7156,9 @@ module fitpack_core
 
                ! rotation into triangle of the new row of (avv), in case the elements
                ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
+               irot = nrold
                do i=1,5
-                  irot = nrold+i
+                  irot = irot+1
                   piv  = h(i)
 
                   if (piv==zero) cycle
@@ -7292,7 +7293,7 @@ module fitpack_core
 
           !  second step: solve the system  (cr) (ru)' = (c1).
           do k=1,nv7
-            right(:nuu) = c(k:k+(nuu-1)*nv7)
+            right(:nuu) = c(k:k+(nuu-1)*nv7:nv7)
             right(:nuu) = fpback(au,right,nuu,5,nu)
             c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
           end do
