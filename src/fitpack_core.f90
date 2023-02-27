@@ -3394,7 +3394,7 @@ module fitpack_core
                     i = i+1
                     l0 = i
                     l1 = l0-k1
-                    do while (l1>n11)
+                    do while (l1>max(0,n11))
                        l0 = l1-n11
                        l1 = l0-k1
                     end do
@@ -6277,7 +6277,7 @@ module fitpack_core
       if (p>zero) then
 
          ! calculate the non-zero elements of the matrix (bu).
-         if (ifbu==0 .and. nu8>0) then
+         if (ifbu==0 .and. nu8/=0) then
             call fpdisc(tu,nu,5,bu,nu)
             ifbu = 1
          endif
@@ -7210,7 +7210,7 @@ module fitpack_core
                    j = j+1
                    l0 = j
                    l1 = l0-4
-                   do while (l1>nv11)
+                   do while (l1>max(0,nv11))
                       l0 = l1-nv11
                       l1 = l0-4
                    end do
@@ -8196,12 +8196,13 @@ module fitpack_core
               if (mk1/=0) then
                   k3 = k/2
                   i  = k2
-                  j  = k3+2
-                  do l=1,mk1
-                    t(i) = merge( u(j) , (u(j)+u(j-1))*half , k3*2/=k)
-                    i = i+1
-                    j = j+1
-                  end do
+                  j = k3+1
+                  odd_k: if (k3*2/=k) then
+                      t(k2:k2+mk1-1) = u(j+1:j+mk1)
+                  else odd_k
+                      t(k2:k2+mk1-1) = half*( u(j+1:j+mk1) + u(j:j+mk1-1) )
+                  endif odd_k
+
               endif
 
           else interpolating
@@ -8215,18 +8216,14 @@ module fitpack_core
                  fp0   = fpint(n)
                  fpold = fpint(n-1)
                  nplus = nrdata(n)
-                 if (fp0<=s) then
-                    n         = nmin
-                    fpold     = zero
-                    nplus     = 0
-                    nrdata(1) = m-2
-                 end if
-              else use_last_call
-                 n = nmin
-                 fpold = zero
-                 nplus = 0
-                 nrdata(1) = m-2
               endif use_last_call
+
+              if (fp0<=s .or. iopt==0 .or. n==nmin) then
+                  n         = nmin
+                  fpold     = zero
+                  nplus     = 0
+                  nrdata(1) = m-2
+              endif
           endif interpolating
 
       endif bootstrap
@@ -8244,9 +8241,9 @@ module fitpack_core
         nrint = n-nmin+1
         ! find the position of the additional knots which are needed for
         ! the b-spline representation of s(u).
-        nk1        = n-k1
-        t(1:k1)    = ub
-        t(nk1+1:n) = ue
+        nk1      = n-k1
+        t(1:k1)  = ub
+        t(n-k:n) = ue
 
         ! compute the b-spline coefficients of the least-squares spline curve
         ! sinf(u). the observation matrix a is built up row by row and
@@ -8273,7 +8270,7 @@ module fitpack_core
            ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
            h = fpbspl(t,n,k,ui,l)
            q(it,1:k1) = h(1:k1)
-           h(:k1) = wi*h(:k1)
+           h(:k1)     = wi*h(:k1)
 
            ! rotate the new row of the observation matrix into triangle.
            j = l-k1
@@ -8322,7 +8319,7 @@ module fitpack_core
         fpms = fp-s; if(abs(fpms)<acc) return
 
         ! if f(p=inf) < s accept the choice of knots.
-        if(fpms<zero) exit main_loop
+        if (fpms<zero) exit main_loop
 
         ! if n = nmax, sinf(u) is an interpolating spline curve.
         if (n==nmax) then
@@ -8445,9 +8442,7 @@ module fitpack_core
       f1 = fp0-s
       p3 = -one
       f3 = fpms
-      p  = sum(a(1:nk1,1))
-      rn = nk1
-      p  = rn/p
+      p  = sum(a(1:nk1,1))/nk1
       check1 = .false.
       check3 = .false.
       n8 = n-nmin
@@ -8462,8 +8457,8 @@ module fitpack_core
          ! triangularised observation matrix a which is stored in g.
          pinv = one/p
          c(1:nc)       = z(1:nc)
-         g(1:nk1,k2)   = zero
          g(1:nk1,1:k1) = a(1:nk1,1:k1)
+         g(1:nk1,k2)   = zero
          b_rows: do it=1,n8
             ! the row of matrix b is rotated into triangle by givens transformation
             h(1:k2) = b(it,1:k2)*pinv
@@ -8512,43 +8507,44 @@ module fitpack_core
          ! SUCCESS! the approximation sp(u) is an acceptable solution.
          fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! Reinitialize p to carry out one more step of the iteration process.
+          ! carry out one more step of the iteration process.
           p2 = p
           f2 = fpms
           if (.not.check3) then
-             if ((f2-f3)>acc) then
-                check3=f2<zero
-             else
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p=p1*con9 + p2*con1
-                cycle find_root
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle find_root
+             elseif (f2<zero) then
+                 check3 = .true.
              endif
           endif
 
           if (.not.check1) then
-             if ((f1-f2)>acc) then
-                 check1 = f2>zero
-             else
-                 ! our initial choice of p is too small
-                 p1 = p2
-                 f1 = f2
-                 p  = p/con4
-                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle find_root
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle find_root
+             elseif (f2>zero) then
+                check1 = .true.
              endif
           endif
 
-         ! test whether the iteration process proceeds as theoretically expected.
-         if (f2>=f1 .or. f2<=f3) then
-            ier = FITPACK_S_TOO_SMALL
-            return
-         endif
+          ! test whether the iteration process proceeds as theoretically expected.
+          if (f2>=f1 .or. f2<=f3) then
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
 
-         ! find the new value for p.
-         call fprati(p1,f1,p2,f2,p3,f3,p)
 
       end do find_root
 
@@ -8576,10 +8572,10 @@ module fitpack_core
       integer    , intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
       !  ..local scalars
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,peru,perv,ub,ue,vb,ve
-      integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
+      integer :: i,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
                  lsv,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
                  nrintu,nrintv,nue,nuk,nve,nuu,nvv
-      logical :: periodic_u,periodic_v
+      logical :: periodic_u,periodic_v,check1,check3
 
       !   set constants
       real(RKIND), parameter :: con1 = 0.1e0_RKIND
@@ -8621,9 +8617,22 @@ module fitpack_core
       lav  = lbu+nuk
       nuk  = nvest*5
       lbv  = lav+nuk
-      laa  = lbv+nuk+merge(4*nuest,0,periodic_u)
-      lau1 = merge(lbv+nuk,lau,periodic_u)
-      lav1 = merge(laa,lav,periodic_v)
+!      laa  = lbv+nuk+merge(4*nuest,0,periodic_u)
+!      lau1 = merge(lbv+nuk,lau,periodic_u)
+!      lav1 = merge(laa,lav,periodic_v)
+
+      laa = lbv+nuk
+      lau1 = lau
+      if (ipar(1)/=0) then
+          peru = ue-ub
+          lau1 = laa
+          laa = laa+4*nuest
+      endif
+      lav1 = lav
+      if (ipar(2)/=0) then
+          perv = ve-vb
+          lav1 = laa
+      endif
 
       peru = merge(ue-ub,zero,periodic_u)
       perv = merge(ve-vb,zero,periodic_v)
@@ -8774,7 +8783,7 @@ module fitpack_core
 
          if (periodic_v) then
             tv(1:4)     = [tv(nv-6:nv-4)-perv,vb]
-            tv(nv-3:nv) = [ve,tu(5:7)+perv]
+            tv(nv-3:nv) = [ve,tv(5:7)+perv]
          else
             tv(1:4)     = vb
             tv(nv-3:nv) = ve
@@ -8819,11 +8828,8 @@ module fitpack_core
          ! adjust the parameter reducu or reducv according to the direction
          ! in which the last added knots were located.
 
-         if (lastdi<0) then
-             reducu = fpold-fp
-         elseif (lastdi>0) then
-             reducv = fpold-fp
-         end if
+         if (lastdi<0) reducu = fpold-fp
+         if (lastdi>0) reducv = fpold-fp
 
          ! store the sum of squared residuals for the current set of knots.
          fpold = fp
@@ -8850,10 +8856,11 @@ module fitpack_core
          ! lastdi = last knot direction: lastdi==0  = not yet set
          !                               lastdi==1  = v direction
          !                               lastdi==-1 = u direction
-        choose_dir: if ( nv<nve .and. &
-                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi>=0)) &
-                          .or. nplu>nplv &
-                          .or. (nplu==nplv .and. lastdi<0) )) then
+         choose_dir: if ( nv<nve .and. &
+                          (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi>=0)) &
+                           .or. nplu>nplv &
+                           .or. (nplu==nplv .and. lastdi<0) ) .or. &
+                           lastdi==0) then
 
             ! addition in the v-direction.
             lastdi = 1
@@ -8917,8 +8924,9 @@ module fitpack_core
       p3 = -one
       f3 = fpms
       p  = one
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
+
       !  iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
           ! find the smoothing spline sp(u,v) and the corresponding sum of
@@ -8934,41 +8942,40 @@ module fitpack_core
           ! carry out one more step of the iteration process.
           p2 = p
           f2 = fpms
-
-          if (ich3==0) then
-             if ((f2-f3)>acc .and. f2<zero) then
-                ich3 = 1
-             else
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p=p1*con9 + p2*con1
-                cycle root_iterations
+          if (.not.check3) then
+             if (f2-f3<=acc) then
+                 ! our initial choice of p is too large.
+                 p3 = p2
+                 f3 = f2
+                 p  = p*con4
+                 if (p<=p1) p = p1*con9 +p2*con1
+                 cycle root_iterations
+             elseif (f2<zero) then
+                 check3 = .true.
              endif
           endif
 
-          if (ich1==0) then
-             if ((f1-f2)>acc .and. f2>zero) then
-                 ich1 = 1
-             else
-                 ! our initial choice of p is too small
-                 p1 = p2
-                 f1 = f2
-                 p = p/con4
-                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle root_iterations
+          if (.not.check1) then
+             if(f1-f2<=acc) then
+                ! our initial choice of p is too small
+                p1 = p2
+                f1 = f2
+                p = p/con4
+                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
+                cycle root_iterations
+             elseif (f2>zero) then
+                check1 = .true.
              endif
           endif
 
           ! test whether the iteration process proceeds as theoretically expected.
           if (f2>=f1 .or. f2<=f3) then
-              ier = FITPACK_S_TOO_SMALL
-              return
-          end if
-
-          ! find the new value of p.
-          call fprati(p1,f1,p2,f2,p3,f3,p)
+             ier = FITPACK_S_TOO_SMALL
+             return
+          else
+             ! find the new value of p.
+             call fprati(p1,f1,p2,f2,p3,f3,p)
+          endif
 
       end do root_iterations
 
@@ -13328,7 +13335,6 @@ module fitpack_core
           !  calculation of acc, the absolute tolerance for the root of f(p)=s.
           acc = tol*s
 
-          if (iopt>0 .or. fp0<=s) then
           if (iopt==0 .or. fp0<=s) then
 
               !  initialization for the least-squares polynomial.
@@ -14217,6 +14223,7 @@ module fitpack_core
              ! test whether there are non-zero values in the new row of (a)
              ! corresponding to the b-splines n(j,*),j=n7+1,...,n4.
              if (nrold>=n11) then
+
                  if (jper==0) then
                     ! initialize the matrix (aa).
                     jk = n11+1
@@ -14242,7 +14249,7 @@ module fitpack_core
                     j  = j+1
                     l0 = j
                     l1 = l0-4
-                    do while (l1>n11)
+                    do while (l1>max(0,n11))
                        l0 = l1-n11
                        l1 = l0-4
                     end do
@@ -15502,48 +15509,34 @@ module fitpack_core
           ub = u(1)
           ue = u(mu)
 
-          if (ipar(1)==0) then
-
+          u_period: if (ipar(1)==0) then
               tu(1:4)     = ub
               tu(nu-3:nu) = ue
-
               ier = fpchec(u,mu,tu,nu,3)
-
-          else
-
+          else u_period
               peru        = ue-ub
               tu(1:4)     = [tu(nu-6:nu-4)-peru, ub]
               tu(nu-3:nu) = [ue, tu(5:7)+peru]
-
               ier = fpchep(u,mu,tu,nu,3)
-
-          endif
+          endif u_period
           if (ier/=FITPACK_OK) return
 
 
           if (nv<8 .or. nv>nvest) return
 
-
           vb = v(1)
           ve = v(mv)
 
-          if (ipar(2)==0) then
-
+          v_period: if (ipar(2)==0) then
               tv(1:4)     = vb
               tv(nv-3:nv) = ve
-
               ier = fpchec(v,mv,tv,nv,3)
-
-          else
-
+          else v_period
               perv        = ve-vb
               tv(1:4)     = [tv(nv-6:nv-4)-perv, vb]
-              tv(nu-3:nu) = [ve, tv(5:7)+perv]
-
+              tv(nv-3:nv) = [ve, tv(5:7)+perv]
               ier = fpchep(v,mv,tv,nv,3)
-
-          endif
-
+          endif v_period
           if (ier/=FITPACK_OK) return
 
       else

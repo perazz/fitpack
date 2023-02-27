@@ -52,7 +52,7 @@ program test
         integer :: itest
 
         ! Perform all legacy tests
-        do itest = 1,27
+        do itest = 1,28
            call add_test(perform_legacy_test(itest))
         end do
 
@@ -105,7 +105,7 @@ program test
             case (25); success = mncuev(iunit)
             case (26); success = mndbin(iunit)
             case (27); success = mnevpo(iunit)
-            case (28); call mnpasu(dapasu)
+            case (28); success = mnpasu(dapasu,iunit)
             case (29); call mnspgr(daspgr_u,daspgr_v,daspgr_r)
             case default;
                  write(useUnit,*) '[fitpack] invalid test ID: try 1-29'
