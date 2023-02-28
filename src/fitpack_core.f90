@@ -542,7 +542,7 @@ module fitpack_core
       if (lwrk<lwest)                 return
 
       ! Check closed curve (1st and last points match)
-      if (any(x(1:idim)/=x((m-1)*idim+1:m*idim))) return
+      if (any(not_equal(x(1:idim),x((m-1)*idim+1:m*idim)))) return
 
       ! Normalized cumulative length parameter coordinate along the curve
       if (ipar==0 .and. iopt<=0) then
@@ -572,7 +572,7 @@ module fitpack_core
       if (iopt>=0) then
 
          if (s<zero) return
-         if (s==zero .and. nest<(m+2*k)) return
+         if (equal(s,zero) .and. nest<(m+2*k)) return
 
       else
 
@@ -746,7 +746,7 @@ module fitpack_core
       ier = fpchec(x,m,t,n,3); if (ier/=FITPACK_OK) return
 
       !  set numbers e(i)
-      where(e/=zero) e = sign(one,e)
+      where (not_equal(e,zero)) e = sign(one,e)
 
       !  we partition the working space and determine the spline approximation
       nm  = n+maxbin
@@ -952,7 +952,7 @@ module fitpack_core
           ! Non-monotonic x
           if (any(x(2:m)<=x(1:m-1))) return
 
-          where (v/=zero) v = sign(one,v)
+          where (not_equal(v,zero)) v = sign(one,v)
 
       endif
 
@@ -1247,7 +1247,7 @@ module fitpack_core
           nmax = m+k1+ib1+ie1
 
           if (s<zero)                     return
-          if (s==zero .and. nest<nmax)    return
+          if (equal(s,zero) .and. nest<nmax)    return
 
           ier = FITPACK_OK
 
@@ -1730,7 +1730,7 @@ module fitpack_core
       if (any(x(1:m-1)>x(2:m)))  return
 
       if (iopt>=0) then
-          if (s<zero .or. (s==zero .and. nest<(m+k1))) return
+          if (s<zero .or. (equal(s,zero) .and. nest<(m+k1))) return
       else
           if (n<nmin .or. n>nest) return
           j = n
@@ -1831,7 +1831,7 @@ module fitpack_core
       dblint_res = zero
       x_dim: do i=1,nkx1
         res = wrk(i)
-        if (res==zero) cycle x_dim
+        if (equal(res,zero)) cycle x_dim
         m = (i-1)*nky1
         l = nkx1
         y_dim: do j=1,nky1
@@ -2348,7 +2348,7 @@ module fitpack_core
       nm3 = n-3
       nm7 = n-7
 
-      term  = merge(six/par,zero,par/=zero)
+      term  = merge(six/par,zero,not_equal(par,zero))
       beta  = par*t(4)
       co(1) = cos(beta)
       si(1) = sin(beta)
@@ -2584,7 +2584,7 @@ module fitpack_core
            do i=1,j
              li = l+i
              lj = li-j
-             if (t(li)/=t(lj)) then
+             if (not_equal(t(li),t(lj))) then
                 f = hh(i)/(t(li)-t(lj))
                 h(i)   = h(i)+f*(t(li)-x)
                 h(i+1) = f*(x-t(lj))
@@ -3115,7 +3115,7 @@ module fitpack_core
                       ! rotation with the rows 1,2,...n10 of matrix a.
                       one_to_n10: do j=1,n10
                           piv = h1(1)
-                          if (piv==zero) then
+                          if (equal(piv,zero)) then
                              h1(1:kk1) = [h1(2:kk1),zero]
                           else
                              ! calculate the parameters of the givens transformation.
@@ -3141,7 +3141,7 @@ module fitpack_core
                   n10_to_n7: do j=1,kk
                       ij = n10+j
                       piv = h2(j)
-                      if (ij<=0 .or. piv==zero) cycle n10_to_n7
+                      if (ij<=0 .or. equal(piv,zero)) cycle n10_to_n7
 
                       ! calculate the parameters of the givens transformation.
                       call fpgivs(piv,a2(ij,j),cos,sin)
@@ -3165,7 +3165,7 @@ module fitpack_core
                       j = j+1
                       piv = h(i)
 
-                      if (piv==zero) cycle rot_zero
+                      if (equal(piv,zero)) cycle rot_zero
 
                       ! calculate the parameters of the givens transformation.
                       call fpgivs(piv,a1(j,1),cos,sin)
@@ -3634,7 +3634,7 @@ module fitpack_core
           m1 = m-1
           n  = 4
           do i=2,m1
-            if (v(i)==zero .or. (v(i)*v(i-1)>zero .and. v(i)*v(i+1)>zero)) cycle
+            if (equal(v(i),zero) .or. (v(i)*v(i-1)>zero .and. v(i)*v(i+1)>zero)) cycle
             n = n+1
             ! test whether the required storage space exceeds the available one.
             if (n+4>nest) then
@@ -3673,7 +3673,7 @@ module fitpack_core
               tj = t(4)
               n6 = n-6
               do l=1,n6
-                 do while (xi/=tj)
+                 do while (not_equal(xi,tj))
                     i = i+1
                     xi = x(i)
                  end do
@@ -3977,7 +3977,7 @@ module fitpack_core
                  rotate_row: do i=li,lj
                      j   = j+1
                      piv = h(i)
-                     if (piv==zero) cycle rotate_row
+                     if (equal(piv,zero)) cycle rotate_row
 
                      ! calculate the parameters of the givens transformation.
                      call fpgivs(piv,a(j,1),cos,sin)
@@ -4880,7 +4880,7 @@ module fitpack_core
 
                 j = j+1
 
-                piv = h(i); if (piv==zero) cycle rotate_row
+                piv = h(i); if (equal(piv,zero)) cycle rotate_row
 
                 ! calculate the parameters of the givens transformation.
                 call fpgivs(piv,a(j,1),cos,sin)
@@ -5828,7 +5828,7 @@ module fitpack_core
             rotate_auu: do i=i0,i1
                irot = irot+1
                piv = h(i)
-               if (piv/=zero) then
+               if (not_equal(piv,zero)) then
                   ! calculate the parameters of the givens transformation.
                   call fpgivs(piv,au(irot,1),co,si)
                   ! apply that transformation to the rows of matrix (qq).
@@ -5951,7 +5951,7 @@ module fitpack_core
                    piv = h1(1)
                    i2 = min(nv11-j,4)
 
-                   if (piv/=zero) then
+                   if (not_equal(piv,zero)) then
 
                       ! calculate the parameters of the givens transformation.
                       call fpgivs(piv,av1(j,1),co,si)
@@ -5981,7 +5981,7 @@ module fitpack_core
              avv_rot2: do j=1,4
                 ij  = nv11+j
                 piv = h2(j)
-                if (ij>0 .and. piv/=zero) then
+                if (ij>0 .and. not_equal(piv,zero)) then
 
                    ! calculate the parameters of the givens transformation.
                    call fpgivs(piv,av2(ij,j),co,si)
@@ -6007,7 +6007,7 @@ module fitpack_core
              rot_avv_3: do i=1,5
                 irot = irot+1
                 piv = h(i)
-                if (piv/=zero) then
+                if (not_equal(piv,zero)) then
                    ! calculate the parameters of the givens transformation.
                    call fpgivs(piv,av1(irot,1),co,si)
 
@@ -6618,7 +6618,7 @@ module fitpack_core
            rot_new_row: do i=1,ibandx
               irot = irot+1
               piv = h(i)
-              if (piv==zero) cycle rot_new_row
+              if (equal(piv,zero)) cycle rot_new_row
 
               ! calculate the parameters of the givens transformation.
               call fpgivs(piv,ax(irot,1),cos,sin)
@@ -6686,7 +6686,7 @@ module fitpack_core
             rot_new_rowy: do i=1,ibandy
                irot = irot+1
                piv = h(i)
-               if (piv==zero) cycle rot_new_rowy
+               if (equal(piv,zero)) cycle rot_new_rowy
 
                ! calculate the parameters of the givens transformation.
                call fpgivs(piv,ay(irot,1),cos,sin)
@@ -7071,7 +7071,7 @@ module fitpack_core
             auu_rot: do i=i0,i1
                irot = irot+1
                piv = h(i)
-               if (piv==zero) cycle auu_rot
+               if (equal(piv,zero)) cycle auu_rot
                ! calculate the parameters of the givens transformation.
                call fpgivs(piv,au(irot,1),co,si)
                ! apply that transformation to the rows of matrix (qq).
@@ -7162,7 +7162,7 @@ module fitpack_core
                   irot = irot+1
                   piv  = h(i)
 
-                  if (piv==zero) cycle
+                  if (equal(piv,zero)) cycle
 
                   ! calculate the parameters of the givens transformation.
                   call fpgivs(piv,av1(irot,1),co,si)
@@ -7230,7 +7230,7 @@ module fitpack_core
                   do j=1,nv11
                      piv = h1(1)
                      i2 = min(nv11-j,4)
-                     if (piv/=zero) then
+                     if (not_equal(piv,zero)) then
 
                         ! calculate the parameters of the givens transformation.
                         call fpgivs(piv,av1(j,1),co,si)
@@ -7256,7 +7256,7 @@ module fitpack_core
                   j1  = j+1
                   piv = h2(j)
 
-                  if (ij<=0 .or. piv==zero) cycle avv_rot
+                  if (ij<=0 .or. equal(piv,zero)) cycle avv_rot
 
                   ! calculate the parameters of the givens transformation.
                   call fpgivs(piv,av2(ij,j),co,si)
@@ -7507,7 +7507,7 @@ module fitpack_core
       bint = zero
 
       !  the integration limits are arranged in increasing order.
-      if (x==y) return
+      if (equal(x,y)) return
 
       a = min(x,y)
       b = max(x,y)
@@ -8280,7 +8280,7 @@ module fitpack_core
 
               j = j+1
 
-              piv = h(i); if (piv==zero) cycle rotate_row
+              piv = h(i); if (equal(piv,zero)) cycle rotate_row
 
               ! calculate the parameters of the givens transformation.
               call fpgivs(piv,a(j,1),cos,sin)
@@ -9253,7 +9253,7 @@ module fitpack_core
                  ! rotation with the rows 1,2,...n10 of matrix a.
                  one_to_n10: do j=1,n10
                     piv = h1(1)
-                    if (piv==zero) then
+                    if (equal(piv,zero)) then
                        h1(1:kk1) = [h1(2:kk1),zero]
                     else
 
@@ -9280,7 +9280,7 @@ module fitpack_core
                n10_to_n7: do j=1,kk
                     ij  = n10+j
                     piv = h2(j)
-                    if (ij<=0 .or. piv==zero) cycle n10_to_n7
+                    if (ij<=0 .or. equal(piv,zero)) cycle n10_to_n7
 
                     ! calculate the parameters of the givens transformation.
                     call fpgivs(piv,a2(ij,j),cos,sin)
@@ -9303,7 +9303,7 @@ module fitpack_core
              new_row: do i=1,kk1
                 j = j+1
                 piv = h(i)
-                if (piv==zero) cycle new_row
+                if (equal(piv,zero)) cycle new_row
 
                 call fpgivs(piv,a1(j,1),cos,sin)
                 ! calculate the parameters of the givens transformation.
@@ -10278,7 +10278,7 @@ module fitpack_core
                  h(4) = merge(uu*(one-u2)*wi,zero,iopt2<=0)
                  do j=1,4
                     piv = h(j)
-                    if (piv==zero) cycle
+                    if (equal(piv,zero)) cycle
                     call fpgivs(piv,a(j,1),co,si)
                     call fprota(co,si,zi,f(j))
                     if (j<4) then
@@ -10293,10 +10293,10 @@ module fitpack_core
                  sup = sup+zi*zi
               end do initial_poly
 
-              if (a(4,1)/=zero) f(4) = f(4)/a(4,1)
-              if (a(3,1)/=zero) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
-              if (a(2,1)/=zero) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
-              if (a(1,1)/=zero) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
+              if (not_equal(a(4,1),zero)) f(4) = f(4)/a(4,1)
+              if (not_equal(a(3,1),zero)) f(3) = (f(3)-a(3,2)*f(4))/a(3,1)
+              if (not_equal(a(2,1),zero)) f(2) = (f(2)-a(2,2)*f(3)-a(2,3)*f(4))/a(2,1)
+              if (not_equal(a(1,1),zero)) f(1) = (f(1)-a(1,2)*f(2)-a(1,3)*f(3)-a(1,4)*f(4))/a(1,1)
 
               !  find the b-spline representation of this least-squares polynomial
               c1 = f(1)
@@ -10425,7 +10425,7 @@ module fitpack_core
 
                   do j=1,nvv
                       piv = row(j)
-                      if (piv==zero) cycle
+                      if (equal(piv,zero)) cycle
                       call fpgivs(piv,a(j,1),co,si)
                       call fprota(co,si,cs(:ipar),cosi(:ipar,j))
 
@@ -10539,7 +10539,7 @@ module fitpack_core
                 rotate: do i=1,iband
                   irot = irot+1
                   piv  = h(i)
-                  if (piv==zero) cycle rotate
+                  if (equal(piv,zero)) cycle rotate
 
                   ! calculate the parameters of the givens transformation.
                   call fpgivs(piv,a(irot,1),co,si)
@@ -10831,7 +10831,7 @@ module fitpack_core
                   rot_new_row: do irot=jrot,ncof
                       piv = h(1)
                       i2 = min(iband1,ncof-irot)
-                      if (piv==zero) then
+                      if (equal(piv,zero)) then
 
                          if (i2<=0) exit rot_new_row
 
@@ -10896,7 +10896,7 @@ module fitpack_core
                   do irot=jrot,ncof
                       piv = h(1)
                       i2 = min(iband3,ncof-irot)
-                      if (piv==zero) then
+                      if (equal(piv,zero)) then
 
                          if (i2<=0) exit
                          h(1:i2+1) = [h(2:i2+1),zero]
@@ -11070,7 +11070,7 @@ module fitpack_core
          in_row: do ii=i1,n
             i2 = min(n-ii,m1)
             piv = h(1)
-            if (piv==zero) then
+            if (equal(piv,zero)) then
                if (i2==0) exit in_row
                h(1:i2) = h(2:i2+1)
             else
@@ -11154,7 +11154,7 @@ module fitpack_core
         rotate_col: do i1=1,ii
            j1 = min(jj-1,m1)
            piv = h(1)
-           if (piv/=zero) then
+           if (not_equal(piv,zero)) then
               call fpgivs(piv,aa(jj,1),cos,sin)
               if (j1==0) cycle make_h
               kk = jj
@@ -12460,20 +12460,20 @@ module fitpack_core
                   fn  = fac2*(fac1-arg)*arg**2
                   f1  = (one-fn)*wi
                   fn  = fn*wi
-                  if (fn/=zero) then
+                  if (not_equal(fn,zero)) then
                       call fpgivs(fn,d1,co,si)
                       call fprota(co,si,f1,aa)
                       call fprota(co,si,ri,cn)
                   endif
-                  if (f1/=zero) then
+                  if (not_equal(f1,zero)) then
                       call fpgivs(f1,d2,co,si)
                       call fprota(co,si,ri,c1)
                   endif
                   sup = sup+ri*ri
               end do initial_poly
 
-              if (d2/=zero) c1 = c1/d2
-              if (d1/=zero) cn = (cn-aa*c1)/d1
+              if (not_equal(d2,zero)) c1 = c1/d2
+              if (not_equal(d1,zero)) cn = (cn-aa*c1)/d1
 
               !  find the b-spline representation of this least-squares polynomial
               nt       = 8
@@ -12575,7 +12575,7 @@ module fitpack_core
 
               do j=1,npp
                   piv = row(j)
-                  if (piv==zero) cycle
+                  if (equal(piv,zero)) cycle
 
                   call fpgivs(piv,a(j,1),co,si)
                   call fprota(co,si,facc,coco(j))
@@ -12699,7 +12699,7 @@ module fitpack_core
                   rotate: do i=1,iband
                     irot = irot+1
                     piv  = h(i)
-                    if (piv==zero) cycle rotate
+                    if (equal(piv,zero)) cycle rotate
 
                     ! calculate the parameters of the givens transformation.
                     call fpgivs(piv,a(irot,1),co,si)
@@ -12987,7 +12987,7 @@ module fitpack_core
                       piv = h(1)
                       i2 = min(iband1,ncof-irot)
 
-                      if (piv==zero) then
+                      if (equal(piv,zero)) then
 
                           if (i2<=0) exit rot_new_row
 
@@ -13051,7 +13051,7 @@ module fitpack_core
                   rot_new_phi: do irot=jrot,ncof
                       piv = h(1)
                       i2 = min(iband3,ncof-irot)
-                      if (piv==zero) then
+                      if (equal(piv,zero)) then
 
                          if (i2<=0) exit rot_new_phi
 
@@ -13466,7 +13466,7 @@ module fitpack_core
                   rotate: do i=1,iband
                       irot = irot+1
                       piv = h(i)
-                      if (piv==zero) cycle rotate
+                      if (equal(piv,zero)) cycle rotate
 
                       ! calculate the parameters of the givens transformation.
                       call fpgivs(piv,a(irot,1),cos,sin)
@@ -13740,7 +13740,7 @@ module fitpack_core
                           piv = h(1)
                           i2 = min(iband1,ncof-irot)
 
-                          if (piv==zero) then
+                          if (equal(piv,zero)) then
 
                               if (i2<=0) exit rot_new_row
 
@@ -13791,7 +13791,7 @@ module fitpack_core
                           piv = h(1)
                           i2 = min(iband3,ncof-irot)
 
-                          if (piv==zero) then
+                          if (equal(piv,zero)) then
 
                               if (i2<=0) exit rot_new_rowy
 
@@ -14105,7 +14105,7 @@ module fitpack_core
              ! rotate the new row of matrix (a) into triangle.
              rotate: do i=1,iband
                 irot = irot+1
-                piv  = h(i); if (piv==zero) cycle rotate
+                piv  = h(i); if (equal(piv,zero)) cycle rotate
 
                 ! calculate the parameters of the givens transformation.
                 call fpgivs(piv,a(irot,1),cos,sin)
@@ -14264,7 +14264,7 @@ module fitpack_core
                     one_to_n11: do irot=1,n11
                         piv = h1(1)
                         i2  = min(n11-irot,4)
-                        if (piv/=zero) then
+                        if (not_equal(piv,zero)) then
                            ! calculate the parameters of the givens transformation.
                            call fpgivs(piv,a(irot,1),co,si)
                            ! apply that transformation to the columns of matrix q.
@@ -14295,7 +14295,7 @@ module fitpack_core
                  n11_to_n7: do irot=1,4
 
                     ij  = n11+irot;  if (ij<=0)     cycle n11_to_n7
-                    piv = h2(irot);  if (piv==zero) cycle n11_to_n7
+                    piv = h2(irot);  if (equal(piv,zero)) cycle n11_to_n7
 
                     ! calculate the parameters of the givens transformation.
                     call fpgivs(piv,aa(ij,irot),co,si)
@@ -14324,7 +14324,7 @@ module fitpack_core
                 all_zero: do i=1,5
                     irot = irot+1
                     piv = h(i)
-                    if (piv==zero) cycle all_zero
+                    if (equal(piv,zero)) cycle all_zero
 
                     ! calculate the parameters of the givens transformation.
                     call fpgivs(piv,a(irot,1),co,si)
@@ -14734,7 +14734,7 @@ module fitpack_core
       else
 
           if (s<zero) return
-          if (s==zero .and. nest<(m+k1)) return
+          if (equal(s,zero) .and. nest<(m+k1)) return
 
           ier = FITPACK_OK
 
@@ -15565,7 +15565,7 @@ module fitpack_core
       else
 
           if(s<zero) return
-          if(s==zero .and. (nuest<(mu+4+2*ipar(1)) .or. &
+          if(equal(s,zero) .and. (nuest<(mu+4+2*ipar(1)) .or. &
                             nvest<(mv+4+2*ipar(2))) )return
 
           ier = FITPACK_OK
@@ -15759,7 +15759,7 @@ module fitpack_core
 
       if (iopt>=0) then
          if (s<zero) return
-         if (s==zero .and. nest<(m+2*k)) return
+         if (equal(s,zero) .and. nest<(m+2*k)) return
       else
 
          if (n<=nmin .or. n>nest) return
@@ -16162,9 +16162,9 @@ module fitpack_core
       if (mu<mumin .or. mv<4)          return
       if (nuest<8 .or. nvest<8)        return
       if (lwrk<lwest .or. kwrk<kwest)  return
-      if (u(1)<=zero .or. u(mu)>r)       return
+      if (u(1)<=zero .or. u(mu)>r)     return
 
-      if (iopt(3)/=0 .and. u(mu)==r)   return
+      if (iopt(3)/=0 .and. equal(u(mu),r)) return
 
       if (mu>1) then
          if (any(u(1:mu-1)>=u(2:mu)))  return
@@ -16235,7 +16235,7 @@ module fitpack_core
 
       if (iopt(1)>=0) then
           if (s<zero) return
-          if (s==zero .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
+          if (equal(s,zero) .and. (nuest<(mu+5+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
       endif
 
       !  we partition the working space and determine the spline approximation
@@ -17021,7 +17021,7 @@ module fitpack_core
       else
 
           if (s<zero) return
-          if (s==zero .and. (nxest<(mx+kx1) .or. nyest<(my+ky1)) ) return
+          if (equal(s,zero) .and. (nxest<(mx+kx1) .or. nyest<(my+ky1)) ) return
 
       endif
 
@@ -17590,7 +17590,7 @@ module fitpack_core
       else
 
           if (s<zero) return
-          if (s==zero .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
+          if (equal(s,zero) .and. (nuest<(mu+6+iopt(2)+iopt(3)) .or. nvest<(mv+7)) ) return
 
       endif
 
@@ -18522,7 +18522,7 @@ module fitpack_core
       j = m
       m = 1
       filter_duplicates: do i=2,j
-        if (zeros(i)==zeros(m)) cycle filter_duplicates
+        if (equal(zeros(i),zeros(m))) cycle filter_duplicates
         m = m+1
         zeros(m) = zeros(i)
       end do filter_duplicates
@@ -18852,7 +18852,6 @@ module fitpack_core
                  lwest,ncest,nest,nek,nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
 
       !  we set up the parameters tol and maxit.
-      logical, parameter :: verbose = .true.
       integer, parameter :: maxit = 20
       real(RKIND), parameter :: tol = smallnum03
 
@@ -18965,5 +18964,18 @@ module fitpack_core
          b   = tmp
 
       end subroutine swap_int
+
+      ! Test if two reals have the same representation at the
+      ! current precision
+      elemental logical function equal(a,b)
+          real(RKIND), intent(in) :: a,b
+          equal = abs(a-b)<spacing(merge(a,b,abs(a)<abs(b)))
+      end function equal
+      elemental logical function not_equal(a,b)
+          real(RKIND), intent(in) :: a,b
+          not_equal = .not.equal(a,b)
+      end function not_equal
+
+
 
 end module fitpack_core
