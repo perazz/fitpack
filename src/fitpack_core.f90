@@ -2846,16 +2846,11 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
                      term,ui,wi,rn
-      integer :: i,ich1,ich3,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+      integer :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1),h1(7),h2(6),xi(MAX_IDIM)
-      logical :: done
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+      logical :: done,check1,check3,success
 
       fpold = zero
       fp0   = zero
@@ -3336,8 +3331,8 @@ module fitpack_core
       if (l>0) p = p + sum(a1(1:n10,1))
       rn   = n7
       p    = rn/p
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
 
       !  iteration process to find the root of f(p) = s.
       find_root: do iter=1,maxit
@@ -3495,43 +3490,12 @@ module fitpack_core
         fpms = fp-s
         if (abs(fpms)<acc) return
 
-        ! carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if (ich3==0) then
-           if (f2-f3<=acc) then
-               ! our initial choice of p is too large.
-               p3 = p2
-               f3 = f2
-               p  = p*con4
-               if (p<=p1) p = p1*con9 +p2*con1
-               cycle find_root
-           elseif (f2<zero) then
-               ich3 = 1
-           endif
-        endif
-
-        if (ich1==0) then
-           if(f1-f2<=acc) then
-              ! our initial choice of p is too small
-              p1 = p2
-              f1 = f2
-              p = p/con4
-              if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-              cycle find_root
-           elseif (f2>zero) then
-              ich1 = 1
-           endif
-        endif
-
-        ! test whether the iteration process proceeds as theoretically expected.
-        if (f2>=f1 .or. f2<=f3) then
+        ! find the new value of p and carry out one more step.
+        call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+        if (.not.success) then
            ier = FITPACK_S_TOO_SMALL
            return
-        else
-           ! find the new value for p.
-           call fprati(p1,f1,p2,f2,p3,f3,p)
-        endif
+        end if
 
       end do find_root
 
@@ -3808,13 +3772,9 @@ module fitpack_core
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer :: i,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
                  nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
-      logical :: new,check1,check3
+      logical :: new,check1,check3,success
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1),xi(MAX_IDIM)
-
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       fpold = zero
       fp0 = zero
@@ -4226,43 +4186,12 @@ module fitpack_core
         ! SUCCESS! the approximation sp(u) is an acceptable solution.
         fpms = fp-s; if (abs(fpms)<acc) return
 
-        ! Reinitialize p to carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if (.not.check3) then
-           if ((f2-f3)>acc) then
-              check3=f2<zero
-           else
-              ! our initial choice of p is too large.
-              p3 = p2
-              f3 = f2
-              p  = p*con4
-              if (p<=p1) p=p1*con9 + p2*con1
-              cycle find_root
-           endif
-        endif
-
-        if (.not.check1) then
-           if ((f1-f2)>acc) then
-               check1 = f2>zero
-           else
-               ! our initial choice of p is too small
-               p1 = p2
-               f1 = f2
-               p  = p/con4
-               if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-               cycle find_root
-           endif
-        endif
-
-        ! test whether the iteration process proceeds as theoretically expected.
-        if (f2>=f1 .or. f2<=f3) then
+        ! find the new value of p and carry out one more step.
+        call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+        if (.not.success) then
            ier = FITPACK_S_TOO_SMALL
            return
-        endif
-
-        ! find the new value for p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
+        end if
 
       end do find_root
 
@@ -4739,12 +4668,7 @@ module fitpack_core
       integer :: i,it,iter,i2,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1)
-      logical :: new,check1,check3
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+      logical :: new,check1,check3,success
 
       fpold = zero
       fp0 = zero
@@ -5089,43 +5013,12 @@ module fitpack_core
           ! SUCCESS! the approximation sp(x) is an acceptable solution.
           fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! Reinitialize p to carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-          if (.not.check3) then
-             if ((f2-f3)>acc) then
-                check3=f2<zero
-             else
-                ! our initial choice of p is too large.
-                p3 = p2
-                f3 = f2
-                p  = p*con4
-                if (p<=p1) p=p1*con9 + p2*con1
-                cycle find_root
-             endif
-          endif
-
-          if (.not.check1) then
-             if ((f1-f2)>acc) then
-                 check1 = f2>zero
-             else
-                 ! our initial choice of p is too small
-                 p1 = p2
-                 f1 = f2
-                 p  = p/con4
-                 if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle find_root
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              return
-          endif
-
-          ! find the new value for p.
-          call fprati(p1,f1,p2,f2,p3,f3,p)
+          end if
 
       end do find_root
 
@@ -8142,14 +8035,9 @@ module fitpack_core
       !  ..local scalars..
       real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
       integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
-      logical :: new,check1,check3
+      logical :: new,check1,check3,success
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1),xi(idim)
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       fpold = zero
       fp0 = zero
@@ -8509,44 +8397,12 @@ module fitpack_core
          ! SUCCESS! the approximation sp(u) is an acceptable solution.
          fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle find_root
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle find_root
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
-             ier = FITPACK_S_TOO_SMALL
-             return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
-
+         ! find the new value of p and carry out one more step.
+         call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+         if (.not.success) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+         end if
 
       end do find_root
 
@@ -8577,12 +8433,7 @@ module fitpack_core
       integer :: i,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
                  lsv,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
                  nrintu,nrintv,nue,nuk,nve,nuu,nvv
-      logical :: periodic_u,periodic_v,check1,check3
-
-      !   set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+      logical :: periodic_u,periodic_v,check1,check3,success
 
       !  acc denotes the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -8937,43 +8788,12 @@ module fitpack_core
           !  test whether the approximation sp(u,v) is an acceptable solution.
           fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle root_iterations
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle root_iterations
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
+          end if
 
       end do root_iterations
 
@@ -9007,12 +8827,7 @@ module fitpack_core
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(RKIND) :: h(MAX_ORDER+1),h1(7),h2(6)
-      logical :: done,check1,check3
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+      logical :: done,check1,check3,success
 
       fpold = zero
       fp0   = zero
@@ -9605,43 +9420,12 @@ module fitpack_core
             return
          end if
 
-         ! carry out one more step of the iteration process.
-        p2 = p
-        f2 = fpms
-        if (.not.check3) then
-           if ((f2-f3)>acc) then
-              check3=f2<zero
-           else
-              ! our initial choice of p is too large.
-              p3 = p2
-              f3 = f2
-              p  = p*con4
-              if (p<=p1) p=p1*con9 + p2*con1
-              cycle find_root
-           endif
-        endif
-
-        if (.not.check1) then
-           if ((f1-f2)>acc) then
-               check1 = f2>zero
-           else
-               ! our initial choice of p is too small
-               p1 = p2
-               f1 = f2
-               p  = p/con4
-               if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-               cycle find_root
-           endif
-        endif
-
-        ! test whether the iteration process proceeds as theoretically expected.
-        if (f2>=f1 .or. f2<=f3) then
-           ier = FITPACK_S_TOO_SMALL
-           return
-        endif
-
-        ! find the new value for p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
+         ! find the new value of p and carry out one more step.
+         call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+         if (.not.success) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+         end if
 
       end do find_root
 
@@ -9786,16 +9570,13 @@ module fitpack_core
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
       integer :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
                  nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
-      logical :: check1,check3
+      logical :: check1,check3,success
       !  ..local arrays..
       integer :: idd(2)
       real(RKIND) :: dzz(3)
 
       !   set constants
       real(RKIND), parameter :: period = 2*pi
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       !   initialization
       nplu  = 0
@@ -10163,43 +9944,12 @@ module fitpack_core
           ! SUCCESS! the approximation sp(u,v) is an acceptable solution.
           fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle root_iterations
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle root_iterations
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
+          end if
 
       end do root_iterations
 
@@ -10233,14 +9983,9 @@ module fitpack_core
       integer :: i,iband,iband3,iband4,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
                  lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,&
                  iband1,jlu
-      logical :: check1,check3
+      logical :: check1,check3,success
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hu,hv
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       fpms   = zero
       ipar   = iopt2*(iopt2+3)/2
@@ -10776,6 +10521,7 @@ module fitpack_core
       check1 = .false.
       check3 = .false.
       nuu    = nu4-iopt3-1
+
       !  iteration process to find the root of f(p)=s.
       iterations: do iter=1,maxit
 
@@ -10981,7 +10727,37 @@ module fitpack_core
               return
           end if
 
-          ! carry out one more step of the iteration process.
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
+             ier = FITPACK_S_TOO_SMALL
+             return
+          end if
+
+      end do iterations
+
+      ! the maximum allowable number of iterations has been reached.
+      ier = FITPACK_MAXIT
+      return
+
+      end subroutine fppola
+
+      ! three values of p (p1,p2,p3) with corresponding values of
+      ! f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value of p
+      ! such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zero
+      elemental subroutine root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          real(RKIND), intent(inout) :: p1,f1,p2,f2,p3,f3,p
+          real(RKIND), intent(in)    :: fpms,acc
+          logical, intent(inout) :: check1,check3
+          logical, intent(out) :: success
+
+          !  set constants
+          real(RKIND), parameter :: con1 = 0.1e0_RKIND
+          real(RKIND), parameter :: con9 = 0.9e0_RKIND
+          real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+
+          success = .true.
+
           p2 = p
           f2 = fpms
           if (.not.check3) then
@@ -10993,7 +10769,7 @@ module fitpack_core
                 f3 = f2
                 p  = p*con4
                 if (p<=p1) p=p1*con9 + p2*con1
-                cycle iterations
+                return
              endif
           endif
 
@@ -11006,26 +10782,20 @@ module fitpack_core
                  f1 = f2
                  p  = p/con4
                  if (p3>=zero .and. p>=p3) p = p2*con1 + p3*con9
-                 cycle iterations
+                 return
              endif
           endif
 
           ! test whether the iteration process proceeds as theoretically expected.
           if (f2>=f1 .or. f2<=f3) then
-             ier = FITPACK_S_TOO_SMALL
+             success = .false.
              return
           else
              ! find the new value of p.
              call fprati(p1,f1,p2,f2,p3,f3,p)
           endif
 
-      end do iterations
-
-      ! the maximum allowable number of iterations has been reached.
-      ier = FITPACK_MAXIT
-      return
-
-      end subroutine fppola
+      end subroutine root_finding_iterate
 
 
       ! subroutine fprank finds the minimum norm solution of a leastsquares problem in case of
@@ -11317,12 +11087,7 @@ module fitpack_core
       integer :: i,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
                  lsy,mk1,mm,mpm,mynx,ncof,nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
                  nrinty,nxe,nxk,nye
-      logical :: check1, check3
-
-      !   set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+      logical :: check1,check3,success
 
       ! we partition the working space.
       kx1  = kx+1
@@ -11671,45 +11436,12 @@ module fitpack_core
           ! test whether the approximation sp(x,y) is an acceptable solution.
           fpms = fp-s; if (abs(fpms)<acc) return
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-
-          ! carry out one more step of the iteration process.
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle root_iterations
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle root_iterations
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
+          end if
 
       end do root_iterations
 
@@ -11934,17 +11666,15 @@ module fitpack_core
                                      wrk(lwrk),step(2)
       !  ..local scalars..
       real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,rmax,rmin,rn
-      integer :: i,ich1,ich3,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,l1,l2,l3,l4,mpm,mumin, &
+      integer :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,l1,l2,l3,l4,mpm,mumin, &
                  mu0,mu1,nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
       !  ..local arrays..
+      logical :: check1,check3,success
       integer :: idd(4)
       real(RKIND) :: drr(6)
 
       !   set constants
       real(RKIND), parameter :: period = pi2
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       !   initialization
       ifsu  = 0
@@ -12329,8 +12059,8 @@ module fitpack_core
       f3   = fpms
       p    = one
       drr  = dr
-      ich1 = 0
-      ich3 = 0
+      check1 = .false.
+      check3 = .false.
 
       !  iteration process to find the root of f(p)=s.
       find_root: do iter = 1,maxit
@@ -12343,44 +12073,12 @@ module fitpack_core
          ! test whether the approximation sp(u,v) is an acceptable solution.
          fpms = fp-s; if (abs(fpms)<=acc) return ! success
 
-         ! carry out one more step of the iteration process.
-         p2 = p
-         f2 = fpms
-         if (ich3==0) then
-            if ((f2-f3)<=acc) then
-               ! our initial choice of p is too large.
-               p3 = p2
-               f3 = f2
-               p = p*con4
-               if (p<=p1) p = p1*con9 + p2*con1
-               cycle find_root
-            elseif (f2<zero) then
-                ich3 = 1
-            endif
-        endif
-
-        if (ich1==0) then
-           if ((f1-f2)<=acc) then
-              ! our initial choice of p is too small
-              p1 = p2
-              f1 = f2
-              p = p/con4
-              if (p3<zero) cycle find_root
-              if (p>=p3) p = p2*con1 + p3*con9
-              cycle find_root
-           elseif (f2>zero) then
-              ! test whether the iteration process proceeds as theoretically expected.
-              ich1 = 1
-           endif
-        endif
-
-        if (f2>=f1 .or. f2<=f3) then
-           ier = FITPACK_S_TOO_SMALL
-           return
-        end if
-
-        ! find the new value of p.
-        call fprati(p1,f1,p2,f2,p3,f3,p)
+         ! find the new value of p and carry out one more step.
+         call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+         if (.not.success) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+         end if
 
       end do find_root
 
@@ -12416,14 +12114,9 @@ module fitpack_core
                      p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
       integer :: i,iband,iband1,iband3,iband4,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,&
                  lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num,num1,rank
-      logical :: check1,check3
+      logical :: check1,check3,success
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hp,ht
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       eps = sqrt(eta)
 
@@ -13137,44 +12830,12 @@ module fitpack_core
               return
           end if
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle iterations
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle iterations
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
+          end if
 
       end do iterations
 
@@ -13284,15 +12945,10 @@ module fitpack_core
       integer :: i,iband,iband1,iband3,iband4,ii,in,irot,iter,i1,i2,j,jrot,&
                  jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
                  nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,rank
-      logical :: interchanged,check1,check3
+      logical :: interchanged,check1,check3,success
 
       !  ..local arrays..
       real(RKIND), dimension(MAX_ORDER+1) :: hx,hy
-
-      !  set constants
-      real(RKIND), parameter :: con1 = 0.1e0_RKIND
-      real(RKIND), parameter :: con9 = 0.9e0_RKIND
-      real(RKIND), parameter :: con4 = 0.4e-01_RKIND
 
       ! **********************************************************************************************
       !  part 1: determination of the number of knots and their position
@@ -13877,44 +13533,13 @@ module fitpack_core
              return
           end if
 
-          ! carry out one more step of the iteration process.
-          p2 = p
-          f2 = fpms
-          if (.not.check3) then
-             if (f2-f3<=acc) then
-                 ! our initial choice of p is too large.
-                 p3 = p2
-                 f3 = f2
-                 p  = p*con4
-                 if (p<=p1) p = p1*con9 +p2*con1
-                 cycle root_iterations
-             elseif (f2<zero) then
-                 check3 = .true.
-             endif
-          endif
-
-          if (.not.check1) then
-             if(f1-f2<=acc) then
-                ! our initial choice of p is too small
-                p1 = p2
-                f1 = f2
-                p = p/con4
-                if (p3>=zero .and. p>=p3) p = p2*con1 +p3*con9
-                cycle root_iterations
-             elseif (f2>zero) then
-                check1 = .true.
-             endif
-          endif
-
-          ! test whether the iteration process proceeds as theoretically expected.
-          if (f2>=f1 .or. f2<=f3) then
+          ! find the new value of p and carry out one more step.
+          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
+          if (.not.success) then
              ier = FITPACK_S_TOO_SMALL
              call sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
              return
-          else
-             ! find the new value of p.
-             call fprati(p1,f1,p2,f2,p3,f3,p)
-          endif
+          end if
 
       end do root_iterations
 
