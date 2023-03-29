@@ -8711,14 +8711,11 @@ module fitpack_core
          ! lastdi = last knot direction: lastdi==0  = not yet set
          !                               lastdi==1  = v direction
          !                               lastdi==-1 = u direction
-         choose_dir: if ( nv<nve .and. &
-                          (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
-                           .or. nplu>nplv &
-                           .or. (nplu==nplv .and. lastdi==LAST_DIM_1) ) .or. &
-                           lastdi==LAST_DIM_NONE) then
+         lastdi = new_knot_dimension(nu,nplu,nue,nv,nplv,nve,lastdi)
+
+         choose_dir: if (lastdi==LAST_DIM_2) then
 
             ! addition in the v-direction.
-            lastdi = LAST_DIM_2
             nplusv = nplv
             ifsv   = 0
 
@@ -8735,7 +8732,6 @@ module fitpack_core
         else choose_dir
 
             ! addition in the u-direction.
-            lastdi = LAST_DIM_1
             nplusu = nplu
             ifsu   = 0
             add_u_knots: do l=1,nplusu
@@ -9866,17 +9862,11 @@ module fitpack_core
             endif first_knot
 
             ! test whether we are going to add knots in the u- or v-direction.
-            ! lastdi = last knot direction: lastdi==0  = not yet set
-            !                               lastdi==1  = v direction
-            !                               lastdi==-1 = u direction
-           choose_dir: if ( nv<nve .and. &
-                            (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
-                             .or. nplu>nplv &
-                             .or. (nplu==nplv .and. lastdi==LAST_DIM_1) ) .or. &
-                             lastdi==LAST_DIM_NONE) then
+            lastdi = new_knot_dimension(nu,nplu,nue,nv,nplv,nve,lastdi)
+
+            choose_dir: if (lastdi==LAST_DIM_2) then
 
                ! addition in the v-direction.
-               lastdi = LAST_DIM_2
                nplusv = nplv
                ifsv   = 0
 
@@ -9893,7 +9883,6 @@ module fitpack_core
            else choose_dir
 
                ! addition in the u-direction.
-               lastdi = LAST_DIM_1
                nplusu = nplu
                ifsu   = 0
                istart = merge(1,0,iopt(2)==0)
@@ -11360,16 +11349,11 @@ module fitpack_core
           endif
 
          ! test whether we are going to add knots in the x- or x-direction.
-         ! lastdi = last knot direction: lastdi==0  = not yet set
-         !                               lastdi==1  = y direction
-         !                               lastdi==-1 = x direction
-        choose_dir: if ( ny<nye .and. &
-                         ((nx==nxe .and. nplx<nply .or. (nplx==nply .and. lastdi/=LAST_DIM_1)) &
-                          .or. nplx>nply &
-                          .or. (nplx==nply .and. lastdi==LAST_DIM_1) )) then
+         lastdi = new_knot_dimension(nx,nplx,nxe,ny,nply,nye,lastdi)
+
+         choose_dim: if (lastdi==LAST_DIM_2) then
 
             ! addition in the y-direction.
-            lastdi = LAST_DIM_2
             nplusy = nply
             ifsy   = 0
 
@@ -11383,10 +11367,9 @@ module fitpack_core
 
             end do add_y_knots
 
-        else choose_dir
+        else choose_dim
 
             ! addition in the x-direction.
-            lastdi = LAST_DIM_1
             nplusx = nplx
             ifsx   = 0
             add_x_knots: do l=1,nplusx
@@ -11399,7 +11382,7 @@ module fitpack_core
 
             end do add_x_knots
 
-        endif choose_dir
+        endif choose_dim
 
       !  restart the computations with the new set of knots.
       end do main_loop
@@ -11460,6 +11443,21 @@ module fitpack_core
       return
 
       end subroutine fpregr
+
+      ! Choose the dimension the next knot should be added on
+      elemental integer function new_knot_dimension(n1,n1add,n1max,n2,n2add,n2max,last) result(dir)
+         integer, intent(in) :: n1,n2       ! Number of knots in both dimensions
+         integer, intent(in) :: n1add,n2add ! Number of knots ADDED in either dimension
+         integer, intent(in) :: n1max,n2max ! Max number of knots in either dimension
+         integer, intent(in) :: last        ! Last dimension used
+
+         if ( n2<n2max .and. ( n2add<=n1add .or. n1>=n1max .or. last==LAST_DIM_NONE ) )then
+            dir = LAST_DIM_2
+         else
+            dir = LAST_DIM_1
+         end if
+
+      end function new_knot_dimension
 
       ! subroutine fprota applies a givens rotation to a and b.
       elemental subroutine fprota(cos,sin,a,b)
@@ -12000,16 +11998,11 @@ module fitpack_core
          endif first_knot
 
          ! test whether we are going to add knots in the u- or v-direction.
-         ! lastdi = last knot direction: lastdi==0  = not yet set
-         !                               lastdi==1  = v direction
-         !                               lastdi==-1 = u direction
-        choose_dir: if ( nv<nve .and. &
-                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
-                          .or. nplu>nplv &
-                          .or. (nplu==nplv .and. lastdi==LAST_DIM_1) )) then
+         lastdi = new_knot_dimension(nu,nplu,nue,nv,nplv,nve,lastdi)
+
+         choose_dim: if (lastdi==LAST_DIM_2) then
 
             ! addition in the v-direction.
-            lastdi = LAST_DIM_2
             nplusv = nplv
             ifsv   = 0
 
@@ -12023,10 +12016,9 @@ module fitpack_core
 
             end do add_v_knots
 
-        else choose_dir
+        else choose_dim
 
             ! addition in the u-direction.
-            lastdi = LAST_DIM_1
             nplusu = nplu
             ifsu   = 0
             istart = merge(1,0,iopt(2)==0)
@@ -12040,7 +12032,7 @@ module fitpack_core
 
             end do add_u_knots
 
-        endif choose_dir
+        endif choose_dim
 
       ! restart the computations with the new set of knots.
       end do iterations
