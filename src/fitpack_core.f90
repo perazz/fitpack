@@ -73,6 +73,11 @@ module fitpack_core
     integer, parameter, public :: OUTSIDE_NOT_ALLOWED = 2 ! an error flag is returned
     integer, parameter, public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
+    ! Dimension of last knot addition
+    integer, parameter, public :: LAST_DIM_NONE =  0  ! No knots added yet
+    integer, parameter, public :: LAST_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
+    integer, parameter, public :: LAST_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
+
                         public :: FITPACK_MESSAGE
                         public :: FITPACK_SUCCESS
     integer, parameter, public :: FITPACK_OK                   = 0  ! ok for spline, abs(fp-s)/s <= tol=0.001
@@ -8580,7 +8585,7 @@ module fitpack_core
                   nv = nminv
                   nrdatu(1) = mu-2
                   nrdatv(1) = mv-2
-                  lastdi = 0
+                  lastdi = LAST_DIM_NONE
                   nplusu = 0
                   nplusv = 0
                   fp0    = zero
@@ -8676,9 +8681,10 @@ module fitpack_core
 
          ! adjust the parameter reducu or reducv according to the direction
          ! in which the last added knots were located.
-
-         if (lastdi<0) reducu = fpold-fp
-         if (lastdi>0) reducv = fpold-fp
+         select case (lastdi)
+            case (LAST_DIM_1); reducu = fpold-fp
+            case (LAST_DIM_2); reducv = fpold-fp
+         end select
 
          ! store the sum of squared residuals for the current set of knots.
          fpold = fp
@@ -8706,13 +8712,13 @@ module fitpack_core
          !                               lastdi==1  = v direction
          !                               lastdi==-1 = u direction
          choose_dir: if ( nv<nve .and. &
-                          (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi>=0)) &
+                          (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
                            .or. nplu>nplv &
-                           .or. (nplu==nplv .and. lastdi<0) ) .or. &
-                           lastdi==0) then
+                           .or. (nplu==nplv .and. lastdi==LAST_DIM_1) ) .or. &
+                           lastdi==LAST_DIM_NONE) then
 
             ! addition in the v-direction.
-            lastdi = 1
+            lastdi = LAST_DIM_2
             nplusv = nplv
             ifsv   = 0
 
@@ -8729,7 +8735,7 @@ module fitpack_core
         else choose_dir
 
             ! addition in the u-direction.
-            lastdi = -1
+            lastdi = LAST_DIM_1
             nplusu = nplu
             ifsu   = 0
             add_u_knots: do l=1,nplusu
@@ -9748,7 +9754,7 @@ module fitpack_core
                   nv        = 8
                   nrdatu(1) = mu-3+iopt(2)+iopt(3)
                   nrdatv(1) = mv-1
-                  lastdi    = 0
+                  lastdi    = LAST_DIM_NONE
                   nplusu    = 0
                   nplusv    = 0
                   fp0       = zero
@@ -9823,7 +9829,7 @@ module fitpack_core
 
             !  adjust the parameter reducu or reducv according to the direction
             !  in which the last added knots were located.
-            first_knot: if (lastdi==0) then
+            first_knot: if (lastdi==LAST_DIM_NONE) then
 
                  nplv   = 3
                  idd(2) = ider(2)
@@ -9831,8 +9837,10 @@ module fitpack_core
 
             else first_knot
 
-                 if (lastdi<0) reducu = fpold-fp
-                 if (lastdi>0) reducv = fpold-fp
+                 select case (lastdi)
+                    case (LAST_DIM_1); reducu = fpold-fp
+                    case (LAST_DIM_2); reducv = fpold-fp
+                 end select
 
                  ! store the sum of squared residuals for the current set of knots.
                  fpold = fp
@@ -9862,13 +9870,13 @@ module fitpack_core
             !                               lastdi==1  = v direction
             !                               lastdi==-1 = u direction
            choose_dir: if ( nv<nve .and. &
-                            (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi>=0)) &
+                            (((nu==nue .and. nplu<nplv) .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
                              .or. nplu>nplv &
-                             .or. (nplu==nplv .and. lastdi<0) ) .or. &
-                             lastdi==0) then
+                             .or. (nplu==nplv .and. lastdi==LAST_DIM_1) ) .or. &
+                             lastdi==LAST_DIM_NONE) then
 
                ! addition in the v-direction.
-               lastdi = 1
+               lastdi = LAST_DIM_2
                nplusv = nplv
                ifsv   = 0
 
@@ -9885,7 +9893,7 @@ module fitpack_core
            else choose_dir
 
                ! addition in the u-direction.
-               lastdi = -1
+               lastdi = LAST_DIM_1
                nplusu = nplu
                ifsu   = 0
                istart = merge(1,0,iopt(2)==0)
@@ -11238,7 +11246,7 @@ module fitpack_core
                   ny        = nminy
                   nrdatx(1) = mx-2
                   nrdaty(1) = my-2
-                  lastdi = 0
+                  lastdi = LAST_DIM_NONE
                   nplusx = 0
                   nplusy = 0
                   fp0    = zero
@@ -11325,8 +11333,10 @@ module fitpack_core
 
           ! adjust the parameter reducx or reducy according to the direction
           ! in which the last added knots were located.
-          if (lastdi<0) reducx = fpold-fp
-          if (lastdi>0) reducy = fpold-fp
+          select case (lastdi)
+             case (LAST_DIM_1); reducx = fpold-fp
+             case (LAST_DIM_2); reducy = fpold-fp
+          end select
 
           ! store the sum of squared residuals for the current set of knots.
           fpold = fp
@@ -11354,12 +11364,12 @@ module fitpack_core
          !                               lastdi==1  = y direction
          !                               lastdi==-1 = x direction
         choose_dir: if ( ny<nye .and. &
-                         ((nx==nxe .and. nplx<nply .or. (nplx==nply .and. lastdi>=0)) &
+                         ((nx==nxe .and. nplx<nply .or. (nplx==nply .and. lastdi/=LAST_DIM_1)) &
                           .or. nplx>nply &
-                          .or. (nplx==nply .and. lastdi<0) )) then
+                          .or. (nplx==nply .and. lastdi==LAST_DIM_1) )) then
 
             ! addition in the y-direction.
-            lastdi = 1
+            lastdi = LAST_DIM_2
             nplusy = nply
             ifsy   = 0
 
@@ -11376,7 +11386,7 @@ module fitpack_core
         else choose_dir
 
             ! addition in the x-direction.
-            lastdi = -1
+            lastdi = LAST_DIM_1
             nplusx = nplx
             ifsx   = 0
             add_x_knots: do l=1,nplusx
@@ -11814,7 +11824,7 @@ module fitpack_core
                   nv        = 8
                   nrdatu(1) = mu-2+iopt(2)+iopt(3)
                   nrdatv(1) = mv-1
-                  lastdi    = 0
+                  lastdi    = LAST_DIM_NONE
                   nplusu    = 0
                   nplusv    = 0
                   fp0       = zero
@@ -11952,7 +11962,7 @@ module fitpack_core
 
          ! adjust the parameter reducu or reducv according to the direction
          ! in which the last added knots were located.
-         first_knot: if (lastdi==0) then
+         first_knot: if (lastdi==LAST_DIM_NONE) then
 
             nplv = 3
             idd(2) = ider(2)
@@ -11961,8 +11971,10 @@ module fitpack_core
 
          else first_knot
 
-            if (lastdi<0) reducu = fpold-fp
-            if (lastdi>0) reducv = fpold-fp
+            select case (lastdi)
+               case (LAST_DIM_1); reducu = fpold-fp
+               case (LAST_DIM_2); reducv = fpold-fp
+            end select
 
             ! store the sum of squared residuals for the current set of knots.
             fpold = fp
@@ -11992,12 +12004,12 @@ module fitpack_core
          !                               lastdi==1  = v direction
          !                               lastdi==-1 = u direction
         choose_dir: if ( nv<nve .and. &
-                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi>=0)) &
+                         ((nu==nue .and. nplu<nplv .or. (nplu==nplv .and. lastdi/=LAST_DIM_1)) &
                           .or. nplu>nplv &
-                          .or. (nplu==nplv .and. lastdi<0) )) then
+                          .or. (nplu==nplv .and. lastdi==LAST_DIM_1) )) then
 
             ! addition in the v-direction.
-            lastdi = 1
+            lastdi = LAST_DIM_2
             nplusv = nplv
             ifsv   = 0
 
@@ -12014,7 +12026,7 @@ module fitpack_core
         else choose_dir
 
             ! addition in the u-direction.
-            lastdi = -1
+            lastdi = LAST_DIM_1
             nplusu = nplu
             ifsu   = 0
             istart = merge(1,0,iopt(2)==0)
