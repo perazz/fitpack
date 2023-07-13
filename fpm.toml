@@ -11,6 +11,7 @@ keywords    = ["curve fitting","spline","interpolation","smoothing","splines","s
 auto-executables = false
 auto-examples    = false
 auto-tests       = true
+module-naming    = "fitpack"
 
 [library]
 source-dir  = "src"

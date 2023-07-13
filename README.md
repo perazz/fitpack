@@ -9,18 +9,18 @@ An object-oriented interface wrapper is also being built.
 Building, using
 ===============
 
-An automated build is not available yet. 
+An automated build is available via the Fortran Package Manager.
+
+Otherwise, a simple command line build script is: 
+```
+gfortran src/fitpack_core.f90 test/fitpack_test_data.f90 test/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
+```
+
 - `src/fitpack_core.f90` contains the refactored package
 - `src/fitpack.f90` contains the object-oriented interface
 - `test/fitpack_tests.f90` contains the original test programs, refactored as subroutines. 
 - `test/fitpack_test_data.f90` contains support data to the original test programs
 - `test/test.f90` is the test driver program 
-
-A simple command line build script is: 
-
-```
-gfortran src/fitpack_core.f90 test/fitpack_test_data.f90 test/fitpack_tests.f90 src/fitpack.f90 test/test.f90 -o fitpack_test.exe
-```
 
 A simple makefile for the GNU compiler suite is provided in folder `project`; to run it: 
 
