@@ -27,6 +27,7 @@ module fitpack
     ! Public interface
     public :: RKIND
     public :: fitpack_curve
+    public :: fitpack_periodic_curve
     public :: fitpack_surface
 
 end module fitpack
