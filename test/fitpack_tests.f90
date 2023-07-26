@@ -2403,7 +2403,7 @@ module fitpack_tests
           y(m) = y(1)
 
           !  we set up the weights of the data points
-          m1 = m-1
+          m1     = m-1
           w(:m1) = one
 
           !  loop for the different spline degrees.

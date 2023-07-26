@@ -23,6 +23,7 @@ module fitpack_curves
     private
 
     public :: fitpack_curve
+    public :: fitpack_periodic_curve
 
     integer, parameter :: MAX_K = 5
 
@@ -96,6 +97,12 @@ module fitpack_curves
            procedure, non_overridable :: mse => curve_error
 
     end type fitpack_curve
+
+    !> Derived type describing a periodic curve. No changes are made to the storage,
+    !> But functions
+    type, extends(fitpack_curve) :: fitpack_periodic_curve
+
+    end type fitpack_periodic_curve
 
     ! Default constructor
     interface fitpack_curve
@@ -297,15 +304,33 @@ module fitpack_curves
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
 
-            ! Call curvfit
-            call curfit(this%iopt,                   &  ! option
-                        this%m,this%x,this%y,this%w, &  ! points
-                        this%xleft,this%xright,      &  ! x range
-                        this%order,this%smoothing,   &  ! spline accuracy
-                        this%nest,this%knots,this%t, &  ! spline output
-                        this%c,this%fp,              &  ! spline output
-                        this%wrk,this%lwrk,this%iwrk,&  ! memory
-                        ierr)                           ! Error flag
+            select type (curve => this)
+
+               type is (fitpack_periodic_curve)
+
+                  ! Call fitting function
+                  call percur(curve%iopt,                      &  ! option
+                              curve%m,curve%x,curve%y,curve%w, &  ! points
+                              curve%order,curve%smoothing,     &  ! spline accuracy
+                              curve%nest,curve%knots,curve%t,  &  ! spline output
+                              curve%c,curve%fp,                &  ! spline output
+                              curve%wrk,curve%lwrk,curve%iwrk, &  ! memory
+                              ierr)                           ! Error flag
+
+               class default
+
+                  ! Call curvfit
+                  call curfit(curve%iopt,                      &  ! option
+                              curve%m,curve%x,curve%y,curve%w, &  ! points
+                              curve%xleft,curve%xright,        &  ! x range
+                              curve%order,curve%smoothing,     &  ! spline accuracy
+                              curve%nest,curve%knots,curve%t,  &  ! spline output
+                              curve%c,curve%fp,                &  ! spline output
+                              curve%wrk,curve%lwrk,curve%iwrk, &  ! memory
+                              ierr)                           ! Error flag
+
+            end select
+
         end do
 
     end function curve_fit_automatic_knots
@@ -340,7 +365,6 @@ module fitpack_curves
 
        !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of
        !  order nu of a spline s(x) of degree k, given in its b-spline representation.
-
        call splder(this%t,     & ! Position of the knots
                    this%knots, & ! Number of knots
                    this%c,     & ! spline coefficients

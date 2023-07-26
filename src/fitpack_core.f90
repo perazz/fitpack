@@ -18598,17 +18598,6 @@ module fitpack_core
 
       end subroutine surfit
 
-      ! Test if two reals have the same representation at the
-      ! current precision
-      elemental logical function equal(a,b)
-          real(RKIND), intent(in) :: a,b
-          equal = abs(a-b)<spacing(merge(a,b,abs(a)<abs(b)))
-      end function equal
-      elemental logical function not_equal(a,b)
-          real(RKIND), intent(in) :: a,b
-          not_equal = .not.equal(a,b)
-      end function not_equal
-
       ! Utilities: argsort
       ! Return indices of sorted array
       pure function fitpack_argsort(list) result(ilist)
@@ -18747,5 +18736,14 @@ module fitpack_core
        is_le = a<=b
     end function is_le
 
+    ! Test if two reals have the same representation at the current precision
+    elemental logical function equal(a,b)
+       real(RKIND), intent(in) :: a,b
+       equal = abs(a-b)<spacing(merge(a,b,abs(a)<abs(b)))
+    end function equal
+    elemental logical function not_equal(a,b)
+       real(RKIND), intent(in) :: a,b
+       not_equal = .not.equal(a,b)
+    end function not_equal
 
 end module fitpack_core
