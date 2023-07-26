@@ -9,7 +9,12 @@ An object-oriented interface wrapper is also being built.
 Building, using
 ===============
 
-An automated build is available via the Fortran Package Manager.
+An automated build is available via the Fortran Package Manager. To use FITPACK within your FPM project, add the following to your fpm.toml file:
+
+```
+[dependencies]
+fitpack = { git="https://github.com/perazz/fitpack.git" }
+```
 
 Otherwise, a simple command line build script is: 
 ```
