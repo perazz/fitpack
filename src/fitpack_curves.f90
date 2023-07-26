@@ -99,7 +99,7 @@ module fitpack_curves
     end type fitpack_curve
 
     !> Derived type describing a periodic curve. No changes are made to the storage,
-    !> But functions
+    !> but the appropriate package functions will be called depending on the type
     type, extends(fitpack_curve) :: fitpack_periodic_curve
 
     end type fitpack_periodic_curve
@@ -306,7 +306,7 @@ module fitpack_curves
 
             select type (curve => this)
 
-               type is (fitpack_periodic_curve)
+               class is (fitpack_periodic_curve)
 
                   ! Call fitting function
                   call percur(curve%iopt,                      &  ! option
