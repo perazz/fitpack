@@ -67,6 +67,11 @@ module fitpack_core
     public :: evapol ! Evaluation of a polar spline
     public :: surev  ! Evaluation of a parametric spline surface
 
+    ! Utilities
+    public :: fitpack_swap
+    public :: fitpack_argsort
+    public :: fitpack_error_handling
+
     ! Spline behavior for points not in the support
     integer, parameter, public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
     integer, parameter, public :: OUTSIDE_ZERO        = 1 ! spline evaluates to zero
@@ -126,7 +131,27 @@ module fitpack_core
        end function boundary
     end interface
 
+    interface fitpack_swap
+        module procedure swap_data
+        module procedure swap_size
+    end interface fitpack_swap
+
     contains
+
+      ! Flow control: on output flag present, return it;
+      ! otherwise, halt on error
+      subroutine fitpack_error_handling(ierr,ierr_out,whereAt)
+          integer, intent(in) :: ierr
+          integer, optional, intent(out) :: ierr_out
+          character(*), intent(in) :: whereAt
+
+          if (present(ierr_out)) then
+              ierr_out = ierr
+          elseif (.not.FITPACK_SUCCESS(ierr)) then
+              print *, '[fitpack] at '//trim(whereAt)//' failed with error '//FITPACK_MESSAGE(ierr)
+              stop ierr
+          end if
+      end subroutine fitpack_error_handling
 
       ! Wrapper for the error flag
       pure function FITPACK_MESSAGE(ierr) result(msg)
@@ -13043,15 +13068,15 @@ module fitpack_core
           do_interchange: if (iband1>l) then
               iband1 = l
               interchanged = .not.interchanged
-              call swap_RKIND(x,y)
-              call swap_RKIND(x0,y0)
-              call swap_RKIND(x1,y1)
+              call fitpack_swap(x,y)
+              call fitpack_swap(x0,y0)
+              call fitpack_swap(x1,y1)
               n  = min(nx,ny)
-              call swap_RKIND(tx ,ty)
-              call swap_int  (nx ,ny)
-              call swap_int  (nxe,nye)
-              call swap_int  (nxx,nyy)
-              call swap_int  (kx ,ky)
+              call fitpack_swap(tx ,ty)
+              call fitpack_swap(nx ,ny)
+              call fitpack_swap(nxe,nye)
+              call fitpack_swap(nxx,nyy)
+              call fitpack_swap(kx ,ky)
               kx1 = kx+1
               ky1 = ky+1
           endif do_interchange
@@ -13583,9 +13608,9 @@ module fitpack_core
                   c(1:ncof) = f(1:ncof)
 
                   n = min(nx,ny)
-                  call swap_RKIND(x,y)
-                  call swap_RKIND(tx,ty)
-                  call swap_int  (nx,ny)
+                  call fitpack_swap(x,y)
+                  call fitpack_swap(tx,ty)
+                  call fitpack_swap(nx,ny)
 
               endif restore_xy
 
@@ -18143,7 +18168,7 @@ module fitpack_core
       ! FP this double loop can be made more efficient
       sort_zeros: do j=1,m
         inner_loop: do j1 = j+1,m
-          if (zeros(j1)<zeros(j)) call swap_RKIND(zeros(j),zeros(j1))
+          if (zeros(j1)<zeros(j)) call fitpack_swap(zeros(j),zeros(j1))
         end do inner_loop
       end do sort_zeros
 
@@ -18573,27 +18598,6 @@ module fitpack_core
 
       end subroutine surfit
 
-      ! Swap two real numbers
-      elemental subroutine swap_RKIND(a,b)
-         real(RKIND), intent(inout) :: a,b
-         real(RKIND) :: tmp
-
-         tmp = a
-         a   = b
-         b   = tmp
-
-      end subroutine swap_RKIND
-
-      elemental subroutine swap_int(a,b)
-         integer, intent(inout) :: a,b
-         integer :: tmp
-
-         tmp = a
-         a   = b
-         b   = tmp
-
-      end subroutine swap_int
-
       ! Test if two reals have the same representation at the
       ! current precision
       elemental logical function equal(a,b)
@@ -18605,6 +18609,143 @@ module fitpack_core
           not_equal = .not.equal(a,b)
       end function not_equal
 
+      ! Utilities: argsort
+      ! Return indices of sorted array
+      pure function fitpack_argsort(list) result(ilist)
+          real(RKIND), dimension(:), intent(in) :: list
+          integer(RSIZE), dimension(size(list)) :: ilist
+
+          real(RKIND), allocatable :: copy(:)
+          integer(RSIZE) :: i
+
+          ! Prepare data
+          allocate(copy(size(list)),source=list)
+          forall(i=1:size(list,kind=RSIZE)) ilist(i) = i
+
+          ! Perform sort
+          call fitpack_quicksort_andlist(copy,ilist)
+
+          deallocate(copy)
+
+      end function fitpack_argsort
+
+      ! Quicksort
+      pure recursive subroutine fitpack_quicksort_andlist(list,ilist,down)
+
+        real(RKIND), dimension(:), intent(inout) :: list
+        integer(RSIZE), dimension(size(list)), intent(inout) :: ilist
+        logical, optional, intent(in) :: down
+
+        integer(RSIZE)  :: i, j, n
+        real(RKIND)  :: chosen
+        integer(RSIZE), parameter :: SMALL_SIZE = 8
+        logical         :: descending
+
+        descending = .false.; if (present(down)) descending = down
+        n = size(list,kind=RSIZE)
+
+        choose_sorting_algorithm: if (n <= SMALL_SIZE) then
+
+           ! Use interchange sort for small lists
+           do i = 1, n - 1
+              do j = i + 1, n
+                 if (toBeSwapped(list(i),list(j),.false.)) then
+                     call fitpack_swap(list(i),list(j))
+                     call fitpack_swap(ilist(i),ilist(j))
+                 end if
+              end do
+           end do
+
+        else
+           ! Use partition (quick) sort if the list is big
+           chosen = list(int(n/2))
+           i = 0
+           j = n + 1
+
+           scan_lists: do
+              ! Scan list from left end
+              ! until element >= chosen is found
+              scan_from_left: do
+                i = i + 1
+                if (toBeSwapped(list(i),chosen,.true.) .or. i==n) exit scan_from_left
+              end do scan_from_left
+
+              ! Scan list from right end
+              ! until element <= chosen is found
+
+              scan_from_right: do
+                 j = j - 1
+                 if (toBeSwapped(chosen,list(j),.true.) .or. j==1) exit scan_from_right
+              end do scan_from_right
+
+              swap_element: if (i < j) then
+                  ! Swap two out of place elements
+                  call fitpack_swap(list(i),list(j))
+                  call fitpack_swap(ilist(i),ilist(j))
+              else if (i == j) then
+                  i = i + 1
+                  exit
+              else
+                  exit
+              endif swap_element
+
+           end do scan_lists
+
+           if (1 < j) call fitpack_quicksort_andlist(list(:j),ilist(:j),down)
+           if (i < n) call fitpack_quicksort_andlist(list(i:),ilist(i:),down)
+
+        end if choose_sorting_algorithm ! test for small array
+
+      contains
+
+         elemental logical function toBeSwapped(a,b,orEqual)
+            real(RKIND), intent(in) :: a,b
+            logical, intent(in) :: orEqual
+
+            toBeSwapped = merge(is_before(a,b),is_after(a,b),descending)
+            if (orEqual .and. equal(a,b)) toBeSwapped = .true.
+
+         end function toBeSwapped
+
+    end subroutine fitpack_quicksort_andlist
+
+    elemental subroutine swap_data(a,b)
+      real(RKIND), intent(inout) :: a, b
+      real(RKIND)                :: tmp
+      tmp = a
+      a   = b
+      b   = tmp
+      return
+    end subroutine swap_data
+
+    elemental subroutine swap_size(a,b)
+      integer(RSIZE), intent(inout) :: a, b
+      integer(RSIZE)                :: tmp
+      tmp = a
+      a   = b
+      b   = tmp
+      return
+    end subroutine swap_size
+
+    elemental logical function is_before(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_before = a<b
+    end function is_before
+
+    elemental logical function is_after(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_after = a>b
+    end function is_after
+
+    elemental logical function is_ge(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_ge = a>=b
+    end function is_ge
+
+    elemental logical function is_le(a,b)
+       real(RKIND), intent(in) :: a,b
+       is_le = a<=b
+    end function is_le
 
 
 end module fitpack_core
