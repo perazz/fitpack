@@ -20,6 +20,7 @@
 module fitpack_curve_tests
     use fitpack
     use fitpack_core
+    use iso_fortran_env, only: output_unit
 
 
     implicit none
@@ -27,9 +28,98 @@ module fitpack_curve_tests
 
     public :: test_sine_fit
     public :: test_periodic_fit
+    public :: test_parametric_fit
 
 
     contains
+
+    ! Test parametric curve
+    logical function test_parametric_fit() result(success)
+
+       real(RKIND), allocatable :: x(:,:),u(:),w(:),y(:,:)
+       type(fitpack_parametric_curve) :: curve
+       real(RKIND) :: s
+       integer :: ierr,loop,useUnit
+
+       useUnit = output_unit
+
+       ! Set data points
+       u = [real(RKIND) :: 120,128,133,136,138,141,144,146,149,151,154,161,170,180,190,&
+                           200,210,220,230,240,250,262,269,273,278,282,287,291,295,299,305,315]
+
+       allocate(x(2,32))
+
+       x(1,:) = [-1.5141,-2.0906,-1.9253,-0.8724,-0.3074,-0.5534,0.0192,1.2298,2.5479,2.4710,1.7063,&
+                 1.1183,0.5534,0.4727,0.3574,0.1998,0.2882,0.2613,0.2652,0.2805,0.4112,0.9377,1.3527,&
+                 1.5564,1.6141,1.6333,1.1567,0.8109,0.2498,-0.2306,-0.7571,-1.1222]
+       x(2,:) = [0.5150,1.3412,2.6094,3.2358,2.7401,2.7823,3.5932,3.8353,2.5863,1.3105,0.6841,0.2575,&
+                 0.2460,0.3689,0.2460,0.2998,0.3651,0.3343,0.3881,0.4573,0.5918,0.7110,0.4035,0.0769,&
+                 -0.3920,-0.8570,-1.3412,-1.5641,-1.7409,-1.7178,-1.2989,-0.5572]
+
+       ! Use flat weights
+       allocate(w(size(x,2)),source=one)
+
+       do loop=1,8
+
+          select case (loop)
+
+             ! start with a polynomial curve ( s very large)
+             case (1); ierr = curve%new_fit(x,u=u,w=w,smoothing=100.0_RKIND)
+
+             ! Smaller values of s to get a tighter approximation
+             case (2); ierr = curve%fit(smoothing=1.0_RKIND)
+             case (3); ierr = curve%fit(smoothing=0.05_RKIND)
+
+             ! Larger values to get a smoother approximation
+             case (4); ierr = curve%fit(smoothing=0.25_RKIND)
+
+             ! New fit to get possibly fewer knots
+             case (5); ierr = curve%new_fit(x,u=u,w=w,smoothing=0.25_RKIND)
+
+             ! Let the program determine parameter values u(i)
+             case (6); ierr = curve%new_fit(x,w=w,smoothing=0.25_RKIND)
+
+             ! Quintic spline approximation
+             case (7); ierr = curve%new_fit(x,w=w,smoothing=0.25_RKIND,order=5)
+
+             ! Interpolating curve
+             case (8); ierr = curve%interpolate()
+
+!                 case (9)
+!
+!                    !  finally we calculate a least-squares spline curve with specified knots
+!                    iopt =-1
+!                    n = 9+2*k
+!                    j = k+2
+!                    del = (ue-ub)*0.125_RKIND
+!                    do l=1,7
+!                        al = l
+!                        t(j) = ub+al*del
+!                        j = j+1
+!                    end do
+
+          end select
+
+          if (.not.FITPACK_SUCCESS(ierr)) then
+              success = .false.
+              write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+          end if
+
+          ! Evaluate the spline curve
+          y = curve%eval(u,ierr)
+
+          if (.not.FITPACK_SUCCESS(ierr)) then
+              success = .false.
+              write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+          end if
+
+
+
+       end do
+
+       1000  format('[test_parametric_fit] parametric curve test ',i0,' failed: ',a)
+
+    end function test_parametric_fit
 
     ! Dumb test: fit a sine function
     logical function test_sine_fit() result(success)

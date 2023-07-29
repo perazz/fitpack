@@ -21,6 +21,8 @@ module fitpack
     use fitpack_core
     use fitpack_curves
     use fitpack_surfaces
+    use fitpack_parametric_curves
+
     implicit none
     private
 
@@ -28,6 +30,7 @@ module fitpack
     public :: RKIND
     public :: fitpack_curve
     public :: fitpack_periodic_curve
+    public :: fitpack_parametric_curve
     public :: fitpack_surface
 
 end module fitpack

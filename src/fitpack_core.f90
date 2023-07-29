@@ -78,6 +78,11 @@ module fitpack_core
     integer, parameter, public :: OUTSIDE_NOT_ALLOWED = 2 ! an error flag is returned
     integer, parameter, public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
+    ! IOPT defines a curve state
+    integer, parameter, public :: IOPT_NEW_LEASTSQUARES = -1 ! Request a new lsq fit
+    integer, parameter, public :: IOPT_NEW_SMOOTHING    =  0 ! Request a new smoothing fit
+    integer, parameter, public :: IOPT_OLD_FIT          =  1 ! Update an old fit
+
     ! Dimension of last knot addition
     integer, parameter, public :: KNOT_DIM_NONE =  0  ! No knots added yet
     integer, parameter, public :: KNOT_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
