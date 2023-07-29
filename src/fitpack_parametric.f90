@@ -60,6 +60,9 @@ module fitpack_parametric_curves
         integer, allocatable     :: iwrk(:)
         real(RKIND), allocatable :: wrk(:)
 
+        ! Space for derivative evaluation
+        real(RKIND), allocatable :: dd(:,:)
+
         ! Curve fit smoothing parameter (fit vs. points MSE)
         real(RKIND) :: smoothing = 1000.0_RKIND
 
@@ -95,12 +98,12 @@ module fitpack_parametric_curves
            procedure, private :: curve_eval_one
            procedure, private :: curve_eval_many
            generic :: eval => curve_eval_one,curve_eval_many
-!
-!           !> Evaluate derivative at given coordinates
-!           procedure, private :: curve_derivative
-!           procedure, private :: curve_derivatives
-!           generic   :: dfdx => curve_derivative,curve_derivatives
-!
+
+           !> Evaluate derivative at given coordinates
+           procedure, private :: curve_derivative
+           procedure, private :: curve_derivatives
+           generic   :: dfdx => curve_derivative,curve_derivatives
+
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
 
@@ -158,6 +161,7 @@ module fitpack_parametric_curves
        deallocate(this%sp,stat=ierr)
        deallocate(this%iwrk,stat=ierr)
        deallocate(this% wrk,stat=ierr)
+       deallocate(this%dd,stat=ierr)
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
        this%ubegin = zero
@@ -231,6 +235,9 @@ module fitpack_parametric_curves
         ! Setup working space.
         lwrk = (m*(MAX_K+1)+nest*(6+idim+3*MAX_K))
         allocate(this%wrk(lwrk),source=zero)
+
+        ! Setup space for derivative evaluatiuon
+        allocate(this%dd(idim,MAX_ORDER+1),source=zero)
 
         endassociate
 
@@ -355,62 +362,67 @@ module fitpack_parametric_curves
        class(fitpack_parametric_curve), intent(in) :: this
        curve_error = this%fp
     end function curve_error
-!
-!    !> Evaluate k-th derivative of the curve at points x
-!    !> Use 1st derivative if order not present
-!    function curve_derivatives(this, x, order, ierr) result(ddx)
-!       class(fitpack_parametric_curve), intent(inout) :: this
-!       real(RKIND),          intent(in)    :: x(:)   ! Evaluation point (scalar)
-!       integer, optional,    intent(in)    :: order  ! Derivative order. Default 1
-!       integer, optional,    intent(out)   :: ierr  ! Optional error flag
-!       real(RKIND), dimension(size(x))     :: ddx
-!
-!       integer :: ddx_order,m,ierr0
-!
-!       if (present(order)) then
-!          ddx_order = max(0,order)
-!       else
-!          ddx_order = 1
-!       end if
-!
-!       ierr0 = FITPACK_OK
-!
-!
-!       m = size(x); if (m<=0) goto 1
-!
-!       !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of
-!       !  order nu of a spline s(x) of degree k, given in its b-spline representation.
-!       call splder(this%t,     & ! Position of the knots
-!                   this%knots, & ! Number of knots
-!                   this%c,     & ! spline coefficients
-!                   this%order, & ! spline degree
-!                   ddx_order,  & ! derivative order (0<=order<=this%order)  x,y,m,e,wrk,ier)
-!                   x,          & ! Array of points where this should be evaluated
-!                   ddx,        & ! Evaluated derivatives
-!                   m,          & ! Number of input points
-!                   this%bc,    & ! Extrapolation behavior
-!                   this%wrk,   & ! Temporary working space
-!                   ierr0)        ! Output flag
-!
-!       1 call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
-!
-!    end function curve_derivatives
-!
-!    !> Evaluate k-th derivative of the curve at points x
-!    !> Use 1st derivative if order not present
-!    real(RKIND) function curve_derivative(this, x, order, ierr) result(ddx)
-!       class(fitpack_parametric_curve), intent(inout)  :: this
-!       real(RKIND),          intent(in)     :: x      ! Evaluation point (scalar)
-!       integer, optional,    intent(in)     :: order  ! Derivative order. Default 1
-!       integer, optional,    intent(out)    :: ierr   ! Optional error flag
-!
-!       real(RKIND) :: ddxa(1)
-!
-!       ! Use the array-based wrapper
-!       ddxa = curve_derivatives(this,[x],order,ierr)
-!       ddx  = ddxa(1)
-!
-!    end function curve_derivative
+
+    !> Evaluate k-th derivative of the curve at point u
+    !> Use 1st derivative if order not present
+    function curve_derivative(this, u, order, ierr) result(ddx)
+       class(fitpack_parametric_curve), intent(inout) :: this
+       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
+       integer, optional,    intent(in)    :: order  ! Derivative order. Default 1
+       integer, optional,    intent(out)   :: ierr  ! Optional error flag
+       real(RKIND), dimension(this%idim)   :: ddx
+
+       integer :: ddx_order,ierr0
+
+       if (present(order)) then
+          ddx_order = max(0,order)
+       else
+          ddx_order = 1 ! Default: 1st derivative
+       end if
+
+       ierr0 = FITPACK_OK
+
+       !  subroutine cualde evaluates at the point u all the derivatives
+       !                     (l)
+       !     d(idim*l+j) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
+       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
+       call cualde(this%idim,    & ! Number of dimensions
+                   this%t,       & ! Position of the knots
+                   this%knots,   & ! Number of knots
+                   this%c,       & ! Spline coefficients
+                   size(this%c), & ! Number of coefficients
+                   this%order+1, & ! k1 = order of s(u) (order = degree+1)
+                   u,            & ! Where the derivatives must be evaluated
+                   this%dd,      & ! Space for derivative evaluation
+                   size(this%dd),& ! Its size
+                   ierr0)          ! Output flag
+
+       ! Order is 0:k <- extract derivative
+       ddx = this%dd(:,1+ddx_order)
+
+       1 call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
+
+    end function curve_derivative
+
+    !> Evaluate k-th derivative of the curve at points x
+    !> Use 1st derivative if order not present
+    function curve_derivatives(this, u, order, ierr) result(ddx)
+       class(fitpack_parametric_curve), intent(inout)  :: this
+       real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter)
+       integer, optional,    intent(in)     :: order  ! Derivative order. Default 1
+       integer, optional,    intent(out)    :: ierr   ! Optional error flag
+       real(RKIND), dimension(this%idim,size(u)) :: ddx
+
+       integer :: i,ierr0
+
+       do i=1,size(u)
+          ddx(:,i) = curve_derivative(this,u(i),order,ierr0)
+          if (.not.FITPACK_SUCCESS(ierr0)) exit
+       end do
+
+       if (present(ierr)) ierr = ierr0
+
+    end function curve_derivatives
 
 
 end module fitpack_parametric_curves

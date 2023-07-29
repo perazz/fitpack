@@ -38,7 +38,7 @@ module fitpack_core
     ! Curve approximation routines
     public :: splev  ! Evaluation of a spline function
     public :: splder ! Derivative calculation of a spline function
-    public :: spalde ! All derivateives of a spline function
+    public :: spalde ! All derivatives of a spline function
     public :: curev  ! Evaluation of a spline curve
     public :: cualde ! All derivatives of a spline curve
     public :: insert ! Insert a knot into a given spline
