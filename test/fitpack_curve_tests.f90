@@ -26,6 +26,7 @@ module fitpack_curve_tests
     private
 
     public :: test_sine_fit
+    public :: test_periodic_fit
 
 
     contains
@@ -107,6 +108,85 @@ module fitpack_curve_tests
        3 format('[sine_fit] ',i0,'-th derivative error is too large: x=',f6.2,' yp(spline)=',f6.2,' analytical=',f6.2)
 
     end function test_sine_fit
+
+    ! Periodic test: fit a cosine function
+    logical function test_periodic_fit() result(success)
+
+       integer, parameter     :: N = 200
+       real(RKIND), parameter :: RTOL = 1.0e-2_RKIND
+       real(RKIND), parameter :: ATOL = 1.0e-4_RKIND
+       type(fitpack_periodic_curve) :: curve
+       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3)
+       integer :: ierr,i,order
+
+       success = .false.
+
+       ! Generate a periodic function with 200 points
+       x = linspace(zero,pi2,N)
+       y = cos(x) + sin(2*x)
+
+       ! Create INTERPOLATING
+       ierr = curve%new_fit(x,y,smoothing=zero)
+
+       ! Failed to create
+       if (.not.FITPACK_SUCCESS(ierr)) then
+          print *, '[periodic_fit] error generating sine function '
+          return
+       end if
+
+       ! Create 200 points in between the range. Include both extremes
+       xrand(1)     = x(1)
+       xrand(2:N-1) = half*(x(1:N-2)+x(2:N-1))
+       xrand(N)     = x(n)
+
+       do i=1,n
+
+          ! Evaluate curve
+          yeval = curve%eval(xrand(i),ierr);
+          if (.not.FITPACK_SUCCESS(ierr)) then
+             print *, '[periodic_fit] error evaluating sine function '
+             return
+          end if
+
+          ! Get analytical function and derivatives
+          dfdx(0) =  cos(xrand(i)) +   sin(2*xrand(i)) ! the function
+          dfdx(1) = -sin(xrand(i)) + 2*cos(2*xrand(i)) ! derivative
+          dfdx(2) = -cos(xrand(i)) - 4*sin(2*xrand(i))
+          dfdx(3) = +sin(xrand(i)) - 8*cos(2*xrand(i))
+
+          ! error
+          if (abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))>one) then
+             print 1, xrand(i),yeval,dfdx(0)
+             return
+          end if
+
+          ! Evaluate first derivative
+          do order = 1,3
+             yprime = curve%dfdx(xrand(i),order=order,ierr=ierr)
+
+             ! Check evaluation
+             if (.not.FITPACK_SUCCESS(ierr)) then
+               print 2, order,xrand(i),FITPACK_MESSAGE(ierr)
+               return
+             end if
+
+             ! Check error
+             if (abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))>one) then
+                print 3, order,xrand(i),yprime,dfdx(order)
+                return
+             end if
+          end do
+
+       end do
+
+       ! All checks passed: success!
+       success = .true.
+
+       1 format('[periodic_fit] sine function error is too large: x=',f6.2,' yspline=',f6.2,' analytical=',f6.2)
+       2 format('[periodic_fit] cannot evaluate ',i0,'-th derivative at ',f6.2,': ',a)
+       3 format('[periodic_fit] ',i0,'-th derivative error is too large: x=',f6.2,' yp(spline)=',f6.2,' analytical=',f6.2)
+
+    end function test_periodic_fit
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)

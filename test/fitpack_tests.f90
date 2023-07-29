@@ -2408,6 +2408,7 @@ module fitpack_tests
 
           !  loop for the different spline degrees.
           spline_degree: do k=3,5,2
+
               ! loop for the different spline approximations of degree k
               approximations: do is=1,7
 
@@ -2510,6 +2511,7 @@ module fitpack_tests
          955  format(1h0,3(3x,2hxi,6x,2hyi,4x,5hs(xi),3x))
          960  format(1h ,3(f7.3,1x,f7.3,1x,f7.3,2x))
         1000  format('[mnperc] spline degree ',i0,' case ',i0,' failed: ',a)
+
       end function mnperc
 
 
