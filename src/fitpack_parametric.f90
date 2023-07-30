@@ -23,6 +23,7 @@ module fitpack_parametric_curves
     private
 
     public :: fitpack_parametric_curve
+    public :: fitpack_closed_curve
 
     integer, parameter :: MAX_K = 5
 
@@ -109,6 +110,11 @@ module fitpack_parametric_curves
 
     end type fitpack_parametric_curve
 
+    !> Derived type describing a closed parametric curve. No changes are made to the storage,
+    !> but the appropriate package functions will be called depending on the type
+    type, extends(fitpack_parametric_curve) :: fitpack_closed_curve
+
+    end type fitpack_closed_curve
 
     ! Default constructor
     interface fitpack_parametric_curve
@@ -126,8 +132,7 @@ module fitpack_parametric_curves
 
         integer :: ierr0
 
-   !     ierr0 = this%new_fit(x,y,w)
-   stop 'not implemented'
+        ierr0 = this%new_fit(x,u,w)
 
         ! Error handling
         call fitpack_error_handling(ierr0,ierr,'new curve fit')
@@ -213,7 +218,6 @@ module fitpack_parametric_curves
             this%ubegin  = minval(u)
             this%uend    = maxval(u)
 
-
         else
             allocate(this%u(m),source=zero)
             this%x = x
@@ -229,11 +233,22 @@ module fitpack_parametric_curves
         ! Reset estimated knots.
         ! In most practical situation nest=m/2 will be sufficient.
         ! always large enough is nest=m+k+1, the number of knots needed for interpolation (s=0).
-        nest = SAFE*(m+MAX_ORDER+1)
-        allocate(this%iwrk(nest),this%t(nest),this%c(nest*idim))
+        select type (curv => this)
+
+           class is (fitpack_closed_curve)
+
+              nest = SAFE*(m+2*MAX_ORDER)
+              lwrk = (m*(MAX_K+1)+nest*(7+idim+5*MAX_K))
+
+           class default
+
+              nest = SAFE*(m+MAX_ORDER+1)
+              lwrk = (m*(MAX_K+1)+nest*(6+idim+3*MAX_K))
+
+        end select
 
         ! Setup working space.
-        lwrk = (m*(MAX_K+1)+nest*(6+idim+3*MAX_K))
+        allocate(this%iwrk(nest),this%t(nest),this%c(nest*idim))
         allocate(this%wrk(lwrk),source=zero)
 
         ! Setup space for derivative evaluatiuon
@@ -334,21 +349,41 @@ module fitpack_parametric_curves
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
 
-            ! If this is the first call
-
             ! Call fitting function
-            call parcur(this%iopt,                    &  ! option
-                        merge(1,0,this%has_params),   &  ! have input parameter values?
-                        this%idim,this%m,             &  ! Number of dimensions
-                        this%u,                       &  ! Parameter array
-                        size(this%x),                 &  ! Unrolled size of x array
-                        this%x,this%w,                &  ! points and weights
-                        this%ubegin,this%uend,        &  ! Parameter range
-                        this%order,this%smoothing,    &  ! spline accuracy
-                        this%nest,this%knots,this%t,  &  ! spline output
-                        size(this%c),this%c,this%fp,  &  ! spline output
-                        this%wrk,this%lwrk,this%iwrk, &  ! memory
-                        ierr)                            ! Error flag
+            select type (curv => this)
+
+               class is (fitpack_closed_curve)
+
+                  call clocur(curv%iopt,                    &  ! option
+                              merge(1,0,curv%has_params),   &   ! have input parameter values?
+                              curv%idim,curv%m,             &  ! Number of dimensions
+                              curv%u,                       &  ! Parameter array
+                              size(curv%x),                 &  ! Unrolled size of x array
+                              curv%x,curv%w,                &  ! points and weights
+                              curv%order,curv%smoothing,    &  ! spline accuracy
+                              curv%nest,curv%knots,curv%t,  &  ! spline output
+                              size(curv%c),curv%c,curv%fp,  &  ! spline output
+                              curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
+                              ierr)
+
+               class is (fitpack_parametric_curve)
+
+                  call parcur(curv%iopt,                    &  ! option
+                              merge(1,0,curv%has_params),   &  ! have input parameter values?
+                              curv%idim,curv%m,             &  ! Number of dimensions
+                              curv%u,                       &  ! Parameter array
+                              size(curv%x),                 &  ! Unrolled size of x array
+                              curv%x,curv%w,                &  ! points and weights
+                              curv%ubegin,curv%uend,        &  ! Parameter range
+                              curv%order,curv%smoothing,    &  ! spline accuracy
+                              curv%nest,curv%knots,curv%t,  &  ! spline output
+                              size(curv%c),curv%c,curv%fp,  &  ! spline output
+                              curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
+                              ierr)
+
+            end select
+
+                        ! Error flag
 
             ! After any successful call, parameters have surely been computed.
             if (FITPACK_SUCCESS(ierr)) this%has_params = .true.
@@ -397,7 +432,7 @@ module fitpack_parametric_curves
                    size(this%dd),& ! Its size
                    ierr0)          ! Output flag
 
-       ! Order is 0:k <- extract derivative
+       ! Derivative order is 0:k <- extract derivative
        ddx = this%dd(:,1+ddx_order)
 
        1 call fitpack_error_handling(ierr0,ierr,'evaluate derivative')

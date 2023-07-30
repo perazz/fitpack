@@ -31,6 +31,7 @@ module fitpack
     public :: fitpack_curve
     public :: fitpack_periodic_curve
     public :: fitpack_parametric_curve
+    public :: fitpack_closed_curve
     public :: fitpack_surface
 
 end module fitpack

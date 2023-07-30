@@ -27,20 +27,20 @@ module fitpack_core
     integer, parameter, public :: RSIZE = int32
 
     ! Curve fitting routines
-    public :: curfit ! General curve fitting
-    public :: percur ! Curve fitting with periodic splines
-    public :: parcur ! Smoothing of parametric curves
-    public :: clocur ! Smoothing of closed curves
+    public :: curfit ! * General curve fitting
+    public :: percur ! * Curve fitting with periodic splines
+    public :: parcur ! * Smoothing of parametric curves
+    public :: clocur ! * Smoothing of closed curves
     public :: concur ! Smoothing with end-point derivative constraints
     public :: cocosp ! Least-squares fitting with convexity constraints
     public :: concon ! Automated smoothing with convexity constraints
 
     ! Curve approximation routines
-    public :: splev  ! Evaluation of a spline function
-    public :: splder ! Derivative calculation of a spline function
+    public :: splev  ! * Evaluation of a spline function
+    public :: splder ! * Derivative calculation of a spline function
     public :: spalde ! All derivatives of a spline function
-    public :: curev  ! Evaluation of a spline curve
-    public :: cualde ! All derivatives of a spline curve
+    public :: curev  ! * Evaluation of a spline curve
+    public :: cualde ! * All derivatives of a spline curve
     public :: insert ! Insert a knot into a given spline
     public :: insert_inplace
     public :: splint ! Integration of a spline function
@@ -512,10 +512,10 @@ module fitpack_core
       !   results will be obtained with the choice of clocur(in case ipar=0), i.e.
       !        v(1)=0, v(i)=v(i-1)+q(i), i=2,...,m, u(i)=v(i)/v(m), i=1,..,m
       !   where
-      !        q(i)= sqrt(sum j=1,idim (xj(i)-xj(i-1))**2 )
+      !        q(i)= sqrt(sum j=1,idim (xj(i)-xj(i-1))**2 ) - Euclidean distance
       !   other possibilities for q(i) are
-      !        q(i)= sum j=1,idim (xj(i)-xj(i-1))**2
-      !        q(i)= sum j=1,idim abs(xj(i)-xj(i-1))
+      !        q(i)= sum j=1,idim (xj(i)-xj(i-1))**2        - Squared distance
+      !        q(i)= sum j=1,idim abs(xj(i)-xj(i-1))        - Manhattan distance
       !        q(i)= max j=1,idim abs(xj(i)-xj(i-1))
       !        q(i)= 1
       !
@@ -16770,7 +16770,7 @@ module fitpack_core
       ier = FITPACK_INPUT_ERROR
       nk1 = n-k1
 
-      if(x<t(k1) .or. x>t(nk1+1)) return
+      if (x<t(k1) .or. x>t(nk1+1)) return
 
       !  search for knot interval t(l) <= x < t(l+1)
       l = k1
