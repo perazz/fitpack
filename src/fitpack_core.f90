@@ -48,9 +48,9 @@ module fitpack_core
     public :: sproot ! The roots of a cubic spline
 
     ! Surface fitting routines
-    public :: surfit ! Surface fitting to scattered data
+    public :: surfit ! * Surface fitting to scattered data
     public :: regrid ! Surface fitting to data on a rectangular grid
-    public :: polar  ! Surface fitting using generalized polar coordinates
+    public :: polar  ! * Surface fitting using generalized polar coordinates
     public :: pogrid ! Surface fitting to data on a polar grid
     public :: sphere ! Surface fitting using spherical coordinates
     public :: spgrid ! Surface fitting to data on a spherical grid
@@ -66,6 +66,9 @@ module fitpack_core
     public :: profil ! Cross-section of a bivariate spline
     public :: evapol ! Evaluation of a polar spline
     public :: surev  ! Evaluation of a parametric spline surface
+
+    ! Polar domain boundary
+    public :: fitpack_polar_boundary
 
     ! Utilities
     public :: fitpack_swap
@@ -130,10 +133,10 @@ module fitpack_core
 
     abstract interface
        ! Function defining the boundary of the curve approximation domain
-       pure real(RKIND) function boundary(v) result(rad)
+       pure real(RKIND) function fitpack_polar_boundary(theta) result(rad)
           import RKIND
-          real(RKIND), intent(in) :: v
-       end function boundary
+          real(RKIND), intent(in) :: theta
+       end function fitpack_polar_boundary
     end interface
 
     interface fitpack_swap
@@ -1922,7 +1925,7 @@ module fitpack_core
       !  ..array arguments..
       real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
       !  ..user specified function
-      procedure(boundary) :: rad
+      procedure(fitpack_polar_boundary) :: rad
 
       !  ..local scalars..
       integer :: ier
@@ -10003,7 +10006,7 @@ module fitpack_core
                                     cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4), &
                                     spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
-      procedure(boundary) :: rad
+      procedure(fitpack_polar_boundary) :: rad
       !  ..local scalars..
       real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
@@ -15978,7 +15981,7 @@ module fitpack_core
       !          found at the last call of the routine.
       !          attention: a call with iopt(1)=1 must always be immediately preceded by another call with
       !          iopt(1) = 1 or iopt(1) = 0.
-      !  iopt(2):on entry iopt(2) must specify the requested order of conti nuity for f(x,y) at the origin.
+      !  iopt(2):on entry iopt(2) must specify the requested order of continuity for f(x,y) at the origin.
       !          if iopt(2)=0 only condition (1) must be fulfilled,
       !          if iopt(2)=1 conditions (1)+(2) must be fulfilled and
       !          if iopt(2)=2 conditions (1)+(2)+(3) must be fulfilled.
@@ -16198,7 +16201,7 @@ module fitpack_core
       integer,     intent(in)    :: iopt(3)
       integer,     intent(inout) :: iwrk(kwrk)
       !  ..user specified function
-      procedure(boundary) :: rad
+      procedure(fitpack_polar_boundary) :: rad
       !  ..local scalars..
       real(RKIND) :: dist,r
       integer :: i,ib1,ib3,ki,kn,kwest,la,lbu,lcc,lcs,lro,lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,&
@@ -16279,15 +16282,15 @@ module fitpack_core
       ier = FITPACK_OK
 
       !  we partition the working space and determine the spline approximation
-      kn = 1
-      ki = kn+m
-      lq = 2
-      la = lq+ncc*ib3
-      lf = la+ncc*ib1
+      kn  = 1
+      ki  = kn+m
+      lq  = 2
+      la  = lq+ncc*ib3
+      lf  = la+ncc*ib1
       lff = lf+ncc
       lfp = lff+ncest
       lco = lfp+nrint
-      lh = lco+nrint
+      lh  = lco+nrint
       lbu = lh+ib3
       lbv = lbu+5*nuest
       lro = lbv+5*nvest

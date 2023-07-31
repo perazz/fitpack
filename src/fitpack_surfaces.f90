@@ -24,7 +24,7 @@ module fitpack_surfaces
 
     public :: fitpack_surface
 
-    !> A public type describing a surface fitter z = s(x,y)
+    !> A public type describing a surface fitter z = s(x,y) to scattered x,y data
     type :: fitpack_surface
 
         !> The data points
@@ -66,9 +66,7 @@ module fitpack_surfaces
         ! Runtime flag
         integer :: iopt = 0
 
-
         contains
-
 
            !> Clean memory
            procedure :: destroy    => surf_destroy

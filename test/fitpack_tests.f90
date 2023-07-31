@@ -2817,7 +2817,7 @@ module fitpack_tests
           !  we calculate the exact function values and set up the weights w(i)=(0.01)**(-1)
           !  (0.01 is an estimate for the standard deviation of the error in z(i)). at the same time
           !  we calculate the mean and maximum errors for the data values.
-          w     = 0.1e3_RKIND
+          w     = 100.0_RKIND
           exact = testpo(x,y)
           avg   = sum(abs(z-exact))/m1
           ermax = maxval(abs(z-exact),1)
@@ -2905,7 +2905,7 @@ module fitpack_tests
 
                  case (4,5)
 
-                     !  determination of the spline approximation on the ellips.
+                     !  determination of the spline approximation on the ellipsoid
                      call polar(iopt,m,x,y,z,w,rad2,s,nuest,nvest,eps,nu,tu, &
                                 nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
@@ -2976,14 +2976,14 @@ module fitpack_tests
               testpo=(x**2+y**2)/((x+y)**2+half)
           end function testpo
 
-          !  the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
+          ! CIRCLE: the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
           pure real(RKIND) function rad1(v)
              real(RKIND), intent(in) :: v
              rad1 = one
              return
           end function rad1
 
-          ! the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
+          ! ELLIPSOID: the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
           pure real(RKIND) function rad2(v)
              real(RKIND), intent(in) :: v
              rad2 = one/sqrt(three-two*sin(2*v))

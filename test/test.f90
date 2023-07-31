@@ -45,6 +45,7 @@ program test
         call add_test(test_periodic_fit())
         call add_test(test_parametric_fit())
         call add_test(test_closed_fit())
+        call add_test(test_polar_fit())
 
     end subroutine run_interface_tests
 
@@ -58,8 +59,6 @@ program test
         do itest = 1,29
            call add_test(perform_legacy_test(itest))
         end do
-
-
 
     end subroutine run_legacy_tests
 
@@ -114,8 +113,6 @@ program test
                  write(useUnit,*) '[fitpack] invalid test ID: try 1-29'
                  success = .false.
         end select
-
-
 
     end function perform_legacy_test
 
