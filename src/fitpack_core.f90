@@ -52,13 +52,13 @@ module fitpack_core
     public :: regrid ! Surface fitting to data on a rectangular grid
     public :: polar  ! * Surface fitting using generalized polar coordinates
     public :: pogrid ! Surface fitting to data on a polar grid
-    public :: sphere ! Surface fitting using spherical coordinates
+    public :: sphere ! * Surface fitting using spherical coordinates
     public :: spgrid ! Surface fitting to data on a spherical grid
     public :: parsur ! Parametric surface fitting to data on a grid
 
     ! Surface application routines
     public :: bispeu ! Evaluation of a bivariate spline function
-    public :: bispev ! Evaluation of a bivariate spline function
+    public :: bispev ! * Evaluation of a bivariate spline function
     public :: parder ! Partial derivatives of a bivariate spline
     public :: pardeu ! Partial derivatives of a bivariate spline
     public :: pardtc ! Create partial derivative splane of a bivariate spline

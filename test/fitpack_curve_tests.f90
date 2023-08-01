@@ -20,7 +20,7 @@
 module fitpack_curve_tests
     use fitpack
     use fitpack_core
-    use fitpack_test_data, only: dapola
+    use fitpack_test_data, only: dapola,dasphe
     use iso_fortran_env, only: output_unit
 
 
@@ -32,6 +32,7 @@ module fitpack_curve_tests
     public :: test_parametric_fit
     public :: test_closed_fit
     public :: test_polar_fit
+    public :: test_sphere_fit
 
 
     contains
@@ -492,6 +493,98 @@ module fitpack_curve_tests
           end function rad2_ellipsoid
 
     end function test_polar_fit
+
+    logical function test_sphere_fit(iunit) result(success)
+       integer, optional, intent(in) :: iunit
+
+       type(fitpack_sphere) :: sphere
+       integer :: useUnit,loop,ierr,i,j,m
+       real(RKIND), allocatable, dimension(:) :: theta,phi,r,w,teval,phieval
+       real(RKIND), allocatable, dimension(:,:) :: exact,f
+       real(RKIND) :: avg,ermax
+
+       ! Initialization.
+       success = .true.
+       if (present(iunit)) then
+           useUnit = iunit
+       else
+           useUnit = output_unit
+       end if
+
+       ! Get latitude and longitude coordinates from array "dasphe"
+       theta = min(deg2rad*dasphe(1:384-1:2),pi)
+       phi   = min(deg2rad*dasphe(2:384  :2),pi2)
+       r     = testsp(theta,phi) ! calculate the function values.
+
+       ! Set up an evaluation grid at fixed observation points
+       teval   = [((pi/8)*i,i=0,8)]
+       phieval = [((pi2/8)*i,i=0,8)]
+       allocate(exact(9,9)); forall(i=1:9,j=1:9) exact(j,i) = testsp(theta(i),phi(j))
+
+       ! Number of points
+       m = size(theta)
+
+       ! Set uniform weights: w(i)=(0.01)**(-1), where 0.01 is an estimate for the standard deviation
+       ! of the error in z(i)).
+       allocate(w(m),source=1.0_RKIND)
+
+       ! we determine a number of smoothing spline approximations on the unit disk: x**2+y**2 <= 1.
+       approximations: do loop=1,3
+
+           ! Compute/update fit
+           select case (loop)
+              case (1)
+                ierr = sphere%new_fit(theta,phi,r,smoothing=500.0_RKIND)
+              case (2)
+                ierr = sphere%fit(smoothing=135.0_RKIND)
+              case (3)
+                ierr = sphere%fit(smoothing=15.0_RKIND)
+           end select
+
+           if (.not.FITPACK_SUCCESS(ierr)) then
+               success = .false.
+               write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+               exit
+           end if
+
+           ! Evaluate fit at the initial points
+           f = sphere%eval(teval,phieval,ierr)
+
+           if (.not.FITPACK_SUCCESS(ierr)) then
+               success = .false.
+               write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+               exit
+           end if
+
+           ! Determine mean and maximum errors
+           avg   = sum(abs(f-exact))/size(f)
+           ermax = maxval(abs(f-exact))
+
+           !write(useUnit,920) sphere%smoothing,avg,ermax
+
+       end do approximations
+
+        920 format('[test_polar_fit] s=',f7.1,', mean error = ',f7.4,5x,'max. error = ',f7.4)
+       1000 format('[test_polar_fit] polar test ',i0,' failed: ',a)
+
+       contains
+
+          ! calculate the value of a test function for the sphere package.
+          elemental real(RKIND) function testsp(v,u)
+              real(RKIND), intent(in) :: u,v
+              real(RKIND) :: cu,cv,rad1,rad2,rad3,su,sv
+              cu = cos(u)
+              cv = cos(v)
+              su = sin(u)
+              sv = sin(v)
+              rad1 = (cu*sv*0.2)**2+(su*sv)**2+(cv*0.5)**2
+              rad2 = (cu*sv)**2+(su*sv*0.5)**2+(cv*0.2)**2
+              rad3 = (cu*sv*0.5)**2+(su*sv*0.2)**2+cv**2
+              testsp = 1./sqrt(rad1) + 1./sqrt(rad2) + 1./sqrt(rad3)
+              return
+          end function testsp
+
+    end function test_sphere_fit
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)
