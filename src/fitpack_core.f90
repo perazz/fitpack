@@ -64,7 +64,7 @@ module fitpack_core
     public :: pardtc ! Create partial derivative splane of a bivariate spline
     public :: dblint ! Integration of a bivariate spline
     public :: profil ! Cross-section of a bivariate spline
-    public :: evapol ! Evaluation of a polar spline
+    public :: evapol ! * Evaluation of a polar spline
     public :: surev  ! Evaluation of a parametric spline surface
 
     ! Polar domain boundary

@@ -399,7 +399,8 @@ module fitpack_curve_tests
        ! Number of points
        m = size(x)
 
-       ! Set uniform weights
+       ! Set uniform weights: w(i)=(0.01)**(-1), where 0.01 is an estimate for the standard deviation
+       ! of the error in z(i)).
        allocate(w(m),source=100.0_RKIND)
 
        ! we determine a number of smoothing spline approximations on the unit disk: x**2+y**2 <= 1.
@@ -446,16 +447,6 @@ module fitpack_curve_tests
              return
           end function rad2_ellipsoid
 
-!
-!
-!          !  we choose a value for eps
-!          real(RKIND), parameter :: eps = 0.1e-05_RKIND
-!
-!          real(RKIND), dimension(m1) :: x,y,z,w,u,v,exact,f
-!          real(RKIND) :: tu(30),tv(30),c(300),s,fp,avg,ermax
-!          real(RKIND), allocatable :: wrk1(:),wrk2(:)
-!          integer :: iopt(3),iwrk(500)
-!          integer :: i,is,ier,l,m,nc,nu,nv,pos,useUnit
 !
 !          !  we calculate the exact function values and set up the weights w(i)=(0.01)**(-1)
 !          !  (0.01 is an estimate for the standard deviation of the error in z(i)). at the same time
