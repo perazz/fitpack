@@ -383,10 +383,11 @@ module fitpack_parametric_curves
 
             end select
 
-                        ! Error flag
-
             ! After any successful call, parameters have surely been computed.
-            if (FITPACK_SUCCESS(ierr)) this%has_params = .true.
+            if (FITPACK_SUCCESS(ierr)) then
+                this%has_params = .true.
+                this%iopt       = IOPT_OLD_FIT
+            endif
 
         end do
 

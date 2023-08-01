@@ -274,7 +274,7 @@ module fitpack_curves
         class(fitpack_curve), intent(inout) :: this
 
         ! Set zero smoothing
-        ierr = curve_fit_automatic_knots(this,zero)
+        ierr = curve_fit_automatic_knots(this,smoothing=zero)
 
     end function interpolating_curve
 
@@ -330,6 +330,9 @@ module fitpack_curves
                               ierr)                           ! Error flag
 
             end select
+
+            ! If fit was successful, set iopt to "old"
+            if (FITPACK_SUCCESS(ierr)) this%iopt = IOPT_OLD_FIT
 
         end do
 

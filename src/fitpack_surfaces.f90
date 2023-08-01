@@ -137,6 +137,9 @@ module fitpack_surfaces
                         this%iwrk,this%liwrk,        &  ! memory
                         ierr)                           ! Error flag
 
+            ! If fit was successful, set iopt to "old"
+            if (FITPACK_SUCCESS(ierr)) this%iopt = IOPT_OLD_FIT
+
         end do
 
     end function surface_fit_automatic_knots

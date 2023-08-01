@@ -93,7 +93,10 @@ module fitpack_polar_domains
            procedure :: new_fit    => polr_new_fit
 
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit        => surface_fit_automatic_knots
+           procedure :: fit           => surface_fit_automatic_knots
+           procedure :: least_squares => surface_fit_least_squares
+           procedure :: interpolate   => surface_fit_interpolating
+
 
            !> Evaluate polar domain at given x,y coordinates
            procedure, private :: polr_eval_one
@@ -108,6 +111,24 @@ module fitpack_polar_domains
 
     contains
 
+    ! Fit a surface to least squares of the current knots
+    integer function surface_fit_least_squares(this) result(ierr)
+       class(fitpack_polar), intent(inout) :: this
+
+       this%iopt = IOPT_NEW_LEASTSQUARES
+       ierr = this%fit()
+
+    end function surface_fit_least_squares
+
+    ! Find interpolating surface
+    integer function surface_fit_interpolating(this) result(ierr)
+        class(fitpack_polar), intent(inout) :: this
+
+        ! Set zero smoothing
+        ierr = surface_fit_automatic_knots(this,smoothing=zero)
+
+    end function surface_fit_interpolating
+
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function surface_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_polar), intent(inout) :: this
@@ -118,13 +139,18 @@ module fitpack_polar_domains
         real(RKIND), parameter :: smoothing_trajectory(*) = [1000.d0,60.d0,30.d0]
         real(RKIND), dimension(size(smoothing_trajectory)) :: smooth_now
 
-        if (present(smoothing)) then
-            smooth_now = smoothing
+        if (this%iopt==IOPT_NEW_LEASTSQUARES) then
+            smooth_now = this%smoothing
             nit        = 1
         else
             smooth_now = smoothing_trajectory
             nit        = size(smoothing_trajectory)
         end if
+
+        if (present(smoothing)) then
+            smooth_now = smoothing
+            nit        = 1
+        endif
 
         do loop=1,nit
 
@@ -150,6 +176,9 @@ module fitpack_polar_domains
                        this%wrk2,this%lwrk2,         &  ! memory
                        this%iwrk,this%liwrk,         &  ! memory
                        ierr)                            ! Error flag
+
+            ! If fit was successful, set iopt to "old"
+            if (FITPACK_SUCCESS(ierr)) this%iopt = IOPT_OLD_FIT
 
         end do
 
@@ -185,11 +214,12 @@ module fitpack_polar_domains
 
     end subroutine polar_destroy
 
-    subroutine polar_new_points(this,x,y,z,boundary,w)
+    subroutine polar_new_points(this,x,y,z,boundary,w,boundary_bc)
         class(fitpack_polar), intent(inout) :: this
         real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        integer    , optional, intent(in) :: boundary_BC
 
         integer :: clen,l,k,p,q,iopt2_min,iopt2_max,iopt3_min,iopt3_max
         integer, parameter :: SAFE = 2
@@ -220,6 +250,9 @@ module fitpack_polar_domains
 
         ! Reset run flag
         this%iopt = 0
+
+        ! Reset boundary BC
+        if (present(boundary_BC)) this%bc_boundary = boundary_BC
 
         ! Knot space: overestimate upper bound
         ! nuest, nvest >=8. In most situations, nuest = nvest = 8+sqrt(m/2) will be sufficient.
@@ -258,15 +291,16 @@ module fitpack_polar_domains
     end subroutine polar_new_points
 
     ! A default constructor
-    type(fitpack_polar) function polr_new_from_points(x,y,z,boundary,w,ierr) result(this)
+    type(fitpack_polar) function polr_new_from_points(x,y,z,boundary,w,boundary_bc,ierr) result(this)
         real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        integer, optional, intent(in) :: boundary_bc
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
 
-        ierr0 = this%new_fit(x,y,z,boundary,w)
+        ierr0 = this%new_fit(x,y,z,boundary,w,boundary_bc)
 
         ! Error handling
         call fitpack_error_handling(ierr0,ierr,'new surface fit')
@@ -304,14 +338,15 @@ module fitpack_polar_domains
     end function polr_eval_many
 
     ! Fit a new curve
-    integer function polr_new_fit(this,x,y,z,boundary,w,smoothing)
+    integer function polr_new_fit(this,x,y,z,boundary,w,boundary_bc,smoothing)
         class(fitpack_polar), intent(inout) :: this
         real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
         real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        integer    , optional, intent(in) :: boundary_bc
         real(RKIND), optional, intent(in) :: smoothing
 
-        call this%new_points(x,y,z,boundary,w)
+        call this%new_points(x,y,z,boundary,w,boundary_bc)
 
         polr_new_fit = this%fit(smoothing)
 

@@ -18,7 +18,6 @@ program test
        stop -1
     endif
 
-
     ! Run legacy tests
     call run_legacy_tests
 

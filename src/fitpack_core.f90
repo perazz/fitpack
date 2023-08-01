@@ -82,6 +82,7 @@ module fitpack_core
     integer, parameter, public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
     ! IOPT defines a curve state
+                        public :: IOPT_MESSAGE
     integer, parameter, public :: IOPT_NEW_LEASTSQUARES = -1 ! Request a new lsq fit
     integer, parameter, public :: IOPT_NEW_SMOOTHING    =  0 ! Request a new smoothing fit
     integer, parameter, public :: IOPT_OLD_FIT          =  1 ! Update an old fit
@@ -182,6 +183,18 @@ module fitpack_core
          end select
 
       end function FITPACK_MESSAGE
+
+      ! Wrapper for iopt
+      pure function IOPT_MESSAGE(iopt) result(msg)
+         integer, intent(in) :: iopt
+         character(len=:), allocatable :: msg
+         select case (iopt)
+            case (IOPT_NEW_LEASTSQUARES); msg = 'Least-Squares'
+            case (IOPT_NEW_SMOOTHING); msg = 'Smoothing'
+            case (IOPT_OLD_FIT); msg = 'Old'
+            case default; msg = 'UNKNOWN IOPT'
+         end select
+      end function IOPT_MESSAGE
 
       ! Wrapper for OK
       elemental logical function FITPACK_SUCCESS(ierr)
@@ -10204,6 +10217,7 @@ module fitpack_core
                       call fpgivs(piv,a(j,1),co,si)
                       call fprota(co,si,cs(:ipar),cosi(:ipar,j))
 
+                      j1 = j+1
                       if (j<nvv) call fprota(co,si,row(j1:nvv),a(j,2:nvv-j1+2))
                   end do
               end do get_coefs
