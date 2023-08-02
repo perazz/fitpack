@@ -46,6 +46,8 @@ module fitpack_curve_tests
        real(RKIND) :: s
        integer :: ierr,loop,useUnit,i
 
+       success = .true.
+
        if (present(iunit)) then
            useUnit = iunit
        else
@@ -138,6 +140,8 @@ module fitpack_curve_tests
        type(fitpack_parametric_curve) :: curve
        real(RKIND) :: s
        integer :: ierr,loop,useUnit
+
+       success = .true.
 
        useUnit = output_unit
 
@@ -502,6 +506,7 @@ module fitpack_curve_tests
        real(RKIND), allocatable, dimension(:) :: theta,phi,r,w,teval,phieval
        real(RKIND), allocatable, dimension(:,:) :: exact,f
        real(RKIND) :: avg,ermax
+       character(64) :: loop_name
 
        ! Initialization.
        success = .true.
@@ -517,9 +522,11 @@ module fitpack_curve_tests
        r     = testsp(theta,phi) ! calculate the function values.
 
        ! Set up an evaluation grid at fixed observation points
-       teval   = [((pi/8)*i,i=0,8)]
-       phieval = [((pi2/8)*i,i=0,8)]
-       allocate(exact(9,9)); forall(i=1:9,j=1:9) exact(j,i) = testsp(theta(i),phi(j))
+       teval   = [((pi/32)*i,i=0,32)]
+       phieval = [((pi2/32)*i,i=0,32)]
+       allocate(exact(33,33)); forall(i=1:33,j=1:33) exact(j,i) = testsp(theta(i),phi(j))
+
+       call write_grid_to_file('exact_grid',teval,phieval,exact)
 
        ! Number of points
        m = size(theta)
@@ -550,6 +557,9 @@ module fitpack_curve_tests
            ! Evaluate fit at the initial points
            f = sphere%eval(teval,phieval,ierr)
 
+           write(loop_name,10),loop
+           call write_grid_to_file(trim(loop_name),teval,phieval,f)
+
            if (.not.FITPACK_SUCCESS(ierr)) then
                success = .false.
                write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
@@ -564,10 +574,33 @@ module fitpack_curve_tests
 
        end do approximations
 
+         10 format('loop_',i0)
         920 format('[test_polar_fit] s=',f7.1,', mean error = ',f7.4,5x,'max. error = ',f7.4)
        1000 format('[test_polar_fit] polar test ',i0,' failed: ',a)
 
        contains
+
+          ! Write sphere data to file
+          subroutine write_grid_to_file(fileName,theta,phi,data)
+              character(*), intent(in) :: fileName
+              real(RKIND), intent(in) :: theta(:),phi(:),data(:,:) ! [size(phi),size(theta)]
+
+              integer :: iunit,i
+
+              open(newunit=iunit,file=fileName,form='formatted',action='write')
+
+              write(iunit,2) zero,theta
+
+              do i=1,size(phi)
+                 write(iunit,2) phi(i),data(i,:)
+              end do
+
+              close(iunit)
+
+              1 format(*(a13))
+              2 format(*(1pe13.5e3))
+
+          end subroutine write_grid_to_file
 
           ! calculate the value of a test function for the sphere package.
           elemental real(RKIND) function testsp(v,u)
@@ -577,10 +610,10 @@ module fitpack_curve_tests
               cv = cos(v)
               su = sin(u)
               sv = sin(v)
-              rad1 = (cu*sv*0.2)**2+(su*sv)**2+(cv*0.5)**2
-              rad2 = (cu*sv)**2+(su*sv*0.5)**2+(cv*0.2)**2
-              rad3 = (cu*sv*0.5)**2+(su*sv*0.2)**2+cv**2
-              testsp = 1./sqrt(rad1) + 1./sqrt(rad2) + 1./sqrt(rad3)
+              rad1 = (cu*sv*0.2_RKIND)**2+(su*sv)**2+(cv*0.5_RKIND)**2
+              rad2 = (cu*sv)**2+(su*sv*0.5_RKIND)**2+(cv*0.2_RKIND)**2
+              rad3 = (cu*sv*0.5_RKIND)**2+(su*sv*0.2_RKIND)**2+cv**2
+              testsp = one/sqrt(rad1) + one/sqrt(rad2) + one/sqrt(rad3)
               return
           end function testsp
 
