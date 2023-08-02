@@ -436,7 +436,7 @@ module fitpack_parametric_curves
        ! Derivative order is 0:k <- extract derivative
        ddx = this%dd(:,1+ddx_order)
 
-       1 call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
+       call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
 
     end function curve_derivative
 

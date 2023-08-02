@@ -43,7 +43,6 @@ module fitpack_curve_tests
 
        real(RKIND), allocatable :: x(:,:),w(:),y(:,:),u(:)
        type(fitpack_closed_curve) :: curve
-       real(RKIND) :: s
        integer :: ierr,loop,useUnit,i
 
        success = .true.
@@ -138,7 +137,6 @@ module fitpack_curve_tests
 
        real(RKIND), allocatable :: x(:,:),u(:),w(:),y(:,:)
        type(fitpack_parametric_curve) :: curve
-       real(RKIND) :: s
        integer :: ierr,loop,useUnit
 
        success = .true.
@@ -384,7 +382,7 @@ module fitpack_curve_tests
        integer, optional, intent(in) :: iunit
 
        type(fitpack_polar) :: polar
-       integer :: m,ier,useUnit,loop,ierr
+       integer :: m,useUnit,loop,ierr
        character(64) :: domain
        real(RKIND), allocatable :: x(:),y(:),z(:),w(:),f(:),exact(:)
        real(RKIND) :: avg,ermax
@@ -557,7 +555,7 @@ module fitpack_curve_tests
            ! Evaluate fit at the initial points
            f = sphere%eval(teval,phieval,ierr)
 
-           write(loop_name,10),loop
+           write(loop_name,10) loop
            call write_grid_to_file(trim(loop_name),teval,phieval,f)
 
            if (.not.FITPACK_SUCCESS(ierr)) then
@@ -589,16 +587,15 @@ module fitpack_curve_tests
 
               open(newunit=iunit,file=fileName,form='formatted',action='write')
 
-              write(iunit,2) zero,theta
+              write(iunit,1) zero,theta
 
               do i=1,size(phi)
-                 write(iunit,2) phi(i),data(i,:)
+                 write(iunit,1) phi(i),data(i,:)
               end do
 
               close(iunit)
 
-              1 format(*(a13))
-              2 format(*(1pe13.5e3))
+              1 format(*(1pe13.5e3))
 
           end subroutine write_grid_to_file
 
