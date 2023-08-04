@@ -49,6 +49,15 @@
 		<Unit filename="../src/fitpack_curves.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="../src/fitpack_parametric.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_polar.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_spheres.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="../src/fitpack_surfaces.f90">
 			<Option weight="1" />
 		</Unit>
