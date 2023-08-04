@@ -86,8 +86,7 @@ module fitpack_parametric_curves
            procedure :: destroy
 
            !> Set new points
-           procedure, private :: new_points_base
-           generic   :: new_points => new_points_base
+           procedure :: new_points
 
            !> Generate new fit
            procedure :: new_fit
@@ -147,8 +146,9 @@ module fitpack_parametric_curves
            !> Clear memory
            procedure :: destroy => con_destroy
 
-           !> Set curve constraints
-           procedure :: set_constraints
+           !> Curve constraints
+           procedure :: clean_constraints
+           procedure ::   set_constraints
 
     end type fitpack_constrained_curve
 
@@ -229,7 +229,7 @@ module fitpack_parametric_curves
 
     end subroutine con_destroy
 
-    subroutine new_points_base(this,x,u,w)
+    subroutine new_points(this,x,u,w)
         class(fitpack_parametric_curve), intent(inout) :: this
         real(RKIND), intent(in) :: x(:,:)
         real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
@@ -314,7 +314,7 @@ module fitpack_parametric_curves
 
         endassociate
 
-    end subroutine new_points_base
+    end subroutine new_points
 
     elemental subroutine clean_constraints(this)
        class(fitpack_constrained_curve), intent(inout) :: this
@@ -374,38 +374,6 @@ module fitpack_parametric_curves
         call fitpack_error_handling(ier,ierr,'constrained_curve: set_constraints')
 
     end subroutine set_constraints
-
-    subroutine new_points_begin_constraint(this,x,u,w,ddx_begin)
-        class(fitpack_constrained_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
-        real(RKIND), intent(in)           :: ddx_begin(0:) ! optional BEGIN constraints (constrained_curve only)
-
-        ! Call base constructor
-        call new_points_base(this,x,u,w)
-
-        ! Add point constraints
-
-
-    end subroutine new_points_begin_constraint
-
-    subroutine new_points_both_constraints(this,x,u,w,ddx_begin,ddx_end)
-        class(fitpack_constrained_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
-        real(RKIND), intent(in)           :: ddx_begin(0:) ! optional BEGIN constraints (constrained_curve only)
-        real(RKIND), intent(in)           :: ddx_end(0:)   ! optional ENDPOINT constraints (constrained_curve only)
-
-        ! Call base constructor
-        call new_points_base(this,x,u,w)
-
-        ! Add point constraints
-
-
-    end subroutine new_points_both_constraints
-
 
     function curve_eval_one(this,u,ierr) result(y)
         class(fitpack_parametric_curve), intent(inout)  :: this
@@ -531,18 +499,6 @@ module fitpack_parametric_curves
                               ierr)
 
                class is (fitpack_constrained_curve)
-
-
-      !           curve returned.
-      !   wrk   : real array of dimension at least m*(k+1)+nest*(6+idim+3*k). used as working space. if
-      !           the computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left
-      !           unchanged between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared
-      !           in the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
-      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged between
-      !           subsequent calls.
-
 
                   call concur(curv%iopt,                    &  ! option
                               curv%idim,curv%m,             &  ! Number of dimensions
