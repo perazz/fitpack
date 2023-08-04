@@ -86,7 +86,8 @@ module fitpack_parametric_curves
            procedure :: destroy
 
            !> Set new points
-           procedure :: new_points
+           procedure, private :: new_points_base
+           generic   :: new_points => new_points_base
 
            !> Generate new fit
            procedure :: new_fit
@@ -115,6 +116,41 @@ module fitpack_parametric_curves
     type, extends(fitpack_parametric_curve) :: fitpack_closed_curve
 
     end type fitpack_closed_curve
+
+    !> Derived type describing a parametric curve with constraints at the boundaries.
+    !> The dimensional splines will satisfy the following boundary constraints
+    !>                     (l)
+    !>       if ib >= 0 :  sj   (u(1)) = db(1:idim,0:ib-1), ib = boundary constraint on the (i-1)-th derivative
+    !>   and                (l)
+    !>       if ie >= 0 :  sj   (u(m)) = de(1:idim,0:ie-1), ie = boundary constraint on the (i-1)-th derivative
+    type, extends(fitpack_parametric_curve) :: fitpack_constrained_curve
+
+        !> Left boundary derivatives
+        integer                  :: ib = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
+        real(RKIND), allocatable :: deriv_begin(:,:) ! 0:ib-1
+        !> Right boundary derivatives
+        integer                  :: ie = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
+        real(RKIND), allocatable :: deriv_end(:,:)
+
+        !> On exit xx contains the coordinates of the data points to which a spline curve with zero
+        !> derivative constraints has been determined. if the computation mode iopt =1 is used xx should
+        !> be left unchanged between calls.
+        real(RKIND), allocatable :: xx(:,:)
+
+        !> On exit cp contains the b-spline coefficients of a polynomial curve which satisfies the
+        !> boundary constraints. if the computation mode iopt =1 is used cp should be left unchanged
+        !> between calls.
+        real(RKIND), allocatable :: cp(:,:)
+
+        contains
+
+           !> Clear memory
+           procedure :: destroy => con_destroy
+
+           !> Set curve constraints
+           procedure :: set_constraints
+
+    end type fitpack_constrained_curve
 
     ! Default constructor
     interface fitpack_parametric_curve
@@ -182,11 +218,22 @@ module fitpack_parametric_curves
 
     end subroutine destroy
 
-    subroutine new_points(this,x,u,w)
+    elemental subroutine con_destroy(this)
+       class(fitpack_constrained_curve), intent(inout) :: this
+
+       integer :: ierr
+       call destroy(this)
+       call clean_constraints(this)
+       deallocate(this%xx,stat=ierr)
+       deallocate(this%cp,stat=ierr)
+
+    end subroutine con_destroy
+
+    subroutine new_points_base(this,x,u,w)
         class(fitpack_parametric_curve), intent(inout) :: this
         real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2)) ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2)) ! node weights
+        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
+        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
 
         integer, allocatable :: isort(:)
         integer, parameter   :: SAFE = 2
@@ -235,6 +282,17 @@ module fitpack_parametric_curves
         ! always large enough is nest=m+k+1, the number of knots needed for interpolation (s=0).
         select type (curv => this)
 
+           class is (fitpack_constrained_curve)
+
+              ! on exit cp will contain the b-spline coefficients of a polynomial curve which satisfies
+              ! the boundary constraints. if the computation mode iopt =1 is used cp should be left
+              ! unchanged between calls.
+              allocate(curv%xx(idim,m),&
+                       curv%cp(idim,2*(MAX_ORDER+1)))
+
+              nest = SAFE*(m+MAX_ORDER+1+max(0,MAX_ORDER)+max(0,MAX_ORDER))
+              lwrk = (m*(MAX_ORDER+1)+nest*(6+idim+3*MAX_ORDER))
+
            class is (fitpack_closed_curve)
 
               nest = SAFE*(m+2*MAX_ORDER)
@@ -256,7 +314,98 @@ module fitpack_parametric_curves
 
         endassociate
 
-    end subroutine new_points
+    end subroutine new_points_base
+
+    elemental subroutine clean_constraints(this)
+       class(fitpack_constrained_curve), intent(inout) :: this
+       integer :: ierr
+       deallocate(this%deriv_begin,stat=ierr)
+       deallocate(this%deriv_end,stat=ierr)
+       this%ib = 0
+       this%ie = 0
+    end subroutine clean_constraints
+
+    ! A call to set_constraints will RESET ALL contraints: a missing "ddx_end" means: no constraints
+    ! at the endpoint
+    subroutine set_constraints(this,ddx_begin,ddx_end,ierr)
+        class(fitpack_constrained_curve), intent(inout) :: this
+
+        !> Begin point constraints: (:,0)=function; (:,i)=i-th derivative
+        real(RKIND), optional, intent(in) :: ddx_begin(:,0:)
+        real(RKIND), optional, intent(in) :: ddx_end  (:,0:)
+
+        integer, optional, intent(out) :: ierr
+
+        integer :: ier
+        logical :: constrained(2)
+
+        ier = FITPACK_OK
+
+        ! Prepare deallocated space
+        call clean_constraints(this)
+
+        constrained(1) = present(ddx_begin)
+        constrained(2) = present(ddx_end)
+
+        if (constrained(1)) then
+            if (size(ddx_begin,1)/=this%idim .or. .not.size(ddx_begin,2)>0) then
+                ier = FITPACK_INVALID_CONSTRAINT
+                call fitpack_error_handling(ier,ierr,'constrained_curve: begin point constraint')
+                return
+            else
+                this%ib = size(ddx_begin,2)
+                allocate(this%deriv_begin(this%idim,0:ubound(ddx_begin,2)),source=ddx_begin)
+            end if
+        end if
+
+
+        if (constrained(2)) then
+            if (size(ddx_end,1)/=this%idim .or. .not.size(ddx_end,2)>0) then
+                ier = FITPACK_INVALID_CONSTRAINT
+                call fitpack_error_handling(ier,ierr,'constrained_curve: endpoint constraint')
+                return
+            else
+                this%ib = size(ddx_end,2)
+                allocate(this%deriv_end(this%idim,0:ubound(ddx_end,2)),source=ddx_end)
+            end if
+        end if
+
+        ! Add point constraints
+        call fitpack_error_handling(ier,ierr,'constrained_curve: set_constraints')
+
+    end subroutine set_constraints
+
+    subroutine new_points_begin_constraint(this,x,u,w,ddx_begin)
+        class(fitpack_constrained_curve), intent(inout) :: this
+        real(RKIND), intent(in) :: x(:,:)
+        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
+        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
+        real(RKIND), intent(in)           :: ddx_begin(0:) ! optional BEGIN constraints (constrained_curve only)
+
+        ! Call base constructor
+        call new_points_base(this,x,u,w)
+
+        ! Add point constraints
+
+
+    end subroutine new_points_begin_constraint
+
+    subroutine new_points_both_constraints(this,x,u,w,ddx_begin,ddx_end)
+        class(fitpack_constrained_curve), intent(inout) :: this
+        real(RKIND), intent(in) :: x(:,:)
+        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
+        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
+        real(RKIND), intent(in)           :: ddx_begin(0:) ! optional BEGIN constraints (constrained_curve only)
+        real(RKIND), intent(in)           :: ddx_end(0:)   ! optional ENDPOINT constraints (constrained_curve only)
+
+        ! Call base constructor
+        call new_points_base(this,x,u,w)
+
+        ! Add point constraints
+
+
+    end subroutine new_points_both_constraints
+
 
     function curve_eval_one(this,u,ierr) result(y)
         class(fitpack_parametric_curve), intent(inout)  :: this
@@ -355,7 +504,7 @@ module fitpack_parametric_curves
                class is (fitpack_closed_curve)
 
                   call clocur(curv%iopt,                    &  ! option
-                              merge(1,0,curv%has_params),   &   ! have input parameter values?
+                              merge(1,0,curv%has_params),   &  ! have input parameter values?
                               curv%idim,curv%m,             &  ! Number of dimensions
                               curv%u,                       &  ! Parameter array
                               size(curv%x),                 &  ! Unrolled size of x array
@@ -378,6 +527,35 @@ module fitpack_parametric_curves
                               curv%order,curv%smoothing,    &  ! spline accuracy
                               curv%nest,curv%knots,curv%t,  &  ! spline output
                               size(curv%c),curv%c,curv%fp,  &  ! spline output
+                              curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
+                              ierr)
+
+               class is (fitpack_constrained_curve)
+
+
+      !           curve returned.
+      !   wrk   : real array of dimension at least m*(k+1)+nest*(6+idim+3*k). used as working space. if
+      !           the computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left
+      !           unchanged between subsequent calls.
+      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared
+      !           in the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
+      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
+      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged between
+      !           subsequent calls.
+
+
+                  call concur(curv%iopt,                    &  ! option
+                              curv%idim,curv%m,             &  ! Number of dimensions
+                              curv%u,                       &  ! Parameter array
+                              size(curv%x),                 &  ! Unrolled size of x array
+                              curv%x,curv%xx,curv%w,        &  ! points and weights
+                              curv%ib,curv%deriv_begin,size(curv%deriv_begin), & ! BEGIN point constraints
+                              curv%ie,curv%deriv_end  ,size(curv%deriv_end),   & ! ENDpoint constraints
+                              curv%order,curv%smoothing,    &  ! spline accuracy
+                              curv%nest,curv%knots,curv%t,  &  ! spline output
+                              size(curv%c),curv%c,          &  ! spline output
+                              size(curv%cp),curv%cp,        &  ! spline output
+                              curv%fp,                      &  ! spline output
                               curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
                               ierr)
 

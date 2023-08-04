@@ -565,7 +565,7 @@ module fitpack_tests
 
                   case (2)
 
-                     !  fixed end points
+                     ! fixed end points
                      iopt = 0
                      ib = 1
                      ie = 1

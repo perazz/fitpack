@@ -31,7 +31,7 @@ module fitpack_core
     public :: percur ! * Curve fitting with periodic splines
     public :: parcur ! * Smoothing of parametric curves
     public :: clocur ! * Smoothing of closed curves
-    public :: concur ! Smoothing with end-point derivative constraints
+    public :: concur ! * Smoothing with end-point derivative constraints
     public :: cocosp ! Least-squares fitting with convexity constraints
     public :: concon ! Automated smoothing with convexity constraints
 
@@ -105,6 +105,7 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INVALID_RANGE        = 6
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
     integer, parameter, public :: FITPACK_TEST_ERROR           = 11
+    integer, parameter, public :: FITPACK_INVALID_CONSTRAINT   = 12
 
     ! Internal Parameters
     integer    , parameter, public :: MAX_IDIM  = 10        ! Max number of dimensions
@@ -179,6 +180,7 @@ module fitpack_core
             case (FITPACK_INVALID_RANGE); msg = 'Invalid variable range'
             case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
             case (FITPACK_TEST_ERROR); msg = 'Test(s) failed'
+            case (FITPACK_INVALID_CONSTRAINT); msg = 'Invalid constraint(s) provided'
             case default; msg = 'UNKNOWN ERROR'
          end select
 
