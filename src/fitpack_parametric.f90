@@ -559,8 +559,8 @@ module fitpack_parametric_curves
        ierr0 = FITPACK_OK
 
        !  subroutine cualde evaluates at the point u all the derivatives
-       !                     (l)
-       !     d(idim*l+j) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
+       !                (l)
+       !     d(j,l) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
        !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
        call cualde(this%idim,    & ! Number of dimensions
                    this%t,       & ! Position of the knots
@@ -592,8 +592,8 @@ module fitpack_parametric_curves
        ierr0 = FITPACK_OK
 
        !  subroutine cualde evaluates at the point u all the derivatives
-       !                     (l)
-       !     d(idim*l+j) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
+       !                (l)
+       !     d(j,l) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
        !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
        call cualde(this%idim,    & ! Number of dimensions
                    this%t,       & ! Position of the knots
