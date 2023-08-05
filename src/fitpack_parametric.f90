@@ -24,6 +24,7 @@ module fitpack_parametric_curves
 
     public :: fitpack_parametric_curve
     public :: fitpack_closed_curve
+    public :: fitpack_constrained_curve
 
     integer, parameter :: MAX_K = 5
 
@@ -87,9 +88,11 @@ module fitpack_parametric_curves
 
            !> Set new points
            procedure :: new_points
+           procedure :: set_default_parameters
 
            !> Generate new fit
            procedure :: new_fit
+
 
            !> Generate/update fitting curve, with optional smoothing
            procedure :: fit         => curve_fit_automatic_knots
@@ -269,8 +272,7 @@ module fitpack_parametric_curves
             allocate(this%u(m),source=zero)
             this%x = x
 
-            this%ubegin  = zero
-            this%uend    = one
+            call set_default_parameters(this)
 
         end if
 
@@ -573,6 +575,34 @@ module fitpack_parametric_curves
        call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
 
     end function curve_derivative
+
+    ! Set normalized coordinates in [0,1] when not provided by the user
+    subroutine set_default_parameters(this)
+        class(fitpack_parametric_curve), intent(inout) :: this
+
+        integer :: i,m
+
+        associate(u=>this%u,x=>this%x)
+
+        ! Number of points
+        m = size(this%x,dim=2)
+
+        ! Point coordinates are stored in x(:), offset by idim values
+        u(1) = zero
+        do i=2,m
+           u(i) = u(i-1) + norm2(x(:,i)-x(:,i-1))
+        end do
+        if (u(m)>zero) u(2:) = u(2:)/u(m)
+        u(m)  = one
+
+        this%ubegin = u(1)
+        this%uend   = u(m)
+
+        this%has_params = .true.
+
+        endassociate
+
+    end subroutine set_default_parameters
 
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present

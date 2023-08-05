@@ -31,12 +31,14 @@ module fitpack
    ! Public interface
    public :: RKIND
    public :: fitpack_curve
-   public :: fitpack_surface
    public :: fitpack_polar
    public :: fitpack_sphere
+   public :: fitpack_surface
+   public :: fitpack_closed_curve
    public :: fitpack_periodic_curve
    public :: fitpack_parametric_curve
-   public :: fitpack_closed_curve
+   public :: fitpack_constrained_curve
+
 
 
 end module fitpack

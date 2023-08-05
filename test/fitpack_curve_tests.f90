@@ -33,9 +33,81 @@ module fitpack_curve_tests
     public :: test_closed_fit
     public :: test_polar_fit
     public :: test_sphere_fit
+    public :: test_constrained_curve
 
 
     contains
+
+    ! Test parametric curve with constraints
+    logical function test_constrained_curve(iunit) result(success)
+       integer, optional, intent(in) :: iunit
+
+       integer :: useUnit,ierr,loop
+       type(fitpack_constrained_curve) :: curve
+       integer, parameter :: m    = 31
+       integer, parameter :: idim = 2
+       real(RKIND) :: x(idim,m),ddx_begin(2,0:2),ddx_end(2,0:2)
+       real(RKIND), allocatable :: w(:),y(:)
+
+       success = .true.
+       if (present(iunit)) then
+          useUnit = iunit
+       else
+          useUnit = output_unit
+       end if
+
+       ! Curve coordinates (2D)
+       x(1,:) = [-3.109,-2.188,-1.351,-0.605,0.093,0.451,0.652,0.701,0.518,0.277,0.008,-0.291,-0.562,-0.679,&
+                 -0.637,-0.425,-0.049,0.575,1.334,2.167,3.206,4.099,4.872,5.710,6.330,6.741,6.928,6.965,6.842,&
+                 6.593,6.269]
+       x(2,:) = [3.040,2.876,2.634,2.183,1.586,1.010,0.382,-0.218,-0.632,-0.879,-0.981,-0.886,-0.642,-0.195,&
+                 0.373,1.070,1.607,2.165,2.618,2.905,2.991,2.897,2.615,2.164,1.617,0.977,0.383,-0.194,-0.665,&
+                 -0.901,-1.010]
+
+       ! Data and derivatives at the extremes (point, 1st, 2nd derivative)
+       ddx_begin = reshape([-pi,three,  three,zero,  zero,-two],[2,3])
+       ddx_end   = reshape([pi2,-one,  -one,zero,  zero,two],[2,3])
+
+       ! weights: 1/sigma with sigma an estimate of the standard deviation of the data points.
+       allocate(w(m),source=one/0.04_RKIND)
+
+       do loop=1,1
+
+          select case (loop)
+
+             ! the smoothing factor is chosen as s = m
+             case (1); ierr = curve%new_fit(x,smoothing=real(m,RKIND))
+
+                print *, 'U=',curve%U
+
+
+          end select
+
+          if (.not.FITPACK_SUCCESS(ierr)) then
+              success = .false.
+              write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+              stop
+              exit
+          end if
+
+          ! Calculate derivatives at the begin point.
+
+
+          y = curve%dfdx(curve%u(1),ierr)
+
+          if (.not.FITPACK_SUCCESS(ierr)) then
+              success = .false.
+              write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+              stop
+              exit
+          end if
+
+       end do
+
+       1000 format('[test_constrained_curve] test ',i0,' failed: ',a)
+
+
+    end function test_constrained_curve
 
     ! Test closed parametric curve
     logical function test_closed_fit(iunit) result(success)
