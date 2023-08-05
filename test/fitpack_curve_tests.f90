@@ -42,12 +42,13 @@ module fitpack_curve_tests
     logical function test_constrained_curve(iunit) result(success)
        integer, optional, intent(in) :: iunit
 
-       integer :: useUnit,ierr,loop
+       integer :: useUnit,ierr,loop,i
        type(fitpack_constrained_curve) :: curve
        integer, parameter :: m    = 31
        integer, parameter :: idim = 2
        real(RKIND) :: x(idim,m),ddx_begin(2,0:2),ddx_end(2,0:2)
-       real(RKIND), allocatable :: w(:),y(:)
+       real(RKIND), allocatable :: w(:),ybegin(:,:),yend(:,:),u(:)
+       character(64) :: whereAt
 
        success = .true.
        if (present(iunit)) then
@@ -71,15 +72,59 @@ module fitpack_curve_tests
        ! weights: 1/sigma with sigma an estimate of the standard deviation of the data points.
        allocate(w(m),source=one/0.04_RKIND)
 
-       do loop=1,1
+       ! Set up the parameter values for the data points
+       u = linspace(zero,3*pi,m)
+
+       do loop=1,6
 
           select case (loop)
 
-             ! the smoothing factor is chosen as s = m
-             case (1); ierr = curve%new_fit(x,smoothing=real(m,RKIND))
 
-                print *, 'U=',curve%U
+             case (1) ! the smoothing factor is chosen as s = m
+                ierr = curve%new_fit(x,u=u,w=w,smoothing=real(m,RKIND))
+                whereAt = 'no constraints'
 
+             case (2) ! Fix end points
+
+                call curve%set_constraints(ddx_begin(:,0:0),ddx_end(:,0:0),ierr)
+                ierr = curve%fit(smoothing=real(m,RKIND))
+                whereAt = 'fix points only'
+
+             case (3) ! Fix points, 1st derivative (begin)
+
+                call curve%set_constraints(ddx_begin(:,0:1),ddx_end(:,0:0),ierr)
+                ierr = curve%fit(smoothing=real(m,RKIND))
+                whereAt = 'fix points + 1st derivative (left)'
+
+             case (4) ! Fix both first derivatives
+
+                call curve%set_constraints(ddx_begin(:,0:1),ddx_end(:,0:1),ierr)
+                ierr = curve%fit(smoothing=real(m,RKIND))
+                whereAt = 'fix points + 1st derivative (both)'
+
+             case (5)
+
+                whereAt = 'quintic spline, 2st derivative constraints (both)'
+                call curve%set_constraints(ddx_begin(:,0:2),ddx_end(:,0:2),ierr)
+                ierr = curve%fit(smoothing=real(m,RKIND),order=5)
+
+             case (6) ! Reduce smoothing
+
+                whereAt = 'quintic spline, 2st derivative constraints (both), s=26'
+                ierr = curve%fit(smoothing=26.0_RKIND,order=5)
+
+             case (7)
+
+                whereAt = ''
+!                ! finally we also calculate a least-squares curve with specified knots
+!                iopt = -1
+!                j = k+2
+!                set_knots: do l=1,5
+!                   ai = l-2
+!                   t(j) = ai*pi*half
+!                   j = j+1
+!                end do set_knots
+!                n = 7+2*k
 
           end select
 
@@ -91,21 +136,52 @@ module fitpack_curve_tests
           end if
 
           ! Calculate derivatives at the begin point.
+          ybegin = curve%dfdx_all(curve%ubegin,ierr)
+          write(useUnit,960) trim(whereAt)
+          do i=0,curve%order
+             write(useUnit,970) i,ybegin(:,i+1)
+          end do
 
-
-          y = curve%dfdx(curve%u(1),ierr)
+          ! Calculate derivatives at the end point
+          yend = curve%dfdx_all(curve%uend,ierr)
+          write(useUnit,965) trim(whereAt)
+          do i=0,curve%order
+             write(useUnit,970) i,yend(:,i+1)
+          end do
 
           if (.not.FITPACK_SUCCESS(ierr)) then
               success = .false.
               write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
-              stop
+              exit
+          end if
+
+          ! Verify the constraints
+          select case (loop)
+             case (2)
+               if (.not.maxval(abs(ybegin(:,1)-ddx_begin(:,0)))<smallnum06) success = .false.
+               if (.not.maxval(abs(  yend(:,1)-ddx_end  (:,0)))<smallnum06) success = .false.
+             case (3)
+               if (.not.maxval(abs(ybegin(:,1:2)-ddx_begin(:,0:1)))<smallnum06) success = .false.
+               if (.not.maxval(abs(  yend(:,1)-ddx_end  (:,0)))<smallnum06) success = .false.
+             case (4)
+               if (.not.maxval(abs(ybegin(:,1:2)-ddx_begin(:,0:1)))<smallnum06) success = .false.
+               if (.not.maxval(abs(  yend(:,1:2)-ddx_end  (:,0:1)))<smallnum06) success = .false.
+             case (5:)
+               if (.not.maxval(abs(ybegin(:,1:3)-ddx_begin(:,0:2)))<smallnum06) success = .false.
+               if (.not.maxval(abs(  yend(:,1:3)-ddx_end  (:,0:2)))<smallnum06) success = .false.
+          end select
+
+          if (.not.success) then
+              write(useUnit,1000) loop,'Constraints failed accuracy test'
               exit
           end if
 
        end do
 
+        960 format('[test_constrained_curve] begin point (',a,'): ')
+        965 format('[test_constrained_curve] endpoint (',a,'): ')
+        970 format(5x,'order=',i2,2f9.4)
        1000 format('[test_constrained_curve] test ',i0,' failed: ',a)
-
 
     end function test_constrained_curve
 

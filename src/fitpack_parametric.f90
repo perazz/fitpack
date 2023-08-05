@@ -106,7 +106,9 @@ module fitpack_parametric_curves
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
            procedure, private :: curve_derivatives
+           procedure, private :: curve_all_derivatives
            generic   :: dfdx => curve_derivative,curve_derivatives
+           generic   :: dfdx_all => curve_all_derivatives
 
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
@@ -295,6 +297,9 @@ module fitpack_parametric_curves
               nest = SAFE*(m+MAX_ORDER+1+max(0,MAX_ORDER)+max(0,MAX_ORDER))
               lwrk = (m*(MAX_ORDER+1)+nest*(6+idim+3*MAX_ORDER))
 
+              ! Ensure constraint arrays are allocated and no constraints set
+              call set_constraints(curv)
+
            class is (fitpack_closed_curve)
 
               nest = SAFE*(m+2*MAX_ORDER)
@@ -312,7 +317,7 @@ module fitpack_parametric_curves
         allocate(this%wrk(lwrk),source=zero)
 
         ! Setup space for derivative evaluatiuon
-        allocate(this%dd(idim,MAX_ORDER+1),source=zero)
+        allocate(this%dd(idim,0:MAX_ORDER),source=zero)
 
         endassociate
 
@@ -339,17 +344,13 @@ module fitpack_parametric_curves
         integer, optional, intent(out) :: ierr
 
         integer :: ier
-        logical :: constrained(2)
 
         ier = FITPACK_OK
 
         ! Prepare deallocated space
         call clean_constraints(this)
 
-        constrained(1) = present(ddx_begin)
-        constrained(2) = present(ddx_end)
-
-        if (constrained(1)) then
+        if (present(ddx_begin)) then
             if (size(ddx_begin,1)/=this%idim .or. .not.size(ddx_begin,2)>0) then
                 ier = FITPACK_INVALID_CONSTRAINT
                 call fitpack_error_handling(ier,ierr,'constrained_curve: begin point constraint')
@@ -358,18 +359,25 @@ module fitpack_parametric_curves
                 this%ib = size(ddx_begin,2)
                 allocate(this%deriv_begin(this%idim,0:ubound(ddx_begin,2)),source=ddx_begin)
             end if
+        else
+            ! Do not leave array unallocated
+            this%ib = 0
+            allocate(this%deriv_begin(this%idim,1))
         end if
 
-
-        if (constrained(2)) then
+        if (present(ddx_end)) then
             if (size(ddx_end,1)/=this%idim .or. .not.size(ddx_end,2)>0) then
                 ier = FITPACK_INVALID_CONSTRAINT
                 call fitpack_error_handling(ier,ierr,'constrained_curve: endpoint constraint')
                 return
             else
-                this%ib = size(ddx_end,2)
+                this%ie = size(ddx_end,2)
                 allocate(this%deriv_end(this%idim,0:ubound(ddx_end,2)),source=ddx_end)
             end if
+        else
+            ! Do not leave array unallocated
+            this%ie = 0
+            allocate(this%deriv_end(this%idim,1))
         end if
 
         ! Add point constraints
@@ -536,21 +544,17 @@ module fitpack_parametric_curves
     end function curve_error
 
     !> Evaluate k-th derivative of the curve at point u
-    !> Use 1st derivative if order not present
     function curve_derivative(this, u, order, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout) :: this
        real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
-       integer, optional,    intent(in)    :: order  ! Derivative order. Default 1
-       integer, optional,    intent(out)   :: ierr  ! Optional error flag
+       integer,              intent(in)    :: order  ! Derivative order. 0=function; 1:k=i-th derivative
+       integer, optional,    intent(out)   :: ierr   ! Optional error flag
        real(RKIND), dimension(this%idim)   :: ddx
 
        integer :: ddx_order,ierr0
 
-       if (present(order)) then
-          ddx_order = max(0,order)
-       else
-          ddx_order = 1 ! Default: 1st derivative
-       end if
+       ! Choose order
+       ddx_order = max(0,order)
 
        ierr0 = FITPACK_OK
 
@@ -575,6 +579,39 @@ module fitpack_parametric_curves
        call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
 
     end function curve_derivative
+
+    !> Evaluate all derivatives (0:k) of the curve at point u
+    function curve_all_derivatives(this, u, ierr) result(ddx)
+       class(fitpack_parametric_curve), intent(inout) :: this
+       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
+       integer, optional,    intent(out)   :: ierr   ! Optional error flag
+       real(RKIND), dimension(this%idim,0:this%order) :: ddx
+
+       integer :: ierr0
+
+       ierr0 = FITPACK_OK
+
+       !  subroutine cualde evaluates at the point u all the derivatives
+       !                     (l)
+       !     d(idim*l+j) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
+       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
+       call cualde(this%idim,    & ! Number of dimensions
+                   this%t,       & ! Position of the knots
+                   this%knots,   & ! Number of knots
+                   this%c,       & ! Spline coefficients
+                   size(this%c), & ! Number of coefficients
+                   this%order+1, & ! k1 = order of s(u) (order = degree+1)
+                   u,            & ! Where the derivatives must be evaluated
+                   this%dd,      & ! Space for derivative evaluation
+                   size(this%dd),& ! Its size
+                   ierr0)          ! Output flag
+
+       ! Derivative order is 0:k <- extract derivative
+       ddx = this%dd(:,0:this%order)
+
+       call fitpack_error_handling(ierr0,ierr,'evaluate all derivatives')
+
+    end function curve_all_derivatives
 
     ! Set normalized coordinates in [0,1] when not provided by the user
     subroutine set_default_parameters(this)
@@ -609,7 +646,7 @@ module fitpack_parametric_curves
     function curve_derivatives(this, u, order, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout)  :: this
        real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter)
-       integer, optional,    intent(in)     :: order  ! Derivative order. Default 1
+       integer,              intent(in)     :: order  ! Derivative order. Default 1
        integer, optional,    intent(out)    :: ierr   ! Optional error flag
        real(RKIND), dimension(this%idim,size(u)) :: ddx
 

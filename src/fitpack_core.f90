@@ -1048,7 +1048,7 @@ module fitpack_core
       !    called the smoothing factor. the fit s(u) is given in the b-spline representation and can
       !    be evaluated by means of subroutine curev.
 
-      subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
+      pure subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
                              ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
       !
       !  calling sequence:
@@ -1279,7 +1279,6 @@ module fitpack_core
       if (nb<(idim*ib) .or. ne<(idim*ie)) return
       if (np<(2*k1*idim))                 return
       if (mx<mxx .or. nc<ncc)             return
-
       if (lwrk<lwest)                     return
       if (any(w<=zero))                   return
       if (any(u(1:m-1)>=u(2:m)))          return
@@ -3808,9 +3807,8 @@ module fitpack_core
       end subroutine fpcoco
 
 
-      subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
+      pure subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
                              tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
-      !cc         c XXX: mmnin/nmin variables on line 61
       !  ..
       !  ..scalar arguments..
       real(RKIND), intent(in)    :: s,tol
