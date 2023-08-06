@@ -44,7 +44,7 @@ module fitpack_core
     public :: insert ! Insert a knot into a given spline
     public :: insert_inplace
     public :: splint ! * Integration of a spline function
-    public :: fourco ! Fourier coefficients of a cubic spline
+    public :: fourco ! * Fourier coefficients of a cubic spline
     public :: sproot ! The roots of a cubic spline
 
     ! Surface fitting routines
@@ -18073,7 +18073,7 @@ module fitpack_core
       real(RKIND), intent(in)  :: t(n),c(n)
       real(RKIND), intent(out) :: zeros(mest)
       !  ..local scalars..
-      integer :: i,j,j1,l,n4
+      integer :: i,j,l,n4
       real(RKIND) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5
       logical :: z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
       !  ..local array..
@@ -18082,8 +18082,12 @@ module fitpack_core
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       n4  = n-4
-      ier = FITPACK_INPUT_ERROR
-      if(n<8) return
+      if (n<8) then
+         ier = FITPACK_INSUFFICIENT_KNOTS
+         return
+      else
+         ier = FITPACK_INPUT_ERROR
+      end if
       j = n
       do i=1,3
         if(t(i)>t(i+1)) return
@@ -18193,13 +18197,7 @@ module fitpack_core
 
       !  the zeros of s(x) are arranged in increasing order.
       if (m<2) return
-
-      ! FP this double loop can be made more efficient
-      sort_zeros: do j=1,m
-        inner_loop: do j1 = j+1,m
-          if (zeros(j1)<zeros(j)) call fitpack_swap(zeros(j),zeros(j1))
-        end do inner_loop
-      end do sort_zeros
+      call fitpack_quicksort(zeros(1:m))
 
       ! Filter duplicates
       j = m
@@ -18641,24 +18639,25 @@ module fitpack_core
           forall(i=1:size(list,kind=RSIZE)) ilist(i) = i
 
           ! Perform sort
-          call fitpack_quicksort_andlist(copy,ilist)
+          call fitpack_quicksort(copy,ilist)
 
           deallocate(copy)
 
       end function fitpack_argsort
 
       ! Quicksort
-      pure recursive subroutine fitpack_quicksort_andlist(list,ilist,down)
+      pure recursive subroutine fitpack_quicksort(list,ilist,down)
 
         real(RKIND), dimension(:), intent(inout) :: list
-        integer(RSIZE), dimension(size(list)), intent(inout) :: ilist
+        integer(RSIZE), dimension(size(list)), optional, intent(inout) :: ilist
         logical, optional, intent(in) :: down
 
         integer(RSIZE)  :: i, j, n
         real(RKIND)  :: chosen
         integer(RSIZE), parameter :: SMALL_SIZE = 8
-        logical         :: descending
+        logical         :: descending,has_list
 
+        has_list   = present(ilist)
         descending = .false.; if (present(down)) descending = down
         n = size(list,kind=RSIZE)
 
@@ -18669,7 +18668,7 @@ module fitpack_core
               do j = i + 1, n
                  if (toBeSwapped(list(i),list(j),.false.)) then
                      call fitpack_swap(list(i),list(j))
-                     call fitpack_swap(ilist(i),ilist(j))
+                     if (has_list) call fitpack_swap(ilist(i),ilist(j))
                  end if
               end do
            end do
@@ -18699,7 +18698,7 @@ module fitpack_core
               swap_element: if (i < j) then
                   ! Swap two out of place elements
                   call fitpack_swap(list(i),list(j))
-                  call fitpack_swap(ilist(i),ilist(j))
+                  if (has_list) call fitpack_swap(ilist(i),ilist(j))
               else if (i == j) then
                   i = i + 1
                   exit
@@ -18709,8 +18708,13 @@ module fitpack_core
 
            end do scan_lists
 
-           if (1 < j) call fitpack_quicksort_andlist(list(:j),ilist(:j),down)
-           if (i < n) call fitpack_quicksort_andlist(list(i:),ilist(i:),down)
+           if (has_list) then
+              if (1 < j) call fitpack_quicksort(list(:j),ilist(:j),down)
+              if (i < n) call fitpack_quicksort(list(i:),ilist(i:),down)
+           else
+              if (1 < j) call fitpack_quicksort(list(:j),down=descending)
+              if (i < n) call fitpack_quicksort(list(i:),down=descending)
+           endif
 
         end if choose_sorting_algorithm ! test for small array
 
@@ -18725,7 +18729,7 @@ module fitpack_core
 
          end function toBeSwapped
 
-    end subroutine fitpack_quicksort_andlist
+    end subroutine fitpack_quicksort
 
     elemental subroutine swap_data(a,b)
       real(RKIND), intent(inout) :: a, b
