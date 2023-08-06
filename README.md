@@ -48,3 +48,5 @@ Fitpack contains very robust algorithms for curve interpolation and fitting, bas
 [3] P. Dierckx, "An improved algorithm for curve fitting with spline functions", report tw54, Dept. Computer Science,K.U. Leuven, 1981.
 
 [4] P. Dierckx, "Curve and surface fitting with splines", Monographs on Numerical Analysis, Oxford University Press, 1993.
+
+[5] P. Dierckx, R. Piessens, "Calculation of Fourier coefficients of discrete functions using cubic splines", Journal of Computational and Applied Mathematics  3(3), 207-209, 1977.
