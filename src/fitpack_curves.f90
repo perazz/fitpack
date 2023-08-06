@@ -88,6 +88,9 @@ module fitpack_curves
            procedure, private :: curve_eval_many
            generic :: eval => curve_eval_one,curve_eval_many
 
+           !> Integrate
+           procedure :: integral
+
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
            procedure, private :: curve_derivatives
@@ -400,5 +403,18 @@ module fitpack_curves
 
     end function curve_derivative
 
+    ! Calculates the integral of the spline function in interval [from,to]
+    real(RKIND) function integral(this,from,to)
+       class(fitpack_curve), intent(inout) :: this
+       real(RKIND), intent(in) :: from,to
+
+       integral = splint(this%t, &  ! array of knots
+                         this%knots, & ! number of knots
+                         this%c    , & ! array of spline coefficients
+                         this%order, & ! degree of the spline
+                         from,to,    & ! endpoints of the integration interval
+                         this%wrk)     ! working space
+
+    end function integral
 
 end module fitpack_curves

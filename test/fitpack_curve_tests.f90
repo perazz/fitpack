@@ -376,7 +376,7 @@ module fitpack_curve_tests
        real(RKIND), parameter :: RTOL = 1.0e-1_RKIND
        real(RKIND), parameter :: ATOL = 1.0e-2_RKIND
        type(fitpack_curve) :: curve
-       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3)
+       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
        integer :: ierr,i,order
 
        success = .false.
@@ -401,7 +401,7 @@ module fitpack_curve_tests
        do i=1,n
 
           ! Evaluate curve
-          yeval = curve%eval(xrand(i),ierr);
+          yeval = curve%eval(xrand(i),ierr)
           if (.not.FITPACK_SUCCESS(ierr)) then
              print *, '[sine_fit] error evaluating sine function '
              return
@@ -438,12 +438,24 @@ module fitpack_curve_tests
 
        end do
 
+       ! Evaluate integral, compare with exact
+       fint = curve%integral(from=pi/3,to=two*pi)
+       eint = cos(pi/3)-cos(two*pi)
+
+       ! Check error
+       if (abs(eint-fint)*rewt(RTOL,ATOL,eint)>one) then
+          print 4, pi/3,two*pi,fint,eint
+          success = .false.
+          return
+       end if
+
        ! All checks passed: success!
        success = .true.
 
        1 format('[sine_fit] sine function error is too large: x=',f6.2,' yspline=',f6.2,' analytical=',f6.2)
        2 format('[sine_fit] cannot evaluate ',i0,'-th derivative at ',f6.2,': ',a)
        3 format('[sine_fit] ',i0,'-th derivative error is too large: x=',f6.2,' yp(spline)=',f6.2,' analytical=',f6.2)
+       4 format('[sine_fit] integral error is too large: [a=',f6.2,',b=',f6.2,'] int(spline)=',f6.2,' analytical=',f6.2)
 
     end function test_sine_fit
 
@@ -454,14 +466,14 @@ module fitpack_curve_tests
        real(RKIND), parameter :: RTOL = 1.0e-2_RKIND
        real(RKIND), parameter :: ATOL = 1.0e-4_RKIND
        type(fitpack_periodic_curve) :: curve
-       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3)
+       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
        integer :: ierr,i,order
 
        success = .false.
 
        ! Generate a periodic function with 200 points
        x = linspace(zero,pi2,N)
-       y = cos(x) + sin(2*x)
+       y = fun(x)
 
        ! Create INTERPOLATING
        ierr = curve%new_fit(x,y,smoothing=zero)
@@ -517,12 +529,35 @@ module fitpack_curve_tests
 
        end do
 
+       ! Test integral calculation *across the periodic boundary*
+       fint = curve%integral(from=half*pi,to=3*pi)
+       eint = intgl(3*pi)-intgl(half*pi)
+
+       ! Check error
+       if (abs(eint-fint)*rewt(RTOL,ATOL,eint)>one) then
+          print 4, pi/3,two*pi,fint,eint
+          return
+       end if
+
        ! All checks passed: success!
        success = .true.
 
        1 format('[periodic_fit] sine function error is too large: x=',f6.2,' yspline=',f6.2,' analytical=',f6.2)
        2 format('[periodic_fit] cannot evaluate ',i0,'-th derivative at ',f6.2,': ',a)
        3 format('[periodic_fit] ',i0,'-th derivative error is too large: x=',f6.2,' yp(spline)=',f6.2,' analytical=',f6.2)
+       4 format('[periodic_fit] integral error is too large: [a=',f6.2,',b=',f6.2,'] int(spline)=',f6.2,' analytical=',f6.2)
+
+       contains
+
+         elemental real(RKIND) function fun(x) result(y)
+            real(RKIND), intent(in) :: x
+            y = cos(x) + sin(2*x)
+         end function fun
+
+         elemental real(RKIND) function intgl(x) result(y)
+            real(RKIND), intent(in) :: x
+            y = sin(x) - half*cos(2*x)
+         end function intgl
 
     end function test_periodic_fit
 
