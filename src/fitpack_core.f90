@@ -45,11 +45,11 @@ module fitpack_core
     public :: insert_inplace
     public :: splint ! * Integration of a spline function
     public :: fourco ! * Fourier coefficients of a cubic spline
-    public :: sproot ! The roots of a cubic spline
+    public :: sproot ! * The roots of a cubic spline
 
     ! Surface fitting routines
     public :: surfit ! * Surface fitting to scattered data
-    public :: regrid ! Surface fitting to data on a rectangular grid
+    public :: regrid ! * Surface fitting to data on a rectangular grid
     public :: polar  ! * Surface fitting using generalized polar coordinates
     public :: pogrid ! Surface fitting to data on a polar grid
     public :: sphere ! * Surface fitting using spherical coordinates
