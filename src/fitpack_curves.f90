@@ -94,6 +94,9 @@ module fitpack_curves
            !> Fourier coefficients
            procedure :: fourier_coefficients
 
+           !> Find the zeros of a spline s(x), only if it is cubic
+           procedure :: zeros
+
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
            procedure, private :: curve_derivatives
@@ -450,5 +453,49 @@ module fitpack_curves
         call fitpack_error_handling(ier,ierr,'fourier_coefficients')
 
     end subroutine fourier_coefficients
+
+    !> Find the zeros of a cubic spline s(x)
+    function zeros(this,ierr)
+        class(fitpack_curve), intent(in) :: this
+        real(RKIND), allocatable :: zeros(:)
+        integer, optional, intent(out) :: ierr
+
+        integer, parameter :: maxit = 10
+        integer :: mest,m,nit,i,ier
+        real(RKIND), allocatable :: tmp_zeros(:)
+
+        ! Estimate a relatively safe number of zeros
+        m    = this%knots
+        ier  = FITPACK_INSUFFICIENT_STORAGE
+        nit  = 0
+
+        ! Iterate until all zeros fit the array
+        storage_attempts: do while (nit<maxit .and. ier==FITPACK_INSUFFICIENT_STORAGE)
+
+            nit = nit+1
+
+            ! Allocate storage with the new estimate
+            mest = 2*m
+            deallocate(tmp_zeros,stat=i)
+            allocate(tmp_zeros(mest))
+
+            call sproot(this%t,this%knots,   & ! Spline knots
+                        this%c,              & ! the spline coefficients
+                        tmp_zeros,mest,      & ! Temporary storage
+                        m,                   & ! Actual number of zeros
+                        ier)
+
+        end do storage_attempts
+
+        !> Always return an allocated array
+        if (m>0) then
+            allocate(zeros(m),source=tmp_zeros(1:m))
+        else
+            allocate(zeros(0))
+        endif
+
+        call fitpack_error_handling(ier,ierr,'compute zeros')
+
+    end function zeros
 
 end module fitpack_curves
