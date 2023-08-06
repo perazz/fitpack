@@ -43,7 +43,7 @@ module fitpack_core
     public :: cualde ! * All derivatives of a spline curve
     public :: insert ! Insert a knot into a given spline
     public :: insert_inplace
-    public :: splint ! Integration of a spline function
+    public :: splint ! * Integration of a spline function
     public :: fourco ! Fourier coefficients of a cubic spline
     public :: sproot ! The roots of a cubic spline
 
@@ -71,6 +71,7 @@ module fitpack_core
     public :: fitpack_polar_boundary
 
     ! Utilities
+    public :: equal
     public :: fitpack_swap
     public :: fitpack_argsort
     public :: fitpack_error_handling

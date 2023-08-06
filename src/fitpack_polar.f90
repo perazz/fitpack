@@ -105,9 +105,9 @@ module fitpack_polar_domains
 
     end type fitpack_polar
 
-!    interface fitpack_polar
-!       module procedure polr_new_from_points
-!    end interface fitpack_polar
+    interface fitpack_polar
+       module procedure polr_new_from_points
+    end interface fitpack_polar
 
     contains
 

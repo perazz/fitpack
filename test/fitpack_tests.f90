@@ -931,7 +931,7 @@ module fitpack_tests
                       !  a new knot interval.
                       l = l1
                       l1 = l+1
-                      if (t(l)==t(l1)) cycle search_knot
+                      if (equal(t(l),t(l1))) cycle search_knot
 
                       write(useUnit,930) t(l),t(l1)
 
@@ -1639,7 +1639,7 @@ module fitpack_tests
           integer :: k,k2
           real(RKIND) :: aa,ak,cc,c1,ss,s1
 
-          if (alfa==zero) then
+          if (equal(alfa,zero)) then
               rs = zero
               rc = half
           elseif (abs(alfa)>=one) then
@@ -1661,7 +1661,7 @@ module fitpack_tests
                  ak = (k2+2)*(k2+5)
                  ss = ss*aa/ak
                  s1 = rs+ss
-                 if (s1==rs) exit
+                 if (equal(s1,rs)) exit
                  rs = s1
               end do
               do k=1,21
@@ -1669,7 +1669,7 @@ module fitpack_tests
                  ak = (k2+1)*(k2+4)
                  cc = cc*aa/ak
                  c1 = rc+cc
-                 if (c1==rc) exit
+                 if (equal(c1,rc)) exit
                  rc = c1
               end do
           endif
@@ -3396,7 +3396,7 @@ module fitpack_tests
                       !  a new knot interval.
                       l = l1
                       l1 = l+1
-                      if (t(l)==t(l1)) cycle search_interval
+                      if (equal(t(l),t(l1))) cycle search_interval
 
                       write(useUnit,925) t(l),t(l1)
 
