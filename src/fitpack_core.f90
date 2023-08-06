@@ -107,6 +107,7 @@ module fitpack_core
     integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
     integer, parameter, public :: FITPACK_TEST_ERROR           = 11
     integer, parameter, public :: FITPACK_INVALID_CONSTRAINT   = 12
+    integer, parameter, public :: FITPACK_INSUFFICIENT_KNOTS   = 13
 
     ! Internal Parameters
     integer    , parameter, public :: MAX_IDIM  = 10        ! Max number of dimensions
@@ -182,6 +183,7 @@ module fitpack_core
             case (FITPACK_INPUT_ERROR); msg = 'Invalid input'
             case (FITPACK_TEST_ERROR); msg = 'Test(s) failed'
             case (FITPACK_INVALID_CONSTRAINT); msg = 'Invalid constraint(s) provided'
+            case (FITPACK_INSUFFICIENT_KNOTS); msg = 'Not enough knots (n>=10)'
             case default; msg = 'UNKNOWN ERROR'
          end select
 
@@ -2000,8 +2002,8 @@ module fitpack_core
       !
       !  restrictions:
       !    n >= 10
-      !    t(4) < t(5) < ... < t(n-4) < t(n-3).
-      !    t(1) <= t(2) <= t(3) <= t(4).
+      !    t(4)   < t(5) < ... < t(n-4) < t(n-3).
+      !    t(1)   <= t(2) <= t(3) <= t(4).
       !    t(n-3) <= t(n-2) <= t(n-1) <= t(n).
       !
       !  other subroutines required: fpbfou,fpcsin
@@ -2027,14 +2029,18 @@ module fitpack_core
       real(RKIND), intent(out) :: ress(m),resc(m)
       !  ..local scalars..
       integer :: i,n4
-      !  ..
+
       n4 = n-4
       !  before starting computations a data check is made. in the input data
       !  are invalid, control is immediately repassed to the calling program.
-      ier = FITPACK_INPUT_ERROR
 
       ! Not enough points
-      if (n<10) return
+      if (n<10) then
+         ier = FITPACK_INSUFFICIENT_KNOTS
+         return
+      else
+         ier = FITPACK_INPUT_ERROR
+      end if
 
       ! Ends of the support: knots must be monotonic
       if (any(t(1:3)>t(2:4)))       return

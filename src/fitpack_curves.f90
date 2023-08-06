@@ -47,7 +47,7 @@ module fitpack_curves
         integer                  :: nest  = 0
         integer                  :: lwrk  = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk(:)
+        real(RKIND), allocatable :: wrk(:),wrk_fou(:,:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
         real(RKIND) :: smoothing = 1000.0_RKIND
@@ -90,6 +90,9 @@ module fitpack_curves
 
            !> Integrate
            procedure :: integral
+
+           !> Fourier coefficients
+           procedure :: fourier_coefficients
 
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
@@ -152,6 +155,7 @@ module fitpack_curves
        deallocate(this%sp,stat=ierr)
        deallocate(this%iwrk,stat=ierr)
        deallocate(this% wrk,stat=ierr)
+       deallocate(this%wrk_fou,stat=ierr)
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
        this%xleft = zero
@@ -209,6 +213,7 @@ module fitpack_curves
         ! Setup working space.
         lwrk = (m*(MAX_K+1)+nest*(7+3*MAX_K))
         allocate(this%wrk(lwrk),source=0.0_RKIND)
+        allocate(this%wrk_fou(nest,2))
 
         endassociate
 
@@ -416,5 +421,34 @@ module fitpack_curves
                          this%wrk)     ! working space
 
     end function integral
+
+    !> Fourier coefficients: compute fourier coefficients from the interior of the spline
+    !> represenation (must be >=10 knots) in the form:
+    !>                 /t(n-3)
+    !>    A(i) =      |        s(x)*sin(alfa(i)*x) dx    and
+    !>           t(4)/
+    !>                 /t(n-3)
+    !>    B(i) =      |        s(x)*cos(alfa(i)*x) dx, i=1,...,size(alfa),
+    !>           t(4)/
+    !> for user defined alpha(:))
+    subroutine fourier_coefficients(this,alpha,A,B,ierr)
+        class(fitpack_curve), intent(inout) :: this
+        real(RKIND), intent(in) :: alpha(:)
+        real(RKIND), intent(out), dimension(size(alpha)) :: A,B
+        integer    , intent(out), optional :: ierr
+
+        integer :: ier
+
+        call fourco(this%t,this%knots,  & ! Spline knots)
+                    this%c,             & ! spline coefficients
+                    alpha,size(alpha),  & ! Parameters alpha(i)
+                    A,B,                & ! Computed Fourier coefficients
+                    this%wrk_fou(:,1),  & ! Working space
+                    this%wrk_fou(:,2),  & ! Working space
+                    ier)
+
+        call fitpack_error_handling(ier,ierr,'fourier_coefficients')
+
+    end subroutine fourier_coefficients
 
 end module fitpack_curves

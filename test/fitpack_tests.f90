@@ -1581,7 +1581,7 @@ module fitpack_tests
           alfa(1) = zero
           alfa(2) = 0.001_RKIND
           do i=3,m
-              alfa(i) = -alfa(i-1)*0.1e+02
+              alfa(i) = -10*alfa(i-1)
           end do
 
           !  calculate the fourier integrals of the cubic spline
