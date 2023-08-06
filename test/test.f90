@@ -41,6 +41,7 @@ program test
 
         ! Sine function interpolant: test f(x) and df/dx
         call add_test(test_sine_fit())
+        call add_test(test_zeros())
         call add_test(test_periodic_fit())
         call add_test(test_parametric_fit())
         call add_test(test_closed_fit())

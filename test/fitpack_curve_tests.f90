@@ -28,6 +28,7 @@ module fitpack_curve_tests
     private
 
     public :: test_sine_fit
+    public :: test_zeros
     public :: test_periodic_fit
     public :: test_parametric_fit
     public :: test_closed_fit
@@ -458,6 +459,30 @@ module fitpack_curve_tests
        4 format('[sine_fit] integral error is too large: [a=',f6.2,',b=',f6.2,'] int(spline)=',f6.2,' analytical=',f6.2)
 
     end function test_sine_fit
+
+    ! Test zeros of a cubic spline
+    logical function test_zeros() result(success)
+
+       type(fitpack_curve) :: curve
+       real(RKIND), allocatable :: x(:),y(:),x0(:)
+       integer :: ierr
+
+       success = .false.
+
+       ! Try f(x) = x3 Ð 3x2 + 2x = x(x Ð 1)(x Ð 2), with real roots x = 0, x = 1, and x = 2.
+       x = linspace(-10.0_RKIND,10.0_RKIND,20)
+       y = x**3-3*x**2+2*x
+
+       ! Get the interpolating curve
+       ierr = curve%new_fit(x,y,smoothing=zero)
+
+       ! Get the zeros
+       x0 = curve%zeros(ierr)
+
+       success = FITPACK_SUCCESS(ierr) .and. size(x0)==3 &
+                 .and. all(abs(x0(1:3)-[zero,one,two])<sqrt(epsilon(zero)))
+
+    end function test_zeros
 
     ! Periodic test: fit a cosine function
     logical function test_periodic_fit() result(success)
