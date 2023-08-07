@@ -66,16 +66,23 @@ module fitpack_grid_surfaces
         contains
 
            !> Clean memory
-           procedure :: destroy    => surf_destroy
+           procedure :: destroy       => surf_destroy
 
            !> Set new points
-           procedure :: new_points => surf_new_points
+           procedure :: new_points    => surf_new_points
 
            !> Generate new fit
-           procedure :: new_fit    => surf_new_fit
+           procedure :: new_fit       => surf_new_fit
 
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit        => surface_fit_automatic_knots
+           procedure :: fit           => surface_fit_automatic_knots
+           procedure :: least_squares => surface_fit_least_squares
+           procedure :: interpolate   => surface_fit_interpolating
+
+           !> Evaluate gridded domain at given x,y coordinates
+           procedure, private :: gridded_eval_one
+           procedure, private :: gridded_eval_many
+           generic :: eval => gridded_eval_one,gridded_eval_many
 
     end type fitpack_grid_surface
 
@@ -84,6 +91,25 @@ module fitpack_grid_surfaces
     end interface fitpack_grid_surface
 
     contains
+
+    ! Fit a surface to least squares of the current knots
+    integer function surface_fit_least_squares(this) result(ierr)
+       class(fitpack_grid_surface), intent(inout) :: this
+
+       this%iopt = IOPT_NEW_LEASTSQUARES
+       ierr = this%fit()
+
+    end function surface_fit_least_squares
+
+    ! Find interpolating surface
+    integer function surface_fit_interpolating(this) result(ierr)
+        class(fitpack_grid_surface), intent(inout) :: this
+
+        ! Set zero smoothing
+        ierr = surface_fit_automatic_knots(this,smoothing=zero)
+
+    end function surface_fit_interpolating
+
 
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function surface_fit_automatic_knots(this,smoothing,order) result(ierr)
@@ -245,5 +271,44 @@ module fitpack_grid_surfaces
         surf_new_fit = this%fit(smoothing,order)
 
     end function surf_new_fit
+
+    function gridded_eval_many(this,x,y,ierr) result(f)
+        class(fitpack_grid_surface), intent(inout)  :: this
+        real(RKIND), intent(in) :: x(:),y(:)  ! Evaluation points
+        real(RKIND) :: f(size(x),size(y))
+        integer, optional, intent(out) :: ierr ! Optional error flag
+
+        integer :: ier
+
+        !  evaluation of the spline approximation.
+        !  Assume cubic spline in both directions
+
+        ! On successful exit r(j,i) contains the value of s(x,y) at point
+        ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
+        call bispev(tx=this%t(:,1),nx=this%knots(1), &
+                    ty=this%t(:,2),ny=this%knots(2), &
+                    c=this%c, &
+                    kx=3,ky=3, &
+                    x=x,mx=size(x), &
+                    y=y,my=size(y), &
+                    z=f, &
+                    wrk=this%wrk,lwrk=this%lwrk, &
+                    iwrk=this%iwrk,kwrk=this%liwrk,ier=ier)
+
+        call fitpack_error_handling(ier,ierr,'evaluate gridded surface')
+
+    end function gridded_eval_many
+
+    ! Curve evaluation driver
+    real(RKIND) function gridded_eval_one(this,x,y,ierr) result(f)
+        class(fitpack_grid_surface), intent(inout)  :: this
+        real(RKIND),          intent(in)      :: x,y ! Evaluation point
+        integer, optional,    intent(out)     :: ierr      ! Optional error flag
+        real(RKIND) :: f1(1,1)
+
+        f1 = gridded_eval_many(this,[x],[y],ierr)
+        f  = f1(1,1)
+
+    end function gridded_eval_one
 
 end module fitpack_grid_surfaces

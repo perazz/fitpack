@@ -79,7 +79,6 @@ module fitpack_sphere_domains
            procedure :: least_squares => surface_fit_least_squares
            procedure :: interpolate   => surface_fit_interpolating
 
-
            !> Evaluate polar domain at given x,y coordinates
            procedure, private :: sphere_eval_one
            procedure, private :: sphere_eval_many

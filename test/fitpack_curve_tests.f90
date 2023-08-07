@@ -20,7 +20,7 @@
 module fitpack_curve_tests
     use fitpack
     use fitpack_core
-    use fitpack_test_data, only: dapola,dasphe
+    use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z
     use iso_fortran_env, only: output_unit
 
 
@@ -34,6 +34,7 @@ module fitpack_curve_tests
     public :: test_closed_fit
     public :: test_polar_fit
     public :: test_sphere_fit
+    public :: test_gridded_fit
     public :: test_constrained_curve
 
 
@@ -823,6 +824,90 @@ module fitpack_curve_tests
           end function testsp
 
     end function test_sphere_fit
+
+    !> Test surface fit from gridded data
+    logical function test_gridded_fit(iunit) result(success)
+        integer, optional, intent(in) :: iunit
+        type(fitpack_grid_surface) :: surf
+
+        integer :: ierr,loop,useUnit
+        real(RKIND), allocatable :: fit_z(:,:)
+        real(RKIND), parameter :: RTOL = 1.0e-4_RKIND
+        real(RKIND), parameter :: ATOL = 1.0e-4_RKIND
+
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+
+        !> Use tabulated data
+        do loop = 1,5
+
+            select case (loop)
+               case (1)
+                  ! we start computing the least-squares bicubic polynomial
+                  ierr = surf%new_fit(daregr_x,daregr_y,daregr_z,smoothing=10.0_RKIND)
+               case (2)
+                  ierr = surf%fit(smoothing=0.22_RKIND)
+               case (3)
+                  ! Overfitting (s is too small
+                  ierr = surf%fit(smoothing=0.1_RKIND)
+               case (4)
+                  ! Interpolating spline
+                  ierr = surf%interpolate()
+               case (5)
+                  ! Quintic spline
+                  ierr = surf%fit(smoothing=0.2_RKIND,order=5)
+               case (6)
+                  ! Finally, calculate a least-squares spline approximation with specified knots
+!                  iopt = -1
+!                  kx = 3
+!                  ky = 3
+!                  nx = 11
+!                  ny = 11
+!                  j  = kx+2
+!
+!                  tx(kx+2:kx+4) = [(half*(i-2),i=1,3)]
+!                  ty(kx+2:kx+4) = tx(kx+2:kx+4)
+
+            end select
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            ! Evaluation of the spline approximation
+            fit_z = surf%eval(daregr_x,daregr_y,ierr)
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            if (loop==4) then
+                ! Check that the evaluations match the original data
+                success = all(abs(daregr_z-fit_z)*rewt(RTOL,ATOL,daregr_z)<one)
+                if (.not.success) then
+                    write(useUnit,1100) loop
+                    print 900, 'daregr=',daregr_z
+                    print 900, 'fit   =',fit_z
+                    exit
+                end if
+            endif
+
+        end do
+
+         900 format(a,*(1x,1pe12.3))
+        1000 format('[test_gridded_surface] test ',i0,' failed: ',a)
+        1100 format('[test_gridded_surface] test ',i0,' evaluation failed ')
+
+
+    end function test_gridded_fit
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)

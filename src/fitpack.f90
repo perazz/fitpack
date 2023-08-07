@@ -21,6 +21,7 @@ module fitpack
    use fitpack_core
    use fitpack_curves
    use fitpack_surfaces
+   use fitpack_grid_surfaces
    use fitpack_polar_domains
    use fitpack_sphere_domains
    use fitpack_parametric_curves
@@ -31,13 +32,16 @@ module fitpack
    ! Public interface
    public :: RKIND
    public :: fitpack_curve
-   public :: fitpack_polar
-   public :: fitpack_sphere
-   public :: fitpack_surface
    public :: fitpack_closed_curve
    public :: fitpack_periodic_curve
    public :: fitpack_parametric_curve
    public :: fitpack_constrained_curve
+
+   public :: fitpack_polar
+   public :: fitpack_sphere
+   public :: fitpack_surface
+   public :: fitpack_grid_surface
+
 
 
 
