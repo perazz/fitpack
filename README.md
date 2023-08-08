@@ -5,21 +5,25 @@ This is a Modern Fortran translation of the FITPACK package for curve and surfac
 The functions are modernized and translated from the original Fortran77 code [FITPACK](http://www.netlib.org/dierckx) by Paul Dierckx.
 The starting code used the double precision version of FITPACK distributed with [scipy](http://www.scipy.org).
 
-An object-oriented interface wrapper is also being built. 
+An object-oriented interface wrapper is also being built:
 
 ### 1D Spline interpolators:
 
 Class      | Description | Degree
 ---        | ---         | ---
-`fitpack_curve` | 1D spline interpolation of scattered data | up to 5
+`fitpack_curve` | 1D spline interpolation of scattered data, `y = s(x)` | up to 5
+`fitpack_parametric_curve` | Parametric 1D curves in N dimensions, `x(1:n) = s(u)` | up to 5
+`fitpack_closed_curve` | Closed parametric 1D curves in N dimensions, `x(1:n) = s(u)` | up to 5
+`fitpack_constrained_curve` | Parametric 1D curves in N dimensions with value/derivative constraints at the endpoints `x(1:n) = s(u)` | up to 5
 
-### 1D Spline interpolators:
+### 2D Spline interpolators:
 
 Class      | Description | Degree
 ---        | ---         | ---
-`fitpack_curve` | 1D spline interpolation of scattered data | up to 5
-
-
+`fitpack_surface` | 2D spline interpolation of scattered data, `z = s(x,y)` | up to 5
+`fitpack_polar` | 2D spline interpolation of scattered data in a user-defined polar domain `u\in[0,1], v \in[-pi,pi], r=f(v)` | 3
+`fitpack_sphere` | 2D spline interpolation of scattered data on a sphere domain `latitude \in [0,pi], longitude \in [-pi,pi]` | 3
+`fitpack_grid_surface` | 2D spline interpolation of gridded 2D data `z(i,j) = s(x(i),y(j))` | up to 5
 
 Building, using
 ===============
