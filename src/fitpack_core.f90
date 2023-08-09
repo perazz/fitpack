@@ -5767,8 +5767,8 @@ module fitpack_core
             ! take into account that we eliminate the constraints (3)
             do while (j0-1<=iop0)
                fac0 = h(i0)
-                            right(1:mv)        = right(1:mv)     -fac0*aa(j0,1:mv)
-               if (mv/=mvv) right(mv+1:mv+nv8) = right(mv+1:mv+8)-fac0*bb(j0,1:nv8)
+                            right(1:mv)        = right(1:mv)       -fac0*aa(j0,1:mv)
+               if (mv/=mvv) right(mv+1:mv+nv8) = right(mv+1:mv+nv8)-fac0*bb(j0,1:nv8)
                j0 = j0+1
                i0 = i0+1
             end do
