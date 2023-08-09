@@ -946,6 +946,7 @@ module fitpack_curve_tests
                case (1)
                   ! Initialize domain
                   call polr%new_points(u,v,r,z,z0)
+                  call polr%write('polar_grid.dat')
 
                   ! Set c0-continuity at the origin
                   call polr%set_origin_BC(z0,exact=.false.,differentiable=.false.)

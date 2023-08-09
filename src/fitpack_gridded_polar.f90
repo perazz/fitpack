@@ -104,6 +104,9 @@ module fitpack_gridded_polar
            procedure, private :: gridded_eval_many
            generic :: eval => gridded_eval_one,gridded_eval_many
 
+           !> Write to disk
+           procedure :: write => gridded_to_disk
+
     end type fitpack_grid_polar
 
     interface fitpack_grid_polar
@@ -357,5 +360,43 @@ module fitpack_gridded_polar
         end if
 
     end subroutine set_origin_BC
+
+    !> Print gridded polar data to disk
+    subroutine gridded_to_disk(this,fileName)
+        class(fitpack_grid_polar), intent(inout) :: this
+        character(*), intent(in) :: fileName
+
+        integer :: iunit,ierr,j,i
+
+        open(newunit=iunit,file=fileName,action='write',form='formatted',iostat=ierr)
+
+        ! Write header
+        write(iunit,1) 'u',(named('v',j)       ,j=1,size(this%v))
+        write(iunit,1) ' ',(numbered(this%v(j)),j=1,size(this%v))
+
+        do i=1,size(this%u)
+            write(iunit,2) this%u(i),this%z(:,i)
+        end do
+
+        close(iunit)
+
+        1 format('!',a12,*(1x,a12))
+        2 format(*(1x,1pe12.5))
+
+        contains
+
+           character(12) function named(name,i)
+              character(*), intent(in) :: name
+              integer, intent(in) :: i
+              write(named,"(a,'_',i0)") name,i
+              named = adjustr(named)
+           end function named
+           character(12) function numbered(v)
+              real(RKIND), intent(in) :: v
+              write(numbered,"(1pe12.5)") v
+              numbered = adjustr(numbered)
+           end function numbered
+
+    end subroutine gridded_to_disk
 
 end module fitpack_gridded_polar
