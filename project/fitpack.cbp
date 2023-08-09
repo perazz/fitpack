@@ -52,6 +52,7 @@
 		<Unit filename="../src/fitpack_grid_surfaces.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="../src/fitpack_gridded_polar.f90" />
 		<Unit filename="../src/fitpack_parametric.f90">
 			<Option weight="1" />
 		</Unit>

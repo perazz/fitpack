@@ -20,7 +20,7 @@
 module fitpack_curve_tests
     use fitpack
     use fitpack_core
-    use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z
+    use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z,dapogr
     use iso_fortran_env, only: output_unit
 
 
@@ -36,6 +36,7 @@ module fitpack_curve_tests
     public :: test_sphere_fit
     public :: test_gridded_fit
     public :: test_constrained_curve
+    public :: test_gridded_polar
 
 
     contains
@@ -908,6 +909,117 @@ module fitpack_curve_tests
 
 
     end function test_gridded_fit
+
+
+    !> Test surface fit from gridded data
+    logical function test_gridded_polar(iunit) result(success)
+        integer, optional, intent(in) :: iunit
+        type(fitpack_grid_polar) :: polr
+
+        integer :: ierr,loop,useUnit,i
+        real(RKIND) :: z0,r
+        real(RKIND), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
+
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+
+        !> Setup grid
+        u = linspace(0.1_RKIND,0.9_RKIND,9)      ! u in [0,r]
+        v = linspace(-pi,0.9_RKIND*pi,19)  ! v in [-pi,pi]
+        r = one
+
+        !> Get tabulated data from external datafile
+        z = reshape(dapogr(1:9*19),[19,9])
+        z0 = dapogr(9*19+1)
+
+        !> Get analytical solution on the grid points
+        exact_z = polar_fun(spread(u,1,19),spread(v,2,9))
+
+        !> Use tabulated data
+        do loop = 1,6
+
+            select case (loop)
+               case (1)
+                  ! Initialize domain
+                  call polr%new_points(u,v,r,z,z0)
+
+                  ! Set c0-continuity at the origin
+                  call polr%set_origin_BC(z0,exact=.false.,differentiable=.false.)
+                  ! Non-vanishing at the boundary
+                  polr%bc_boundary = OUTSIDE_EXTRAPOLATE
+
+                  ! Large value of s for computing least-squares polynomial
+                  ierr = polr%fit(smoothing=5.0_RKIND)
+               case (2)
+                  ierr = polr%fit(smoothing=0.1_RKIND)
+               case (3)
+                  ierr = polr%interpolate()
+               case (4)
+
+                  ! Change BCs
+                  polr%bc_boundary = OUTSIDE_ZERO
+                  call polr%set_origin_BC(polar_fun(zero,zero),exact=.true.,differentiable=.true.)
+                  ierr = polr%fit(smoothing=0.1_RKIND)
+
+               case (5)
+
+                  call polr%set_origin_BC(differentiable=.true.)
+
+                  ierr = polr%fit(smoothing=0.1_RKIND)
+
+               case (6)
+
+                  ierr = polr%least_squares()
+
+            end select
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            ! Evaluation of the spline approximation
+            fit_z = polr%eval(u,v,ierr)
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1100) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            ! Check error vs analytical solution
+            err = abs(exact_z-fit_z)
+            write(useUnit,800) polr%c(1),abs(polr%c(1)-polar_fun(zero,zero))
+            write(useUnit,935) sum(err)/size(err),maxval(err)
+
+        end do
+
+         900 format(a,*(1x,1pe12.3))
+         800 format('[test_gridded_polar] spline value at (0,0) = ',f7.3,5x,'error = ',f7.3)
+
+         935 format('[test_gridded_polar] error: mean = ',f9.3,'     max. abs. = ',f9.3)
+
+        1000 format('[test_gridded_polar] test ',i0,' failed: ',a)
+        1100 format('[test_gridded_polar] test ',i0,' evaluation failed ')
+
+        contains
+
+        ! function program tespog calculates the value of the test function underlying the data.
+        elemental real(RKIND) function polar_fun(u,v)
+           real(RKIND), intent(in) :: u,v
+           real(RKIND) :: x,y,f
+           x = u*cos(v)
+           y = u*sin(v)
+           f = one-((3*x-one)**2+(3*y-one)**2)/(11.-6*(x+y))
+           polar_fun = f-(one-x**2-y**2)*(x+y)*54.0_RKIND/121.0_RKIND
+        end function polar_fun
+
+    end function test_gridded_polar
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)

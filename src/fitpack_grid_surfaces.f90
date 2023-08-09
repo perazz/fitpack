@@ -30,7 +30,7 @@ module fitpack_grid_surfaces
         !> The data points
         integer :: m = 0
         real(RKIND), allocatable :: x(:),y(:) ! Grid values in x, y dimensions
-        real(RKIND), allocatable :: z(:,:)    ! Function values z(ix,iy)
+        real(RKIND), allocatable :: z(:,:)    ! Function values z(iy,ix)
 
         !> Spline degree
         integer :: order(2) = 3
@@ -193,7 +193,7 @@ module fitpack_grid_surfaces
 
     subroutine surf_new_points(this,x,y,z)
         class(fitpack_grid_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(:),z(size(x),size(y))
+        real(RKIND), intent(in) :: x(:),y(:),z(size(y),size(x))
 
         integer :: clen,u,m(2)
         integer, parameter :: SAFE = 2
@@ -203,7 +203,7 @@ module fitpack_grid_surfaces
 
         call this%destroy()
 
-        m = shape(z)
+        m = [size(x),size(y)]
 
         ! Ensure x are sorted
         allocate(this%x,source=x)
@@ -247,7 +247,7 @@ module fitpack_grid_surfaces
 
     ! A default constructor
     type(fitpack_grid_surface) function surf_new_from_points(x,y,z,ierr) result(this)
-        real(RKIND), intent(in) :: x(:),y(:),z(size(x),size(y))
+        real(RKIND), intent(in) :: x(:),y(:),z(size(y),size(x))
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -262,7 +262,7 @@ module fitpack_grid_surfaces
     ! Fit a new curve
     integer function surf_new_fit(this,x,y,z,smoothing,order)
         class(fitpack_grid_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(:),z(size(x),size(y))
+        real(RKIND), intent(in) :: x(:),y(:),z(size(y),size(x))
         real(RKIND), optional, intent(in) :: smoothing
         integer    , optional, intent(in) :: order
 
@@ -275,7 +275,7 @@ module fitpack_grid_surfaces
     function gridded_eval_many(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         real(RKIND), intent(in) :: x(:),y(:)  ! Evaluation points
-        real(RKIND) :: f(size(x),size(y))
+        real(RKIND) :: f(size(y),size(x))
         integer, optional, intent(out) :: ierr ! Optional error flag
 
         integer :: ier

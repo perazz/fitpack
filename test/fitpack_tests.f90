@@ -2525,8 +2525,8 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  ..local scalars..
-          real(RKIND) :: cv,ermax,er0,exz0,fp,r,sum,sv,x,y,z0,s
-          integer :: i,ier,is,j,k,m,nc,nu,nv,pos,useUnit
+          real(RKIND) :: ermax,er0,exz0,fp,r,sum,x,y,z0,s
+          integer :: i,ier,is,j,k,m,nc,nu,nv,useUnit
 
           ! number of u (radius)-values of the grid.
           integer, parameter :: mu = 9
@@ -2553,9 +2553,6 @@ module fitpack_tests
               useUnit = output_unit
           end if
 
-          ! Store a pointer to the data array
-          pos = 0
-
           ! we set up the radius of the disc
           r = one
 
@@ -2567,10 +2564,10 @@ module fitpack_tests
 
           ! we fetch the data values at the grid points.
           m = mu*mv
-          z(1:m) = datafile(pos+1:pos+m); pos = pos+m
+          z(1:m) = datafile(1:mu*mv)
 
           ! we fetch the data value at the origin.
-          z0     = datafile(pos+1)      ; pos = pos+1
+          z0     = datafile(mu*mv+1)
 
           ! we print the data values at the grid points.
           write(useUnit,905)
@@ -2584,12 +2581,10 @@ module fitpack_tests
           ermax = er0
           sum   = er0
           exact_data: do j=1,mv
-             cv = cos(v(j))
-             sv = sin(v(j))
              k = j
              do i=1,mu
-                x = u(i)*cv
-                y = u(i)*sv
+                x = u(i)*cos(v(j))
+                y = u(i)*sin(v(j))
                 exact(k) = tespog(x,y)
                 err(i) = abs(exact(k)-z(k))
                 sum = sum+err(i)
@@ -2727,9 +2722,9 @@ module fitpack_tests
           end do approximations
 
           ! Format statements
-          905  format(49h1data value (exact function value) at grid points)
-          910  format(8h u(i),i=,3x,9(i1,7x))
-          915  format(8h v(j),j=)
+          905  format('1data value (exact function value) at grid points')
+          910  format(' u(i),i=',3x,9(i1,7x))
+          915  format(' v(j),j=')
           920  format(1x,i5,9(2x,f6.3))
           925  format(7x,9(2h (,f5.3,1h)))
           930  format(23h0data value at (0,0) = ,f7.3,5x,14hexact value = ,f7.3)

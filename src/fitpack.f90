@@ -22,6 +22,7 @@ module fitpack
    use fitpack_curves
    use fitpack_surfaces
    use fitpack_grid_surfaces
+   use fitpack_gridded_polar
    use fitpack_polar_domains
    use fitpack_sphere_domains
    use fitpack_parametric_curves
@@ -38,11 +39,12 @@ module fitpack
    public :: fitpack_constrained_curve
 
    public :: fitpack_polar
+   public :: fitpack_grid_polar
+
    public :: fitpack_sphere
+
    public :: fitpack_surface
    public :: fitpack_grid_surface
-
-
 
 
 end module fitpack
