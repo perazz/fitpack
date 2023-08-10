@@ -11,10 +11,10 @@ An object-oriented interface wrapper is also being built:
 
 Class      | Description | Degree
 ---        | ---         | ---
-`fitpack_curve` | 1D spline interpolation of scattered data, `y = s(x)` | up to 5
-`fitpack_parametric_curve` | Parametric 1D curves in N dimensions, `x(1:n) = s(u)` | up to 5
-`fitpack_closed_curve` | Closed parametric 1D curves in N dimensions, `x(1:n) = s(u)` | up to 5
-`fitpack_constrained_curve` | Parametric 1D curves in N dimensions with value/derivative constraints at the endpoints `x(1:n) = s(u)` | up to 5
+`fitpack_curve` | 1D spline interpolation of scattered data, $y = s(x)$ | up to 5
+`fitpack_parametric_curve` | Parametric 1D curves in N dimensions, $x_i = s_i(u), i=1,\ldots,n$ | up to 5
+`fitpack_closed_curve` | Closed parametric 1D curves in N dimensions, $x_i = s_i(u), i=1,\ldots,n, x_i(0)=x_i(1)$ | up to 5
+`fitpack_constrained_curve` | Parametric 1D curves in N dimensions with value/derivative constraints at the endpoints $x_i = s_i(u), i=1,\ldots,n$ | up to 5
 
 ### 2D Spline interpolators:
 
