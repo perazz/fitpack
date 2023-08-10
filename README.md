@@ -70,3 +70,8 @@ Fitpack contains very robust algorithms for curve interpolation and fitting, bas
 [4] P. Dierckx, "Curve and surface fitting with splines", Monographs on Numerical Analysis, Oxford University Press, 1993.
 
 [5] P. Dierckx, R. Piessens, "Calculation of Fourier coefficients of discrete functions using cubic splines", Journal of Computational and Applied Mathematics  3(3), 207-209, 1977.
+
+See also
+--------
+[Dierckx.jl](https://github.com/kbarbary/Dierckx.jl), a Julia interface to FITPACK
+[scipy.interpolate](https://docs.scipy.org/doc/scipy/reference/interpolate.html), which includes interfaces to FITPACK
