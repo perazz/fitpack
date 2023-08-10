@@ -73,5 +73,5 @@ Fitpack contains very robust algorithms for curve interpolation and fitting, bas
 
 See also
 --------
-[Dierckx.jl](https://github.com/kbarbary/Dierckx.jl), a Julia interface to FITPACK
-[scipy.interpolate](https://docs.scipy.org/doc/scipy/reference/interpolate.html), which includes interfaces to FITPACK
+- [Dierckx.jl](https://github.com/kbarbary/Dierckx.jl), a Julia interface to FITPACK
+- [scipy.interpolate](https://docs.scipy.org/doc/scipy/reference/interpolate.html), which includes interfaces to FITPACK
