@@ -51,7 +51,7 @@ module fitpack_core
     public :: surfit ! * Surface fitting to scattered data
     public :: regrid ! * Surface fitting to data on a rectangular grid
     public :: polar  ! * Surface fitting using generalized polar coordinates
-    public :: pogrid ! Surface fitting to data on a polar grid
+    public :: pogrid ! * Surface fitting to data on a polar grid
     public :: sphere ! * Surface fitting using spherical coordinates
     public :: spgrid ! Surface fitting to data on a spherical grid
     public :: parsur ! Parametric surface fitting to data on a grid
@@ -273,7 +273,6 @@ module fitpack_core
       end if
 
       end subroutine bispeu
-
 
       !  subroutine bispev evaluates on a grid (x(i),y(j)),i=1,...,mx; j=1,...,my a bivariate spline
       !  s(x,y) of degrees kx and ky, given in the b-spline representation.

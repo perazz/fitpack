@@ -3800,16 +3800,16 @@ module fitpack_tests
             write(useUnit,955) iopt(2),iopt(3)
             if(ider(2)==1) write(useUnit,960)
             if(ider(4)==1) write(useUnit,965)
-            write(useUnit,970) fp,FITPACK_MESSAGE(ier)
-            write(useUnit,975) nu
-            write(useUnit,980)
-            write(useUnit,985) (tu(i),i=1,nu)
-            write(useUnit,990) nv
-            write(useUnit,980)
-            write(useUnit,985) (tv(i),i=1,nv)
-            nc = (nu-4)*(nv-4)
-            write(useUnit,995)
-            write(useUnit,985) (c(i),i=1,nc)
+!            write(useUnit,970) fp,FITPACK_MESSAGE(ier)
+!            write(useUnit,975) nu
+!            write(useUnit,980)
+!            write(useUnit,985) (tu(i),i=1,nu)
+!            write(useUnit,990) nv
+!            write(useUnit,980)
+!            write(useUnit,985) (tv(i),i=1,nv)
+!            nc = (nu-4)*(nv-4)
+!            write(useUnit,995)
+!            write(useUnit,985) (c(i),i=1,nc)
 
             !  evaluation of the spline approximation
             call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iwrk,70,ier)
@@ -3828,13 +3828,15 @@ module fitpack_tests
                     k = k+1
                 end do
                 if( (i/2)*2 /=i ) cycle
-                write(useUnit,925) i,(sp(j),j=1,mv,2)
-                write(useUnit,930) (err(j),j=1,mv,2)
+!                write(useUnit,925) i,(sp(j),j=1,mv,2)
+!                write(useUnit,930) (err(j),j=1,mv,2)
             end do
             sum = sum/ai
             write(useUnit,935) sum,ermax
             write(useUnit,1005) c(1),c(nc)
         end do approximations
+
+        STOP
 
        ! Formats statements
          910  format(49h1data value (exact function value) at grid points)

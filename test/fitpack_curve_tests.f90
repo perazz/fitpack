@@ -20,7 +20,8 @@
 module fitpack_curve_tests
     use fitpack
     use fitpack_core
-    use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z,dapogr
+    use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z,dapogr, &
+                                 daspgr_r,daspgr_u,daspgr_v
     use iso_fortran_env, only: output_unit
 
 
@@ -37,6 +38,7 @@ module fitpack_curve_tests
     public :: test_gridded_fit
     public :: test_constrained_curve
     public :: test_gridded_polar
+    public :: test_gridded_sphere
 
 
     contains
@@ -933,7 +935,7 @@ module fitpack_curve_tests
         r = one
 
         !> Get tabulated data from external datafile
-        z = reshape(dapogr(1:9*19),[19,9])
+        z  = reshape(dapogr(1:9*19),[19,9])
         z0 = dapogr(9*19+1)
 
         !> Get analytical solution on the grid points
@@ -945,7 +947,7 @@ module fitpack_curve_tests
             select case (loop)
                case (1)
                   ! Initialize domain
-                  call polr%new_points(u,v,r,z,z0)
+                  call polr%new_points(u,v,r,z)
                   call polr%write('polar_grid.dat')
 
                   ! Set c0-continuity at the origin
@@ -1021,6 +1023,120 @@ module fitpack_curve_tests
         end function polar_fun
 
     end function test_gridded_polar
+
+    !> Test surface fit from gridded sphere data
+    logical function test_gridded_sphere(iunit) result(success)
+        integer, optional, intent(in) :: iunit
+        type(fitpack_grid_sphere) :: spgr
+
+        integer :: ierr,loop,useUnit,i
+        real(RKIND), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
+
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+
+        !> Load grid and data
+        u = daspgr_u
+        v = daspgr_v
+        z = reshape(daspgr_r,[size(v),size(u)])
+
+        !> Get analytical solution on the grid points
+        exact_z = tesspg(spread(u,1,size(v)),spread(v,2,size(u)))
+
+        ! Check error of input data vs analytical solution
+        err = abs(z-exact_z)
+        write(useUnit,935) sum(err)/size(err),maxval(err)
+
+        !> Use tabulated data
+        do loop = 1,6
+
+            select case (loop)
+               case (1)
+
+                  ! Initialize data
+                  call spgr%new_points(u,v,z)
+
+                  ! Set c0-continuity at the poles, no data values
+                  call spgr%BC_south_pole(differentiable=.false.)
+                  call spgr%BC_north_pole(differentiable=.false.)
+
+                  ! A large value for s for computing the least-squares polynomial
+                  ierr = spgr%fit(smoothing=60.0_RKIND)
+
+               case (2)
+
+                  ierr = spgr%fit(smoothing=0.05_RKIND)
+               case (3)
+                  ierr = spgr%interpolate()
+               case (4)
+
+                  ! a second set of approximations with c1-continuity at the poles and the exact values
+                  call spgr%BC_north_pole(z0=tesspg(zero,zero),exact=.true.,differentiable=.true.,zero_grad=.false.)
+                  call spgr%BC_south_pole(z0=tesspg(pi,zero),exact=.true.,differentiable=.true.,zero_grad=.false.)
+                  ierr = spgr%fit(smoothing=0.05_RKIND)
+
+               case (5)
+
+                  ! Vanishing derivatives at the poles
+                  call spgr%BC_north_pole(z0=tesspg(zero,zero),exact=.true.,differentiable=.true.,zero_grad=.true.)
+                  call spgr%BC_south_pole(z0=tesspg(pi,zero),exact=.true.,differentiable=.true.,zero_grad=.true.)
+                  ierr = spgr%fit(smoothing=0.05_RKIND)
+
+               case (6)
+
+                  ! finally we calculate the least-squares spline according to the current set of knots
+                  ierr = spgr%least_squares()
+
+            end select
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            ! Evaluation of the spline approximation
+            fit_z = spgr%eval(u,v,ierr)
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                success = .false.
+                write(useUnit,1100) loop,FITPACK_MESSAGE(ierr)
+                exit
+            end if
+
+            ! Check error vs analytical solution
+            err = abs(exact_z-fit_z)
+            write(useUnit,800) spgr%c(1),spgr%c(size(spgr%c))
+            write(useUnit,800) tesspg(zero,zero),tesspg(pi,zero)
+            write(useUnit,935) sum(err)/size(err),maxval(err)
+
+        end do
+
+        !stop
+
+         900 format(a,*(1x,1pe12.3))
+         800 format('[test_gridded_sphere] spline value at the poles =',2(1x,f7.3,5x))
+
+         935 format('[test_gridded_sphere] error: mean = ',f9.3,'     max. abs. = ',f9.3)
+
+        1000 format('[test_gridded_sphere] test ',i0,' failed: ',a)
+        1100 format('[test_gridded_sphere] test ',i0,' evaluation failed ')
+
+        contains
+
+          ! function program tesspg calculates the value of the test function
+          ! underlying the data.
+          elemental real(RKIND) function tesspg(u,v)
+              real(RKIND), intent(in) :: u,v
+              tesspg = 2.0_RKIND/(4.1_RKIND+cos(3*u)+3*cos(v+v+u*0.25_RKIND)*sin(u)**2)
+              return
+          end function tesspg
+
+    end function test_gridded_sphere
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)

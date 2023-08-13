@@ -50,6 +50,7 @@ program test
         call add_test(test_constrained_curve())
         call add_test(test_gridded_fit())
         call add_test(test_gridded_polar())
+        call add_test(test_gridded_sphere())
 
     end subroutine run_interface_tests
 
