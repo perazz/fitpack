@@ -51,7 +51,7 @@ module fitpack_tests
     public :: mncuev ! test curev : Evaluation of a spline curve
     public :: mndbin ! test dblint: Integration of a bivariate spline
     public :: mnevpo ! test evapol: Evaluation of a polar spline
-    public :: mnpasu
+    public :: mnpasu ! test parsur: Parametric surface fitting
     public :: mnspgr
 
 
@@ -2189,7 +2189,7 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnpasu(datafile,iunit) result(success)
-          real(RKIND), intent(in) :: datafile(:)
+          real(RKIND), intent(in) :: datafile(:,:,:)
           integer, optional, intent(in) :: iunit
 
           integer, parameter :: mu = 21
@@ -2205,10 +2205,10 @@ module fitpack_tests
           integer, parameter :: lwrk = 2000
           integer, parameter :: kwrk = 80
 
-          real(RKIND) :: u(mu),v(mv),f(693),tu(27),tv(17),c(900),wrk(lwrk),z(693), wk(128)
-          integer     :: iwrk(kwrk),iw(32),ipar(2)
+          real(RKIND), dimension(mv,mu,idim) :: f,z
+          real(RKIND) :: u(mu),v(mv),tu(27),tv(17),c(900),wrk(lwrk),wk(128)
+          integer     :: iwrk(kwrk),iw(32),ipar(2),nc,nu,nv,i,ier,is,iopt,j,l,useUnit,j0,j1
           real(RKIND) :: ai,fp,s
-          integer     :: j0,j1,j2,j3,nc,nu,nv,i,ier,is,iopt,j,l,pos,useUnit
 
           success = .true.
           if (present(iunit)) then
@@ -2216,9 +2216,6 @@ module fitpack_tests
           else
               useUnit = output_unit
           end if
-
-          ! Store a pointer to the datafile
-          pos = 0
 
           !  we generate the u-coordinates of the grid.
           u = [(i,i=0,mu-1)]
@@ -2228,23 +2225,13 @@ module fitpack_tests
           write(useUnit,900)
           write(useUnit,905) (v(i),i=1,mv)
           write(useUnit,910)
-
-          j0 = 0
           do i=1,mu
               write(useUnit,915) u(i)
-              j1 = j0
               do l=1,idim
-                  j2 = j1+1
-                  j3 = j1+mv
-
                   ! Read from an array
-                  f(j2:j3) = datafile(pos+1:pos+mv)
-                  pos = pos+mv
-
-                  write(useUnit,925) (f(j),j=j2,j3)
-                  j1 = j1+m
+                  f(:,i,l) = datafile(:,l,i)
+                  write(useUnit,925) (f(j,i,l),j=1,mv)
               end do
-              j0 = j0+mv
           end do
 
           !  main loop for the different spline approximations
@@ -2328,19 +2315,15 @@ module fitpack_tests
               write(useUnit,985)
               write(useUnit,905) (v(i),i=1,mv,2)
               write(useUnit,910)
-              j0 = 0
               do i=1,mu,4
                   write(useUnit,915) u(i)
-                  j1 = j0
                   do l=1,idim
-                    j2 = j1+1
-                    j3 = j1+mv
-                    write(useUnit,925) (z(j),j=j2,j3,2)
-                    j1 = j1+m
+                    write(useUnit,925) (z(j,i,l),j=1,mv,2)
                   end do
-                  j0 = j0+mv*4
               end do
           end do approximations
+
+          stop
 
           !  format statements.
           900  format(15h1the input data)
