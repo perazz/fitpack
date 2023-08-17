@@ -306,7 +306,6 @@ module fitpack_tests
              if (.not.FITPACK_SUCCESS(ier)) then
                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
                  success = .false.
-                 stop
              end if
 
              ! printing of the results.
@@ -2323,8 +2322,6 @@ module fitpack_tests
               end do
           end do approximations
 
-          stop
-
           !  format statements.
           900  format(15h1the input data)
           905  format(1h0,2x,1hv,11(3x,f4.1))
@@ -2646,7 +2643,6 @@ module fitpack_tests
               if (.not.FITPACK_SUCCESS(ier)) then
                   success = .false.
                   write(useUnit,1100) is,FITPACK_MESSAGE(ier)
-                  stop
               end if
 
               ! printing of the fitting results.
@@ -3819,8 +3815,6 @@ module fitpack_tests
             write(useUnit,1005) c(1),c(nc)
         end do approximations
 
-        STOP
-
        ! Formats statements
          910  format(49h1data value (exact function value) at grid points)
          915  format(8h0v(j),j=,3x,7(i2,6x))
@@ -3964,7 +3958,6 @@ module fitpack_tests
               if (.not.FITPACK_SUCCESS(ier)) then
                   success = .false.
                   write(useUnit,1000) is,FITPACK_MESSAGE(ier)
-                  stop
               end if
 
               !  printing of the fitting results.

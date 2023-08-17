@@ -61,7 +61,7 @@ module fitpack_grid_surfaces
         real(RKIND), allocatable :: c(:)
 
         ! Runtime flag
-        integer :: iopt = 0
+        integer :: iopt = IOPT_NEW_SMOOTHING
 
         contains
 
@@ -198,7 +198,6 @@ module fitpack_grid_surfaces
         integer :: clen,u,m(2)
         integer, parameter :: SAFE = 2
 
-
         associate(nest=>this%nest,nmax=>this%nmax,order=>this%order)
 
         call this%destroy()
@@ -217,7 +216,7 @@ module fitpack_grid_surfaces
         this%right(2) = maxval(y,1)
 
         ! Reset run flag
-        this%iopt = 0
+        this%iopt = IOPT_NEW_SMOOTHING
 
         ! Knot space: overestimate (2*order+1 => order+m+1)
         nest = SAFE*(order + m + 1)
