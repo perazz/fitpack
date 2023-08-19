@@ -27,6 +27,7 @@ module fitpack
    use fitpack_polar_domains
    use fitpack_sphere_domains
    use fitpack_parametric_curves
+   use fitpack_parametric_surfaces
 
    implicit none
    private
@@ -47,6 +48,7 @@ module fitpack
 
    public :: fitpack_surface
    public :: fitpack_grid_surface
+   public :: fitpack_parametric_surface
 
 
 end module fitpack

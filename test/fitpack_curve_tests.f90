@@ -21,7 +21,7 @@ module fitpack_curve_tests
     use fitpack
     use fitpack_core
     use fitpack_test_data, only: dapola,dasphe,daregr_x,daregr_y,daregr_z,dapogr, &
-                                 daspgr_r,daspgr_u,daspgr_v
+                                 daspgr_r,daspgr_u,daspgr_v,dapasu
     use iso_fortran_env, only: output_unit
 
 
@@ -39,6 +39,7 @@ module fitpack_curve_tests
     public :: test_constrained_curve
     public :: test_gridded_polar
     public :: test_gridded_sphere
+    public :: test_parametric_surface
 
 
     contains
@@ -136,7 +137,6 @@ module fitpack_curve_tests
           if (.not.FITPACK_SUCCESS(ierr)) then
               success = .false.
               write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
-              stop
               exit
           end if
 
@@ -1116,8 +1116,6 @@ module fitpack_curve_tests
 
         end do
 
-        !stop
-
          900 format(a,*(1x,1pe12.3))
          800 format('[test_gridded_sphere] spline value at the poles =',2(1x,f7.3,5x))
 
@@ -1137,6 +1135,156 @@ module fitpack_curve_tests
           end function tesspg
 
     end function test_gridded_sphere
+
+    logical function test_parametric_surface(iunit) result(success)
+        integer, optional, intent(in) :: iunit
+
+        integer, parameter :: mu   = 21
+        integer, parameter :: mv   = 11
+        integer, parameter :: idim = 3
+        integer :: useUnit,i,loop,ier
+        type(fitpack_parametric_surface) :: surf
+        real(RKIND), allocatable :: u(:),v(:),f1(:,:,:),f(:,:,:)
+
+
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+
+        !  we generate the u-coordinates of the grid and load surface data
+        u = [(i-1,i=1,mu)]
+        v = [(u(2*i-1),i=1,mv)]
+
+        ! dapasu is provided as [v,idim,u], f is requested as [v,u,idim] -> swap dimensions
+        f  = reshape(dapasu,[mv,mu,idim],order=[1,3,2])
+
+        !  main loop for the different spline approximations
+        approximations: do loop=1,1
+           select case (loop)
+              case (1)
+
+                 ! Smoothing surface, no periodicity constraint
+                 ier = surf%new_fit(u,v,f,smoothing=0.07_RKIND,periodic_BC=[.false.,.false.])
+
+           end select
+!
+!              select case (is)
+!                  case (1)
+!                      !  a smoothing surface with no periodicity conditions
+!                      iopt = 0
+!                      s = 0.07
+!                      ipar(1:2) = 0
+!
+!                  case (2)
+!
+!                      !  a smoothing surface periodic in the v-variable
+!                      ipar(2) = 1
+!
+!                  case (3)
+!
+!                      !  a smoothing surface periodic in both variables
+!                      ipar(1) = 1
+!
+!                  case (4)
+!
+!                      !  finally we also calculate a least-squares spline surface
+!                      !  with specified knots.
+!                      iopt = -1
+!                      nu = 11
+!                      nv = 11
+!                      j = 5
+!                      do i=1,3
+!                          ai = 5*i
+!                          tu(j) = ai
+!                          tv(j) = tu(j)
+!                          j = j+1
+!                      end do
+!
+!              end select
+
+              if (.not.FITPACK_SUCCESS(ier)) then
+                  success = .false.
+                  write(useUnit,1000) loop,FITPACK_MESSAGE(ier)
+              end if
+
+              !  printing of the fitting results.
+              if (surf%iopt>=0) then
+                  write(useUnit,940) merge(1,0,surf%periodic_dim)
+                  write(useUnit,945) surf%smoothing
+              else
+                  write(useUnit,935) merge(1,0,surf%periodic_dim)
+              endif
+!
+!              write(useUnit,950) fp,ier
+!              write(useUnit,955) nu
+!              write(useUnit,960)
+!              write(useUnit,965) (tu(i),i=1,nu)
+!              write(useUnit,970) nv
+!              write(useUnit,960)
+!              write(useUnit,965) (tv(i),i=1,nv)
+!              nc = (nu-4)*(nv-4)
+!              write(useUnit,975)
+!              j1 = 0
+!              do l=1,idim
+!                  j0 = j1+1
+!                  j1 = j1+nc
+!                  write(useUnit,980) (c(j),j=j0,j1)
+!              end do
+!
+!              !  evaluation of the spline surface.
+!              call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,z,693,wk,128,iw,32,ier)
+!
+!              if (.not.FITPACK_SUCCESS(ier)) then
+!                  success = .false.
+!                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
+!              end if
+!
+!              write(useUnit,985)
+!              write(useUnit,905) (v(i),i=1,mv,2)
+!              write(useUnit,910)
+!              j0 = 0
+!              do i=1,mu,4
+!                  write(useUnit,915) u(i)
+!                  j1 = j0
+!                  do l=1,idim
+!                    j2 = j1+1
+!                    j3 = j1+mv
+!                    write(useUnit,925) (z(j),j=j2,j3,2)
+!                    j1 = j1+m
+!                  end do
+!                  j0 = j0+mv*4
+!              end do
+        end do approximations
+
+        stop
+!
+!          !  format statements.
+!          900  format(15h1the input data)
+!          905  format(1h0,2x,1hv,11(3x,f4.1))
+!          910  format(1h ,1x,1hu)
+!          915  format(1h ,f4.1)
+!          925  format(5x,11f7.3)
+          935  format('0least-squares surface of periodicity',2i3)
+          940  format('0smoothing surface of periodicity',2i3)
+          945  format(' smoothing factor s=',f8.2)
+!          950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
+!          955  format(1x,42htotal number of knots in the u-direction =,i3)
+!          960  format(1x,22hposition of the knots )
+!          965  format(5x,10f6.2)
+!          970  format(1x,42htotal number of knots in the v-direction =,i3)
+!          975  format(23h0b-spline coefficients )
+!          980  format(5x,8f9.4)
+!          985  format(1h0,37hspline values at selected grid points)
+
+!      end function mnpasu
+!
+
+       1000  format('[test_parametric_surface] case ',i0,' failed with message: ',a)
+
+    end function test_parametric_surface
 
     ! ODE-style reciprocal error weight
     elemental real(RKIND) function rewt(RTOL,ATOL,x)
