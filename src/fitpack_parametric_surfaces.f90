@@ -77,25 +77,18 @@ module fitpack_parametric_surfaces
            !> Generate new fit
            procedure :: new_fit
 
-
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit         => curve_fit_automatic_knots
-           procedure :: interpolate => interpolating_curve
+           procedure :: fit           => surf_fit_automatic_knots
+           procedure :: interpolate   => interpolating_curve
+           procedure :: least_squares => surface_fit_least_squares
 
            !> Evaluate curve at given coordinates
-           procedure, private :: curve_eval_one
-           procedure, private :: curve_eval_many
-           generic :: eval => curve_eval_one,curve_eval_many
-
-           !> Evaluate derivative at given coordinates
-           procedure, private :: curve_derivative
-           procedure, private :: curve_derivatives
-           procedure, private :: curve_all_derivatives
-           generic   :: dfdx => curve_derivative,curve_derivatives
-           generic   :: dfdx_all => curve_all_derivatives
+           procedure, private :: surf_eval_one
+           procedure, private :: surf_eval_grid
+           generic :: eval => surf_eval_one,surf_eval_grid
 
            !> Properties: MSE
-           procedure, non_overridable :: mse => curve_error
+           procedure, non_overridable :: mse => surf_error
 
     end type fitpack_parametric_surface
 
@@ -165,7 +158,6 @@ module fitpack_parametric_surfaces
         integer, parameter   :: SAFE = 2
         integer :: m(2),q,clen
 
-
         associate(idim=>this%idim,nest=>this%nest,nmax=>this%nmax,lwrk=>this%lwrk)
 
         call this%destroy()
@@ -191,111 +183,160 @@ module fitpack_parametric_surfaces
 
         ! Knot space: overestimate (mv+4+2*ipar(2))
         nest = SAFE*(m+4+2)
-        nmax = maxval(nest)
-        allocate(this%t(nmax,2),source=zero)
-
-        ! Spline coefficients
-        clen = product(nest-4)*idim
-        allocate(this%c(clen),source=zero)
+        call allocate_knot_storage(this,nest)
 
         this%fp = zero
-
-        ! Working space
-        this%liwrk = 3+sum(m+nest)
-        allocate(this%iwrk(this%liwrk),source=0)
-
-        ! wrk
-        ! lwrk >= 4+nuest*(mv*idim+11+4*ipar(1))+nvest*(11+4*ipar(2))+4*(mu+mv)+q*idim
-        ! where q is the larger of mv and nuest.
-        q = max(m(2),nest(1))
-        this%lwrk = 4+nest(1)*(m(2)*idim+11+4)+nest(2)*(11+4)+4*sum(m)+q*idim
-        allocate(this%wrk(this%lwrk),source=zero)
 
         endassociate
 
     end subroutine new_points
 
-    function curve_eval_one(this,u,ierr) result(y)
+    pure subroutine allocate_knot_storage(this,knots)
+       class(fitpack_parametric_surface), intent(inout) :: this
+       integer, intent(in) :: knots(2)
+
+       integer :: clen,q,m(2)
+       real(RKIND), allocatable :: t(:,:),c(:),wrk(:)
+       integer, allocatable :: iwrk(:)
+
+       associate(nmax=>this%nmax,idim=>this%idim)
+
+       m = [size(this%u),size(this%v)]
+
+       nmax = maxval(knots)
+       allocate(t(nmax,2),source=zero)
+       call move_alloc(from=t,to=this%t)
+
+       ! Spline coefficients
+       clen = product(knots-4)*idim
+       allocate(c(clen),source=zero)
+       call move_alloc(from=c,to=this%c)
+
+       ! Working space
+       this%liwrk = 3+sum(m+knots)
+       allocate(iwrk(this%liwrk),source=0)
+       call move_alloc(from=iwrk,to=this%iwrk)
+
+       ! wrk
+       ! lwrk >= 4+nuest*(mv*idim+11+4*ipar(1))+nvest*(11+4*ipar(2))+4*(mu+mv)+q*idim
+       ! where q is the larger of mv and nuest.
+       q = max(m(2),knots(1))
+       this%lwrk = 4+knots(1)*(m(2)*idim+11+4)+knots(2)*(11+4)+4*sum(m)+q*idim
+       allocate(wrk(this%lwrk),source=zero)
+       call move_alloc(from=wrk,to=this%wrk)
+
+       endassociate
+
+    end subroutine allocate_knot_storage
+
+    function surf_eval_one(this,u,v,ierr) result(y)
         class(fitpack_parametric_surface), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u      ! Evaluation point
-        integer, optional,    intent(out)    :: ierr   ! Optional error flag
+        real(RKIND),          intent(in)     :: u,v      ! Evaluation point
+        integer, optional,    intent(out)    :: ierr     ! Optional error flag
         real(RKIND) :: y(this%idim)
 
-        real(RKIND) :: y1(this%idim,1)
+        real(RKIND) :: y1(1,1,this%idim)
 
-        y1 = curve_eval_many(this,[u],ierr)
-        y  = y1(:,1)
+        y1 = surf_eval_grid(this,[u],[v],ierr)
+        y  = y1(1,1,:)
 
-    end function curve_eval_one
+    end function surf_eval_one
 
-    ! Curve evaluation driver
-    function curve_eval_many(this,u,ierr) result(x)
+    ! subroutine surev evaluate parameter values on a grid (u(i),v(j)),i=1,...,mu; j=1,...,mv a bicubic spline
+    ! surface of dimension idim, given in the b-spline representation.
+
+    ! on successful exit f(mu*mv*(l-1)+mv*(i-1)+j) contains the l-th co-ordinate of the bicubic
+    ! spline surface at the point (u(i),v(j)),l=1,...,idim,i=1,...,mu;j=1,...,mv.
+
+    ! f(1:mv,1:mu,1:idim)
+
+
+    function surf_eval_grid(this,u,v,ierr) result(f)
         class(fitpack_parametric_surface), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter value)
-        integer, optional,    intent(out)    :: ierr   ! Optional error flag
-        real(RKIND) :: x(this%idim,size(u))
+        real(RKIND),          intent(in)     :: u(:),v(:) ! Evaluation grid (parameter range)
+        integer, optional,    intent(out)    :: ierr      ! Optional error flag
+        real(RKIND) :: f(size(v),size(u),this%idim)
 
-        integer :: npts,ier
+        integer :: ier
 
-        npts = size(u)
+        call surev(idim=this%idim,                  &  ! dimension of the spline surface
+                   tu=this%t(:,1),nu=this%knots(1), &  ! knots in the u-direction
+                   tv=this%t(:,2),nv=this%knots(2), &  ! knots in the v-direction
+                   c=this%c,                        &  ! the b-spline coefficients
+                   u=u,mu=size(u),                  &  ! u co-ordinates of the grid points along the u-axis.
+                   v=v,mv=size(v),                  &  ! v co-ordinates of the grid points along the v-axis.
+                   f=f,mf=size(f),                  &  ! Array of the results
+                   wrk=this%wrk,lwrk=this%lwrk,     &  ! workspace
+                   iwrk=this%iwrk,kwrk=this%liwrk,  &  ! workspace
+                   ier=ier)
 
-        !  subroutine curev evaluates in a number of points u(i),i=1,2,...,m a spline curve s(u)
-        !  of degree k and dimension idim, given in its b-spline representation.
-        !
-        !  input parameters:
-        !    idim : integer, giving the dimension of the spline curve.
-        !    t    : array,length n, which contains the position of the knots.
-        !    n    : integer, giving the total number of knots of s(u).
-        !    c    : array,length nc, which contains the b-spline coefficients.
-        !    nc   : integer, giving the total number of coefficients of s(u).
-        !    k    : integer, giving the degree of s(u).
-        !    u    : array,length m, which contains the points where s(u) must be evaluated.
-        !    m    : integer, giving the number of points where s(u) must be evaluated.
-        !    mx   : integer, giving the dimension of the array x. mx >= m*idim
+        call fitpack_error_handling(ier,ierr,'evaluate parametric surface')
 
-!        call curev(idim=this%idim,&                ! dimension of the spline curve
-!                   t=this%t,&                      ! the position of the knots
-!                   n=this%knots,&                  ! total number of knots of s(u(x))
-!                   c=this%c,&                      ! the b-spline coefficients
-!                   nc=size(this%c),&               ! number of coefficients of s(u(x))
-!                   k=this%order,&                  ! the degree of s(u(x))
-!                   u=u,m=npts,&                    ! the points where s(u) must be evaluated.
-!                   x=x,mx=size(x), &               ! the predictions
-!                   ier=ier)
-
-        call fitpack_error_handling(ier,ierr,'evaluate 1d spline')
-
-    end function curve_eval_many
+    end function surf_eval_grid
 
     ! Interpolating curve
     integer function interpolating_curve(this) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
 
         ! Set zero smoothing
-        ierr = curve_fit_automatic_knots(this,zero)
+        ierr = surf_fit_automatic_knots(this,zero)
 
     end function interpolating_curve
 
+    ! Least-squares surface on current or given knots
+    integer function surface_fit_least_squares(this,u_knots,v_knots) result(ierr)
+       class(fitpack_parametric_surface), intent(inout) :: this
+       real(RKIND), optional, intent(in) :: u_knots(:)
+       real(RKIND), optional, intent(in) :: v_knots(:)
+
+       integer :: nuuser,nu,nvuser,nv,new_knots(2)
+
+       this%iopt = IOPT_NEW_LEASTSQUARES
+
+       if (present(u_knots)) then
+           nuuser = size(u_knots)
+           nu     = nuuser+8
+       else
+           nuuser = 0
+           nu     = this%knots(1)
+       endif
+
+       if (present(v_knots)) then
+           nvuser = size(v_knots)
+           nv     = nvuser+8
+       else
+           nvuser = 0
+           nv     = this%knots(2)
+       endif
+
+       ! Reallocate knots if necessary
+       new_knots = [nu,nv]
+       if (any(new_knots>this%nmax)) call allocate_knot_storage(this,new_knots)
+       this%knots = new_knots
+
+       ! Copy knots
+       if (present(u_knots)) this%t(4+1:4+nuuser,1) = u_knots
+       if (present(v_knots)) this%t(4+1:4+nvuser,2) = v_knots
+
+       ! Fit
+       this%iopt = IOPT_NEW_LEASTSQUARES
+       ierr = this%fit()
+
+    end function surface_fit_least_squares
+
     ! Curve fitting driver: automatic number of knots
-    integer function curve_fit_automatic_knots(this,smoothing) result(ierr)
+    integer function surf_fit_automatic_knots(this,smoothing,periodic) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(RKIND), optional, intent(in) :: smoothing
+        logical, optional, intent(in) :: periodic(2)
 
         integer :: loop,nit,ipar(2)
+        real(RKIND) :: smooth_now(3)
 
-        real(RKIND), parameter :: smoothing_trajectory(*) = [1000.d0,60.d0,30.d0]
-        real(RKIND), dimension(size(smoothing_trajectory)) :: smooth_now
+        call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
-        if (present(smoothing)) then
-            smooth_now = smoothing
-            nit        = 1
-        else
-            smooth_now = smoothing_trajectory
-            nit        = size(smoothing_trajectory)
-        end if
-
-        ! First iteration lets solver decide knots
-        this%iopt = 0
+        ! Optionally set periodicity
+        if (present(periodic)) this%periodic_dim = periodic
 
         do loop=1,nit
 
@@ -331,104 +372,12 @@ module fitpack_parametric_surfaces
 
         end do
 
-    end function curve_fit_automatic_knots
+    end function surf_fit_automatic_knots
 
     ! Return fitting MSE
-    elemental real(RKIND) function curve_error(this)
+    elemental real(RKIND) function surf_error(this)
        class(fitpack_parametric_surface), intent(in) :: this
-       curve_error = this%fp
-    end function curve_error
-
-    !> Evaluate k-th derivative of the curve at point u
-    function curve_derivative(this, u, order, ierr) result(ddx)
-       class(fitpack_parametric_surface), intent(inout) :: this
-       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
-       integer,              intent(in)    :: order  ! Derivative order. 0=function; 1:k=i-th derivative
-       integer, optional,    intent(out)   :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim)   :: ddx
-
-       integer :: ddx_order,ierr0
-
-       ! Choose order
-       ddx_order = max(0,order)
-
-       ierr0 = FITPACK_OK
-
-       !  subroutine cualde evaluates at the point u all the derivatives
-       !                (l)
-       !     d(j,l) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
-       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
-!       call cualde(this%idim,    & ! Number of dimensions
-!                   this%t,       & ! Position of the knots
-!                   this%knots,   & ! Number of knots
-!                   this%c,       & ! Spline coefficients
-!                   size(this%c), & ! Number of coefficients
-!                   this%order+1, & ! k1 = order of s(u) (order = degree+1)
-!                   u,            & ! Where the derivatives must be evaluated
-!                   this%dd,      & ! Space for derivative evaluation
-!                   size(this%dd),& ! Its size
-!                   ierr0)          ! Output flag
-
-       ! Derivative order is 0:k <- extract derivative
-       !ddx = this%dd(:,1+ddx_order)
-
-       call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
-
-    end function curve_derivative
-
-    !> Evaluate all derivatives (0:k) of the curve at point u
-    function curve_all_derivatives(this, u, ierr) result(ddx)
-       class(fitpack_parametric_surface), intent(inout) :: this
-       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
-       integer, optional,    intent(out)   :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim,0:3) :: ddx
-
-       integer :: ierr0
-
-       ierr0 = FITPACK_OK
-!
-!       !  subroutine cualde evaluates at the point u all the derivatives
-!       !                (l)
-!       !     d(j,l) = sj   (u) ,l=0,1,...,k, j=1,2,...,idim
-!       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim.
-!       call cualde(this%idim,    & ! Number of dimensions
-!                   this%t,       & ! Position of the knots
-!                   this%knots,   & ! Number of knots
-!                   this%c,       & ! Spline coefficients
-!                   size(this%c), & ! Number of coefficients
-!                   this%order+1, & ! k1 = order of s(u) (order = degree+1)
-!                   u,            & ! Where the derivatives must be evaluated
-!                   this%dd,      & ! Space for derivative evaluation
-!                   size(this%dd),& ! Its size
-!                   ierr0)          ! Output flag
-
-       ! Derivative order is 0:k <- extract derivative
-       !ddx = this%dd(:,0:this%order)
-
-       call fitpack_error_handling(ierr0,ierr,'evaluate all derivatives')
-
-    end function curve_all_derivatives
-
-
-    !> Evaluate k-th derivative of the curve at points x
-    !> Use 1st derivative if order not present
-    function curve_derivatives(this, u, order, ierr) result(ddx)
-       class(fitpack_parametric_surface), intent(inout)  :: this
-       real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter)
-       integer,              intent(in)     :: order  ! Derivative order. Default 1
-       integer, optional,    intent(out)    :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim,size(u)) :: ddx
-
-       integer :: i,ierr0
-
-       do i=1,size(u)
-          ddx(:,i) = curve_derivative(this,u(i),order,ierr0)
-          if (.not.FITPACK_SUCCESS(ierr0)) exit
-       end do
-
-       if (present(ierr)) ierr = ierr0
-
-    end function curve_derivatives
-
+       surf_error = this%fp
+    end function surf_error
 
 end module fitpack_parametric_surfaces

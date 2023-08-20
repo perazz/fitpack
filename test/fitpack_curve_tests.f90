@@ -1162,104 +1162,56 @@ module fitpack_curve_tests
         f  = reshape(dapasu,[mv,mu,idim],order=[1,3,2])
 
         !  main loop for the different spline approximations
-        approximations: do loop=1,1
+        approximations: do loop=1,4
            select case (loop)
               case (1)
 
                  ! Smoothing surface, no periodicity constraint
                  ier = surf%new_fit(u,v,f,smoothing=0.07_RKIND,periodic_BC=[.false.,.false.])
 
+              case (2)
+
+                 ! A smoothign surface periodic in the v-variable
+                 ier = surf%fit(periodic=[.false.,.true.])
+
+              case (3)
+
+                 ! Smoothing surface with both periodic variables
+                 ier = surf%fit(periodic=[.true.,.true.])
+
+              case (4)
+
+                 ! Least-squares with specified knots
+                 ier = surf%least_squares(u_knots=[(5.0_RKIND*i,i=1,3)],&
+                                          v_knots=[(5.0_RKIND*i,i=1,3)])
+
            end select
-!
-!              select case (is)
-!                  case (1)
-!                      !  a smoothing surface with no periodicity conditions
-!                      iopt = 0
-!                      s = 0.07
-!                      ipar(1:2) = 0
-!
-!                  case (2)
-!
-!                      !  a smoothing surface periodic in the v-variable
-!                      ipar(2) = 1
-!
-!                  case (3)
-!
-!                      !  a smoothing surface periodic in both variables
-!                      ipar(1) = 1
-!
-!                  case (4)
-!
-!                      !  finally we also calculate a least-squares spline surface
-!                      !  with specified knots.
-!                      iopt = -1
-!                      nu = 11
-!                      nv = 11
-!                      j = 5
-!                      do i=1,3
-!                          ai = 5*i
-!                          tu(j) = ai
-!                          tv(j) = tu(j)
-!                          j = j+1
-!                      end do
-!
-!              end select
 
-              if (.not.FITPACK_SUCCESS(ier)) then
-                  success = .false.
-                  write(useUnit,1000) loop,FITPACK_MESSAGE(ier)
-              end if
+           if (.not.FITPACK_SUCCESS(ier)) then
+               success = .false.
+               write(useUnit,1000) loop,FITPACK_MESSAGE(ier)
+           end if
 
-              !  printing of the fitting results.
-              if (surf%iopt>=0) then
-                  write(useUnit,940) merge(1,0,surf%periodic_dim)
-                  write(useUnit,945) surf%smoothing
-              else
-                  write(useUnit,935) merge(1,0,surf%periodic_dim)
-              endif
-!
-!              write(useUnit,950) fp,ier
-!              write(useUnit,955) nu
-!              write(useUnit,960)
-!              write(useUnit,965) (tu(i),i=1,nu)
-!              write(useUnit,970) nv
-!              write(useUnit,960)
-!              write(useUnit,965) (tv(i),i=1,nv)
-!              nc = (nu-4)*(nv-4)
-!              write(useUnit,975)
-!              j1 = 0
-!              do l=1,idim
-!                  j0 = j1+1
-!                  j1 = j1+nc
-!                  write(useUnit,980) (c(j),j=j0,j1)
-!              end do
-!
-!              !  evaluation of the spline surface.
-!              call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,z,693,wk,128,iw,32,ier)
-!
-!              if (.not.FITPACK_SUCCESS(ier)) then
-!                  success = .false.
-!                  write(useUnit,1000) is,FITPACK_MESSAGE(ier)
-!              end if
-!
-!              write(useUnit,985)
-!              write(useUnit,905) (v(i),i=1,mv,2)
-!              write(useUnit,910)
-!              j0 = 0
-!              do i=1,mu,4
-!                  write(useUnit,915) u(i)
-!                  j1 = j0
-!                  do l=1,idim
-!                    j2 = j1+1
-!                    j3 = j1+mv
-!                    write(useUnit,925) (z(j),j=j2,j3,2)
-!                    j1 = j1+m
-!                  end do
-!                  j0 = j0+mv*4
-!              end do
+           !  printing of the fitting results.
+           if (surf%iopt>=0) then
+               write(useUnit,940) merge(1,0,surf%periodic_dim)
+               write(useUnit,945) surf%smoothing
+           else
+               write(useUnit,935) merge(1,0,surf%periodic_dim)
+           endif
+
+           ! Evaluate the spline surface at the same nodes
+           f1 = surf%eval(u,v,ier)
+
+           if (.not.FITPACK_SUCCESS(ier)) then
+               success = .false.
+               write(useUnit,1000) loop,FITPACK_MESSAGE(ier)
+               exit
+           end if
+
         end do approximations
 
-        stop
+        stop 'test_parametric_surface'
 !
 !          !  format statements.
 !          900  format(15h1the input data)
@@ -1299,7 +1251,7 @@ module fitpack_curve_tests
        real(RKIND), dimension(max(2,n)) :: linspace
 
        integer :: nx,i
-       real(RKIND) :: dx
+      real(RKIND) :: dx
 
        nx = max(n,2)
        dx = (x2-x1)/(nx-1)

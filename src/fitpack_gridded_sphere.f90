@@ -131,20 +131,9 @@ module fitpack_gridded_sphere
         real(RKIND), optional, intent(in) :: smoothing
 
         integer :: loop,nit,iopt(3),ider(4)
+        real(RKIND) :: smooth_now(3)
 
-        real(RKIND), parameter :: smoothing_trajectory(*) = [1000.d0,60.d0,30.d0]
-        real(RKIND), dimension(size(smoothing_trajectory)) :: smooth_now
-
-        if (present(smoothing)) then
-            smooth_now = smoothing
-            nit        = 1
-        else
-            smooth_now = smoothing_trajectory
-            nit        = size(smoothing_trajectory)
-        end if
-
-        ! First iteration lets solver decide knots
-        this%iopt = 0
+        call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
         do loop=1,nit
 

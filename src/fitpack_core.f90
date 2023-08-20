@@ -65,7 +65,7 @@ module fitpack_core
     public :: dblint ! Integration of a bivariate spline
     public :: profil ! Cross-section of a bivariate spline
     public :: evapol ! * Evaluation of a polar spline
-    public :: surev  ! Evaluation of a parametric spline surface
+    public :: surev  ! * Evaluation of a parametric spline surface
 
     ! Polar domain boundary
     public :: fitpack_polar_boundary
@@ -75,6 +75,7 @@ module fitpack_core
     public :: fitpack_swap
     public :: fitpack_argsort
     public :: fitpack_error_handling
+    public :: get_smoothing
 
     ! Spline behavior for points not in the support
     integer, parameter, public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
@@ -188,6 +189,31 @@ module fitpack_core
          end select
 
       end function FITPACK_MESSAGE
+
+      ! Smoothing parameter choice.
+      ! - If not set yet, choose a smoothing trajectory
+      ! - If a user input is present, use that one
+      ! - If a previous value is available, keep that one
+      subroutine get_smoothing(old_smoothing,user_smoothing,nit,smooth_now)
+          integer, intent(out) :: nit
+          real(RKIND), intent(in), optional :: user_smoothing
+          real(RKIND), intent(in) :: old_smoothing
+          real(RKIND), intent(out) :: smooth_now(3)
+
+          real(RKIND), parameter :: smoothing_trajectory(3) = [1000.d0,60.d0,30.d0]
+
+          if (present(user_smoothing)) then
+              nit = 1
+              smooth_now = user_smoothing
+          elseif (old_smoothing<1000.0_RKIND) then
+              nit = 1
+              smooth_now = old_smoothing
+          else
+              nit = 3
+              smooth_now = smoothing_trajectory
+          end if
+
+      end subroutine get_smoothing
 
       ! Wrapper for iopt
       pure function IOPT_MESSAGE(iopt) result(msg)

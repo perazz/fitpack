@@ -135,22 +135,9 @@ module fitpack_polar_domains
         real(RKIND), optional, intent(in) :: smoothing
 
         integer :: loop,nit,iopt(3)
+        real(RKIND) :: smooth_now(3)
 
-        real(RKIND), parameter :: smoothing_trajectory(*) = [1000.d0,60.d0,30.d0]
-        real(RKIND), dimension(size(smoothing_trajectory)) :: smooth_now
-
-        if (this%iopt==IOPT_NEW_LEASTSQUARES) then
-            smooth_now = this%smoothing
-            nit        = 1
-        else
-            smooth_now = smoothing_trajectory
-            nit        = size(smoothing_trajectory)
-        end if
-
-        if (present(smoothing)) then
-            smooth_now = smoothing
-            nit        = 1
-        endif
+        call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
         do loop=1,nit
 
