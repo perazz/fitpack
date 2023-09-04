@@ -99,6 +99,9 @@ module fitpack_surfaces
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
+        !> Ensure we start with new knots
+        if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
+
         ! User may want to change the order for both x and y
         if (present(order)) this%order = order
 

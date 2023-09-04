@@ -1211,29 +1211,9 @@ module fitpack_curve_tests
 
         end do approximations
 
-        stop 'test_parametric_surface'
-!
-!          !  format statements.
-!          900  format(15h1the input data)
-!          905  format(1h0,2x,1hv,11(3x,f4.1))
-!          910  format(1h ,1x,1hu)
-!          915  format(1h ,f4.1)
-!          925  format(5x,11f7.3)
-          935  format('0least-squares surface of periodicity',2i3)
-          940  format('0smoothing surface of periodicity',2i3)
-          945  format(' smoothing factor s=',f8.2)
-!          950  format(1x,23hsum squared residuals =,e15.6,5x,11herror flag=,i3)
-!          955  format(1x,42htotal number of knots in the u-direction =,i3)
-!          960  format(1x,22hposition of the knots )
-!          965  format(5x,10f6.2)
-!          970  format(1x,42htotal number of knots in the v-direction =,i3)
-!          975  format(23h0b-spline coefficients )
-!          980  format(5x,8f9.4)
-!          985  format(1h0,37hspline values at selected grid points)
-
-!      end function mnpasu
-!
-
+        935  format('0least-squares surface of periodicity',2i3)
+        940  format('0smoothing surface of periodicity',2i3)
+        945  format(' smoothing factor s=',f8.2)
        1000  format('[test_parametric_surface] case ',i0,' failed with message: ',a)
 
     end function test_parametric_surface

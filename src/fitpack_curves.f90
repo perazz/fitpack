@@ -299,7 +299,11 @@ module fitpack_curves
         integer :: loop,nit
         real(RKIND) :: smooth_now(3)
 
+        !> Get smoothing trajectory
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
+
+        !> Ensure we start with new knots
+        if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
 
         do loop=1,nit
 

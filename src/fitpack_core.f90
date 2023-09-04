@@ -195,21 +195,21 @@ module fitpack_core
       ! - If a user input is present, use that one
       ! - If a previous value is available, keep that one
       subroutine get_smoothing(old_smoothing,user_smoothing,nit,smooth_now)
-          integer, intent(out) :: nit
+          integer    , intent(out)   :: nit
           real(RKIND), intent(in), optional :: user_smoothing
-          real(RKIND), intent(in) :: old_smoothing
-          real(RKIND), intent(out) :: smooth_now(3)
+          real(RKIND), intent(in)    :: old_smoothing
+          real(RKIND), intent(out)   :: smooth_now(3)
 
           real(RKIND), parameter :: smoothing_trajectory(3) = [1000.d0,60.d0,30.d0]
 
           if (present(user_smoothing)) then
-              nit = 1
+              nit        = 1
               smooth_now = user_smoothing
           elseif (old_smoothing<1000.0_RKIND) then
-              nit = 1
+              nit        = 1
               smooth_now = old_smoothing
           else
-              nit = 3
+              nit        = 3
               smooth_now = smoothing_trajectory
           end if
 
@@ -221,8 +221,8 @@ module fitpack_core
          character(len=:), allocatable :: msg
          select case (iopt)
             case (IOPT_NEW_LEASTSQUARES); msg = 'Least-Squares'
-            case (IOPT_NEW_SMOOTHING); msg = 'Smoothing'
-            case (IOPT_OLD_FIT); msg = 'Old'
+            case (IOPT_NEW_SMOOTHING);    msg = 'Smoothing'
+            case (IOPT_OLD_FIT);          msg = 'Old'
             case default; msg = 'UNKNOWN IOPT'
          end select
       end function IOPT_MESSAGE
