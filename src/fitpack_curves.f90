@@ -100,7 +100,9 @@ module fitpack_curves
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
            procedure, private :: curve_derivatives
-           generic   :: dfdx => curve_derivative,curve_derivatives
+           procedure, private :: curve_all_derivatives
+           generic   :: dfdx     => curve_derivative,curve_derivatives
+           generic   :: dfdx_all => curve_all_derivatives
 
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
@@ -355,17 +357,14 @@ module fitpack_curves
     function curve_derivatives(this, x, order, ierr) result(ddx)
        class(fitpack_curve), intent(inout) :: this
        real(RKIND),          intent(in)    :: x(:)   ! Evaluation point (scalar)
-       integer, optional,    intent(in)    :: order  ! Derivative order. Default 1
+       integer,              intent(in)    :: order  ! Derivative order. Default 1
        integer, optional,    intent(out)   :: ierr  ! Optional error flag
        real(RKIND), dimension(size(x))     :: ddx
 
        integer :: ddx_order,m,ierr0
 
-       if (present(order)) then
-          ddx_order = max(0,order)
-       else
-          ddx_order = 1
-       end if
+       ! Order 0 = spline value
+       ddx_order = max(0,order)
 
        ierr0 = FITPACK_OK
 
@@ -390,12 +389,40 @@ module fitpack_curves
 
     end function curve_derivatives
 
+    !> Evaluate ALL derivatives of the curve at points x
+    !>              (j-1)
+    !>      d(j) = s     (x) , j=1,2,...,k1
+    !>  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
+    function curve_all_derivatives(this, x, ierr) result(ddx)
+       class(fitpack_curve), intent(inout)  :: this
+       real(RKIND),          intent(in)     :: x   ! Evaluation point (scalar)
+       integer, optional,    intent(out)    :: ierr  ! Optional error flag
+       real(RKIND), dimension(this%order+1) :: ddx
+
+       integer :: ierr0
+
+       ierr0 = FITPACK_OK
+
+       !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of
+       !  order nu of a spline s(x) of degree k, given in its b-spline representation.
+       call spalde(this%t,       & ! Position of the knots
+                   this%knots,   & ! Number of knots
+                   this%c,       & ! spline coefficients
+                   this%order+1, & ! spline order (=degree+1)
+                   x,            & ! Point where this should be evaluated
+                   ddx,          & ! Evaluated derivatives
+                   ierr0)        ! Output flag
+
+       1 call fitpack_error_handling(ierr0,ierr,'evaluate all derivatives')
+
+    end function curve_all_derivatives
+
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present
     real(RKIND) function curve_derivative(this, x, order, ierr) result(ddx)
        class(fitpack_curve), intent(inout)  :: this
        real(RKIND),          intent(in)     :: x      ! Evaluation point (scalar)
-       integer, optional,    intent(in)     :: order  ! Derivative order. Default 1
+       integer,              intent(in)     :: order  ! Derivative order. Default 1
        integer, optional,    intent(out)    :: ierr   ! Optional error flag
 
        real(RKIND) :: ddxa(1)
