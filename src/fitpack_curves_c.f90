@@ -29,10 +29,6 @@ module fitpack_curves_c
         type(c_ptr) :: cptr = c_null_ptr
     end type fp_curve_c
 
-    !> Integer/real types
-    integer, parameter :: FP_REAL = c_double
-    integer, parameter :: FP_INT  = c_int
-
     public :: fp_curve_c_allocate
     public :: fp_curve_c_destroy
     public :: fp_curve_c_pointer
@@ -123,7 +119,7 @@ module fitpack_curves_c
      !> Wrapper to new_points
      subroutine fp_curve_c_new_points(this,npts,x,y,w) bind(c,name='fp_curve_c_new_points')
          type(fp_curve_c), intent(inout) :: this
-         integer(FP_INT), intent(in), value :: npts
+         integer(FP_SIZE), intent(in), value :: npts
          real(FP_REAL), intent(in) :: x(npts),y(npts)
          real(FP_REAL), optional, intent(in) :: w(npts)
 
@@ -138,9 +134,9 @@ module fitpack_curves_c
      end subroutine fp_curve_c_new_points
 
      !> Wrapper to new_fit
-     integer(FP_INT) function fp_curve_c_new_fit(this,npts,x,y,w,smoothing) result(ierr) bind(c,name='fp_curve_c_new_fit')
+     integer(FP_SIZE) function fp_curve_c_new_fit(this,npts,x,y,w,smoothing) result(ierr) bind(c,name='fp_curve_c_new_fit')
          type(fp_curve_c), intent(inout) :: this
-         integer(FP_INT), intent(in), value :: npts
+         integer(FP_SIZE), intent(in), value :: npts
          real(FP_REAL), intent(in) :: x(npts),y(npts)
          real(FP_REAL), optional, intent(in) :: w(npts)
          real(FP_REAL), optional, intent(in) :: smoothing
@@ -156,7 +152,7 @@ module fitpack_curves_c
      end function fp_curve_c_new_fit
 
      !> Wrapper to curve_fit_automatic_knots
-     integer(FP_INT) function fp_curve_c_fit(this,smoothing) result(ierr) bind(c,name='fp_curve_c_fit')
+     integer(FP_SIZE) function fp_curve_c_fit(this,smoothing) result(ierr) bind(c,name='fp_curve_c_fit')
         type(fp_curve_c), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
 
@@ -170,7 +166,7 @@ module fitpack_curves_c
      end function fp_curve_c_fit
 
      !> Wrapper to interpolating_curve
-     integer(FP_INT) function fp_curve_c_interpolating(this) result(ierr) bind(c,name='fp_curve_FP_INTeprolating')
+     integer(FP_SIZE) function fp_curve_c_interpolating(this) result(ierr) bind(c,name='fp_curve_FP_SIZEeprolating')
         type(fp_curve_c), intent(inout) :: this
 
         type(fitpack_curve), pointer :: fcurve
@@ -186,7 +182,7 @@ module fitpack_curves_c
      real(FP_REAL) function fp_curve_c_eval_one(this,x,ierr) result(y) bind(c,name='fp_curve_c_eval_one')
         type(fp_curve_c), intent(inout) :: this
         real(FP_REAL), intent(in), value :: x
-        integer(FP_INT), optional, intent(out) :: ierr
+        integer(FP_SIZE), optional, intent(out) :: ierr
 
 
         type(fitpack_curve), pointer :: fcurve
@@ -204,10 +200,10 @@ module fitpack_curves_c
      !> Wrapper to curve_eval_many
      subroutine fp_curve_c_eval_many(this,npts,x,y,ierr) bind(c,name='fp_curve_c_eval_many')
         type(fp_curve_c), intent(inout) :: this
-        integer(FP_INT), intent(in), value :: npts
+        integer(FP_SIZE), intent(in), value :: npts
         real(FP_REAL), intent(in) :: x(npts)
         real(FP_REAL), intent(out) :: y(npts)
-        integer(FP_INT), optional, intent(out) :: ierr
+        integer(FP_SIZE), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
         integer :: ierr0
@@ -238,10 +234,10 @@ module fitpack_curves_c
      !> Wrapper to fourier_coefficients
      subroutine fp_curve_c_fourier(this,nparm,alpha,A,B,ierr) bind(c,name='fp_curve_c_fourier')
         type(fp_curve_c), intent(inout) :: this
-        integer(FP_INT), intent(in), value :: nparm
+        integer(FP_SIZE), intent(in), value :: nparm
         real(FP_REAL), intent(in) :: alpha(nparm)
         real(FP_REAL), intent(out) :: a(nparm),b(nparm)
-        integer(FP_INT), optional, intent(out) :: ierr
+        integer(FP_SIZE), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
 
@@ -256,8 +252,8 @@ module fitpack_curves_c
      real(FP_REAL) function fp_curve_c_derivative(this,x,order,ierr) result(ddx) bind(c,name='fp_curve_c_derivative')
         type(fp_curve_c), intent(inout) :: this
         real(FP_REAL), intent(in), value :: x
-        integer(FP_INT), intent(in), value :: order
-        integer(FP_INT), optional, intent(out) :: ierr
+        integer(FP_SIZE), intent(in), value :: order
+        integer(FP_SIZE), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
 
@@ -269,7 +265,7 @@ module fitpack_curves_c
      end function fp_curve_c_derivative
 
      !> Wrapper to curve_all_derivatives
-     integer(FP_INT) function fp_curve_c_all_derivatives(this,x,ddx) result(ierr) bind(c,name='fp_curve_c_all_derivatives')
+     integer(FP_FLAG) function fp_curve_c_all_derivatives(this,x,ddx) result(ierr) bind(c,name='fp_curve_c_all_derivatives')
         type(fp_curve_c), intent(inout) :: this
         real(FP_REAL), intent(in), value :: x
         real(FP_REAL), intent(out) :: ddx(*)
@@ -310,7 +306,7 @@ module fitpack_curves_c
      end function fp_curve_c_mse
 
      !> Get spline degree
-     integer(FP_INT) function fp_curve_c_degree(this) bind(c,name='fp_curve_c_degree')
+     integer(FP_SIZE) function fp_curve_c_degree(this) bind(c,name='fp_curve_c_degree')
         type(fp_curve_c), intent(inout) :: this
 
         type(fitpack_curve), pointer :: fcurve

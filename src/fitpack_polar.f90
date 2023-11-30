@@ -38,13 +38,13 @@ module fitpack_polar_domains
 
         !> Scattered data points
         integer :: m = 0
-        real(RKIND), allocatable :: x(:),y(:)
+        real(FP_REAL), allocatable :: x(:),y(:)
 
         !> Function values at the points
-        real(RKIND), allocatable :: z(:)
+        real(FP_REAL), allocatable :: z(:)
 
         !> Coordinates of the data points in rectangular coordinates (u,v)
-        real(RKIND), allocatable :: u(:),v(:)
+        real(FP_REAL), allocatable :: u(:),v(:)
 
         !> Function that describes shape of the polar boundary: radius as a function of
         !> angle theta:
@@ -52,18 +52,18 @@ module fitpack_polar_domains
         procedure(fitpack_polar_boundary), nopass, pointer :: rad => null()
 
         ! Node weights
-        real(RKIND), allocatable :: w(:)
+        real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
         integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk1(:),wrk2(:)
+        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.d0
+        real(FP_REAL) :: smoothing = 1000.d0
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Curve behavior
         integer :: bc_continuity_origin = 2 ! Continuity at origin (C0, C1, C2)
@@ -73,10 +73,10 @@ module fitpack_polar_domains
         integer :: nest(2)  = 0
         integer :: nmax     = 0
         integer :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Coefficients of the spline approximation
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
@@ -132,10 +132,10 @@ module fitpack_polar_domains
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function surface_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_polar), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         integer :: loop,nit,iopt(3)
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -192,7 +192,7 @@ module fitpack_polar_domains
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%nest      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
@@ -206,9 +206,9 @@ module fitpack_polar_domains
 
     subroutine polar_new_points(this,x,y,z,boundary,w,boundary_bc)
         class(fitpack_polar), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
         integer    , optional, intent(in) :: boundary_BC
 
         integer :: clen,l,k,p,q,iopt2_min,iopt2_max,iopt3_min,iopt3_max
@@ -282,9 +282,9 @@ module fitpack_polar_domains
 
     ! A default constructor
     type(fitpack_polar) function polr_new_from_points(x,y,z,boundary,w,boundary_bc,ierr) result(this)
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
         integer, optional, intent(in) :: boundary_bc
         integer, optional, intent(out) :: ierr
 
@@ -297,9 +297,9 @@ module fitpack_polar_domains
 
     end function polr_new_from_points
 
-    real(RKIND) function polr_eval_one(this,x,y,ierr) result(z)
+    real(FP_REAL) function polr_eval_one(this,x,y,ierr) result(z)
         class(fitpack_polar), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: x,y    ! Evaluation point
+        real(FP_REAL),          intent(in)     :: x,y    ! Evaluation point
         integer, optional,    intent(out)    :: ierr   ! Optional error flag
 
         z = evapol(this%t(:,1),this%knots(1), & ! u-direction knots
@@ -315,9 +315,9 @@ module fitpack_polar_domains
     ! Curve evaluation driver
     function polr_eval_many(this,x,y,ierr) result(z)
         class(fitpack_polar), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: x(:),y(size(x)) ! Evaluation points
+        real(FP_REAL),          intent(in)     :: x(:),y(size(x)) ! Evaluation points
         integer, optional,    intent(out)    :: ierr            ! Optional error flag
-        real(RKIND) :: z(size(x))
+        real(FP_REAL) :: z(size(x))
 
         integer :: i
 
@@ -330,11 +330,11 @@ module fitpack_polar_domains
     ! Fit a new curve
     integer function polr_new_fit(this,x,y,z,boundary,w,boundary_bc,smoothing)
         class(fitpack_polar), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
         integer    , optional, intent(in) :: boundary_bc
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         call this%new_points(x,y,z,boundary,w,boundary_bc)
 

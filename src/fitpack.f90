@@ -33,7 +33,8 @@ module fitpack
    private
 
    ! Public interface
-   public :: RKIND
+   public :: FP_REAL
+   public :: FP_SIZE
    public :: fitpack_curve
    public :: fitpack_closed_curve
    public :: fitpack_periodic_curve

@@ -18,7 +18,7 @@
 !
 ! **************************************************************************************************
 module fitpack_test_data
-    use fitpack_core, only: RKIND,pi
+    use fitpack_core, only: FP_REAL,pi
     implicit none
     private
 
@@ -30,7 +30,7 @@ module fitpack_test_data
     public :: dasphe
     public :: dasurf_delta,dasurf_xyz
 
-    real(RKIND), parameter :: dapola(*) = [ real(RKIND) :: &
+    real(FP_REAL), parameter :: dapola(*) = [ real(FP_REAL) :: &
          -0.010, -0.028, -0.002,  0.009,  0.018, -0.008, -0.180, -0.044,  0.067, -0.178, -0.035,  0.062, &
           0.010, -0.110,  0.013,  0.148,  0.087,  0.045,  0.007,  0.152,  0.030, -0.123,  0.147,  0.061, &
          -0.012, -0.249,  0.119, -0.224, -0.068,  0.111, -0.156, -0.145,  0.071,  0.246, -0.004,  0.096, &
@@ -82,7 +82,7 @@ module fitpack_test_data
          -0.079,  0.951,  0.716, -0.945,  0.157,  0.836, -0.928,  0.032,  0.652, -0.037,  0.910,  0.656, &
          -0.405,  0.913,  1.320, -0.639,  0.692,  1.756, -0.204,  0.952,  0.895, -0.896,  0.272,  0.996]
 
-    real(RKIND), parameter :: dapogr(*) = [ real(RKIND) :: &
+    real(FP_REAL), parameter :: dapogr(*) = [ real(FP_REAL) :: &
              0.805, 0.793, 0.796, 0.814, 0.822, 0.789, 0.813, 0.810, 0.789, 0.823, &
              0.796, 0.832, 0.786, 0.823, 0.788, 0.828, 0.831, 0.791, 0.846, 0.790, &
              0.783, 0.773, 0.776, 0.750, 0.810, 0.794, 0.797, 0.815, 0.793, 0.788, &
@@ -104,7 +104,7 @@ module fitpack_test_data
              0.805]
 
     !> 3D Parametric surface data is provided as a 3D array with dimensions [size(u),3,size(v)]
-    real(RKIND), parameter :: dapasu(*,*,*) = reshape([ real(RKIND) :: &
+    real(FP_REAL), parameter :: dapasu(*,*,*) = reshape([ real(FP_REAL) :: &
               0.718,  0.737,  0.837,  1.007,  1.206,  1.295,  1.294,  1.154,  0.980,  0.794,  0.701, &
               0.010,  0.004,  0.006, -0.015, -0.005, -0.003,  0.005,  0.013, -0.003, -0.008,  0.003, &
               0.930,  1.104,  1.247,  1.291,  1.242,  1.083,  0.892,  0.736,  0.705,  0.773,  0.914, &
@@ -172,11 +172,11 @@ module fitpack_test_data
 
 
     ! Regrid test: x,y grid coordinates
-    real(RKIND), parameter :: daregr_x(*) = [real(RKIND) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
-    real(RKIND), parameter :: daregr_y(*) = [real(RKIND) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
+    real(FP_REAL), parameter :: daregr_x(*) = [real(FP_REAL) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
+    real(FP_REAL), parameter :: daregr_y(*) = [real(FP_REAL) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
 
     ! Regrid: function values at the grid points
-    real(RKIND), parameter :: daregr_z(*,*) = reshape([real(RKIND) :: &
+    real(FP_REAL), parameter :: daregr_z(*,*) = reshape([real(FP_REAL) :: &
             -0.0325, 0.0784, 0.0432, 0.0092, 0.1523, 0.0802, 0.0925,-0.0098, 0.0810,-0.0146,-0.0019, &
              0.1276, 0.0223, 0.0357, 0.1858, 0.2818, 0.1675, 0.2239, 0.1671, 0.0843, 0.0151, 0.0427, &
              0.0860, 0.1267, 0.1839, 0.3010, 0.5002, 0.4683, 0.4562, 0.2688, 0.1276, 0.1244, 0.0377, &
@@ -192,11 +192,11 @@ module fitpack_test_data
 
 
    ! Spherical grid: u= latitudes, v=longitudes
-   real(RKIND), parameter :: daspgr_u(*) = pi*0.05_RKIND*[2,4,6,7,8,9,10,12,14,16,18]
-   real(RKIND), parameter :: daspgr_v(*) = pi*0.05_RKIND*[0,4,7,9,11,14,18,20,24,27,29,31,34,38]
+   real(FP_REAL), parameter :: daspgr_u(*) = pi*0.05_FP_REAL*[2,4,6,7,8,9,10,12,14,16,18]
+   real(FP_REAL), parameter :: daspgr_v(*) = pi*0.05_FP_REAL*[0,4,7,9,11,14,18,20,24,27,29,31,34,38]
 
    ! Spherical grid: coordinates
-   real(RKIND), parameter :: daspgr_r(*) = [ real(RKIND) :: &
+   real(FP_REAL), parameter :: daspgr_r(*) = [ real(FP_REAL) :: &
                                              0.400, 0.375, 0.449, 0.476, 0.428, 0.410, 0.414, &
                                              0.413, 0.413, 0.459, 0.453, 0.448, 0.425, 0.423, &
                                              0.399, 0.526, 0.666, 0.753, 0.718, 0.525, 0.458, &
@@ -220,7 +220,7 @@ module fitpack_test_data
                                              0.533, 0.569, 0.612, 0.622, 0.615, 0.565, 0.548, &
                                              0.556, 0.604, 0.604, 0.634, 0.599, 0.534, 0.512]
 
-   real(RKIND), parameter :: dasphe(*) = [ real(RKIND) :: &
+   real(FP_REAL), parameter :: dasphe(*) = [ real(FP_REAL) :: &
                                        23.0,  13.0,   2.0,   1.0,  21.0,   9.0,  47.0,  22.0, &
                                        35.0,  38.0,  59.0,  10.0,  34.0,  37.0,  68.0,  18.0, &
                                        62.0,   5.0,  63.0,  20.0,  70.0,  32.0,  81.0,  28.0, &
@@ -270,8 +270,8 @@ module fitpack_test_data
                                       101.0, 318.0, 124.0, 340.0, 124.0, 356.0, 146.0, 346.0, &
                                       140.0, 318.0, 168.0, 327.0, 168.0, 331.0, 153.0, 333.0]
 
-   real(RKIND), parameter :: dasurf_delta = 0.102569e-01 ! Estimate of the standard deviation
-   real(RKIND), parameter :: dasurf_xyz(*,*) = reshape([ real(RKIND) :: &
+   real(FP_REAL), parameter :: dasurf_delta = 0.102569e-01 ! Estimate of the standard deviation
+   real(FP_REAL), parameter :: dasurf_xyz(*,*) = reshape([ real(FP_REAL) :: &
                                           -1.9867, -1.9470,  0.0076, &
                                           -1.5042, -1.4471, -0.0035, &
                                           -1.7742, -1.0253,  0.0144, &

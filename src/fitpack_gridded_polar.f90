@@ -32,15 +32,15 @@ module fitpack_gridded_polar
     type :: fitpack_grid_polar
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size
-        real(RKIND), allocatable :: u(:),v(:)
-        real(RKIND) :: r = zero
+        real(FP_REAL), allocatable :: u(:),v(:)
+        real(FP_REAL) :: r = zero
 
         !> Function values at the points
-        real(RKIND), allocatable :: z(:,:)    ! Function values z(iu,iv)
+        real(FP_REAL), allocatable :: z(:,:)    ! Function values z(iu,iv)
 
         ! Origin of the polar domain
         !> Function value at the origin
-        real(RKIND) :: z0 = zero              ! Function value at the origin
+        real(FP_REAL) :: z0 = zero              ! Function value at the origin
 
         !> Fit spline to z0 exactly at the origin
         logical :: z0_present = .false.
@@ -56,20 +56,20 @@ module fitpack_gridded_polar
         integer :: nmax     = 0
         integer                  :: lwrk = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk (:)
+        real(FP_REAL), allocatable :: wrk (:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.d0
+        real(FP_REAL) :: smoothing = 1000.d0
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Knots
         integer     :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Curve behavior
         integer :: bc_continuity_origin = 1 ! Continuity at origin (C0, C1)
@@ -137,10 +137,10 @@ module fitpack_gridded_polar
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function polr_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_grid_polar), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         integer :: loop,nit,iopt(3),ider(2)
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -198,7 +198,7 @@ module fitpack_gridded_polar
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%iopt      = 0
        this%bc_boundary = OUTSIDE_EXTRAPOLATE
        this%bc_continuity_origin = 1
@@ -213,9 +213,9 @@ module fitpack_gridded_polar
 
     subroutine surf_new_points(this,u,v,r,z,z0)
         class(fitpack_grid_polar), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:),r ! polar domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
-        real(RKIND), optional, intent(in) :: z0 ! Origin value (optional)
+        real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), optional, intent(in) :: z0 ! Origin value (optional)
 
         integer :: clen,m(2),q
         integer, parameter :: SAFE = 2
@@ -266,9 +266,9 @@ module fitpack_gridded_polar
 
     ! A default constructor
     type(fitpack_grid_polar) function surf_new_from_points(u,v,r,z,z0,ierr) result(this)
-        real(RKIND), intent(in) :: u(:),v(:),r ! polar domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
-        real(RKIND), optional, intent(in) :: z0 ! Origin value (optional)
+        real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), optional, intent(in) :: z0 ! Origin value (optional)
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -283,10 +283,10 @@ module fitpack_gridded_polar
     ! Fit a new curve
     integer function surf_new_fit(this,u,v,r,z,z0,smoothing)
         class(fitpack_grid_polar), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:),r ! polar domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
-        real(RKIND), optional, intent(in) :: z0 ! Origin value (optional)
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), optional, intent(in) :: z0 ! Origin value (optional)
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         call this%new_points(u,v,r,z,z0)
 
@@ -296,8 +296,8 @@ module fitpack_gridded_polar
 
     function gridded_eval_many(this,u,v,ierr) result(f)
         class(fitpack_grid_polar), intent(inout)  :: this
-        real(RKIND), intent(in) :: u(:),v(:)  ! Evaluation grid points (polar coordinates)
-        real(RKIND) :: f(size(v),size(u))
+        real(FP_REAL), intent(in) :: u(:),v(:)  ! Evaluation grid points (polar coordinates)
+        real(FP_REAL) :: f(size(v),size(u))
         integer, optional, intent(out) :: ierr ! Optional error flag
 
         integer :: ier
@@ -322,11 +322,11 @@ module fitpack_gridded_polar
     end function gridded_eval_many
 
     ! Curve evaluation driver
-    real(RKIND) function gridded_eval_one(this,u,v,ierr) result(f)
+    real(FP_REAL) function gridded_eval_one(this,u,v,ierr) result(f)
         class(fitpack_grid_polar), intent(inout)  :: this
-        real(RKIND),          intent(in)      :: u,v ! Evaluation point (grid polar coordinates)
+        real(FP_REAL),          intent(in)      :: u,v ! Evaluation point (grid polar coordinates)
         integer, optional,    intent(out)     :: ierr      ! Optional error flag
-        real(RKIND) :: f1(1,1)
+        real(FP_REAL) :: f1(1,1)
 
         f1 = gridded_eval_many(this,[u],[v],ierr)
         f  = f1(1,1)
@@ -335,7 +335,7 @@ module fitpack_gridded_polar
 
     subroutine set_origin_BC(this,z0,exact,differentiable)
         class(fitpack_grid_polar), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: z0 ! Function value at origin
+        real(FP_REAL), optional, intent(in) :: z0 ! Function value at origin
         logical, optional, intent(in) :: exact,differentiable
 
         this%z0_present = present(z0)
@@ -384,7 +384,7 @@ module fitpack_gridded_polar
               named = adjustr(named)
            end function named
            character(12) function numbered(v)
-              real(RKIND), intent(in) :: v
+              real(FP_REAL), intent(in) :: v
               write(numbered,"(1pe12.5)") v
               numbered = adjustr(numbered)
            end function numbered

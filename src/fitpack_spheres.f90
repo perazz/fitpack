@@ -32,33 +32,33 @@ module fitpack_sphere_domains
 
         !> Scattered data points
         integer :: m = 0
-        real(RKIND), allocatable :: theta(:),phi(:)
+        real(FP_REAL), allocatable :: theta(:),phi(:)
 
         !> Function values at the points
-        real(RKIND), allocatable :: r(:)
+        real(FP_REAL), allocatable :: r(:)
 
         ! Node weights
-        real(RKIND), allocatable :: w(:)
+        real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
         integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk1(:),wrk2(:)
+        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.d0
+        real(FP_REAL) :: smoothing = 1000.d0
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Knots: extimated max number
         integer :: nest(2)  = 0
         integer :: nmax     = 0
         integer :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Coefficients of the spline approximation
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
@@ -113,10 +113,10 @@ module fitpack_sphere_domains
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function surface_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_sphere), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         integer :: loop,nit
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -166,7 +166,7 @@ module fitpack_sphere_domains
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%nest      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
@@ -178,8 +178,8 @@ module fitpack_sphere_domains
 
     subroutine sphere_new_points(this,theta,phi,r,w)
         class(fitpack_sphere), intent(inout) :: this
-        real(RKIND), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
-        real(RKIND), optional, intent(in) :: w(size(theta)) ! node weights
+        real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
+        real(FP_REAL), optional, intent(in) :: w(size(theta)) ! node weights
 
         integer :: clen,u,v
         integer, parameter :: SAFE = 2
@@ -237,8 +237,8 @@ module fitpack_sphere_domains
 
     ! A default constructor
     type(fitpack_sphere) function sphere_new_from_points(theta,phi,r,w,ierr) result(this)
-        real(RKIND), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
-        real(RKIND), optional, intent(in) :: w(size(theta)) ! node weights
+        real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
+        real(FP_REAL), optional, intent(in) :: w(size(theta)) ! node weights
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -252,8 +252,8 @@ module fitpack_sphere_domains
 
     function sphere_eval_many(this,theta,phi,ierr) result(r)
         class(fitpack_sphere), intent(inout)  :: this
-        real(RKIND), intent(in) :: theta(:),phi(:)  ! Evaluation points
-        real(RKIND) :: r(size(phi),size(theta))
+        real(FP_REAL), intent(in) :: theta(:),phi(:)  ! Evaluation points
+        real(FP_REAL) :: r(size(phi),size(theta))
         integer, optional, intent(out) :: ierr ! Optional error flag
 
         integer :: ier
@@ -278,11 +278,11 @@ module fitpack_sphere_domains
     end function sphere_eval_many
 
     ! Curve evaluation driver
-    real(RKIND) function sphere_eval_one(this,theta,phi,ierr) result(r)
+    real(FP_REAL) function sphere_eval_one(this,theta,phi,ierr) result(r)
         class(fitpack_sphere), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: theta,phi ! Evaluation point
+        real(FP_REAL),          intent(in)     :: theta,phi ! Evaluation point
         integer, optional,    intent(out)    :: ierr      ! Optional error flag
-        real(RKIND) :: r1(1,1)
+        real(FP_REAL) :: r1(1,1)
 
         r1 = sphere_eval_many(this,[theta],[phi],ierr)
         r = r1(1,1)
@@ -292,9 +292,9 @@ module fitpack_sphere_domains
     ! Fit a new curve
     integer function sphere_new_fit(this,theta,phi,r,w,smoothing)
         class(fitpack_sphere), intent(inout) :: this
-        real(RKIND), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
-        real(RKIND), optional, intent(in) :: w(size(theta)) ! node weights
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
+        real(FP_REAL), optional, intent(in) :: w(size(theta)) ! node weights
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         call this%new_points(theta,phi,r,w)
 

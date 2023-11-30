@@ -1,19 +1,33 @@
 # depslib dependency file v1.0
-1690392044 source:/Users/federico/code/fitpack/src/fitpack_core.f90
+1701370652 source:/Users/federico/code/fitpack/src/fitpack_core.f90
 
-1690392843 source:/Users/federico/code/fitpack/src/fitpack.f90
+1701369078 source:/Users/federico/code/fitpack/src/fitpack.f90
 
 1666511730 source:/Users/federico/code/fitpack/src/fitpack_tests.f90
 
-1677488120 source:/Users/federico/code/fitpack/test/test.f90
+1701369260 source:/Users/federico/code/fitpack/test/test.f90
 
-1666514676 source:/Users/federico/code/fitpack/test/fitpack_test_data.f90
+1701368868 source:/Users/federico/code/fitpack/test/fitpack_test_data.f90
 
-1690401633 source:/Users/federico/code/fitpack/test/fitpack_tests.f90
+1701370591 source:/Users/federico/code/fitpack/test/fitpack_tests.f90
 
 1667300897 source:/Users/federico/code/fitpack/test/fitpack_curve_tests.f90
 
-1690391800 source:/Users/federico/code/fitpack/src/fitpack_surfaces.f90
+1701368856 source:/Users/federico/code/fitpack/src/fitpack_surfaces.f90
 
-1690392808 source:/Users/federico/code/fitpack/src/fitpack_curves.f90
+1701370128 source:/Users/federico/code/fitpack/src/fitpack_curves.f90
+
+1701368856 source:/Users/federico/code/fitpack/src/fitpack_gridded_polar.f90
+
+1701368856 source:/Users/federico/code/fitpack/src/fitpack_gridded_sphere.f90
+
+1701370743 source:/Users/federico/code/fitpack/src/fitpack_parametric.f90
+
+1701368856 source:/Users/federico/code/fitpack/src/fitpack_polar.f90
+
+1701368856 source:/Users/federico/code/fitpack/src/fitpack_spheres.f90
+
+1701370639 source:/Users/federico/code/fitpack/src/fitpack_parametric_surfaces.f90
+
+1701370707 source:/Users/federico/code/fitpack/src/fitpack_curves_c.f90
 

@@ -32,10 +32,10 @@ module fitpack_parametric_surfaces
         integer :: idim = 0
 
         !> Parameter grid values
-        real(RKIND), allocatable :: u(:),v(:)
+        real(FP_REAL), allocatable :: u(:),v(:)
 
         !> idim-dimensional function values [size(v),size(u),idim]
-        real(RKIND), allocatable :: z(:,:,:)
+        real(FP_REAL), allocatable :: z(:,:,:)
 
         !> Flags to determine whether dimensions u,v are periodic
         logical :: periodic_dim(2) = .false.
@@ -45,23 +45,23 @@ module fitpack_parametric_surfaces
         integer :: nmax     = 0
         integer                  :: lwrk = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk (:)
+        real(FP_REAL), allocatable :: wrk (:)
 
 !        ! Space for derivative evaluation
-!        real(RKIND), allocatable :: dd(:,:)
+!        real(FP_REAL), allocatable :: dd(:,:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.0_RKIND
+        real(FP_REAL) :: smoothing = 1000.0_FP_REAL
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Knots
         integer     :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:)  ! Knot locations (:,1)=u; (:,2)=v
+        real(FP_REAL), allocatable :: t(:,:)  ! Knot locations (:,1)=u; (:,2)=v
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING
@@ -101,7 +101,7 @@ module fitpack_parametric_surfaces
 
     ! A default constructor
     type(fitpack_parametric_surface) function new_from_points(u,v,z,periodic_BC,ierr) result(this)
-        real(RKIND), intent(in) :: u(:),v(:),z(:,:,:)
+        real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
         logical    , optional, intent(in) :: periodic_BC(2)
         integer    , optional, intent(out) :: ierr
 
@@ -117,8 +117,8 @@ module fitpack_parametric_surfaces
     ! Fit a new curve
     integer function new_fit(this,u,v,z,smoothing,periodic_BC)
         class(fitpack_parametric_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:),z(:,:,:)
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
+        real(FP_REAL), optional, intent(in) :: smoothing
         logical    , optional, intent(in) :: periodic_BC(2)
 
         call this%new_points(u,v,z,periodic_BC)
@@ -140,19 +140,19 @@ module fitpack_parametric_surfaces
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%iopt      = IOPT_NEW_SMOOTHING
        this%nest      = 0
        this%lwrk      = 0
        this%liwrk     = 0
        this%knots     = 0
-       this%fp        = 0.0_RKIND
+       this%fp        = 0.0_FP_REAL
 
     end subroutine destroy
 
     subroutine new_points(this,u,v,z,periodic_BC)
         class(fitpack_parametric_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:),z(:,:,:)
+        real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
         logical, optional, intent(in) :: periodic_BC(2)
 
         integer, parameter   :: SAFE = 2
@@ -196,7 +196,7 @@ module fitpack_parametric_surfaces
        integer, intent(in) :: knots(2)
 
        integer :: clen,q,m(2)
-       real(RKIND), allocatable :: t(:,:),c(:),wrk(:)
+       real(FP_REAL), allocatable :: t(:,:),c(:),wrk(:)
        integer, allocatable :: iwrk(:)
 
        associate(nmax=>this%nmax,idim=>this%idim)
@@ -231,11 +231,11 @@ module fitpack_parametric_surfaces
 
     function surf_eval_one(this,u,v,ierr) result(y)
         class(fitpack_parametric_surface), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u,v      ! Evaluation point
+        real(FP_REAL),          intent(in)     :: u,v      ! Evaluation point
         integer, optional,    intent(out)    :: ierr     ! Optional error flag
-        real(RKIND) :: y(this%idim)
+        real(FP_REAL) :: y(this%idim)
 
-        real(RKIND) :: y1(1,1,this%idim)
+        real(FP_REAL) :: y1(1,1,this%idim)
 
         y1 = surf_eval_grid(this,[u],[v],ierr)
         y  = y1(1,1,:)
@@ -253,9 +253,9 @@ module fitpack_parametric_surfaces
 
     function surf_eval_grid(this,u,v,ierr) result(f)
         class(fitpack_parametric_surface), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u(:),v(:) ! Evaluation grid (parameter range)
+        real(FP_REAL),          intent(in)     :: u(:),v(:) ! Evaluation grid (parameter range)
         integer, optional,    intent(out)    :: ierr      ! Optional error flag
-        real(RKIND) :: f(size(v),size(u),this%idim)
+        real(FP_REAL) :: f(size(v),size(u),this%idim)
 
         integer :: ier
 
@@ -286,8 +286,8 @@ module fitpack_parametric_surfaces
     ! Least-squares surface on current or given knots
     integer function surface_fit_least_squares(this,u_knots,v_knots) result(ierr)
        class(fitpack_parametric_surface), intent(inout) :: this
-       real(RKIND), optional, intent(in) :: u_knots(:)
-       real(RKIND), optional, intent(in) :: v_knots(:)
+       real(FP_REAL), optional, intent(in) :: u_knots(:)
+       real(FP_REAL), optional, intent(in) :: v_knots(:)
 
        integer :: nuuser,nu,nvuser,nv,new_knots(2)
 
@@ -327,11 +327,11 @@ module fitpack_parametric_surfaces
     ! Curve fitting driver: automatic number of knots
     integer function surf_fit_automatic_knots(this,smoothing,periodic) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
         logical, optional, intent(in) :: periodic(2)
 
         integer :: loop,nit,ipar(2)
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -378,7 +378,7 @@ module fitpack_parametric_surfaces
     end function surf_fit_automatic_knots
 
     ! Return fitting MSE
-    elemental real(RKIND) function surf_error(this)
+    elemental real(FP_REAL) function surf_error(this)
        class(fitpack_parametric_surface), intent(in) :: this
        surf_error = this%fp
     end function surf_error

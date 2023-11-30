@@ -52,8 +52,8 @@ module fitpack_curve_tests
        type(fitpack_constrained_curve) :: curve
        integer, parameter :: m    = 31
        integer, parameter :: idim = 2
-       real(RKIND) :: x(idim,m),ddx_begin(2,0:2),ddx_end(2,0:2)
-       real(RKIND), allocatable :: w(:),ybegin(:,:),yend(:,:),u(:)
+       real(FP_REAL) :: x(idim,m),ddx_begin(2,0:2),ddx_end(2,0:2)
+       real(FP_REAL), allocatable :: w(:),ybegin(:,:),yend(:,:),u(:)
        character(64) :: whereAt
 
        success = .true.
@@ -76,7 +76,7 @@ module fitpack_curve_tests
        ddx_end   = reshape([pi2,-one,  -one,zero,  zero,two],[2,3])
 
        ! weights: 1/sigma with sigma an estimate of the standard deviation of the data points.
-       allocate(w(m),source=one/0.04_RKIND)
+       allocate(w(m),source=one/0.04_FP_REAL)
 
        ! Set up the parameter values for the data points
        u = linspace(zero,3*pi,m)
@@ -87,37 +87,37 @@ module fitpack_curve_tests
 
 
              case (1) ! the smoothing factor is chosen as s = m
-                ierr = curve%new_fit(x,u=u,w=w,smoothing=real(m,RKIND))
+                ierr = curve%new_fit(x,u=u,w=w,smoothing=real(m,FP_REAL))
                 whereAt = 'no constraints'
 
              case (2) ! Fix end points
 
                 call curve%set_constraints(ddx_begin(:,0:0),ddx_end(:,0:0),ierr)
-                ierr = curve%fit(smoothing=real(m,RKIND))
+                ierr = curve%fit(smoothing=real(m,FP_REAL))
                 whereAt = 'fix points only'
 
              case (3) ! Fix points, 1st derivative (begin)
 
                 call curve%set_constraints(ddx_begin(:,0:1),ddx_end(:,0:0),ierr)
-                ierr = curve%fit(smoothing=real(m,RKIND))
+                ierr = curve%fit(smoothing=real(m,FP_REAL))
                 whereAt = 'fix points + 1st derivative (left)'
 
              case (4) ! Fix both first derivatives
 
                 call curve%set_constraints(ddx_begin(:,0:1),ddx_end(:,0:1),ierr)
-                ierr = curve%fit(smoothing=real(m,RKIND))
+                ierr = curve%fit(smoothing=real(m,FP_REAL))
                 whereAt = 'fix points + 1st derivative (both)'
 
              case (5)
 
                 whereAt = 'quintic spline, 2st derivative constraints (both)'
                 call curve%set_constraints(ddx_begin(:,0:2),ddx_end(:,0:2),ierr)
-                ierr = curve%fit(smoothing=real(m,RKIND),order=5)
+                ierr = curve%fit(smoothing=real(m,FP_REAL),order=5)
 
              case (6) ! Reduce smoothing
 
                 whereAt = 'quintic spline, 2st derivative constraints (both), s=26'
-                ierr = curve%fit(smoothing=26.0_RKIND,order=5)
+                ierr = curve%fit(smoothing=26.0_FP_REAL,order=5)
 
              case (7)
 
@@ -194,7 +194,7 @@ module fitpack_curve_tests
     logical function test_closed_fit(iunit) result(success)
        integer, optional, intent(in) :: iunit
 
-       real(RKIND), allocatable :: x(:,:),w(:),y(:,:),u(:)
+       real(FP_REAL), allocatable :: x(:,:),w(:),y(:,:),u(:)
        type(fitpack_closed_curve) :: curve
        integer :: ierr,loop,useUnit,i
 
@@ -228,23 +228,23 @@ module fitpack_curve_tests
           select case (loop)
 
              ! start with a least-squares point (s is very large)
-             case (1); ierr = curve%new_fit(x,w=w,smoothing=900.0_RKIND)
+             case (1); ierr = curve%new_fit(x,w=w,smoothing=900.0_FP_REAL)
 
              ! Smaller values of s to get a tighter approximation
-             case (2); ierr = curve%fit(smoothing=10.0_RKIND)
-             case (3); ierr = curve%fit(smoothing=0.1_RKIND)
+             case (2); ierr = curve%fit(smoothing=10.0_FP_REAL)
+             case (3); ierr = curve%fit(smoothing=0.1_FP_REAL)
 
              ! Larger values to get a smoother approximation
-             case (4); ierr = curve%fit(smoothing=0.5_RKIND)
+             case (4); ierr = curve%fit(smoothing=0.5_FP_REAL)
 
              ! New fit to get possibly fewer knots
-             case (5); ierr = curve%new_fit(x,w=w,smoothing=0.5_RKIND)
+             case (5); ierr = curve%new_fit(x,w=w,smoothing=0.5_FP_REAL)
 
              ! Let the program determine parameter values u(i)
-             case (6); ierr = curve%new_fit(x,w=w,smoothing=0.5_RKIND)
+             case (6); ierr = curve%new_fit(x,w=w,smoothing=0.5_FP_REAL)
 
              ! Quintic spline approximation
-             case (7); ierr = curve%new_fit(x,w=w,smoothing=0.5_RKIND,order=5)
+             case (7); ierr = curve%new_fit(x,w=w,smoothing=0.5_FP_REAL,order=5)
 
              ! Interpolating curve
              case (8); ierr = curve%interpolate()
@@ -255,7 +255,7 @@ module fitpack_curve_tests
 !                   iopt = -1
 !                   n = 9+2*k
 !                   j = k+2
-!                   del = (u(m)-u(1))*0.125_RKIND
+!                   del = (u(m)-u(1))*0.125_FP_REAL
 !                   do l=1,7
 !                      al = l
 !                      t(j) = u(1)+al*del
@@ -288,7 +288,7 @@ module fitpack_curve_tests
     ! Test parametric curve
     logical function test_parametric_fit() result(success)
 
-       real(RKIND), allocatable :: x(:,:),u(:),w(:),y(:,:)
+       real(FP_REAL), allocatable :: x(:,:),u(:),w(:),y(:,:)
        type(fitpack_parametric_curve) :: curve
        integer :: ierr,loop,useUnit
 
@@ -297,7 +297,7 @@ module fitpack_curve_tests
        useUnit = output_unit
 
        ! Set data points
-       u = [real(RKIND) :: 120,128,133,136,138,141,144,146,149,151,154,161,170,180,190,&
+       u = [real(FP_REAL) :: 120,128,133,136,138,141,144,146,149,151,154,161,170,180,190,&
                            200,210,220,230,240,250,262,269,273,278,282,287,291,295,299,305,315]
 
        allocate(x(2,32))
@@ -317,23 +317,23 @@ module fitpack_curve_tests
           select case (loop)
 
              ! start with a polynomial curve ( s very large)
-             case (1); ierr = curve%new_fit(x,u=u,w=w,smoothing=100.0_RKIND)
+             case (1); ierr = curve%new_fit(x,u=u,w=w,smoothing=100.0_FP_REAL)
 
              ! Smaller values of s to get a tighter approximation
-             case (2); ierr = curve%fit(smoothing=1.0_RKIND)
-             case (3); ierr = curve%fit(smoothing=0.05_RKIND)
+             case (2); ierr = curve%fit(smoothing=1.0_FP_REAL)
+             case (3); ierr = curve%fit(smoothing=0.05_FP_REAL)
 
              ! Larger values to get a smoother approximation
-             case (4); ierr = curve%fit(smoothing=0.25_RKIND)
+             case (4); ierr = curve%fit(smoothing=0.25_FP_REAL)
 
              ! New fit to get possibly fewer knots
-             case (5); ierr = curve%new_fit(x,u=u,w=w,smoothing=0.25_RKIND)
+             case (5); ierr = curve%new_fit(x,u=u,w=w,smoothing=0.25_FP_REAL)
 
              ! Let the program determine parameter values u(i)
-             case (6); ierr = curve%new_fit(x,w=w,smoothing=0.25_RKIND)
+             case (6); ierr = curve%new_fit(x,w=w,smoothing=0.25_FP_REAL)
 
              ! Quintic spline approximation
-             case (7); ierr = curve%new_fit(x,w=w,smoothing=0.25_RKIND,order=5)
+             case (7); ierr = curve%new_fit(x,w=w,smoothing=0.25_FP_REAL,order=5)
 
              ! Interpolating curve
              case (8); ierr = curve%interpolate()
@@ -344,7 +344,7 @@ module fitpack_curve_tests
 !                    iopt =-1
 !                    n = 9+2*k
 !                    j = k+2
-!                    del = (ue-ub)*0.125_RKIND
+!                    del = (ue-ub)*0.125_FP_REAL
 !                    do l=1,7
 !                        al = l
 !                        t(j) = ub+al*del
@@ -378,10 +378,10 @@ module fitpack_curve_tests
     logical function test_sine_fit() result(success)
 
        integer, parameter     :: N = 200
-       real(RKIND), parameter :: RTOL = 1.0e-1_RKIND
-       real(RKIND), parameter :: ATOL = 1.0e-2_RKIND
+       real(FP_REAL), parameter :: RTOL = 1.0e-1_FP_REAL
+       real(FP_REAL), parameter :: ATOL = 1.0e-2_FP_REAL
        type(fitpack_curve) :: curve
-       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
+       real(FP_REAL) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
        integer :: ierr,i,order
 
        success = .false.
@@ -468,13 +468,13 @@ module fitpack_curve_tests
     logical function test_zeros() result(success)
 
        type(fitpack_curve) :: curve
-       real(RKIND), allocatable :: x(:),y(:),x0(:)
+       real(FP_REAL), allocatable :: x(:),y(:),x0(:)
        integer :: ierr
 
        success = .false.
 
        ! Try f(x) = x3 Ð 3x2 + 2x = x(x Ð 1)(x Ð 2), with real roots x = 0, x = 1, and x = 2.
-       x = linspace(-10.0_RKIND,10.0_RKIND,20)
+       x = linspace(-10.0_FP_REAL,10.0_FP_REAL,20)
        y = x**3-3*x**2+2*x
 
        ! Get the interpolating curve
@@ -492,10 +492,10 @@ module fitpack_curve_tests
     logical function test_periodic_fit() result(success)
 
        integer, parameter     :: N = 200
-       real(RKIND), parameter :: RTOL = 1.0e-2_RKIND
-       real(RKIND), parameter :: ATOL = 1.0e-4_RKIND
+       real(FP_REAL), parameter :: RTOL = 1.0e-2_FP_REAL
+       real(FP_REAL), parameter :: ATOL = 1.0e-4_FP_REAL
        type(fitpack_periodic_curve) :: curve
-       real(RKIND) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
+       real(FP_REAL) :: x(N),y(N),xrand(N),yeval,yprime,dfdx(0:3),fint,eint
        integer :: ierr,i,order
 
        success = .false.
@@ -578,13 +578,13 @@ module fitpack_curve_tests
 
        contains
 
-         elemental real(RKIND) function fun(x) result(y)
-            real(RKIND), intent(in) :: x
+         elemental real(FP_REAL) function fun(x) result(y)
+            real(FP_REAL), intent(in) :: x
             y = cos(x) + sin(2*x)
          end function fun
 
-         elemental real(RKIND) function intgl(x) result(y)
-            real(RKIND), intent(in) :: x
+         elemental real(FP_REAL) function intgl(x) result(y)
+            real(FP_REAL), intent(in) :: x
             y = sin(x) - half*cos(2*x)
          end function intgl
 
@@ -596,8 +596,8 @@ module fitpack_curve_tests
        type(fitpack_polar) :: polar
        integer :: m,useUnit,loop,ierr
        character(64) :: domain
-       real(RKIND), allocatable :: x(:),y(:),z(:),w(:),f(:),exact(:)
-       real(RKIND) :: avg,ermax
+       real(FP_REAL), allocatable :: x(:),y(:),z(:),w(:),f(:),exact(:)
+       real(FP_REAL) :: avg,ermax
 
        ! Initialization.
        success = .true.
@@ -620,7 +620,7 @@ module fitpack_curve_tests
 
        ! Set uniform weights: w(i)=(0.01)**(-1), where 0.01 is an estimate for the standard deviation
        ! of the error in z(i)).
-       allocate(w(m),f(m),source=100.0_RKIND)
+       allocate(w(m),f(m),source=100.0_FP_REAL)
 
        ! we determine a number of smoothing spline approximations on the unit disk: x**2+y**2 <= 1.
        approximations: do loop=1,6
@@ -629,11 +629,11 @@ module fitpack_curve_tests
            select case (loop)
               case (1)
                   domain = 'unity disk'
-                  ierr = polar%new_fit(x,y,z,unit_disk,w,smoothing=1500.0_RKIND)
+                  ierr = polar%new_fit(x,y,z,unit_disk,w,smoothing=1500.0_FP_REAL)
               case (2)
-                  ierr = polar%fit(smoothing=200.0_RKIND)
+                  ierr = polar%fit(smoothing=200.0_FP_REAL)
               case (3)
-                  ierr = polar%fit(smoothing=170.0_RKIND)
+                  ierr = polar%fit(smoothing=170.0_FP_REAL)
               case (4)
                   ! Ellipsoid: Only consider datapoints inside this domain
                   domain = ' ellipsoid'
@@ -643,9 +643,9 @@ module fitpack_curve_tests
                   w = w(1:90)
 
                   ! Impose z=0 at the boundary by shifting all previous z's
-                  z     = z - 0.4_RKIND
-                  exact = testpo(x,y) - 0.4_RKIND
-                  ierr  = polar%new_fit(x,y,z,rad2_ellipsoid,w,smoothing=90.0_RKIND)
+                  z     = z - 0.4_FP_REAL
+                  exact = testpo(x,y) - 0.4_FP_REAL
+                  ierr  = polar%new_fit(x,y,z,rad2_ellipsoid,w,smoothing=90.0_FP_REAL)
               case (5)
 
                   ! Determine least-squares approximation with current knots
@@ -687,21 +687,21 @@ module fitpack_curve_tests
        contains
 
           !  test function for the polar package
-          elemental real(RKIND) function testpo(x,y)
-              real(RKIND), intent(in) ::x,y
+          elemental real(FP_REAL) function testpo(x,y)
+              real(FP_REAL), intent(in) ::x,y
               testpo=(x**2+y**2)/((x+y)**2+half)
           end function testpo
 
           ! CIRCLE: the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
-          pure real(RKIND) function unit_disk(v)
-             real(RKIND), intent(in) :: v
+          pure real(FP_REAL) function unit_disk(v)
+             real(FP_REAL), intent(in) :: v
              unit_disk = one
              return
           end function unit_disk
 
           ! ELLIPSOID: the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
-          pure real(RKIND) function rad2_ellipsoid(v)
-             real(RKIND), intent(in) :: v
+          pure real(FP_REAL) function rad2_ellipsoid(v)
+             real(FP_REAL), intent(in) :: v
              rad2_ellipsoid = one/sqrt(three-two*sin(2*v))
              return
           end function rad2_ellipsoid
@@ -713,9 +713,9 @@ module fitpack_curve_tests
 
        type(fitpack_sphere) :: sphere
        integer :: useUnit,loop,ierr,i,j,m
-       real(RKIND), allocatable, dimension(:) :: theta,phi,r,w,teval,phieval
-       real(RKIND), allocatable, dimension(:,:) :: exact,f
-       real(RKIND) :: avg,ermax
+       real(FP_REAL), allocatable, dimension(:) :: theta,phi,r,w,teval,phieval
+       real(FP_REAL), allocatable, dimension(:,:) :: exact,f
+       real(FP_REAL) :: avg,ermax
        character(64) :: loop_name
 
        ! Initialization.
@@ -743,7 +743,7 @@ module fitpack_curve_tests
 
        ! Set uniform weights: w(i)=(0.01)**(-1), where 0.01 is an estimate for the standard deviation
        ! of the error in z(i)).
-       allocate(w(m),source=1.0_RKIND)
+       allocate(w(m),source=1.0_FP_REAL)
 
        ! we determine a number of smoothing spline approximations on the unit disk: x**2+y**2 <= 1.
        approximations: do loop=1,3
@@ -751,11 +751,11 @@ module fitpack_curve_tests
            ! Compute/update fit
            select case (loop)
               case (1)
-                ierr = sphere%new_fit(theta,phi,r,smoothing=500.0_RKIND)
+                ierr = sphere%new_fit(theta,phi,r,smoothing=500.0_FP_REAL)
               case (2)
-                ierr = sphere%fit(smoothing=135.0_RKIND)
+                ierr = sphere%fit(smoothing=135.0_FP_REAL)
               case (3)
-                ierr = sphere%fit(smoothing=15.0_RKIND)
+                ierr = sphere%fit(smoothing=15.0_FP_REAL)
            end select
 
            if (.not.FITPACK_SUCCESS(ierr)) then
@@ -793,7 +793,7 @@ module fitpack_curve_tests
           ! Write sphere data to file
           subroutine write_grid_to_file(fileName,theta,phi,data)
               character(*), intent(in) :: fileName
-              real(RKIND), intent(in) :: theta(:),phi(:),data(:,:) ! [size(phi),size(theta)]
+              real(FP_REAL), intent(in) :: theta(:),phi(:),data(:,:) ! [size(phi),size(theta)]
 
               integer :: iunit,i
 
@@ -812,16 +812,16 @@ module fitpack_curve_tests
           end subroutine write_grid_to_file
 
           ! calculate the value of a test function for the sphere package.
-          elemental real(RKIND) function testsp(v,u)
-              real(RKIND), intent(in) :: u,v
-              real(RKIND) :: cu,cv,rad1,rad2,rad3,su,sv
+          elemental real(FP_REAL) function testsp(v,u)
+              real(FP_REAL), intent(in) :: u,v
+              real(FP_REAL) :: cu,cv,rad1,rad2,rad3,su,sv
               cu = cos(u)
               cv = cos(v)
               su = sin(u)
               sv = sin(v)
-              rad1 = (cu*sv*0.2_RKIND)**2+(su*sv)**2+(cv*0.5_RKIND)**2
-              rad2 = (cu*sv)**2+(su*sv*0.5_RKIND)**2+(cv*0.2_RKIND)**2
-              rad3 = (cu*sv*0.5_RKIND)**2+(su*sv*0.2_RKIND)**2+cv**2
+              rad1 = (cu*sv*0.2_FP_REAL)**2+(su*sv)**2+(cv*0.5_FP_REAL)**2
+              rad2 = (cu*sv)**2+(su*sv*0.5_FP_REAL)**2+(cv*0.2_FP_REAL)**2
+              rad3 = (cu*sv*0.5_FP_REAL)**2+(su*sv*0.2_FP_REAL)**2+cv**2
               testsp = one/sqrt(rad1) + one/sqrt(rad2) + one/sqrt(rad3)
               return
           end function testsp
@@ -834,9 +834,9 @@ module fitpack_curve_tests
         type(fitpack_grid_surface) :: surf
 
         integer :: ierr,loop,useUnit
-        real(RKIND), allocatable :: fit_z(:,:)
-        real(RKIND), parameter :: RTOL = 1.0e-4_RKIND
-        real(RKIND), parameter :: ATOL = 1.0e-4_RKIND
+        real(FP_REAL), allocatable :: fit_z(:,:)
+        real(FP_REAL), parameter :: RTOL = 1.0e-4_FP_REAL
+        real(FP_REAL), parameter :: ATOL = 1.0e-4_FP_REAL
 
         success = .true.
         if (present(iunit)) then
@@ -851,18 +851,18 @@ module fitpack_curve_tests
             select case (loop)
                case (1)
                   ! we start computing the least-squares bicubic polynomial
-                  ierr = surf%new_fit(daregr_x,daregr_y,daregr_z,smoothing=10.0_RKIND)
+                  ierr = surf%new_fit(daregr_x,daregr_y,daregr_z,smoothing=10.0_FP_REAL)
                case (2)
-                  ierr = surf%fit(smoothing=0.22_RKIND)
+                  ierr = surf%fit(smoothing=0.22_FP_REAL)
                case (3)
                   ! Overfitting (s is too small
-                  ierr = surf%fit(smoothing=0.1_RKIND)
+                  ierr = surf%fit(smoothing=0.1_FP_REAL)
                case (4)
                   ! Interpolating spline
                   ierr = surf%interpolate()
                case (5)
                   ! Quintic spline
-                  ierr = surf%fit(smoothing=0.2_RKIND,order=5)
+                  ierr = surf%fit(smoothing=0.2_FP_REAL,order=5)
                case (6)
                   ! Finally, calculate a least-squares spline approximation with specified knots
 !                  iopt = -1
@@ -919,8 +919,8 @@ module fitpack_curve_tests
         type(fitpack_grid_polar) :: polr
 
         integer :: ierr,loop,useUnit,i
-        real(RKIND) :: z0,r
-        real(RKIND), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
+        real(FP_REAL) :: z0,r
+        real(FP_REAL), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
 
         success = .true.
         if (present(iunit)) then
@@ -930,8 +930,8 @@ module fitpack_curve_tests
         end if
 
         !> Setup grid
-        u = linspace(0.1_RKIND,0.9_RKIND,9)      ! u in [0,r]
-        v = linspace(-pi,0.9_RKIND*pi,19)  ! v in [-pi,pi]
+        u = linspace(0.1_FP_REAL,0.9_FP_REAL,9)      ! u in [0,r]
+        v = linspace(-pi,0.9_FP_REAL*pi,19)  ! v in [-pi,pi]
         r = one
 
         !> Get tabulated data from external datafile
@@ -956,9 +956,9 @@ module fitpack_curve_tests
                   polr%bc_boundary = OUTSIDE_EXTRAPOLATE
 
                   ! Large value of s for computing least-squares polynomial
-                  ierr = polr%fit(smoothing=5.0_RKIND)
+                  ierr = polr%fit(smoothing=5.0_FP_REAL)
                case (2)
-                  ierr = polr%fit(smoothing=0.1_RKIND)
+                  ierr = polr%fit(smoothing=0.1_FP_REAL)
                case (3)
                   ierr = polr%interpolate()
                case (4)
@@ -966,13 +966,13 @@ module fitpack_curve_tests
                   ! Change BCs
                   polr%bc_boundary = OUTSIDE_ZERO
                   call polr%set_origin_BC(polar_fun(zero,zero),exact=.true.,differentiable=.true.)
-                  ierr = polr%fit(smoothing=0.1_RKIND)
+                  ierr = polr%fit(smoothing=0.1_FP_REAL)
 
                case (5)
 
                   call polr%set_origin_BC(differentiable=.true.)
 
-                  ierr = polr%fit(smoothing=0.1_RKIND)
+                  ierr = polr%fit(smoothing=0.1_FP_REAL)
 
                case (6)
 
@@ -1013,13 +1013,13 @@ module fitpack_curve_tests
         contains
 
         ! function program tespog calculates the value of the test function underlying the data.
-        elemental real(RKIND) function polar_fun(u,v)
-           real(RKIND), intent(in) :: u,v
-           real(RKIND) :: x,y,f
+        elemental real(FP_REAL) function polar_fun(u,v)
+           real(FP_REAL), intent(in) :: u,v
+           real(FP_REAL) :: x,y,f
            x = u*cos(v)
            y = u*sin(v)
            f = one-((3*x-one)**2+(3*y-one)**2)/(11.-6*(x+y))
-           polar_fun = f-(one-x**2-y**2)*(x+y)*54.0_RKIND/121.0_RKIND
+           polar_fun = f-(one-x**2-y**2)*(x+y)*54.0_FP_REAL/121.0_FP_REAL
         end function polar_fun
 
     end function test_gridded_polar
@@ -1030,7 +1030,7 @@ module fitpack_curve_tests
         type(fitpack_grid_sphere) :: spgr
 
         integer :: ierr,loop,useUnit,i
-        real(RKIND), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
+        real(FP_REAL), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
 
         success = .true.
         if (present(iunit)) then
@@ -1065,11 +1065,11 @@ module fitpack_curve_tests
                   call spgr%BC_north_pole(differentiable=.false.)
 
                   ! A large value for s for computing the least-squares polynomial
-                  ierr = spgr%fit(smoothing=60.0_RKIND)
+                  ierr = spgr%fit(smoothing=60.0_FP_REAL)
 
                case (2)
 
-                  ierr = spgr%fit(smoothing=0.05_RKIND)
+                  ierr = spgr%fit(smoothing=0.05_FP_REAL)
                case (3)
                   ierr = spgr%interpolate()
                case (4)
@@ -1077,14 +1077,14 @@ module fitpack_curve_tests
                   ! a second set of approximations with c1-continuity at the poles and the exact values
                   call spgr%BC_north_pole(z0=tesspg(zero,zero),exact=.true.,differentiable=.true.,zero_grad=.false.)
                   call spgr%BC_south_pole(z0=tesspg(pi,zero),exact=.true.,differentiable=.true.,zero_grad=.false.)
-                  ierr = spgr%fit(smoothing=0.05_RKIND)
+                  ierr = spgr%fit(smoothing=0.05_FP_REAL)
 
                case (5)
 
                   ! Vanishing derivatives at the poles
                   call spgr%BC_north_pole(z0=tesspg(zero,zero),exact=.true.,differentiable=.true.,zero_grad=.true.)
                   call spgr%BC_south_pole(z0=tesspg(pi,zero),exact=.true.,differentiable=.true.,zero_grad=.true.)
-                  ierr = spgr%fit(smoothing=0.05_RKIND)
+                  ierr = spgr%fit(smoothing=0.05_FP_REAL)
 
                case (6)
 
@@ -1128,9 +1128,9 @@ module fitpack_curve_tests
 
           ! function program tesspg calculates the value of the test function
           ! underlying the data.
-          elemental real(RKIND) function tesspg(u,v)
-              real(RKIND), intent(in) :: u,v
-              tesspg = 2.0_RKIND/(4.1_RKIND+cos(3*u)+3*cos(v+v+u*0.25_RKIND)*sin(u)**2)
+          elemental real(FP_REAL) function tesspg(u,v)
+              real(FP_REAL), intent(in) :: u,v
+              tesspg = 2.0_FP_REAL/(4.1_FP_REAL+cos(3*u)+3*cos(v+v+u*0.25_FP_REAL)*sin(u)**2)
               return
           end function tesspg
 
@@ -1144,7 +1144,7 @@ module fitpack_curve_tests
         integer, parameter :: idim = 3
         integer :: useUnit,i,loop,ier
         type(fitpack_parametric_surface) :: surf
-        real(RKIND), allocatable :: u(:),v(:),f1(:,:,:),f(:,:,:)
+        real(FP_REAL), allocatable :: u(:),v(:),f1(:,:,:),f(:,:,:)
 
 
         success = .true.
@@ -1167,7 +1167,7 @@ module fitpack_curve_tests
               case (1)
 
                  ! Smoothing surface, no periodicity constraint
-                 ier = surf%new_fit(u,v,f,smoothing=0.07_RKIND,periodic_BC=[.false.,.false.])
+                 ier = surf%new_fit(u,v,f,smoothing=0.07_FP_REAL,periodic_BC=[.false.,.false.])
 
               case (2)
 
@@ -1182,8 +1182,8 @@ module fitpack_curve_tests
               case (4)
 
                  ! Least-squares with specified knots
-                 ier = surf%least_squares(u_knots=[(5.0_RKIND*i,i=1,3)],&
-                                          v_knots=[(5.0_RKIND*i,i=1,3)])
+                 ier = surf%least_squares(u_knots=[(5.0_FP_REAL*i,i=1,3)],&
+                                          v_knots=[(5.0_FP_REAL*i,i=1,3)])
 
            end select
 
@@ -1219,19 +1219,19 @@ module fitpack_curve_tests
     end function test_parametric_surface
 
     ! ODE-style reciprocal error weight
-    elemental real(RKIND) function rewt(RTOL,ATOL,x)
-       real(RKIND), intent(in) :: RTOL,ATOL,x
+    elemental real(FP_REAL) function rewt(RTOL,ATOL,x)
+       real(FP_REAL), intent(in) :: RTOL,ATOL,x
        rewt = one/(RTOL*abs(x)+ATOL)
     end function rewt
 
     ! Simple linspace function
     pure function linspace(x1,x2,n)
-       real(RKIND), intent(in) :: x1,x2
+       real(FP_REAL), intent(in) :: x1,x2
        integer,     intent(in) :: n
-       real(RKIND), dimension(max(2,n)) :: linspace
+       real(FP_REAL), dimension(max(2,n)) :: linspace
 
        integer :: nx,i
-      real(RKIND) :: dx
+      real(FP_REAL) :: dx
 
        nx = max(n,2)
        dx = (x2-x1)/(nx-1)

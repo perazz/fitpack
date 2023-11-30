@@ -29,39 +29,39 @@ module fitpack_surfaces
 
         !> The data points
         integer :: m = 0
-        real(RKIND), allocatable :: x(:),y(:),z(:)
+        real(FP_REAL), allocatable :: x(:),y(:),z(:)
 
         !> Spline degree
         integer :: order(2) = 3
 
         !> Interval boundaries
-        real(RKIND) :: left(2),right(2)
+        real(FP_REAL) :: left(2),right(2)
 
         ! Node weights
-        real(RKIND), allocatable :: w(:)
+        real(FP_REAL), allocatable :: w(:)
 
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax = 0
         integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk1(:),wrk2(:)
+        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.d0
+        real(FP_REAL) :: smoothing = 1000.d0
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Curve extrapolation behavior
         integer     :: bc = OUTSIDE_NEAREST_BND
 
         ! Knots
         integer     :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = 0
@@ -91,11 +91,11 @@ module fitpack_surfaces
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function surface_fit_automatic_knots(this,smoothing,order) result(ierr)
         class(fitpack_surface), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
         integer, optional, intent(in) :: order
 
         integer :: loop,nit
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -153,7 +153,7 @@ module fitpack_surfaces
        this%left  = zero
        this%right = zero
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%order     = 3
        this%iopt      = 0
        this%nest      = 0
@@ -169,8 +169,8 @@ module fitpack_surfaces
 
     subroutine surf_new_points(this,x,y,z,w)
         class(fitpack_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
 
         integer :: clen,uv(2),km,bxy(2),b1,b2
         integer, parameter :: SAFE = 2
@@ -244,8 +244,8 @@ module fitpack_surfaces
 
     ! A default constructor
     type(fitpack_surface) function surf_new_from_points(x,y,z,w,ierr) result(this)
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -260,9 +260,9 @@ module fitpack_surfaces
     ! Fit a new curve
     integer function surf_new_fit(this,x,y,z,w,smoothing,order)
         class(fitpack_surface), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x)),z(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), optional, intent(in) :: smoothing
         integer    , optional, intent(in) :: order
 
         call this%new_points(x,y,z,w)

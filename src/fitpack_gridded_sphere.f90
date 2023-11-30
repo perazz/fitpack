@@ -31,13 +31,13 @@ module fitpack_gridded_sphere
     type :: fitpack_grid_sphere
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size
-        real(RKIND), allocatable :: u(:),v(:)
+        real(FP_REAL), allocatable :: u(:),v(:)
 
         !> Function values at the data points z(iv,iu) note (v,u) indices
-        real(RKIND), allocatable :: z(:,:)
+        real(FP_REAL), allocatable :: z(:,:)
 
         !> North pole BC (u=0, index=1), South pole BC (u=pi, index=2)
-        real(RKIND) :: pole_z0(2)      = zero      ! Function value at north pole
+        real(FP_REAL) :: pole_z0(2)      = zero      ! Function value at north pole
         logical     :: pole_present(2) = .false.   ! Is pole data provided?
         logical     :: pole_exct(2)    = .false.   ! Should that be treated as exact
         integer     :: pole_continuity(2) = 1      ! Continuity at pole BC (C0 or C1)
@@ -50,20 +50,20 @@ module fitpack_gridded_sphere
         integer :: nmax     = 0
         integer                  :: lwrk = 0, liwrk = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk (:)
+        real(FP_REAL), allocatable :: wrk (:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.d0
+        real(FP_REAL) :: smoothing = 1000.d0
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Knots
         integer     :: knots(2) = 0
-        real(RKIND), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
@@ -128,10 +128,10 @@ module fitpack_gridded_sphere
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
     integer function spgrid_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_grid_sphere), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         integer :: loop,nit,iopt(3),ider(4)
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -190,7 +190,7 @@ module fitpack_gridded_sphere
        deallocate(this%t,stat=ierr)
        deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%iopt      = 0
        this%nest      = 0
        this%nmax      = 0
@@ -203,8 +203,8 @@ module fitpack_gridded_sphere
 
     subroutine spgrid_new_points(this,u,v,z)
         class(fitpack_grid_sphere), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:) ! sphere domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), intent(in) :: u(:),v(:) ! sphere domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
 
         integer :: clen,m(2),q
         integer, parameter :: SAFE = 2
@@ -249,8 +249,8 @@ module fitpack_gridded_sphere
 
     ! A default constructor
     type(fitpack_grid_sphere) function spgrid_new_from_points(u,v,z,ierr) result(this)
-        real(RKIND), intent(in) :: u(:),v(:) ! sphere domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), intent(in) :: u(:),v(:) ! sphere domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -265,9 +265,9 @@ module fitpack_gridded_sphere
     ! Fit a new curve
     integer function spgrid_new_fit(this,u,v,z,smoothing)
         class(fitpack_grid_sphere), intent(inout) :: this
-        real(RKIND), intent(in) :: u(:),v(:) ! sphere domain
-        real(RKIND), intent(in) :: z(size(v),size(u)) ! Gridded values
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: u(:),v(:) ! sphere domain
+        real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         call this%new_points(u,v,z)
 
@@ -277,8 +277,8 @@ module fitpack_gridded_sphere
 
     function gridded_eval_many(this,u,v,ierr) result(f)
         class(fitpack_grid_sphere), intent(inout)  :: this
-        real(RKIND), intent(in) :: u(:),v(:)  ! Evaluation grid points (polar coordinates)
-        real(RKIND) :: f(size(v),size(u))
+        real(FP_REAL), intent(in) :: u(:),v(:)  ! Evaluation grid points (polar coordinates)
+        real(FP_REAL) :: f(size(v),size(u))
         integer, optional, intent(out) :: ierr ! Optional error flag
 
         integer :: ier
@@ -303,11 +303,11 @@ module fitpack_gridded_sphere
     end function gridded_eval_many
 
     ! Curve evaluation driver
-    real(RKIND) function gridded_eval_one(this,u,v,ierr) result(f)
+    real(FP_REAL) function gridded_eval_one(this,u,v,ierr) result(f)
         class(fitpack_grid_sphere), intent(inout)  :: this
-        real(RKIND),          intent(in)      :: u,v ! Evaluation point (grid polar coordinates)
+        real(FP_REAL),          intent(in)      :: u,v ! Evaluation point (grid polar coordinates)
         integer, optional,    intent(out)     :: ierr      ! Optional error flag
-        real(RKIND) :: f1(1,1)
+        real(FP_REAL) :: f1(1,1)
 
         f1 = gridded_eval_many(this,[u],[v],ierr)
         f  = f1(1,1)
@@ -318,7 +318,7 @@ module fitpack_gridded_sphere
     subroutine pole_BC(this,pole,z0,exact,differentiable,zero_grad)
         class(fitpack_grid_sphere), intent(inout) :: this
         integer, intent(in) :: pole
-        real(RKIND), optional, intent(in) :: z0 ! Function value at origin
+        real(FP_REAL), optional, intent(in) :: z0 ! Function value at origin
         logical, optional, intent(in) :: exact,differentiable,zero_grad
 
         this%pole_present(pole) = present(z0)
@@ -345,7 +345,7 @@ module fitpack_gridded_sphere
     !> North pole BC
     subroutine BC_north_pole(this,z0,exact,differentiable,zero_grad)
         class(fitpack_grid_sphere), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: z0 ! Function value at origin
+        real(FP_REAL), optional, intent(in) :: z0 ! Function value at origin
         logical, optional, intent(in) :: exact,differentiable,zero_grad
         call pole_BC(this,1,z0,exact,differentiable,zero_grad)
     end subroutine BC_north_pole
@@ -353,7 +353,7 @@ module fitpack_gridded_sphere
     !> South pole BC
     subroutine BC_south_pole(this,z0,exact,differentiable,zero_grad)
         class(fitpack_grid_sphere), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: z0 ! Function value at origin
+        real(FP_REAL), optional, intent(in) :: z0 ! Function value at origin
         logical, optional, intent(in) :: exact,differentiable,zero_grad
         call pole_BC(this,1,z0,exact,differentiable,zero_grad)
     end subroutine BC_south_pole
@@ -389,7 +389,7 @@ module fitpack_gridded_sphere
               named = adjustr(named)
            end function named
            character(12) function numbered(v)
-              real(RKIND), intent(in) :: v
+              real(FP_REAL), intent(in) :: v
               write(numbered,"(1pe12.5)") v
               numbered = adjustr(numbered)
            end function numbered

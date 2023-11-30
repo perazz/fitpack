@@ -18,13 +18,15 @@
 !
 ! **************************************************************************************************
 module fitpack_core
-    use iso_fortran_env, only: real64,int32
+    use iso_c_binding, only: c_double,c_int32_t,c_int64_t,c_bool,c_int8_t
     implicit none
     private
 
     ! Precision and array size
-    integer, parameter, public :: RKIND = real64
-    integer, parameter, public :: RSIZE = int32
+    integer, parameter, public :: FP_REAL = c_double
+    integer, parameter, public :: FP_SIZE = c_int32_t
+    integer, parameter, public :: FP_FLAG = c_int32_t
+    integer, parameter, public :: FP_BOOL = c_bool
 
     ! Curve fitting routines
     public :: curfit ! * General curve fitting
@@ -78,69 +80,84 @@ module fitpack_core
     public :: get_smoothing
 
     ! Spline behavior for points not in the support
-    integer, parameter, public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
-    integer, parameter, public :: OUTSIDE_ZERO        = 1 ! spline evaluates to zero
-    integer, parameter, public :: OUTSIDE_NOT_ALLOWED = 2 ! an error flag is returned
-    integer, parameter, public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
+    integer(FP_FLAG), parameter,  public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
+    integer(FP_FLAG), parameter,  public :: OUTSIDE_ZERO        = 1 ! spline evaluates to zero
+    integer(FP_FLAG), parameter,  public :: OUTSIDE_NOT_ALLOWED = 2 ! an error flag is returned
+    integer(FP_FLAG), parameter,  public :: OUTSIDE_NEAREST_BND = 3 ! evaluate to value of nearest boundary point
 
     ! IOPT defines a curve state
-                        public :: IOPT_MESSAGE
-    integer, parameter, public :: IOPT_NEW_LEASTSQUARES = -1 ! Request a new lsq fit
-    integer, parameter, public :: IOPT_NEW_SMOOTHING    =  0 ! Request a new smoothing fit
-    integer, parameter, public :: IOPT_OLD_FIT          =  1 ! Update an old fit
+                                  public :: IOPT_MESSAGE
+    integer(FP_FLAG), parameter,  public :: IOPT_NEW_LEASTSQUARES = -1 ! Request a new lsq fit
+    integer(FP_FLAG), parameter,  public :: IOPT_NEW_SMOOTHING    =  0 ! Request a new smoothing fit
+    integer(FP_FLAG), parameter,  public :: IOPT_OLD_FIT          =  1 ! Update an old fit
 
-    ! Dimension of last knot addition
-    integer, parameter, public :: KNOT_DIM_NONE =  0  ! No knots added yet
-    integer, parameter, public :: KNOT_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
-    integer, parameter, public :: KNOT_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
+    ! Dimensions of last knot addition
+    integer(FP_SIZE), parameter,  public :: MAX_IDIM  = 10      ! Max number of dimensions
+    integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
+    integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
+    integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
 
-                        public :: FITPACK_MESSAGE
-                        public :: FITPACK_SUCCESS
-    integer, parameter, public :: FITPACK_OK                   = 0  ! ok for spline, abs(fp-s)/s <= tol=0.001
-    integer, parameter, public :: FITPACK_INTERPOLATING_OK     = -1 ! ok for interpolating spline, fp=0
-    integer, parameter, public :: FITPACK_LEASTSQUARES_OK      = -2 ! ok for weighted least-squares polynomial of degree k.
-    integer, parameter, public :: FITPACK_INSUFFICIENT_STORAGE = 1
-    integer, parameter, public :: FITPACK_S_TOO_SMALL          = 2
-    integer, parameter, public :: FITPACK_MAXIT                = 3
-    integer, parameter, public :: FITPACK_TOO_MANY_KNOTS       = 4
-    integer, parameter, public :: FITPACK_OVERLAPPING_KNOTS    = 5
-    integer, parameter, public :: FITPACK_INVALID_RANGE        = 6
-    integer, parameter, public :: FITPACK_INPUT_ERROR          = 10
-    integer, parameter, public :: FITPACK_TEST_ERROR           = 11
-    integer, parameter, public :: FITPACK_INVALID_CONSTRAINT   = 12
-    integer, parameter, public :: FITPACK_INSUFFICIENT_KNOTS   = 13
+    ! Spline degrees
+    integer(FP_SIZE), parameter, public :: MAX_ORDER = 19    ! Max spline order (for array allocation)
+    integer(FP_SIZE), parameter, public :: DEGREE_3  =  3
+    integer(FP_SIZE), parameter, public :: DEGREE_4  =  4
+    integer(FP_SIZE), parameter, public :: DEGREE_5  =  5
+
+                                  public :: FITPACK_MESSAGE
+                                  public :: FITPACK_SUCCESS
+    integer(FP_FLAG), parameter,  public :: FITPACK_OK                   = 0  ! ok for spline, abs(fp-s)/s <= tol=0.001
+    integer(FP_FLAG), parameter,  public :: FITPACK_INTERPOLATING_OK     = -1 ! ok for interpolating spline, fp=0
+    integer(FP_FLAG), parameter,  public :: FITPACK_LEASTSQUARES_OK      = -2 ! ok for weighted least-squares polynomial of degree k.
+    integer(FP_FLAG), parameter,  public :: FITPACK_INSUFFICIENT_STORAGE = 1
+    integer(FP_FLAG), parameter,  public :: FITPACK_S_TOO_SMALL          = 2
+    integer(FP_FLAG), parameter,  public :: FITPACK_MAXIT                = 3
+    integer(FP_FLAG), parameter,  public :: FITPACK_TOO_MANY_KNOTS       = 4
+    integer(FP_FLAG), parameter,  public :: FITPACK_OVERLAPPING_KNOTS    = 5
+    integer(FP_FLAG), parameter,  public :: FITPACK_INVALID_RANGE        = 6
+    integer(FP_FLAG), parameter,  public :: FITPACK_INPUT_ERROR          = 10
+    integer(FP_FLAG), parameter,  public :: FITPACK_TEST_ERROR           = 11
+    integer(FP_FLAG), parameter,  public :: FITPACK_INVALID_CONSTRAINT   = 12
+    integer(FP_FLAG), parameter,  public :: FITPACK_INSUFFICIENT_KNOTS   = 13
 
     ! Internal Parameters
-    integer    , parameter, public :: MAX_IDIM  = 10        ! Max number of dimensions
-    integer    , parameter, public :: MAX_ORDER = 19        ! Max spline order (for array allocation)
-    real(RKIND), parameter, public :: one     = 1.0_RKIND
-    real(RKIND), parameter, public :: zero    = 0.0_RKIND
-    real(RKIND), parameter, public :: half    = 0.5_RKIND
-    real(RKIND), parameter, public :: onep5   = 1.5_RKIND
-    real(RKIND), parameter, public :: fourth  = 0.25_RKIND
-    real(RKIND), parameter, public :: two     = 2.0_RKIND
-    real(RKIND), parameter, public :: three   = 3.0_RKIND
-    real(RKIND), parameter, public :: four    = 4.0_RKIND
-    real(RKIND), parameter, public :: five    = 5.0_RKIND
-    real(RKIND), parameter, public :: six     = 6.0_RKIND
-    real(RKIND), parameter, public :: ten     = 10.0_RKIND
-    real(RKIND), parameter, public :: pi      = atan2(zero,-one)
-    real(RKIND), parameter, public :: pi2     = 2*pi
-    real(RKIND), parameter, public :: pi4     = 4*pi
-    real(RKIND), parameter, public :: pio2    = half*pi
-    real(RKIND), parameter, public :: pio4    = fourth*pi
-    real(RKIND), parameter, public :: pio8    = 0.125_RKIND*pi
-    real(RKIND), parameter, public :: deg2rad = pi/180.0_RKIND
-    real(RKIND), parameter, public :: smallnum03 = 1.0e-03_RKIND
-    real(RKIND), parameter, public :: smallnum06 = 1.0e-06_RKIND
-    real(RKIND), parameter, public :: smallnum08 = 1.0e-08_RKIND
-    real(RKIND), parameter, public :: smallnum10 = 1.0e-10_RKIND
+    logical(FP_BOOL), parameter, public :: FP_TRUE  = .true._FP_BOOL
+    logical(FP_BOOL), parameter, public :: FP_FALSE = .false._FP_BOOL
+
+    integer(FP_SIZE), parameter :: IZERO  = 0_FP_SIZE
+    integer(FP_SIZE), parameter :: IONE   = 1_FP_SIZE
+    integer(FP_SIZE), parameter :: ITWO   = 2_FP_SIZE
+    integer(FP_SIZE), parameter :: ITHREE = 3_FP_SIZE
+    integer(FP_SIZE), parameter :: IFOUR  = 4_FP_SIZE
+    integer(FP_SIZE), parameter :: IFIVE  = 5_FP_SIZE
+
+    real(FP_REAL), parameter, public :: one     = 1.0_FP_REAL
+    real(FP_REAL), parameter, public :: zero    = 0.0_FP_REAL
+    real(FP_REAL), parameter, public :: half    = 0.5_FP_REAL
+    real(FP_REAL), parameter, public :: onep5   = 1.5_FP_REAL
+    real(FP_REAL), parameter, public :: fourth  = 0.25_FP_REAL
+    real(FP_REAL), parameter, public :: two     = 2.0_FP_REAL
+    real(FP_REAL), parameter, public :: three   = 3.0_FP_REAL
+    real(FP_REAL), parameter, public :: four    = 4.0_FP_REAL
+    real(FP_REAL), parameter, public :: five    = 5.0_FP_REAL
+    real(FP_REAL), parameter, public :: six     = 6.0_FP_REAL
+    real(FP_REAL), parameter, public :: ten     = 10.0_FP_REAL
+    real(FP_REAL), parameter, public :: pi      = atan2(zero,-one)
+    real(FP_REAL), parameter, public :: pi2     = 2*pi
+    real(FP_REAL), parameter, public :: pi4     = 4*pi
+    real(FP_REAL), parameter, public :: pio2    = half*pi
+    real(FP_REAL), parameter, public :: pio4    = fourth*pi
+    real(FP_REAL), parameter, public :: pio8    = 0.125_FP_REAL*pi
+    real(FP_REAL), parameter, public :: deg2rad = pi/180.0_FP_REAL
+    real(FP_REAL), parameter, public :: smallnum03 = 1.0e-03_FP_REAL
+    real(FP_REAL), parameter, public :: smallnum06 = 1.0e-06_FP_REAL
+    real(FP_REAL), parameter, public :: smallnum08 = 1.0e-08_FP_REAL
+    real(FP_REAL), parameter, public :: smallnum10 = 1.0e-10_FP_REAL
 
     abstract interface
        ! Function defining the boundary of the curve approximation domain
-       pure real(RKIND) function fitpack_polar_boundary(theta) result(rad)
-          import RKIND
-          real(RKIND), intent(in) :: theta
+       pure real(FP_REAL) function fitpack_polar_boundary(theta) result(rad)
+          import FP_REAL
+          real(FP_REAL), intent(in) :: theta
        end function fitpack_polar_boundary
     end interface
 
@@ -154,8 +171,8 @@ module fitpack_core
       ! Flow control: on output flag present, return it;
       ! otherwise, halt on error
       subroutine fitpack_error_handling(ierr,ierr_out,whereAt)
-          integer, intent(in) :: ierr
-          integer, optional, intent(out) :: ierr_out
+          integer(FP_FLAG), intent(in) :: ierr
+          integer(FP_FLAG), optional, intent(out) :: ierr_out
           character(*), intent(in) :: whereAt
 
           if (present(ierr_out)) then
@@ -168,7 +185,7 @@ module fitpack_core
 
       ! Wrapper for the error flag
       pure function FITPACK_MESSAGE(ierr) result(msg)
-         integer, intent(in) :: ierr
+         integer(FP_FLAG), intent(in) :: ierr
          character(len=:), allocatable :: msg
 
          select case (ierr)
@@ -195,17 +212,17 @@ module fitpack_core
       ! - If a user input is present, use that one
       ! - If a previous value is available, keep that one
       subroutine get_smoothing(old_smoothing,user_smoothing,nit,smooth_now)
-          integer    , intent(out)   :: nit
-          real(RKIND), intent(in), optional :: user_smoothing
-          real(RKIND), intent(in)    :: old_smoothing
-          real(RKIND), intent(out)   :: smooth_now(3)
+          integer(FP_SIZE), intent(out)   :: nit
+          real(FP_REAL), intent(in), optional :: user_smoothing
+          real(FP_REAL), intent(in)    :: old_smoothing
+          real(FP_REAL), intent(out)   :: smooth_now(3)
 
-          real(RKIND), parameter :: smoothing_trajectory(3) = [1000.d0,60.d0,30.d0]
+          real(FP_REAL), parameter :: smoothing_trajectory(3) = [1000.d0,60.d0,30.d0]
 
           if (present(user_smoothing)) then
               nit        = 1
               smooth_now = user_smoothing
-          elseif (old_smoothing<1000.0_RKIND) then
+          elseif (old_smoothing<1000.0_FP_REAL) then
               nit        = 1
               smooth_now = old_smoothing
           else
@@ -217,7 +234,7 @@ module fitpack_core
 
       ! Wrapper for iopt
       pure function IOPT_MESSAGE(iopt) result(msg)
-         integer, intent(in) :: iopt
+         integer(FP_FLAG), intent(in) :: iopt
          character(len=:), allocatable :: msg
          select case (iopt)
             case (IOPT_NEW_LEASTSQUARES); msg = 'Least-Squares'
@@ -228,8 +245,8 @@ module fitpack_core
       end function IOPT_MESSAGE
 
       ! Wrapper for OK
-      elemental logical function FITPACK_SUCCESS(ierr)
-         integer, intent(in) :: ierr
+      elemental logical(FP_BOOL) function FITPACK_SUCCESS(ierr)
+         integer(FP_FLAG), intent(in) :: ierr
          FITPACK_SUCCESS = ierr<=FITPACK_OK
       end function FITPACK_SUCCESS
 
@@ -244,16 +261,16 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   x     : real array of dimension (mx).
       !   y     : real array of dimension (my).
       !   m     : on entry m must specify the number points. m >= 1.
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk. lwrk >= kx+ky+2
+      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk. lwrk >= kx+ky+2
       !
       !  output parameters:
       !   z     : real array of dimension m.
@@ -270,16 +287,16 @@ module fitpack_core
       !    fpbisp,fpbspl
       !
       !  ..scalar arguments..
-      integer, intent(in) :: nx,ny,kx,ky,m,lwrk
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,m,lwrk
+      integer(FP_FLAG), intent(out) :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
-      real(RKIND), intent(inout) :: wrk(lwrk)
-      real(RKIND), intent(out)   :: z(m)
+      real(FP_REAL), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
+      real(FP_REAL), intent(inout) :: wrk(lwrk)
+      real(FP_REAL), intent(out)   :: z(m)
 
       !  ..local scalars..
-      integer :: iwrk(2),i,lwest
+      integer(FP_SIZE) :: iwrk(2),i,lwest
 
       !  Check inputs
       lwest = kx+ky+2
@@ -293,7 +310,7 @@ module fitpack_core
 
          ier = FITPACK_OK
          do i=1,m
-            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),1,y(i),1,z(i),wrk(1),wrk(kx+2),iwrk(1),iwrk(2))
+            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),IONE,y(i),IONE,z(i),wrk(1),wrk(kx+2),iwrk(1),iwrk(2))
          end do
 
       end if
@@ -307,9 +324,9 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   x     : real array of dimension (mx).
@@ -321,10 +338,10 @@ module fitpack_core
       !           ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
       !   my    : on entry my must specify the number of grid points along the y-axis. my >=1.
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk.
+      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
       !           lwrk >= mx*(kx+1)+my*(ky+1)
       !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer, specifying the dimension of iwrk. kwrk >= mx+my.
+      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
       !
       !  output parameters:
       !   z     : real array of dimension (mx*my).
@@ -357,15 +374,15 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer, intent(in) :: nx,ny,kx,ky,mx,my,lwrk,kwrk
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,mx,my,lwrk,kwrk
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      integer, intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      real(RKIND), intent(out)   :: z(mx*my)
-      real(RKIND), intent(inout) :: wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+      real(FP_REAL), intent(out)   :: z(mx*my)
+      real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
-      integer :: iw,lwest
+      integer(FP_SIZE) :: iw,lwest
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -587,22 +604,23 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,ipar,idim,m,mx,k,nest,nc,lwrk
-      integer,     intent(inout) :: n,ier
+      real(FP_REAL),    intent(in)    :: s
+      real(FP_REAL),    intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,ipar,idim,m,mx,k,nest,nc,lwrk
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(mx),w(m)
-      real(RKIND), intent(inout) :: u(m),t(nest),c(nc),wrk(lwrk)
-      integer,     intent(inout) :: iwrk(nest)
+      real(FP_REAL),    intent(in)    :: x(mx),w(m)
+      real(FP_REAL),    intent(inout) :: u(m),t(nest),c(nc),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(nest)
 
       !  ..local scalars..
-      real(RKIND) :: per,dist
-      integer :: i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest,m1,nmin,ncc
+      real(FP_REAL) :: per,dist
+      integer(FP_SIZE) :: i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest,m1,nmin,ncc
 
       !  we set up the parameters tol and maxit
-      integer, parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -797,18 +815,19 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(out)   :: sq
-      integer,     intent(in)    :: m,n,maxtr,maxbin,lwrk,kwrk
-      integer,     intent(out)   :: ier
+      real(FP_REAL),    intent(out)   :: sq
+      integer(FP_SIZE), intent(in)    :: m,n,maxtr,maxbin,lwrk,kwrk
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m),t(n)
-      real(RKIND), intent(inout) :: e(n)
-      real(RKIND), intent(out)   :: c(n),sx(m)
-      real(RKIND), intent(inout) :: wrk(lwrk)
-      integer,     intent(inout) :: iwrk(kwrk)
-      logical,     intent(out)   :: bind(n)
+      real(FP_REAL),    intent(in)    :: x(m),y(m),w(m),t(n)
+      real(FP_REAL),    intent(inout) :: e(n)
+      real(FP_REAL),    intent(out)   :: c(n),sx(m)
+      real(FP_REAL),    intent(inout) :: wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      logical(FP_BOOL), intent(out)   :: bind(n)
+
       !  ..local scalars..
-      integer :: ia,ib,ic,iq,iu,iz,izz,ji,jib,jjb,jl,jr,ju,kwest,lwest,mb,nm,n6
+      integer(FP_SIZE) :: ia,ib,ic,iq,iu,iz,izz,ji,jib,jjb,jl,jr,ju,kwest,lwest,mb,nm,n6
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -824,7 +843,7 @@ module fitpack_core
       if (any(w<=zero))               return
       if (any(x(1:m-1)>=x(2:m)))      return
 
-      ier = fpchec(x,m,t,n,3); if (ier/=FITPACK_OK) return
+      ier = fpchec(x,m,t,n,DEGREE_3); if (ier/=FITPACK_OK) return
 
       !  set numbers e(i)
       where (not_equal(e,zero)) e = sign(one,e)
@@ -999,18 +1018,18 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(out)   :: sq
-      integer, intent(in)        :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
-      integer, intent(inout)     :: n
-      integer, intent(out)       :: ier
+      real(FP_REAL),    intent(in)    :: s
+      real(FP_REAL),    intent(out)   :: sq
+      integer(FP_SIZE), intent(in)        :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
+      integer(FP_SIZE), intent(inout)     :: n
+      integer(FP_FLAG), intent(out)       :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m)
-      real(RKIND), intent(inout) :: v(m),t(nest),c(nest),sx(m),wrk(lwrk)
-      integer,     intent(inout) :: iwrk(kwrk)
-      logical,     intent(inout) :: bind(nest)
+      real(FP_REAL),    intent(in)    :: x(m),y(m),w(m)
+      real(FP_REAL),    intent(inout) :: v(m),t(nest),c(nest),sx(m),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      logical(FP_BOOL), intent(inout) :: bind(nest)
       !  ..local scalars..
-      integer :: lwest,kwest,ie,iw,lww
+      integer(FP_SIZE) :: lwest,kwest,ie,iw,lww
 
       !  before starting computations a data check is made. if the input data are invalid, control is
       !  immediately repassed to the calling program.
@@ -1114,13 +1133,13 @@ module fitpack_core
       !   db    : real array of dimension nb. before entry db(idim*l+j) must contain the l-th order deri-
       !           vative of sj(u) at u=u(1) for j=1,2,...,idim and l=0,1,...,ib-1 (if ib>0).
       !           unchanged on exit.
-      !   nb    : integer, specifying the dimension of db. nb>=max(1,idim*ib). unchanged on exit.
+      !   nb    : integer(FP_SIZE), specifying the dimension of db. nb>=max(1,idim*ib). unchanged on exit.
       !   ie    : integer. on entry ie must specify the number of derivative constraints for the curve at
       !           the end point. 0<=ie<=(k+1)/2. unchanged on exit.
       !   de    : real array of dimension ne. before entry de(idim*l+j) must contain the l-th order deri-
       !           vative of sj(u) at u=u(m) for j=1,2,...,idim and l=0,1,...,ie-1 (if ie>0).
       !           unchanged on exit.
-      !   ne    : integer, specifying the dimension of de. ne>=max(1,idim*ie) unchanged on exit.
+      !   ne    : integer(FP_SIZE), specifying the dimension of de. ne>=max(1,idim*ie) unchanged on exit.
       !   k     : integer. on entry k must specify the degree of the splines. k=1,3 or 5. unchanged on exit.
       !   s     : real.on entry (in case iopt>=0) s must specify the smoothing factor. s >=zero unchanged
       !           on exit. for advice on the choice of s see further comments.
@@ -1266,21 +1285,21 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,idim,m,mx,ib,nb,ie,ne,k,nest,nc,np,lwrk
-      integer,     intent(inout) :: n
-      integer,     intent(out)   :: ier
+      real(FP_REAL),    intent(in)    :: s
+      real(FP_REAL),    intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,idim,m,mx,ib,nb,ie,ne,k,nest,nc,np,lwrk
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(m),x(mx),db(nb),de(ne),w(m)
-      real(RKIND), intent(inout) :: xx(mx),t(nest),c(nc),cp(np),wrk(lwrk)
-      integer    , intent(inout) :: iwrk(nest)
+      real(FP_REAL),    intent(in)    :: u(m),x(mx),db(nb),de(ne),w(m)
+      real(FP_REAL),    intent(inout) :: xx(mx),t(nest),c(nc),cp(np),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      integer :: ib1,ie1,ja,jb,jfp,jg,jq,jz,k1,k2,lwest,nmin,ncc,kk,mmin,nmax,mxx
+      integer(FP_SIZE) :: ib1,ie1,ja,jb,jfp,jg,jq,jz,k1,k2,lwest,nmin,ncc,kk,mmin,nmax,mxx
       !  ..
       !  we set up the parameters tol and maxit
-      real(RKIND), parameter :: tol = smallnum03
-      integer, parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -1380,14 +1399,14 @@ module fitpack_core
 
       !
       !  input parameters:
-      !    idim : integer, giving the dimension of the spline curve.
+      !    idim : integer(FP_SIZE), giving the dimension of the spline curve.
       !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(u).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(u).
       !    c    : array,length nc, which contains the b-spline coefficients.
-      !    nc   : integer, giving the total number of coefficients of s(u).
-      !    k1   : integer, giving the order of s(u) (order=degree+1).
+      !    nc   : integer(FP_SIZE), giving the total number of coefficients of s(u).
+      !    k1   : integer(FP_SIZE), giving the order of s(u) (order=degree+1).
       !    u    : real, which contains the point where the derivatives must be evaluated.
-      !    nd   : integer, giving the dimension of the array d. nd >= k1*idim
+      !    nd   : integer(FP_SIZE), giving the dimension of the array d. nd >= k1*idim
       !
       !  output parameters:
       !    d    : array,length nd,giving the different curve derivatives. d(idim*l+j) will contain the
@@ -1423,16 +1442,16 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer,     intent(in)  :: idim,n,nc,k1,nd
-      integer,     intent(out) :: ier
-      real(RKIND), intent(in)  :: u
+      integer(FP_SIZE), intent(in)  :: idim,n,nc,k1,nd
+      integer(FP_FLAG), intent(out) :: ier
+      real(FP_REAL),    intent(in)  :: u
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n),c(nc)
-      real(RKIND), intent(out) :: d(nd)
+      real(FP_REAL),    intent(in)  :: t(n),c(nc)
+      real(FP_REAL),    intent(out) :: d(nd)
       !  ..local scalars..
-      integer :: i,j,kk,l,m,nk1
+      integer(FP_SIZE) :: i,j,kk,l,m,nk1
       !  ..local array..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -1474,15 +1493,15 @@ module fitpack_core
       !     call curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
       !
       !  input parameters:
-      !    idim : integer, giving the dimension of the spline curve.
+      !    idim : integer(FP_SIZE), giving the dimension of the spline curve.
       !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(u).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(u).
       !    c    : array,length nc, which contains the b-spline coefficients.
-      !    nc   : integer, giving the total number of coefficients of s(u).
-      !    k    : integer, giving the degree of s(u).
+      !    nc   : integer(FP_SIZE), giving the total number of coefficients of s(u).
+      !    k    : integer(FP_SIZE), giving the degree of s(u).
       !    u    : array,length m, which contains the points where s(u) must be evaluated.
-      !    m    : integer, giving the number of points where s(u) must be evaluated.
-      !    mx   : integer, giving the dimension of the array x. mx >= m*idim
+      !    m    : integer(FP_SIZE), giving the number of points where s(u) must be evaluated.
+      !    mx   : integer(FP_SIZE), giving the dimension of the array x. mx >= m*idim
       !
       !  output parameters:
       !    x    : array,length mx,giving the value of s(u) at the different points. x(idim*(i-1)+j) will
@@ -1511,16 +1530,16 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in) :: idim,n,nc,k,m,mx
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in) :: idim,n,nc,k,m,mx
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n),c(nc),u(m)
-      real(RKIND), intent(out) :: x(idim,m) ! x has size (mx), assume 2d (idim,m)
+      real(FP_REAL), intent(in) :: t(n),c(nc),u(m)
+      real(FP_REAL), intent(out) :: x(idim,m) ! x has size (mx), assume 2d (idim,m)
       !  ..local scalars..
-      integer :: i,j1,k1,l,ll,l1,nk1
-      real(RKIND) :: arg,tb,te
+      integer(FP_SIZE) :: i,j1,k1,l,ll,l1,nk1
+      real(FP_REAL) :: arg,tb,te
       !  ..local array..
-      real(RKIND) h(MAX_ORDER+1)
+      real(FP_REAL) h(MAX_ORDER+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -1778,21 +1797,21 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: xb,xe,s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,m,k,nest,lwrk
-      integer,     intent(out)   :: ier
-      integer,     intent(inout) :: n
+      real(FP_REAL),    intent(in)    :: xb,xe,s
+      real(FP_REAL),    intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,m,k,nest,lwrk
+      integer(FP_FLAG), intent(out)   :: ier
+      integer(FP_SIZE), intent(inout) :: n
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nest),wrk(lwrk)
-      integer,     intent(inout) :: iwrk(nest)
+      real(FP_REAL),    intent(in)    :: x(m),y(m),w(m)
+      real(FP_REAL),    intent(inout) :: t(nest),c(nest),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      integer :: i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin
+      integer(FP_SIZE) :: i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin
       !  ..
       !  we set up the parameters tol and maxit
-      real(RKIND), parameter :: tol = smallnum03
-      integer    , parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
 
       k1   = k+1
       k2   = k1+1
@@ -1842,7 +1861,7 @@ module fitpack_core
       !        |     |      s(x,y) dx dy
       !    xb /  yb /
       !  with s(x,y) a bivariate spline of degrees kx and ky, given in the b-spline representation.
-      real(RKIND) function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
+      real(FP_REAL) function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
 
       !
       !  calling sequence:
@@ -1850,9 +1869,9 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   xb,xe : real values, containing the boundaries of the integration
@@ -1888,14 +1907,14 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in) :: nx,ny,kx,ky
-      real(RKIND), intent(in) :: xb,xe,yb,ye
+      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky
+      real(FP_REAL), intent(in) :: xb,xe,yb,ye
       !  ..array arguments..
-      real(RKIND), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(RKIND), intent(out) :: wrk(nx+ny-kx-ky-2)
+      real(FP_REAL), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
+      real(FP_REAL), intent(out) :: wrk(nx+ny-kx-ky-2)
       !  ..local scalars..
-      integer :: i,j,l,m,nkx1,nky1
-      real(RKIND) :: res
+      integer(FP_SIZE) :: i,j,l,m,nkx1,nky1
+      real(FP_REAL) :: res
 
       !  ..
       nkx1 = nx-kx-1
@@ -1928,16 +1947,16 @@ module fitpack_core
       !  and where s(u,v) is a bicubic spline ( 0<=u<=1 , -pi<=v<=pi ), given in its standard b-spline
       !  representation.
 
-      pure real(RKIND) function evapol(tu,nu,tv,nv,c,rad,x,y) result(e_res)
+      pure real(FP_REAL) function evapol(tu,nu,tv,nv,c,rad,x,y) result(e_res)
 
       !  calling sequence:
       !     f = evapol(tu,nu,tv,nv,c,rad,x,y)
       !
       !  input parameters:
       !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
-      !   nu    : integer, giving the total number of knots in the u-direction
+      !   nu    : integer(FP_SIZE), giving the total number of knots in the u-direction
       !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
-      !   nv    : integer, giving the total number of knots in the v-direction
+      !   nv    : integer(FP_SIZE), giving the total number of knots in the v-direction
       !   c     : real array, length (nu-4)*(nv-4), which contains the b-spline coefficients.
       !   rad   : real function subprogram, defining the boundary of the approximation domain. must be
       !           declared external in the calling (sub)-program
@@ -1962,20 +1981,20 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer,     intent(in) :: nu,nv
-      real(RKIND), intent(in) :: x,y
+      integer(FP_SIZE), intent(in) :: nu,nv
+      real(FP_REAL),    intent(in) :: x,y
       !  ..array arguments..
-      real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
+      real(FP_REAL),    intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
       !  ..user specified function
       procedure(fitpack_polar_boundary) :: rad
 
       !  ..local scalars..
-      integer :: ier
-      integer, parameter :: liwrk = 2, lwrk = 8
-      real(RKIND) :: u(1),v(1),r,f(1),dist
+      integer(FP_FLAG) :: ier
+      integer(FP_SIZE), parameter :: liwrk = 2, lwrk = 8
+      real(FP_REAL) :: u(1),v(1),r,f(1),dist
       !  ..local arrays
-      real(RKIND) :: wrk(lwrk)
-      integer :: iwrk(liwrk)
+      real(FP_REAL) :: wrk(lwrk)
+      integer(FP_SIZE) :: iwrk(liwrk)
       !  ..
       !  calculate the (u,v)-coordinates of the given point.
       u    = zero
@@ -2011,10 +2030,10 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : real array,length n, containing the knots of s(x).
-      !    n    : integer, containing the total number of knots. n>=10.
+      !    n    : integer(FP_SIZE), containing the total number of knots. n>=10.
       !    c    : real array,length n, containing the b-spline coefficients.
       !    alfa : real array,length m, containing the parameters alfa(i).
-      !    m    : integer, specifying the number of integrals to be computed.
+      !    m    : integer(FP_SIZE), specifying the number of integrals to be computed.
       !    wrk1 : real array,length n. used as working space
       !    wrk2 : real array,length n. used as working space
       !
@@ -2046,14 +2065,14 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in) :: n,m
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in) :: n,m
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n),c(n),alfa(m)
-      real(RKIND), intent(inout) :: wrk1(n),wrk2(n)
-      real(RKIND), intent(out) :: ress(m),resc(m)
+      real(FP_REAL), intent(in) :: t(n),c(n),alfa(m)
+      real(FP_REAL), intent(inout) :: wrk1(n),wrk2(n)
+      real(FP_REAL), intent(out) :: ress(m),resc(m)
       !  ..local scalars..
-      integer :: i,n4
+      integer(FP_SIZE) :: i,n4
 
       n4 = n-4
       !  before starting computations a data check is made. in the input data
@@ -2100,17 +2119,17 @@ module fitpack_core
       !  ..
       pure subroutine fpader(t,n,c,k1,x,l,d)
       !  ..scalar arguments..
-      real(RKIND), intent(in)  :: x
-      integer, intent(in)      :: n,k1,l
+      real(FP_REAL),    intent(in)  :: x
+      integer(FP_SIZE), intent(in)      :: n,k1,l
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n),c(n)
-      real(RKIND), intent(out) :: d(k1)
+      real(FP_REAL),    intent(in)  :: t(n),c(n)
+      real(FP_REAL),    intent(out) :: d(k1)
 
       !  ..local scalars..
-      integer :: i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
-      real(RKIND) :: ak,fac
+      integer(FP_SIZE) :: i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
+      real(FP_REAL) :: ak,fac
       !  ..local array..
-      real(RKIND) :: h(20)
+      real(FP_REAL) :: h(20)
       !  ..
       lk = l-k1
       do i=1,k1
@@ -2168,15 +2187,15 @@ module fitpack_core
       !  if no computer words are available at that moment, the error parameter ier is set to 1.
       !  ..
       !  ..scalar arguments..
-      integer, intent(in)    :: maxtr,n1
-      integer, intent(inout) :: count,merk
-      integer, intent(out)   :: ier
+      integer(FP_SIZE), intent(in)    :: maxtr,n1
+      integer(FP_SIZE), intent(inout) :: count,merk
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
-      integer, intent(in)    :: jbind(n1)
+      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      integer(FP_SIZE), intent(in)    :: jbind(n1)
       !  ..local scalars..
-      integer :: k,level,point
-      logical :: is_left
+      integer(FP_SIZE) :: k,level,point
+      logical(FP_BOOL) :: is_left
 
       !  ..
       point   = 1
@@ -2187,11 +2206,11 @@ module fitpack_core
           point = k
           if (info(k)-jbind(level)<0) then
               k       = right(point)
-              is_left = .false.
+              is_left = FP_FALSE
           else ! info(k)-jbind(level)==0
               level  = level+1
               k       = left(point)
-              is_left = .true.
+              is_left = FP_TRUE
           endif
       end do loop
 
@@ -2234,12 +2253,12 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer, intent(in) :: idim,k,n,nc,np
+      integer(FP_SIZE), intent(in) :: idim,k,n,nc,np
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n),cp(np)
-      real(RKIND), intent(out) :: c(nc),cc(nc),t1(n),t2(n)
+      real(FP_REAL),    intent(in) :: t(n),cp(np)
+      real(FP_REAL),    intent(out) :: c(nc),cc(nc),t1(n),t2(n)
       !  ..local scalars..
-      integer :: i,ii,j,jj,k1,l,l1,n1,n2,nk1,nk2
+      integer(FP_SIZE) :: i,ii,j,jj,k1,l,l1,n1,n2,nk1,nk2
       !  ..
       k1  = k+1
       nk1 = n-k1
@@ -2300,22 +2319,23 @@ module fitpack_core
       pure function fpback(a,z,n,k,nest) result(c)
 
       !  ..scalar arguments..
-      integer, intent(in) :: n,k,nest
+      integer(FP_SIZE), intent(in) :: n,k,nest
       !  ..array arguments..
-      real(RKIND), intent(in)  :: a(nest,k),z(n)
-      real(RKIND)              :: c(n)
+      real(FP_REAL), intent(in)  :: a(nest,k),z(n)
+      real(FP_REAL)              :: c(n)
       !  ..local scalars..
-      real(RKIND) :: store
-      integer :: i,i1,j,k1,l,m
+      real(FP_REAL) :: store
+      integer(FP_SIZE) :: i,i1,j,k1,l,m,jm1
       !  ..
       k1   = k-1
       c(n) = z(n)/a(n,1)
       i    = n-1
       if (i==0) return
 
+      jm1 = 1
       rows: do j=2,n
         store = z(i)
-        i1 = merge(j-1,k1,j<=k1)
+        i1 = merge(jm1,k1,j<=k1)
         m = i
         do l=1,i1
           m = m+1
@@ -2323,6 +2343,7 @@ module fitpack_core
         end do
         c(i) = store/a(i,1)
         i = i-1
+        jm1 = j
       end do rows
 
       end function fpback
@@ -2336,13 +2357,13 @@ module fitpack_core
       pure function fpbacp(a,b,z,n,k,k1,nest) result(c)
 
       !  ..scalar arguments..
-      integer, intent(in) :: n,k,k1,nest
+      integer(FP_SIZE), intent(in) :: n,k,k1,nest
       !  ..array arguments..
-      real(RKIND), intent(in) :: a(nest,k1),b(nest,k),z(n)
-      real(RKIND) :: c(n)
+      real(FP_REAL), intent(in) :: a(nest,k1),b(nest,k),z(n)
+      real(FP_REAL) :: c(n)
       !  ..local scalars..
-      integer :: i,i1,j,l,l0,l1,n2
-      real(RKIND) :: store
+      integer(FP_SIZE) :: i,i1,j,l,l0,l1,n2
+      real(FP_REAL) :: store
       !  ..
       n2 = n-k
       l  = n
@@ -2403,7 +2424,7 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : real array,length n, containing the knots.
-      !    n    : integer, containing the number of knots.
+      !    n    : integer(FP_SIZE), containing the number of knots.
       !    par  : real, containing the value of the parameter par.
       !
       !  output parameters:
@@ -2414,21 +2435,21 @@ module fitpack_core
       !    n >= 10, t(4) < t(5) < ... < t(n-4) < t(n-3).
       !  ..
       !  ..scalar arguments..
-      integer, intent(in) :: n
-      real(RKIND), intent(in) :: par
+      integer(FP_SIZE), intent(in) :: n
+      real(FP_REAL),    intent(in) :: par
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n)
-      real(RKIND), intent(out) :: ress(n),resc(n)
+      real(FP_REAL),    intent(in) :: t(n)
+      real(FP_REAL),    intent(out) :: ress(n),resc(n)
       !  ..local scalars..
-      integer :: i,ic,ipj,is,j,jj,jp1,jp4,k,li,lj,ll,nmj,nm3,nm7
-      real(RKIND) :: ak,beta,c1,c2,delta,fac,f1,f2,f3,sign,s1,s2,term
+      integer(FP_SIZE) :: i,ic,ipj,is,j,jj,jp1,jp4,k,li,lj,ll,nmj,nm3,nm7
+      real(FP_REAL) :: ak,beta,c1,c2,delta,fac,f1,f2,f3,sign,s1,s2,term
       !  ..local arrays..
-      real(RKIND) :: co(5),si(5),hs(5),hc(5),rs(3),rc(3)
+      real(FP_REAL) :: co(5),si(5),hs(5),hc(5),rs(3),rc(3)
       !  ..
       !  initialization.
-      real(RKIND), parameter ::  eps = smallnum08
-      real(RKIND), parameter :: con1 = 0.5e-01_RKIND
-      real(RKIND), parameter :: con2 = 0.12e+03_RKIND
+      real(FP_REAL), parameter ::  eps = smallnum08
+      real(FP_REAL), parameter :: con1 = 0.5e-01_FP_REAL
+      real(FP_REAL), parameter :: con2 = 0.12e+03_FP_REAL
       nm3 = n-3
       nm7 = n-7
 
@@ -2578,15 +2599,15 @@ module fitpack_core
       pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
 
       !  ..scalar arguments..
-      integer    , intent(in)  :: nx,ny,kx,ky,mx,my
+      integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,mx,my
       !  ..array arguments..
-      real(RKIND), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      integer    , intent(out) :: lx(mx),ly(my)
-      real(RKIND), intent(out) :: wx(mx,kx+1),wy(my,ky+1),z(mx*my)
+      real(FP_REAL),    intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+      integer(FP_SIZE), intent(out) :: lx(mx),ly(my)
+      real(FP_REAL),    intent(out) :: wx(mx,kx+1),wy(my,ky+1),z(mx*my)
 
       !  ..local variables..
-      integer :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
-      real(RKIND) :: arg,sp,tb,te,h(MAX_ORDER+1)
+      integer(FP_SIZE) :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
+      real(FP_REAL) :: arg,sp,tb,te,h(MAX_ORDER+1)
 
       ! X
       kx1  = kx+1
@@ -2653,13 +2674,13 @@ module fitpack_core
       !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
       !   Thus it is imperative that that k <= l <= n-k but this is not checked.
       pure function fpbspl(t,n,k,x,l) result(h)
-         integer    , intent(in)  :: n,k,l
-         real(RKIND), intent(in)  :: x,t(n)
-         real(RKIND) :: h(MAX_ORDER+1)
+         integer(FP_SIZE), intent(in)  :: n,k,l
+         real(FP_REAL), intent(in)  :: x,t(n)
+         real(FP_REAL) :: h(MAX_ORDER+1)
 
          ! Local variables
-         real(RKIND) :: f,hh(MAX_ORDER+1)
-         integer     :: i,j,li,lj
+         real(FP_REAL) :: f,hh(MAX_ORDER+1)
+         integer(FP_SIZE) :: i,j,li,lj
 
          h(1) = one
          do j=1,k
@@ -2684,13 +2705,13 @@ module fitpack_core
       !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
       !  If all of the following conditions are fulfilled, the error parameter ier is set to zero. if one
       !  of the conditions is violated, an error flag is returned.
-      pure integer function fpchec(x,m,t,n,k) result(ier)
-         integer,     intent(in)  :: m,n,k
-         real(RKIND), intent(in) :: x(m),t(n)
+      pure integer(FP_FLAG) function fpchec(x,m,t,n,k) result(ier)
+         integer(FP_SIZE), intent(in)  :: m,n,k
+         real(FP_REAL), intent(in) :: x(m),t(n)
 
          ! Local variables
-         integer :: i,j,k1,k2,l,nk1,nk2,nk3
-         real(RKIND) :: tj,tl
+         integer(FP_SIZE) :: i,j,k1,k2,l,nk1,nk2,nk3
+         real(FP_REAL) :: tj,tl
 
          ! Init sizes
          k1 = k+1
@@ -2759,12 +2780,12 @@ module fitpack_core
       !  is set to ten.
       !  ..
       !  ..scalar arguments..
-      integer, intent(in) :: m,n,k,ib,ie
+      integer(FP_SIZE), intent(in) :: m,n,k,ib,ie
       !  ..array arguments..
-      real(RKIND), intent(in) :: x(m),t(n)
+      real(FP_REAL), intent(in) :: x(m),t(n)
       !  ..local scalars..
-      integer :: i,ib1,ie1,j,jj,k1,k2,l,nk1,nk2,nk3
-      real(RKIND) :: tj,tl
+      integer(FP_SIZE) :: i,ib1,ie1,j,jj,k1,k2,l,nk1,nk2,nk3
+      real(FP_REAL) :: tj,tl
       !  ..
       k1 = k+1
       k2 = k1+1
@@ -2827,14 +2848,14 @@ module fitpack_core
       ! x(i),i=1,2,...,m.
       ! if all of the following conditions are fulfilled, ier is set to zero.
       ! if one of the conditions is violated ier is set to ten.
-      pure integer function fpchep(x,m,t,n,k) result(ier)
+      pure integer(FP_FLAG) function fpchep(x,m,t,n,k) result(ier)
           !  ..scalar arguments..
-          integer, intent(in) :: m,n,k
+          integer(FP_SIZE), intent(in) :: m,n,k
           !  ..array arguments..
-          real(RKIND), intent(in) :: x(m),t(n)
+          real(FP_REAL), intent(in) :: x(m),t(n)
           !  ..local scalars..
-          integer :: i,i1,i2,j,j1,k1,k2,l,l1,l2,mm,m1,nk1,nk2
-          real(RKIND) :: per,tj,tl,xi
+          integer(FP_SIZE) :: i,i1,i2,j,j1,k1,k2,l,l1,l2,mm,m1,nk1,nk2
+          real(FP_REAL) :: per,tj,tl,xi
           !  ..
           k1  = k+1
           k2  = k1+1
@@ -2916,25 +2937,26 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,tol
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,idim,m,mx,k,nest,maxit,k1,k2,nc
-      integer,     intent(inout) :: n,ier
+      real(FP_REAL),    intent(in)    :: s,tol
+      real(FP_REAL),    intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,idim,m,mx,k,nest,maxit,k1,k2,nc
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(inout) :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
-                                    a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
-      integer,     intent(inout) :: nrdata(nest)
+      real(FP_REAL),    intent(in)    :: u(m),x(mx),w(m)
+      real(FP_REAL),    intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a1(nest,k1), &
+                                         a2(nest,k),b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
+      integer(FP_SIZE), intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(RKIND) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
+      real(FP_REAL) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
                      term,ui,wi,rn
-      integer :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
-                 nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
+      integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+                          nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),h1(7),h2(6),xi(MAX_IDIM)
-      logical :: done,check1,check3,success
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6),xi(MAX_IDIM)
+      logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
       fp0   = zero
@@ -3307,7 +3329,7 @@ module fitpack_core
 
           ! determine the number of knots nplus we are going to add.
           rn    = nplus
-          npl1  = merge(int(rn*fpms/(fpold-fp)),nplus*2,fpold-fp>acc)
+          npl1  = merge(int(rn*fpms/(fpold-fp)),nplus*ITWO,fpold-fp>acc)
           nplus = min(nplus*2,max(npl1,nplus/2,1))
           fpold = fp
 
@@ -3352,7 +3374,7 @@ module fitpack_core
 
           add_new_knots: do l=1,nplus
               ! add a new knot
-              call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+              call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,IONE)
 
               ! if n=nmax we locate the knots as for interpolation
               if (n==nmax) then
@@ -3415,8 +3437,8 @@ module fitpack_core
       if (l>0) p = p + sum(a1(1:n10,1))
       rn   = n7
       p    = rn/p
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       !  iteration process to find the root of f(p) = s.
       find_root: do iter=1,maxit
@@ -3590,14 +3612,14 @@ module fitpack_core
       end subroutine fpclos
 
       pure subroutine fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
-         integer, intent(in) :: idim,k,m,mx,n,nc,nest
-         integer, intent(inout) :: kk,kk1
-         real(RKIND), intent(in) :: u(m),x(mx),per,fp0,s
-         real(RKIND), intent(inout) :: t(nest),c(nc),fp,fpint(nest)
-         integer, intent(inout) :: nrdata(nest)
-         logical, intent(out) :: done
+         integer(FP_SIZE), intent(in) :: idim,k,m,mx,n,nc,nest
+         integer(FP_SIZE), intent(inout) :: kk,kk1
+         real(FP_REAL),    intent(in) :: u(m),x(mx),per,fp0,s
+         real(FP_REAL),    intent(inout) :: t(nest),c(nc),fp,fpint(nest)
+         integer(FP_SIZE), intent(inout) :: nrdata(nest)
+         logical(FP_BOOL), intent(out) :: done
 
-         integer :: i,j,j1,jj,m1
+         integer(FP_SIZE) :: i,j,j1,jj,m1
 
          m1 = m-1
          done = .false.
@@ -3649,20 +3671,20 @@ module fitpack_core
       pure subroutine fpcoco(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,e,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(inout) :: sq
-      integer,     intent(in)    :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
-      integer,     intent(inout) :: n
-      integer,     intent(out)   :: ier
+      real(FP_REAL),    intent(in)    :: s
+      real(FP_REAL),    intent(inout) :: sq
+      integer(FP_SIZE), intent(in)    :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer,     intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: x(m),y(m),w(m),v(m)
-      real(RKIND), intent(inout) :: t(nest),c(nest),sx(m),e(nest),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      real(FP_REAL),    intent(in)    :: x(m),y(m),w(m),v(m)
+      real(FP_REAL),    intent(inout) :: t(nest),c(nest),sx(m),e(nest),wrk(lwrk)
 
-      logical,     intent(inout) ::  bind(nest)
+      logical(FP_BOOL), intent(inout) ::  bind(nest)
       !  ..local scalars..
-      integer :: i,ia,ib,ic,iq,it,iu,iz,izz,i1,j,k,l,l1,m1,nmax,nr,n4,n6,n8,ji,jib,jjb,jl,jr,ju,mb,nm
-      real(RKIND) :: sql,sqmax,term,tj,xi
+      integer(FP_SIZE) :: i,ia,ib,ic,iq,it,iu,iz,izz,i1,j,k,l,l1,m1,nmax,nr,n4,n6,n8,ji,jib,jjb,jl,jr,ju,mb,nm
+      real(FP_REAL) :: sql,sqmax,term,tj,xi
       !  ..subroutine references..
       !    fpcosp,fpbspl,fpadno,fpdeno,fpseno,fpfrno
       !  ..
@@ -3843,21 +3865,22 @@ module fitpack_core
                              tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,tol
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: ib,ie,iopt,idim,k,k1,k2,m,mx,maxit,nc,nest
-      integer,     intent(inout) :: n,ier
+      real(FP_REAL),    intent(in)    :: s,tol
+      real(FP_REAL),    intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: ib,ie,iopt,idim,k,k1,k2,m,mx,maxit,nc,nest
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer,     intent(inout) :: nrdata(nest)
+      real(FP_REAL), intent(in)    :: u(m),x(mx),w(m)
+      real(FP_REAL), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      integer(FP_SIZE), intent(inout) :: nrdata(nest)
       !  ..local scalars..
-      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer :: i,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
+      real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      integer(FP_SIZE) :: i,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
                  nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
-      logical :: new,check1,check3,success
+      logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),xi(MAX_IDIM)
+      real(FP_REAL) :: h(MAX_ORDER+1),xi(MAX_IDIM)
 
       fpold = zero
       fp0 = zero
@@ -3885,10 +3908,10 @@ module fitpack_core
       nmin = 2*k1
 
       !  find which data points are to be considered.
-      mb = merge(2,1,ib>0)
-      jb = merge(ib,1,ib>0)
-      me = merge(m-1,m,ie>0)
-      je = merge(ie,1,ie>0)
+      mb = merge(ITWO,IONE,ib>0)
+      jb = merge(ib,IONE,ib>0)
+      me = merge(m-IONE,m,ie>0)
+      je = merge(ie,IONE,ie>0)
 
       bootstrap: if (iopt>=0) then
 
@@ -4132,7 +4155,7 @@ module fitpack_core
         add_new_knots: do l=1,nplus
 
            ! add a new knot.
-           call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+           call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,IONE)
 
            ! if n=nmax we locate the knots as for interpolation
            if (n==nmax) then
@@ -4190,8 +4213,8 @@ module fitpack_core
       p  = sum(a(1:nn,1))
       rn = nn
       p  = rn/p
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
       n8 = n-nmin
 
       !  iteration process to find the root of f(p) = s.
@@ -4289,20 +4312,20 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(out) :: sq
-      integer,     intent(in)  :: m,n,maxtr,maxbin,nm,mb
-      integer,     intent(out) :: ier
+      real(FP_REAL),    intent(out) :: sq
+      integer(FP_SIZE), intent(in)  :: m,n,maxtr,maxbin,nm,mb
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)  :: x(m),y(m),w(m),t(n),e(n)
-      real(RKIND), intent(inout) :: c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
-      integer, intent(inout)   :: info(maxtr),up(maxtr),left(maxtr),right(maxtr)
-      integer, intent(inout)   :: ibind(mb),jbind(mb)
-      logical, intent(inout)   :: bind(n)
+      real(FP_REAL),    intent(in)  :: x(m),y(m),w(m),t(n),e(n)
+      real(FP_REAL),    intent(inout) :: c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
+      integer(FP_SIZE), intent(inout)   :: info(maxtr),up(maxtr),left(maxtr),right(maxtr)
+      integer(FP_SIZE), intent(inout)   :: ibind(mb),jbind(mb)
+      logical(FP_BOOL), intent(inout)   :: bind(n)
       !  ..local scalars..
-      integer :: count,i,i1,j,j1,j2,j3,k,kdim,k1,k2,k3,k4,k5,k6,l,l1,l2,l3,merk,nbind,violated,n1,n4,n6
-      real(RKIND) :: f,wi,xi
+      integer(FP_SIZE) :: count,i,i1,j,j1,j2,j3,k,kdim,k1,k2,k3,k4,k5,k6,l,l1,l2,l3,merk,nbind,violated,n1,n4,n6
+      real(FP_REAL) :: f,wi,xi
       !  ..local array..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..subroutine references..
       !    fpbspl,fpadno,fpdeno,fpfrno,fpseno
       !  ..
@@ -4356,7 +4379,7 @@ module fitpack_core
           end do
 
           ! evaluate the four non-zero cubic b-splines nj(xi),j=l-3,...l.
-          h = fpbspl(t,n,3,xi,l)
+          h = fpbspl(t,n,DEGREE_3,xi,l)
 
           ! store in q these values h(1),h(2),...h(4).
           q(i,1:4) = h(1:4)
@@ -4680,13 +4703,13 @@ module fitpack_core
       pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
 
           !  ..scalar arguments..
-          real(RKIND), intent(in)  :: a,b,par,sia,coa,sib,cob
-          real(RKIND), intent(out) :: ress,resc
+          real(FP_REAL), intent(in)  :: a,b,par,sia,coa,sib,cob
+          real(FP_REAL), intent(out) :: ress,resc
 
           !  ..local scalars..
-          integer :: i,j
-          real(RKIND) :: ab,ab4,ai,alfa,beta,b2,b4,fac,f1,f2
-          real(RKIND), parameter :: eps = smallnum10
+          integer(FP_SIZE) :: i,j
+          real(FP_REAL) :: ab,ab4,ai,alfa,beta,b2,b4,fac,f1,f2
+          real(FP_REAL), parameter :: eps = smallnum10
 
           ab   = b-a
           ab4  = ab**4
@@ -4735,23 +4758,24 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)  :: xb,xe,s,tol
-      real(RKIND), intent(out) :: fp
-      integer,     intent(in)  :: iopt,m,k,nest,maxit,k1,k2
-      integer,     intent(out) :: n,ier
+      real(FP_REAL),    intent(in)  :: xb,xe,s,tol
+      real(FP_REAL),    intent(out) :: fp
+      integer(FP_SIZE), intent(in)  :: iopt,m,k,nest,maxit,k1,k2
+      integer(FP_SIZE), intent(out) :: n
+      integer(FP_FLAG), intent(out) :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a(nest,k1),b(nest,k2),&
+      real(FP_REAL), intent(in)    :: x(m),y(m),w(m)
+      real(FP_REAL), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a(nest,k1),b(nest,k2),&
                                     g(nest,k2),q(m,k1)
-      integer,     intent(inout) :: nrdata(nest)
+      integer(FP_SIZE), intent(inout) :: nrdata(nest)
       !  ..local scalars..
-      real(RKIND) :: acc,cos,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,&
+      real(FP_REAL) :: acc,cos,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,&
                      term,wi,xi,yi
-      integer :: i,it,iter,i2,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      integer(FP_SIZE) :: i,it,iter,i2,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1)
-      logical :: new,check1,check3,success
+      real(FP_REAL) :: h(MAX_ORDER+1)
+      logical(FP_BOOL) :: new,check1,check3,success
 
       fpold = zero
       fp0 = zero
@@ -4979,7 +5003,7 @@ module fitpack_core
         add_new_knots: do l=1,nplus
 
             ! add a new knot.
-            call fpknot(x,m,t,n,fpint,nrdata,nrint,nest,1)
+            call fpknot(x,m,t,n,fpint,nrdata,nrint,nest,IONE)
 
             ! if n=nmax we locate the knots as for interpolation.
             if (n==nmax) then
@@ -5042,8 +5066,8 @@ module fitpack_core
       p  = sum(a(1:nk1,1))
       rn = nk1
       p  = rn/p
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
       n8 = n-nmin
 
       !  iteration process to find the root of f(p) = s.
@@ -5124,22 +5148,22 @@ module fitpack_core
       !
       !  output parameters:
       !    x      : real array,length 3, which contains the real zeros of p(x)
-      !    n      : integer, giving the number of real zeros of p(x).
+      !    n      : integer(FP_SIZE), giving the number of real zeros of p(x).
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: a,b,c,d
-      integer,     intent(out) :: n
+      real(FP_REAL),    intent(in) :: a,b,c,d
+      integer(FP_SIZE), intent(out) :: n
       !  ..array argument..
-      real(RKIND), intent(out) :: x(3)
+      real(FP_REAL), intent(out) :: x(3)
       !  ..local scalars..
-      integer :: i
-      real(RKIND) :: a1,b1,c1,df,disc,d1,f,p3,q,r,step,u,u1,u2,y
+      integer(FP_SIZE) :: i
+      real(FP_REAL) :: a1,b1,c1,df,disc,d1,f,p3,q,r,step,u,u1,u2,y
 
       !  set constants
-      real(RKIND), parameter :: ovfl = 1.0e4_RKIND
-      real(RKIND), parameter :: tent = 0.1_RKIND
-      real(RKIND), parameter :: pi3  = datan(one)/0.75_RKIND
-      real(RKIND), parameter :: e3   = tent/0.3_RKIND
+      real(FP_REAL), parameter :: ovfl = 1.0e4_FP_REAL
+      real(FP_REAL), parameter :: tent = 0.1_FP_REAL
+      real(FP_REAL), parameter :: pi3  = datan(one)/0.75_FP_REAL
+      real(FP_REAL), parameter :: e3   = tent/0.3_FP_REAL
 
       a1 = abs(a)
       b1 = abs(b)
@@ -5228,12 +5252,12 @@ module fitpack_core
       pure subroutine fpcyt1(a,n,nn)
 
           !  ..scalar arguments..
-          integer, intent(in) :: n,nn
+          integer(FP_SIZE), intent(in) :: n,nn
           !  ..array arguments..
-          real(RKIND), intent(inout) :: a(nn,6)
+          real(FP_REAL), intent(inout) :: a(nn,6)
           !  ..local scalars..
-          real(RKIND) aa,beta,gamma,sum,teta,v
-          integer i,n1,n2
+          real(FP_REAL) :: aa,beta,gamma,sum,teta,v
+          integer(FP_SIZE) :: i,n1,n2
           !  ..
           n2   = n-2
           beta = one/a(1,2)
@@ -5276,13 +5300,13 @@ module fitpack_core
       ! where matrix a is a cyclic tridiagonal matrix, decomposed using subroutine fpsyt1.
       pure subroutine fpcyt2(a,n,b,c,nn)
           !  ..scalar arguments..
-          integer, intent(in) :: n,nn
+          integer(FP_SIZE), intent(in) :: n,nn
           !  ..array arguments..
-          real(RKIND), intent(in)  :: a(nn,6),b(n)
-          real(RKIND), intent(out) :: c(n)
+          real(FP_REAL), intent(in)  :: a(nn,6),b(n)
+          real(FP_REAL), intent(out) :: c(n)
           !  ..local scalars..
-          real(RKIND) :: cc,sum
-          integer :: i,j,j1,n1
+          real(FP_REAL) :: cc,sum
+          integer(FP_SIZE) :: i,j,j1,n1
           !  ..
           c(1) = b(1)*a(1,4)
           sum  = c(1)*a(1,5)
@@ -5311,13 +5335,13 @@ module fitpack_core
       pure subroutine fpdeno(maxtr,up,left,right,nbind,merk)
       !  ..
       !  ..scalar arguments..
-      integer, intent(in)  :: maxtr,nbind
-      integer, intent(out) :: merk
+      integer(FP_SIZE), intent(in)  :: maxtr,nbind
+      integer(FP_SIZE), intent(out) :: merk
       !  ..array arguments..
-      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr)
+      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr)
 
       ! ..local scalars ..
-      integer :: i,j,k,l,level,point
+      integer(FP_SIZE) :: i,j,k,l,level,point
 
       ! Begin from root node
       i     = 1
@@ -5401,15 +5425,15 @@ module fitpack_core
       pure subroutine fpdisc(t,n,k2,b,nest)
 
       !  ..scalar arguments..
-      integer, intent(in) :: n,k2,nest
+      integer(FP_SIZE), intent(in) :: n,k2,nest
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n)
-      real(RKIND), intent(inout) :: b(nest,k2)
+      real(FP_REAL), intent(in) :: t(n)
+      real(FP_REAL), intent(inout) :: b(nest,k2)
       !  ..local scalars..
-      real(RKIND) :: an,fac,prod
-      integer i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
+      real(FP_REAL) :: an,fac,prod
+      integer(FP_SIZE) :: i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
       !  ..local array..
-      real(RKIND) :: h(12)
+      real(FP_REAL) :: h(12)
       !  ..
       k1    = k2-1
       k     = k1-1
@@ -5450,13 +5474,14 @@ module fitpack_core
       pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
       !  ..scalar arguments..
-      integer, intent(in)    :: maxtr,n1
-      integer, intent(inout) :: point,merk
-      integer, intent(out)   :: count,ier
+      integer(FP_SIZE), intent(in)    :: maxtr,n1
+      integer(FP_SIZE), intent(inout) :: point,merk
+      integer(FP_SIZE), intent(out)   :: count
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer, intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
       !  ..local scalars
-      integer :: i,j,k,l,n,level
+      integer(FP_SIZE) :: i,j,k,l,n,level
       !  ..
       ier    = 1
       level  = 1
@@ -5542,11 +5567,11 @@ module fitpack_core
 
       !  subroutine fpgivs calculates the parameters of a givens transformation .
       elemental subroutine fpgivs(piv,ww,cos,sin)
-          real(RKIND), intent(in)    :: piv
-          real(RKIND), intent(inout) :: ww
-          real(RKIND), intent(out)   :: cos,sin
+          real(FP_REAL), intent(in)    :: piv
+          real(FP_REAL), intent(inout) :: ww
+          real(FP_REAL), intent(out)   :: cos,sin
           !  ..local scalars..
-          real(RKIND) :: dd,store
+          real(FP_REAL) :: dd,store
 
           store = abs(piv)
           dd  = merge(store*sqrt(one+(ww/piv)**2), &
@@ -5559,33 +5584,34 @@ module fitpack_core
 
 
       ! Compute spline coefficients on a rectangular grid
-      pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,iback,u,mu,v, &
+      pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v, &
                              mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,aa,bb,cc,cosi,nru,nrv)
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(out)   :: sq
-      real(RKIND), intent(inout) :: fp  ! computed if iback==0
-      real(RKIND), intent(out)   :: p
-      integer    , intent(inout) :: ifsu,ifsv,ifbu,ifbv
-      integer    , intent(in)    :: iback,mu,mv,mz,iop0,iop1,nu,nv,nc,mm,mvnu
+      real(FP_REAL), intent(out)   :: sq
+      real(FP_REAL), intent(inout) :: fp  ! computed if .not.lback
+      real(FP_REAL), intent(out)   :: p
+      integer(FP_SIZE),  intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      logical(FP_BOOL),  intent(in)    :: lback
+      integer(FP_SIZE),  intent(in)    :: mu,mv,mz,iop0,iop1,nu,nv,nc,mm,mvnu
       !  ..array arguments..
-      real(RKIND), intent(inout) :: fpu(nu),fpv(nv)   ! if iback==0
-      real(RKIND), intent(inout) :: bu(nu,5),bv(nv,5) ! ifbu,ifbv
-      real(RKIND), intent(in)    :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv)
-      real(RKIND), intent(inout) :: spu(mu,4),spv(mv,4),cosi(2,nv),au(nu,5),av1(nv,6),av2(nv,4),right(mm), &
+      real(FP_REAL), intent(inout) :: fpu(nu),fpv(nv)   ! if .not.lback
+      real(FP_REAL), intent(inout) :: bu(nu,5),bv(nv,5) ! ifbu,ifbv
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv)
+      real(FP_REAL), intent(inout) :: spu(mu,4),spv(mv,4),cosi(2,nv),au(nu,5),av1(nv,6),av2(nv,4),right(mm), &
                                     aa(2,mv),bb(2,nv),c(nc),cc(nv),q(mvnu)
-      integer, intent(inout) :: nru(mu),nrv(mv)
+      integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
-      real(RKIND) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
+      real(FP_REAL) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
 
-      integer :: i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jk,jper,j0,k,k1,&
+      integer(FP_SIZE) :: i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jk,jper,j0,k,k1,&
                  l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number,numu,numu1,numv,&
                  numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
 
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
 
       !  let
       !               |   (spu)    |            |   (spv)    |
@@ -5653,7 +5679,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            h = fpbspl(tu,nu,3,arg,l)
+            h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
 
@@ -5676,7 +5702,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
              end do
-             h = fpbspl(tv,nv,3,arg,l)
+             h = fpbspl(tv,nv,DEGREE_3,arg,l)
              spv(it,1:4) = h(1:4)
              nrv(it) = number
           end do
@@ -5689,7 +5715,7 @@ module fitpack_core
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
-                     h = fpbspl(tv,nv,3,arg,l)
+                     h = fpbspl(tv,nv,DEGREE_3,arg,l)
                      av1(i,1:3) = h(1:3)
                      cosi(:,i) = [cos(arg),sin(arg)]
                   end do
@@ -5708,12 +5734,12 @@ module fitpack_core
       if (p>zero) then
           !  calculate the non-zero elements of the matrix (bu).
           if (ifbu==0 .and. nu8/=0) then
-             call fpdisc(tu,nu,5,bu,nu)
+             call fpdisc(tu,nu,DEGREE_5,bu,nu)
              ifbu = 1
           endif
           !  calculate the non-zero elements of the matrix (bv).
           if (ifbv==0 .and. nv8/=0) then
-             call fpdisc(tv,nv,5,bv,nv)
+             call fpdisc(tv,nv,DEGREE_5,bv,nv)
              ifbv = 1
           endif
       endif
@@ -6017,7 +6043,7 @@ module fitpack_core
       end do avv_iterations
 
       !  test whether the b-spline coefficients must be determined.
-      spline_coefs: if (iback==0) then
+      spline_coefs: if (.not.lback) then
 
           !  backward substitution to obtain the b-spline coefficients as the solution of the linear
           !  system    (rv) (cr) (ru)' = h.
@@ -6025,7 +6051,7 @@ module fitpack_core
           !  first step: solve the system  (rv) (c1) = h.
           k = 1
           do i=1,nuu
-             c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
+             c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,DEGREE_4,DEGREE_5,nv)
              k = k+nv7
           end do
 
@@ -6034,7 +6060,7 @@ module fitpack_core
           do j=1,nv7
             k = k+1
             right(:nuu) = c(k:k+(nuu-1)*nv7:nv7)
-            right(:nuu) = fpback(au,right,nuu,5,nu)
+            right(:nuu) = fpback(au,right,nuu,DEGREE_5,nu)
             c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
           end do
 
@@ -6134,33 +6160,33 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer, intent(inout) :: ifsu ! (spu) needs to be determined if /=0 [todo: make logical]
-      integer, intent(inout) :: ifsv ! (spv) needs to be determined
-      integer, intent(inout) :: ifbu ! (bu)  needs to be determined
-      integer, intent(inout) :: ifbv ! (bv)  needs to be determined
-      integer, intent(in) :: idim,mu,mv,mz,nu,nv,nc,mm,mvnu ! sizes
+      integer(FP_SIZE), intent(inout) :: ifsu ! (spu) needs to be determined if /=0 [todo: make logical]
+      integer(FP_SIZE), intent(inout) :: ifsv ! (spv) needs to be determined
+      integer(FP_SIZE), intent(inout) :: ifbu ! (bu)  needs to be determined
+      integer(FP_SIZE), intent(inout) :: ifbv ! (bv)  needs to be determined
+      integer(FP_SIZE), intent(in) :: idim,mu,mv,mz,nu,nv,nc,mm,mvnu ! sizes
 
       !  ..array arguments..
-      real(RKIND), intent(inout) :: c(nc*idim),right(mm*idim),q(mvnu),au(nu,5),av(nv,5),au1(nu,4),av1(nv,4)
-      real(RKIND), intent(in) :: u(mu),v(mv),z(mz*idim),tu(nu),tv(nv)
-      integer,     intent(in) :: ipar(2)
+      real(FP_REAL), intent(inout) :: c(nc*idim),right(mm*idim),q(mvnu),au(nu,5),av(nv,5),au1(nu,4),av1(nv,4)
+      real(FP_REAL), intent(in) :: u(mu),v(mv),z(mz*idim),tu(nu),tv(nv)
+      integer(FP_SIZE), intent(in) :: ipar(2)
 
-      real(RKIND), intent(in)  :: p
-      real(RKIND), intent(out) :: fp,fpu(nu),fpv(nv)
+      real(FP_REAL), intent(in)  :: p
+      real(FP_REAL), intent(out) :: fp,fpu(nu),fpv(nv)
 
       ! Only modified if ifsu, ifsv
-      real(RKIND), intent(inout) :: spu(mu,4),spv(mv,4)
-      integer,     intent(inout) :: nru(mu),nrv(mv)
+      real(FP_REAL), intent(inout) :: spu(mu,4),spv(mv,4)
+      integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
 
       ! Only modified if ifbu,ifbv
-      real(RKIND), intent(inout) :: bu(nu,5),bv(nv,5)
+      real(FP_REAL), intent(inout) :: bu(nu,5),bv(nv,5)
 
       !  ..local scalars..
-      real(RKIND) :: arg,fac,term,value
-      integer :: i,id,ii,it,iz,i1,i2,j,jz,k,k1,k2,l,l1,l2,mvv,k0,muu,ncof,nroldu,nroldv,number,nmd,numu, &
-                 numu1,numv,numv1,nuu,nvv,nu4,nu7,nu8,nv4,nv7,nv8,n33
+      real(FP_REAL) :: arg,fac,term,value
+      integer(FP_SIZE) :: i,id,ii,it,iz,i1,i2,j,jz,k,k1,k2,l,l1,l2,mvv,k0,muu,ncof,nroldu,nroldv,number,nmd, &
+                 numu,numu1,numv,numv1,nuu,nvv,nu4,nu7,nu8,nv4,nv7,nv8,n33
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..subroutine references..
       !    fpback,fpbspl,fpdisc,fpbacp,fptrnp,fptrpe
       !  ..
@@ -6220,7 +6246,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            h = fpbspl(tu,nu,3,arg,l)
+            h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
           end do spu_rows
@@ -6242,7 +6268,7 @@ module fitpack_core
                l1 = l+1
                number = number+1
             end do
-            h = fpbspl(tv,nv,3,arg,l)
+            h = fpbspl(tv,nv,DEGREE_3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
           end do spv_rows
@@ -6255,13 +6281,13 @@ module fitpack_core
 
          ! calculate the non-zero elements of the matrix (bu).
          if (ifbu==0 .and. nu8/=0) then
-            call fpdisc(tu,nu,5,bu,nu)
+            call fpdisc(tu,nu,DEGREE_5,bu,nu)
             ifbu = 1
          endif
 
          ! calculate the non-zero elements of the matrix (bv).
          if (ifbv==0 .and. nv8/=0) then
-            call fpdisc(tv,nv,5,bv,nv)
+            call fpdisc(tv,nv,DEGREE_5,bv,nv)
             ifbv = 1
          endif
 
@@ -6303,9 +6329,9 @@ module fitpack_core
       do ii=1,idim
           do i=1,nuu
              if (ipar(2)/=0) then
-                c(k:k+nvv-1) = fpbacp(av,av1,c(k),nvv,4,5,nv)
+                c(k:k+nvv-1) = fpbacp(av,av1,c(k),nvv,DEGREE_4,DEGREE_5,nv)
              else
-                c(k:k+nvv-1) = fpback(av,c(k),nvv,5,nv)
+                c(k:k+nvv-1) = fpback(av,c(k),nvv,DEGREE_5,nv)
              end if
              k = k+nvv
           end do
@@ -6322,9 +6348,9 @@ module fitpack_core
                 l = l+nvv
             end do
             if (ipar(1)/=0) then
-                right(:nuu) = fpbacp(au,au1,right,nuu,4,5,nu)
+                right(:nuu) = fpbacp(au,au1,right,nuu,DEGREE_4,DEGREE_5,nu)
             else
-                right(:nuu) = fpback(au,right,nuu,5,nu)
+                right(:nuu) = fpback(au,right,nuu,DEGREE_5,nu)
             end if
             l = k
             do i=1,nuu
@@ -6474,21 +6500,21 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: p
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: mx,my,mz,kx,ky,nx,ny,nc,mm,mynx,kx1,kx2,ky1,ky2
-      integer,     intent(inout) :: ifsx,ifsy,ifbx,ifby
+      real(FP_REAL), intent(in)    :: p
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: mx,my,mz,kx,ky,nx,ny,nc,mm,mynx,kx1,kx2,ky1,ky2
+      integer(FP_SIZE), intent(inout) :: ifsx,ifsy,ifbx,ifby
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(mx),y(my),z(mz),tx(nx),ty(ny)
-      real(RKIND), intent(inout) :: c(nc),spx(mx,kx1),spy(my,ky1),right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),&
+      real(FP_REAL), intent(in)    :: x(mx),y(my),z(mz),tx(nx),ty(ny)
+      real(FP_REAL), intent(inout) :: c(nc),spx(mx,kx1),spy(my,ky1),right(mm),q(mynx),ax(nx,kx2),bx(nx,kx2),&
                                     ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
-      integer    , intent(inout) :: nrx(mx),nry(my)
+      integer(FP_SIZE),  intent(inout) :: nrx(mx),nry(my)
       !  ..local scalars..
-      real(RKIND) :: arg,cos,fac,pinv,piv,sin,term
-      integer :: i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,l,l1,ncof,nk1x,nk1y,&
+      real(FP_REAL) :: arg,cos,fac,pinv,piv,sin,term
+      integer(FP_SIZE) :: i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,l,l1,ncof,nk1x,nk1y,&
                  nrold,nroldx,nroldy,number,numx,numx1,numy,numy1,n1
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
 
       nk1x = nx-kx1
       nk1y = ny-ky1
@@ -6768,30 +6794,31 @@ module fitpack_core
       return
       end subroutine fpgrre
 
-      pure subroutine fpgrsp(ifsu,ifsv,ifbu,ifbv,iback,u,mu,v,                         &
+      pure subroutine fpgrsp(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v,                         &
                              mv,r,mr,dr,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,a0,a1,b0,b1,c0,c1,  &
                              cosi,nru,nrv)
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: p
-      real(RKIND), intent(inout) :: fp,sq
-      integer,     intent(in) :: iback,mu,mv,mr,iop0,iop1,nu,nv,nc,mm,mvnu
-      integer,     intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      real(FP_REAL), intent(in) :: p
+      real(FP_REAL), intent(inout) :: fp,sq
+      logical(FP_BOOL), intent(in) :: lback
+      integer(FP_SIZE), intent(in) :: mu,mv,mr,iop0,iop1,nu,nv,nc,mm,mvnu
+      integer(FP_SIZE), intent(inout) :: ifsu,ifsv,ifbu,ifbv
       !  ..array arguments..
-      real(RKIND), intent(in) :: u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv)
+      real(FP_REAL), intent(in) :: u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv)
 
-      real(RKIND), intent(inout) :: av1(nv,6),av2(nv,4),cosi(2,nv),spu(mu,4),spv(mv,4),right(mm),bu(nu,5), &
+      real(FP_REAL), intent(inout) :: av1(nv,6),av2(nv,4),cosi(2,nv),spu(mu,4),spv(mv,4),right(mm),bu(nu,5), &
                                     bv(nv,5),a0(2,mv),b0(2,nv),c0(nv),c1(nv),a1(2,mv),b1(2,nv),q(mvnu),&
                                     au(nu,5),c(nc),fpu(nu),fpv(nv)
-      integer,     intent(inout) :: nru(mu),nrv(mv)
+      integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
-      real(RKIND) :: arg,co,dr01,dr11,fac,fac0,fac1,pinv,piv,si,term
-      integer :: i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
+      real(FP_REAL) :: arg,co,dr01,dr11,fac,fac0,fac1,pinv,piv,si,term
+      integer(FP_SIZE) :: i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
                  j0,j1,k,k1,l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number, &
                  numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
 
       !  let
       !               |     (spu)      |            |     (spv)      |
@@ -6860,7 +6887,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
             end do
-            h = fpbspl(tu,nu,3,arg,l)
+            h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
           end do
@@ -6882,7 +6909,7 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
             end do
-            h =  fpbspl(tv,nv,3,arg,l)
+            h =  fpbspl(tv,nv,DEGREE_3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
           end do
@@ -6897,7 +6924,7 @@ module fitpack_core
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
-                     h = fpbspl(tv,nv,3,arg,l)
+                     h = fpbspl(tv,nv,DEGREE_3,arg,l)
                      av1(i,1:3) = h(1:3)
                      cosi(:,i)  = [cos(arg),sin(arg)]
                   end do
@@ -6914,13 +6941,13 @@ module fitpack_core
       if (p>zero) then
           !  calculate the non-zero elements of the matrix (bu).
           if(ifbu==0 .and. nu8/=0) then
-             call fpdisc(tu,nu,5,bu,nu)
+             call fpdisc(tu,nu,DEGREE_5,bu,nu)
              ifbu = 1
           endif
 
           !  calculate the non-zero elements of the matrix (bv).
           if (ifbv==0 .and. nv8/=0) then
-             call fpdisc(tv,nv,5,bv,nv)
+             call fpdisc(tv,nv,DEGREE_5,bv,nv)
              ifbv = 1
           endif
       endif
@@ -7258,20 +7285,20 @@ module fitpack_core
           end do avv_iterations
 
           !  test whether the b-spline coefficients must be determined.
-          if (iback/=0) return
+          if (lback) return
           !  backward substitution to obtain the b-spline coefficients as the
           !  solution of the linear system    (rv) (cr) (ru)' = h.
           !  first step: solve the system  (rv) (c1) = h.
           k = 1
           do i=1,nuu
-             c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,4,5,nv)
+             c(k:k+nv7-1) = fpbacp(av1,av2,c(k),nv7,DEGREE_4,DEGREE_5,nv)
              k = k+nv7
           end do
 
           !  second step: solve the system  (cr) (ru)' = (c1).
           do k=1,nv7
             right(:nuu) = c(k:k+(nuu-1)*nv7:nv7)
-            right(:nuu) = fpback(au,right,nuu,5,nu)
+            right(:nuu) = fpback(au,right,nuu,DEGREE_5,nu)
             c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
           end do
 
@@ -7377,15 +7404,16 @@ module fitpack_core
 
       !
       !  ..scalar arguments..
-      integer, intent(in) :: k,n,l,iopt,nest
-      integer, intent(out) :: nn
-      real(RKIND), intent(in) :: x
+      integer(FP_SIZE), intent(in) :: iopt
+      integer(FP_SIZE), intent(in) :: k,n,l,nest
+      integer(FP_SIZE), intent(out) :: nn
+      real(FP_REAL), intent(in) :: x
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(nest),c(nest)
-      real(RKIND), intent(out) :: tt(nest),cc(nest)
+      real(FP_REAL), intent(in)  :: t(nest),c(nest)
+      real(FP_REAL), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
-      real(RKIND) :: fac,per
-      integer :: i,i1,j,k1,m,mk,nk,nk1,nl,ll
+      real(FP_REAL) :: fac,per
+      integer(FP_SIZE) :: i,i1,j,k1,m,mk,nk,nk1,nl,ll
 
       !  ..
       k1  = k+1
@@ -7461,20 +7489,20 @@ module fitpack_core
       !    bint : array,length nk1, containing the integrals of the b-splines.
       !  ..
       !  ..scalars arguments..
-      integer,     intent(in)  :: n,nk1
-      real(RKIND), intent(in)  :: x,y
+      integer(FP_SIZE), intent(in)  :: n,nk1
+      real(FP_REAL),    intent(in)  :: x,y
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n)
-      real(RKIND), intent(out) :: bint(nk1)
+      real(FP_REAL),    intent(in)  :: t(n)
+      real(FP_REAL),    intent(out) :: bint(nk1)
 
       !  ..local scalars..
-      integer :: i,ia,ib,it,j,j1,k,k1,l,li,lj,lk,l0
-      logical :: lmin
-      real(RKIND) :: a,ak,arg,b,f
+      integer(FP_SIZE) :: i,ia,ib,it,j,j1,k,k1,l,li,lj,lk,l0
+      logical(FP_BOOL) :: lmin
+      real(FP_REAL) :: a,ak,arg,b,f
       !  ..local arrays..
-      real(RKIND) aint(6),h(MAX_ORDER+1),h1(6)
+      real(FP_REAL) aint(6),h(MAX_ORDER+1),h1(6)
 
-      integer, parameter :: nit = 2 ! number of iterations
+      integer(FP_SIZE), parameter :: nit = 2 ! number of iterations
 
       !  initialization.
       k1   = n-nk1
@@ -7584,17 +7612,17 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer, intent(in)    :: m,nest,istart
-      integer, intent(inout) :: n,nrint
+      integer(FP_SIZE), intent(in)    :: m,nest,istart
+      integer(FP_SIZE), intent(inout) :: n,nrint
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m)
-      real(RKIND), intent(inout) :: t(nest)
-      real(RKIND), intent(inout) :: fpint(nest)
-      integer    , intent(inout) :: nrdata(nest)
+      real(FP_REAL), intent(in)    :: x(m)
+      real(FP_REAL), intent(inout) :: t(nest)
+      real(FP_REAL), intent(inout) :: fpint(nest)
+      integer(FP_SIZE),  intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(RKIND) :: an,am,fpmax
-      integer :: ihalf,j,jbegin,jj,jk,jpoint,k,maxbeg,maxpt,next,nrx,number
+      real(FP_REAL) :: an,am,fpmax
+      integer(FP_SIZE) :: ihalf,j,jbegin,jj,jk,jpoint,k,maxbeg,maxpt,next,nrx,number
       !  ..
       number = 0
       maxpt  = 0
@@ -7689,22 +7717,22 @@ module fitpack_core
 
       !
       !  ..scalar arguments..
-      integer,     intent(inout) :: ifsu,ifsv,ifbu,ifbv
-      integer,     intent(in)    :: mu,mv,mz,nu,nv,nc,lwrk,nuest,nvest
-      real(RKIND), intent(in)    :: z0,step
-      real(RKIND), intent(inout) :: fp,p
+      integer(FP_SIZE), intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      integer(FP_SIZE), intent(in)    :: mu,mv,mz,nu,nv,nc,lwrk,nuest,nvest
+      real(FP_REAL), intent(in)    :: z0,step
+      real(FP_REAL), intent(inout) :: fp,p
       !  ..array arguments..
-      integer    , intent(in)    :: ider(2),iopt(3)
-      integer    , intent(inout) :: nru(mu),nrv(mv)
-      real(RKIND), intent(in)    :: u(mu),v(mv),z(mz),tu(nu),tv(nv)
-      real(RKIND), intent(inout) :: c(nc),dz(3),fpu(nu),fpv(nv),wrk(lwrk)
+      integer(FP_SIZE),  intent(in)    :: ider(2),iopt(3)
+      integer(FP_SIZE),  intent(inout) :: nru(mu),nrv(mv)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),z(mz),tu(nu),tv(nv)
+      real(FP_REAL), intent(inout) :: c(nc),dz(3),fpu(nu),fpv(nv),wrk(lwrk)
       !  ..local scalars..
-      real(RKIND) res,sq,sqq,step1,step2
-      integer i,id0,iop0,iop1,i1,j,l,laa,lau,lav1,lav2,lbb,lbu,lbv, &
-       lcc,lcs,lq,lri,lsu,lsv,l1,l2,mm,mvnu,number
+      real(FP_REAL) :: res,sq,sqq,step1,step2
+      integer(FP_SIZE) :: i,id0,iop0,iop1,i1,j,l,laa,lau,lav1,lav2,lbb,lbu,lbv, &
+                          lcc,lcs,lq,lri,lsu,lsv,l1,l2,mm,mvnu,number
       !  ..local arrays..
-      integer nr(3)
-      real(RKIND) delta(3),dzz(3),sum(3),a(6,6),g(6)
+      integer(FP_SIZE) :: nr(3)
+      real(FP_REAL) :: delta(3),dzz(3),sum(3),a(6,6),g(6)
 
       !  we partition the working space
       lsu  = 1
@@ -7726,7 +7754,7 @@ module fitpack_core
       !  we calculate the smoothing spline sp(u,v) according to the input values dz(i),i=1,2,3.
       iop0 = iopt(2)
       iop1 = iopt(3)
-      call fpgrdi(ifsu,ifsv,ifbu,ifbv,0,u,mu,v,mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,&
+      call fpgrdi(ifsu,ifsv,ifbu,ifbv,FP_FALSE,u,mu,v,mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,&
                   fp,fpu,fpv,mm,mvnu,wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1),&
                   wrk(lav2),wrk(lbu),wrk(lbv),wrk(laa),wrk(lbb),wrk(lcc),wrk(lcs),nru,nrv)
 
@@ -7771,14 +7799,14 @@ module fitpack_core
          step1  = delta(i)
 
          dzz(l) = dz(l)+step1
-         call fpgrdi(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sum(i),&
+         call fpgrdi(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sum(i),&
                      fp,fpu,fpv,mm,mvnu,wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                      wrk(lav2),wrk(lbu),wrk(lbv),wrk(laa),wrk(lbb),wrk(lcc),wrk(lcs),nru,nrv)
 
          if (id0==0) sum(i) = sum(i)+(z0-dzz(1))**2
 
          dzz(l) = dz(l)-step1
-         call fpgrdi(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,&
+         call fpgrdi(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,&
                      fp,fpu,fpv,mm,mvnu,wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                      wrk(lav2),wrk(lbu),wrk(lbv),wrk(laa),wrk(lbb),wrk(lcc),wrk(lcs),nru,nrv)
 
@@ -7804,7 +7832,7 @@ module fitpack_core
                step2   = delta(j)
                dzz(l2) = dz(l2)+step2
 
-               call fpgrdi(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,&
+               call fpgrdi(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,z,mz,dzz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,&
                            fp,fpu,fpv,mm,mvnu,wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                            wrk(lav2),wrk(lbu),wrk(lbv),wrk(laa),wrk(lbb),wrk(lcc),wrk(lcs),nru,nrv)
 
@@ -7827,7 +7855,7 @@ module fitpack_core
       endif
 
       ! we determine the spline sp(u,v) according to the optimal values g(j).
-      call fpgrdi(ifsu,ifsv,ifbu,ifbv,0,u,mu,v,mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq, &
+      call fpgrdi(ifsu,ifsv,ifbu,ifbv,FP_FALSE,u,mu,v,mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq, &
                   fp,fpu,fpv,mm,mvnu,wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                   wrk(lav2),wrk(lbu),wrk(lbv),wrk(laa),wrk(lbb),wrk(lcc),wrk(lcs),nru,nrv)
       if (id0==0) fp = fp+(z0-dz(1))**2
@@ -7883,24 +7911,24 @@ module fitpack_core
       !      is continuous and strictly decreasing for p>0.
       !
       !  ..scalar arguments..
-      integer,     intent(in) :: mu,mv,mr,nu,nv,nuest,nvest,nc,lwrk
-      integer,     intent(inout) :: ifsu,ifsv,ifbu,ifbv
-      real(RKIND), intent(in) :: r0,r1
-      real(RKIND), intent(inout) :: fp
-      real(RKIND), intent(out) :: p
+      integer(FP_SIZE), intent(in) :: mu,mv,mr,nu,nv,nuest,nvest,nc,lwrk
+      integer(FP_SIZE), intent(inout) :: ifsu,ifsv,ifbu,ifbv
+      real(FP_REAL), intent(in) :: r0,r1
+      real(FP_REAL), intent(inout) :: fp
+      real(FP_REAL), intent(out) :: p
       !  ..array arguments..
-      integer,     intent(in) :: ider(4),iopt(3)
-      integer,     intent(inout) :: nru(mu),nrv(mv)
-      real(RKIND), intent(in) :: u(mu),v(mv),r(mr),tu(nu),tv(nv)
-      real(RKIND), intent(inout) :: dr(6),wrk(lwrk),step(2),c(nc),fpu(nu),fpv(nv)
+      integer(FP_SIZE), intent(in) :: ider(4),iopt(3)
+      integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
+      real(FP_REAL), intent(in) :: u(mu),v(mv),r(mr),tu(nu),tv(nv)
+      real(FP_REAL), intent(inout) :: dr(6),wrk(lwrk),step(2),c(nc),fpu(nu),fpv(nv)
       !  ..local scalars..
-      real(RKIND) :: sq,sqq,sq0,sq1,step1,step2
-      integer :: i,id0,iop0,iop1,i1,j,l,lau,lav1,lav2,la0,la1,lbu,lbv,lb0, &
+      real(FP_REAL) :: sq,sqq,sq0,sq1,step1,step2
+      integer(FP_SIZE) :: i,id0,iop0,iop1,i1,j,l,lau,lav1,lav2,la0,la1,lbu,lbv,lb0, &
        lb1,lc0,lc1,lcs,lq,lri,lsu,lsv,l1,l2,mm,mvnu,number, id1
       !  ..local arrays..
-      integer :: nr(6)
-      logical :: zeroed
-      real(RKIND) :: delta(6),drr(6),sum(6),a(6,6),g(6)
+      integer(FP_SIZE) :: nr(6)
+      logical(FP_BOOL) :: zeroed
+      real(FP_REAL) :: delta(6),drr(6),sum(6),a(6,6),g(6)
 
       !  we partition the working space
       lsu  = 1
@@ -7927,8 +7955,8 @@ module fitpack_core
       iop1 = iopt(3)
       id0  = ider(1)
       id1  = ider(3)
-      call fpgrsp(ifsu,ifsv,ifbu,ifbv,0,u,mu,v,mv,r,mr,dr,                 &
-                  iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm,mvnu,      &
+      call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_FALSE,u,mu,v,mv,r,mr,dr,           &
+                  iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm,mvnu,       &
                   wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1),   &
                   wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0),  &
                   wrk(lb1),wrk(lc0),wrk(lc1),wrk(lcs),nru,nrv)
@@ -7977,7 +8005,7 @@ module fitpack_core
          l      = nr(i)
          step1  = delta(i)
          drr(l) = dr(l)+step1
-         call fpgrsp(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,r,mr,drr, &
+         call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,r,mr,drr, &
                      iop0,iop1,tu,nu,tv,nv,p,c,nc,sum(i),fp,fpu,fpv,mm,mvnu, &
                      wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                      wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0), &
@@ -7988,7 +8016,7 @@ module fitpack_core
          sum(i) = sum(i)+sq0+sq1
          drr(l) = dr(l)-step1
 
-         call fpgrsp(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,r,mr,drr, &
+         call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,r,mr,drr, &
                      iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,fp,fpu,fpv,mm,mvnu, &
                      wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                      wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0), &
@@ -8019,7 +8047,7 @@ module fitpack_core
                     l2      = nr(j)
                     step2   = delta(j)
                     drr(l2) = dr(l2)+step2
-                    call fpgrsp(ifsu,ifsv,ifbu,ifbv,1,u,mu,v,mv,r,mr,drr, &
+                    call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_TRUE,u,mu,v,mv,r,mr,drr, &
                                 iop0,iop1,tu,nu,tv,nv,p,c,nc,sqq,fp,fpu,fpv,mm,mvnu, &
                                 wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                                 wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0), &
@@ -8042,7 +8070,7 @@ module fitpack_core
       endif
 
       ! we determine the spline sp(u,v) according to the optimal values g(j).
-      call fpgrsp(ifsu,ifsv,ifbu,ifbv,0,u,mu,v,mv,r,mr,dr, &
+      call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_FALSE,u,mu,v,mv,r,mr,dr, &
                   iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm,mvnu, &
                   wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                   wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0), &
@@ -8061,13 +8089,13 @@ module fitpack_core
       !  in the panel.
       pure subroutine fporde(x,y,m,kx,ky,tx,nx,ty,ny,nummer,index,nreg)
       !  ..scalar arguments..
-      integer,     intent(in)  :: m,kx,ky,nx,ny,nreg
+      integer(FP_SIZE), intent(in)  :: m,kx,ky,nx,ny,nreg
       !  ..array arguments..
-      real(RKIND), intent(in)  :: x(m),y(m),tx(nx),ty(ny)
-      integer,     intent(out) :: nummer(m),index(nreg)
+      real(FP_REAL), intent(in)  :: x(m),y(m),tx(nx),ty(ny)
+      integer(FP_SIZE), intent(out) :: nummer(m),index(nreg)
       !  ..local scalars..
-      real(RKIND) :: xi,yi
-      integer :: im,k,kx1,ky1,k1,l,l1,nk1x,nk1y,num,nyy
+      real(FP_REAL) :: xi,yi
+      integer(FP_SIZE) :: im,k,kx1,ky1,k1,l,l1,nk1x,nk1y,num,nyy
 
       !  ..
       kx1  = kx+1
@@ -8106,21 +8134,22 @@ module fitpack_core
                              k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: ub,ue,s,tol
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: idim,maxit,iopt,m,mx,k,k1,k2,nest
-      integer,     intent(inout) :: n,nc,ier
+      real(FP_REAL), intent(in)    :: ub,ue,s,tol
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: idim,maxit,iopt,m,mx,k,k1,k2,nest
+      integer(FP_SIZE), intent(inout) :: n,nc
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(m),x(mx),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
-      integer,     intent(inout) :: nrdata(nest)
+      real(FP_REAL), intent(in)    :: u(m),x(mx),w(m)
+      real(FP_REAL), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
+      integer(FP_SIZE), intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(RKIND) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
-      logical :: new,check1,check3,success
+      real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
+      integer(FP_SIZE) :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),xi(idim)
+      real(FP_REAL) :: h(MAX_ORDER+1),xi(idim)
 
       fpold = zero
       fp0 = zero
@@ -8355,7 +8384,7 @@ module fitpack_core
         add_new_knots: do l=1,nplus
 
             ! add a new knot.
-            call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,1)
+            call fpknot(u,m,t,n,fpint,nrdata,nrint,nest,IONE)
 
             ! if n=nmax we locate the knots as for interpolation
             if (n==nmax) then
@@ -8416,8 +8445,8 @@ module fitpack_core
       p3 = -one
       f3 = fpms
       p  = sum(a(1:nk1,1))/nk1
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
       n8 = n-nmin
 
       !  iteration process to find the root of f(p) = s.
@@ -8502,21 +8531,22 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,tol
-      real(RKIND), intent(inout) :: fp,fp0,fpold,reducu,reducv
-      integer    , intent(in)    :: iopt,idim,mu,mv,mz,nuest,nvest,maxit
-      integer    , intent(inout) :: nc,nu,nv,lastdi,nplusu,nplusv,lwrk,ier
+      real(FP_REAL), intent(in)    :: s,tol
+      real(FP_REAL), intent(inout) :: fp,fp0,fpold,reducu,reducv
+      integer(FP_SIZE), intent(in)    :: iopt,idim,mu,mv,mz,nuest,nvest,maxit
+      integer(FP_SIZE), intent(inout) :: nc,nu,nv,lastdi,nplusu,nplusv,lwrk
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(mu),v(mv),z(mz*idim)
-      real(RKIND), intent(inout) :: tu(nuest),tv(nvest),c(nc*idim),fpintu(nuest),fpintv(nvest),wrk(lwrk)
-      integer    , intent(in)    :: ipar(2)
-      integer    , intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),z(mz*idim)
+      real(FP_REAL), intent(inout) :: tu(nuest),tv(nvest),c(nc*idim),fpintu(nuest),fpintv(nvest),wrk(lwrk)
+      integer(FP_SIZE),  intent(in)    :: ipar(2)
+      integer(FP_SIZE),  intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
       !  ..local scalars
-      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,peru,perv,ub,ue,vb,ve
-      integer :: i,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
+      real(FP_REAL) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn,peru,perv,ub,ue,vb,ve
+      integer(FP_SIZE) :: i,ifbu,ifbv,ifsu,ifsv,iter,j,lau1,lav1,laa,l,lau,lav,lbu,lbv,lq,lri,lsu,&
                  lsv,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
                  nrintu,nrintv,nue,nuk,nve,nuu,nvv
-      logical :: periodic_u,periodic_v,check1,check3,success
+      logical(FP_BOOL) :: periodic_u,periodic_v,check1,check3,success
 
       !  acc denotes the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -8800,7 +8830,7 @@ module fitpack_core
             add_v_knots: do l=1,nplusv
 
                ! add a new knot in the v-direction.
-               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
+               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,IONE)
 
                ! test whether we cannot further increase the number of knots in the v-direction.
                if (nv==nve) exit add_v_knots
@@ -8815,7 +8845,7 @@ module fitpack_core
             add_u_knots: do l=1,nplusu
 
                ! add a new knot in the u-direction
-               call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,1)
+               call fpknot(u,mu,tu,nu,fpintu,nrdatu,nrintu,nuest,IONE)
 
                ! test whether we cannot further increase the number of knots in the u-direction.
                if (nu==nue) exit add_u_knots
@@ -8853,8 +8883,8 @@ module fitpack_core
       p3 = -one
       f3 = fpms
       p  = one
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       !  iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
@@ -8889,25 +8919,26 @@ module fitpack_core
                              k1,k2,n,t,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,tol
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,m,k,k1,k2,nest,maxit
-      integer,     intent(inout) :: n,ier
+      real(FP_REAL), intent(in)    :: s,tol
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,m,k,k1,k2,nest,maxit
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(inout) :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a1(nest,k1),a2(nest,k), &
+      real(FP_REAL), intent(in)    :: x(m),y(m),w(m)
+      real(FP_REAL), intent(inout) :: t(nest),c(nest),fpint(nest),z(nest),a1(nest,k1),a2(nest,k), &
                                     b(nest,k2),g1(nest,k2),g2(nest,k1),q(m,k1)
-      integer, intent(inout) :: nrdata(nest)
+      integer(FP_SIZE), intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(RKIND) :: acc,cos,c1,d1,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
+      real(FP_REAL) :: acc,cos,c1,d1,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
                      term,wi,xi,yi,rn
-      integer :: i,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+      integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1),h1(7),h2(6)
-      logical :: done,check1,check3,success
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6)
+      logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
       fp0   = zero
@@ -9253,7 +9284,7 @@ module fitpack_core
         end if
 
         ! determine the number of knots nplus we are going to add.
-        npl1  = merge(int((nplus*fpms)/(fpold-fp)),nplus*2,fpold-fp>acc)
+        npl1  = merge(int((nplus*fpms)/(fpold-fp),FP_SIZE),nplus*ITWO,fpold-fp>acc)
         nplus = min(nplus*2,max(npl1,nplus/2,1))
         fpold = fp
 
@@ -9292,7 +9323,7 @@ module fitpack_core
         add_new_knots: do l=1,nplus
 
            ! add a new knot
-           call fpknot(x,m,t,n,fpint,nrdata,nrint,nest,1)
+           call fpknot(x,m,t,n,fpint,nrdata,nrint,nest,IONE)
 
            ! if n=nmax we locate the knots as for interpolation.
            if (n==nmax) then
@@ -9355,8 +9386,8 @@ module fitpack_core
       if (l/=0) p = p+sum(a1(1:n10,1))
       rn = n7
       p = rn/p
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       ! iteration process to find the root of f(p) = s.
       find_root: do iter=1,maxit
@@ -9514,14 +9545,14 @@ module fitpack_core
       end subroutine fpperi
 
       pure subroutine fpperi_reset_interp(k,m,n,nest,kk,kk1,x,y,t,c,fp,per,fp0,s,fpint,nrdata,done)
-         integer, intent(in) :: k,m,n,nest
-         integer, intent(inout) :: kk,kk1
-         real(RKIND), intent(in) :: x(m),y(m),per,fp0,s
-         real(RKIND), intent(inout) :: t(nest),c(nest),fp,fpint(nest)
-         integer, intent(inout) :: nrdata(nest)
-         logical, intent(out) :: done
+         integer(FP_SIZE), intent(in) :: k,m,n,nest
+         integer(FP_SIZE), intent(inout) :: kk,kk1
+         real(FP_REAL), intent(in) :: x(m),y(m),per,fp0,s
+         real(FP_REAL), intent(inout) :: t(nest),c(nest),fp,fpint(nest)
+         integer(FP_SIZE), intent(inout) :: nrdata(nest)
+         logical(FP_BOOL), intent(out) :: done
 
-         integer :: m1
+         integer(FP_SIZE) :: m1
 
          m1 = m-1
          done = .false.
@@ -9563,16 +9594,16 @@ module fitpack_core
       pure subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
 
       !  ..scalar arguments..
-      integer, intent(in)        :: idim,k,ib,nb,ie,ne,np
-      real(RKIND), intent(in)    :: a,b
+      integer(FP_SIZE), intent(in)        :: idim,k,ib,nb,ie,ne,np
+      real(FP_REAL), intent(in)    :: a,b
       !  ..array arguments..
-      real(RKIND), intent(in)    :: db(nb),de(ne)
-      real(RKIND), intent(inout) :: cp(np)
+      real(FP_REAL), intent(in)    :: db(nb),de(ne)
+      real(FP_REAL), intent(inout) :: cp(np)
       !  ..local scalars..
-      real(RKIND) :: ab,aki
+      real(FP_REAL) :: ab,aki
       integer     :: i,id,j,jj,l,ll,k1,k2
       !  ..local array..
-      real(RKIND) :: work(6,6)
+      real(FP_REAL) :: work(6,6)
       !  ..
       k1 = k+1
       k2 = 2*k1
@@ -9637,26 +9668,27 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer,     intent(in)    :: mu,mv,mz,nuest,nvest,nc,lwrk,maxit
-      integer,     intent(inout) :: nu,nv,lastdi,nplusu,nplusv,lasttu,ier
-      real(RKIND), intent(in)    :: z0,r,s,tol
-      real(RKIND), intent(inout) :: fp,fp0,fpold,step,reducu,reducv
+      integer(FP_SIZE), intent(in)    :: mu,mv,mz,nuest,nvest,nc,lwrk,maxit
+      integer(FP_SIZE), intent(inout) :: nu,nv,lastdi,nplusu,nplusv,lasttu
+      integer(FP_FLAG), intent(inout) :: ier
+      real(FP_REAL), intent(in)    :: z0,r,s,tol
+      real(FP_REAL), intent(inout) :: fp,fp0,fpold,step,reducu,reducv
       !  ..array arguments..
-      integer, intent(in) :: iopt(3),ider(2)
-      integer, intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
-      real(RKIND), intent(in) :: u(mu),v(mv),z(mz)
-      real(RKIND), intent(inout) :: c(nc),tu(nuest),tv(nvest),dz(3),wrk(lwrk),fpintu(nuest),fpintv(nvest)
+      integer(FP_SIZE), intent(in) :: iopt(3),ider(2)
+      integer(FP_SIZE), intent(inout) :: nrdatu(nuest),nrdatv(nvest),nru(mu),nrv(mv)
+      real(FP_REAL), intent(in) :: u(mu),v(mv),z(mz)
+      real(FP_REAL), intent(inout) :: c(nc),tu(nuest),tv(nvest),dz(3),wrk(lwrk),fpintu(nuest),fpintv(nvest)
       !  ..local scalars..
-      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
-      integer :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
+      real(FP_REAL) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,zmax,zmin,rn
+      integer(FP_SIZE) :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,mpm,mumin,mu0,mu1,&
                  nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
-      logical :: check1,check3,success
+      logical(FP_BOOL) :: check1,check3,success
       !  ..local arrays..
-      integer :: idd(2)
-      real(RKIND) :: dzz(3)
+      integer(FP_SIZE) :: idd(2)
+      real(FP_REAL) :: dzz(3)
 
       !   set constants
-      real(RKIND), parameter :: period = 2*pi
+      real(FP_REAL), parameter :: period = 2*pi
 
       !   initialization
       nplu  = 0
@@ -9717,7 +9749,7 @@ module fitpack_core
 
               ! if not all the derivative values g(i,j) are given, we will first
               ! estimate these values by computing a least-squares spline
-              idd(1) = merge(ider(1),1,ider(1)/=0)
+              idd(1) = merge(ider(1),IONE,ider(1)/=0)
               idd(2) = ider(2)
               if (idd(1)>0) dz(1) = z0
 
@@ -9823,7 +9855,7 @@ module fitpack_core
                   ! if iopt(1)=0 or iopt(1)=1 and s >= fp0,we start computing the least-
                   ! squares polynomial (which is a spline without interior knots).
                   ier       = FITPACK_LEASTSQUARES_OK
-                  idd       = [ider(1),1]
+                  idd       = [ider(1),IONE]
                   nu        = 8
                   nv        = 8
                   nrdatu(1) = mu-3+iopt(2)+iopt(3)
@@ -9858,7 +9890,7 @@ module fitpack_core
           tv(nv-3:nv) = [ve,tv(5:7)+period]
 
           ! find an estimate of the range of possible values for the optimal derivatives at the origin.
-          ktu = max(mumin,merge(mu,nrdatu(1)+2-iopt(2),nrintu==1))
+          ktu = max(mumin,merge(mu,nrdatu(1)+ITWO-iopt(2),nrintu==1))
 
           if (ktu/=lasttu) then
               l      = mv*ktu
@@ -9951,7 +9983,7 @@ module fitpack_core
                add_v_knots: do l=1,nplusv
 
                   ! add a new knot in the v-direction.
-                  call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
+                  call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,IONE)
 
                   ! test whether we cannot further increase the number of knots in the v-direction.
                   if (nv==nve) exit add_v_knots
@@ -10005,8 +10037,8 @@ module fitpack_core
       f3 = fpms
       p  = one
       dzz(1:3) = dz(1:3)
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       !  iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
@@ -10040,27 +10072,28 @@ module fitpack_core
                              f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
 
       !  ..scalar arguments..
-      integer    , intent(in)    :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
-      integer    , intent(inout) :: ier,nu,nv
-      real(RKIND), intent(in)    :: s,eta,tol
-      real(RKIND), intent(inout) :: fp,sup
+      integer(FP_SIZE), intent(in)    :: iopt1,iopt2,iopt3,m,nuest,nvest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer(FP_SIZE), intent(inout) :: nu,nv
+      integer(FP_FLAG), intent(inout) :: ier
+      real(FP_REAL), intent(in)    :: s,eta,tol
+      real(FP_REAL), intent(inout) :: fp,sup
       !  ..array arguments..
-      integer    , intent(inout) :: index(nrest),nummer(m)
-      real(RKIND), intent(in)    :: u(m),v(m),z(m),w(m)
-      real(RKIND), intent(inout) :: tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
+      integer(FP_SIZE),  intent(inout) :: index(nrest),nummer(m)
+      real(FP_REAL), intent(in)    :: u(m),v(m),z(m),w(m)
+      real(FP_REAL), intent(inout) :: tu(nuest),tv(nvest),c(nc),fpint(intest),coord(intest),f(ncc),ff(nc),row(nvest), &
                                     cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4), &
                                     spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
       procedure(fitpack_polar_boundary) :: rad
       !  ..local scalars..
-      real(RKIND) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
+      real(FP_REAL) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
-      integer :: i,iband,iband3,iband4,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
+      integer(FP_SIZE) :: i,iband,iband3,iband4,ii,il,in,ipar,ipar1,irot,iter,i1,i2,j,jrot,j1,j2,l,la,lf,lh,ll,&
                  lu,lv,lwest,l1,l2,l3,l4,ncof,ncoff,nvv,nv4,nreg,nrint,nrr,nr1,nuu,nu4,num,num1,numin,nvmin,rank,&
                  iband1,jlu
-      logical :: check1,check3,success
+      logical(FP_BOOL) :: check1,check3,success
       !  ..local arrays..
-      real(RKIND), dimension(MAX_ORDER+1) :: hu,hv
+      real(FP_REAL), dimension(MAX_ORDER+1) :: hu,hv
 
       fpms   = zero
       ipar   = iopt2*(iopt2+3)/2
@@ -10216,7 +10249,7 @@ module fitpack_core
           nreg = nuu*nvv
 
           ! arrange the data points according to the panel they belong to.
-          call fporde(u,v,m,3,3,tu,nu,tv,nv,nummer,index,nreg)
+          call fporde(u,v,m,DEGREE_3,DEGREE_3,tu,nu,tv,nv,nummer,index,nreg)
 
           if (iopt2/=0) then
               ! find the b-spline coefficients cosi of the cubic spline approximations for cr(v)=rad(v)*cos(v)
@@ -10229,7 +10262,7 @@ module fitpack_core
               get_coefs: do i=1,nvv
                   l2  = i+3
                   arg = tv(l2)
-                  hv = fpbspl(tv,nv,3,arg,l2)
+                  hv = fpbspl(tv,nv,DEGREE_3,arg,l2)
                   row(1:nvv) = zero
                   ll = i
                   do j=1,3
@@ -10269,7 +10302,7 @@ module fitpack_core
           ncof = ipar1+nvv*(nu4-1-iopt2-iopt3)
 
           ! find the bandwidth of the observation matrix a.
-          iband = merge(ncof,4*nvv,nuu-iopt2-iopt3<=1)
+          iband = merge(ncof,IFOUR*nvv,nuu-iopt2-iopt3<=1)
           iband1 = iband-1
 
           ! initialize the observation matrix a.
@@ -10287,7 +10320,7 @@ module fitpack_core
              l1   = lu+4
              lv   = num1-lu*nvv+1
              l2   = lv+3
-             jrot = merge(ipar1+(lu-iopt2-1)*nvv,0,lu>iopt2)
+             jrot = merge(ipar1+(lu-iopt2-1)*nvv,IZERO,lu>iopt2)
              lu   = lu+1
 
              !  test whether there are still data points in the current panel.
@@ -10299,10 +10332,10 @@ module fitpack_core
                 zi = z(in)*wi
 
                 ! evaluate for the u-direction, the 4 non-zero b-splines at u(in)
-                hu = fpbspl(tu,nu,3,u(in),l1)
+                hu = fpbspl(tu,nu,DEGREE_3,u(in),l1)
 
                 ! evaluate for the v-direction, the 4 non-zero b-splines at v(in)
-                hv = fpbspl(tv,nv,3,v(in),l2)
+                hv = fpbspl(tv,nv,DEGREE_3,v(in),l2)
 
                 ! store the value of these b-splines in spu and spv resp.
                 spu(in,:) = hu(1:4)
@@ -10581,21 +10614,21 @@ module fitpack_core
       ! ************************************************************************************************************
 
       ! evaluate the discontinuity jumps of the 3-th order derivative of the b-splines at the knots:
-      call fpdisc(tu,nu,5,bu,nuest)   ! tu(l),l=5,...,nu-4.
-      call fpdisc(tv,nv,5,bv,nvest)   ! tv(l),l=5,...,nv-4.
+      call fpdisc(tu,nu,DEGREE_5,bu,nuest)   ! tu(l),l=5,...,nu-4.
+      call fpdisc(tv,nv,DEGREE_5,bv,nvest)   ! tv(l),l=5,...,nv-4.
 
       ! initial value for p.
       p1 = zero
       f1 = sup-s
       p3 = -one
       f3 = fpms
-      p  = sum(a(:ncof,1))/real(ncof,RKIND)
+      p  = sum(a(:ncof,1))/real(ncof,FP_REAL)
 
       !  find the bandwidth of the extended observation matrix.
       iband4 = min(ncof,iband+ipar1)
       iband3 = iband4 -1
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
       nuu    = nu4-iopt3-1
 
       !  iteration process to find the root of f(p)=s.
@@ -10712,7 +10745,7 @@ module fitpack_core
 
                   h(:iband4) = h(:iband4)*pinv
                   zi   = zero
-                  jrot = merge(ipar1+(ii-iopt2-2)*nvv+j,1,ii>iopt2+1)
+                  jrot = merge(ipar1+(ii-iopt2-2)*nvv+j,IONE,ii>iopt2+1)
 
                   ! rotate the new row into triangle by givens transformations.
                   do irot=jrot,ncof
@@ -10822,15 +10855,15 @@ module fitpack_core
       ! f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value of p
       ! such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zero
       elemental subroutine root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
-          real(RKIND), intent(inout) :: p1,f1,p2,f2,p3,f3,p
-          real(RKIND), intent(in)    :: fpms,acc
-          logical, intent(inout) :: check1,check3
-          logical, intent(out) :: success
+          real(FP_REAL), intent(inout) :: p1,f1,p2,f2,p3,f3,p
+          real(FP_REAL), intent(in)    :: fpms,acc
+          logical(FP_BOOL), intent(inout) :: check1,check3
+          logical(FP_BOOL), intent(out) :: success
 
           !  set constants
-          real(RKIND), parameter :: con1 = 0.1e0_RKIND
-          real(RKIND), parameter :: con9 = 0.9e0_RKIND
-          real(RKIND), parameter :: con4 = 0.4e-01_RKIND
+          real(FP_REAL), parameter :: con1 = 0.1e0_FP_REAL
+          real(FP_REAL), parameter :: con9 = 0.9e0_FP_REAL
+          real(FP_REAL), parameter :: con4 = 0.4e-01_FP_REAL
 
           success = .true.
 
@@ -10878,24 +10911,24 @@ module fitpack_core
       ! rank deficiency.
       pure subroutine fprank(a,f,n,m,na,tol,c,sq,rank,aa,ff,h)
       !  ..scalar arguments..
-      integer,     intent(in)  :: n         ! the dimension of a.
-      integer,     intent(in)  :: m         ! the bandwidth of a.
-      integer,     intent(in)  :: na
-      integer,     intent(out) :: rank      ! the rank of matrix a.
-      real(RKIND), intent(in)  :: tol       ! a threshold to determine the rank of a.
-      real(RKIND), intent(out) :: sq        ! the contribution of reducing the rank to the sum of squared residuals.
+      integer(FP_SIZE), intent(in)  :: n         ! the dimension of a.
+      integer(FP_SIZE), intent(in)  :: m         ! the bandwidth of a.
+      integer(FP_SIZE), intent(in)  :: na
+      integer(FP_SIZE), intent(out) :: rank      ! the rank of matrix a.
+      real(FP_REAL), intent(in)  :: tol       ! a threshold to determine the rank of a.
+      real(FP_REAL), intent(out) :: sq        ! the contribution of reducing the rank to the sum of squared residuals.
 
       !  ..array arguments..
-      real(RKIND), intent(out) :: c(n)      ! the minimum norm solution.
-      real(RKIND), intent(out) :: a(na,m)   ! the non-zero elements of the observation matrix after
+      real(FP_REAL), intent(out) :: c(n)      ! the minimum norm solution.
+      real(FP_REAL), intent(out) :: a(na,m)   ! the non-zero elements of the observation matrix after
                                             ! triangularization by givens transformations.
-      real(RKIND), intent(out)  :: f(n)     ! the transformed right hand side.
+      real(FP_REAL), intent(out)  :: f(n)     ! the transformed right hand side.
 
-      real(RKIND), intent(inout) :: aa(n,m),ff(n),h(m) ! working arrays
+      real(FP_REAL), intent(inout) :: aa(n,m),ff(n),h(m) ! working arrays
       !  ..local scalars..
       integer     :: i,ii,ij,i1,i2,j,jj,j1,j2,j3,k,kk,m1,nl
-      real(RKIND) :: cos,fac,piv,sin,yi
-      real(RKIND) :: store,stor1,stor2,stor3
+      real(FP_REAL) :: cos,fac,piv,sin,yi
+      real(FP_REAL) :: store,stor1,stor2,stor3
 
       !  ..
       m1 = m-1
@@ -11113,12 +11146,12 @@ module fitpack_core
       !  that the rational interpolating function of the form r(p) = (u*p+v)/(p+w) equals zero at p.
       elemental subroutine fprati(p1,f1,p2,f2,p3,f3,p)
       !  ..scalar arguments..
-      real(RKIND), intent(inout) :: p1,f1,p3,f3
-      real(RKIND), intent(in)    :: p2,f2
-      real(RKIND), intent(out)   :: p
+      real(FP_REAL), intent(inout) :: p1,f1,p3,f3
+      real(FP_REAL), intent(in)    :: p2,f2
+      real(FP_REAL), intent(out)   :: p
 
       !  ..local scalars..
-      real(RKIND) :: h1,h2,h3
+      real(FP_REAL) :: h1,h2,h3
       !  ..
       if (p3>zero) then
          h1 = f1*(f2-f3)
@@ -11150,20 +11183,21 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,tol
-      real(RKIND), intent(inout) :: fp,fp0,fpold,reducx,reducy
-      integer    , intent(in)    :: iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,lwrk
-      integer    , intent(inout) :: nx,ny,lastdi,nplusx,nplusy,ier
+      real(FP_REAL),    intent(in)    :: xb,xe,yb,ye,s,tol
+      real(FP_REAL),    intent(inout) :: fp,fp0,fpold,reducx,reducy
+      integer(FP_SIZE), intent(in)    :: iopt,mx,my,mz,kx,ky,nxest,nyest,maxit,nc,lwrk
+      integer(FP_SIZE), intent(inout) :: nx,ny,lastdi,nplusx,nplusy
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(mx),y(my),z(mz)
-      real(RKIND), intent(inout) :: c(nc),tx(nxest),ty(nyest),fpintx(nxest),fpinty(nyest),wrk(lwrk)
-      integer    , intent(inout) :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
+      real(FP_REAL), intent(in)    :: x(mx),y(my),z(mz)
+      real(FP_REAL), intent(inout) :: c(nc),tx(nxest),ty(nyest),fpintx(nxest),fpinty(nyest),wrk(lwrk)
+      integer(FP_SIZE),  intent(inout) :: nrdatx(nxest),nrdaty(nyest),nrx(mx),nry(my)
       !  ..local scalars
-      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
-      integer :: i,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
+      real(FP_REAL) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,rn
+      integer(FP_SIZE) :: i,ifbx,ifby,ifsx,ifsy,iter,j,kx1,kx2,ky1,ky2,k3,l,lax,lay,lbx,lby,lq,lri,lsx,&
                  lsy,mk1,mm,mpm,mynx,ncof,nk1x,nk1y,nmaxx,nmaxy,nminx,nminy,nplx,nply,npl1,nrintx, &
                  nrinty,nxe,nxk,nye
-      logical :: check1,check3,success
+      logical(FP_BOOL) :: check1,check3,success
 
       ! we partition the working space.
       kx1  = kx+1
@@ -11439,7 +11473,7 @@ module fitpack_core
             add_y_knots: do l=1,nplusy
 
                ! add a new knot in the v-direction.
-               call fpknot(y,my,ty,ny,fpinty,nrdaty,nrinty,nyest,1)
+               call fpknot(y,my,ty,ny,fpinty,nrdaty,nrinty,nyest,IONE)
 
                ! test whether we cannot further increase the number of knots in the y-direction.
                if (ny==nye) exit add_y_knots
@@ -11454,7 +11488,7 @@ module fitpack_core
             add_x_knots: do l=1,nplusx
 
                ! add a new knot in the u-direction
-               call fpknot(x,mx,tx,nx,fpintx,nrdatx,nrintx,nxest,1)
+               call fpknot(x,mx,tx,nx,fpintx,nrdatx,nrintx,nxest,IONE)
 
                ! test whether we cannot further increase the number of knots in the x-direction.
                if (nx==nxe) exit add_x_knots
@@ -11492,8 +11526,8 @@ module fitpack_core
       p3   = -one
       f3   = fpms
       p    = one
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       ! iteration process to find the root of f(p)=s.
       root_iterations: do iter = 1,maxit
@@ -11525,10 +11559,10 @@ module fitpack_core
 
       ! Choose the dimension the next knot should be added on
       elemental integer function new_knot_dimension(n1,n1add,n1max,n2,n2add,n2max,last) result(dir)
-         integer, intent(in) :: n1,n2       ! Number of knots in both dimensions
-         integer, intent(in) :: n1add,n2add ! Number of knots ADDED in either dimension
-         integer, intent(in) :: n1max,n2max ! Max number of knots in either dimension
-         integer, intent(in) :: last        ! Last dimension used
+         integer(FP_SIZE), intent(in) :: n1,n2       ! Number of knots in both dimensions
+         integer(FP_SIZE), intent(in) :: n1add,n2add ! Number of knots ADDED in either dimension
+         integer(FP_SIZE), intent(in) :: n1max,n2max ! Max number of knots in either dimension
+         integer(FP_SIZE), intent(in) :: last        ! Last dimension used
 
          if ( n2<n2max .and. ( n2add<=n1add .or. n1>=n1max .or. last==KNOT_DIM_NONE ) )then
             dir = KNOT_DIM_2
@@ -11542,11 +11576,11 @@ module fitpack_core
       elemental subroutine fprota(cos,sin,a,b)
 
           !  ..scalar arguments..
-          real(RKIND), intent(in)    :: cos,sin
-          real(RKIND), intent(inout) :: a,b
+          real(FP_REAL), intent(in)    :: cos,sin
+          real(FP_REAL), intent(inout) :: a,b
 
           ! ..local scalars..
-          real(RKIND) :: stor1,stor2
+          real(FP_REAL) :: stor1,stor2
 
           !  ..
           stor1 = a
@@ -11563,13 +11597,13 @@ module fitpack_core
       pure subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
 
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: ratio
-      integer, intent(in) :: if1,if2,nu,nv,ncoff
+      real(FP_REAL), intent(in) :: ratio
+      integer(FP_SIZE), intent(in) :: if1,if2,nu,nv,ncoff
       !  ..array arguments
-      real(RKIND), intent(inout) :: c(ncoff),f(ncoff)
-      real(RKIND), intent(in) :: cosi(5,nv)
+      real(FP_REAL), intent(inout) :: c(ncoff),f(ncoff)
+      real(FP_REAL), intent(in) :: cosi(5,nv)
       !  ..local scalars..
-      integer :: i,iopt,ii,j,k,l,nu4,nvv
+      integer(FP_SIZE) :: i,iopt,ii,j,k,l,nu4,nvv
       !  ..
       nu4  = nu-4
       nvv  = nv-7
@@ -11638,15 +11672,15 @@ module fitpack_core
       pure subroutine fprpsp(nt,np,co,si,c,f,ncoff)
           !  ..
           !  ..scalar arguments
-          integer,     intent(in)    :: nt,np,ncoff
+          integer(FP_SIZE), intent(in)    :: nt,np,ncoff
 
           !  ..array arguments
-          real(RKIND), intent(in)    :: co(np),si(np)
-          real(RKIND), intent(inout) :: c(ncoff),f(ncoff) ! f is a working array
+          real(FP_REAL), intent(in)    :: co(np),si(np)
+          real(FP_REAL), intent(inout) :: c(ncoff),f(ncoff) ! f is a working array
 
           !  ..local scalars
-          real(RKIND) :: cn,c1,c2,c3
-          integer :: i,ii,j,k,l,ncof,npp,np4,nt4
+          real(FP_REAL) :: cn,c1,c2,c3
+          integer(FP_SIZE) :: i,ii,j,k,l,ncof,npp,np4,nt4
           !  ..
           nt4 = nt-4
           np4 = np-4
@@ -11700,14 +11734,14 @@ module fitpack_core
       pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
           !  ..scalar arguments..
-          integer, intent(in)    :: maxtr   ! Tree array sizes
-          integer, intent(inout) :: merk    ! (in) terminal node of the branch
-          integer, intent(in)    :: nbind
+          integer(FP_SIZE), intent(in)    :: maxtr   ! Tree array sizes
+          integer(FP_SIZE), intent(inout) :: merk    ! (in) terminal node of the branch
+          integer(FP_SIZE), intent(in)    :: nbind
           !  ..array arguments..
-          integer, intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
-          integer, intent(out)   :: ibind(nbind)
+          integer(FP_SIZE), intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+          integer(FP_SIZE), intent(out)   :: ibind(nbind)
           !  ..scalar arguments..
-          integer :: i,j,k
+          integer(FP_SIZE) :: i,j,k
           !  ..
           k = merk
           j = nbind
@@ -11740,28 +11774,28 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer,     intent(in)    :: mu,mv,mr,nuest,nvest,maxit,nc,lwrk
-      integer,     intent(inout) :: nu,nv,lastdi,nplusu,nplusv,lastu0,lastu1
-      integer,     intent(out)   :: ier
-      real(RKIND), intent(in)    :: r0,r1,s,tol
-      real(RKIND), intent(inout) :: fp,fp0,fpold,reducu,reducv
+      integer(FP_SIZE), intent(in)    :: mu,mv,mr,nuest,nvest,maxit,nc,lwrk
+      integer(FP_SIZE), intent(inout) :: nu,nv,lastdi,nplusu,nplusv,lastu0,lastu1
+      integer(FP_FLAG), intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: r0,r1,s,tol
+      real(FP_REAL), intent(inout) :: fp,fp0,fpold,reducu,reducv
       !  ..array arguments..
-      integer,     intent(in)    :: iopt(3),ider(4)
-      integer,     intent(inout) :: nru(mu),nrv(mv),nrdatu(nuest),nrdatv(nvest)
-      real(RKIND), intent(in)    :: u(mu),v(mv),r(mr)
-      real(RKIND), intent(inout) :: fpintu(nuest),fpintv(nvest),dr(6),tu(nuest),tv(nvest),c(nc),&
+      integer(FP_SIZE), intent(in)    :: iopt(3),ider(4)
+      integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv),nrdatu(nuest),nrdatv(nvest)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),r(mr)
+      real(FP_REAL), intent(inout) :: fpintu(nuest),fpintv(nvest),dr(6),tu(nuest),tv(nvest),c(nc),&
                                      wrk(lwrk),step(2)
       !  ..local scalars..
-      real(RKIND) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,rmax,rmin,rn
-      integer :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,l1,l2,l3,l4,mpm,mumin, &
+      real(FP_REAL) :: acc,fpms,f1,f2,f3,p,p1,p2,p3,vb,ve,rmax,rmin,rn
+      integer(FP_SIZE) :: i,ifbu,ifbv,ifsu,ifsv,istart,iter,i1,i2,j,ju,ktu,l,l1,l2,l3,l4,mpm,mumin, &
                  mu0,mu1,nn,nplu,nplv,npl1,nrintu,nrintv,nue,numax,nve,nvmax
       !  ..local arrays..
-      logical :: check1,check3,success
-      integer :: idd(4)
-      real(RKIND) :: drr(6)
+      logical(FP_BOOL) :: check1,check3,success
+      integer(FP_SIZE) :: idd(4)
+      real(FP_REAL) :: drr(6)
 
       !   set constants
-      real(RKIND), parameter :: period = pi2
+      real(FP_REAL), parameter :: period = pi2
 
       !   initialization
       ifsu  = 0
@@ -11896,7 +11930,7 @@ module fitpack_core
                   !  if iopt(1)=0 or iopt(1)=1 and fp0 <= s,we start computing the least-
                   !  squares polynomial (which is a spline without interior knots).
                   ier       = FITPACK_LEASTSQUARES_OK
-                  idd       = [ider(1),1,ider(3),1]
+                  idd       = [ider(1),IONE,ider(3),IONE]
                   nu        = 8
                   nv        = 8
                   nrdatu(1) = mu-2+iopt(2)+iopt(3)
@@ -12088,7 +12122,8 @@ module fitpack_core
             add_v_knots: do l=1,nplusv
 
                ! add a new knot in the v-direction.
-               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,1)
+               istart = 1
+               call fpknot(v,mv,tv,nv,fpintv,nrdatv,nrintv,nvest,istart)
 
                ! test whether we cannot further increase the number of knots in the v-direction.
                if (nv==nve) exit add_v_knots
@@ -12142,8 +12177,8 @@ module fitpack_core
       f3   = fpms
       p    = one
       drr  = dr
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       !  iteration process to find the root of f(p)=s.
       find_root: do iter = 1,maxit
@@ -12178,28 +12213,28 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      integer,     intent(in)    :: iopt,m,ntest,npest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
-      integer,     intent(out)   :: ier
-      integer,     intent(inout) :: nt,np
-      real(RKIND), intent(in)    :: s,eta,tol
-      real(RKIND), intent(inout) :: fp,sup
+      integer(FP_SIZE), intent(in)    :: iopt,m,ntest,npest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
+      integer(FP_FLAG), intent(out)   :: ier
+      integer(FP_SIZE), intent(inout) :: nt,np
+      real(FP_REAL), intent(in)    :: s,eta,tol
+      real(FP_REAL), intent(inout) :: fp,sup
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: teta(m),phi(m),r(m),w(m)
-      real(RKIND), intent(inout) :: tt(ntest),tp(npest),c(nc),f(ncc),&
+      real(FP_REAL), intent(in)    :: teta(m),phi(m),r(m),w(m)
+      real(FP_REAL), intent(inout) :: tt(ntest),tp(npest),c(nc),f(ncc),&
                                     row(npest),coco(npest),cosi(npest), &
                                     fpint(intest),coord(intest),ff(nc),bt(ntest,5),bp(npest,5),&
                                     a(ncc,ib1),q(ncc,ib3),spt(m,4),spp(m,4),h(ib3),wrk(lwrk)
-      integer,     intent(inout) ::  index(nrest),nummer(m)
+      integer(FP_SIZE), intent(inout) ::  index(nrest),nummer(m)
 
       !  ..local scalars..
-      real(RKIND) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,htj, &
+      real(FP_REAL) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,htj, &
                      p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
-      integer :: i,iband,iband1,iband3,iband4,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,&
+      integer(FP_SIZE) :: i,iband,iband1,iband3,iband4,ii,ij,il,in,irot,iter,i1,i2,j,jlt,jrot,j1,j2,l,la,lf,lh,ll,lp,&
                  lt,lwest,l1,l2,l4,ncof,ncoff,npp,np4,nreg,nrint,nrr,nr1,ntt,nt4,nt6,num,num1,rank
-      logical :: check1,check3,success
+      logical(FP_BOOL) :: check1,check3,success
       !  ..local arrays..
-      real(RKIND), dimension(MAX_ORDER+1) :: hp,ht
+      real(FP_REAL), dimension(MAX_ORDER+1) :: hp,ht
 
       eps = sqrt(eta)
 
@@ -12323,7 +12358,7 @@ module fitpack_core
           nreg  = ntt*npp
 
           ! arrange the data points according to the panel they belong to.
-          call fporde(teta,phi,m,3,3,tt,nt,tp,np,nummer,index,nreg)
+          call fporde(teta,phi,m,DEGREE_3,DEGREE_3,tt,nt,tp,np,nummer,index,nreg)
 
           ! find the b-spline coefficients coco and cosi of the cubic spline
           ! approximations sc(phi) and ss(phi) for cos(phi) and sin(phi).
@@ -12336,7 +12371,7 @@ module fitpack_core
           get_coefs: do i=1,npp
               l2 = i+3
               arg = tp(l2)
-              hp = fpbspl(tp,np,3,arg,l2)
+              hp = fpbspl(tp,np,DEGREE_3,arg,l2)
 
               row(1:npp) = zero
               ll = i
@@ -12415,10 +12450,10 @@ module fitpack_core
                   ri = r(in)*wi
 
                   ! evaluate for the teta-direction, the 4 non-zero b-splines at teta(in)
-                  ht = fpbspl(tt,nt,3,teta(in),l1)
+                  ht = fpbspl(tt,nt,DEGREE_3,teta(in),l1)
 
                   ! evaluate for the phi-direction, the 4 non-zero b-splines at phi(in)
-                  hp = fpbspl(tp,np,3,phi(in),l2)
+                  hp = fpbspl(tp,np,DEGREE_3,phi(in),l2)
 
                   ! store the value of these b-splines in spt and spp resp.
                   spp(in,1:4) = hp(1:4)
@@ -12698,8 +12733,8 @@ module fitpack_core
       ! ************************************************************************************************************
 
       ! evaluate the discontinuity jumps of the 3-th order derivative of the b-splines at the knots
-      call fpdisc(tt,nt,5,bt,ntest) ! tt(l),l=5,...,nt-4.
-      call fpdisc(tp,np,5,bp,npest) ! tp(l),l=5,...,np-4.
+      call fpdisc(tt,nt,DEGREE_5,bt,ntest) ! tt(l),l=5,...,nt-4.
+      call fpdisc(tp,np,DEGREE_5,bp,npest) ! tp(l),l=5,...,np-4.
 
       !  initial value for p.
       p1 = zero
@@ -12713,8 +12748,8 @@ module fitpack_core
       ! find the bandwidth of the extended observation matrix.
       iband4 = merge(ncof,iband+3,ntt<=4)
       iband3 = iband4 -1
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       ! iteration process to find the root of f(p)=s.
       iterations: do iter=1,maxit
@@ -12933,16 +12968,16 @@ module fitpack_core
       pure subroutine fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wu,wv,lu,lv)
 
       !  ..scalar arguments..
-      integer, intent(in) :: idim,nu,nv,mu,mv
+      integer(FP_SIZE), intent(in) :: idim,nu,nv,mu,mv
       !  ..array arguments..
-      integer, intent(out)    :: lu(mu),lv(mv)
-      real(RKIND), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
-      real(RKIND), intent(out) :: wu(mu,4),wv(mv,4),f(mu*mv*idim)
+      integer(FP_SIZE), intent(out)    :: lu(mu),lv(mv)
+      real(FP_REAL), intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
+      real(FP_REAL), intent(out) :: wu(mu,4),wv(mv,4),f(mu*mv*idim)
       !  ..local scalars..
-      integer :: i,i1,j,j1,k,l,l1,l3,m,nuv,nu4,nv4
-      real(RKIND) :: arg,sp,tb,te
+      integer(FP_SIZE) :: i,i1,j,j1,k,l,l1,l3,m,nuv,nu4,nv4
+      real(FP_REAL) :: arg,sp,tb,te
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
 
       ! Process u
       nu4 = nu-4
@@ -12956,7 +12991,7 @@ module fitpack_core
            l = l1
            l1 = l+1
         end do
-        h = fpbspl(tu,nu,3,arg,l)
+        h = fpbspl(tu,nu,DEGREE_3,arg,l)
         lu(i) = l-4
         wu(i,1:4) = h(1:4)
       end do
@@ -12973,7 +13008,7 @@ module fitpack_core
            l = l1
            l1 = l+1
          end do
-         h = fpbspl(tv,nv,3,arg,l)
+         h = fpbspl(tv,nv,DEGREE_3,arg,l)
          lv(i) = l-4
          wv(i,1:4) = h(1:4)
       end do
@@ -13010,28 +13045,29 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,eta,tol
-      real(RKIND), intent(inout) :: fp,fp0
-      integer,     intent(in)    :: iopt,m,kxx,kyy,nxest,nyest,maxit,nmax,km1,km2,ib1,ib3, &
+      real(FP_REAL), intent(in)    :: xb,xe,yb,ye,s,eta,tol
+      real(FP_REAL), intent(inout) :: fp,fp0
+      integer(FP_SIZE), intent(in)    :: iopt,m,kxx,kyy,nxest,nyest,maxit,nmax,km1,km2,ib1,ib3, &
                                     nc,intest,nrest,lwrk
-      integer,     intent(inout) :: nx0,ny0,ier
+      integer(FP_SIZE), intent(inout) :: nx0,ny0
+      integer(FP_FLAG), intent(inout) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: z(m),w(m)
-      real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),fpint(intest),coord(intest),&
+      real(FP_REAL), intent(in)    :: z(m),w(m)
+      real(FP_REAL), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),fpint(intest),coord(intest),&
                                     f(nc),ff(nc),a(nc,ib1),q(nc,ib3),bx(nmax,km2),by(nmax,km2), &
                                     spx(m,km1),spy(m,km1),h(ib3),wrk(lwrk)
-      integer,     intent(inout) :: index(nrest),nummer(m)
+      integer(FP_SIZE), intent(inout) :: index(nrest),nummer(m)
 
       !  ..local scalars..
-      real(RKIND) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
+      real(FP_REAL) :: acc,arg,cos,dmax,fac1,fac2,fpmax,fpms,f1,f2,f3,hxi,p,pinv,piv,p1,p2,p3,sigma,&
                      sin,sq,store,wi,x0,x1,y0,y1,zi,eps
-      integer :: i,iband,iband1,iband3,iband4,ii,in,irot,iter,i1,i2,j,jrot,&
+      integer(FP_SIZE) :: i,iband,iband1,iband3,iband4,ii,in,irot,iter,i1,i2,j,jrot,&
                  jxy,j1,kx,kx1,kx2,ky,ky1,ky2,l,la,lf,lh,lwest,lx,ly,l1,l2,n,ncof,nk1x,nk1y,nminx,&
                  nminy,nreg,nrint,num,num1,nx,nxe,nxx,ny,nye,nyy,rank
-      logical :: interchanged,check1,check3,success
+      logical(FP_BOOL) :: interchanged,check1,check3,success
 
       !  ..local arrays..
-      real(RKIND), dimension(MAX_ORDER+1) :: hx,hy
+      real(FP_REAL), dimension(MAX_ORDER+1) :: hx,hy
 
       ! **********************************************************************************************
       !  part 1: determination of the number of knots and their position
@@ -13445,8 +13481,8 @@ module fitpack_core
       !  find the bandwidth of the extended observation matrix.
       iband3 = kx1*nk1y
       iband4 = iband3 +1
-      check1 = .false.
-      check3 = .false.
+      check1 = FP_FALSE
+      check3 = FP_FALSE
 
       ! iteration process to find the root of f(p)=s.
       root_iterations: do iter=1,maxit
@@ -13637,12 +13673,12 @@ module fitpack_core
 
           ! Ensure x,y are returned in the original order, if they were interchanged
           pure subroutine sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
-              logical, intent(in) :: interchanged
-              integer, intent(in) :: m,nmax,nc,iopt,nk1x,nk1y
-              integer, intent(inout) :: l1,l2,nx,ny,nx0,ny0
-              real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),f(nc)
+              logical(FP_BOOL), intent(in) :: interchanged
+              integer(FP_SIZE), intent(in) :: m,nmax,nc,iopt,nk1x,nk1y
+              integer(FP_SIZE), intent(inout) :: l1,l2,nx,ny,nx0,ny0
+              real(FP_REAL), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c(nc),f(nc)
 
-              integer :: i,j,n,ncof
+              integer(FP_SIZE) :: i,j,n,ncof
 
               restore_xy: if (interchanged) then
 
@@ -13682,14 +13718,14 @@ module fitpack_core
       pure subroutine fpsysy(a,n,g)
 
       !  ..scalar arguments..
-      integer,     intent(in)    ::  n
+      integer(FP_SIZE), intent(in)    ::  n
       !  ..array arguments..
-      real(RKIND), intent(inout) :: a(6,6)
-      real(RKIND), intent(inout) :: g(6)
+      real(FP_REAL), intent(inout) :: a(6,6)
+      real(FP_REAL), intent(inout) :: g(6)
 
       !  ..local scalars..
-      real(RKIND) :: fac
-      integer :: i,i1,j,k
+      real(FP_REAL) :: fac
+      integer(FP_SIZE) :: i,i1,j,k
       !  ..
       g(1) = g(1)/a(1,1)
       if (n==1) return
@@ -13742,18 +13778,18 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: p
-      integer,     intent(in) :: m,mm,idim,n
+      real(FP_REAL), intent(in) :: p
+      integer(FP_SIZE), intent(in) :: m,mm,idim,n
       !  ..array arguments..
-      real(RKIND), intent(in)  :: sp(m,4),b(n,5),z(m*mm*idim)
-      real(RKIND), intent(out) :: q((n-4)*mm*idim),a(n,5),right(mm*idim)
-      integer,     intent(in)  :: nr(m)
+      real(FP_REAL), intent(in)  :: sp(m,4),b(n,5),z(m*mm*idim)
+      real(FP_REAL), intent(out) :: q((n-4)*mm*idim),a(n,5),right(mm*idim)
+      integer(FP_SIZE), intent(in)  :: nr(m)
 
       !  ..local scalars..
-      real(RKIND) :: cos,pinv,piv,sin
+      real(FP_REAL) :: cos,pinv,piv,sin
       integer     :: i,iband,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1
       !  ..local arrays..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..subroutine references..
       !    fpgivs,fprota
       !  ..
@@ -13854,19 +13890,19 @@ module fitpack_core
       pure subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: p
-      integer, intent(in) :: m,mm,idim,n
+      real(FP_REAL), intent(in) :: p
+      integer(FP_SIZE), intent(in) :: m,mm,idim,n
       !  ..array arguments..
-      real(RKIND), intent(in) :: sp(m,4),b(n,5),z(m*mm*idim)
-      real(RKIND), intent(out) :: q((n-7)*mm*idim),right(mm*idim),a(n,5),aa(n,4)
-      integer, intent(in) :: nr(m)
+      real(FP_REAL), intent(in) :: sp(m,4),b(n,5),z(m*mm*idim)
+      real(FP_REAL), intent(out) :: q((n-7)*mm*idim),right(mm*idim),a(n,5),aa(n,4)
+      integer(FP_SIZE), intent(in) :: nr(m)
 
       !  ..local scalars..
-      real(RKIND) :: co,pinv,piv,si
-      integer :: i,irot,it,ii,i2,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
-      integer :: ij,jk,jper,l0,l1,ik
+      real(FP_REAL) :: co,pinv,piv,si
+      integer(FP_SIZE) :: i,irot,it,ii,i2,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
+      integer(FP_SIZE) :: ij,jk,jper,l0,l1,ik
       !  ..local arrays..
-      real(RKIND) :: h(5),h1(5),h2(4)
+      real(FP_REAL) :: h(5),h1(5),h2(4)
 
       !  ..
       pinv = merge(one/p,one,p>zero)
@@ -14083,15 +14119,15 @@ module fitpack_core
       !    iopt : integer flag, specifying whether (iopt/=0) or not (iopt=0) the given spline must be
       !           considered as being periodic.
       !    t    : array,length nest, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(x).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
       !    c    : array,length nest, which contains the b-spline coefficients.
-      !    k    : integer, giving the degree of s(x).
+      !    k    : integer(FP_SIZE), giving the degree of s(x).
       !    x    : real, which gives the location of the knot to be inserted.
       !    nest : integer specifying the dimension of the arrays t,c,tt and cc. nest > n.
       !
       !  output parameters:
       !    tt   : array,length nest, which contains the position of the knots after insertion.
-      !    nn   : integer, giving the total number of knots after insertion
+      !    nn   : integer(FP_SIZE), giving the total number of knots after insertion
       !    cc   : array,length nest, which contains the b-spline coefficients of s(x) with respect to the
       !           new set of knots.
       !    ier  : error flag
@@ -14123,14 +14159,15 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in)      :: iopt,n,k,nest
-      integer, intent(out)     :: nn,ier
-      real(RKIND), intent(in)  :: x
+      integer(FP_SIZE), intent(in)  :: iopt,n,k,nest
+      integer(FP_SIZE), intent(out) :: nn
+      integer(FP_FLAG), intent(out) :: ier
+      real(FP_REAL),    intent(in)  :: x
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(nest),c(nest)
-      real(RKIND), intent(out) :: tt(nest),cc(nest)
+      real(FP_REAL), intent(in)  :: t(nest),c(nest)
+      real(FP_REAL), intent(out) :: tt(nest),cc(nest)
       !  ..local scalars..
-      integer :: kk,k1,l,nk,nk1
+      integer(FP_SIZE) :: kk,k1,l,nk,nk1
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -14164,16 +14201,16 @@ module fitpack_core
       ! that called subroutine insert with the same variables as input and output arguments
       pure subroutine insert_inplace(iopt,t,n,c,k,x,nest,ier)
 
-          integer, intent(in)        :: iopt,k,nest
-          integer, intent(out)       :: ier
-          real(RKIND), intent(in)    :: x
-          integer, intent(inout)     :: n
+          integer(FP_SIZE), intent(in)        :: iopt,k,nest
+          integer(FP_FLAG), intent(out)       :: ier
+          real(FP_REAL), intent(in)    :: x
+          integer(FP_SIZE), intent(inout)     :: n
           !  ..array arguments..
-          real(RKIND), intent(inout) :: t(nest),c(nest)
+          real(FP_REAL), intent(inout) :: t(nest),c(nest)
 
           ! Temporary storage
-          real(RKIND) :: tt(nest),cc(nest)
-          integer :: nn
+          real(FP_REAL) :: tt(nest),cc(nest)
+          integer(FP_SIZE) :: nn
 
           ! Call insert
           call insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
@@ -14377,22 +14414,22 @@ module fitpack_core
       !  creation date : may 1979
       !
       !  ..scalar arguments..
-      real(RKIND), intent(inout) :: ub,ue,s
-      real(RKIND), intent(out) :: fp
-      integer, intent(in)    :: iopt,ipar,idim,m,mx,k,nest,lwrk,nc
-      integer, intent(inout) :: n
-      integer, intent(out)   :: ier
+      real(FP_REAL), intent(inout) :: ub,ue,s
+      real(FP_REAL), intent(out) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,ipar,idim,m,mx,k,nest,lwrk,nc
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: x(idim,m)
-      real(RKIND), intent(inout) :: u(m),w(m),t(nest),c(nc),wrk(lwrk)
-      integer, intent(inout) :: iwrk(nest)
+      real(FP_REAL), intent(in) :: x(idim,m)
+      real(FP_REAL), intent(inout) :: u(m),w(m),t(nest),c(nc),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(nest)
       !  ..local scalars..
-      integer i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin,ncc
+      integer(FP_SIZE) :: i,ia,ib,ifp,ig,iq,iz,j,k1,k2,lwest,nmin,ncc
 
 
       !  we set up the parameters tol and maxit
-      integer, parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -14472,9 +14509,9 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   nux/y : integer values, specifying the order of the partial derivative. 0<=nux<kx, 0<=nuy<ky.
@@ -14487,10 +14524,10 @@ module fitpack_core
       !           ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
       !   my    : on entry my must specify the number of grid points along the y-axis. my >=1.
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk.
+      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
       !           lwrk >= mx*(kx+1-nux)+my*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1)
       !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer, specifying the dimension of iwrk. kwrk >= mx+my.
+      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
       !
       !  output parameters:
       !   z     : real array of dimension (mx*my).
@@ -14521,16 +14558,16 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer, intent(in)      :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
-      integer, intent(out)     :: ier
+      integer(FP_SIZE), intent(in)      :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
+      integer(FP_FLAG), intent(out)     :: ier
       !  ..array arguments..
-      integer, intent(inout)   :: iwrk(kwrk)
-      real(RKIND), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      real(RKIND), intent(out) :: z(mx*my)
-      real(RKIND), intent(inout) :: wrk(lwrk)
+      integer(FP_SIZE), intent(inout)   :: iwrk(kwrk)
+      real(FP_REAL), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+      real(FP_REAL), intent(out) :: z(mx*my)
+      real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
-      integer :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,m,m0,m1,nc,nkx1,nky1,nxx,nyy
-      real(RKIND) :: ak,fac
+      integer(FP_SIZE) :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,m,m0,m1,nc,nkx1,nky1,nxx,nyy
+      real(FP_REAL) :: ak,fac
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -14620,7 +14657,7 @@ module fitpack_core
       !  we partition the working space and evaluate the partial derivative
       iwx = 1+nxx*nyy
       iwy = iwx+mx*(kx1-nux)
-      call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,wrk,kkx,kky, &
+      call fpbisp(tx(nux+1),nx-ITWO*nux,ty(nuy+1),ny-ITWO*nuy,wrk,kkx,kky, &
                   x,mx,y,my,z,wrk(iwx),wrk(iwy),iwrk(1),iwrk(mx+1))
 
       return
@@ -14639,9 +14676,9 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   nux/y : integer values, specifying the order of the partial derivative. 0<=nux<kx, 0<=nuy<ky.
@@ -14650,10 +14687,10 @@ module fitpack_core
       !   y     : real array of dimension (my).
       !   m     : on entry m must specify the number points. m >= 1.
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk.
+      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
       !           lwrk >= mx*(kx+1-nux)+my*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1)
       !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer, specifying the dimension of iwrk. kwrk >= mx+my.
+      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
       !
       !  output parameters:
       !   z     : real array of dimension (m).
@@ -14679,17 +14716,17 @@ module fitpack_core
       !
       !
       !  ..scalar arguments..
-      integer    , intent(in)    :: nx,ny,kx,ky,m,lwrk,kwrk,nux,nuy
-      integer    , intent(out)   :: ier
+      integer(FP_SIZE),  intent(in)    :: nx,ny,kx,ky,m,lwrk,kwrk,nux,nuy
+      integer(FP_SIZE),  intent(out)   :: ier
       !  ..array arguments..
-      integer    , intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
-      real(RKIND), intent(out)   :: z(m)
-      real(RKIND), intent(inout) :: wrk(lwrk)
+      integer(FP_SIZE),  intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
+      real(FP_REAL), intent(out)   :: z(m)
+      real(FP_REAL), intent(inout) :: wrk(lwrk)
 
       !  ..local scalars..
-      integer :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,mm,m0,m1,nc,nkx1,nky1,nxx,nyy
-      real(RKIND) :: ak,fac
+      integer(FP_SIZE) :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,mm,m0,m1,nc,nkx1,nky1,nxx,nyy
+      real(FP_REAL) :: ak,fac
 
       !  ..
       !  before starting computations a data check is made. if the input data are invalid control is
@@ -14781,7 +14818,7 @@ module fitpack_core
 
       do i=1,m
          call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,wrk,kkx,kky, &
-                     x(i),1,y(i),1,z(i),wrk(iwx),wrk(iwy),iwrk(1),iwrk(2))
+                     x(i),IONE,y(i),IONE,z(i),wrk(iwx),wrk(iwy),iwrk(1),iwrk(2))
       end do
       return
       end subroutine pardeu
@@ -14798,9 +14835,9 @@ module fitpack_core
       !
       !  input parameters:
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction (hidden)
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction (hidden)
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction (hidden)
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction (hidden)
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   nux   : integer values, specifying the order of the partial
@@ -14830,14 +14867,14 @@ module fitpack_core
       !    e-mail : cong.ma@uct.ac.za
       !
       !  ..scalar arguments..
-      integer, intent(in) :: nx,ny,kx,ky,nux,nuy
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,nux,nuy
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(RKIND), intent(out) :: newc((nx-kx-1)*(ny-ky-1))
+      real(FP_REAL), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
+      real(FP_REAL), intent(out) :: newc((nx-kx-1)*(ny-ky-1))
       !  ..local scalars..
-      integer :: i,j,kx1,ky1,lx,ly,l1,l2,m,m0,m1,nkx1,nky1,nxx,nyy,newkx,newky,nc
-      real(RKIND) ak,fac
+      integer(FP_SIZE) :: i,j,kx1,ky1,lx,ly,l1,l2,m,m0,m1,nkx1,nky1,nxx,nyy,newkx,newky,nc
+      real(FP_REAL) ak,fac
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -15194,25 +15231,25 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,idim,mu,mv,nuest,nvest,lwrk,kwrk
-      integer,     intent(inout) :: nu,nv
-      integer,     intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: s
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,idim,mu,mv,nuest,nvest,lwrk,kwrk
+      integer(FP_SIZE), intent(inout) :: nu,nv
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: u(mu),v(mv),f(mu*mv*idim)
-      real(RKIND), intent(inout) :: tu(nuest),tv(nvest),c((nuest-4)*(nvest-4)*idim),wrk(lwrk)
-      integer,     intent(in)    :: ipar(2)
-      integer,     intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),f(mu*mv*idim)
+      real(FP_REAL), intent(inout) :: tu(nuest),tv(nvest),c((nuest-4)*(nvest-4)*idim),wrk(lwrk)
+      integer(FP_SIZE), intent(in)    :: ipar(2)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
       !  ..local scalars..
-      real(RKIND) :: ub,ue,vb,ve,peru,perv
-      integer :: jwrk,kndu,kndv,knru,knrv,kwest,lfpu,lfpv,lwest,lww,nc,mf,mumin,mvmin
+      real(FP_REAL) :: ub,ue,vb,ve,peru,perv
+      integer(FP_SIZE) :: jwrk,kndu,kndv,knru,knrv,kwest,lfpu,lfpv,lwest,lww,nc,mf,mumin,mvmin
       !  ..subroutine references..
       !    fppasu,fpchec,fpchep
       !  ..
       !  we set up the parameters tol and maxit.
-      integer,     parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -15243,12 +15280,12 @@ module fitpack_core
           u_period: if (ipar(1)==0) then
               tu(1:4)     = ub
               tu(nu-3:nu) = ue
-              ier = fpchec(u,mu,tu,nu,3)
+              ier = fpchec(u,mu,tu,nu,DEGREE_3)
           else u_period
               peru        = ue-ub
               tu(1:4)     = [tu(nu-6:nu-4)-peru, ub]
               tu(nu-3:nu) = [ue, tu(5:7)+peru]
-              ier = fpchep(u,mu,tu,nu,3)
+              ier = fpchep(u,mu,tu,nu,DEGREE_3)
           endif u_period
           if (ier/=FITPACK_OK) return
 
@@ -15261,12 +15298,12 @@ module fitpack_core
           v_period: if (ipar(2)==0) then
               tv(1:4)     = vb
               tv(nv-3:nv) = ve
-              ier = fpchec(v,mv,tv,nv,3)
+              ier = fpchec(v,mv,tv,nv,DEGREE_3)
           else v_period
               perv        = ve-vb
               tv(1:4)     = [tv(nv-6:nv-4)-perv, vb]
               tv(nv-3:nv) = [ve, tv(5:7)+perv]
-              ier = fpchep(v,mv,tv,nv,3)
+              ier = fpchep(v,mv,tv,nv,DEGREE_3)
           endif v_period
           if (ier/=FITPACK_OK) return
 
@@ -15432,23 +15469,24 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(inout) :: n,ier
-      integer,     intent(in)    :: iopt,m,k,nest,lwrk
+      real(FP_REAL), intent(in)    :: s
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(inout) :: ier
+      integer(FP_SIZE), intent(in)    :: iopt,m,k,nest,lwrk
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),w(m)
-      real(RKIND), intent(inout) :: t(nest),c(nest),wrk(lwrk)
-      integer,     intent(inout) :: iwrk(nest)
+      real(FP_REAL), intent(in)    :: x(m),y(m),w(m)
+      real(FP_REAL), intent(inout) :: t(nest),c(nest),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(nest)
 
       !  ..local scalars..
-      real(RKIND) :: per
-      integer :: i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest,m1,nmin
+      real(FP_REAL) :: per
+      integer(FP_SIZE) :: i,ia1,ia2,ib,ifp,ig1,ig2,iq,iz,i1,i2,j1,j2,k1,k2,lwest,m1,nmin
 
       !  ..
       !  we set up the parameters tol and maxit
-      integer,     parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -15828,25 +15866,25 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: z0,r,s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
-      integer,     intent(out)   :: ier
-      integer,     intent(inout) :: nu,nv
+      real(FP_REAL), intent(in)    :: z0,r,s
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
+      integer(FP_FLAG), intent(out)   :: ier
+      integer(FP_SIZE), intent(inout) :: nu,nv
       !  ..array arguments..
-      integer,     intent(in)    :: iopt(3),ider(2)
-      integer,     intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: u(mu),v(mv),z(mu*mv)
-      real(RKIND), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
+      integer(FP_SIZE), intent(in)    :: iopt(3),ider(2)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),z(mu*mv)
+      real(FP_REAL), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
 
       !  ..local scalars..
-      real(RKIND) :: uu,ve,zmax,zmin,zb
-      integer :: jwrk,kndu,kndv,knru,knrv,kwest,l,ldz,lfpu,lfpv,lwest,lww,m,mumin,muu,nc
+      real(FP_REAL) :: uu,ve,zmax,zmin,zb
+      integer(FP_SIZE) :: jwrk,kndu,kndv,knru,knrv,kwest,l,ldz,lfpu,lfpv,lwest,lww,m,mumin,muu,nc,mv1
 
       !  set constants
-      integer,     parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
-      real(RKIND), parameter :: per = pi2
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
+      real(FP_REAL), parameter :: per = pi2
 
       ve = v(1)+per
       !  we set up the parameters tol and maxit.
@@ -15928,7 +15966,7 @@ module fitpack_core
           endif
 
           muu = l-8
-          ier = fpchec(wrk(9),muu,tu,nu,3); if(ier/=FITPACK_OK) return
+          ier = fpchec(wrk(9),muu,tu,nu,DEGREE_3); if(ier/=FITPACK_OK) return
 
           tv(1:4)     = [tv(nv-6:nv-4)-per, v(1)]
           tv(nv-3:nv) = [ve, tv(5:7)+per]
@@ -15936,7 +15974,8 @@ module fitpack_core
           l = 9
           wrk(l:l+mv) = [v,ve]
 
-          ier = fpchep(wrk(9),mv+1,tv,nv,3)
+          mv1 = mv+1
+          ier = fpchep(wrk(9),mv1,tv,nv,DEGREE_3)
           if (ier/=FITPACK_OK) return
 
       endif
@@ -16236,26 +16275,27 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,eps
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: m,nuest,nvest,lwrk1,lwrk2,kwrk
-      integer,     intent(out)   :: nu,nv,ier
+      real(FP_REAL), intent(in)     :: s,eps
+      real(FP_REAL), intent(inout)  :: fp
+      integer(FP_SIZE), intent(in)  :: m,nuest,nvest,lwrk1,lwrk2,kwrk
+      integer(FP_SIZE), intent(out) :: nu,nv
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(m),y(m),z(m),w(m)
-      real(RKIND), intent(out)   :: u(m),v(m),tu(nuest),tv(nvest),c((nuest-4)*(nvest-4))
-      real(RKIND), intent(inout) :: wrk1(lwrk1),wrk2(lwrk2)
-      integer,     intent(in)    :: iopt(3)
-      integer,     intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: x(m),y(m),z(m),w(m)
+      real(FP_REAL), intent(out)   :: u(m),v(m),tu(nuest),tv(nvest),c((nuest-4)*(nvest-4))
+      real(FP_REAL), intent(inout) :: wrk1(lwrk1),wrk2(lwrk2)
+      integer(FP_SIZE), intent(in)    :: iopt(3)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
       !  ..user specified function
       procedure(fitpack_polar_boundary) :: rad
       !  ..local scalars..
-      real(RKIND) :: dist,r
-      integer :: i,ib1,ib3,ki,kn,kwest,la,lbu,lcc,lcs,lro,lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,&
+      real(FP_REAL) :: dist,r
+      integer(FP_SIZE) :: i,ib1,ib3,ki,kn,kwest,la,lbu,lcc,lcs,lro,lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,&
                  ncest,ncc,nuu,nvv,nreg,nrint,nu4,nv4,iopt1,iopt2,iopt3,ipar,nvmin
 
       !  set up constants
-      integer    , parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE),  parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
@@ -16367,9 +16407,9 @@ module fitpack_core
       !   iopt  : integer flag, specifying whether the profile f(y) (iopt=0) or the profile g(x) (iopt=1)
       !           must be determined.
       !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer, giving the total number of knots in the x-direction
+      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
       !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer, giving the total number of knots in the y-direction
+      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   u     : real value, specifying the requested profile.
@@ -16396,17 +16436,17 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer,     intent(in)  :: iopt,nx,ny,kx,ky,nu
-      integer,     intent(out) :: ier
-      real(RKIND), intent(in)  :: u
+      integer(FP_SIZE), intent(in)  :: iopt,nx,ny,kx,ky,nu
+      integer(FP_FLAG), intent(out) :: ier
+      real(FP_REAL), intent(in)  :: u
       !  ..array arguments..
-      real(RKIND), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(RKIND), intent(out) :: cu(nu)
+      real(FP_REAL), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
+      real(FP_REAL), intent(out) :: cu(nu)
 
       !  ..local scalars..
-      integer :: i,kx1,ky1,l,l1,m0,nkx1,nky1
+      integer(FP_SIZE) :: i,kx1,ky1,l,l1,m0,nkx1,nky1
       !  ..local array
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -16666,25 +16706,25 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: xb,xe,yb,ye,s
-      real(RKIND), intent(out)   :: fp
-      integer,     intent(in)    :: iopt,mx,my,kx,ky,nxest,nyest,lwrk,kwrk
-      integer,     intent(inout) :: nx,ny
-      integer,     intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: xb,xe,yb,ye,s
+      real(FP_REAL), intent(out)   :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,mx,my,kx,ky,nxest,nyest,lwrk,kwrk
+      integer(FP_SIZE), intent(inout) :: nx,ny
+      integer(FP_FLAG), intent(out)   :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: x(mx),y(my),z(mx*my)
-      real(RKIND), intent(inout) :: tx(nxest),ty(nyest),c((nxest-kx-1)*(nyest-ky-1)),wrk(lwrk)
-      integer,     intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: x(mx),y(my),z(mx*my)
+      real(FP_REAL), intent(inout) :: tx(nxest),ty(nyest),c((nxest-kx-1)*(nyest-ky-1)),wrk(lwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
 
       !  ..local scalars..
-      integer :: jwrk,kndx,kndy,knrx,knry,kwest,kx1,kx2,ky1,ky2,lfpx,lfpy,lwest,lww,nc,nminx,nminy,mz
+      integer(FP_SIZE) :: jwrk,kndx,kndy,knrx,knry,kwest,kx1,kx2,ky1,ky2,lfpx,lfpy,lwest,lww,nc,nminx,nminy,mz
       !  ..subroutine references..
       !    fpregr,fpchec
       !  ..
       !  we set up the parameters tol and maxit.
-      integer, parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -16765,9 +16805,9 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(x).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
       !    c    : array,length n, which contains the b-spline coefficients.
-      !    k1   : integer, giving the order of s(x) (order=degree+1)
+      !    k1   : integer(FP_SIZE), giving the order of s(x) (order=degree+1)
       !    x    : real, which contains the point where the derivatives must
       !           be evaluated.
       !
@@ -16803,16 +16843,16 @@ module fitpack_core
       !  latest update : march 1987
       !
       !  ..scalar arguments..
-      integer, intent(in)      :: n,k1
-      integer, intent(out)     :: ier
+      integer(FP_SIZE), intent(in)      :: n,k1
+      integer(FP_FLAG), intent(out)     :: ier
 
-      real(RKIND), intent(in)  :: x
+      real(FP_REAL), intent(in)  :: x
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n),c(n)
-      real(RKIND), intent(out) :: d(k1)
+      real(FP_REAL), intent(in)  :: t(n),c(n)
+      real(FP_REAL), intent(out) :: d(k1)
 
       !  ..local scalars..
-      integer :: l,nk1
+      integer(FP_SIZE) :: l,nk1
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -17164,26 +17204,26 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: r0,r1,s
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
-      integer,     intent(inout) :: nu,nv
-      integer,     intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: r0,r1,s
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: mu,mv,nuest,nvest,lwrk,kwrk
+      integer(FP_SIZE), intent(inout) :: nu,nv
+      integer(FP_FLAG), intent(out)   :: ier
 
       !  ..array arguments..
-      integer,     intent(in)    :: iopt(3),ider(4)
-      integer,     intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: u(mu),v(mv),r(mu*mv)
-      real(RKIND), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
+      integer(FP_SIZE), intent(in)    :: iopt(3),ider(4)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: u(mu),v(mv),r(mu*mv)
+      real(FP_REAL), intent(inout) :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
 
       !  ..local scalars..
-      real(RKIND) :: uu,ve,rmax,rmin,rb,re,rn
-      integer :: i,jwrk,kndu,kndv,knru,knrv,kwest,l,ldr,lfpu,lfpv,lwest,lww,m,mumin,muu,nc
+      real(FP_REAL) :: uu,ve,rmax,rmin,rb,re,rn
+      integer(FP_SIZE) :: i,jwrk,kndu,kndv,knru,knrv,kwest,l,ldr,lfpu,lfpv,lwest,lww,m,mumin,muu,nc,mv1
 
       !  set constants
-      real(RKIND), parameter :: per = pi2
-      real(RKIND), parameter :: tol = smallnum03
-      integer,     parameter :: maxit = 20
+      real(FP_REAL), parameter :: per = pi2
+      real(FP_REAL), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
 
       ve    = v(1)+per
       mumin = 4
@@ -17287,13 +17327,14 @@ module fitpack_core
           l      = l+1
           wrk(l) = pi
           muu    = l-12
-          ier    = fpchec(wrk(13),muu,tu,nu,3); if (ier/=FITPACK_OK) return
+          ier    = fpchec(wrk(13),muu,tu,nu,DEGREE_3); if (ier/=FITPACK_OK) return
 
           ! Init tv: use wrk(13:) as working space
           tv(1:4)       = [tv(nv-6:nv-4)-per, v(1)]
           tv(nv-3:nv)   = [ve, tv(5:7)+per]
           wrk(13:13+mv) = [v, ve]
-          ier = fpchep(wrk(13),mv+1,tv,nv,3); if (ier/=FITPACK_OK) return
+          mv1 = mv+1
+          ier = fpchep(wrk(13),mv1,tv,nv,DEGREE_3); if (ier/=FITPACK_OK) return
 
       else
 
@@ -17630,23 +17671,23 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: s,eps
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,m,ntest,npest,lwrk1,lwrk2,kwrk
-      integer,     intent(inout) :: nt,np
-      integer,     intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: s,eps
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,m,ntest,npest,lwrk1,lwrk2,kwrk
+      integer(FP_SIZE), intent(inout) :: nt,np
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)    :: teta(m),phi(m),r(m),w(m)
-      real(RKIND), intent(inout) :: tt(ntest),tp(npest),c((ntest-4)*(npest-4)),wrk1(lwrk1),wrk2(lwrk2)
-      integer,     intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: teta(m),phi(m),r(m),w(m)
+      real(FP_REAL), intent(inout) :: tt(ntest),tp(npest),c((ntest-4)*(npest-4)),wrk1(lwrk1),wrk2(lwrk2)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
 
       !  ..local scalars..
-      integer :: i,ib1,ib3,ki,kn,kwest,la,lbt,lcc,lcs,lro,j,lbp,lco,lf,lff,lfp,lh,lq,lst,lsp,lwest, &
+      integer(FP_SIZE) :: i,ib1,ib3,ki,kn,kwest,la,lbt,lcc,lcs,lro,j,lbp,lco,lf,lff,lfp,lh,lq,lst,lsp,lwest, &
                  ncest,ncc,ntt,npp,nreg,nrint,ncof,nt4,np4
 
       ! we set up the parameters tol and maxit.
-      real(RKIND), parameter :: tol = smallnum03
-      integer    , parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
+      integer(FP_SIZE),  parameter :: maxit = 20
 
       !  before starting computations a data check is made. if the input data
       !  are invalid,control is immediately repassed to the calling program.
@@ -17746,13 +17787,13 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(x).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
       !    c    : array,length n, which contains the b-spline coefficients.
-      !    k    : integer, giving the degree of s(x).
-      !    nu   : integer, specifying the order of the derivative. 0<=nu<=k
+      !    k    : integer(FP_SIZE), giving the degree of s(x).
+      !    nu   : integer(FP_SIZE), specifying the order of the derivative. 0<=nu<=k
       !    x    : array,length m, which contains the points where the derivative of s(x) must be evaluated.
-      !    m    : integer, giving the number of points where the derivative of s(x) must be evaluated
-      !    e    : integer, if 0 the spline is extrapolated from the end spans for points not in the
+      !    m    : integer(FP_SIZE), giving the number of points where the derivative of s(x) must be evaluated
+      !    e    : integer(FP_FLAG), if 0 the spline is extrapolated from the end spans for points not in the
       !           support, if 1 the spline evaluates to zero for those points, and if 2 ier is set to
       !           1 and the subroutine returns.
       !    wrk  : real array of dimension n. used as working space.
@@ -17788,21 +17829,22 @@ module fitpack_core
       !++ pearu: 13 aug 2003
       !++   - disabled cliping x values to interval [min(t),max(t)]
       !++   - removed the restriction of the orderness of x values
-      !++   - fixed initialization of sp to real(RKIND) value
+      !++   - fixed initialization of sp to real(FP_REAL) value
       !
       !  ..scalar arguments..
-      integer, intent(in) :: n,k,nu,m,e
-      integer, intent(out) :: ier
+      integer(FP_SIZE), intent(in)  :: n,k,nu,m
+      integer(FP_FLAG), intent(in)  :: e
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in) :: t(n),c(n),x(m)
-      real(RKIND), intent(out) :: y(m)
-      real(RKIND), intent(inout) :: wrk(n)
+      real(FP_REAL), intent(in) :: t(n),c(n),x(m)
+      real(FP_REAL), intent(out) :: y(m)
+      real(FP_REAL), intent(inout) :: wrk(n)
       !  ..local scalars..
-      integer :: i,j,k1,k2,k3,l,l1,l2,nk1,nk2,kk
-      real(RKIND) :: ak,arg,fac,tb,te
+      integer(FP_SIZE) :: i,j,k1,k2,k3,l,l1,l2,nk1,nk2,kk
+      real(FP_REAL) :: ak,arg,fac,tb,te
       !  ..local arrays ..
-      real(RKIND) :: h(MAX_ORDER+1)
-      logical :: nonflat
+      real(FP_REAL) :: h(MAX_ORDER+1)
+      logical(FP_BOOL) :: nonflat
 
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -17901,12 +17943,12 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer, giving the total number of knots of s(x).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
       !    c    : array,length n, which contains the b-spline coefficients.
-      !    k    : integer, giving the degree of s(x).
+      !    k    : integer(FP_SIZE), giving the degree of s(x).
       !    x    : array,length m, which contains the points where s(x) must be evaluated.
-      !    m    : integer, giving the number of points where s(x) must be evaluated.
-      !    e    : integer, boundary condition for points outside the support
+      !    m    : integer(FP_SIZE), giving the number of points where s(x) must be evaluated.
+      !    e    : integer(FP_SIZE), boundary condition for points outside the support
       !           0 = the spline is extrapolated from the end spans
       !           1 = the spline evaluates to zero for those points,
       !           2 = extrapolation not allowed, ier is set to 1 and the subroutine returns,
@@ -17934,17 +17976,18 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer,     intent(in)  :: n, k, m, e
-      integer,     intent(out) :: ier
+      integer(FP_SIZE), intent(in)  :: n, k, m
+      integer(FP_FLAG), intent(in)  :: e
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n), c(n), x(m)
-      real(RKIND), intent(out) :: y(m)
+      real(FP_REAL), intent(in)  :: t(n), c(n), x(m)
+      real(FP_REAL), intent(out) :: y(m)
 
       !  ..local scalars..
-      integer :: i, k1, l, l1, nk1,k2
-      real(RKIND) :: arg, tb, te
+      integer(FP_SIZE) :: i, k1, l, l1, nk1,k2
+      real(FP_REAL) :: arg, tb, te
       !  ..local array..
-      real(RKIND) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
@@ -18005,16 +18048,16 @@ module fitpack_core
       !  function splint calculates the integral of a spline function s(x)
       !  of degree k, which is given in its normalized b-spline representation
 
-      real(RKIND) function splint(t,n,c,k,a,b,wrk) result(integral)
+      real(FP_REAL) function splint(t,n,c,k,a,b,wrk) result(integral)
 
       !  calling sequence:
       !     aint = splint(t,n,c,k,a,b,wrk)
       !
       !  input parameters:
       !    t    : array,length n,which contains the position of the knots of s(x).
-      !    n    : integer, giving the total number of knots of s(x).
+      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
       !    c    : array,length n, containing the b-spline coefficients.
-      !    k    : integer, giving the degree of s(x).
+      !    k    : integer(FP_SIZE), giving the degree of s(x).
       !    a,b  : real values, containing the end points of the integration interval. s(x) is considered to be identically
       !           zero outside the interval (t(k+1),t(n-k)).
       !
@@ -18036,14 +18079,14 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      real(RKIND), intent(in) :: a,b
-      integer    , intent(in) :: n,k
+      real(FP_REAL), intent(in) :: a,b
+      integer(FP_SIZE), intent(in) :: n,k
       !  ..array arguments..
-      real(RKIND), intent(in)    :: t(n),c(n)
-      real(RKIND), intent(inout) :: wrk(n)
+      real(FP_REAL), intent(in)    :: t(n),c(n)
+      real(FP_REAL), intent(inout) :: wrk(n)
 
       !  ..local scalars..
-      integer :: nk1
+      integer(FP_SIZE) :: nk1
 
       nk1 = n-k-1
 
@@ -18062,13 +18105,13 @@ module fitpack_core
       !
       !  input parameters:
       !    t    : real array,length n, containing the knots of s(x).
-      !    n    : integer, containing the number of knots.  n>=8
+      !    n    : integer(FP_SIZE), containing the number of knots.  n>=8
       !    c    : real array,length n, containing the b-spline coefficients.
-      !    mest : integer, specifying the dimension of array zero.
+      !    mest : integer(FP_SIZE), specifying the dimension of array zero.
       !
       !  output parameters:
       !    zeros : real array,length mest, containing the zeros of s(x).
-      !    m     : integer,giving the number of zeros.
+      !    m     : integer(FP_SIZE),giving the number of zeros.
       !    ier   : error flag:
       !      ier = 0: normal return.
       !      ier = 1: the number of zeros exceeds mest.
@@ -18092,17 +18135,18 @@ module fitpack_core
       !
       ! ..
       ! ..scalar arguments..
-      integer, intent(in)  :: n,mest
-      integer, intent(out) :: m,ier
+      integer(FP_SIZE), intent(in)  :: n,mest
+      integer(FP_SIZE), intent(out) :: m
+      integer(FP_FLAG), intent(out) :: ier
       !  ..array arguments..
-      real(RKIND), intent(in)  :: t(n),c(n)
-      real(RKIND), intent(out) :: zeros(mest)
+      real(FP_REAL), intent(in)  :: t(n),c(n)
+      real(FP_REAL), intent(out) :: zeros(mest)
       !  ..local scalars..
-      integer :: i,j,l,n4
-      real(RKIND) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5
-      logical :: z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
+      integer(FP_SIZE) :: i,j,l,n4
+      real   (FP_REAL) :: ah,a0,a1,a2,a3,bh,b0,b1,c1,c2,c3,c4,c5,d4,d5,h1,h2,t1,t2,t3,t4,t5
+      logical(FP_BOOL) :: z0,z1,z2,z3,z4,nz0,nz1,nz2,nz3,nz4
       !  ..local array..
-      real(RKIND) :: y(3)
+      real(FP_REAL) :: y(3)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
@@ -18245,11 +18289,11 @@ module fitpack_core
       !     call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
       !
       !  input parameters:
-      !   idim  : integer, specifying the dimension of the spline surface.
+      !   idim  : integer(FP_SIZE), specifying the dimension of the spline surface.
       !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
-      !   nu    : integer, giving the total number of knots in the u-direction
+      !   nu    : integer(FP_SIZE), giving the total number of knots in the u-direction
       !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
-      !   nv    : integer, giving the total number of knots in the v-direction
+      !   nv    : integer(FP_SIZE), giving the total number of knots in the v-direction
       !   c     : real array, length (nu-4)*(nv-4)*idim, which contains the b-spline coefficients.
       !   u     : real array of dimension (mu).
       !           before entry u(i) must be set to the u co-ordinate of the i-th grid point along the u-axis.
@@ -18261,9 +18305,9 @@ module fitpack_core
       !   mv    : on entry mv must specify the number of grid points along the v-axis. mv >=1.
       !   mf    : on entry, mf must specify the dimension of the array f. mf >= mu*mv*idim
       !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer, specifying the dimension of wrk. lwrk >= 4*(mu+mv)
+      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk. lwrk >= 4*(mu+mv)
       !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer, specifying the dimension of iwrk. kwrk >= mu+mv.
+      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mu+mv.
       !
       !  output parameters:
       !   f     : real array of dimension (mf).
@@ -18294,15 +18338,15 @@ module fitpack_core
       !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
       !
       !  ..scalar arguments..
-      integer,     intent(in)    :: idim,nu,nv,mu,mv,mf,lwrk,kwrk
-      integer,     intent(out)   :: ier
+      integer(FP_SIZE), intent(in)    :: idim,nu,nv,mu,mv,mf,lwrk,kwrk
+      integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer,     intent(inout) :: iwrk(kwrk)
-      real(RKIND), intent(in)    :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
-      real(RKIND), intent(inout) :: wrk(lwrk)
-      real(RKIND), intent(out)   :: f(mf)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+      real(FP_REAL), intent(in)    :: tu(nu),tv(nv),c((nu-4)*(nv-4)*idim),u(mu),v(mv)
+      real(FP_REAL), intent(inout) :: wrk(lwrk)
+      real(FP_REAL), intent(out)   :: f(mf)
       !  ..local scalars..
-      integer :: muv
+      integer(FP_SIZE) :: muv
 
       !  ..
       !  before starting computations a data check is made. if the input data
@@ -18542,24 +18586,24 @@ module fitpack_core
       !
       !  ..
       !  ..scalar arguments..
-      real(RKIND), intent(in)    :: xb,xe,yb,ye,s,eps
-      real(RKIND), intent(inout) :: fp
-      integer,     intent(in)    :: iopt,m,kx,ky,nxest,nyest,nmax,lwrk1,lwrk2,kwrk
-      integer,     intent(inout) :: nx,ny
-      integer,     intent(out)   :: ier
+      real(FP_REAL), intent(in)    :: xb,xe,yb,ye,s,eps
+      real(FP_REAL), intent(inout) :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,m,kx,ky,nxest,nyest,nmax,lwrk1,lwrk2,kwrk
+      integer(FP_SIZE), intent(inout) :: nx,ny
+      integer(FP_FLAG), intent(out)   :: ier
 
       !  ..array arguments..
-      real(RKIND), intent(in)    :: z(m),w(m)
-      real(RKIND), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),&
+      real(FP_REAL), intent(in)    :: z(m),w(m)
+      real(FP_REAL), intent(inout) :: x(m),y(m),tx(nmax),ty(nmax),c((nxest-kx-1)*(nyest-ky-1)),wrk1(lwrk1),&
                                     wrk2(lwrk2)
-      integer,     intent(inout) :: iwrk(kwrk)
+      integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
       !  ..local scalars..
-      integer :: ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx,lby,lco,lf,lff,lfp,lh,lq,lsx,lsy, &
+      integer(FP_SIZE) :: ib1,ib3,jb1,ki,kmax,km1,km2,kn,kwest,kx1,ky1,la,lbx,lby,lco,lf,lff,lfp,lh,lq,lsx,lsy, &
                  lwest,ncest,nest,nek,nminx,nminy,nmx,nmy,nreg,nrint,nxk,nyk
 
       !  we set up the parameters tol and maxit.
-      integer, parameter :: maxit = 20
-      real(RKIND), parameter :: tol = smallnum03
+      integer(FP_SIZE), parameter :: maxit = 20
+      real(FP_REAL), parameter :: tol = smallnum03
 
       ! Size parameters
       kx1   = kx+1
@@ -18653,15 +18697,15 @@ module fitpack_core
       ! Utilities: argsort
       ! Return indices of sorted array
       pure function fitpack_argsort(list) result(ilist)
-          real(RKIND), dimension(:), intent(in) :: list
-          integer(RSIZE), dimension(size(list)) :: ilist
+          real(FP_REAL), dimension(:), intent(in) :: list
+          integer(FP_SIZE), dimension(size(list)) :: ilist
 
-          real(RKIND), allocatable :: copy(:)
-          integer(RSIZE) :: i
+          real(FP_REAL), allocatable :: copy(:)
+          integer(FP_SIZE) :: i
 
           ! Prepare data
           allocate(copy(size(list)),source=list)
-          forall(i=1:size(list,kind=RSIZE)) ilist(i) = i
+          forall(i=1:size(list,kind=FP_SIZE)) ilist(i) = i
 
           ! Perform sort
           call fitpack_quicksort(copy,ilist)
@@ -18673,25 +18717,25 @@ module fitpack_core
       ! Quicksort
       pure recursive subroutine fitpack_quicksort(list,ilist,down)
 
-        real(RKIND), dimension(:), intent(inout) :: list
-        integer(RSIZE), dimension(size(list)), optional, intent(inout) :: ilist
-        logical, optional, intent(in) :: down
+        real(FP_REAL), dimension(:), intent(inout) :: list
+        integer(FP_SIZE), dimension(size(list)), optional, intent(inout) :: ilist
+        logical(FP_BOOL), optional, intent(in) :: down
 
-        integer(RSIZE)  :: i, j, n
-        real(RKIND)  :: chosen
-        integer(RSIZE), parameter :: SMALL_SIZE = 8
-        logical         :: descending,has_list
+        integer(FP_SIZE)  :: i, j, n
+        real(FP_REAL)     :: chosen
+        logical(FP_BOOL) :: descending,has_list
+        integer(FP_SIZE), parameter :: SMALL_SIZE = 8
 
         has_list   = present(ilist)
-        descending = .false.; if (present(down)) descending = down
-        n = size(list,kind=RSIZE)
+        descending = FP_FALSE; if (present(down)) descending = down
+        n = size(list,kind=FP_SIZE)
 
         choose_sorting_algorithm: if (n <= SMALL_SIZE) then
 
            ! Use interchange sort for small lists
            do i = 1, n - 1
               do j = i + 1, n
-                 if (toBeSwapped(list(i),list(j),.false.)) then
+                 if (toBeSwapped(list(i),list(j),FP_FALSE)) then
                      call fitpack_swap(list(i),list(j))
                      if (has_list) call fitpack_swap(ilist(i),ilist(j))
                  end if
@@ -18709,7 +18753,7 @@ module fitpack_core
               ! until element >= chosen is found
               scan_from_left: do
                 i = i + 1
-                if (toBeSwapped(list(i),chosen,.true.) .or. i==n) exit scan_from_left
+                if (toBeSwapped(list(i),chosen,FP_TRUE) .or. i==n) exit scan_from_left
               end do scan_from_left
 
               ! Scan list from right end
@@ -18717,7 +18761,7 @@ module fitpack_core
 
               scan_from_right: do
                  j = j - 1
-                 if (toBeSwapped(chosen,list(j),.true.) .or. j==1) exit scan_from_right
+                 if (toBeSwapped(chosen,list(j),FP_TRUE) .or. j==1) exit scan_from_right
               end do scan_from_right
 
               swap_element: if (i < j) then
@@ -18745,20 +18789,20 @@ module fitpack_core
 
       contains
 
-         elemental logical function toBeSwapped(a,b,orEqual)
-            real(RKIND), intent(in) :: a,b
-            logical, intent(in) :: orEqual
+         elemental logical(FP_BOOL) function toBeSwapped(a,b,orEqual)
+            real(FP_REAL), intent(in) :: a,b
+            logical(FP_BOOL), intent(in) :: orEqual
 
             toBeSwapped = merge(is_before(a,b),is_after(a,b),descending)
-            if (orEqual .and. equal(a,b)) toBeSwapped = .true.
+            if (orEqual .and. equal(a,b)) toBeSwapped = FP_TRUE
 
          end function toBeSwapped
 
     end subroutine fitpack_quicksort
 
     elemental subroutine swap_data(a,b)
-      real(RKIND), intent(inout) :: a, b
-      real(RKIND)                :: tmp
+      real(FP_REAL), intent(inout) :: a, b
+      real(FP_REAL)                :: tmp
       tmp = a
       a   = b
       b   = tmp
@@ -18766,41 +18810,41 @@ module fitpack_core
     end subroutine swap_data
 
     elemental subroutine swap_size(a,b)
-      integer(RSIZE), intent(inout) :: a, b
-      integer(RSIZE)                :: tmp
+      integer(FP_SIZE), intent(inout) :: a, b
+      integer(FP_SIZE)                :: tmp
       tmp = a
       a   = b
       b   = tmp
       return
     end subroutine swap_size
 
-    elemental logical function is_before(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function is_before(a,b)
+       real(FP_REAL), intent(in) :: a,b
        is_before = a<b
     end function is_before
 
-    elemental logical function is_after(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function is_after(a,b)
+       real(FP_REAL), intent(in) :: a,b
        is_after = a>b
     end function is_after
 
-    elemental logical function is_ge(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function is_ge(a,b)
+       real(FP_REAL), intent(in) :: a,b
        is_ge = a>=b
     end function is_ge
 
-    elemental logical function is_le(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function is_le(a,b)
+       real(FP_REAL), intent(in) :: a,b
        is_le = a<=b
     end function is_le
 
     ! Test if two reals have the same representation at the current precision
-    elemental logical function equal(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function equal(a,b)
+       real(FP_REAL), intent(in) :: a,b
        equal = abs(a-b)<spacing(merge(a,b,abs(a)<abs(b)))
     end function equal
-    elemental logical function not_equal(a,b)
-       real(RKIND), intent(in) :: a,b
+    elemental logical(FP_BOOL) function not_equal(a,b)
+       real(FP_REAL), intent(in) :: a,b
        not_equal = .not.equal(a,b)
     end function not_equal
 

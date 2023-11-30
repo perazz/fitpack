@@ -39,44 +39,44 @@ module fitpack_parametric_curves
         integer :: idim = 0
 
         !> The data points
-        real(RKIND), allocatable :: x(:,:) ! [idim x m]
+        real(FP_REAL), allocatable :: x(:,:) ! [idim x m]
 
         !> Parameter values: one for each point. They may be optional, in which case, they will
         !> be internally calculated by fitpack
         logical :: has_params = .false.
-        real(RKIND), allocatable :: u(:)
+        real(FP_REAL), allocatable :: u(:)
 
         !> Spline degree
         integer :: order = 3
 
         !> Interval boundaries
-        real(RKIND) :: ubegin = zero
-        real(RKIND) :: uend = zero
+        real(FP_REAL) :: ubegin = zero
+        real(FP_REAL) :: uend = zero
 
         ! Node weights
-        real(RKIND), allocatable :: sp(:),w(:)
+        real(FP_REAL), allocatable :: sp(:),w(:)
 
         ! Estimated and actual number of knots and their allocations
         integer                  :: nest  = 0
         integer                  :: lwrk  = 0
         integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk(:)
+        real(FP_REAL), allocatable :: wrk(:)
 
         ! Space for derivative evaluation
-        real(RKIND), allocatable :: dd(:,:)
+        real(FP_REAL), allocatable :: dd(:,:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.0_RKIND
+        real(FP_REAL) :: smoothing = 1000.0_FP_REAL
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Knots
         integer     :: knots = 0
-        real(RKIND), allocatable :: t(:)  ! Knot location
+        real(FP_REAL), allocatable :: t(:)  ! Knot location
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING
@@ -131,20 +131,20 @@ module fitpack_parametric_curves
 
         !> Left boundary derivatives
         integer                  :: ib = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
-        real(RKIND), allocatable :: deriv_begin(:,:) ! 0:ib-1
+        real(FP_REAL), allocatable :: deriv_begin(:,:) ! 0:ib-1
         !> Right boundary derivatives
         integer                  :: ie = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
-        real(RKIND), allocatable :: deriv_end(:,:)
+        real(FP_REAL), allocatable :: deriv_end(:,:)
 
         !> On exit xx contains the coordinates of the data points to which a spline curve with zero
         !> derivative constraints has been determined. if the computation mode iopt =1 is used xx should
         !> be left unchanged between calls.
-        real(RKIND), allocatable :: xx(:,:)
+        real(FP_REAL), allocatable :: xx(:,:)
 
         !> On exit cp contains the b-spline coefficients of a polynomial curve which satisfies the
         !> boundary constraints. if the computation mode iopt =1 is used cp should be left unchanged
         !> between calls.
-        real(RKIND), allocatable :: cp(:,:)
+        real(FP_REAL), allocatable :: cp(:,:)
 
         contains
 
@@ -166,9 +166,9 @@ module fitpack_parametric_curves
 
     ! A default constructor
     type(fitpack_parametric_curve) function new_from_points(x,u,w,ierr) result(this)
-        real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2)) ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2)) ! node weights
+        real(FP_REAL), intent(in) :: x(:,:)
+        real(FP_REAL), optional, intent(in) :: u(size(x,2)) ! parameter values
+        real(FP_REAL), optional, intent(in) :: w(size(x,2)) ! node weights
         integer, optional, intent(out) :: ierr
 
         integer :: ierr0
@@ -183,10 +183,10 @@ module fitpack_parametric_curves
     ! Fit a new curve
     integer function new_fit(this,x,u,w,smoothing,order)
         class(fitpack_parametric_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2)) ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2)) ! node weights
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: x(:,:)
+        real(FP_REAL), optional, intent(in) :: u(size(x,2)) ! parameter values
+        real(FP_REAL), optional, intent(in) :: w(size(x,2)) ! node weights
+        real(FP_REAL), optional, intent(in) :: smoothing
         integer    , optional, intent(in) :: order
 
         call this%new_points(x,u,w)
@@ -213,13 +213,13 @@ module fitpack_parametric_curves
        this%ubegin = zero
        this%uend = zero
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%order     = 3
        this%iopt      = IOPT_NEW_SMOOTHING
        this%nest      = 0
        this%lwrk      = 0
        this%knots     = 0
-       this%fp        = 0.0_RKIND
+       this%fp        = 0.0_FP_REAL
 
     end subroutine destroy
 
@@ -236,9 +236,9 @@ module fitpack_parametric_curves
 
     subroutine new_points(this,x,u,w)
         class(fitpack_parametric_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:,:)
-        real(RKIND), optional, intent(in) :: u(size(x,2))  ! parameter values
-        real(RKIND), optional, intent(in) :: w(size(x,2))  ! node weights
+        real(FP_REAL), intent(in) :: x(:,:)
+        real(FP_REAL), optional, intent(in) :: u(size(x,2))  ! parameter values
+        real(FP_REAL), optional, intent(in) :: w(size(x,2))  ! node weights
 
         integer, allocatable :: isort(:)
         integer, parameter   :: SAFE = 2
@@ -338,8 +338,8 @@ module fitpack_parametric_curves
         class(fitpack_constrained_curve), intent(inout) :: this
 
         !> Begin point constraints: (:,0)=function; (:,i)=i-th derivative
-        real(RKIND), optional, intent(in) :: ddx_begin(:,0:)
-        real(RKIND), optional, intent(in) :: ddx_end  (:,0:)
+        real(FP_REAL), optional, intent(in) :: ddx_begin(:,0:)
+        real(FP_REAL), optional, intent(in) :: ddx_end  (:,0:)
 
         integer, optional, intent(out) :: ierr
 
@@ -387,11 +387,11 @@ module fitpack_parametric_curves
 
     function curve_eval_one(this,u,ierr) result(y)
         class(fitpack_parametric_curve), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u      ! Evaluation point
+        real(FP_REAL),          intent(in)     :: u      ! Evaluation point
         integer, optional,    intent(out)    :: ierr   ! Optional error flag
-        real(RKIND) :: y(this%idim)
+        real(FP_REAL) :: y(this%idim)
 
-        real(RKIND) :: y1(this%idim,1)
+        real(FP_REAL) :: y1(this%idim,1)
 
         y1 = curve_eval_many(this,[u],ierr)
         y  = y1(:,1)
@@ -401,9 +401,9 @@ module fitpack_parametric_curves
     ! Curve evaluation driver
     function curve_eval_many(this,u,ierr) result(x)
         class(fitpack_parametric_curve), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter value)
+        real(FP_REAL),          intent(in)     :: u(:)   ! Evaluation points (parameter value)
         integer, optional,    intent(out)    :: ierr   ! Optional error flag
-        real(RKIND) :: x(this%idim,size(u))
+        real(FP_REAL) :: x(this%idim,size(u))
 
         integer :: npts,ier
 
@@ -449,11 +449,11 @@ module fitpack_parametric_curves
     ! Curve fitting driver: automatic number of knots
     integer function curve_fit_automatic_knots(this,smoothing,order) result(ierr)
         class(fitpack_parametric_curve), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
         integer    , optional, intent(in) :: order
 
         integer :: loop,nit
-        real(RKIND) :: smooth_now(3)
+        real(FP_REAL) :: smooth_now(3)
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -530,7 +530,7 @@ module fitpack_parametric_curves
     end function curve_fit_automatic_knots
 
     ! Return fitting MSE
-    elemental real(RKIND) function curve_error(this)
+    elemental real(FP_REAL) function curve_error(this)
        class(fitpack_parametric_curve), intent(in) :: this
        curve_error = this%fp
     end function curve_error
@@ -538,10 +538,10 @@ module fitpack_parametric_curves
     !> Evaluate k-th derivative of the curve at point u
     function curve_derivative(this, u, order, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout) :: this
-       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
+       real(FP_REAL),          intent(in)    :: u      ! Evaluation points (parameter)
        integer,              intent(in)    :: order  ! Derivative order. 0=function; 1:k=i-th derivative
        integer, optional,    intent(out)   :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim)   :: ddx
+       real(FP_REAL), dimension(this%idim)   :: ddx
 
        integer :: ddx_order,ierr0
 
@@ -575,9 +575,9 @@ module fitpack_parametric_curves
     !> Evaluate all derivatives (0:k) of the curve at point u
     function curve_all_derivatives(this, u, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout) :: this
-       real(RKIND),          intent(in)    :: u      ! Evaluation points (parameter)
+       real(FP_REAL),          intent(in)    :: u      ! Evaluation points (parameter)
        integer, optional,    intent(out)   :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim,0:this%order) :: ddx
+       real(FP_REAL), dimension(this%idim,0:this%order) :: ddx
 
        integer :: ierr0
 
@@ -637,10 +637,10 @@ module fitpack_parametric_curves
     !> Use 1st derivative if order not present
     function curve_derivatives(this, u, order, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout)  :: this
-       real(RKIND),          intent(in)     :: u(:)   ! Evaluation points (parameter)
+       real(FP_REAL),          intent(in)     :: u(:)   ! Evaluation points (parameter)
        integer,              intent(in)     :: order  ! Derivative order. Default 1
        integer, optional,    intent(out)    :: ierr   ! Optional error flag
-       real(RKIND), dimension(this%idim,size(u)) :: ddx
+       real(FP_REAL), dimension(this%idim,size(u)) :: ddx
 
        integer :: i,ierr0
 

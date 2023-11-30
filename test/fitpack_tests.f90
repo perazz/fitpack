@@ -64,11 +64,12 @@ module fitpack_tests
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnbisp(iunit) result(success)
           integer, optional, intent(in) :: iunit
-          integer, parameter :: mx = 6, my = 6
-          real(RKIND) :: fac,facx
-          integer     :: i,ier,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny
-          real(RKIND) :: tx(15),ty(15),c(100),x(mx),y(my),z(mx*my),wrk(100)
-          integer     :: iwrk(20),useUnit
+          integer(FP_SIZE), parameter :: mx = 6, my = 6
+          real(FP_REAL)    :: fac,facx
+          integer(FP_SIZE) :: i,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny
+          integer(FP_FLAG) :: ier
+          real(FP_REAL)    :: tx(15),ty(15),c(100),x(mx),y(my),z(mx*my),wrk(100)
+          integer(FP_SIZE) :: iwrk(20),useUnit
 
           ! Output unit
           if (present(iunit)) then
@@ -81,7 +82,7 @@ module fitpack_tests
           success = .true.
 
           ! we set up the grid points for evaluating the tensor product splines.
-          x = 0.2_RKIND*[0,1,2,3,4,5]
+          x = 0.2_FP_REAL*[0,1,2,3,4,5]
           y = x
 
           ! loop for different spline degrees with respect to the x-variable
@@ -184,14 +185,15 @@ module fitpack_tests
           integer, intent(in), optional :: iunit
 
           ! m denotes the number of data points
-          integer, parameter :: m = 19
-          integer, parameter :: nest = 40
-          integer, parameter :: lwrk = 1500
-          integer, parameter :: nc = 80
-          real(RKIND) :: x(2*m),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(nest)
-          integer     :: iwrk(40)
-          real(RKIND) :: al,del,fp,s
-          integer     :: i,idim,ier,iopt,ipar,is,i1,i2,j,j1,k,l,l1,mx,n,nk1,useUnit
+          integer(FP_SIZE), parameter :: m = 19
+          integer(FP_SIZE), parameter :: nest = 40
+          integer(FP_SIZE), parameter :: lwrk = 1500
+          integer(FP_SIZE), parameter :: nc = 80
+          real(FP_REAL) :: x(2*m),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(nest)
+          integer(FP_SIZE) :: iwrk(40)
+          real(FP_REAL) :: al,del,fp,s
+          integer(FP_SIZE) :: i,idim,iopt,ipar,is,i1,i2,j,j1,k,l,l1,mx,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
 
           if (present(iunit)) then
               useUnit = iunit
@@ -239,30 +241,30 @@ module fitpack_tests
 
                    ! we start computing the least-squares point ( s very large)
                    iopt = 0
-                   s = 900.0_RKIND
+                   s = 900.0_FP_REAL
 
                 case (2)
 
                    ! iopt =  1 from the second call on
                    iopt = 1
-                   s = 10.0_RKIND
+                   s = 10.0_FP_REAL
 
                 case (3)
 
                    ! a smaller value for s to get a closer approximation
-                   s = 0.1_RKIND
+                   s = 0.1_FP_REAL
 
                 case (4)
 
                    ! a larger value for s to get a smoother approximation
-                   s = 0.5_RKIND
+                   s = 0.5_FP_REAL
 
                 case (5)
 
                    ! if a satisfactory fit is obtained we can calculate a curve of equal quality
                    ! of fit (same value for s) but possibly with fewer knots by specifying iopt=0
                    iopt = 0
-                   s = 0.5_RKIND
+                   s = 0.5_FP_REAL
 
                 case (6)
 
@@ -270,14 +272,14 @@ module fitpack_tests
                    ! factor s, but now we let the program determine parameter values u(i)
                    ipar = 0
                    iopt = 0
-                   s = 0.5_RKIND
+                   s = 0.5_FP_REAL
 
                 case (7)
 
                    ! we choose a different degree of spline approximation
                    k = 5
                    iopt = 0
-                   s = 0.5_RKIND
+                   s = 0.5_FP_REAL
 
                 case (8)
 
@@ -290,7 +292,7 @@ module fitpack_tests
                    iopt = -1
                    n = 9+2*k
                    j = k+2
-                   del = (u(m)-u(1))*0.125_RKIND
+                   del = (u(m)-u(1))*0.125_FP_REAL
                    do l=1,7
                       al = l
                       t(j) = u(1)+al*del
@@ -376,16 +378,17 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           ! m denotes the number of data points.
-          integer, parameter :: m = 16
-          integer, parameter :: nest = 20
-          integer, parameter :: lwrk = 550
-          integer, parameter :: kwrk = 450
+          integer(FP_SIZE), parameter :: m = 16
+          integer(FP_SIZE), parameter :: nest = 20
+          integer(FP_SIZE), parameter :: lwrk = 550
+          integer(FP_SIZE), parameter :: kwrk = 450
 
-          real(RKIND) :: x(m),y(m),w(m),v(m),sx(m),s2(m),t(nest),c(nest),wrk(lwrk),s(3)
-          integer     :: iwrk(kwrk)
-          logical     :: bind(nest)
-          integer     :: i,ier,iopt,is,j,maxbin,maxtr,n,useUnit
-          real(RKIND) :: sq
+          real(FP_REAL)    :: x(m),y(m),w(m),v(m),sx(m),s2(m),t(nest),c(nest),wrk(lwrk),s(3)
+          integer(FP_SIZE) :: iwrk(kwrk)
+          logical(FP_BOOL) :: bind(nest)
+          integer(FP_SIZE) :: i,iopt,is,j,maxbin,maxtr,n,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL)    :: sq
 
           ! Decide output unit
           if (present(iunit)) then
@@ -404,9 +407,9 @@ module fitpack_tests
 
           !  we set up the weights of the data points.
           w = one
-          w(1) = 10.0_RKIND
-          w(2) = 3.0_RKIND
-          w(16) = 10.0_RKIND
+          w(1) = 10.0_FP_REAL
+          w(2) = 3.0_FP_REAL
+          w(16) = 10.0_FP_REAL
 
           !  we will determine concave approximations
           v = one
@@ -450,7 +453,7 @@ module fitpack_tests
              write(useUnit,940) (c(i),i=1,n-4)
 
              ! we evaluate the second order derivative of the spline.
-             call splder(t,n,c,3,2,x,s2,m,0,wrk,ier)
+             call splder(t,n,c,3,2,x,s2,m,OUTSIDE_EXTRAPOLATE,wrk,ier)
 
              if (.not.FITPACK_SUCCESS(ier)) then
                  success = .false.
@@ -490,25 +493,26 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  m denotes the number of data points
-          integer, parameter :: m = 31
+          integer(FP_SIZE), parameter :: m = 31
 
           !  we have a planar curve  x = sx(u) , y = sy(u)
-          integer, parameter :: idim = 2
+          integer(FP_SIZE), parameter :: idim = 2
 
           !  we set up the dimension information.
-          integer, parameter :: mx = idim*m
-          integer, parameter :: lwrk = 1400
-          integer, parameter :: ndd = 12
-          integer, parameter :: np = 24
-          integer, parameter :: nb = 6
-          integer, parameter :: ne = 6
-          integer, parameter :: nest = 50
-          integer, parameter :: nc = 100
+          integer(FP_SIZE), parameter :: mx = idim*m
+          integer(FP_SIZE), parameter :: lwrk = 1400
+          integer(FP_SIZE), parameter :: ndd = 12
+          integer(FP_SIZE), parameter :: np = 24
+          integer(FP_SIZE), parameter :: nb = 6
+          integer(FP_SIZE), parameter :: ne = 6
+          integer(FP_SIZE), parameter :: nest = 50
+          integer(FP_SIZE), parameter :: nc = 100
 
-          real(RKIND) :: x(mx),w(m),u(m),t(nest),c(nc),wrk(lwrk),xx(mx),db(nb),de(ne),cp(np),dd(ndd),sp(mx)
-          integer :: iwrk(50)
-          real(RKIND) :: ai,del,fp,s,sigma
-          integer :: i,ib,ie,ier,iopt,is,i1,i2,j,j1,k,kk,k1,l,l1,l2,n,nk1,useUnit
+          real(FP_REAL) :: x(mx),w(m),u(m),t(nest),c(nc),wrk(lwrk),xx(mx),db(nb),de(ne),cp(np),dd(ndd),sp(mx)
+          integer(FP_SIZE) :: iwrk(50)
+          real(FP_REAL) :: ai,del,fp,s,sigma
+          integer(FP_SIZE) :: i,ib,ie,iopt,is,i1,i2,j,j1,k,kk,k1,l,l1,l2,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -519,11 +523,11 @@ module fitpack_tests
           end if
 
           ! the data abscissae values
-          x(1:61:2) = [ real(RKIND) :: -3.109,-2.188,-1.351,-0.605,0.093,0.451,0.652,0.701,0.518,0.277,0.008,&
+          x(1:61:2) = [ real(FP_REAL) :: -3.109,-2.188,-1.351,-0.605,0.093,0.451,0.652,0.701,0.518,0.277,0.008,&
                        -0.291,-0.562,-0.679,-0.637,-0.425,-0.049,0.575,1.334,2.167,3.206,4.099,4.872,5.710,&
                        6.330,6.741,6.928,6.965,6.842,6.593,6.269]
           !  the data ordinate values
-          x(2:62:2) = [ real(RKIND) :: 3.040,2.876,2.634,2.183,1.586,1.010,0.382,-0.218,-0.632,-0.879,-0.981,&
+          x(2:62:2) = [ real(FP_REAL) :: 3.040,2.876,2.634,2.183,1.586,1.010,0.382,-0.218,-0.632,-0.879,-0.981,&
                        -0.886,-0.642,-0.195,0.373,1.070,1.607,2.165,2.618,2.905,2.991,2.897,2.615,2.164,1.617,&
                        0.977,0.383,-0.194,-0.665,-0.901,-1.010]
 
@@ -696,13 +700,13 @@ module fitpack_tests
 
       end function mnconc
 
-      pure real(RKIND) function r1(v)
-          real(RKIND), intent(in) :: v
+      pure real(FP_REAL) function r1(v)
+          real(FP_REAL), intent(in) :: v
           r1 = one
       end function r1
 
-      pure real(RKIND) function r2(v)
-          real(RKIND), intent(in) :: v
+      pure real(FP_REAL) function r2(v)
+          real(FP_REAL), intent(in) :: v
           r2 = (one+cos(v)**2)*half
       end function r2
 
@@ -717,19 +721,20 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           ! m denotes the number of data points.
-          integer, parameter :: m = 10
+          integer(FP_SIZE), parameter :: m = 10
 
           !  we set up the dimension information.
-          integer, parameter :: maxtr = 100
-          integer, parameter :: maxbin = 10
-          integer, parameter :: lwrk = 550
-          integer, parameter :: kwrk = 450
+          integer(FP_SIZE), parameter :: maxtr = 100
+          integer(FP_SIZE), parameter :: maxbin = 10
+          integer(FP_SIZE), parameter :: lwrk = 550
+          integer(FP_SIZE), parameter :: kwrk = 450
 
-          real(RKIND) :: x(m),y(m),w(m),sx(m),s2(m),t(20),c(20),e(20),wrk(550)
-          integer     :: iwrk(450)
-          logical     :: bind(20)
-          integer     :: i,ier,is,j,n,n4,n6,useUnit
-          real(RKIND) :: sq
+          real(FP_REAL)    :: x(m),y(m),w(m),sx(m),s2(m),t(20),c(20),e(20),wrk(550)
+          integer(FP_SIZE) :: iwrk(450)
+          logical(FP_BOOL) :: bind(20)
+          integer(FP_SIZE) :: i,is,j,n,n4,n6,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: sq
 
           !  initialization.
           success = .true.
@@ -740,9 +745,9 @@ module fitpack_tests
           end if
 
           !  the absciss values of the data points.
-          x = [ real(RKIND) :: 0.25,0.5,0.75,1.25,1.75,2.25,2.75,3.25,6.25,12.25 ]
+          x = [ real(FP_REAL) :: 0.25,0.5,0.75,1.25,1.75,2.25,2.75,3.25,6.25,12.25 ]
           !  the ordinate values of the data points.
-          y = [ real(RKIND) :: 17.0,15.2,13.8,12.2,11.0,10.1,9.4,8.6,6.1,3.5 ]
+          y = [ real(FP_REAL) :: 17.0,15.2,13.8,12.2,11.0,10.1,9.4,8.6,6.1,3.5 ]
 
           !  we set up the weights of the data points.
           w = one
@@ -807,7 +812,7 @@ module fitpack_tests
              write(useUnit,955) (c(i),i=1,n4)
 
              !  we evaluate the second order derivative of the spline.
-             call splder(t,n,c,3,2,x,s2,m,0,wrk,ier)
+             call splder(t,n,c,3,2,x,s2,m,OUTSIDE_EXTRAPOLATE,wrk,ier)
              write(useUnit,960)
              do i=1,m
                 write(useUnit,965) i,x(i),y(i),sx(i),s2(i)
@@ -847,15 +852,16 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  we have a planar curve
-          integer, parameter :: idim = 2
+          integer(FP_SIZE), parameter :: idim = 2
           !  set up the dimension information
-          integer, parameter :: nc = 40
-          integer, parameter :: nd = 12
-          integer, parameter :: m = 20
+          integer(FP_SIZE), parameter :: nc = 40
+          integer(FP_SIZE), parameter :: nd = 12
+          integer(FP_SIZE), parameter :: m = 20
 
-          real(RKIND) :: t(m),c(nc),u(m),sp(nc),d(nd),cof(2,6)
-          integer     :: i,ier,ii,ip,i1,i2,j,jj,jn,j1,j2,j3,j4,k,kk,k1,l,l1,n,nk,nk1,useUnit
-          real(RKIND) :: aj,arg,fac,per,pol,tt,uu
+          real(FP_REAL)    :: t(m),c(nc),u(m),sp(nc),d(nd),cof(2,6)
+          integer(FP_SIZE) :: i,ii,ip,i1,i2,j,jj,jn,j1,j2,j3,j4,k,kk,k1,l,l1,n,nk,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL)    :: aj,arg,fac,per,pol,tt,uu
 
           !  initialization.
           success = .true.
@@ -866,7 +872,7 @@ module fitpack_tests
           end if
 
           !  set up the points where the curve will be evaluated.
-          u = 0.05_RKIND*[(i-1,i=1,m)]
+          u = 0.05_FP_REAL*[(i-1,i=1,m)]
 
           !  main loop for the different spline degrees.
           spline_degree: do k=3,5,2
@@ -878,7 +884,7 @@ module fitpack_tests
               n = 2*k1+4
 
               ! set up the knots of the spline
-              t(k1:k1+5) = [ real(RKIND) :: zero,0.1,0.3,0.4,0.8,one]
+              t(k1:k1+5) = [ real(FP_REAL) :: zero,0.1,0.3,0.4,0.8,one]
 
               ! fetch the b-spline coefficients for sx(u)
               c(1:5) = [one,three,four,five,-one]
@@ -1023,9 +1029,10 @@ module fitpack_tests
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mncuev(iunit) result(success)
           integer, optional, intent(in) :: iunit
-          real(RKIND) :: u(20),t(20),c(40),sp(40)
-          integer     :: i,idim,i1,i2,ier,j,jn,j1,j2,j3,j4,k,k1,m,mx,n,nc,nk,nk1,useUnit
-          real(RKIND) :: per
+          real(FP_REAL) :: u(20),t(20),c(40),sp(40)
+          integer(FP_SIZE) :: i,idim,i1,i2,j,jn,j1,j2,j3,j4,k,k1,m,mx,n,nc,nk,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: per
 
           success = .true.
           if (present(iunit)) then
@@ -1042,7 +1049,7 @@ module fitpack_tests
 
           !  set up the points where the curve will be evaluated.
           m = 20
-          u = 0.05_RKIND*[(i,i=0,m-1)]
+          u = 0.05_FP_REAL*[(i,i=0,m-1)]
 
           !  main loop for the different spline degrees.
           spline_degrees: do k=1,5
@@ -1132,20 +1139,21 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  m denotes the number of data points
-          integer, parameter :: m = 25
+          integer(FP_SIZE), parameter :: m = 25
 
           ! we set up the dimension information
-          integer :: nest = 35
-          integer, parameter :: lwrk = 1000
+          integer(FP_SIZE) :: nest = 35
+          integer(FP_SIZE), parameter :: lwrk = 1000
 
-          real(RKIND) :: t(35),c(35),wrk(lwrk),sp(m)
-          real(RKIND) :: ai,fp,s,xb,xe
-          integer     :: i,ier,iopt,is,j,k,l,l1,l2,n,nk1,iwrk(35),useUnit
+          real(FP_REAL) :: t(35),c(35),wrk(lwrk),sp(m)
+          real(FP_REAL) :: ai,fp,s,xb,xe
+          integer(FP_SIZE) :: i,iopt,is,j,k,l,l1,l2,n,nk1,iwrk(35),useUnit
+          integer(FP_FLAG) :: ier
 
           ! we set up the abscissae, ordinate values, and weights of the data points
-          real(RKIND), parameter :: w(m) = one
-          real(RKIND), parameter :: x(m) = [(real(i-1,RKIND),i=1,m)]
-          real(RKIND), parameter :: y(m) = [ real(RKIND) :: 1.0,1.0,1.4,1.1,1.0,1.0,4.0,9.0,13.0,13.4, &
+          real(FP_REAL), parameter :: w(m) = one
+          real(FP_REAL), parameter :: x(m) = [(real(i-1,FP_REAL),i=1,m)]
+          real(FP_REAL), parameter :: y(m) = [ real(FP_REAL) :: 1.0,1.0,1.4,1.1,1.0,1.0,4.0,9.0,13.0,13.4, &
                                              12.8,13.1,13.0,14.0,13.0,13.5,10.0,2.0,3.0,2.5,2.5,2.5, &
                                              3.0,4.0,3.5]
 
@@ -1170,21 +1178,21 @@ module fitpack_tests
                   case (1)
                      !  we start computing the least-squares polynomial (large value for s).
                      iopt = 0
-                     s = 1000.0_RKIND
+                     s = 1000.0_FP_REAL
                   case (2)
                      !  iopt=1 from the second call on
                      iopt = 1
-                     s = 60.0_RKIND
+                     s = 60.0_FP_REAL
                   case (3)
                      !  a smaller value for s to get a closer approximation
-                     s = 10.0_RKIND
+                     s = 10.0_FP_REAL
                   case (4)
                      !  a larger value for s to get a smoother approximation
-                     s = 30.0_RKIND
+                     s = 30.0_FP_REAL
                   case (5)
                      !  if a satisfactory fit is obtained  we can calculate a spline of equal quality
                      !  of fit ( same value for s ) but possibly with fewer knots by specifying iopt=0
-                     s = 30.0_RKIND
+                     s = 30.0_FP_REAL
                      iopt = 0
                   case (6)
                      !  we calculate an interpolating spline
@@ -1229,7 +1237,7 @@ module fitpack_tests
                 write(useUnit,955)
 
                 ! evaluation of the spline approximation
-                call splev(t,n,c,k,x,sp,m,0,ier)
+                call splev(t,n,c,k,x,sp,m,OUTSIDE_EXTRAPOLATE,ier)
                 if (.not.FITPACK_SUCCESS(ier)) then
                     success = .false.
                     write(useUnit,1000)is,FITPACK_MESSAGE(ier)
@@ -1268,9 +1276,9 @@ module fitpack_tests
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mndbin(iunit) result(success)
           integer, optional, intent(in) :: iunit
-          real(RKIND) :: fac,facx,aint,exint,xb,xe,yb,ye
-          integer     :: i,j,kx,kx1,ky,ky1,mx,my,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
-          real(RKIND) :: tx(15),ty(15),c(100),x(6),y(6),wrk(50)
+          real(FP_REAL) :: fac,facx,aint,exint,xb,xe,yb,ye
+          integer(FP_SIZE) :: i,j,kx,kx1,ky,ky1,mx,my,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
+          real(FP_REAL) :: tx(15),ty(15),c(100),x(6),y(6),wrk(50)
 
           success = .true.
           if (present(iunit)) then
@@ -1376,9 +1384,9 @@ module fitpack_tests
       logical function mnevpo(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: fac
-          integer     :: i,ir,j,m,mx,my,m0,m1,m2,nc,nu4,nv4,nu,nv,useUnit
-          real(RKIND) :: tu(11),tv(10),c(42),x(6),y(6),f(36),fa(36)
+          real(FP_REAL) :: fac
+          integer(FP_SIZE) :: i,ir,j,m,mx,my,m0,m1,m2,nc,nu4,nv4,nu,nv,useUnit
+          real(FP_REAL) :: tu(11),tv(10),c(42),x(6),y(6),f(36),fa(36)
 
           success = .true.
           if (present(iunit)) then
@@ -1391,7 +1399,7 @@ module fitpack_tests
           mx = 6
           my = 6
 
-          x = [((2*i-7)*0.1_RKIND,i=1,6)]
+          x = [((2*i-7)*0.1_FP_REAL,i=1,6)]
           y = x
 
           !  the knots with respect to the u-variable.
@@ -1506,13 +1514,13 @@ module fitpack_tests
 
           contains
 
-             elemental real(RKIND) function f1(x,y)
-                 real(RKIND), intent(in) :: x,y
+             elemental real(FP_REAL) function f1(x,y)
+                 real(FP_REAL), intent(in) :: x,y
                  f1 = x**2+y**2
              end function f1
 
-             elemental real(RKIND) function f2(x,y)
-                 real(RKIND), intent(in) :: x,y
+             elemental real(FP_REAL) function f2(x,y)
+                 real(FP_REAL), intent(in) :: x,y
                  f2 = 4*(x**2+y**2)**3/(4*x**4 +y**4 +4*x**2*y**2)
              end function f2
 
@@ -1529,9 +1537,10 @@ module fitpack_tests
       logical function mnfour(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: c(20),t(20),wrk1(20),wrk2(20),alfa(10),ress(10),resc(10)
-          integer     :: i,ier,j,k,k1,m,n,nk1,useUnit
-          real(RKIND) :: ak,rc,rs
+          real(FP_REAL) :: c(20),t(20),wrk1(20),wrk2(20),alfa(10),ress(10),resc(10)
+          integer(FP_SIZE) :: i,j,k,k1,m,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: ak,rc,rs
 
           ! Initialization.
           success = .true.
@@ -1557,7 +1566,7 @@ module fitpack_tests
           t(n-k:n) = one
 
           !  the interior knots
-          t(5:8) = [real(RKIND) :: 0.1, 0.3, 0.4, 0.8]
+          t(5:8) = [real(FP_REAL) :: 0.1, 0.3, 0.4, 0.8]
 
           !  find the b-spline representation of y=x
           nk1  = n-k1
@@ -1578,7 +1587,7 @@ module fitpack_tests
           !  fetch the different values for alfa
           m = 8
           alfa(1) = zero
-          alfa(2) = 0.001_RKIND
+          alfa(2) = 0.001_FP_REAL
           do i=3,m
               alfa(i) = -10*alfa(i-1)
           end do
@@ -1632,11 +1641,11 @@ module fitpack_tests
       !             0 /
       elemental subroutine exfour(alfa,rs,rc)
 
-          real(RKIND), intent(in) :: alfa
-          real(RKIND), intent(out) :: rs,rc
+          real(FP_REAL), intent(in) :: alfa
+          real(FP_REAL), intent(out) :: rs,rc
 
-          integer :: k,k2
-          real(RKIND) :: aa,ak,cc,c1,ss,s1
+          integer(FP_SIZE) :: k,k2
+          real(FP_REAL) :: aa,ak,cc,c1,ss,s1
 
           if (equal(alfa,zero)) then
               rs = zero
@@ -1686,12 +1695,13 @@ module fitpack_tests
       logical function mnist(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          integer, parameter :: m = 21
-          integer, parameter :: nest = 30
+          integer(FP_SIZE), parameter :: m = 21
+          integer(FP_SIZE), parameter :: nest = 30
 
-          real(RKIND) :: t1(nest),c1(nest),t2(nest),c2(nest),x(m),y(m),y1(m),y2(m)
-          integer :: i,ier,iopt,ip,i1,i2,j,j1,j2,k,k1,nk,n1,n1k1,n2,n2k1,useUnit
-          real(RKIND) :: per
+          real(FP_REAL) :: t1(nest),c1(nest),t2(nest),c2(nest),x(m),y(m),y1(m),y2(m)
+          integer(FP_SIZE) :: i,iopt,ip,i1,i2,j,j1,j2,k,k1,nk,n1,n1k1,n2,n2k1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: per
 
           ! Initialization.
           if (present(iunit)) then
@@ -1701,7 +1711,7 @@ module fitpack_tests
           end if
 
           !  set up the points where the splines will be evaluated.
-          x = [(0.05_RKIND*(i-1),i=1,m)]
+          x = [(0.05_FP_REAL*(i-1),i=1,m)]
 
           !  main loop for the different spline degrees.
           spline_degrees: do k=3,5,2
@@ -1721,14 +1731,14 @@ module fitpack_tests
                   n1 = 2*k1+5
                   n1k1 = n1-k1
 
-                  t1(k1:k1+6) = [real(RKIND) :: 0.0,0.2,0.3,0.4,0.7,0.9,1.0]
+                  t1(k1:k1+6) = [real(FP_REAL) :: 0.0,0.2,0.3,0.4,0.7,0.9,1.0]
                   c1(1:6)     = [one,two,-one,three,three,-three]
 
                   !  fetch the knots and b-spline coefficients of the second spline s2(x).
                   n2 = 2*k1+6
                   n2k1 = n2-k1
 
-                  t2(k1:k1+7) = [real(RKIND) :: 0.0,0.1,0.2,0.3,0.4,0.7,0.8,1.0]
+                  t2(k1:k1+7) = [real(FP_REAL) :: 0.0,0.1,0.2,0.3,0.4,0.7,0.8,1.0]
                   c2(1:7)     = [two,-two,one,-three,four,four,four]
 
                   !  incorporate the boundary conditions for periodic splines.
@@ -1812,20 +1822,20 @@ module fitpack_tests
                   call splev(t2,n2,c2,k,x,y2,m,OUTSIDE_EXTRAPOLATE,ier)
 
                   !  insert the knots of the second spline into those of the first one
-                  call insert_inplace(iopt,t1,n1,c1,k,0.1_RKIND,nest,ier)
+                  call insert_inplace(iopt,t1,n1,c1,k,0.1_FP_REAL,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,1,FITPACK_MESSAGE(ier)
                   end if
 
-                  call insert_inplace(iopt,t1,n1,c1,k,0.8_RKIND,nest,ier)
+                  call insert_inplace(iopt,t1,n1,c1,k,0.8_FP_REAL,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+2,1,FITPACK_MESSAGE(ier)
                   end if
 
                   !  insert the knots of the first spline into those of the second one
-                  call insert_inplace(iopt,t2,n2,c2,k,0.9_RKIND,nest,ier)
+                  call insert_inplace(iopt,t2,n2,c2,k,0.9_FP_REAL,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,2,FITPACK_MESSAGE(ier)
@@ -1847,7 +1857,7 @@ module fitpack_tests
                   write(useUnit,930) (c1(i),i=1,n1k1)
 
                   !  evaluate this new spline and compare results
-                  call splev(t1,n1,c1,k,x,y,m,0,ier)
+                  call splev(t1,n1,c1,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
                   write(useUnit,955)
                   do i=1,m
                       write(useUnit,960) i,x(i),y1(i),y2(i),y(i)
@@ -1882,14 +1892,15 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
 
-          integer, parameter :: mx = 6
-          integer, parameter :: my = 6
+          integer(FP_SIZE), parameter :: mx = 6
+          integer(FP_SIZE), parameter :: my = 6
 
-          real(RKIND) :: fac,facx
-          integer :: i,ix,iy,ier,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc, &
-           nkx1,nky1,nux,nuy,nx,ny,useUnit
-          real(RKIND) :: tx(15),ty(15),c(100),x(mx),y(my),z(mx*my),wrk(200)
-          integer :: iwrk(20)
+          real(FP_REAL) :: fac,facx
+          integer(FP_SIZE) :: i,ix,iy,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc, &
+                              nkx1,nky1,nux,nuy,nx,ny,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: tx(15),ty(15),c(100),x(mx),y(my),z(mx*my),wrk(200)
+          integer(FP_SIZE) :: iwrk(20)
 
           ! Initialization.
           success = .true.
@@ -1900,7 +1911,7 @@ module fitpack_tests
           end if
 
           !  we set up the grid points for evaluating the spline derivatives.
-          x = [(0.2_RKIND*(i-1),i=1,6)]
+          x = [(0.2_FP_REAL*(i-1),i=1,6)]
           y = x
 
           !  loop for different spline degrees with respect to the x-variable
@@ -2003,21 +2014,22 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  m denotes the number of data points
-          integer, parameter :: m = 32
+          integer(FP_SIZE), parameter :: m = 32
 
           !  we will determine a planar curve   x=sx(u) , y=sy(u)
-          integer, parameter :: idim = 2
+          integer(FP_SIZE), parameter :: idim = 2
 
           !  we set up the dimension information.
-          integer, parameter :: nest = 40
-          integer, parameter :: lwrk = 1200
-          integer, parameter :: nc = 80
-          integer, parameter :: mx = 64
+          integer(FP_SIZE), parameter :: nest = 40
+          integer(FP_SIZE), parameter :: lwrk = 1200
+          integer(FP_SIZE), parameter :: nc = 80
+          integer(FP_SIZE), parameter :: mx = 64
 
-          real(RKIND) :: x(mx),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(mx)
-          integer     :: iwrk(40)
-          real(RKIND) :: al,del,fp,s,ub,ue
-          integer     :: i,ier,iopt,ipar,is,i1,i2,j,j1,k,l,l1,n,nk1,useUnit
+          real(FP_REAL) :: x(mx),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(mx)
+          integer(FP_SIZE) :: iwrk(40)
+          real(FP_REAL) :: al,del,fp,s,ub,ue
+          integer(FP_SIZE) :: i,iopt,ipar,is,i1,i2,j,j1,k,l,l1,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -2028,7 +2040,7 @@ module fitpack_tests
           end if
 
           !  the data parameter values
-          u = [real(RKIND) :: 120.,128.,133.,136.,138.,141.,144.,146.,149.,151.,154.,161.,170.,180.,190.,&
+          u = [real(FP_REAL) :: 120.,128.,133.,136.,138.,141.,144.,146.,149.,151.,154.,161.,170.,180.,190.,&
                 200.,210.,220.,230.,240.,250.,262.,269.,273.,278.,282.,287.,291.,295.,299.,305.,315.]
 
           !  the data absciss values
@@ -2047,8 +2059,8 @@ module fitpack_tests
           k = 3
           !  we will also supply the parameter values u(i)
           ipar = 1
-          ub = 120.0_RKIND
-          ue = 320.0_RKIND
+          ub = 120.0_FP_REAL
+          ue = 320.0_FP_REAL
 
           !  loop for the different approximating spline curves
           approximations: do is=1,9
@@ -2058,44 +2070,44 @@ module fitpack_tests
 
                     !  we start computing a polynomial curve ( s very large)
                     iopt = 0
-                    s = 100.0_RKIND
+                    s = 100.0_FP_REAL
 
                  case (2)
 
                     !  iopt =  1 from the second call on
                     iopt = 1
-                    s = 1.0_RKIND
+                    s = 1.0_FP_REAL
 
                  case (3)
 
                     !  a smaller value for s to get a closer approximation
-                    s = 0.05_RKIND
+                    s = 0.05_FP_REAL
 
                  case (4)
 
                     !  a larger value for s to get a smoother approximation
-                    s = 0.25_RKIND
+                    s = 0.25_FP_REAL
 
                  case (5)
 
                     !  if a satisfactory fit is obtained we can calculate a curve of equal quality of
                     !  fit (same value for s) but possibly with fewer knots by specifying iopt=0
                     iopt = 0
-                    s = 0.25_RKIND
+                    s = 0.25_FP_REAL
 
                  case (6)
                     !  we determine a spline curve with respect to the same smoothing
                     !  factor s,  but now we let the program determine parameter values u(i)
                     ipar = 0
                     iopt = 0
-                    s = 0.25_RKIND
+                    s = 0.25_FP_REAL
 
                  case (7)
 
                     !  we choose a different degree of spline approximation
                     k = 5
                     iopt = 0
-                    s = 0.25_RKIND
+                    s = 0.25_FP_REAL
 
                  case (8)
 
@@ -2108,7 +2120,7 @@ module fitpack_tests
                     iopt =-1
                     n = 9+2*k
                     j = k+2
-                    del = (ue-ub)*0.125_RKIND
+                    del = (ue-ub)*0.125_FP_REAL
                     do l=1,7
                         al = l
                         t(j) = ub+al*del
@@ -2188,26 +2200,28 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnpasu(datafile,iunit) result(success)
-          real(RKIND), intent(in) :: datafile(:,:,:)
+          real(FP_REAL), intent(in) :: datafile(:,:,:)
           integer, optional, intent(in) :: iunit
 
-          integer, parameter :: mu = 21
-          integer, parameter :: mv = 11
-          integer, parameter :: m  = mu*mv
+          integer(FP_SIZE), parameter :: mu = 21
+          integer(FP_SIZE), parameter :: mv = 11
+          integer(FP_SIZE), parameter :: m  = mu*mv
 
           !  the dimension of the surface
-          integer, parameter :: idim = 3
+          integer(FP_SIZE), parameter :: idim = 3
 
           !  we set up the dimension information
-          integer, parameter :: nuest = 27
-          integer, parameter :: nvest = 17
-          integer, parameter :: lwrk = 2000
-          integer, parameter :: kwrk = 80
+          integer(FP_SIZE), parameter :: nuest = 27
+          integer(FP_SIZE), parameter :: nvest = 17
+          integer(FP_SIZE), parameter :: lwrk = 2000
+          integer(FP_SIZE), parameter :: kwrk = 80
 
-          real(RKIND), dimension(mv,mu,idim) :: f,z
-          real(RKIND) :: u(mu),v(mv),tu(27),tv(17),c(900),wrk(lwrk),wk(128)
-          integer     :: iwrk(kwrk),iw(32),ipar(2),nc,nu,nv,i,ier,is,iopt,j,l,useUnit,j0,j1
-          real(RKIND) :: ai,fp,s
+          real(FP_REAL), dimension(mv,mu,idim) :: f,z
+          real(FP_REAL) :: u(mu),v(mv),tu(27),tv(17),c(900),wrk(lwrk),wk(128)
+          integer(FP_SIZE) :: iwrk(kwrk),iw(32),ipar(2),nc,nu,nv,i,is,iopt,j,l,useUnit,j0,j1
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: ai,fp,s
+
 
           success = .true.
           if (present(iunit)) then
@@ -2352,16 +2366,17 @@ module fitpack_tests
           integer, optional, intent(in) :: iunit
 
           !  m denotes the number of data points
-          integer, parameter :: m = 27
+          integer(FP_SIZE), parameter :: m = 27
 
           !  we set up the dimension information.
-          integer, parameter :: nest = 37
-          integer, parameter :: lwrk = 1400
+          integer(FP_SIZE), parameter :: nest = 37
+          integer(FP_SIZE), parameter :: lwrk = 1400
 
-          real(RKIND) :: x(m),y(m),w(m),t(nest),c(nest),wrk(lwrk),sp(m)
-          integer     :: iwrk(nest)
-          real(RKIND) :: fp,s
-          integer     :: i,ier,iopt,is,k,l,l1,l2,m1,n,nk1,useUnit
+          real(FP_REAL) :: x(m),y(m),w(m),t(nest),c(nest),wrk(lwrk),sp(m)
+          integer(FP_SIZE) :: iwrk(nest)
+          real(FP_REAL) :: fp,s
+          integer(FP_SIZE) :: i,iopt,is,k,l,l1,l2,m1,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -2379,7 +2394,7 @@ module fitpack_tests
                     21.560,28.041,39.205,59.489,72.559,75.960,79.137,75.925,68.809,55.758,39.915,22.006,12.076]
 
           !  the period of the spline is determined by x(m)
-          x(m) = 100.0_RKIND
+          x(m) = 100.0_FP_REAL
           y(m) = y(1)
 
           !  we set up the weights of the data points
@@ -2463,7 +2478,7 @@ module fitpack_tests
                   write(useUnit,955)
 
                   !  evaluation of the spline approximation
-                  call splev(t,n,c,k,x,sp,m,0,ier)
+                  call splev(t,n,c,k,x,sp,m,OUTSIDE_EXTRAPOLATE,ier)
 
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
@@ -2501,28 +2516,29 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnpogr(datafile,iunit) result(success)
-          real(RKIND), intent(in) :: datafile(:)
+          real(FP_REAL), intent(in) :: datafile(:)
           integer, optional, intent(in) :: iunit
 
           !  ..local scalars..
-          real(RKIND) :: ermax,er0,exz0,fp,r,sum,x,y,z0,s
-          integer :: i,ier,is,j,k,m,nc,nu,nv,useUnit
+          real(FP_REAL) :: ermax,er0,exz0,fp,r,sum,x,y,z0,s
+          integer(FP_SIZE) :: i,is,j,k,m,nc,nu,nv,useUnit
+          integer(FP_FLAG) :: ier
 
           ! number of u (radius)-values of the grid.
-          integer, parameter :: mu = 9
+          integer(FP_SIZE), parameter :: mu = 9
 
           ! number of v (angle)-values of the grid
-          integer, parameter :: mv = 20
+          integer(FP_SIZE), parameter :: mv = 20
 
           !  we set up the dimension information
-          integer, parameter :: nuest = 16
-          integer, parameter :: nvest = 27
-          integer, parameter :: kwrk = 100
-          integer, parameter :: lwrk = 1600
+          integer(FP_SIZE), parameter :: nuest = 16
+          integer(FP_SIZE), parameter :: nvest = 27
+          integer(FP_SIZE), parameter :: kwrk = 100
+          integer(FP_SIZE), parameter :: lwrk = 1600
 
           ! ..local arrays..
-          integer :: ider(2),iopt(3),iwrk(kwrk),iw(29)
-          real(RKIND) :: u(mu),v(mv),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
+          integer(FP_SIZE) :: ider(2),iopt(3),iwrk(kwrk),iw(29)
+          real(FP_REAL) :: u(mu),v(mv),z(180),c(300),tu(50),tv(50),f(180),wk(116), &
                          exact(180),err(mu),sp(mu),wrk(lwrk)
 
           ! Initialization
@@ -2537,10 +2553,10 @@ module fitpack_tests
           r = one
 
           ! set up the u-coordinates of the grid.
-          forall(i=1:mu) u(i) = 0.1_RKIND*i
+          forall(i=1:mu) u(i) = 0.1_FP_REAL*i
 
           ! we set up the v-coordinates of the grid.
-          forall(j=1:mv) v(j) = (j-1)*pi*0.1_RKIND -pi
+          forall(j=1:mv) v(j) = (j-1)*pi*0.1_FP_REAL -pi
 
           ! we fetch the data values at the grid points.
           m = mu*mv
@@ -2726,14 +2742,14 @@ module fitpack_tests
           contains
 
           ! function program tespog calculates the value of the test function underlying the data.
-          elemental real(RKIND) function tespog(x,y)
+          elemental real(FP_REAL) function tespog(x,y)
               !  ..scalar arguments..
-              real(RKIND), intent(in) :: x,y
+              real(FP_REAL), intent(in) :: x,y
 
-              real(RKIND) :: f
+              real(FP_REAL) :: f
               !  ..
               f = one-((3*x-one)**2+(3*y-one)**2)/(11.-6*(x+y))
-              tespog = f-(one-x**2-y**2)*(x+y)*54.0_RKIND/121.0_RKIND
+              tespog = f-(one-x**2-y**2)*(x+y)*54.0_FP_REAL/121.0_FP_REAL
               return
           end function tespog
 
@@ -2748,26 +2764,27 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnpola(datafile,iunit) result(success)
-          real(RKIND), intent(in) :: datafile(:)
+          real(FP_REAL), intent(in) :: datafile(:)
           integer, optional, intent(in) :: iunit
 
           !  we set up the dimension information
-          integer, parameter :: nuest = 15
-          integer, parameter :: nvest = 19
-          integer, parameter :: lwrk1 = 15000
-          integer, parameter :: lwrk2 = 5700
-          integer, parameter :: kwrk  = 500
-          integer, parameter :: m1 = 200
-          integer, parameter :: m2 = 90
+          integer(FP_SIZE), parameter :: nuest = 15
+          integer(FP_SIZE), parameter :: nvest = 19
+          integer(FP_SIZE), parameter :: lwrk1 = 15000
+          integer(FP_SIZE), parameter :: lwrk2 = 5700
+          integer(FP_SIZE), parameter :: kwrk  = 500
+          integer(FP_SIZE), parameter :: m1 = 200
+          integer(FP_SIZE), parameter :: m2 = 90
 
           !  we choose a value for eps
-          real(RKIND), parameter :: eps = 0.1e-05_RKIND
+          real(FP_REAL), parameter :: eps = 0.1e-05_FP_REAL
 
-          real(RKIND), dimension(m1) :: x,y,z,w,u,v,exact,f
-          real(RKIND) :: tu(30),tv(30),c(300),s,fp,avg,ermax
-          real(RKIND), allocatable :: wrk1(:),wrk2(:)
-          integer :: iopt(3),iwrk(500)
-          integer :: i,is,ier,l,m,nc,nu,nv,pos,useUnit
+          real(FP_REAL), dimension(m1) :: x,y,z,w,u,v,exact,f
+          real(FP_REAL) :: tu(30),tv(30),c(300),s,fp,avg,ermax
+          real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+          integer(FP_SIZE) :: iopt(3),iwrk(500)
+          integer(FP_SIZE) :: i,is,l,m,nc,nu,nv,pos,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization.
           success = .true.
@@ -2791,7 +2808,7 @@ module fitpack_tests
           !  we calculate the exact function values and set up the weights w(i)=(0.01)**(-1)
           !  (0.01 is an estimate for the standard deviation of the error in z(i)). at the same time
           !  we calculate the mean and maximum errors for the data values.
-          w     = 100.0_RKIND
+          w     = 100.0_FP_REAL
           exact = testpo(x,y)
           avg   = sum(abs(z-exact))/m1
           ermax = maxval(abs(z-exact),1)
@@ -2945,21 +2962,21 @@ module fitpack_tests
           contains
 
           !  test function for the polar package
-          elemental real(RKIND) function testpo(x,y)
-              real(RKIND), intent(in) ::x,y
+          elemental real(FP_REAL) function testpo(x,y)
+              real(FP_REAL), intent(in) ::x,y
               testpo=(x**2+y**2)/((x+y)**2+half)
           end function testpo
 
           ! CIRCLE: the boundary of the approximation domain  x**2+y**2<=1. in polar coordinates
-          pure real(RKIND) function rad1(v)
-             real(RKIND), intent(in) :: v
+          pure real(FP_REAL) function rad1(v)
+             real(FP_REAL), intent(in) :: v
              rad1 = one
              return
           end function rad1
 
           ! ELLIPSOID: the boundary of the approximation domain  3*x**2+3*y**2-4*x*y<=1. in polar coordinates
-          pure real(RKIND) function rad2(v)
-             real(RKIND), intent(in) :: v
+          pure real(FP_REAL) function rad2(v)
+             real(FP_REAL), intent(in) :: v
              rad2 = one/sqrt(three-two*sin(2*v))
              return
           end function rad2
@@ -2974,13 +2991,14 @@ module fitpack_tests
       logical function mnprof(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          integer, parameter :: mx = 6
-          integer, parameter :: my = 6
-          integer, parameter :: m = mx*my
+          integer(FP_SIZE), parameter :: mx = 6
+          integer(FP_SIZE), parameter :: my = 6
+          integer(FP_SIZE), parameter :: m = mx*my
 
-          real(RKIND) :: fac,facx,u
-          integer     :: i,ier,iopt,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
-          real(RKIND) :: tx(15),ty(15),c(100),x(mx),y(my),z(m),cc(15)
+          real(FP_REAL) :: fac,facx,u
+          integer(FP_SIZE) :: i,iopt,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: tx(15),ty(15),c(100),x(mx),y(my),z(m),cc(15)
 
           ! Initialization.
           success = .true.
@@ -2991,7 +3009,7 @@ module fitpack_tests
           end if
 
           !  we set up the grid points for evaluating the tensor product splines.
-          x = [((i-1)*0.2_RKIND,i=1,6)]
+          x = [((i-1)*0.2_FP_REAL,i=1,6)]
           y = x
 
           !  loop for different spline degrees with respect to the x-variable
@@ -3130,19 +3148,20 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnregr(x,y,z,iunit) result(success)
-          real(RKIND), intent(in) :: x(:),y(:),z(size(x)*size(y))
+          real(FP_REAL), intent(in) :: x(:),y(:),z(size(x)*size(y))
           integer, optional, intent(in) :: iunit
 
           !  we set up the dimension information
-          integer, parameter :: nxest = 17
-          integer, parameter :: nyest = 17
-          integer, parameter :: lwrk = 850
-          integer, parameter :: kwrk = 60
+          integer(FP_SIZE), parameter :: nxest = 17
+          integer(FP_SIZE), parameter :: nyest = 17
+          integer(FP_SIZE), parameter :: lwrk = 850
+          integer(FP_SIZE), parameter :: kwrk = 60
 
-          real(RKIND) :: tx(nxest),ty(nyest),c(300),wrk(lwrk),f(121), wk(132)
-          integer     :: iwrk(kwrk),iw(22)
-          real(RKIND) :: fp,s,xb,xe,yb,ye
-          integer     :: kx,ky,m,mx,my,m1,m2,nc,nx,ny,i,ier,is,iopt,j,useUnit
+          real(FP_REAL) :: tx(nxest),ty(nyest),c(300),wrk(lwrk),f(121), wk(132)
+          integer(FP_SIZE) :: iwrk(kwrk),iw(22)
+          real(FP_REAL) :: fp,s,xb,xe,yb,ye
+          integer(FP_SIZE) :: kx,ky,m,mx,my,m1,m2,nc,nx,ny,i,is,iopt,j,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization.
           success = .true.
@@ -3313,9 +3332,10 @@ module fitpack_tests
       logical function mnspal(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: x(21),y(21),t(20),c(20),d(6),cof(6)
-          integer     :: i,i1,i2,ier,j,jj,k,k1,l,l1,m,n,nk1,useUnit
-          real(RKIND) :: arg,fac,pol,tt,xx
+          real(FP_REAL) :: x(21),y(21),t(20),c(20),d(6),cof(6)
+          integer(FP_SIZE) :: i,i1,i2,j,jj,k,k1,l,l1,m,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: arg,fac,pol,tt,xx
 
           ! Initialization.
           success = .true.
@@ -3327,7 +3347,7 @@ module fitpack_tests
 
           !  set up the points where the splines will be evaluated.
           m = 21
-          x = 0.05_RKIND*[(i-1,i=1,m)]
+          x = 0.05_FP_REAL*[(i-1,i=1,m)]
 
           !  main loop for the different spline degrees.
           spline_degrees: do k=3,5,2
@@ -3349,7 +3369,7 @@ module fitpack_tests
 
               !  generate the b-spline coefficients.
               nk1 = n-k1
-              c(:nk1) = 0.01_RKIND*[(i*(i-5),i=1,nk1)]
+              c(:nk1) = 0.01_FP_REAL*[(i*(i-5),i=1,nk1)]
 
               !  print the data for the spline.
               write(useUnit,900) k
@@ -3440,8 +3460,9 @@ module fitpack_tests
       logical function mnspde(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: x(7),y(42),t(20),c(20),wrk(20),d(6)
-          integer     :: i,ier,j,k,k1,l,m,n,nk1,nu,useUnit
+          real(FP_REAL) :: x(7),y(42),t(20),c(20),wrk(20),d(6)
+          integer(FP_SIZE) :: i,j,k,k1,l,m,n,nk1,nu,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -3453,7 +3474,7 @@ module fitpack_tests
 
           !  set up the points where the spline derivatives will be evaluated.
           m    = 7
-          x    = [(0.05_RKIND*(i-1),i=1,m)]
+          x    = [(0.05_FP_REAL*(i-1),i=1,m)]
           x(m) = one
 
           !  main loop for the different spline degrees.
@@ -3475,7 +3496,7 @@ module fitpack_tests
 
               !  generate the b-spline coefficients.
               nk1 = n-k1
-              c(:nk1) = [(0.01_RKIND*i*(i-5),i=1,nk1)]
+              c(:nk1) = [(0.01_FP_REAL*i*(i-5),i=1,nk1)]
 
               !  evaluate the spline derivatives.
               j = 1
@@ -3531,8 +3552,9 @@ module fitpack_tests
       logical function mnspev(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: x(21),y(21),t(20),c(20)
-          integer     :: i,i1,i2,ier,j,k,k1,m,n,nk1,useUnit
+          real(FP_REAL) :: x(21),y(21),t(20),c(20)
+          integer(FP_SIZE) :: i,i1,i2,j,k,k1,m,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -3544,7 +3566,7 @@ module fitpack_tests
 
           !  set up the points where the splines will be evaluated.
           m = 21
-          x = [(0.05_RKIND*(i-1),i=1,m)]
+          x = [(0.05_FP_REAL*(i-1),i=1,m)]
 
           !  main loop for the different spline degrees.
           spline_degrees: do k=1,5
@@ -3565,7 +3587,7 @@ module fitpack_tests
 
               !  generate the b-spline coefficients.
               nk1 = n-k1
-              c(:nk1) = [(0.01_RKIND*i*(i-5),i=1,nk1)]
+              c(:nk1) = [(0.01_FP_REAL*i*(i-5),i=1,nk1)]
 
               !  evaluate the spline.
               call splev(t,n,c,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
@@ -3611,15 +3633,16 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnspgr(u,v,r,iunit) result(success)
-        real(RKIND), intent(in) :: u(:),v(:),r(size(u)*size(v))
+        real(FP_REAL), intent(in) :: u(:),v(:),r(size(u)*size(v))
         integer, optional, intent(in) :: iunit
 
         !  ..local scalars..
-        real(RKIND) :: ermax,erf,exr0,exr1,fp,sum,r0,r1,ai,s
-        integer     :: i,ier,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv,useUnit
+        real(FP_REAL) :: ermax,erf,exr0,exr1,fp,sum,r0,r1,ai,s
+        integer(FP_SIZE) :: i,is,j,k,kwrk,l,lwrk,m,mu,mv,nc,nuest,nu,nvest,nv,useUnit
+        integer(FP_FLAG) :: ier
         !  ..local arrays..
-        integer     :: ider(4),iopt(3),iwrk(70)
-        real(RKIND) :: c(300),tu(25),tv(25),f(154),wk(100),exact(154),err(14),sp(14),wrk(1500)
+        integer(FP_SIZE) :: ider(4),iopt(3),iwrk(70)
+        real(FP_REAL) :: c(300),tu(25),tv(25),f(154),wk(100),exact(154),err(14),sp(14),wrk(1500)
 
 
         ! Initialization
@@ -3843,9 +3866,9 @@ module fitpack_tests
 
           ! function program tesspg calculates the value of the test function
           ! underlying the data.
-          elemental real(RKIND) function tesspg(u,v)
-              real(RKIND), intent(in) :: u,v
-              tesspg = 2.0_RKIND/(4.1_RKIND+cos(3*u)+3*cos(v+v+u*0.25_RKIND)*sin(u)**2)
+          elemental real(FP_REAL) function tesspg(u,v)
+              real(FP_REAL), intent(in) :: u,v
+              tesspg = 2.0_FP_REAL/(4.1_FP_REAL+cos(3*u)+3*cos(v+v+u*0.25_FP_REAL)*sin(u)**2)
               return
           end function tesspg
 
@@ -3861,23 +3884,24 @@ module fitpack_tests
       !c                                                                    cc
       !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       logical function mnsphe(datafile,iunit) result(success)
-          real(RKIND), intent(in) :: datafile(:)
+          real(FP_REAL), intent(in) :: datafile(:)
           integer, optional, intent(in) :: iunit
 
           !  we fetch the number of data points.
-          integer, parameter :: m = 192
+          integer(FP_SIZE), parameter :: m = 192
 
           ! we set up the dimension information
-          integer, parameter :: ntest = 15
-          integer, parameter :: npest = 19
-          integer, parameter :: lwrk1 = 12000
-          integer, parameter :: lwrk2 = 72
-          integer, parameter :: kwrk = 300
+          integer(FP_SIZE), parameter :: ntest = 15
+          integer(FP_SIZE), parameter :: npest = 19
+          integer(FP_SIZE), parameter :: lwrk1 = 12000
+          integer(FP_SIZE), parameter :: lwrk2 = 72
+          integer(FP_SIZE), parameter :: kwrk = 300
 
-          real(RKIND) :: teta(m),phi(m),r(m),w(m),tp(30),tt(30),c(300), &
+          real(FP_REAL) :: teta(m),phi(m),r(m),w(m),tp(30),tt(30),c(300), &
                          p(9),t(9),f(81),eps,fp,s
-          real(RKIND), allocatable :: wrk1(:),wrk2(:)
-          integer :: i,ier,iopt,j,l2,l,np,nt,is,i1,i2,nc,ntt,npp,iwrk(kwrk),pos,useUnit
+          real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+          integer(FP_SIZE) :: i,iopt,j,l2,l,np,nt,is,i1,i2,nc,ntt,npp,iwrk(kwrk),pos,useUnit
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -3912,7 +3936,7 @@ module fitpack_tests
           p = [(i*pio4,i=0,8)]; p(9) = pi2
 
           !  we choose a value for eps
-          eps = 0.1e-05_RKIND
+          eps = 0.1e-05_FP_REAL
 
           !  main loop for the different spline approximations
           approximations: do is=1,4
@@ -4014,9 +4038,9 @@ module fitpack_tests
       end function mnsphe
 
       ! calculate the value of a test function for the sphere package.
-      elemental real(RKIND) function testsp(v,u)
-          real(RKIND), intent(in) :: u,v
-          real(RKIND) :: cu,cv,rad1,rad2,rad3,su,sv
+      elemental real(FP_REAL) function testsp(v,u)
+          real(FP_REAL), intent(in) :: u,v
+          real(FP_REAL) :: cu,cv,rad1,rad2,rad3,su,sv
           cu = cos(u)
           cv = cos(v)
           su = sin(u)
@@ -4036,9 +4060,10 @@ module fitpack_tests
       logical function mnspin(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: t(20),c(20),wrk(20)
-          integer     :: i,j,k,k1,n,nk1,ier,useUnit
-          real(RKIND) :: a,aint,ak,b,exint
+          real(FP_REAL) :: t(20),c(20),wrk(20)
+          integer(FP_SIZE) :: i,j,k,k1,n,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: a,aint,ak,b,exint
 
           ! Initialization
           success = .true.
@@ -4069,10 +4094,10 @@ module fitpack_tests
               t(n-k:n) = one
 
               !  insert a number of knots
-              call insert_inplace(0,t,n,c,k,0.8_RKIND,20,ier)
-              call insert_inplace(0,t,n,c,k,0.4_RKIND,20,ier)
-              call insert_inplace(0,t,n,c,k,0.3_RKIND,20,ier)
-              call insert_inplace(0,t,n,c,k,0.1_RKIND,20,ier)
+              call insert_inplace(0,t,n,c,k,0.8_FP_REAL,20,ier)
+              call insert_inplace(0,t,n,c,k,0.4_FP_REAL,20,ier)
+              call insert_inplace(0,t,n,c,k,0.3_FP_REAL,20,ier)
+              call insert_inplace(0,t,n,c,k,0.1_FP_REAL,20,ier)
 
               !  print the data for the spline.
               write(useUnit,900) k
@@ -4098,8 +4123,8 @@ module fitpack_tests
 
                   if (.not.(abs(aint-exint)<smallnum03*abs(exint))) success = .false.
 
-                  a = a+0.1_RKIND
-                  b = b-0.3_RKIND
+                  a = a+0.1_FP_REAL
+                  b = b-0.3_FP_REAL
               end do integral_ranges
           end do spline_degrees
 
@@ -4125,9 +4150,10 @@ module fitpack_tests
       logical function mnspro(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: t(13),c(26),zeros(20),sp(40),cc(13)
-          integer     :: i,idim,ier,is,i1,i2,j,k,k1,l1,l2,m,mest,n,nc,nk1,useUnit
-          real(RKIND) :: alfa,beta,gamma,per
+          real(FP_REAL) :: t(13),c(26),zeros(20),sp(40),cc(13)
+          integer(FP_SIZE) :: i,idim,is,i1,i2,j,k,k1,l1,l2,m,mest,n,nc,nk1,useUnit
+          integer(FP_FLAG) :: ier
+          real(FP_REAL) :: alfa,beta,gamma,per
 
           ! Initialization
           success = .true.
@@ -4196,11 +4222,11 @@ module fitpack_tests
                  case (3)
                     beta  = -one
                  case (4)
-                    alfa  = 0.4_RKIND
-                    beta  = 0.3_RKIND
-                    gamma = 1.2_RKIND
+                    alfa  = 0.4_FP_REAL
+                    beta  = 0.3_FP_REAL
+                    gamma = 1.2_FP_REAL
                  case (5)
-                    beta  = 0.4_RKIND
+                    beta  = 0.4_FP_REAL
                     gamma = zero
               end select
 
@@ -4261,10 +4287,11 @@ module fitpack_tests
       logical function mnsuev(iunit) result(success)
           integer, optional, intent(in) :: iunit
 
-          real(RKIND) :: fac
-          integer     :: i,idim,ier,j,m,mu,mv,m0,m1,m2,m3,nc,nu4,nv4,nu,nv,l,useUnit
-          real(RKIND) :: tu(11),tv(10),c(126),u(6),v(6),f(108),wrk(48)
-          integer     :: iwrk(12)
+          real(FP_REAL) :: fac
+          integer(FP_SIZE) :: i,idim,j,m,mu,mv,m0,m1,m2,m3,nc,nu4,nv4,nu,nv,l,useUnit
+          real(FP_REAL) :: tu(11),tv(10),c(126),u(6),v(6),f(108),wrk(48)
+          integer(FP_SIZE) :: iwrk(12)
+          integer(FP_FLAG) :: ier
 
           ! Initialization
           success = .true.
@@ -4278,7 +4305,7 @@ module fitpack_tests
           mu = 6
           mv = 6
 
-          u = 0.2_RKIND*[(i,i=0,5)]
+          u = 0.2_FP_REAL*[(i,i=0,5)]
           v = u
 
           !  the knots with respect to the u-variable.
@@ -4418,16 +4445,17 @@ module fitpack_tests
       logical function mnsurf(xyz,delta,iunit) result(success)
 
          ! Surface points fetched from an external file
-         real(RKIND), intent(in) :: xyz(:,:), delta
+         real(FP_REAL), intent(in) :: xyz(:,:), delta
          integer, optional, intent(in) :: iunit
 
          ! Local variables
-         real(RKIND), allocatable :: wrk1(:),wrk2(:)
-         real(RKIND), dimension(size(xyz,2)) :: x,y,z,w
-         real(RKIND) :: tx(15),ty(15),c(200)
-         real(RKIND) :: ai,eps,fp,s,xb,xe,yb,ye,xx(11),yy(11),zz(121)
-         integer :: iwrk(300),i,ier,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
+         real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+         real(FP_REAL), dimension(size(xyz,2)) :: x,y,z,w
+         real(FP_REAL) :: tx(15),ty(15),c(200)
+         real(FP_REAL) :: ai,eps,fp,s,xb,xe,yb,ye,xx(11),yy(11),zz(121)
+         integer(FP_SIZE) :: iwrk(300),i,iopt,is,j,kwrk,kx,ky,lwrk1,lwrk2,m,mx,my,nc, &
                     nmax,nx,nxest,ny,nyest,useUnit
+         integer(FP_FLAG) :: ier
 
          ! Initialization.
          success = .true.

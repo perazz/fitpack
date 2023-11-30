@@ -31,42 +31,42 @@ module fitpack_curves
     type :: fitpack_curve
 
         !> The data points
-        integer :: m = 0
-        real(RKIND), allocatable :: x(:),y(:)
+        integer(FP_SIZE) :: m = 0
+        real(FP_REAL), allocatable :: x(:),y(:)
 
         !> Spline degree
-        integer :: order = 3
+        integer(FP_SIZE) :: order = 3
 
         !> Interval boundaries
-        real(RKIND) :: xleft,xright
+        real(FP_REAL) :: xleft,xright
 
         ! Node weights
-        real(RKIND), allocatable :: sp(:),w(:)
+        real(FP_REAL), allocatable :: sp(:),w(:)
 
         ! Estimated and actual number of knots and their allocations
-        integer                  :: nest  = 0
-        integer                  :: lwrk  = 0
-        integer, allocatable     :: iwrk(:)
-        real(RKIND), allocatable :: wrk(:),wrk_fou(:,:)
+        integer(FP_SIZE)               :: nest  = 0
+        integer(FP_SIZE)               :: lwrk  = 0
+        integer(FP_SIZE), allocatable  :: iwrk(:)
+        real(FP_REAL), allocatable     :: wrk(:),wrk_fou(:,:)
 
         ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(RKIND) :: smoothing = 1000.0_RKIND
+        real(FP_REAL) :: smoothing = 1000.0_FP_REAL
 
         ! Actual curve MSE
-        real(RKIND) :: fp = zero
+        real(FP_REAL) :: fp = zero
 
         ! Curve extrapolation behavior
-        integer     :: bc = OUTSIDE_NEAREST_BND
+        integer(FP_FLAG) :: bc = OUTSIDE_NEAREST_BND
 
         ! Knots
-        integer     :: knots = 0
-        real(RKIND), allocatable :: t(:)  ! Knot location
+        integer(FP_SIZE) :: knots = 0
+        real(FP_REAL), allocatable :: t(:)  ! Knot location
 
         ! Spline coefficients [knots-order-1]
-        real(RKIND), allocatable :: c(:)
+        real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
-        integer :: iopt = 0
+        integer(FP_SIZE) :: iopt = 0
 
         contains
 
@@ -124,11 +124,11 @@ module fitpack_curves
 
     ! A default constructor
     type(fitpack_curve) function new_from_points(x,y,w,ierr) result(this)
-        real(RKIND), intent(in) :: x(:),y(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
-        integer, optional, intent(out) :: ierr
+        real(FP_REAL), intent(in) :: x(:),y(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
-        integer :: ierr0
+        integer(FP_FLAG) :: ierr0
 
         ierr0 = this%new_fit(x,y,w)
 
@@ -138,11 +138,11 @@ module fitpack_curves
     end function new_from_points
 
     ! Fit a new curve
-    integer function new_fit(this,x,y,w,smoothing)
+    integer(FP_FLAG) function new_fit(this,x,y,w,smoothing)
         class(fitpack_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), intent(in) :: x(:),y(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), optional, intent(in) :: smoothing
 
         call this%new_points(x,y,w)
 
@@ -166,21 +166,21 @@ module fitpack_curves
        this%xleft = zero
        this%xright = zero
 
-       this%smoothing = 1000.0_RKIND
+       this%smoothing = 1000.0_FP_REAL
        this%order     = 3
        this%iopt      = 0
        this%nest      = 0
        this%lwrk      = 0
        this%knots     = 0
-       this%fp        = 0.0_RKIND
+       this%fp        = 0.0_FP_REAL
        this%bc        = OUTSIDE_NEAREST_BND
 
     end subroutine destroy
 
     subroutine new_points(this,x,y,w)
         class(fitpack_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: x(:),y(size(x))
-        real(RKIND), optional, intent(in) :: w(size(x)) ! node weights
+        real(FP_REAL), intent(in) :: x(:),y(size(x))
+        real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
 
         integer, allocatable :: isort(:)
         integer, parameter   :: SAFE = 10
@@ -200,9 +200,9 @@ module fitpack_curves
         if (present(w)) then
            allocate(this%w(m),source=w(isort))
         else
-           allocate(this%w(m),source=1.0_RKIND)
+           allocate(this%w(m),source=1.0_FP_REAL)
         endif
-        allocate(this%sp(m),source=0.0_RKIND)
+        allocate(this%sp(m),source=0.0_FP_REAL)
 
         ! Setup boundaries
         this%xleft  = minval(x)
@@ -217,19 +217,19 @@ module fitpack_curves
 
         ! Setup working space.
         lwrk = (m*(MAX_K+1)+nest*(7+3*MAX_K))
-        allocate(this%wrk(lwrk),source=0.0_RKIND)
+        allocate(this%wrk(lwrk),source=0.0_FP_REAL)
         allocate(this%wrk_fou(nest,2))
 
         endassociate
 
     end subroutine new_points
 
-    real(RKIND) function curve_eval_one(this,x,ierr) result(y)
-        class(fitpack_curve), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: x      ! Evaluation point
-        integer, optional,    intent(out)    :: ierr   ! Optional error flag
+    real(FP_REAL) function curve_eval_one(this,x,ierr) result(y)
+        class(fitpack_curve), intent(inout)     :: this
+        real(FP_REAL),          intent(in)      :: x      ! Evaluation point
+        integer(FP_FLAG), optional, intent(out) :: ierr   ! Optional error flag
 
-        real(RKIND) :: y1(1)
+        real(FP_REAL) :: y1(1)
 
         y1 = curve_eval_many(this,[x],ierr)
         y  = y1(1)
@@ -240,11 +240,12 @@ module fitpack_curves
     ! Curve evaluation driver
     function curve_eval_many(this,x,ierr) result(y)
         class(fitpack_curve), intent(inout)  :: this
-        real(RKIND),          intent(in)     :: x(:)   ! Evaluation points
-        integer, optional,    intent(out)    :: ierr   ! Optional error flag
-        real(RKIND) :: y(size(x))
+        real(FP_REAL),          intent(in)     :: x(:)   ! Evaluation points
+        integer(FP_FLAG), optional, intent(out)    :: ierr   ! Optional error flag
+        real(FP_REAL) :: y(size(x))
 
-        integer :: npts,ier
+        integer(FP_SIZE) :: npts
+        integer(FP_FLAG) :: ier
 
         npts = size(x)
 
@@ -283,7 +284,7 @@ module fitpack_curves
     end function curve_eval_many
 
     ! Interpolating curve
-    integer function interpolating_curve(this) result(ierr)
+    integer(FP_FLAG) function interpolating_curve(this) result(ierr)
         class(fitpack_curve), intent(inout) :: this
 
         ! Set zero smoothing
@@ -294,12 +295,12 @@ module fitpack_curves
     end function interpolating_curve
 
     ! Curve fitting driver: automatic number of knots
-    integer function curve_fit_automatic_knots(this,smoothing) result(ierr)
+    integer(FP_FLAG) function curve_fit_automatic_knots(this,smoothing) result(ierr)
         class(fitpack_curve), intent(inout) :: this
-        real(RKIND), optional, intent(in) :: smoothing
+        real(FP_REAL), optional, intent(in) :: smoothing
 
-        integer :: loop,nit
-        real(RKIND) :: smooth_now(3)
+        integer(FP_SIZE) :: loop,nit
+        real(FP_REAL) :: smooth_now(3)
 
         !> Get smoothing trajectory
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
@@ -347,7 +348,7 @@ module fitpack_curves
     end function curve_fit_automatic_knots
 
     ! Return fitting MSE
-    elemental real(RKIND) function curve_error(this)
+    elemental real(FP_REAL) function curve_error(this)
        class(fitpack_curve), intent(in) :: this
        curve_error = this%fp
     end function curve_error
@@ -355,13 +356,14 @@ module fitpack_curves
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present
     function curve_derivatives(this, x, order, ierr) result(ddx)
-       class(fitpack_curve), intent(inout) :: this
-       real(RKIND),          intent(in)    :: x(:)   ! Evaluation point (scalar)
-       integer,              intent(in)    :: order  ! Derivative order. Default 1
-       integer, optional,    intent(out)   :: ierr  ! Optional error flag
-       real(RKIND), dimension(size(x))     :: ddx
+       class(fitpack_curve), intent(inout)     :: this
+       real(FP_REAL),          intent(in)      :: x(:)   ! Evaluation point (scalar)
+       integer,              intent(in)        :: order  ! Derivative order. Default 1
+       integer(FP_FLAG), optional, intent(out) :: ierr  ! Optional error flag
+       real(FP_REAL), dimension(size(x))       :: ddx
 
-       integer :: ddx_order,m,ierr0
+       integer(FP_SIZE) :: ddx_order,m
+       integer(FP_FLAG) :: ierr0
 
        ! Order 0 = spline value
        ddx_order = max(0,order)
@@ -394,12 +396,12 @@ module fitpack_curves
     !>      d(j) = s     (x) , j=1,2,...,k1
     !>  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
     function curve_all_derivatives(this, x, ierr) result(ddx)
-       class(fitpack_curve), intent(inout)  :: this
-       real(RKIND),          intent(in)     :: x   ! Evaluation point (scalar)
-       integer, optional,    intent(out)    :: ierr  ! Optional error flag
-       real(RKIND), dimension(this%order+1) :: ddx
+       class(fitpack_curve), intent(inout)     :: this
+       real(FP_REAL),          intent(in)      :: x   ! Evaluation point (scalar)
+       integer(FP_FLAG), optional, intent(out) :: ierr  ! Optional error flag
+       real(FP_REAL), dimension(this%order+1)  :: ddx
 
-       integer :: ierr0
+       integer(FP_FLAG) :: ierr0
 
        ierr0 = FITPACK_OK
 
@@ -413,19 +415,19 @@ module fitpack_curves
                    ddx,          & ! Evaluated derivatives
                    ierr0)        ! Output flag
 
-       1 call fitpack_error_handling(ierr0,ierr,'evaluate all derivatives')
+       call fitpack_error_handling(ierr0,ierr,'evaluate all derivatives')
 
     end function curve_all_derivatives
 
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present
-    real(RKIND) function curve_derivative(this, x, order, ierr) result(ddx)
-       class(fitpack_curve), intent(inout)  :: this
-       real(RKIND),          intent(in)     :: x      ! Evaluation point (scalar)
-       integer,              intent(in)     :: order  ! Derivative order. Default 1
-       integer, optional,    intent(out)    :: ierr   ! Optional error flag
+    real(FP_REAL) function curve_derivative(this, x, order, ierr) result(ddx)
+       class(fitpack_curve), intent(inout)     :: this
+       real(FP_REAL),          intent(in)      :: x      ! Evaluation point (scalar)
+       integer,              intent(in)        :: order  ! Derivative order. Default 1
+       integer(FP_FLAG), optional, intent(out) :: ierr   ! Optional error flag
 
-       real(RKIND) :: ddxa(1)
+       real(FP_REAL) :: ddxa(1)
 
        ! Use the array-based wrapper
        ddxa = curve_derivatives(this,[x],order,ierr)
@@ -434,9 +436,9 @@ module fitpack_curves
     end function curve_derivative
 
     ! Calculates the integral of the spline function in interval [from,to]
-    real(RKIND) function integral(this,from,to)
+    real(FP_REAL) function integral(this,from,to)
        class(fitpack_curve), intent(inout) :: this
-       real(RKIND), intent(in) :: from,to
+       real(FP_REAL), intent(in) :: from,to
 
        integral = splint(this%t, &  ! array of knots
                          this%knots, & ! number of knots
@@ -458,11 +460,11 @@ module fitpack_curves
     !> for user defined alpha(:))
     subroutine fourier_coefficients(this,alpha,A,B,ierr)
         class(fitpack_curve), intent(inout) :: this
-        real(RKIND), intent(in) :: alpha(:)
-        real(RKIND), intent(out), dimension(size(alpha)) :: A,B
-        integer    , intent(out), optional :: ierr
+        real(FP_REAL),    intent(in) :: alpha(:)
+        real(FP_REAL),    intent(out), dimension(size(alpha)) :: A,B
+        integer(FP_FLAG), intent(out), optional :: ierr
 
-        integer :: ier
+        integer(FP_FLAG) :: ier
 
         call fourco(this%t,this%knots,  & ! Spline knots)
                     this%c,             & ! spline coefficients
@@ -479,12 +481,13 @@ module fitpack_curves
     !> Find the zeros of a cubic spline s(x)
     function zeros(this,ierr)
         class(fitpack_curve), intent(in) :: this
-        real(RKIND), allocatable :: zeros(:)
-        integer, optional, intent(out) :: ierr
+        real(FP_REAL), allocatable :: zeros(:)
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
-        integer, parameter :: maxit = 10
-        integer :: mest,m,nit,i,ier
-        real(RKIND), allocatable :: tmp_zeros(:)
+        integer(FP_SIZE), parameter :: maxit = 10
+        integer(FP_SIZE) :: mest,m,nit,i
+        integer(FP_FLAG) :: ier
+        real(FP_REAL), allocatable :: tmp_zeros(:)
 
         ! Estimate a relatively safe number of zeros
         m    = this%knots
