@@ -49,12 +49,22 @@
 		<Unit filename="../src/fitpack_curves.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="../src/fitpack_curves_c.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="../src/fitpack_grid_surfaces.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="../src/fitpack_gridded_polar.f90" />
-		<Unit filename="../src/fitpack_gridded_sphere.f90" />
+		<Unit filename="../src/fitpack_gridded_polar.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_gridded_sphere.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="../src/fitpack_parametric.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_parametric_surfaces.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_polar.f90">
@@ -76,7 +86,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="../test/test.f90">
-			<Option weight="4" />
+			<Option weight="3" />
 		</Unit>
 		<Extensions />
 	</Project>
