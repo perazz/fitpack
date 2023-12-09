@@ -1,3 +1,6 @@
+#ifndef FITPACK_CURVES_C_H_INCLUDED
+#define FITPACK_CURVES_C_H_INCLUDED
+
 /***************************************************************************************************
 !                                ____________________  ___   ________ __
 !                               / ____/  _/_  __/ __ \/   | / ____/ //_/
@@ -7,8 +10,11 @@
 !
 !                                     A Curve Fitting Package
 !
-!   Refactored by Federico Perini, 10/6/2022
-!   Based on the netlib library by Paul Dierckx
+!   fitpack_curves_c
+!> @brief C interface to fitpack_curves
+!
+!   Author: (C) Federico Perini
+!> @since     12/09/2023
 !
 !   References :
 !     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
@@ -18,64 +24,43 @@
 !
 ! **************************************************************************************************/
 
-#ifndef FITPACK_CURVES_C_H_INCLUDED
-#define FITPACK_CURVES_C_H_INCLUDED
-
-#include "fitpack_core_c.h"
+#include <stddef.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Interoperable opaque pointer type
-struct fp_curve_c {
-  void* cptr;
-};
+// Define C opaque pointer struct
+typedef struct fitpack_curve_c {
+	void* cptr;
+} fitpack_curve_c;
 
-// C API
-void    fp_curve_c_allocate       (fp_curve_c *self);
-void    fp_curve_c_destroy        (fp_curve_c *self);
-void    fp_curve_c_new_points     (fp_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
-FP_INT  fp_curve_c_new_fit        (fp_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
-FP_INT  fp_curve_c_fit            (fp_curve_c *self, FP_REAL* smoothing);
-FP_INT  fp_curve_c_interpolating  (fp_curve_c *self);
-FP_REAL fp_curve_c_eval_one       (fp_curve_c *self, FP_REAL x, FP_INT* ierr);
-void    fp_curve_c_eval_many      (fp_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_INT* ierr);
-FP_REAL fp_curve_c_integral       (fp_curve_c *self, FP_REAL from, FP_REAL to);
-void    fp_curve_c_fourier        (fp_curve_c *self, FP_INT nparm, FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_INT* ierr);
-FP_REAL fp_curve_c_derivative     (fp_curve_c *self, FP_REAL x, FP_INT order, FP_INT* ierr);
-FP_INT  fp_curve_c_all_derivatives(fp_curve_c *self, FP_REAL x, FP_REAL* ddx);
-FP_REAL fp_curve_c_smoothing      (fp_curve_c *self);
-FP_REAL fp_curve_c_mse            (fp_curve_c *self);
-FP_INT  fp_curve_c_degree         (fp_curve_c *self);
+// Null-initialized object
+static const fitpack_curve_c fitpack_curve_c_null = { .cptr = NULL };
 
+// Methods
+void    fitpack_curve_c_allocate       (fitpack_curve_c *self);
+void    fitpack_curve_c_destroy        (fitpack_curve_c *self);
+void    fitpack_curve_c_copy           (fitpack_curve_c *self, const fitpack_curve_c* other);
+void    fitpack_curve_c_move_alloc     (fitpack_curve_c *to, fitpack_curve_c* from);
+void    fitpack_curve_c_new_points     (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
+FP_INT  fitpack_curve_c_new_fit        (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
+FP_INT  fitpack_curve_c_fit            (fitpack_curve_c *self, FP_REAL* smoothing);
+FP_INT  fitpack_curve_c_interpolating  (fitpack_curve_c *self);
+FP_REAL fitpack_curve_c_eval_one       (fitpack_curve_c *self, FP_REAL x, FP_INT* ierr);
+void    fitpack_curve_c_eval_many      (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_INT* ierr);
+FP_REAL fitpack_curve_c_integral       (fitpack_curve_c *self, FP_REAL from, FP_REAL to);
+void    fitpack_curve_c_fourier        (fitpack_curve_c *self, FP_INT nparm, FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_INT* ierr);
+FP_REAL fitpack_curve_c_derivative     (fitpack_curve_c *self, FP_REAL x, FP_INT order, FP_INT* ierr);
+FP_INT  fitpack_curve_c_all_derivatives(fitpack_curve_c *self, FP_REAL x, FP_REAL* ddx);
+FP_REAL fitpack_curve_c_smoothing      (fitpack_curve_c *self);
+FP_REAL fitpack_curve_c_mse            (fitpack_curve_c *self);
+FP_INT  fitpack_curve_c_degree         (fitpack_curve_c *self);
 
 #ifdef __cplusplus
 }
 #endif
 
-// C++ class
-#ifdef __cplusplus
-
-class fpCurve
-{
-    public:
-        fpCurve() { fp_curve_c_allocate(cptr); };
-       ~fpCurve() { fp_curve_c_destroy (cptr); };
-
-       // Fit properties
-       const FP_INT  degree   () { return fp_curve_c_degree(cptr); };
-       const FP_REAL smoothing() { return fp_curve_c_smoothing(cptr); };
-       const FP_REAL mse      () { return fp_curve_c_mse(cptr); };
-
-       // Opaque C type
-       fp_curve_c cptr;
-
-    protected:
-
-    private:
-
-};
-#endif
-
 #endif // FITPACK_CURVES_C_H_INCLUDED
+
