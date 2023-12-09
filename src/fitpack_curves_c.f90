@@ -7,7 +7,7 @@
 !
 !                                     A Curve Fitting Package
 !
-!   Refactored by Federico Perini, 10/6/2022
+!   (C) Federico Perini, 12/09/2023
 !   Based on the netlib library by Paul Dierckx
 !
 !   References :

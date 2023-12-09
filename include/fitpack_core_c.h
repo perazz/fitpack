@@ -105,6 +105,11 @@ static const FP_REAL smallnum06 = 1.0e-06;
 static const FP_REAL smallnum08 = 1.0e-08;
 static const FP_REAL smallnum10 = 1.0e-10;
 
+// Core library interface
+void curfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,
+              FP_REAL xb, FP_REAL xe, FP_SIZE k, FP_REAL s, FP_SIZE nest,
+              FP_SIZE* n, FP_REAL* t, FP_REAL* c, FP_REAL* fp,
+              FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier)
 
 #ifdef __cplusplus
 }

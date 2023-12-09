@@ -1,5 +1,7 @@
 *.o
 *.mod
+*.depend
+*.layout
 build/*
 project/bin/*
 project/obj/*
