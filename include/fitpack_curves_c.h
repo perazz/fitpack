@@ -27,6 +27,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "fitpack_core_c.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,19 +46,19 @@ void    fitpack_curve_c_allocate       (fitpack_curve_c *self);
 void    fitpack_curve_c_destroy        (fitpack_curve_c *self);
 void    fitpack_curve_c_copy           (fitpack_curve_c *self, const fitpack_curve_c* other);
 void    fitpack_curve_c_move_alloc     (fitpack_curve_c *to, fitpack_curve_c* from);
-void    fitpack_curve_c_new_points     (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
-FP_INT  fitpack_curve_c_new_fit        (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
-FP_INT  fitpack_curve_c_fit            (fitpack_curve_c *self, FP_REAL* smoothing);
-FP_INT  fitpack_curve_c_interpolating  (fitpack_curve_c *self);
-FP_REAL fitpack_curve_c_eval_one       (fitpack_curve_c *self, FP_REAL x, FP_INT* ierr);
-void    fitpack_curve_c_eval_many      (fitpack_curve_c *self, FP_INT npts, FP_REAL* x, FP_REAL* y, FP_INT* ierr);
+void    fitpack_curve_c_new_points     (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
+FP_FLAG fitpack_curve_c_new_fit        (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
+FP_FLAG fitpack_curve_c_fit            (fitpack_curve_c *self, FP_REAL* smoothing);
+FP_FLAG fitpack_curve_c_interpolating  (fitpack_curve_c *self);
+FP_REAL fitpack_curve_c_eval_one       (fitpack_curve_c *self, FP_REAL x, FP_FLAG* ierr);
+void    fitpack_curve_c_eval_many      (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_FLAG* ierr);
 FP_REAL fitpack_curve_c_integral       (fitpack_curve_c *self, FP_REAL from, FP_REAL to);
-void    fitpack_curve_c_fourier        (fitpack_curve_c *self, FP_INT nparm, FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_INT* ierr);
-FP_REAL fitpack_curve_c_derivative     (fitpack_curve_c *self, FP_REAL x, FP_INT order, FP_INT* ierr);
-FP_INT  fitpack_curve_c_all_derivatives(fitpack_curve_c *self, FP_REAL x, FP_REAL* ddx);
+void    fitpack_curve_c_fourier        (fitpack_curve_c *self, FP_SIZE nparm, const FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_FLAG* ierr);
+FP_REAL fitpack_curve_c_derivative     (fitpack_curve_c *self, FP_REAL x, FP_SIZE order, FP_SIZE* ierr);
+FP_FLAG  fitpack_curve_c_all_derivatives(fitpack_curve_c *self, FP_REAL x, FP_REAL* ddx);
 FP_REAL fitpack_curve_c_smoothing      (fitpack_curve_c *self);
 FP_REAL fitpack_curve_c_mse            (fitpack_curve_c *self);
-FP_INT  fitpack_curve_c_degree         (fitpack_curve_c *self);
+FP_SIZE  fitpack_curve_c_degree         (fitpack_curve_c *self);
 
 #ifdef __cplusplus
 }

@@ -21,18 +21,18 @@
 !
 ! **************************************************************************************************/
 
-#include <stdlib>
-#include <stdbool>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Precision and array size
-typedef FP_REAL double;
-typedef FP_SIZE int32_t;
-typedef FP_FLAG int32_t;
-typedef FP_BOOL bool;
+typedef double  FP_REAL;
+typedef int32_t FP_SIZE;
+typedef int32_t FP_FLAG;
+typedef bool    FP_BOOL;
 
 //Spline behavior for points not in the support
 static const FP_FLAG OUTSIDE_EXTRAPOLATE = 0; // extrapolated from the end spans
@@ -60,16 +60,16 @@ static const FP_SIZE DEGREE_5  =  5;
 static const FP_FLAG FITPACK_OK                   = 0 ; // ok for spline, abs(fp-s)/s <= tol=0.001
 static const FP_FLAG FITPACK_INTERPOLATING_OK     = -1; // ok for interpolating spline, fp=0
 static const FP_FLAG FITPACK_LEASTSQUARES_OK      = -2; // ok for weighted least-squares polynomial of degree k.
-static const FP_FLAG FITPACK_INSUFFICIENT_STORAGE = 1
-static const FP_FLAG FITPACK_S_TOO_SMALL          = 2
-static const FP_FLAG FITPACK_MAXIT                = 3
-static const FP_FLAG FITPACK_TOO_MANY_KNOTS       = 4
-static const FP_FLAG FITPACK_OVERLAPPING_KNOTS    = 5
-static const FP_FLAG FITPACK_INVALID_RANGE        = 6
-static const FP_FLAG FITPACK_INPUT_ERROR          = 10
-static const FP_FLAG FITPACK_TEST_ERROR           = 11
-static const FP_FLAG FITPACK_INVALID_CONSTRAINT   = 12
-static const FP_FLAG FITPACK_INSUFFICIENT_KNOTS   = 13
+static const FP_FLAG FITPACK_INSUFFICIENT_STORAGE = 1;
+static const FP_FLAG FITPACK_S_TOO_SMALL          = 2;
+static const FP_FLAG FITPACK_MAXIT                = 3;
+static const FP_FLAG FITPACK_TOO_MANY_KNOTS       = 4;
+static const FP_FLAG FITPACK_OVERLAPPING_KNOTS    = 5;
+static const FP_FLAG FITPACK_INVALID_RANGE        = 6;
+static const FP_FLAG FITPACK_INPUT_ERROR          = 10;
+static const FP_FLAG FITPACK_TEST_ERROR           = 11;
+static const FP_FLAG FITPACK_INVALID_CONSTRAINT   = 12;
+static const FP_FLAG FITPACK_INSUFFICIENT_KNOTS   = 13;
 
 //Internal Parameters
 static const FP_BOOL FP_TRUE  = true;
@@ -98,7 +98,7 @@ static const FP_REAL pi2     = 2*pi;
 static const FP_REAL pi4     = 4*pi;
 static const FP_REAL pio2    = half*pi;
 static const FP_REAL pio4    = fourth*pi;
-static const FP_REAL pio8    = 0.125;*pi;
+static const FP_REAL pio8    = 0.125*pi;
 static const FP_REAL deg2rad = pi/180.0;
 static const FP_REAL smallnum03 = 1.0e-03;
 static const FP_REAL smallnum06 = 1.0e-06;
@@ -109,7 +109,7 @@ static const FP_REAL smallnum10 = 1.0e-10;
 void curfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,
               FP_REAL xb, FP_REAL xe, FP_SIZE k, FP_REAL s, FP_SIZE nest,
               FP_SIZE* n, FP_REAL* t, FP_REAL* c, FP_REAL* fp,
-              FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier)
+              FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier);
 
 #ifdef __cplusplus
 }

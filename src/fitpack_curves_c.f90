@@ -170,7 +170,7 @@ module fitpack_curves_c
      end subroutine fitpack_curve_c_new_points
 
      !> Wrapper to new_fit
-     integer(FP_SIZE) function fitpack_curve_c_new_fit(this,npts,x,y,w,smoothing) result(ierr) &
+     integer(FP_FLAG) function fitpack_curve_c_new_fit(this,npts,x,y,w,smoothing) result(ierr) &
                                 bind(c,name='fitpack_curve_c_new_fit')
          type(fitpack_curve_c), intent(inout) :: this
          integer(FP_SIZE), intent(in), value :: npts
@@ -189,7 +189,7 @@ module fitpack_curves_c
      end function fitpack_curve_c_new_fit
 
      !> Wrapper to curve_fit_automatic_knots
-     integer(FP_SIZE) function fitpack_curve_c_fit(this,smoothing) result(ierr) &
+     integer(FP_FLAG) function fitpack_curve_c_fit(this,smoothing) result(ierr) &
                                bind(c,name='fitpack_curve_c_fit')
         type(fitpack_curve_c), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -204,7 +204,7 @@ module fitpack_curves_c
      end function fitpack_curve_c_fit
 
      !> Wrapper to interpolating_curve
-     integer(FP_SIZE) function fitpack_curve_c_interpolating(this) result(ierr) bind(c,name='fp_curve_FP_SIZEeprolating')
+     integer(FP_FLAG) function fitpack_curve_c_interpolating(this) result(ierr) bind(c,name='fp_curve_FP_SIZEeprolating')
         type(fitpack_curve_c), intent(inout) :: this
 
         type(fitpack_curve), pointer :: fcurve
@@ -220,8 +220,7 @@ module fitpack_curves_c
      real(FP_REAL) function fitpack_curve_c_eval_one(this,x,ierr) result(y) bind(c,name='fitpack_curve_c_eval_one')
         type(fitpack_curve_c), intent(inout) :: this
         real(FP_REAL), intent(in), value :: x
-        integer(FP_SIZE), optional, intent(out) :: ierr
-
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
         integer :: ierr0
@@ -241,10 +240,10 @@ module fitpack_curves_c
         integer(FP_SIZE), intent(in), value :: npts
         real(FP_REAL), intent(in) :: x(npts)
         real(FP_REAL), intent(out) :: y(npts)
-        integer(FP_SIZE), optional, intent(out) :: ierr
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
-        integer :: ierr0
+        integer(FP_FLAG) :: ierr0
 
         !> Get object; allocate it in case
         call fitpack_curve_c_pointer(this, fcurve)
@@ -275,7 +274,7 @@ module fitpack_curves_c
         integer(FP_SIZE), intent(in), value :: nparm
         real(FP_REAL), intent(in) :: alpha(nparm)
         real(FP_REAL), intent(out) :: a(nparm),b(nparm)
-        integer(FP_SIZE), optional, intent(out) :: ierr
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
         type(fitpack_curve), pointer :: fcurve
 

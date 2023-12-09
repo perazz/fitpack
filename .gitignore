@@ -5,3 +5,8 @@
 build/*
 project/bin/*
 project/obj/*
+exact_grid
+loop_1
+loop_2
+loop_3
+polar_grid.dat

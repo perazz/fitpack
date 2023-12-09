@@ -35,6 +35,9 @@ module fitpack
    ! Public interface
    public :: FP_REAL
    public :: FP_SIZE
+   public :: FP_FLAG
+   public :: FP_BOOL
+
    public :: fitpack_curve
    public :: fitpack_closed_curve
    public :: fitpack_periodic_curve

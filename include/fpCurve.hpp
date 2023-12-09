@@ -42,6 +42,8 @@ class fpCurve
         void operator= ( const fpCurve &rhs) { fitpack_curve_c_copy(&cptr, &rhs.cptr); };
         void destroy() { fitpack_curve_c_destroy(&cptr); };
 
+        //
+
         // Fit properties
         const FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
         const FP_REAL smoothing() { return fitpack_curve_c_smoothing(&cptr); };
@@ -62,6 +64,25 @@ class fpCurve
            if (ierr) (*ierr)=ier;
            return deriv;
         }
+
+        // Get integral in range
+        FP_REAL integrate(FP_REAL from, FP_REAL to)
+        {
+           return fitpack_curve_c_integral(&cptr, from, to);
+        }
+
+        // Get fourier coefficients
+        FP_FLAG fourier(const std::vector<FP_REAL> &alpha,
+                              std::vector<FP_REAL> &A, std::vector<FP_REAL> &B)
+        {
+           FP_FLAG ierr;
+           FP_SIZE nparm = alpha.size();
+           A.reserve(nparm);
+           B.reserve(nparm);
+           fitpack_curve_c_fourier(&cptr, nparm, alpha.data(), A.data(), B.data(), &ierr );
+           return ierr;
+        }
+
 
     protected:
 
