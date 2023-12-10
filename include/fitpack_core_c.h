@@ -102,6 +102,7 @@ static const FP_REAL pio2    = half*pi;
 static const FP_REAL pio4    = fourth*pi;
 static const FP_REAL pio8    = 0.125*pi;
 static const FP_REAL deg2rad = pi/180.0;
+static const FP_REAL third   = one/three;
 static const FP_REAL smallnum03 = 1.0e-03;
 static const FP_REAL smallnum06 = 1.0e-06;
 static const FP_REAL smallnum08 = 1.0e-08;

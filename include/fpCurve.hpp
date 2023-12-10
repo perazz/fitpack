@@ -27,6 +27,7 @@
 // Import Fortran-C interface
 #include "fitpack_curves_c.h"
 #include <vector>
+using std::vector;
 
 class fpCurve
 {
@@ -43,16 +44,38 @@ class fpCurve
         void destroy() { fitpack_curve_c_destroy(&cptr); };
 
         // New curve from x,y only
-        FP_FLAG new_fit(std::vector<FP_REAL> x, std::vector<FP_REAL> y)
+        FP_FLAG new_fit(vector<FP_REAL> x, vector<FP_REAL> y, FP_REAL smoothing = 1000.0)
         {
             FP_SIZE npts = x.size();
-            return fitpack_curve_c_new_fit(&cptr,npts,x.data(),y.data(),nullptr,nullptr);
+            return fitpack_curve_c_new_fit(&cptr,npts,x.data(),y.data(),nullptr,&smoothing);
+        }
+
+        // New curve from x, y and weights w
+        FP_FLAG new_fit(vector<FP_REAL> x, vector<FP_REAL> y, vector<FP_REAL> w, FP_REAL smoothing = 1000.0)
+        {
+            FP_SIZE npts = x.size();
+            return fitpack_curve_c_new_fit(&cptr,npts,x.data(),y.data(),w.data(),&smoothing);
         }
 
         // Fit properties
         const FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
         const FP_REAL smoothing() { return fitpack_curve_c_smoothing(&cptr); };
         const FP_REAL mse      () { return fitpack_curve_c_mse(&cptr); };
+
+        // Get value at x
+        FP_REAL eval(FP_REAL x, FP_SIZE* ierr=nullptr)
+        {
+            return fitpack_curve_c_eval_one(&cptr,x,ierr);
+        }
+
+        // Get values at a vector of x coordinates
+        vector<FP_REAL> eval(vector<FP_REAL> x, FP_SIZE* ierr=nullptr)
+        {
+           FP_SIZE npts = x.size();
+           vector<FP_REAL> y;
+           y.resize(npts);
+           fitpack_curve_c_eval_many(&cptr,npts,x.data(),y.data(),ierr);
+        }
 
         // Get single derivative at x
         FP_REAL ddx(FP_REAL x, FP_SIZE order, FP_SIZE* ierr=nullptr)
@@ -61,29 +84,29 @@ class fpCurve
         }
 
         // Get all derivatives at x
-        std::vector<FP_REAL> ddx(FP_REAL x, FP_SIZE* ierr=nullptr)
+        vector<FP_REAL> ddx(FP_REAL x, FP_SIZE* ierr=nullptr)
         {
-           std::vector<FP_REAL> deriv;
-           deriv.reserve(degree()+1);
+           vector<FP_REAL> deriv;
+           deriv.resize(degree()+1);
            FP_SIZE ier = fitpack_curve_c_all_derivatives(&cptr,x,deriv.data());
            if (ierr) (*ierr)=ier;
            return deriv;
         }
 
         // Get integral in range
-        FP_REAL integrate(FP_REAL from, FP_REAL to)
+        FP_REAL integral(FP_REAL from, FP_REAL to)
         {
            return fitpack_curve_c_integral(&cptr, from, to);
         }
 
         // Get fourier coefficients
-        FP_FLAG fourier(const std::vector<FP_REAL> &alpha,
-                              std::vector<FP_REAL> &A, std::vector<FP_REAL> &B)
+        FP_FLAG fourier(const vector<FP_REAL> &alpha,
+                              vector<FP_REAL> &A, vector<FP_REAL> &B)
         {
            FP_FLAG ierr;
            FP_SIZE nparm = alpha.size();
-           A.reserve(nparm);
-           B.reserve(nparm);
+           A.resize(nparm);
+           B.resize(nparm);
            fitpack_curve_c_fourier(&cptr, nparm, alpha.data(), A.data(), B.data(), &ierr );
            return ierr;
         }
