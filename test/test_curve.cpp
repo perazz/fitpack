@@ -14,9 +14,9 @@ FP_BOOL test_cpp_sine_fit()
    static const int N = 201;
    FP_FLAG ierr = FITPACK_OK;
 
+   // Create a sine function over 200 points in [0,2*pi]
    vector<FP_REAL> x; x.reserve(N);
    vector<FP_REAL> y; y.reserve(N);
-
    for (int i=0; i<N; i++)
    {
        x.push_back(pi2*i/(N-1));
@@ -28,7 +28,7 @@ FP_BOOL test_cpp_sine_fit()
    ierr = sine.new_fit(x,y,0.0);
    if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
-   // Create 200 points in between the range
+   // Create 200 points halfway between the range
    vector<FP_REAL> xrand; xrand.reserve(N-1);
    for (int i=0; i<N-1; i++)
    {
