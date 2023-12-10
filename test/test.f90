@@ -1,7 +1,9 @@
 program test
+    use fitpack_core
     use fitpack_tests
     use fitpack_test_data
     use fitpack_curve_tests
+    use fitpack_cpp_tests
     use iso_fortran_env, only: output_unit
     implicit none
 
@@ -24,11 +26,18 @@ program test
     if (failed>0) then
        print 1, passed, failed, 'legacy'
        stop -1
+    endif
+
+    ! Run C++ tests
+    call run_cpp_tests
+
+    if (failed>0) then
+       print 1, passed, failed, 'c++'
+       stop -1
     else
        print 2, passed
        stop 0
     endif
-
 
     1 format('[fitpack] there are ',i0,' passed, ',i0,' failed ',a,' tests.')
     2 format(//'[fitpack] SUCCESS! ',i0,' tests passed, none failed.')
@@ -122,6 +131,13 @@ program test
 
     end function perform_legacy_test
 
+    subroutine run_cpp_tests()
+
+        ! Sine function interpolant: test f(x) and df/dx
+        call add_testl(test_cpp_sine_fit())
+
+    end subroutine run_cpp_tests
+
     subroutine add_test(success)
         logical, intent(in) :: success
         if (success) then
@@ -129,6 +145,15 @@ program test
         else
             failed = failed+1
         end if
-    end subroutine
+    end subroutine add_test
+
+    subroutine add_testl(success)
+        logical(FP_BOOL), intent(in) :: success
+        if (success) then
+            passed = passed+1
+        else
+            failed = failed+1
+        end if
+    end subroutine add_testl
 
 end program test

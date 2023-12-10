@@ -57,6 +57,8 @@ static const FP_SIZE DEGREE_3  =  3;
 static const FP_SIZE DEGREE_4  =  4;
 static const FP_SIZE DEGREE_5  =  5;
 
+// Error codes
+             FP_BOOL FITPACK_SUCCESS_c(FP_FLAG ierr);
 static const FP_FLAG FITPACK_OK                   = 0 ; // ok for spline, abs(fp-s)/s <= tol=0.001
 static const FP_FLAG FITPACK_INTERPOLATING_OK     = -1; // ok for interpolating spline, fp=0
 static const FP_FLAG FITPACK_LEASTSQUARES_OK      = -2; // ok for weighted least-squares polynomial of degree k.
@@ -104,6 +106,7 @@ static const FP_REAL smallnum03 = 1.0e-03;
 static const FP_REAL smallnum06 = 1.0e-06;
 static const FP_REAL smallnum08 = 1.0e-08;
 static const FP_REAL smallnum10 = 1.0e-10;
+
 
 // Core library interface
 void curfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,

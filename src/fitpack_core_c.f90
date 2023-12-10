@@ -25,6 +25,12 @@ module fitpack_core_c
 
     contains
 
+      ! Error test wrapper
+      logical(FP_BOOL) function FITPACK_SUCCESS_c(ierr) result(success) bind(C,name="FITPACK_SUCCESS_c")
+         integer(FP_FLAG), intent(in), value :: ierr
+         success = FITPACK_SUCCESS(ierr)
+      end function FITPACK_SUCCESS_c
+
       ! curfit interface
       subroutine curfit_c(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="curfit_c")
          real(FP_REAL),    intent(in),    value  :: xb,xe,s

@@ -10,22 +10,12 @@ keywords    = ["curve fitting","spline","interpolation","smoothing","splines","s
 [build]
 auto-executables = false
 auto-examples    = false
-auto-tests       = false
+auto-tests       = true
 module-naming    = "fitpack"
 
 [library]
 source-dir  = "src"
-include-dir = "src"
+include-dir = "include"
 
 [install]
 library = true
-
-[[test]]
-name = "Fortran-Tests"
-source-dir = "test/fortran"
-main = "test.f90"
-
-[[test]]
-name = "Cpp-Tests"
-source-dir = "test/cpp"
-main = "test_curve.cpp"

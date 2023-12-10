@@ -42,7 +42,12 @@ class fpCurve
         void operator= ( const fpCurve &rhs) { fitpack_curve_c_copy(&cptr, &rhs.cptr); };
         void destroy() { fitpack_curve_c_destroy(&cptr); };
 
-        //
+        // New curve from x,y only
+        FP_FLAG new_fit(std::vector<FP_REAL> x, std::vector<FP_REAL> y)
+        {
+            FP_SIZE npts = x.size();
+            return fitpack_curve_c_new_fit(&cptr,npts,x.data(),y.data(),nullptr,nullptr);
+        }
 
         // Fit properties
         const FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
