@@ -33,16 +33,29 @@ module fitpack_core_c
 
       ! curfit interface
       subroutine curfit_c(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="curfit_c")
-         real(FP_REAL),    intent(in),    value  :: xb,xe,s
-         real(FP_REAL),    intent(inout)         :: fp
+         real   (FP_REAL), intent(in),    value  :: xb,xe,s
+         real   (FP_REAL), intent(inout)         :: fp
          integer(FP_SIZE), intent(in),    value  :: iopt,m,k,nest,lwrk
          integer(FP_FLAG), intent(out)           :: ier
          integer(FP_SIZE), intent(inout)         :: n
-         real(FP_REAL),    intent(in)            :: x(m),y(m),w(m)
-         real(FP_REAL),    intent(inout)         :: t(nest),c(nest),wrk(lwrk)
+         real   (FP_REAL), intent(in)            :: x(m),y(m),w(m)
+         real   (FP_REAL), intent(inout)         :: t(nest),c(nest),wrk(lwrk)
          integer(FP_SIZE), intent(inout)         :: iwrk(nest)
          call curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
       end subroutine curfit_c
+
+      ! percur interface
+      subroutine percur_c(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="percur_c")
+         real   (FP_REAL), intent(in),    value :: s
+         real   (FP_REAL), intent(inout)        :: fp
+         integer(FP_SIZE), intent(inout)        :: n
+         integer(FP_FLAG), intent(inout)        :: ier
+         integer(FP_SIZE), intent(in),    value :: iopt,m,k,nest,lwrk
+         real   (FP_REAL), intent(in)           :: x(m),y(m),w(m)
+         real   (FP_REAL), intent(inout)        :: t(nest),c(nest),wrk(lwrk)
+         integer(FP_SIZE), intent(inout)        :: iwrk(nest)
+         call percur(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
+      end subroutine percur_c
 
 
 end module fitpack_core_c

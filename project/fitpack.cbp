@@ -82,18 +82,22 @@
 		<Unit filename="../src/fitpack_surfaces.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="../test/fortran/fitpack_curve_tests.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="../test/fortran/fitpack_test_data.f90">
+		<Unit filename="../test/fitpack_cpp_tests.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="../test/fortran/fitpack_tests.f90">
+		<Unit filename="../test/fitpack_curve_tests.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="../test/fitpack_test_data.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../test/fitpack_tests.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../test/fortran/test.f90">
+		<Unit filename="../test/test.f90">
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="../test/test_curve.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

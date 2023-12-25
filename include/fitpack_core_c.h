@@ -115,6 +115,12 @@ void curfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,
               FP_SIZE* n, FP_REAL* t, FP_REAL* c, FP_REAL* fp,
               FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier);
 
+
+void percur_c(FP_REAL s, FP_REAL* fp, FP_SIZE* n, FP_FLAG* ier,
+              FP_SIZE iopt, FP_SIZE m, FP_SIZE k, FP_SIZE nest, FP_SIZE lwrk,
+              FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* t, FP_REAL* c, FP_REAL* wrk,
+              FP_SIZE* iwrk);
+
 #ifdef __cplusplus
 }
 #endif
