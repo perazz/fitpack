@@ -57,5 +57,18 @@ module fitpack_core_c
          call percur(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
       end subroutine percur_c
 
+      ! parcur interface
+      subroutine parcur_c(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="parcur_c")
+          real   (FP_REAL), intent(inout)       :: ub,ue,s
+          real   (FP_REAL), intent(out)         :: fp
+          integer(FP_SIZE), intent(in),   value :: iopt,ipar,idim,m,mx,k,nest,lwrk,nc
+          integer(FP_SIZE), intent(inout)       :: n
+          integer(FP_FLAG), intent(out)         :: ier
+          real   (FP_REAL), intent(in)          :: x(idim,m)
+          real   (FP_REAL), intent(inout)       :: u(m),w(m),t(nest),c(nc),wrk(lwrk)
+          integer(FP_SIZE), intent(inout)       :: iwrk(nest)
+          call parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
+      end subroutine parcur_c
+
 
 end module fitpack_core_c
