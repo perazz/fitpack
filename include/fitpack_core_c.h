@@ -138,6 +138,11 @@ void cocosp_c(FP_SIZE m, const FP_REAL* x, const FP_REAL* y, const FP_REAL* w, F
               FP_REAL* sx, FP_BOOL* bind, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk,
               FP_FLAG* ier);
 
+
+void concon_c(FP_SIZE iopt,FP_SIZE m,const FP_REAL* x,const FP_REAL* y,const FP_REAL* w,FP_REAL* v,FP_REAL s,
+              FP_SIZE nest,FP_SIZE maxtr,FP_SIZE maxbin, FP_SIZE* n, FP_REAL* t,FP_REAL* c,FP_REAL* sq,
+              FP_REAL* sx,FP_BOOL* bind, FP_REAL* wrk,FP_SIZE lwrk,FP_SIZE* iwrk,FP_SIZE kwrk,FP_FLAG* ier);
+
 #ifdef __cplusplus
 }
 #endif

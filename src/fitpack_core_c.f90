@@ -29,6 +29,7 @@ module fitpack_core_c
     public :: parcur_c
     public :: clocur_c
     public :: cocosp_c
+    public :: concon_c
 
     contains
 
@@ -103,6 +104,20 @@ module fitpack_core_c
           logical(FP_BOOL), intent(out)       :: bind(n)
           call cocosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
       end subroutine cocosp_c
+
+      ! concon interface
+      subroutine concon_c(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='concon_c')
+          real   (FP_REAL), intent(in), value :: s
+          real   (FP_REAL), intent(out)       :: sq
+          integer(FP_SIZE), intent(in), value :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)     :: n
+          integer(FP_FLAG), intent(out)       :: ier
+          real   (FP_REAL), intent(in)        :: x(m),y(m),w(m)
+          real   (FP_REAL), intent(inout)     :: v(m),t(nest),c(nest),sx(m),wrk(lwrk)
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          logical(FP_BOOL), intent(inout)     :: bind(nest)
+          call concon(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
+      end subroutine concon_c
 
 
 
