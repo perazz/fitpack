@@ -204,7 +204,7 @@ module fitpack_curves_c
      end function fitpack_curve_c_fit
 
      !> Wrapper to interpolating_curve
-     integer(FP_FLAG) function fitpack_curve_c_interpolating(this) result(ierr) bind(c,name='fp_curve_FP_SIZEeprolating')
+     integer(FP_FLAG) function fitpack_curve_c_interpolating(this) result(ierr) bind(c,name='fitpack_curve_c_interpolating')
         type(fitpack_curve_c), intent(inout) :: this
 
         type(fitpack_curve), pointer :: fcurve
