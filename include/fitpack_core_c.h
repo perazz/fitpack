@@ -110,13 +110,13 @@ static const FP_REAL smallnum10 = 1.0e-10;
 
 
 // Core library interface
-void curfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,
+void curfit_c(FP_SIZE iopt, FP_SIZE m, const FP_REAL* x, const FP_REAL* y, const FP_REAL* w,
               FP_REAL xb, FP_REAL xe, FP_SIZE k, FP_REAL s, FP_SIZE nest,
               FP_SIZE* n, FP_REAL* t, FP_REAL* c, FP_REAL* fp,
               FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier);
 
 
-void percur_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, FP_REAL* w,
+void percur_c(FP_SIZE iopt, FP_SIZE m, const FP_REAL* x, const FP_REAL* y, const FP_REAL* w,
               FP_SIZE k, FP_REAL s, FP_SIZE nest, FP_SIZE* n, FP_REAL* t, FP_REAL* c,
               FP_REAL* fp, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_FLAG* ier);
 
@@ -128,10 +128,15 @@ void parcur_c(FP_SIZE iopt, FP_SIZE ipar, FP_SIZE idim, FP_SIZE m, FP_REAL* u, F
 
 
 void clocur_c(FP_SIZE iopt, FP_SIZE ipar, FP_SIZE idim, FP_SIZE m, FP_REAL* u, FP_SIZE mx,
-              FP_REAL* x, FP_REAL* w, FP_SIZE k, FP_REAL s, FP_SIZE nest, FP_SIZE *n, FP_REAL *t,
+              const FP_REAL* x, const FP_REAL* w, FP_SIZE k, FP_REAL s, FP_SIZE nest, FP_SIZE *n, FP_REAL *t,
               FP_SIZE nc, FP_REAL* c, FP_REAL* fp, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE *iwrk,
               FP_FLAG* ier);
 
+
+void cocosp_c(FP_SIZE m, const FP_REAL* x, const FP_REAL* y, const FP_REAL* w, FP_SIZE n,
+              const FP_REAL* t,FP_REAL* e,FP_SIZE maxtr,FP_SIZE maxbin, FP_REAL* c, FP_REAL* sq,
+              FP_REAL* sx, FP_BOOL* bind, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk,
+              FP_FLAG* ier);
 
 #ifdef __cplusplus
 }

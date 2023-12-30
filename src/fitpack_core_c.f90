@@ -23,6 +23,13 @@ module fitpack_core_c
     implicit none
     private
 
+    public :: FITPACK_SUCCESS_c
+    public :: curfit_c
+    public :: percur_c
+    public :: parcur_c
+    public :: clocur_c
+    public :: cocosp_c
+
     contains
 
       ! Error test wrapper
@@ -82,6 +89,20 @@ module fitpack_core_c
           integer(FP_SIZE), intent(inout)        :: iwrk(nest)
           call clocur(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
       end subroutine clocur_c
+
+      ! cocosp interface
+      subroutine cocosp_c(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='cocosp_c')
+          real   (FP_REAL), intent(out)       :: sq
+          integer(FP_SIZE), intent(in), value :: m,n,maxtr,maxbin,lwrk,kwrk
+          integer(FP_FLAG), intent(out)       :: ier
+          real   (FP_REAL), intent(in)        :: x(m),y(m),w(m),t(n)
+          real   (FP_REAL), intent(inout)     :: e(n)
+          real   (FP_REAL), intent(out)       :: c(n),sx(m)
+          real   (FP_REAL), intent(inout)     :: wrk(lwrk)
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          logical(FP_BOOL), intent(out)       :: bind(n)
+          call cocosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
+      end subroutine cocosp_c
 
 
 
