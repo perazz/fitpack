@@ -26,11 +26,15 @@ module fitpack_cpp_tests
     private
 
     public :: test_cpp_sine_fit
+    public :: test_cpp_periodic_fit
 
     interface
         logical(FP_BOOL) function test_cpp_sine_fit() bind(C,name="test_cpp_sine_fit")
            import FP_BOOL
         end function test_cpp_sine_fit
+        logical(FP_BOOL) function test_cpp_periodic_fit() bind(C,name="test_cpp_periodic_fit")
+           import FP_BOOL
+        end function test_cpp_periodic_fit
     end interface
 
 

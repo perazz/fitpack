@@ -135,6 +135,7 @@ program test
 
         ! Sine function interpolant: test f(x) and df/dx
         call add_testl(test_cpp_sine_fit())
+        call add_testl(test_cpp_periodic_fit())
 
     end subroutine run_cpp_tests
 
