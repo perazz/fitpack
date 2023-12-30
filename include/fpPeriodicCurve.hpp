@@ -75,6 +75,7 @@ class fpPeriodicCurve
            vector<FP_REAL> y;
            y.resize(npts);
            fitpack_periodic_curve_c_eval_many(&cptr,npts,x.data(),y.data(),ierr);
+           return y;
         }
 
         // Get single derivative at x
