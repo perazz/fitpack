@@ -70,5 +70,19 @@ module fitpack_core_c
           call parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
       end subroutine parcur_c
 
+      ! clocur interface
+      subroutine clocur_c(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name='clocur_c')
+          real   (FP_REAL), intent(in),    value :: s
+          real   (FP_REAL), intent(inout)        :: fp
+          integer(FP_SIZE), intent(in),    value :: iopt,ipar,idim,m,mx,k,nest,nc,lwrk
+          integer(FP_SIZE), intent(inout)        :: n
+          integer(FP_FLAG), intent(inout)        :: ier
+          real   (FP_REAL), intent(in)           :: x(mx),w(m)
+          real   (FP_REAL), intent(inout)        :: u(m),t(nest),c(nc),wrk(lwrk)
+          integer(FP_SIZE), intent(inout)        :: iwrk(nest)
+          call clocur(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
+      end subroutine clocur_c
+
+
 
 end module fitpack_core_c
