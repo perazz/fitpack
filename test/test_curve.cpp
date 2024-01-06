@@ -297,6 +297,119 @@ FP_BOOL test_cpp_parametric_fit()
 
 }
 
+// Test closed curve fit
+FP_BOOL test_cpp_closed_fit()
+{
+
+     char msg[256];
+
+     static const FP_SIZE npts = 19;
+
+     // Set closed curve
+     static const FP_REAL  x[][2] = {{-4.7000, 0.0000},{-7.0480, 2.5650},{-6.8940, 5.7850},{-3.7500, 6.4950},
+                                     {-1.0420, 5.9090},{ 0.9380, 5.3180},{ 2.5000, 4.3300},{ 3.5240, 2.9570},
+                                     { 4.5110, 1.6420},{ 5.0000, 0.0000},{ 4.8860,-1.7790},{ 3.5240,-2.9570},
+                                     { 3.2000,-5.5430},{ 1.3020,-7.3860},{-1.4240,-8.0750},{-3.0000,-5.1960},
+                                     {-3.0640,-2.5710},{-3.6650,-1.3340},{-4.7000, 0.0000}};
+
+     // Fit points into a vector
+     vector<fpPoint> xv;
+     for (FP_SIZE i=0; i<npts; i++) xv.push_back(fpPoint(x[i],x[i]+2));
+
+     // Supply parameter values (also used as evaluation points)
+     vector<FP_REAL> u(npts);
+     for (FP_SIZE i=0; i<npts; i++) u[i] = 20.0*i;
+
+     // Use flat weights
+     vector<FP_REAL> w(npts,1.0);
+
+     // Create curve object
+     fpParametricCurve curve;
+
+     // Run tests
+     FP_FLAG ierr = FITPACK_OK;
+
+     for (FP_SIZE loop=1; loop<=8; loop++)
+     {
+         switch (loop)
+         {
+         case 1: // start with a least-squares point (s is very large)
+            {
+                 ierr = curve.new_fit(xv,u,w,900.0);
+                 break;
+            }
+         case 2: // Smaller values of s to get a tighter approximation
+            {
+                ierr = curve.fit(10.0);
+                break;
+            }
+         case 3:
+            {
+                ierr = curve.fit(0.1);
+                break;
+            }
+         case 4: // Larger values to get a smoother approximateion
+            {
+                ierr = curve.fit(0.5);
+                break;
+            }
+         case 5: // New fit to get possibly fewer knots
+            {
+                ierr = curve.new_fit(xv,u,w,0.5);
+                break;
+            }
+         case 6: // Let the program determine parameters u[i]
+            {
+                ierr = curve.new_fit(xv,0.5);
+                break;
+            }
+         case 7: // 5-degree spline approximation
+            {
+                ierr = curve.new_fit(xv,0.5,5);
+                break;
+            }
+         case 8:
+            {
+                // Interpolating curve
+                ierr = curve.interpolate();
+                break;
+            }
+         default:
+            break;
+         }
+
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_closed_fit] test " << loop << " failed: " << msg << std::endl;
+            break;
+         }
+
+          // Evaluate the spline at all nodes
+          vector<fpPoint> y = curve.eval(u,&ierr);
+
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_closed_fit] point evaluation " << loop << " failed: " << msg << std::endl;
+            break;
+          }
+
+          // Evaluate derivatives at a random point from the initial set
+          if (loop<6) {
+              vector<fpPoint> dy = curve.ddu_all(u[12], &ierr);
+
+              if (!FITPACK_SUCCESS_c(ierr)) {
+                fitpack_message_c(ierr,msg);
+                std::cout << "[test_closed_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
+                break;
+              }
+          }
+
+     }
+
+    // All checks passed: success!
+    return FITPACK_SUCCESS_c(ierr);
+
+}
 
 }
 

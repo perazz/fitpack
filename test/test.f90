@@ -137,6 +137,7 @@ program test
         call add_testl(test_cpp_sine_fit())
         call add_testl(test_cpp_periodic_fit())
         call add_testl(test_cpp_parametric_fit())
+        call add_testl(test_cpp_closed_fit())
 
     end subroutine run_cpp_tests
 
