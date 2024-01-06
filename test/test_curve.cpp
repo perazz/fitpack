@@ -181,7 +181,6 @@ FP_BOOL test_cpp_periodic_fit()
 
 
 // Test parametric curve fit
-// Periodic test: fit a cosine function
 FP_BOOL test_cpp_parametric_fit()
 {
 
