@@ -43,7 +43,9 @@
 		<Unit filename="../include/fitpack_core_c.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="../include/fitpack_parametric_curves_c.h" />
 		<Unit filename="../include/fitpack_periodic_curves_c.h" />
+		<Unit filename="../include/fpParametricCurve.hpp" />
 		<Unit filename="../include/fpPeriodicCurve.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -73,6 +75,9 @@
 		</Unit>
 		<Unit filename="../src/fitpack_parametric.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/fitpack_parametric_c.f90">
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric_surfaces.f90">
 			<Option weight="1" />

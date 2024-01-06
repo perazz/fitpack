@@ -185,12 +185,118 @@ FP_BOOL test_cpp_periodic_fit()
 FP_BOOL test_cpp_parametric_fit()
 {
 
+     char msg[256];
+
+     // Normalized coordinates
+     static const FP_REAL u[] = {120,128,133,136,138,141,144,146,149,151,154,161,170,180,190,
+                                 200,210,220,230,240,250,262,269,273,278,282,287,291,295,299,305,315};
+
+     // Data points
+     static const FP_REAL x[][2] = {{-1.5141, 0.5150},{-2.0906, 1.3412},{-1.9253, 2.6094},{-0.8724, 3.2358},
+                                    {-0.3074, 2.7401},{-0.5534, 2.7823},{ 0.0192, 3.5932},{ 1.2298, 3.8353},
+                                    { 2.5479, 2.5863},{ 2.4710, 1.3105},{ 1.7063, 0.6841},{ 1.1183, 0.2575},
+                                    { 0.5534, 0.2460},{ 0.4727, 0.3689},{ 0.3574, 0.2460},{ 0.1998, 0.2998},
+                                    { 0.2882, 0.3651},{ 0.2613, 0.3343},{ 0.2652, 0.3881},{ 0.2805, 0.4573},
+                                    { 0.4112, 0.5918},{ 0.9377, 0.7110},{ 1.3527, 0.4035},{ 1.5564, 0.0769},
+                                    { 1.6141,-0.3920},{ 1.6333,-0.8570},{ 1.1567,-1.3412},{ 0.8109,-1.5641},
+                                    { 0.2498,-1.7409},{-0.2306,-1.7178},{-0.7571,-1.2989},{-1.1222,-0.5572}};
+
+     // Fit points into a vector
+     vector<fpPoint> xv;
+     for (FP_SIZE i=0; i<32; i++) xv.push_back(fpPoint(x[i],x[i]+2));
+
+     vector<FP_REAL> uv(u, u+32);
+
+     // Use flat weights
+     vector<FP_REAL> wv(32,1.0);
+
+     // Create curve object
+     fpParametricCurve curve;
+
+     // Run tests
+     FP_FLAG ierr = FITPACK_OK;
+
+     for (FP_SIZE loop=1; loop<=8; loop++)
+     {
+         switch (loop)
+         {
+         case 1: // start with a polynomial curve ( s very large)
+            {
+                 ierr = curve.new_fit(xv,uv,100.0);
+                 break;
+            }
+         case 2: // Smaller values of s to get a tighter approximation
+            {
+                ierr = curve.fit(1.0);
+                break;
+            }
+         case 3:
+            {
+                ierr = curve.fit(0.05);
+                break;
+            }
+         case 4: // Larger values to get a smoother approximateion
+            {
+                ierr = curve.fit(0.25);
+                break;
+            }
+         case 5: // New fit to get possibly fewer knots
+            {
+                ierr = curve.new_fit(xv,uv,wv,0.25);
+                break;
+            }
+         case 6: // Let the program determine parameters u[i]
+            {
+                ierr = curve.new_fit(xv,0.25);
+                break;
+            }
+         case 7: // 5-degree spline approximation
+            {
+                ierr = curve.new_fit(xv,0.25,5);
+                break;
+            }
+         case 8:
+            {
+                // Interpolating curve
+                ierr = curve.interpolate();
+                break;
+            }
+         default:
+            break;
+         }
+
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_parametric_fit] test " << loop << " failed: " << msg << std::endl;
+            break;
+         }
+
+          // Evaluate the spline at all nodes
+          vector<fpPoint> y = curve.eval(uv,&ierr);
+
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_parametric_fit] point evaluation " << loop << " failed: " << msg << std::endl;
+            break;
+          }
+
+          // Evaluate derivatives at a random point from the initial set
+          if (loop<6) {
+              vector<fpPoint> dy = curve.ddu_all(uv[12], &ierr);
+
+              if (!FITPACK_SUCCESS_c(ierr)) {
+                fitpack_message_c(ierr,msg);
+                std::cout << "[test_parametric_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
+                break;
+              }
+          }
+
+     }
 
     // All checks passed: success!
-    return FP_TRUE;
+    return FITPACK_SUCCESS_c(ierr);
 
 }
-
 
 
 }

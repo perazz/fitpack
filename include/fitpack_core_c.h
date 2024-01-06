@@ -73,6 +73,8 @@ static const FP_FLAG FITPACK_TEST_ERROR           = 11;
 static const FP_FLAG FITPACK_INVALID_CONSTRAINT   = 12;
 static const FP_FLAG FITPACK_INSUFFICIENT_KNOTS   = 13;
 
+void fitpack_message_c(FP_FLAG ierr, char* msg);
+
 //Internal Parameters
 static const FP_BOOL FP_TRUE  = true;
 static const FP_BOOL FP_FALSE = false;

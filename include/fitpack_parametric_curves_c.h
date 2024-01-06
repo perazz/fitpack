@@ -48,18 +48,17 @@ void    fitpack_parametric_curve_c_copy                  (fitpack_parametric_cur
 void    fitpack_parametric_curve_c_move_alloc            (fitpack_parametric_curve_c *to, fitpack_parametric_curve_c* from);
 void    fitpack_parametric_curve_c_new_points            (fitpack_parametric_curve_c *self, FP_SIZE ndim, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
 void    fitpack_parametric_curve_c_set_default_parameters(fitpack_parametric_curve_c *self);
-FP_FLAG fitpack_parametric_curve_c_new_fit               (fitpack_parametric_curve_c *self, FP_SIZE ndim, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
-//FP_FLAG fitpack_parametric_curve_c_fit            (fitpack_parametric_curve_c *self, FP_REAL* smoothing);
-//FP_FLAG fitpack_parametric_curve_c_interpolating  (fitpack_parametric_curve_c *self);
-//FP_REAL fitpack_parametric_curve_c_eval_one       (fitpack_parametric_curve_c *self, FP_REAL x, FP_FLAG* ierr);
-//void    fitpack_parametric_curve_c_eval_many      (fitpack_parametric_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_FLAG* ierr);
+FP_FLAG fitpack_parametric_curve_c_new_fit               (fitpack_parametric_curve_c *self, FP_SIZE ndim, FP_SIZE npts, FP_REAL* x, FP_REAL* u, FP_REAL* w, FP_REAL* smoothing, FP_SIZE* order);
+FP_FLAG fitpack_parametric_curve_c_fit                   (fitpack_parametric_curve_c *self, FP_REAL* smoothing, FP_SIZE* order);
+FP_FLAG fitpack_parametric_curve_c_interpolating         (fitpack_parametric_curve_c *self);
+FP_FLAG fitpack_parametric_curve_c_eval_one              (fitpack_parametric_curve_c *self, FP_REAL u, FP_REAL* y);
 //FP_REAL fitpack_parametric_curve_c_integral       (fitpack_parametric_curve_c *self, FP_REAL from, FP_REAL to);
 //void    fitpack_parametric_curve_c_fourier        (fitpack_parametric_curve_c *self, FP_SIZE nparm, const FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_FLAG* ierr);
-//FP_REAL fitpack_parametric_curve_c_derivative     (fitpack_parametric_curve_c *self, FP_REAL x, FP_SIZE order, FP_SIZE* ierr);
-//FP_FLAG  fitpack_parametric_curve_c_all_derivatives(fitpack_parametric_curve_c *self, FP_REAL x, FP_REAL* ddx);
-//FP_REAL fitpack_parametric_curve_c_smoothing      (fitpack_parametric_curve_c *self);
-//FP_REAL fitpack_parametric_curve_c_mse            (fitpack_parametric_curve_c *self);
-//FP_SIZE  fitpack_parametric_curve_c_degree         (fitpack_parametric_curve_c *self);
+FP_FLAG fitpack_parametric_curve_c_derivative      (fitpack_parametric_curve_c *self, FP_REAL u, FP_SIZE order, FP_REAL* ddx);
+FP_REAL fitpack_parametric_curve_c_smoothing       (fitpack_parametric_curve_c *self);
+FP_REAL fitpack_parametric_curve_c_mse             (fitpack_parametric_curve_c *self);
+FP_SIZE  fitpack_parametric_curve_c_degree         (fitpack_parametric_curve_c *self);
+FP_SIZE  fitpack_parametric_curve_c_idim           (fitpack_parametric_curve_c *self);
 
 #ifdef __cplusplus
 }

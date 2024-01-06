@@ -24,6 +24,7 @@ module fitpack_core_c
     private
 
     public :: FITPACK_SUCCESS_c
+    public :: fitpack_message_c
     public :: curfit_c
     public :: percur_c
     public :: parcur_c
@@ -38,6 +39,20 @@ module fitpack_core_c
          integer(FP_FLAG), intent(in), value :: ierr
          success = FITPACK_SUCCESS(ierr)
       end function FITPACK_SUCCESS_c
+
+      ! Flow control: on output flag present, return it; otherwise, halt on error
+      subroutine fitpack_message_c(ierr,msg) bind(C,name='fitpack_message_c')
+          integer(FP_FLAG), intent(in), value :: ierr
+          character(len=1,kind=c_char), intent(inout) :: msg(*)
+          character(:), allocatable :: str
+          integer :: i
+
+          str = FITPACK_MESSAGE(ierr)
+          do i=1,len_trim(str)
+             msg(i) = str(i:i)
+          end do
+          msg(len_trim(str)+1) = c_null_char
+      end subroutine fitpack_message_c
 
       ! curfit interface
       subroutine curfit_c(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="curfit_c")

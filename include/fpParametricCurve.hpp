@@ -58,6 +58,8 @@ vector<FP_REAL> flatten_2d_vector(vector<fpPoint> x2d)
         }
     }
 
+    return x;
+
 }
 
 class fpParametricCurve
@@ -74,86 +76,99 @@ class fpParametricCurve
         void operator= ( const fpParametricCurve &rhs) { fitpack_parametric_curve_c_copy(&cptr, &rhs.cptr); };
         void destroy() { fitpack_parametric_curve_c_destroy(&cptr); };
 
-        // New curve from x,y only
-        FP_FLAG new_fit(vector<fpPoint> x, vector<fpPoint> y, FP_REAL smoothing = 1000.0)
+        // New curve from x (guess u with Euclidean distance)
+        FP_FLAG new_fit(vector<fpPoint> x, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
         {
             FP_SIZE npts = x.size();
             FP_SIZE ndim = npts>0? x[0].size() : 0;
-
             vector<FP_REAL> x1d = flatten_2d_vector(x);
-            vector<FP_REAL> y1d = flatten_2d_vector(y);
 
-            return fitpack_parametric_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),y1d.data(),nullptr,&smoothing);
+            return fitpack_parametric_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),nullptr,nullptr,&smoothing,&order);
+        }
+
+        // New curve from x,u only
+        FP_FLAG new_fit(vector<fpPoint> x, vector<FP_REAL> u, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
+        {
+            FP_SIZE npts = x.size();
+            FP_SIZE ndim = npts>0? x[0].size() : 0;
+            vector<FP_REAL> x1d = flatten_2d_vector(x);
+
+            return fitpack_parametric_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),u.data(),nullptr,&smoothing,&order);
         }
 
         // New curve from x, y and weights w
-        FP_FLAG new_fit(vector<fpPoint> x, vector<fpPoint> y, vector<fpPoint> w, FP_REAL smoothing = 1000.0)
+        FP_FLAG new_fit(vector<fpPoint> x, vector<FP_REAL> u, vector<FP_REAL> w, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
         {
             FP_SIZE npts = x.size();
             FP_SIZE ndim = npts>0? x[0].size() : 0;
-
             vector<FP_REAL> x1d = flatten_2d_vector(x);
-            vector<FP_REAL> y1d = flatten_2d_vector(y);
-            vector<FP_REAL> w1d = flatten_2d_vector(w);
 
-            return fitpack_parametric_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),y1d.data(),w1d.data(),&smoothing);
+            return fitpack_parametric_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),u.data(),w.data(),&smoothing,&order);
         }
-//
-//        // Fit properties
-//        const FP_SIZE degree   () { return fitpack_parametric_curve_c_degree(&cptr); };
-//        const FP_REAL smoothing() { return fitpack_parametric_curve_c_smoothing(&cptr); };
-//        const FP_REAL mse      () { return fitpack_parametric_curve_c_mse(&cptr); };
-//
-//        // Get value at x
-//        FP_REAL eval(FP_REAL x, FP_SIZE* ierr=nullptr)
-//        {
-//            return fitpack_parametric_curve_c_eval_one(&cptr,x,ierr);
-//        }
-//
-//        // Get values at a vector of x coordinates
-//        vector<FP_REAL> eval(vector<FP_REAL> x, FP_SIZE* ierr=nullptr)
-//        {
-//           FP_SIZE npts = x.size();
-//           vector<FP_REAL> y;
-//           y.resize(npts);
-//           fitpack_parametric_curve_c_eval_many(&cptr,npts,x.data(),y.data(),ierr);
-//           return y;
-//        }
-//
-//        // Get single derivative at x
-//        FP_REAL ddx(FP_REAL x, FP_SIZE order, FP_SIZE* ierr=nullptr)
-//        {
-//            return fitpack_parametric_curve_c_derivative(&cptr,x,order,ierr);
-//        }
-//
-//        // Get all derivatives at x
-//        vector<FP_REAL> ddx(FP_REAL x, FP_SIZE* ierr=nullptr)
-//        {
-//           vector<FP_REAL> deriv;
-//           deriv.resize(degree()+1);
-//           FP_SIZE ier = fitpack_parametric_curve_c_all_derivatives(&cptr,x,deriv.data());
-//           if (ierr) (*ierr)=ier;
-//           return deriv;
-//        }
-//
-//        // Get integral in range
-//        FP_REAL integral(FP_REAL from, FP_REAL to)
-//        {
-//           return fitpack_parametric_curve_c_integral(&cptr, from, to);
-//        }
-//
-//        // Get fourier coefficients
-//        FP_FLAG fourier(const vector<FP_REAL> &alpha,
-//                              vector<FP_REAL> &A, vector<FP_REAL> &B)
-//        {
-//           FP_FLAG ierr;
-//           FP_SIZE nparm = alpha.size();
-//           A.resize(nparm);
-//           B.resize(nparm);
-//           fitpack_parametric_curve_c_fourier(&cptr, nparm, alpha.data(), A.data(), B.data(), &ierr );
-//           return ierr;
-//        }
 
+        // Update fit with new parameters
+        FP_FLAG fit(FP_SIZE order)                    { return fitpack_parametric_curve_c_fit(&cptr,nullptr,&order); }
+        FP_FLAG fit(FP_REAL smoothing)                { return fitpack_parametric_curve_c_fit(&cptr,&smoothing,nullptr); }
+        FP_FLAG fit(FP_REAL smoothing, FP_SIZE order) { return fitpack_parametric_curve_c_fit(&cptr,&smoothing,&order); }
+
+        // Get the interpolating fit
+        FP_FLAG interpolate()                         { return fitpack_parametric_curve_c_interpolating(&cptr); }
+
+        // Fit properties
+        const FP_SIZE degree   () { return fitpack_parametric_curve_c_degree(&cptr); };
+        const FP_REAL smoothing() { return fitpack_parametric_curve_c_smoothing(&cptr); };
+        const FP_REAL mse      () { return fitpack_parametric_curve_c_mse(&cptr); };
+        const FP_SIZE ndim     () { return fitpack_parametric_curve_c_idim(&cptr); };
+
+        // Get value at u
+        fpPoint eval(FP_REAL u, FP_FLAG* ierr=nullptr)
+        {
+            fpPoint y(fitpack_parametric_curve_c_idim(&cptr),0.0);
+            FP_FLAG ierr0 = fitpack_parametric_curve_c_eval_one(&cptr, u, y.data());
+            if (ierr) (*ierr) = ierr0;
+            return y;
+        }
+
+        // Get value at many u
+        vector<fpPoint> eval(vector<FP_REAL> u, FP_FLAG* ierr=nullptr)
+        {
+            FP_FLAG ierr0 = FITPACK_OK;
+            fpPoint y1(fitpack_parametric_curve_c_idim(&cptr),0.0);
+            vector<fpPoint> y(u.size(),y1);
+
+            for (FP_SIZE i=0; i<u.size(); i++)
+            {
+                y[i] = eval(u[i],&ierr0);
+                if (!FITPACK_SUCCESS_c(ierr0)) break;
+            }
+
+            // Return error flag
+            if (ierr) (*ierr) = ierr0;
+            return y;
+
+        }
+
+        // Get single derivative at u
+        fpPoint ddu(FP_REAL u, FP_SIZE order, FP_FLAG* ierr=nullptr)
+        {
+            fpPoint dx(fitpack_parametric_curve_c_idim(&cptr),0.0);
+            FP_FLAG ierr0 = fitpack_parametric_curve_c_derivative(&cptr,u,order,dx.data());
+            if (ierr) (*ierr) = ierr0;
+            return dx;
+        }
+
+        // Get all derivatives at u
+        vector<fpPoint> ddu_all(FP_REAL u, FP_FLAG* ierr=nullptr)
+        {
+           vector<fpPoint> deriv(degree()+1);
+           FP_FLAG ierr0 = FITPACK_OK;
+           for (FP_SIZE order = 0; order<degree()+1; order++) {
+                deriv[order] = ddu(u,order,&ierr0);
+                if (!FITPACK_SUCCESS_c(ierr0)) break;
+           }
+           if (ierr) (*ierr)=ierr0;
+           return deriv;
+        }
 
     protected:
 

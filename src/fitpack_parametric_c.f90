@@ -29,25 +29,6 @@ module fitpack_parametric_curves_c
      implicit none
      private
 
-!           !> Generate/update fitting curve, with optional smoothing
-!           procedure :: fit         => curve_fit_automatic_knots
-!           procedure :: interpolate => interpolating_curve
-!
-!           !> Evaluate curve at given coordinates
-!           procedure, private :: curve_eval_one
-!           procedure, private :: curve_eval_many
-!           generic :: eval => curve_eval_one,curve_eval_many
-!
-!           !> Evaluate derivative at given coordinates
-!           procedure, private :: curve_derivative
-!           procedure, private :: curve_derivatives
-!           procedure, private :: curve_all_derivatives
-!           generic   :: dfdx => curve_derivative,curve_derivatives
-!           generic   :: dfdx_all => curve_all_derivatives
-!
-!           !> Properties: MSE
-!           procedure, non_overridable :: mse => curve_error
-
      !> Public Fortran interface
      public :: fitpack_parametric_curve_c_get_pointer
      public :: fitpack_parametric_curve_c_pointer
@@ -58,17 +39,17 @@ module fitpack_parametric_curves_c
      public :: fitpack_parametric_curve_c_new_points
      public :: fitpack_parametric_curve_c_set_default_parameters
      public :: fitpack_parametric_curve_c_new_fit
-!     public :: fitpack_parametric_curve_c_fit
-!     public :: fitpack_parametric_curve_c_interpolating
-!     public :: fitpack_parametric_curve_c_eval_one
-!     public :: fitpack_parametric_curve_c_eval_many
+     public :: fitpack_parametric_curve_c_fit
+     public :: fitpack_parametric_curve_c_interpolating
+     public :: fitpack_parametric_curve_c_eval_one
 !     public :: fitpack_parametric_curve_c_integral
 !     public :: fitpack_parametric_curve_c_fourier
 !     public :: fitpack_parametric_curve_c_derivative
 !     public :: fitpack_parametric_curve_c_all_derivatives
-!     public :: fitpack_parametric_curve_c_smoothing
-!     public :: fitpack_parametric_curve_c_mse
-!     public :: fitpack_parametric_curve_c_degree
+     public :: fitpack_parametric_curve_c_smoothing
+     public :: fitpack_parametric_curve_c_mse
+     public :: fitpack_parametric_curve_c_degree
+     public :: fitpack_parametric_curve_c_idim
 
      !> Opaque-pointer C derived type
      type, public, bind(C) :: fitpack_parametric_curve_c
@@ -205,13 +186,15 @@ module fitpack_parametric_curves_c
      end subroutine fitpack_parametric_curve_c_set_default_parameters
 
      !> Wrapper to new_fit
-     integer(FP_FLAG) function fitpack_parametric_curve_c_new_fit(this,ndim,npts,x,y,w,smoothing) result(ierr) &
+     integer(FP_FLAG) function fitpack_parametric_curve_c_new_fit(this,ndim,npts,x,u,w,smoothing,order) result(ierr) &
                                 bind(c,name='fitpack_parametric_curve_c_new_fit')
          type(fitpack_parametric_curve_c), intent(inout) :: this
-         integer(FP_SIZE), intent(in), value :: ndim,npts
-         real(FP_REAL), intent(in) :: x(ndim,npts),y(ndim,npts)
-         real(FP_REAL), optional, intent(in) :: w(ndim,npts)
-         real(FP_REAL), optional, intent(in) :: smoothing
+         integer(FP_SIZE), value,    intent(in) :: ndim,npts
+         real   (FP_REAL),           intent(in) :: x(ndim,npts)
+         real   (FP_REAL), optional, intent(in) :: u(npts)
+         real   (FP_REAL), optional, intent(in) :: w(npts)
+         real   (FP_REAL), optional, intent(in) :: smoothing
+         integer(FP_SIZE), optional, intent(in) :: order
 
          !> Local variables
          type(fitpack_parametric_curve), pointer :: fcurve
@@ -219,186 +202,155 @@ module fitpack_parametric_curves_c
          !> Get object; allocate it in case
          call fitpack_parametric_curve_c_pointer(this, fcurve)
 
-         ierr = fcurve%new_fit(x,y,w,smoothing)
+         ierr = fcurve%new_fit(x,u,w,smoothing,order)
 
      end function fitpack_parametric_curve_c_new_fit
+
+     !> Wrapper to curve_fit_automatic_knots
+     integer(FP_FLAG) function fitpack_parametric_curve_c_fit(this,smoothing,order) result(ierr) &
+                               bind(c,name='fitpack_parametric_curve_c_fit')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+        real   (FP_REAL), optional, intent(in) :: smoothing
+        integer(FP_SIZE), optional, intent(in) :: order
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_pointer(this, fcurve)
+
+        ierr = fcurve%fit(smoothing,order)
+
+     end function fitpack_parametric_curve_c_fit
+
+     !> Wrapper to interpolating_curve
+     integer(FP_FLAG) function fitpack_parametric_curve_c_interpolating(this) result(ierr) &
+                                bind(c,name='fitpack_parametric_curve_c_interpolating')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_pointer(this, fcurve)
+
+        ierr = fcurve%interpolate()
+
+     end function fitpack_parametric_curve_c_interpolating
+
+     !> Wrapper to curve_eval_one
+     integer(FP_FLAG) function fitpack_parametric_curve_c_eval_one(this,u,y) result(ierr) &
+                            bind(c,name='fitpack_parametric_curve_c_eval_one')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+        real(FP_REAL), intent(in), value :: u
+        real(FP_REAL), intent(out) :: y(*)
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_pointer(this, fcurve)
+
+        y(1:fcurve%idim) = fcurve%eval(u,ierr)
+
+     end function fitpack_parametric_curve_c_eval_one
+
+
+!           !> Evaluate derivative at given coordinates
+!           procedure, private :: curve_derivative
+!           procedure, private :: curve_derivatives
+!           procedure, private :: curve_all_derivatives
+!           generic   :: dfdx => curve_derivatives
+!           generic   :: dfdx_all => curve_all_derivatives
 !
-!     !> Wrapper to curve_fit_automatic_knots
-!     integer(FP_FLAG) function fitpack_parametric_curve_c_fit(this,smoothing) result(ierr) &
-!                               bind(c,name='fitpack_parametric_curve_c_fit')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        real(FP_REAL), optional, intent(in) :: smoothing
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        ierr = fcurve%fit(smoothing)
-!
-!     end function fitpack_parametric_curve_c_fit
-!
-!     !> Wrapper to interpolating_curve
-!     integer(FP_FLAG) function fitpack_parametric_curve_c_interpolating(this) result(ierr) &
-!                                bind(c,name='fitpack_parametric_curve_c_interpolating')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        ierr = fcurve%interpolate()
-!
-!     end function fitpack_parametric_curve_c_interpolating
-!
-!     !> Wrapper to curve_eval_one
-!     real(FP_REAL) function fitpack_parametric_curve_c_eval_one(this,x,ierr) result(y) &
-!                            bind(c,name='fitpack_parametric_curve_c_eval_one')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        real(FP_REAL), intent(in), value :: x
-!        integer(FP_FLAG), optional, intent(out) :: ierr
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!        integer :: ierr0
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        y = fcurve%eval(x,ierr0)
-!
-!        if (present(ierr)) ierr = ierr0
-!
-!     end function fitpack_parametric_curve_c_eval_one
-!
-!     !> Wrapper to curve_eval_many
-!     subroutine fitpack_parametric_curve_c_eval_many(this,npts,x,y,ierr) &
-!                bind(c,name='fitpack_parametric_curve_c_eval_many')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        integer(FP_SIZE), intent(in), value :: npts
-!        real(FP_REAL), intent(in) :: x(npts)
-!        real(FP_REAL), intent(out) :: y(npts)
-!        integer(FP_FLAG), optional, intent(out) :: ierr
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!        integer(FP_FLAG) :: ierr0
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        y = fcurve%eval(x,ierr0)
-!
-!        if (present(ierr)) ierr = ierr0
-!
-!     end subroutine fitpack_parametric_curve_c_eval_many
-!
-!     !> Wrapper to integral
-!     real(FP_REAL) function fitpack_parametric_curve_c_integral(this,from,to) result(y) &
-!                            bind(c,name='fitpack_parametric_curve_c_integral')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        real(FP_REAL), intent(in), value :: from,to
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        y = fcurve%integral(from,to)
-!
-!     end function fitpack_parametric_curve_c_integral
-!
-!     !> Wrapper to fourier_coefficients
-!     subroutine fitpack_parametric_curve_c_fourier(this,nparm,alpha,A,B,ierr) &
-!                bind(c,name='fitpack_parametric_curve_c_fourier')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        integer(FP_SIZE), intent(in), value :: nparm
-!        real(FP_REAL), intent(in) :: alpha(nparm)
-!        real(FP_REAL), intent(out) :: a(nparm),b(nparm)
-!        integer(FP_FLAG), optional, intent(out) :: ierr
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this, fcurve)
-!
-!        call fcurve%fourier_coefficients(alpha,a,b,ierr)
-!
-!     end subroutine fitpack_parametric_curve_c_fourier
-!
-!     !> Wrapper to curve_derivative
-!     real(FP_REAL) function fitpack_parametric_curve_c_derivative(this,x,order,ierr) result(ddx) &
-!                            bind(c,name='fitpack_parametric_curve_c_derivative')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        real(FP_REAL), intent(in), value :: x
-!        integer(FP_SIZE), intent(in), value :: order
-!        integer(FP_SIZE), optional, intent(out) :: ierr
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this,fcurve)
-!
-!        ddx = fcurve%dfdx(x,order,ierr)
-!
-!     end function fitpack_parametric_curve_c_derivative
-!
-!     !> Wrapper to curve_all_derivatives
-!     integer(FP_FLAG) function fitpack_parametric_curve_c_all_derivatives(this,x,ddx) result(ierr) &
-!                               bind(c,name='fitpack_parametric_curve_c_all_derivatives')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!        real(FP_REAL), intent(in), value :: x
-!        real(FP_REAL), intent(out) :: ddx(*)
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this,fcurve)
-!
-!        ddx(1:fcurve%order+1) = fcurve%dfdx_all(x,ierr)
-!
-!     end function fitpack_parametric_curve_c_all_derivatives
-!
-!     !> Get smoothing
-!     real(FP_REAL) function fitpack_parametric_curve_c_smoothing(this) &
-!                            bind(c,name='fitpack_parametric_curve_c_smoothing')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this,fcurve)
-!
-!        fitpack_parametric_curve_c_smoothing = fcurve%smoothing
-!
-!     end function fitpack_parametric_curve_c_smoothing
-!
-!     !> Get MSE
-!     real(FP_REAL) function fitpack_parametric_curve_c_mse(this) &
-!                            bind(c,name='fitpack_parametric_curve_c_mse')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this,fcurve)
-!
-!        fitpack_parametric_curve_c_mse = fcurve%fp
-!
-!     end function fitpack_parametric_curve_c_mse
-!
-!     !> Get spline degree
-!     integer(FP_SIZE) function fitpack_parametric_curve_c_degree(this) &
-!                               bind(c,name='fitpack_parametric_curve_c_degree')
-!        type(fitpack_parametric_curve_c), intent(inout) :: this
-!
-!        type(fitpack_parametric_curve), pointer :: fcurve
-!
-!        !> Get object; allocate it in case
-!        call fitpack_parametric_curve_c_pointer(this,fcurve)
-!
-!        fitpack_parametric_curve_c_degree = fcurve%order
-!
-!     end function fitpack_parametric_curve_c_degree
+
+     !> Evaluate k-th derivative of the curve at point u
+     integer(FP_FLAG) function fitpack_parametric_curve_c_derivative(this,u,order,ddx) result(ierr) &
+                            bind(c,name='fitpack_parametric_curve_c_derivative')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+        real   (FP_REAL), intent(in), value :: u
+        integer(FP_SIZE), intent(in), value :: order
+        real   (FP_REAL), intent(out)       :: ddx(*)
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) ddx(1:fcurve%idim) = fcurve%dfdx(u,order,ierr)
+
+     end function fitpack_parametric_curve_c_derivative
+
+     !> Get smoothing
+     real(FP_REAL) function fitpack_parametric_curve_c_smoothing(this) &
+                            bind(c,name='fitpack_parametric_curve_c_smoothing')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_smoothing = fcurve%smoothing
+        else
+           fitpack_parametric_curve_c_smoothing = -1.0_FP_REAL
+        endif
+
+     end function fitpack_parametric_curve_c_smoothing
+
+
+     !> Get dimensions
+     integer(FP_SIZE) function fitpack_parametric_curve_c_idim(this) &
+                            bind(c,name='fitpack_parametric_curve_c_idim')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_idim = fcurve%idim
+        else
+           fitpack_parametric_curve_c_idim = 0
+        end if
+
+     end function fitpack_parametric_curve_c_idim
+
+
+     !> Get MSE
+     real(FP_REAL) function fitpack_parametric_curve_c_mse(this) &
+                            bind(c,name='fitpack_parametric_curve_c_mse')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_mse = fcurve%fp
+        else
+           fitpack_parametric_curve_c_mse = 0.0_FP_REAL
+        endif
+
+     end function fitpack_parametric_curve_c_mse
+
+     !> Get spline degree
+     integer(FP_SIZE) function fitpack_parametric_curve_c_degree(this) &
+                            bind(c,name='fitpack_parametric_curve_c_degree')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_degree = fcurve%order
+        else
+           fitpack_parametric_curve_c_degree = 0
+        end if
+
+     end function fitpack_parametric_curve_c_degree
 !
 
 end module fitpack_parametric_curves_c

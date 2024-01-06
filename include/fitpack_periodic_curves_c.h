@@ -60,6 +60,7 @@ FP_REAL fitpack_periodic_curve_c_smoothing      (fitpack_periodic_curve_c *self)
 FP_REAL fitpack_periodic_curve_c_mse            (fitpack_periodic_curve_c *self);
 FP_SIZE fitpack_periodic_curve_c_degree         (fitpack_periodic_curve_c *self);
 
+
 #ifdef __cplusplus
 }
 #endif
