@@ -93,7 +93,6 @@ module fitpack_parametric_curves
            !> Generate new fit
            procedure :: new_fit
 
-
            !> Generate/update fitting curve, with optional smoothing
            procedure :: fit         => curve_fit_automatic_knots
            procedure :: interpolate => interpolating_curve
@@ -130,10 +129,10 @@ module fitpack_parametric_curves
     type, extends(fitpack_parametric_curve) :: fitpack_constrained_curve
 
         !> Left boundary derivatives
-        integer                  :: ib = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
+        integer                    :: ib = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
         real(FP_REAL), allocatable :: deriv_begin(:,:) ! 0:ib-1
         !> Right boundary derivatives
-        integer                  :: ie = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
+        integer                    :: ie = 0 ! Number of boundary constraints: up to (ib-1)-th derivative
         real(FP_REAL), allocatable :: deriv_end(:,:)
 
         !> On exit xx contains the coordinates of the data points to which a spline curve with zero
@@ -183,11 +182,11 @@ module fitpack_parametric_curves
     ! Fit a new curve
     integer function new_fit(this,x,u,w,smoothing,order)
         class(fitpack_parametric_curve), intent(inout) :: this
-        real(FP_REAL), intent(in) :: x(:,:)
-        real(FP_REAL), optional, intent(in) :: u(size(x,2)) ! parameter values
-        real(FP_REAL), optional, intent(in) :: w(size(x,2)) ! node weights
-        real(FP_REAL), optional, intent(in) :: smoothing
-        integer    , optional, intent(in) :: order
+        real   (FP_REAL), intent(in) :: x(:,:)
+        real   (FP_REAL), optional, intent(in) :: u(size(x,2)) ! parameter values
+        real   (FP_REAL), optional, intent(in) :: w(size(x,2)) ! node weights
+        real   (FP_REAL), optional, intent(in) :: smoothing
+        integer(FP_SIZE), optional, intent(in) :: order
 
         call this%new_points(x,u,w)
 

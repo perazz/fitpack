@@ -2,6 +2,8 @@
 #include "../include/fpCurve.hpp"
 #include "../include/fitpack_periodic_curves_c.h"
 #include "../include/fpPeriodicCurve.hpp"
+#include "../include/fitpack_parametric_curves_c.h"
+#include "../include/fpParametricCurve.hpp"
 
 #include <cmath>
 #include <vector>
@@ -176,6 +178,20 @@ FP_BOOL test_cpp_periodic_fit()
     return FP_TRUE;
 
 }
+
+
+// Test parametric curve fit
+// Periodic test: fit a cosine function
+FP_BOOL test_cpp_parametric_fit()
+{
+
+
+    // All checks passed: success!
+    return FP_TRUE;
+
+}
+
+
 
 }
 

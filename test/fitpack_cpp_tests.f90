@@ -27,6 +27,7 @@ module fitpack_cpp_tests
 
     public :: test_cpp_sine_fit
     public :: test_cpp_periodic_fit
+    public :: test_cpp_parametric_fit
 
     interface
         logical(FP_BOOL) function test_cpp_sine_fit() bind(C,name="test_cpp_sine_fit")
@@ -35,6 +36,9 @@ module fitpack_cpp_tests
         logical(FP_BOOL) function test_cpp_periodic_fit() bind(C,name="test_cpp_periodic_fit")
            import FP_BOOL
         end function test_cpp_periodic_fit
+        logical(FP_BOOL) function test_cpp_parametric_fit() bind(C,name="test_cpp_parametric_fit")
+           import FP_BOOL
+        end function test_cpp_parametric_fit
     end interface
 
 
