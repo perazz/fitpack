@@ -57,6 +57,8 @@ FP_REAL  fitpack_closed_curve_c_smoothing       (fitpack_closed_curve_c *self);
 FP_REAL  fitpack_closed_curve_c_mse             (fitpack_closed_curve_c *self);
 FP_SIZE  fitpack_closed_curve_c_degree          (fitpack_closed_curve_c *self);
 FP_SIZE  fitpack_closed_curve_c_idim            (fitpack_closed_curve_c *self);
+FP_REAL  fitpack_closed_curve_c_ubegin          (fitpack_closed_curve_c *self);
+FP_REAL  fitpack_closed_curve_c_uend            (fitpack_closed_curve_c *self);
 
 #ifdef __cplusplus
 }

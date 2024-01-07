@@ -119,6 +119,8 @@ class fpParametricCurve
         const FP_REAL smoothing() { return fitpack_parametric_curve_c_smoothing(&cptr); };
         const FP_REAL mse      () { return fitpack_parametric_curve_c_mse(&cptr); };
         const FP_SIZE ndim     () { return fitpack_parametric_curve_c_idim(&cptr); };
+        const FP_REAL ubegin   () { return fitpack_parametric_curve_c_ubegin(&cptr); };
+        const FP_REAL uend     () { return fitpack_parametric_curve_c_uend(&cptr); };
 
         // Get value at u
         fpPoint eval(FP_REAL u, FP_FLAG* ierr=nullptr)

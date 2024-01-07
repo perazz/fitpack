@@ -26,41 +26,11 @@
 
 // Import Fortran-C interface
 #include "fitpack_closed_curves_c.h"
+#include "fpParametricCurve.hpp"
 #include <vector>
 using std::vector;
 
 typedef vector<FP_REAL> fpPoint;
-
-// Flatten a 2D vector
-vector<FP_REAL> flatten_2d_vector(vector<fpPoint> x2d)
-{
-
-    // Get number of points
-    FP_SIZE npts = x2d.size();
-
-    // Get max vector size
-    FP_SIZE ndim = 0;
-    for (FP_SIZE i=0; i<x2d.size(); i++)
-    {
-        ndim = x2d[i].size()>ndim? x2d[i].size() : ndim;
-    }
-
-    // Allocate flattened vector
-    FP_SIZE n = npts*ndim;
-
-    vector<FP_REAL> x(n,0.0);
-
-    for (FP_SIZE pt=0; pt<x2d.size(); pt++)
-    {
-        for (FP_SIZE idim=0; idim<x2d[pt].size(); idim++)
-        {
-            x[pt*ndim+idim] = x2d[pt][idim];
-        }
-    }
-
-    return x;
-
-}
 
 class fpClosedCurve
 {
@@ -119,6 +89,8 @@ class fpClosedCurve
         const FP_REAL smoothing() { return fitpack_closed_curve_c_smoothing(&cptr); };
         const FP_REAL mse      () { return fitpack_closed_curve_c_mse(&cptr); };
         const FP_SIZE ndim     () { return fitpack_closed_curve_c_idim(&cptr); };
+        const FP_REAL ubegin   () { return fitpack_closed_curve_c_ubegin(&cptr); };
+        const FP_REAL uend     () { return fitpack_closed_curve_c_uend(&cptr); };
 
         // Get value at u
         fpPoint eval(FP_REAL u, FP_FLAG* ierr=nullptr)

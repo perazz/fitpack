@@ -42,14 +42,13 @@ module fitpack_parametric_curves_c
      public :: fitpack_parametric_curve_c_fit
      public :: fitpack_parametric_curve_c_interpolating
      public :: fitpack_parametric_curve_c_eval_one
-!     public :: fitpack_parametric_curve_c_integral
-!     public :: fitpack_parametric_curve_c_fourier
-!     public :: fitpack_parametric_curve_c_derivative
-!     public :: fitpack_parametric_curve_c_all_derivatives
+     public :: fitpack_parametric_curve_c_derivative
      public :: fitpack_parametric_curve_c_smoothing
      public :: fitpack_parametric_curve_c_mse
      public :: fitpack_parametric_curve_c_degree
      public :: fitpack_parametric_curve_c_idim
+     public :: fitpack_parametric_curve_c_ubegin
+     public :: fitpack_parametric_curve_c_uend
 
      !> Opaque-pointer C derived type
      type, public, bind(C) :: fitpack_parametric_curve_c
@@ -315,7 +314,6 @@ module fitpack_parametric_curves_c
 
      end function fitpack_parametric_curve_c_idim
 
-
      !> Get MSE
      real(FP_REAL) function fitpack_parametric_curve_c_mse(this) &
                             bind(c,name='fitpack_parametric_curve_c_mse')
@@ -333,6 +331,42 @@ module fitpack_parametric_curves_c
         endif
 
      end function fitpack_parametric_curve_c_mse
+
+     !> Get begin endpoint
+     real(FP_REAL) function fitpack_parametric_curve_c_ubegin(this) &
+                            bind(c,name='fitpack_parametric_curve_c_ubegin')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_ubegin = fcurve%ubegin
+        else
+           fitpack_parametric_curve_c_ubegin = -huge(0.0_FP_REAL)
+        end if
+
+     end function fitpack_parametric_curve_c_ubegin
+
+     !> Get end endpoint
+     real(FP_REAL) function fitpack_parametric_curve_c_uend(this) &
+                            bind(c,name='fitpack_parametric_curve_c_uend')
+        type(fitpack_parametric_curve_c), intent(inout) :: this
+
+        type(fitpack_parametric_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_parametric_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_parametric_curve_c_uend = fcurve%uend
+        else
+           fitpack_parametric_curve_c_uend = -huge(0.0_FP_REAL)
+        end if
+
+     end function fitpack_parametric_curve_c_uend
 
      !> Get spline degree
      integer(FP_SIZE) function fitpack_parametric_curve_c_degree(this) &

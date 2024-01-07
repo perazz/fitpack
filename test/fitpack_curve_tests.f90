@@ -167,7 +167,7 @@ module fitpack_curve_tests
                if (.not.maxval(abs(  yend(:,1)-ddx_end  (:,0)))<smallnum06) success = .false.
              case (3)
                if (.not.maxval(abs(ybegin(:,1:2)-ddx_begin(:,0:1)))<smallnum06) success = .false.
-               if (.not.maxval(abs(  yend(:,1)-ddx_end  (:,0)))<smallnum06) success = .false.
+               if (.not.maxval(abs(  yend(:,1)-ddx_end  (:,0)))<smallnum06)     success = .false.
              case (4)
                if (.not.maxval(abs(ybegin(:,1:2)-ddx_begin(:,0:1)))<smallnum06) success = .false.
                if (.not.maxval(abs(  yend(:,1:2)-ddx_end  (:,0:1)))<smallnum06) success = .false.
@@ -220,7 +220,7 @@ module fitpack_curve_tests
        allocate(w(size(x,2)),source=one)
 
        ! Supply parameter values (also used as evaluation points)
-       u = [(20*(i-1),i=1,size(x,2))]
+       u = [(20*i,i=0,size(x,2)-1)]
 
 
        do loop=1,8

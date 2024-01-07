@@ -4,6 +4,7 @@
 #include "../include/fpPeriodicCurve.hpp"
 #include "../include/fitpack_parametric_curves_c.h"
 #include "../include/fpParametricCurve.hpp"
+#include "../include/fpConstrainedCurve.hpp"
 
 #include <cmath>
 #include <vector>
@@ -408,6 +409,188 @@ FP_BOOL test_cpp_closed_fit()
 
     // All checks passed: success!
     return FITPACK_SUCCESS_c(ierr);
+
+}
+
+// Constrained curve test
+FP_BOOL test_cpp_constrained_fit() {
+
+     char msg[256];
+
+     FP_FLAG ierr = FITPACK_OK;
+
+     static const FP_SIZE m = 31;
+     static const FP_SIZE idim = 2;
+     static const FP_REAL x[][2] = {{-3.1090, 3.0400},{-2.1880, 2.8760},{-1.3510, 2.6340},{-0.6050, 2.1830},
+                                    { 0.0930, 1.5860},{ 0.4510, 1.0100},{ 0.6520, 0.3820},{ 0.7010,-0.2180},
+                                    { 0.5180,-0.6320},{ 0.2770,-0.8790},{ 0.0080,-0.9810},{-0.2910,-0.8860},
+                                    {-0.5620,-0.6420},{-0.6790,-0.1950},{-0.6370, 0.3730},{-0.4250, 1.0700},
+                                    {-0.0490, 1.6070},{ 0.5750, 2.1650},{ 1.3340, 2.6180},{ 2.1670, 2.9050},
+                                    { 3.2060, 2.9910},{ 4.0990, 2.8970},{ 4.8720, 2.6150},{ 5.7100, 2.1640},
+                                    { 6.3300, 1.6170},{ 6.7410, 0.9770},{ 6.9280, 0.3830},{ 6.9650,-0.1940},
+                                    { 6.8420,-0.6650},{ 6.5930,-0.9010},{ 6.2690,-1.0100}};
+
+     // Data derivatives at the extremes (point, 1st, 2nd derivative)
+     static const FP_REAL ddx_begin[][2] = {{-M_PI,3.0},{3.0,0.0},{0.0,-2.0}};
+     static const FP_REAL ddx_end  [][2] = {{2*M_PI,-1.0},{-1.0,0.0},{0.0,2.0}};
+
+     // Fit points into vectors
+     vector<fpPoint> xv,ddx_beginv,ddx_endv;
+     for (FP_SIZE i=0; i<m; i++) xv        .push_back(fpPoint(x[i],x[i]+2));
+     for (FP_SIZE i=0; i<3; i++) ddx_beginv.push_back(fpPoint(ddx_begin[i],ddx_begin[i]+2));
+     for (FP_SIZE i=0; i<3; i++) ddx_endv  .push_back(fpPoint(ddx_end  [i],ddx_end  [i]+2));
+
+     // weights: 1/sigma with sigma an estimate of the standard deviation of the data points.
+     vector<FP_REAL> w(m,1.0/0.04);
+
+     // Parameter space
+     vector<FP_REAL> u(m);
+     for (FP_SIZE i=0; i<m; i++) u[i] = i*(3*M_PI)/(m-1.0);
+
+     // Create curve object
+     fpConstrainedCurve curve;
+
+     // Run tests
+     for (FP_SIZE loop=1; loop<=5; loop++)
+     {
+         switch (loop)
+         {
+         case 1: // No constraints
+            {
+                 ierr = curve.new_fit(xv,u,w,(FP_REAL) m);
+                 break;
+            }
+         case 2: // Constraints on points only
+            {
+                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+1),
+                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
+                if (!FITPACK_SUCCESS_c(ierr)) break;
+                ierr = curve.fit((FP_REAL) m);
+                break;
+            }
+         case 3: // Fix points, 1st derivative (begin)
+            {
+                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
+                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
+                if (!FITPACK_SUCCESS_c(ierr)) break;
+                ierr = curve.fit((FP_REAL) m);
+                break;
+            }
+         case 4: // Fix points, 1st derivative (both)
+            {
+                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
+                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+2));
+                if (!FITPACK_SUCCESS_c(ierr)) break;
+                ierr = curve.fit((FP_REAL) m);
+                break;
+            }
+         case 5: // quintic spline, 2st derivative constraints (both)
+            {
+                ierr = curve.constrain_both(ddx_beginv,ddx_endv);
+                if (!FITPACK_SUCCESS_c(ierr)) break;
+                ierr = curve.fit((FP_REAL) m, 5);
+                break;
+            }
+         case 6: // quintic spline, 2st derivative constraints (both), s=26'
+            {
+                ierr = curve.fit(26.0,5);
+                break;
+            }
+         default:
+            break;
+         }
+
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_constrained_fit] test " << loop << " failed: " << msg << std::endl;
+            break;
+         }
+
+          // Evaluate the spline at all nodes
+          vector<fpPoint> y = curve.eval(u,&ierr);
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_constrained_fit] point evaluation " << loop << " failed: " << msg << std::endl;
+            break;
+          }
+
+         // Calculate derivatives at the begin point.
+         vector<fpPoint> ybegin = curve.ddu_all(curve.ubegin(), &ierr);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_constrained_fit] begin point derivatives " << loop << " failed: " << msg << std::endl;
+            break;
+         }
+
+         // Calculate derivatives at the end point
+         vector<fpPoint> yend = curve.ddu_all(curve.uend(), &ierr);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_constrained_fit] end point derivatives " << loop << " failed: " << msg << std::endl;
+            break;
+         }
+
+         // Verify constraints
+         switch (loop)
+         {
+         case 2: // Smaller values of s to get a tighter approximation
+            {
+                FP_SIZE i = 0;
+                for (FP_SIZE j=0; j<idim; j++)
+                {
+                    if (abs(ybegin[0][j]-ddx_beginv[0][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                    if (abs(  yend[0][j]-  ddx_endv[0][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                }
+                break;
+            }
+         case 3: // Fix points, 1st derivative (begin)
+            {
+                for (FP_SIZE i=0; i<2; i++) {
+                for (FP_SIZE j=0; j<idim; j++)
+                {
+                    if (abs(ybegin[i][j]-ddx_beginv[i][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                    if (abs(  yend[0][j]-  ddx_endv[0][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                }
+                }
+                break;
+            }
+         case 4: // Fix points, 1st derivative (both)
+            {
+                for (FP_SIZE i=0; i<2; i++) {
+                for (FP_SIZE j=0; j<idim; j++)
+                {
+                    if (abs(ybegin[i][j]-ddx_beginv[i][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                    if (abs(  yend[i][j]-  ddx_endv[i][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                }
+                }
+                break;
+            }
+         case 5: // Fix points, 2 derivatives (both), 5-th order
+         case 6: // Fix points, 2 derivatives (both), 5-th order, more smoothing
+            {
+                for (FP_SIZE i=0; i<3; i++) {
+                for (FP_SIZE j=0; j<idim; j++)
+                {
+                    if (abs(ybegin[i][j]-ddx_beginv[i][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                    if (abs(  yend[i][j]-  ddx_endv[i][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
+                }
+                }
+                break;
+            }
+         default:
+            break;
+         }
+
+          // Evaluate derivatives at a random point from the initial set
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
+            std::cout << "[test_constrained_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
+            break;
+          }
+
+     }
+
+   return FITPACK_SUCCESS_c(ierr);
 
 }
 

@@ -46,6 +46,8 @@ module fitpack_closed_curves_c
      public :: fitpack_closed_curve_c_mse
      public :: fitpack_closed_curve_c_degree
      public :: fitpack_closed_curve_c_idim
+     public :: fitpack_closed_curve_c_ubegin
+     public :: fitpack_closed_curve_c_uend
 
      !> Opaque-pointer C derived type
      type, public, bind(C) :: fitpack_closed_curve_c
@@ -311,6 +313,41 @@ module fitpack_closed_curves_c
 
      end function fitpack_closed_curve_c_idim
 
+     !> Get begin endpoint
+     real(FP_REAL) function fitpack_closed_curve_c_ubegin(this) &
+                            bind(c,name='fitpack_closed_curve_c_ubegin')
+        type(fitpack_closed_curve_c), intent(inout) :: this
+
+        type(fitpack_closed_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_closed_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_closed_curve_c_ubegin = fcurve%ubegin
+        else
+           fitpack_closed_curve_c_ubegin = -huge(0.0_FP_REAL)
+        end if
+
+     end function fitpack_closed_curve_c_ubegin
+
+     !> Get end endpoint
+     real(FP_REAL) function fitpack_closed_curve_c_uend(this) &
+                            bind(c,name='fitpack_closed_curve_c_uend')
+        type(fitpack_closed_curve_c), intent(inout) :: this
+
+        type(fitpack_closed_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_closed_curve_c_get_pointer(this,fcurve)
+
+        if (associated(fcurve)) then
+           fitpack_closed_curve_c_uend = fcurve%uend
+        else
+           fitpack_closed_curve_c_uend = -huge(0.0_FP_REAL)
+        end if
+
+     end function fitpack_closed_curve_c_uend
 
      !> Get MSE
      real(FP_REAL) function fitpack_closed_curve_c_mse(this) &

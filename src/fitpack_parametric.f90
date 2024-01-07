@@ -285,7 +285,7 @@ module fitpack_parametric_curves
         ! always large enough is nest=m+k+1, the number of knots needed for interpolation (s=0).
         select type (curv => this)
 
-           class is (fitpack_constrained_curve)
+           type is (fitpack_constrained_curve)
 
               ! on exit cp will contain the b-spline coefficients of a polynomial curve which satisfies
               ! the boundary constraints. if the computation mode iopt =1 is used cp should be left
@@ -299,7 +299,7 @@ module fitpack_parametric_curves
               ! Ensure constraint arrays are allocated and no constraints set
               call set_constraints(curv)
 
-           class is (fitpack_closed_curve)
+           type is (fitpack_closed_curve)
 
               nest = SAFE*(m+2*MAX_ORDER)
               lwrk = (m*(MAX_K+1)+nest*(7+idim+5*MAX_K))
@@ -470,7 +470,7 @@ module fitpack_parametric_curves
             ! Call fitting function
             select type (curv => this)
 
-               class is (fitpack_closed_curve)
+               type is (fitpack_closed_curve)
 
                   call clocur(curv%iopt,                    &  ! option
                               merge(1,0,curv%has_params),   &  ! have input parameter values?
@@ -484,7 +484,7 @@ module fitpack_parametric_curves
                               curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
                               ierr)
 
-               class is (fitpack_parametric_curve)
+               type is (fitpack_parametric_curve)
 
                   call parcur(curv%iopt,                    &  ! option
                               merge(1,0,curv%has_params),   &  ! have input parameter values?
@@ -499,7 +499,7 @@ module fitpack_parametric_curves
                               curv%wrk,curv%lwrk,curv%iwrk, &  ! memory
                               ierr)
 
-               class is (fitpack_constrained_curve)
+               type is (fitpack_constrained_curve)
 
                   call concur(curv%iopt,                    &  ! option
                               curv%idim,curv%m,             &  ! Number of dimensions
@@ -565,7 +565,7 @@ module fitpack_parametric_curves
                    ierr0)          ! Output flag
 
        ! Derivative order is 0:k <- extract derivative
-       ddx = this%dd(:,1+ddx_order)
+       ddx = this%dd(:,ddx_order)
 
        call fitpack_error_handling(ierr0,ierr,'evaluate derivative')
 

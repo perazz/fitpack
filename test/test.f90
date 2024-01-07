@@ -133,11 +133,11 @@ program test
 
     subroutine run_cpp_tests()
 
-        ! Sine function interpolant: test f(x) and df/dx
         call add_testl(test_cpp_sine_fit())
         call add_testl(test_cpp_periodic_fit())
         call add_testl(test_cpp_parametric_fit())
         call add_testl(test_cpp_closed_fit())
+        call add_testl(test_cpp_constrained_fit())
 
     end subroutine run_cpp_tests
 

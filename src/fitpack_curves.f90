@@ -315,7 +315,7 @@ module fitpack_curves
 
             select type (curve => this)
 
-               class is (fitpack_periodic_curve)
+               type is (fitpack_periodic_curve)
 
                   ! Call fitting function
                   call percur(curve%iopt,                      &  ! option
