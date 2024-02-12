@@ -35,6 +35,9 @@ Fortran      | C | C++
 ---        | ---         | ---
 `fitpack_curve` | `fitpack_curve_c` | `fpCurve`
 `fitpack_periodic_curve` | `fitpack_periodic_curve_c` | `fpPeriodicCurve`
+`fitpack_parametric_curve` | `fitpack_parametric_curve_c` | `fpParametricCurve`
+`fitpack_closed_curve` | `fitpack_closed_curve_c` | `fpClosedCurve`
+`fitpack_constrained_curve` | `fitpack_constrained_curve_c` | `fpConstrainedCurve`
 
 Building, using
 ===============
