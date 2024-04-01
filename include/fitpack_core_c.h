@@ -145,6 +145,21 @@ void concon_c(FP_SIZE iopt,FP_SIZE m,const FP_REAL* x,const FP_REAL* y,const FP_
               FP_SIZE nest,FP_SIZE maxtr,FP_SIZE maxbin, FP_SIZE* n, FP_REAL* t,FP_REAL* c,FP_REAL* sq,
               FP_REAL* sx,FP_BOOL* bind, FP_REAL* wrk,FP_SIZE lwrk,FP_SIZE* iwrk,FP_SIZE kwrk,FP_FLAG* ier);
 
+void splev_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_SIZE k, const FP_REAL* x, 
+             FP_REAL* y, FP_SIZE m, FP_FLAG e,FP_FLAG* ier);
+              
+void splder_c(const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE k,FP_SIZE nu,const FP_REAL* x,
+              FP_REAL* y, FP_SIZE m, FP_FLAG e, FP_REAL* wrk, FP_FLAG*ier);
+
+void spalde_c(const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE k1,
+              FP_REAL x,FP_REAL* d, FP_FLAG* ier);
+
+void curev_c(FP_SIZE idim,const FP_REAL t*,FP_SIZE n,const FP_REAL c*,FP_SIZE nc, FP_SIZE k,
+             const FP_REAL* u,FP_SIZE m, FP_REAL* x,FP_SIZE mx, FP_FLAG* ier);
+
+void cualde_c(FP_SIZE idim, const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE nc,FP_SIZE k1, 
+              FP_REAL u, FP_REAL* d, FP_SIZE nd, FP_FLAG* ier);
+              
 #ifdef __cplusplus
 }
 #endif
