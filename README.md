@@ -39,6 +39,8 @@ Fortran      | C | C++
 `fitpack_closed_curve` | `fitpack_closed_curve_c` | `fpClosedCurve`
 `fitpack_constrained_curve` | `fitpack_constrained_curve_c` | `fpConstrainedCurve`
 
+The choice to provide a header-only `C++` implementation is motivated by the need to keep the library C-ABI compatible whatever compiler is being used to build it. For example, on macOS, one may build the library with g++/gfortran, that is not ABI-compatible with clang++. So, it is important that no C++ code is compiled together with the Fortran code in the library.
+
 Building, using
 ===============
 
