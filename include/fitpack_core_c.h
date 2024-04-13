@@ -159,7 +159,10 @@ void curev_c(FP_SIZE idim,const FP_REAL t*,FP_SIZE n,const FP_REAL c*,FP_SIZE nc
 
 void cualde_c(FP_SIZE idim, const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE nc,FP_SIZE k1, 
               FP_REAL u, FP_REAL* d, FP_SIZE nd, FP_FLAG* ier);
-              
+  
+void insert_c(FP_SIZE iopt, FP_REAL* t, FP_SIZE* n, FP_REAL* c, FP_SIZE k, FP_REAL x, 
+              fP_SIZE nest, FP_FLAG* ier);  
+                
 #ifdef __cplusplus
 }
 #endif

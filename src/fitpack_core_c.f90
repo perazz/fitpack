@@ -36,6 +36,7 @@ module fitpack_core_c
     public :: spalde_c
     public :: curev_c
     public :: cualde_c
+    public :: insert_c
 
     contains
 
@@ -191,5 +192,14 @@ module fitpack_core_c
           call cualde(idim,t,n,c,nc,k1,u,d,nd,ier)
       end subroutine cualde_c
       
+      ! insert interface
+      pure subroutine insert_c(iopt,t,n,c,k,x,nest,ier) bind(C,name='insert_c')
+          integer(FP_SIZE), intent(in), value  :: iopt,k,nest
+          real(FP_REAL),    intent(inout)      :: t(nest),c(nest)          
+          real(FP_REAL),    intent(in), value  :: x
+          integer(FP_SIZE), intent(inout)      :: n
+          integer(FP_FLAG), intent(out)        :: ier
+          call insert_inplace(iopt,t,n,c,k,x,nest,ier)
+      end subroutine insert_c
 
 end module fitpack_core_c
