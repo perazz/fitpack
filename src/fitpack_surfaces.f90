@@ -89,7 +89,7 @@ module fitpack_surfaces
     contains
 
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
-    integer function surface_fit_automatic_knots(this,smoothing,order) result(ierr)
+    integer(FP_FLAG) function surface_fit_automatic_knots(this,smoothing,order) result(ierr)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
         integer, optional, intent(in) :: order
@@ -246,9 +246,9 @@ module fitpack_surfaces
     type(fitpack_surface) function surf_new_from_points(x,y,z,w,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
-        integer, optional, intent(out) :: ierr
+        integer(FP_FLAG), optional, intent(out) :: ierr
 
-        integer :: ierr0
+        integer(FP_FLAG) :: ierr0
 
         ierr0 = this%new_fit(x,y,z,w)
 
@@ -258,7 +258,7 @@ module fitpack_surfaces
     end function surf_new_from_points
 
     ! Fit a new curve
-    integer function surf_new_fit(this,x,y,z,w,smoothing,order)
+    integer(FP_FLAG) function surf_new_fit(this,x,y,z,w,smoothing,order)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
