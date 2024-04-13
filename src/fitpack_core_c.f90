@@ -201,5 +201,15 @@ module fitpack_core_c
           integer(FP_FLAG), intent(out)        :: ier
           call insert_inplace(iopt,t,n,c,k,x,nest,ier)
       end subroutine insert_c
+      
+      ! splint interface
+      real(FP_REAL) function splint_c(t,n,c,k,a,b,wrk) bind(C,name='splint_c')
+          real(FP_REAL),    intent(in), value :: a,b
+          integer(FP_SIZE), intent(in), value :: n,k
+          real(FP_REAL),    intent(in)        :: t(n),c(n)
+          real(FP_REAL),    intent(inout)     :: wrk(n)
+          splint_c = splint(t,n,c,k,a,b,wrk)
+      end function splint_c
+
 
 end module fitpack_core_c
