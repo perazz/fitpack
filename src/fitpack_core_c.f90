@@ -210,6 +210,17 @@ module fitpack_core_c
           real(FP_REAL),    intent(inout)     :: wrk(n)
           splint_c = splint(t,n,c,k,a,b,wrk)
       end function splint_c
+      
+      ! fourier coefficients
+      pure subroutine fourco_c(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier) bind(C,name='fourco_c')
+          integer(FP_SIZE), intent(in), value :: n,m
+          integer(FP_FLAG), intent(out)       :: ier
+          real(FP_REAL),    intent(in)        :: t(n),c(n),alfa(m)
+          real(FP_REAL),    intent(inout)     :: wrk1(n),wrk2(n)
+          real(FP_REAL),    intent(out)       :: ress(m),resc(m)
+      end subroutine fourco_c
+
+
 
 
 end module fitpack_core_c

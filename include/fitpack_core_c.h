@@ -166,6 +166,9 @@ void insert_c(FP_SIZE iopt, FP_REAL* t, FP_SIZE* n, FP_REAL* c, FP_SIZE k, FP_RE
 FP_REAL splint_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_SIZE k, FP_REAL a, 
               FP_REAL b, FP_REAL* wrk);            
     
+void fourco_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, const FP_REAL* alfa, FP_SIZE m, 
+              RP_REAL* ress, FP_REAL* resc, FP_REAL* wrk1, FP_REAL* wrk2, FP_FLAG* ier);    
+    
 #ifdef __cplusplus
 }
 #endif
