@@ -168,6 +168,9 @@ FP_REAL splint_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_SIZE k, FP_RE
     
 void fourco_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, const FP_REAL* alfa, FP_SIZE m, 
               RP_REAL* ress, FP_REAL* resc, FP_REAL* wrk1, FP_REAL* wrk2, FP_FLAG* ier);    
+  
+void sproot_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_REAL* zeros, FP_SIZE mest, 
+              FP_SIZE* m, FP_FLAG* ier);
     
 #ifdef __cplusplus
 }

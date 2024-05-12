@@ -18159,8 +18159,8 @@ module fitpack_core
       end if
       j = n
       do i=1,3
-        if(t(i)>t(i+1)) return
-        if(t(j)<t(j-1)) return
+        if (t(i)>t(i+1)) return
+        if (t(j)<t(j-1)) return
         j = j-1
       end do
       if (any(t(4:n4)>=t(5:n4+1))) return

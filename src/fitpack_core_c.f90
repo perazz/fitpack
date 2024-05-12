@@ -220,6 +220,14 @@ module fitpack_core_c
           real(FP_REAL),    intent(out)       :: ress(m),resc(m)
       end subroutine fourco_c
 
+      ! spline roots
+      pure subroutine sproot_c(t,n,c,zeros,mest,m,ier) bind(C,name='sproot_c')
+          integer(FP_SIZE), intent(in), value  :: n,mest
+          integer(FP_SIZE), intent(out)        :: m
+          integer(FP_FLAG), intent(out)        :: ier
+          real(FP_REAL),    intent(in)         :: t(n),c(n)
+          real(FP_REAL),    intent(out)        :: zeros(mest)
+      end subroutine sproot_c
 
 
 
