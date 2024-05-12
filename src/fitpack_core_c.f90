@@ -229,6 +229,19 @@ module fitpack_core_c
           real(FP_REAL),    intent(out)        :: zeros(mest)
       end subroutine sproot_c
 
+      pure subroutine surfit_c(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx, &
+                               tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='surfit_c')
+          real(FP_REAL),    intent(in), value  :: xb,xe,yb,ye,s,eps
+          real(FP_REAL),    intent(inout)      :: fp
+          integer(FP_SIZE), intent(in), value  :: iopt,m,kx,ky,nxest,nyest,nmax,lwrk1,lwrk2,kwrk
+          integer(FP_SIZE), intent(inout)      :: nx,ny
+          integer(FP_FLAG), intent(out)        :: ier
+          real(FP_REAL),    intent(in)         :: z(m),w(m)
+          real(FP_REAL),    intent(inout)      :: x(m),y(m),tx(nmax),ty(nmax), &
+                                                  c((nxest-kx-1)*(nyest-ky-1)),&
+                                                  wrk1(lwrk1),wrk2(lwrk2)
+          integer(FP_SIZE), intent(inout)      :: iwrk(kwrk)
+      end subroutine surfit_c
 
 
 end module fitpack_core_c
