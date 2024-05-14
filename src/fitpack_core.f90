@@ -3793,6 +3793,7 @@ module fitpack_core
           nr    = 0
           i1    = 1
           n4    = n-4
+          k     = l
           get_error: do i=1,m
              term = (w(i)*(sx(i)-y(i)))**2
              if (x(i)>=t(l) .and. l<=n4) then
@@ -8555,6 +8556,8 @@ module fitpack_core
                  lsv,mm,mpm,mvnu,ncof,nk1u,nk1v,nmaxu,nmaxv,nminu,nminv,nplu,nplv,npl1,&
                  nrintu,nrintv,nue,nuk,nve,nuu,nvv
       logical(FP_BOOL) :: periodic_u,periodic_v,check1,check3,success
+      
+      fpms = huge(zero)
 
       !  acc denotes the absolute tolerance for the root of f(p)=s.
       acc = tol*s
@@ -9712,6 +9715,15 @@ module fitpack_core
       vb    = v(1)
       ve    = vb+period
 
+      ! acc denotes the absolute tolerance for the root of f(p)=s.
+      acc   = tol*s
+
+      ! numax and nvmax denote the number of knots needed for interpolation.
+      numax = mu+5+iopt(2)+iopt(3)
+      nvmax = mv+7
+      nue   = min(numax,nuest)
+      nve   = min(nvmax,nvest)
+
       ! *****************************************************************************************************
       ! part 1: determination of the number of knots and their position.
       ! *****************************************************************************************************
@@ -9731,15 +9743,6 @@ module fitpack_core
       !          case that s > fp0; then we compute the least-squares polynomial directly.
       ! *****************************************************************************************************
       if (iopt(1)>=0) then
-
-          !  acc denotes the absolute tolerance for the root of f(p)=s.
-          acc   = tol*s
-
-          !  numax and nvmax denote the number of knots needed for interpolation.
-          numax = mu+5+iopt(2)+iopt(3)
-          nvmax = mv+7
-          nue   = min(numax,nuest)
-          nve   = min(nvmax,nvest)
 
           if (s<=zero) then
 
@@ -11242,7 +11245,7 @@ module fitpack_core
       nxe = min(nmaxx,nxest)
       nye = min(nmaxy,nyest)
 
-      ! *****
+      ! ***** 
       ! part 1: determination of the number of knots and their position.
       ! *****
       !  given a set of knots we compute the least-squares spline sinf(x,y) and the corresponding sum of
@@ -11816,6 +11819,8 @@ module fitpack_core
       ifsv  = 0
       ifbu  = 0
       ifbv  = 0
+      nplu  = 0
+      nplv  = 0
       p     = -one
       mumin = 4 - merge(1,0,ider(1)>=0) - merge(1,0,iopt(2)==1 .and. ider(2)==1) &
                 - merge(1,0,ider(3)>=0) - merge(1,0,iopt(3)==1 .and. ider(4)==1)
@@ -11823,6 +11828,15 @@ module fitpack_core
 
       vb = v(1)
       ve = vb+period
+
+      ! acc denotes the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      ! numax and nvmax denote the number of knots needed for interpolation.
+      numax = mu+6+iopt(2)+iopt(3)
+      nvmax = mv+7
+      nue   = min(numax,nuest)
+      nve   = min(nvmax,nvest)
 
       ! *****
       ! part 1: determination of the number of knots and their position.
@@ -11845,15 +11859,6 @@ module fitpack_core
       ! *****
 
       if (iopt(1)>=0) then
-
-          !  acc denotes the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
-
-          !  numax and nvmax denote the number of knots needed for interpolation.
-          numax = mu+6+iopt(2)+iopt(3)
-          nvmax = mv+7
-          nue   = min(numax,nuest)
-          nve   = min(nvmax,nvest)
 
           if (s<=zero) then
 
