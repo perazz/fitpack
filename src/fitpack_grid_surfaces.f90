@@ -128,12 +128,12 @@ module fitpack_grid_surfaces
 
         ! User may want to change the order for both x and y
         if (present(order)) this%order = order
-
+        
         do loop=1,nit
 
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
-
+            
             call regrid(this%iopt,                   &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
                         size(this%x),this%x,         &  ! x coordinate of the grid points
                         size(this%y),this%y,         &  ! y coordinate of the grid points

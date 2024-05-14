@@ -2961,6 +2961,8 @@ module fitpack_core
       fpold = zero
       fp0   = zero
       nplus = 0
+      nmax  = 0
+      acc   = epsilon(zero)
 
       ! **********************************************************************************************
       !  part 1: determination of the number of knots and their position
@@ -3883,8 +3885,12 @@ module fitpack_core
       real(FP_REAL) :: h(MAX_ORDER+1),xi(MAX_IDIM)
 
       fpold = zero
-      fp0 = zero
+      fp0   = zero
       nplus = 0
+      nmax  = 0
+      acc   = epsilon(zero)
+      fpms  = huge(zero)
+      nk1   = n-k1
 
       !  ******************************************************************************************
       !  part 1: determination of the number of knots and their position
@@ -3979,7 +3985,6 @@ module fitpack_core
       main_loop: do while (iter<m)
 
          iter = iter+1
-
 
          if (n==nmin) ier = FITPACK_LEASTSQUARES_OK
 
@@ -4087,7 +4092,7 @@ module fitpack_core
         ! test whether the approximation sinf(u) is an acceptable solution.
         if (iopt<0) return ! was done already
 
-        fpms = fp-s; if(abs(fpms)<acc) return
+        fpms = fp-s; if (abs(fpms)<acc) return
 
         ! if f(p=inf) < s accept the choice of knots.
         if (fpms<zero) exit main_loop
@@ -4778,8 +4783,16 @@ module fitpack_core
       logical(FP_BOOL) :: new,check1,check3,success
 
       fpold = zero
-      fp0 = zero
+      fp0   = zero
       nplus = 0
+      fpms  = huge(zero)
+      nk1   = n-k1
+
+      ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc  = tol*s
+
+      ! determine nmax, the number of knots for spline interpolation.
+      nmax = m+k1
 
       ! *****
       !  part 1: determination of the number of knots and their position
@@ -4802,12 +4815,6 @@ module fitpack_core
       !  determine nmin, the number of knots for polynomial approximation.
       nmin = 2*k1
       bootstrap: if (iopt>=0) then
-
-          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
-
-          !  determine nmax, the number of knots for spline interpolation.
-          nmax = m+k1
 
           interpolating: if (s<=zero) then
 
@@ -8152,8 +8159,15 @@ module fitpack_core
       real(FP_REAL) :: h(MAX_ORDER+1),xi(idim)
 
       fpold = zero
-      fp0 = zero
+      fp0   = zero
       nplus = 0
+      fpms  = huge(zero)
+
+      ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      ! determine nmax, the number of knots for spline interpolation.
+      nmax = m+k1
 
       ! *****
       !  part 1: determination of the number of knots and their position
@@ -8176,12 +8190,6 @@ module fitpack_core
       !  determine nmin, the number of knots for polynomial approximation.
       nmin = 2*k1
       bootstrap: if (iopt>=0) then
-
-          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
-
-          !  determine nmax, the number of knots for spline interpolation.
-          nmax = m+k1
 
           interpolating: if (s<=zero) then
 
@@ -8943,6 +8951,13 @@ module fitpack_core
       fpold = zero
       fp0   = zero
       nplus = 0
+      fpms  = huge(zero)
+
+      !  calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      !  determine nmax, the number of knots for periodic spline interpolation
+      nmax = m+2*k
 
       ! *****
       !  part 1: determination of the number of knots and their position
@@ -8967,12 +8982,6 @@ module fitpack_core
       ! determine the length of the period of s(x).
       per = x(m)-x(1)
       if (iopt>=0) then
-
-         !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-         acc = tol*s
-
-         !  determine nmax, the number of knots for periodic spline interpolation
-         nmax = m+2*k
 
          interp_or_fit: if (s<=zero .and. nmax/=nmin) then
 
@@ -10100,11 +10109,13 @@ module fitpack_core
       ipar1  = ipar+1
       eps    = sqrt(eta)
       iband1 = 0
+      fpms   = huge(zero)
+
+      ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc    = tol*s
 
       initialize: if (iopt1>=0) then
 
-          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc   = tol*s
           numin = 9
           nvmin = 9+iopt2*(iopt2+1)
 
@@ -10215,7 +10226,10 @@ module fitpack_core
       !               v-direction.
       !    if iopt1>0 we start with the set of knots found at the last call of the routine.
       !  ************************************************************************************************************
-      !  main loop for the different sets of knots. m is a save upper bound for the number of trials.
+      !  main loop for the different sets of knots. m is a safe upper bound for the number of trials.
+      nu4 = nu-4
+      nv4 = nv-4      
+      
       compute_knots: do iter=1,m
           ! find the position of the additional knots which are needed for the
           ! b-spline representation of s(u,v).
@@ -11216,6 +11230,18 @@ module fitpack_core
       lay  = lbx+nxk
       lby  = lay+nyest*ky2
 
+      ! acc denotes the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
+
+      ! find nmaxx and nmaxy which denote the number of knots in x- and y-
+      ! direction in case of spline interpolation.
+      nmaxx = mx+kx1
+      nmaxy = my+ky1
+
+      !  find nxe and nye which denote the maximum number of knots allowed in each direction
+      nxe = min(nmaxx,nxest)
+      nye = min(nmaxy,nyest)
+
       ! *****
       ! part 1: determination of the number of knots and their position.
       ! *****
@@ -11241,18 +11267,6 @@ module fitpack_core
       nminy = 2*ky1
 
       bootstrap: if (iopt>=0) then
-
-          !  acc denotes the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
-
-          !  find nmaxx and nmaxy which denote the number of knots in x- and y-
-          !  direction in case of spline interpolation.
-          nmaxx = mx+kx1
-          nmaxy = my+ky1
-
-          !  find nxe and nye which denote the maximum number of knots allowed in each direction
-          nxe = min(nmaxx,nxest)
-          nye = min(nmaxy,nyest)
 
           interpolating: if (s<=zero) then
 
@@ -12093,18 +12107,16 @@ module fitpack_core
             ! find nplu, the number of knots we should add in the u-direction.
             nplu = 1
             if (nu/=8) then
-               npl1 = nplusu*2
-               rn = nplusu
-               if (reducu>acc) npl1 = int(rn*fpms/reducu)
+               rn   = nplusu
+               npl1 = merge(int(rn*fpms/reducu),nplusu*2,reducu>acc)
                nplu = min(nplusu*2,max(npl1,nplusu/2,1))
             endif
 
             ! find nplv, the number of knots we should add in the v-direction.
             nplv = 3
             if (nv/=8) then
-               npl1 = nplusv*2
-               rn = nplusv
-               if (reducv>acc) npl1 = int(rn*fpms/reducv)
+               rn   = nplusv
+               npl1 = merge(int(rn*fpms/reducv),nplusv*2,reducv>acc)
                nplv = min(nplusv*2,max(npl1,nplusv/2,1))
             endif
 
@@ -12211,7 +12223,6 @@ module fitpack_core
                              ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
                              ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
 
-      !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: iopt,m,ntest,npest,maxit,ib1,ib3,nc,ncc,intest,nrest,lwrk
       integer(FP_FLAG), intent(out)   :: ier
@@ -12236,7 +12247,11 @@ module fitpack_core
       !  ..local arrays..
       real(FP_REAL), dimension(MAX_ORDER+1) :: hp,ht
 
-      eps = sqrt(eta)
+      eps  = sqrt(eta)
+      fpms = huge(zero)
+
+      ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
 
       ! Initializations
       lwest  = 0
@@ -12244,9 +12259,6 @@ module fitpack_core
       iband1 = 0
 
       bootstrap: if (iopt>=0) then
-
-          ! calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
 
           !  if iopt=0 we begin by computing the weighted least-squares polynomial of the form
           !     s(teta,phi) = c1*f1(teta) + cn*fn(teta)
@@ -13102,11 +13114,12 @@ module fitpack_core
       nxe = nxest
       nye = nyest
       eps = sqrt(eta)
+      fpms = huge(zero)
+
+      ! calculation of acc, the absolute tolerance for the root of f(p)=s.
+      acc = tol*s
 
       bootstrap: if (iopt>=0) then
-
-          !  calculation of acc, the absolute tolerance for the root of f(p)=s.
-          acc = tol*s
 
           if (iopt==0 .or. fp0<=s) then
 
@@ -13131,6 +13144,11 @@ module fitpack_core
 
       endif bootstrap
 
+
+      !  initialize variables
+      nxx    = nx-2*kx1+1
+      nyy    = ny-2*ky1+1
+      iband1 = kx*(ny-ky1)+ky
 
       !  main loop for the different sets of knots. m is a safe upper bound for the number of trials.
       compute_knots: do iter=1,m
