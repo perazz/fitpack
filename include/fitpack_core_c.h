@@ -154,7 +154,7 @@ void splder_c(const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE k,FP_SIZE nu,c
 void spalde_c(const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE k1,
               FP_REAL x,FP_REAL* d, FP_FLAG* ier);
 
-void curev_c(FP_SIZE idim,const FP_REAL t*,FP_SIZE n,const FP_REAL c*,FP_SIZE nc, FP_SIZE k,
+void curev_c(FP_SIZE idim,const FP_REAL* t,FP_SIZE n, const FP_REAL* c,FP_SIZE nc, FP_SIZE k,
              const FP_REAL* u,FP_SIZE m, FP_REAL* x,FP_SIZE mx, FP_FLAG* ier);
 
 void cualde_c(FP_SIZE idim, const FP_REAL* t,FP_SIZE n,const FP_REAL* c,FP_SIZE nc,FP_SIZE k1, 
@@ -167,7 +167,7 @@ FP_REAL splint_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_SIZE k, FP_RE
               FP_REAL b, FP_REAL* wrk);            
     
 void fourco_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, const FP_REAL* alfa, FP_SIZE m, 
-              RP_REAL* ress, FP_REAL* resc, FP_REAL* wrk1, FP_REAL* wrk2, FP_FLAG* ier);    
+              FP_REAL* ress, FP_REAL* resc, FP_REAL* wrk1, FP_REAL* wrk2, FP_FLAG* ier);    
   
 void sproot_c(const FP_REAL* t, FP_SIZE n, const FP_REAL* c, FP_REAL* zeros, FP_SIZE mest, 
               FP_SIZE* m, FP_FLAG* ier);
