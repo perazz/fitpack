@@ -218,6 +218,7 @@ module fitpack_core_c
           real(FP_REAL),    intent(in)        :: t(n),c(n),alfa(m)
           real(FP_REAL),    intent(inout)     :: wrk1(n),wrk2(n)
           real(FP_REAL),    intent(out)       :: ress(m),resc(m)
+          call fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
       end subroutine fourco_c
 
       ! spline roots
@@ -227,8 +228,10 @@ module fitpack_core_c
           integer(FP_FLAG), intent(out)        :: ier
           real(FP_REAL),    intent(in)         :: t(n),c(n)
           real(FP_REAL),    intent(out)        :: zeros(mest)
+          call sproot(t,n,c,zeros,mest,m,ier)
       end subroutine sproot_c
 
+      ! surface fit
       pure subroutine surfit_c(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx, &
                                tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='surfit_c')
           real(FP_REAL),    intent(in), value  :: xb,xe,yb,ye,s,eps
@@ -241,7 +244,23 @@ module fitpack_core_c
                                                   c((nxest-kx-1)*(nyest-ky-1)),&
                                                   wrk1(lwrk1),wrk2(lwrk2)
           integer(FP_SIZE), intent(inout)      :: iwrk(kwrk)
+          call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx, &
+                               tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       end subroutine surfit_c
 
+      ! regular grid fit
+      pure subroutine regrid_c(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
+                               nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='regrid_c')
+          real(FP_REAL),    intent(in), value :: xb,xe,yb,ye,s
+          real(FP_REAL),    intent(out)       :: fp
+          integer(FP_SIZE), intent(in), value :: iopt,mx,my,kx,ky,nxest,nyest,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)     :: nx,ny
+          integer(FP_FLAG), intent(out)       :: ier
+          real(FP_REAL),    intent(in)        :: x(mx),y(my),z(mx*my)
+          real(FP_REAL),    intent(inout)     :: tx(nxest),ty(nyest),c((nxest-kx-1)*(nyest-ky-1)),wrk(lwrk)
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          call regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
+                               nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      end subroutine regrid_c
 
 end module fitpack_core_c

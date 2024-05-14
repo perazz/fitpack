@@ -178,6 +178,17 @@ void surfit_c(FP_SIZE iopt, FP_SIZE m, FP_REAL* x, FP_REAL* y, const FP_REAL* z,
               FP_SIZE* ny, FP_REAL* ty, FP_REAL* c, FP_REAL* fp, FP_REAL* wrk1, FP_SIZE lwrk1, 
               FP_REAL* wrk2, FP_SIZE lwrk2, FP_SIZE* iwrk, FP_SIZE kwrk, FP_FLAG* ier); 
 
+              
+void regrid_c(FP_SIZE iopt, FP_SIZE mx, const FP_REAL* x, 
+                            FP_SIZE my, const FP_REAL* y, const FP_REAL* z, 
+                            FP_REAL xb, FP_REAL xe, FP_REAL yb, FP_REAL ye, 
+                            FP_SIZE kx, FP_SIZE ky, FP_REAL s, 
+                            FP_SIZE nxest, FP_SIZE nyest, FP_SIZE* nx, FP_REAL* tx, 
+                            FP_SIZE* ny, FP_REAL* ty, FP_REAL* c, FP_REAL* fp, 
+                            FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk, 
+                            FP_FLAG* ier);
+
+              
 #ifdef __cplusplus
 }
 #endif
