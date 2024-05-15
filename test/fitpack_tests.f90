@@ -3809,12 +3809,13 @@ module fitpack_tests
 !            write(useUnit,990) nv
 !            write(useUnit,980)
 !            write(useUnit,985) (tv(i),i=1,nv)
-!            nc = (nu-4)*(nv-4)
+            
 !            write(useUnit,995)
 !            write(useUnit,985) (c(i),i=1,nc)
 
             !  evaluation of the spline approximation
             call bispev(tu,nu,tv,nv,c,3,3,u,mu,v,mv,f,wk,100,iwrk,70,ier)
+            nc = (nu-4)*(nv-4)
             write(useUnit,1000)
             write(useUnit,915) (j,j=1,mv,2)
             write(useUnit,920)

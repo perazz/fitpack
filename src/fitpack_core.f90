@@ -134,6 +134,7 @@ module fitpack_core
     real(FP_REAL), parameter, public :: zero    = 0.0_FP_REAL
     real(FP_REAL), parameter, public :: half    = 0.5_FP_REAL
     real(FP_REAL), parameter, public :: onep5   = 1.5_FP_REAL
+    real(FP_REAL), parameter, public :: third   = one/3.0_FP_REAL
     real(FP_REAL), parameter, public :: fourth  = 0.25_FP_REAL
     real(FP_REAL), parameter, public :: two     = 2.0_FP_REAL
     real(FP_REAL), parameter, public :: three   = 3.0_FP_REAL
@@ -6806,9 +6807,8 @@ module fitpack_core
                              mv,r,mr,dr,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,a0,a1,b0,b1,c0,c1,  &
                              cosi,nru,nrv)
-      !  ..
       !  ..scalar arguments..
-      real(FP_REAL), intent(in) :: p
+      real(FP_REAL), intent(in)    :: p
       real(FP_REAL), intent(inout) :: fp,sq
       logical(FP_BOOL), intent(in) :: lback
       integer(FP_SIZE), intent(in) :: mu,mv,mr,iop0,iop1,nu,nv,nc,mm,mvnu
@@ -6876,7 +6876,7 @@ module fitpack_core
       nv7 = nv-7
       nv8 = nv-8
       nv11 = nv-11
-      nuu = nu4-iop0-iop1-2
+      nuu  = nu4-iop0-iop1-2
       pinv = merge(one/p,one,p>zero)
 
       !  it depends on the value of the flags ifsu,ifsv,ifbu,ifbv,iop0,iop1
@@ -6905,7 +6905,7 @@ module fitpack_core
       !  calculate the non-zero elements of the matrix (spv) which is the ob-
       !  servation matrix according to the least-squares spline approximation
       !  problem in the v-direction.
-      if(ifsv==0) then
+      if (ifsv==0) then
 
           l  = 4
           l1 = 5
@@ -6917,12 +6917,11 @@ module fitpack_core
                 l1 = l+1
                 number = number+1
             end do
-            h =  fpbspl(tv,nv,DEGREE_3,arg,l)
+            h = fpbspl(tv,nv,DEGREE_3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
           end do
           ifsv = 1
-
 
           !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
           if (iop0/=0 .or. iop1/=0) then
@@ -6938,6 +6937,7 @@ module fitpack_core
                   end do
                   call fpcyt1(av1,nv7,nv)
                   do j=1,2
+                     right(1:nv7) = cosi(j,1:nv7)
                      call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
                      cosi(j,1:nv4) = [right(nv7),right(1:nv7),right(1:2)]
                   end do
@@ -6948,7 +6948,7 @@ module fitpack_core
 
       if (p>zero) then
           !  calculate the non-zero elements of the matrix (bu).
-          if(ifbu==0 .and. nu8/=0) then
+          if (ifbu==0 .and. nu8/=0) then
              call fpdisc(tu,nu,DEGREE_5,bu,nu)
              ifbu = 1
           endif
@@ -6975,18 +6975,22 @@ module fitpack_core
       endif
       mvv = mv
       if (iop0/=0) then
-          fac       = (tu(5)-tu(4))/three
+          fac       = (tu(5)-tu(4))*third
           c0(1:nv4) = dr01+fac*matmul(dr(2:3),cosi(:,:nv4))
 
-          forall (i=1:mv) a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
+          do i=1,mv
+            a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
+          end do
 
           if (nv8/=0 .and. p>zero) then
-              forall (i=1:nv8) b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))
+              do i=1,nv8 
+                b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))
+              end do
               mvv = mv+nv8
           endif
       endif
       if (iop1/=0) then
-          fac       = (tu(nu4)-tu(nu4+1))/three
+          fac       = (tu(nu4)-tu(nu4+1))*third
           c1(1:nv4) = dr11 + fac*matmul(dr(5:6),cosi(:,:nv4))
 
           forall (i=1:mv) a1(2,i) = dot_product(c1(nrv(i)+1:nrv(i)+4),spv(i,1:4))
@@ -7168,27 +7172,22 @@ module fitpack_core
 
                ! rotation into triangle of the new row of (avv), in case the elements
                ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
-               irot = nrold
                do i=1,5
-                  irot = irot+1
                   piv  = h(i)
 
                   if (equal(piv,zero)) cycle
 
                   ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,av1(irot,1),co,si)
+                  call fpgivs(piv,av1(nrold+i,1),co,si)
 
                   ! apply that transformation to the columns of matrix g.
-                  ic = irot
+                  ic = nrold+i
                   call fprota(co,si,right(1:nuu),c(ic:ic+(nuu-1)*nv7:nv7))
 
                   ! apply that transformation to the rows of (avv).
                   if (i<5) then
-                     i2 = 1
-                     i3 = i+1
-                     do j=i3,5
-                        i2 = i2+1
-                        call fprota(co,si,h(j),av1(irot,i2))
+                     do j=i+1,5
+                        call fprota(co,si,h(j),av1(nrold+i,j+1-i))
                      end do
                   endif
                end do
@@ -7256,6 +7255,7 @@ module fitpack_core
                         if (i2/=0) call fprota(co,si,h1(2:i2+1),av1(j,2:i2+1))
 
                      endif
+                     
                      h1(1:i2+1) = [h1(2:i2+1),zero]
                   end do
 
@@ -7305,8 +7305,7 @@ module fitpack_core
 
           !  second step: solve the system  (cr) (ru)' = (c1).
           do k=1,nv7
-            right(:nuu) = c(k:k+(nuu-1)*nv7:nv7)
-            right(:nuu) = fpback(au,right,nuu,DEGREE_5,nu)
+            right(:nuu) = fpback(au,c(k:k+(nuu-1)*nv7:nv7),nuu,DEGREE_5,nu)
             c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
           end do
 
@@ -7354,7 +7353,7 @@ module fitpack_core
       !                  tu(r+3) <= u(i) <= tu(r+4)
       !    fpv(r) = sumi=1,mu(sum''j(res(i,j))) , r=1,2,...,nv-7
       !                  tv(r+3) <= v(j) <= tv(r+4)
-      fp = zero
+      fp  = zero
       fpu = zero
       fpv = zero
       ir = 0
@@ -7923,7 +7922,7 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: ifsu,ifsv,ifbu,ifbv
       real(FP_REAL), intent(in) :: r0,r1
       real(FP_REAL), intent(inout) :: fp
-      real(FP_REAL), intent(out) :: p
+      real(FP_REAL), intent(inout) :: p
       !  ..array arguments..
       integer(FP_SIZE), intent(in) :: ider(4),iopt(3)
       integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
@@ -7963,19 +7962,25 @@ module fitpack_core
       iop1 = iopt(3)
       id0  = ider(1)
       id1  = ider(3)
+      sq   = zero
+      sum  = zero
+      
       call fpgrsp(ifsu,ifsv,ifbu,ifbv,FP_FALSE,u,mu,v,mv,r,mr,dr,           &
                   iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm,mvnu,       &
                   wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1),   &
                   wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0),  &
                   wrk(lb1),wrk(lc0),wrk(lc1),wrk(lcs),nru,nrv)
-
+                  
       sq0 = merge((r0-dr(1))**2,zero,id0==0)
       sq1 = merge((r1-dr(4))**2,zero,id1==0)
-      sq  = sq+sq0+sq1
+      sq  = sq+sq0+sq1      
+      
       ! in case all derivative values dr(i) are given (step<=0) or in case
       ! we have spline interpolation, we accept this spline as a solution.
       if (sq<=zero .or. all(step(1:2)<=zero)) return
-      drr = dr
+      drr    = dr
+      sqq    = sq
+      sum(1) = sq
 
       ! number denotes the number of derivative values dr(i) that still must
       ! be optimized. let us denote these parameters by g(j),j=1,...,number.
@@ -8003,7 +8008,7 @@ module fitpack_core
          number = number+2
       endif
 
-      if(number==0) return
+      if (number==0) return
 
       ! the sum of squared residulas sq is a quadratic polynomial in the parameters g(j).
       ! we determine the unknown coefficients of this polymomial by calculating (number+1)*(number+2)/2
@@ -8018,7 +8023,7 @@ module fitpack_core
                      wrk(lsu),wrk(lsv),wrk(lri),wrk(lq),wrk(lau),wrk(lav1), &
                      wrk(lav2),wrk(lbu),wrk(lbv),wrk(la0),wrk(la1),wrk(lb0), &
                      wrk(lb1),wrk(lc0),wrk(lc1),wrk(lcs),nru,nrv)
-
+                     
          if (id0==0) sq0 = (r0-drr(1))**2
          if (id1==0) sq1 = (r1-drr(4))**2
          sum(i) = sum(i)+sq0+sq1
@@ -11837,6 +11842,14 @@ module fitpack_core
       nvmax = mv+7
       nue   = min(numax,nuest)
       nve   = min(nvmax,nvest)
+      
+      ! initialize wrk(1:4)
+      if (iopt(1)==0) then         
+        fp0       = zero
+        fpold     = zero
+        reducu    = zero
+        reducv    = zero   
+      endif  
 
       ! *****
       ! part 1: determination of the number of knots and their position.
@@ -11932,7 +11945,7 @@ module fitpack_core
               call fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r,mr,r0,r1,dr,iopt,idd,         &
                           tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru,nrv, &
                           wrk,lwrk)
-
+                          
               ier = FITPACK_INTERPOLATING_OK
               fp  = zero
               return
@@ -12013,7 +12026,7 @@ module fitpack_core
          ! u-direction (v-direction).
          nrintu = nu-7
          nrintv = nv-7
-
+         
          ! find the position of the additional knots which are needed for the
          ! b-spline representation of s(u,v).
          i = nu
@@ -12060,7 +12073,7 @@ module fitpack_core
          call fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r,mr,r0,r1,dr,iopt, &
                      idd,tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu,fpintv,nru, &
                      nrv,wrk,lwrk)
-
+                     
          step = abs(step)
          if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
 
@@ -12199,7 +12212,7 @@ module fitpack_core
 
       !  iteration process to find the root of f(p)=s.
       find_root: do iter = 1,maxit
-
+      
          ! find the smoothing spline sp(u,v) and the corresponding sum f(p).
          call fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r,mr,r0,r1,drr,iopt, &
                      idd,tu,nu,tv,nv,nuest,nvest,p,step,c,nc,fp,fpintu, &
@@ -12207,7 +12220,7 @@ module fitpack_core
 
          ! test whether the approximation sp(u,v) is an acceptable solution.
          fpms = fp-s; if (abs(fpms)<=acc) return ! success
-
+         
          ! find the new value of p and carry out one more step.
          call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
          if (.not.success) then
