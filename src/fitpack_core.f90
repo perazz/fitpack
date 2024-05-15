@@ -5609,7 +5609,7 @@ module fitpack_core
       real(FP_REAL), intent(inout) :: fpu(nu),fpv(nv)   ! if .not.lback
       real(FP_REAL), intent(inout) :: bu(nu,5),bv(nv,5) ! ifbu,ifbv
       real(FP_REAL), intent(in)    :: u(mu),v(mv),z(mz),dz(3),tu(nu),tv(nv)
-      real(FP_REAL), intent(inout) :: spu(mu,4),spv(mv,4),cosi(2,nv),au(nu,5),av1(nv,6),av2(nv,4),right(mm), &
+      real(FP_REAL), intent(inout) :: spu(mu,4),spv(mv,4),cosi(nv,2),au(nu,5),av1(nv,6),av2(nv,4),right(mm), &
                                     aa(2,mv),bb(2,nv),c(nc),cc(nv),q(mvnu)
       integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
@@ -5719,22 +5719,20 @@ module fitpack_core
 
           if (iop0/=0) then
               !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
-              cosi(:,:nv4) = zero
+              cosi(:nv4,:) = zero
               if (nv7>=4) then
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
                      h = fpbspl(tv,nv,DEGREE_3,arg,l)
                      av1(i,1:3) = h(1:3)
-                     cosi(:,i) = [cos(arg),sin(arg)]
+                     cosi(i,1) = cos(arg)
+                     cosi(i,2) = sin(arg)
                   end do
                   call fpcyt1(av1,nv7,nv)
                   do j=1,2
-                     call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
-                     cosi(j,2:nv7+1) = right(1:nv7)
-                     cosi(j,1)       = cosi(j,nv7+1)
-                     cosi(j,nv7+2)   = cosi(j,2)
-                     cosi(j,nv4)     = cosi(j,3)
+                     call fpcyt2(av1,nv7,cosi(1:nv7,j),right,nv)
+                     cosi(:nv4,j) = [right(nv7),right(1:nv7),right(1:2)]
                   end do
               endif
           endif
@@ -5767,7 +5765,8 @@ module fitpack_core
           fac = tu(5)/three
           dz2 = dz(2)*fac
           dz3 = dz(3)*fac
-          cc(1:nv4) = dz1+dz2*cosi(1,1:nv4)+dz3*cosi(2,1:nv4)
+          cc(1:nv4) = dz1+dz2*cosi(:nv4,1)+dz3*cosi(1:nv4,2)
+          
           forall (i=1:mv) aa(2,i) = dot_product(spv(i,1:4),cc(nrv(i)+1:nrv(i)+4))
 
           if (nv8/=0 .and. p>zero) then
@@ -6816,7 +6815,7 @@ module fitpack_core
       !  ..array arguments..
       real(FP_REAL), intent(in) :: u(mu),v(mv),r(mr),dr(6),tu(nu),tv(nv)
 
-      real(FP_REAL), intent(inout) :: av1(nv,6),av2(nv,4),cosi(2,nv),spu(mu,4),spv(mv,4),right(mm),bu(nu,5), &
+      real(FP_REAL), intent(inout) :: av1(nv,6),av2(nv,4),cosi(nv,2),spu(mu,4),spv(mv,4),right(mm),bu(nu,5), &
                                     bv(nv,5),a0(2,mv),b0(2,nv),c0(nv),c1(nv),a1(2,mv),b1(2,nv),q(mvnu),&
                                     au(nu,5),c(nc),fpu(nu),fpv(nv)
       integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
@@ -6926,20 +6925,20 @@ module fitpack_core
           !  calculate the coefficients of the interpolating splines for cos(v) and sin(v).
           if (iop0/=0 .or. iop1/=0) then
 
-              cosi(:,1:nv4) = zero
+              cosi(1:nv4,:) = zero
               if (nv7>=4) then
                   do i=1,nv7
                      l = i+3
                      arg = tv(l)
                      h = fpbspl(tv,nv,DEGREE_3,arg,l)
                      av1(i,1:3) = h(1:3)
-                     cosi(:,i)  = [cos(arg),sin(arg)]
+                     cosi(i,1) = cos(arg)
+                     cosi(i,2) = sin(arg)
                   end do
                   call fpcyt1(av1,nv7,nv)
                   do j=1,2
-                     right(1:nv7) = cosi(j,1:nv7)
-                     call fpcyt2(av1,nv7,cosi(j,1:nv7),right,nv)
-                     cosi(j,1:nv4) = [right(nv7),right(1:nv7),right(1:2)]
+                     call fpcyt2(av1,nv7,cosi(:nv7,j),right,nv)
+                     cosi(:nv4,j) = [right(nv7),right(1:nv7),right(1:2)]
                   end do
               endif
           endif
@@ -6976,22 +6975,18 @@ module fitpack_core
       mvv = mv
       if (iop0/=0) then
           fac       = (tu(5)-tu(4))*third
-          c0(1:nv4) = dr01+fac*matmul(dr(2:3),cosi(:,:nv4))
+          c0(1:nv4) = dr01+fac*matmul(cosi(:nv4,:),dr(2:3))
 
-          do i=1,mv
-            a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
-          end do
+          forall (i=1:mv) a0(2,i) = dot_product(spv(i,1:4),c0(nrv(i)+1:nrv(i)+4))
 
           if (nv8/=0 .and. p>zero) then
-              do i=1,nv8 
-                b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))
-              end do
+              forall (i=1:nv8) b0(2,i) = pinv*dot_product(bv(i,1:5),c0(i:i+4))
               mvv = mv+nv8
           endif
       endif
       if (iop1/=0) then
           fac       = (tu(nu4)-tu(nu4+1))*third
-          c1(1:nv4) = dr11 + fac*matmul(dr(5:6),cosi(:,:nv4))
+          c1(1:nv4) = dr11 + fac*matmul(cosi(:nv4,:),dr(5:6))
 
           forall (i=1:mv) a1(2,i) = dot_product(c1(nrv(i)+1:nrv(i)+4),spv(i,1:4))
 
