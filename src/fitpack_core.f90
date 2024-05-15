@@ -7305,8 +7305,8 @@ module fitpack_core
 
           !  second step: solve the system  (cr) (ru)' = (c1).
           do k=1,nv7
-            right(:nuu) = fpback(au,c(k:k+(nuu-1)*nv7:nv7),nuu,DEGREE_5,nu)
-            c(k:k+(nuu-1)*nv7:nv7) = right(:nuu)
+            right(:nuu) = c(k:k+(nuu-1)*nv7:nv7)
+            c(k:k+(nuu-1)*nv7:nv7) = fpback(au,right(:nuu),nuu,DEGREE_5,nu)
           end do
 
       endif

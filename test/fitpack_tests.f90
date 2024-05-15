@@ -1702,6 +1702,8 @@ module fitpack_tests
           integer(FP_SIZE) :: i,iopt,ip,i1,i2,j,j1,j2,k,k1,nk,n1,n1k1,n2,n2k1,useUnit
           integer(FP_FLAG) :: ier
           real(FP_REAL) :: per
+          
+          success = .true.
 
           ! Initialization.
           if (present(iunit)) then
@@ -1770,6 +1772,7 @@ module fitpack_tests
                          if (.not.FITPACK_SUCCESS(ier)) then
                              success = .false.
                              write(useUnit,1000) iopt,j,1,FITPACK_MESSAGE(ier)
+                             exit spline_degrees
                          end if
 
                          call insert_inplace(iopt,t1,n1,c1,k,zero,nest,ier)
@@ -1778,6 +1781,7 @@ module fitpack_tests
                          if (.not.FITPACK_SUCCESS(ier)) then
                              success = .false.
                              write(useUnit,1000) iopt,j,1,FITPACK_MESSAGE(ier)
+                             exit spline_degrees
                          end if
 
                          t1(1:n1) = t1(2:n1+1)
@@ -1826,12 +1830,14 @@ module fitpack_tests
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,1,FITPACK_MESSAGE(ier)
+                      exit spline_degrees
                   end if
 
                   call insert_inplace(iopt,t1,n1,c1,k,0.8_FP_REAL,nest,ier)
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+2,1,FITPACK_MESSAGE(ier)
+                      exit spline_degrees
                   end if
 
                   !  insert the knots of the first spline into those of the second one
@@ -1839,6 +1845,7 @@ module fitpack_tests
                   if (.not.FITPACK_SUCCESS(ier)) then
                       success = .false.
                       write(useUnit,1000) iopt,k+1,2,FITPACK_MESSAGE(ier)
+                      exit spline_degrees
                   end if
 
                   !  print the knots and coefficients of the splines in their new
@@ -1858,6 +1865,11 @@ module fitpack_tests
 
                   !  evaluate this new spline and compare results
                   call splev(t1,n1,c1,k,x,y,m,OUTSIDE_EXTRAPOLATE,ier)
+                  if (.not.FITPACK_SUCCESS(ier)) then
+                      success = .false.
+                      write(useUnit,1100) iopt,k+1
+                      exit spline_degrees
+                  end if                  
                   write(useUnit,955)
                   do i=1,m
                       write(useUnit,960) i,x(i),y1(i),y2(i),y(i)
@@ -1866,20 +1878,21 @@ module fitpack_tests
           end do spline_degrees
 
           !  format statements.
-          900  format(41h0insertion algorithm for ordinary splines)
-          905  format(41h0insertion algorithm for periodic splines)
-          910  format(1x,25hdegree of the splines k =,i2)
-          915  format(1x,30hposition of the knots of s1(x))
+          900  format('insertion algorithm for ordinary splines')
+          905  format('insertion algorithm for periodic splines')
+          910  format(1x,'degree of the splines k =',i0)
+          915  format(1x,'position of the knots of s1(x)')
           920  format(5x,15f5.1)
-          925  format(1x,30hb-spline coefficients of s1(x))
+          925  format(1x,'b-spline coefficients of s1(x)')
           930  format(5x,8f9.5)
-          935  format(1x,30hposition of the knots of s2(x))
-          940  format(1x,30hb-spline coefficients of s2(x))
-          945  format(1x,37hposition of the knots after insertion)
-          950  format(1x,33hb-spline coefficients of s1+s2(x))
+          935  format(1x,'position of the knots of s2(x)')
+          940  format(1x,'b-spline coefficients of s2(x)')
+          945  format(1x,'position of the knots after insertion')
+          950  format(1x,'b-spline coefficients of s1+s2(x)')
           955  format(3h0 i,6x,1hx,7x,5hs1(x),7x,5hs2(x),6x,8hs1+s2(x))
           960  format(1x,i2,f8.2,3f12.5)
          1000  format('[mnist] with iopt=',i0,' error inserting ',i0,'-th knot on spline ',i0,': ',a)
+         1100  format('[mnist] with iopt=',i0,' degree ',i0,' error inserting evaluating spline')
       end function mnist
 
 
