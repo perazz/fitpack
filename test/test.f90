@@ -15,29 +15,23 @@ program test
     ! Run object-oriented tests
     call run_interface_tests
 
-    if (failed>0) then
-       print 1, passed, failed, 'interface'
-       stop -1
-    endif
+    print 1, passed, failed, 'interface'
+    if (failed>0) stop -1
 
     ! Run legacy tests
     call run_legacy_tests
 
-    if (failed>0) then
-       print 1, passed, failed, 'legacy'
-       stop -1
-    endif
+    print 1, passed, failed, 'legacy'
+    if (failed>0) stop -1
 
     ! Run C++ tests
     call run_cpp_tests
 
-    if (failed>0) then
-       print 1, passed, failed, 'c++'
-       stop -1
-    else
-       print 2, passed
-       stop 0
-    endif
+    print 1, passed, failed, 'c++'
+    if (failed>0) stop -1
+
+    print 2, passed
+    stop 0
 
     1 format('[fitpack] there are ',i0,' passed, ',i0,' failed ',a,' tests.')
     2 format(//'[fitpack] SUCCESS! ',i0,' tests passed, none failed.')

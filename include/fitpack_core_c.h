@@ -57,6 +57,10 @@ static const FP_SIZE DEGREE_3  =  3;
 static const FP_SIZE DEGREE_4  =  4;
 static const FP_SIZE DEGREE_5  =  5;
 
+// Function interface to define a polar boundary shape: radius as a function of angle
+// rad = boundary(theta);
+typedef FP_REAL (*FP_POLAR_BC)(FP_REAL); 
+
 // Error codes
              FP_BOOL FITPACK_SUCCESS_c(FP_FLAG ierr);
 static const FP_FLAG FITPACK_OK                   = 0 ; // ok for spline, abs(fp-s)/s <= tol=0.001
@@ -187,7 +191,11 @@ void regrid_c(FP_SIZE iopt, FP_SIZE mx, const FP_REAL* x,
                             FP_SIZE* ny, FP_REAL* ty, FP_REAL* c, FP_REAL* fp, 
                             FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk, 
                             FP_FLAG* ier);
-
+void polar_c(const FP_SIZE* iopt, FP_SIZE m, const FP_REAL* x, const FP_REAL* y, const FP_REAL* z,
+             const FP_REAL* w, FP_POLAR_BC rad, FP_REAL s, FP_SIZE nuest, FP_SIZE nvest, FP_REAL eps,
+             FP_SIZE* nu, FP_REAL* tu, FP_SIZE* nv, FP_REAL* tv, FP_REAL* u, FP_REAL* v, FP_REAL* c,
+             FP_REAL* fp, FP_REAL* wrk1, FP_SIZE lwrk1, FP_REAL* wrk2, FP_SIZE lwrk2, FP_SIZE* iwrk,
+             FP_SIZE kwrk, FP_FLAG* ier);
               
 #ifdef __cplusplus
 }

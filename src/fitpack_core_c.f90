@@ -263,4 +263,25 @@ module fitpack_core_c
                                nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
       end subroutine regrid_c
 
+      subroutine polar_c(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu,nv,tv,u,v,c,&
+                         fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='polar_c')
+          real(FP_REAL),    intent(in), value :: s,eps
+          real(FP_REAL),    intent(inout)     :: fp
+          integer(FP_SIZE), intent(in), value :: m,nuest,nvest,lwrk1,lwrk2,kwrk
+          integer(FP_SIZE), intent(out)       :: nu,nv
+          integer(FP_FLAG), intent(out)       :: ier
+          type(c_funptr),   intent(in), value :: rad
+          real(FP_REAL),    intent(in)        :: x(m),y(m),z(m),w(m)
+          real(FP_REAL),    intent(out)       :: u(m),v(m),tu(nuest),tv(nvest),c((nuest-4)*(nvest-4))
+          real(FP_REAL),    intent(inout)     :: wrk1(lwrk1),wrk2(lwrk2)
+          integer(FP_SIZE), intent(in)        :: iopt(3)
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          procedure(fitpack_polar_boundary), pointer :: frad
+          
+          call c_f_procpointer(rad,frad)
+          call polar(iopt,m,x,y,z,w,frad,s,nuest,nvest,eps,nu,tu,nv,tv,u,v,c,&
+                              fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
+
+      end subroutine polar_c
+
 end module fitpack_core_c
