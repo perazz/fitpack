@@ -284,4 +284,21 @@ module fitpack_core_c
 
       end subroutine polar_c
 
+      subroutine pogrid_c(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest,nu,tu,nv,tv, &
+                          c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='pogrid_c')
+          integer(FP_SIZE), intent(in)        :: iopt(3),ider(2)
+          real(FP_REAL),    intent(in), value :: z0,r,s
+          real(FP_REAL),    intent(inout)     :: fp
+          integer(FP_SIZE), intent(in), value :: mu,mv,nuest,nvest,lwrk,kwrk
+          integer(FP_FLAG), intent(out)       :: ier
+          integer(FP_SIZE), intent(inout)     :: nu,nv
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          real(FP_REAL), intent(in)           :: u(mu),v(mv),z(mu*mv)
+          real(FP_REAL), intent(inout)        :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)
+          
+          call pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest,nu,tu,nv,tv, &
+                      c,fp,wrk,lwrk,iwrk,kwrk,ier)
+          
+      end subroutine pogrid_c
+
 end module fitpack_core_c

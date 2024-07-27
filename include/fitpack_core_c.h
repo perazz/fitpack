@@ -197,6 +197,11 @@ void polar_c(const FP_SIZE* iopt, FP_SIZE m, const FP_REAL* x, const FP_REAL* y,
              FP_REAL* fp, FP_REAL* wrk1, FP_SIZE lwrk1, FP_REAL* wrk2, FP_SIZE lwrk2, FP_SIZE* iwrk,
              FP_SIZE kwrk, FP_FLAG* ier);
               
+void pogrid_c(const FP_SIZE* iopt, const FP_SIZE* ider, FP_SIZE mu, const FP_REAL* u, FP_SIZE mv, 
+              const FP_REAL* v, const FP_REAL* z, FP_REAL z0, FP_REAL r, FP_REAL s, FP_SIZE nuest, 
+              FP_SIZE nvest, FP_SIZE* nu, FP_REAL* tu, FP_SIZE* nv, FP_REAL* tv, FP_REAL* c, 
+              FP_REAL* fp, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk, FP_FLAG* ier);
+              
 #ifdef __cplusplus
 }
 #endif

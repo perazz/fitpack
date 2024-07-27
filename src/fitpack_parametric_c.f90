@@ -251,15 +251,6 @@ module fitpack_parametric_curves_c
 
      end function fitpack_parametric_curve_c_eval_one
 
-
-!           !> Evaluate derivative at given coordinates
-!           procedure, private :: curve_derivative
-!           procedure, private :: curve_derivatives
-!           procedure, private :: curve_all_derivatives
-!           generic   :: dfdx => curve_derivatives
-!           generic   :: dfdx_all => curve_all_derivatives
-!
-
      !> Evaluate k-th derivative of the curve at point u
      integer(FP_FLAG) function fitpack_parametric_curve_c_derivative(this,u,order,ddx) result(ierr) &
                             bind(c,name='fitpack_parametric_curve_c_derivative')
