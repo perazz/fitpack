@@ -316,4 +316,23 @@ module fitpack_core_c
                       fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       end subroutine sphere_c
 
+      integer(FP_FLAG) function spgrid_c(iopt,ider,mu,u,mv,v,r,r0,r1,s,nuest,nvest,nu,tu,nv,tv, &
+                             c,fp,wrk,lwrk,iwrk,kwrk) bind(C,name='spgrid_c') result(ier)
+
+          real(FP_REAL),    intent(in), value :: r0,r1,s
+          real(FP_REAL),    intent(inout)     :: fp
+          integer(FP_SIZE), intent(in), value :: mu,mv,nuest,nvest,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)     :: nu,nv
+          integer(FP_SIZE), intent(in)        :: iopt(3),ider(4)
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          real(FP_REAL),    intent(in)        :: u(mu),v(mv),r(mu*mv)
+          real(FP_REAL),    intent(inout)     :: c((nuest-4)*(nvest-4)),tu(nuest),tv(nvest),wrk(lwrk)                             
+          
+          call spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s,&
+                      nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+                             
+      end function spgrid_c
+
+
+
 end module fitpack_core_c

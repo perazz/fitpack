@@ -206,6 +206,17 @@ void sphere_c(FP_SIZE iopt, FP_SIZE m, const FP_REAL* teta, const FP_REAL* phi, 
               const FP_REAL* w, FP_REAL s, FP_SIZE ntest, FP_SIZE npest, FP_REAL eps, FP_SIZE* nt,
               FP_REAL* tt, FP_SIZE* np, FP_REAL* tp, FP_REAL* c, FP_REAL* fp, FP_REAL* wrk1, 
               FP_SIZE lwrk1, FP_REAL* wrk2, FP_SIZE lwrk2, FP_SIZE* iwrk, FP_SIZE kwrk, FP_FLAG* ier);
+              
+
+FP_FLAG spgrid_c(const FP_SIZE* iopt, const FP_SIZE* ider,
+                 FP_SIZE mu, const FP_REAL* u,
+                 FP_SIZE mv, const FP_REAL* v, 
+                 const FP_REAL* r, FP_REAL r0, FP_REAL r1, FP_REAL s,
+                 FP_SIZE nuest, FP_SIZE nvest, 
+                 FP_SIZE* nu, FP_REAL* tu,
+                 FP_SIZE* nv, FP_REAL* tv, FP_REAL* c, FP_REAL* fp, 
+                 FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk);
+              
 #ifdef __cplusplus
 }
 #endif
