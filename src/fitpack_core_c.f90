@@ -333,6 +333,21 @@ module fitpack_core_c
                              
       end function spgrid_c
 
+      integer(FP_FLAG) function parsur_c(iopt,ipar,idim,mu,u,mv,v,f,s,nuest,nvest,nu,tu,nv,tv, &
+                             c,fp,wrk,lwrk,iwrk,kwrk) result(ier) bind(C,name='parsur_c')
 
+          real(FP_REAL),    intent(in), value  :: s
+          real(FP_REAL),    intent(inout)      :: fp
+          integer(FP_SIZE), intent(in), value  :: iopt,idim,mu,mv,nuest,nvest,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)      :: nu,nv
+          real(FP_REAL),    intent(in)         :: u(mu),v(mv),f(mu*mv*idim)
+          real(FP_REAL),    intent(inout)      :: tu(nuest),tv(nvest),c((nuest-4)*(nvest-4)*idim),wrk(lwrk)
+          integer(FP_SIZE), intent(in)         :: ipar(2)
+          integer(FP_SIZE), intent(inout)      :: iwrk(kwrk)
+          
+          call parsur(iopt,ipar,idim,mu,u,mv,v,f,s,nuest,nvest,nu,tu,nv,tv, &
+                      c,fp,wrk,lwrk,iwrk,kwrk,ier)
+          
+      end function parsur_c
 
 end module fitpack_core_c

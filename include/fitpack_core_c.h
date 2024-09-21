@@ -217,6 +217,12 @@ FP_FLAG spgrid_c(const FP_SIZE* iopt, const FP_SIZE* ider,
                  FP_SIZE* nv, FP_REAL* tv, FP_REAL* c, FP_REAL* fp, 
                  FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk);
               
+              
+FP_FLAG parsur_c(FP_SIZE iopt, const FP_SIZE* ipar, FP_SIZE idim, FP_SIZE mu, const FP_REAL* u, FP_SIZE mv,
+                 const FP_REAL* v, const FP_REAL* f,FP_REAL s, FP_SIZE nuest, FP_SIZE nvest, FP_SIZE* nu,
+                 FP_REAL* tu, FP_SIZE* nv, FP_REAL* tv, FP_REAL* c, FP_REAL* fp, FP_REAL* wrk, 
+                 FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk);
+              
 #ifdef __cplusplus
 }
 #endif
