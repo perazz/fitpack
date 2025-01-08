@@ -14713,7 +14713,6 @@ module fitpack_core
       !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
       !   kx,ky : integer values, giving the degrees of the spline.
       !   nux/y : integer values, specifying the order of the partial derivative. 0<=nux<kx, 0<=nuy<ky.
-      !   kx,ky : integer values, giving the degrees of the spline.
       !   x     : real array of dimension (mx).
       !   y     : real array of dimension (my).
       !   m     : on entry m must specify the number points. m >= 1.

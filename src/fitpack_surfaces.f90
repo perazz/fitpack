@@ -24,7 +24,7 @@ module fitpack_surfaces
 
     public :: fitpack_surface
 
-    !> A public type describing a surface fitter z = s(x,y) to scattered x,y data
+    !> A public type describing a bivariate surface fitter z = s(x,y) to scattered x,y data
     type :: fitpack_surface
 
         !> The data points
@@ -64,7 +64,7 @@ module fitpack_surfaces
         real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
-        integer :: iopt = 0
+        integer(FP_FLAG) :: iopt = IOPT_NEW_SMOOTHING
 
         contains
 
@@ -219,7 +219,6 @@ module fitpack_surfaces
         ! Working space
         this%liwrk = m+product(nest-2*order-1)
         allocate(this%iwrk(this%liwrk),source=0)
-
 
         ! wrk1
         uv  = nest-order-1
