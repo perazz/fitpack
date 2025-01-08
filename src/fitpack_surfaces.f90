@@ -27,7 +27,7 @@ module fitpack_surfaces
     !> A public type describing a bivariate surface fitter z = s(x,y) to scattered x,y data
     type :: fitpack_surface
 
-        !> The data points
+        !> The input data points
         integer :: m = 0
         real(FP_REAL), allocatable :: x(:),y(:),z(:)
 
@@ -79,6 +79,13 @@ module fitpack_surfaces
 
            !> Generate/update fitting curve, with optional smoothing
            procedure :: fit        => surface_fit_automatic_knots
+
+           !> Evaluate derivatives at given coordinates
+           procedure, private :: surface_derivatives_gridded
+           procedure, private :: surface_derivatives_many
+           procedure, private :: surface_derivatives_one
+           generic   :: dfdx => surface_derivatives_one,surface_derivatives_many
+           generic   :: dfdx_ongrid => surface_derivatives_gridded
 
     end type fitpack_surface
 
@@ -269,5 +276,152 @@ module fitpack_surfaces
         surf_new_fit = this%fit(smoothing,order)
 
     end function surf_new_fit
+
+    !> Evaluate derivatives on a grid domain
+    function surface_derivatives_gridded(this,x,y,dx,dy,ierr) result(f)
+        class(fitpack_surface), intent(inout)  :: this
+        
+        ! Grid evaluation ranges
+        real(FP_REAL),    intent(in) :: x(:),y(:)  
+        
+        ! Order of the partial derivatives w.r.t. x and y
+        integer(FP_SIZE), intent(in) :: dx,dy      
+        
+        ! f(j,i) contains the value of the specified partial derivative of s(x,y) at (x(i),y(j))
+        real(FP_REAL) :: f(size(y),size(x))
+        
+        ! Optional error flag
+        integer(FP_FLAG), optional, intent(out) :: ierr 
+
+        integer(FP_FLAG) :: ier        
+        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
+        real(FP_REAL), allocatable :: min_wrk(:)
+        integer(FP_SIZE), allocatable :: min_iwrk(:)
+        
+        ! Check if the internal working storage is large enough: reallocate it if necessary
+        m = [size(x),size(y)]
+        
+        ! Assert real working storage
+        min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
+        if (min_lwrk>this%lwrk1) then 
+            allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
+            call move_alloc(from=min_wrk,to=this%wrk1)
+            this%lwrk1 = min_lwrk
+        end if
+        
+        ! Assert integer working storage
+        min_kwrk = sum(m)
+        if (min_kwrk>this%liwrk) then 
+            allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
+            call move_alloc(from=min_iwrk,to=this%iwrk)
+            this%liwrk = min_kwrk
+        end if
+        
+        ! On successful exit f(j,i) contains the value of s(x,y) at point
+        ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
+        call parder(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
+                    ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
+                    c=this%c,                          &    ! the b-spline coefficients                  
+                    kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
+                    nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
+                    x=x,mx=size(x),                    &    ! x grid points: tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2:mx.
+                    y=y,my=size(y),                    &    ! y grid points: ty(ky+1)<=y(i-1)<=y(i)<=ty(ny-ky), i=2:mx.
+                    z=f,                               &    ! Value of the partial derivative
+                    wrk=this%wrk1,lwrk=this%lwrk1,     &    ! memory
+                    iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
+                    ier=ier)
+
+        call fitpack_error_handling(ier,ierr,'evaluate gridded derivatives')
+
+    end function surface_derivatives_gridded
+
+    !> Evaluate derivatives on a list of (x(i),y(i)) points
+    function surface_derivatives_many(this,x,y,dx,dy,ierr) result(f)
+        class(fitpack_surface), intent(inout)  :: this
+        
+        ! Grid evaluation ranges
+        real(FP_REAL),    intent(in) :: x(:),y(:)  
+        
+        ! Order of the partial derivatives w.r.t. x and y
+        integer(FP_SIZE), intent(in) :: dx,dy      
+        
+        ! f(j,i) contains the value of the specified partial derivative of s(x,y) at (x(i),y(j))
+        real(FP_REAL) :: f(size(x))
+        
+        ! Optional error flag
+        integer(FP_FLAG), optional, intent(out) :: ierr 
+
+        integer(FP_FLAG) :: ier        
+        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
+        real(FP_REAL), allocatable :: min_wrk(:)
+        integer(FP_SIZE), allocatable :: min_iwrk(:)
+        
+        ! Check if the input arrays have the same size
+        m = [size(x),size(y)]
+        if (m(1)/=m(2)) then 
+            
+            ier = FITPACK_INPUT_ERROR
+            
+        else
+        
+            ! Assert real working storage
+            min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
+            if (min_lwrk>this%lwrk1) then 
+                allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
+                call move_alloc(from=min_wrk,to=this%wrk1)
+                this%lwrk1 = min_lwrk
+            end if
+            
+            ! Assert integer working storage
+            min_kwrk = sum(m)
+            if (min_kwrk>this%liwrk) then 
+                allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
+                call move_alloc(from=min_iwrk,to=this%iwrk)
+                this%liwrk = min_kwrk
+            end if
+            
+            ! On successful exit f(j,i) contains the value of s(x,y) at point
+            ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
+            call pardeu(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
+                        ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
+                        c=this%c,                          &    ! the b-spline coefficients                  
+                        kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
+                        nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
+                        x=x,y=y,                           &    ! list of (x,y) points
+                        z=f,                               &    ! Value of the partial derivative
+                        m=m(1),                            &    ! Number of input points
+                        wrk=this%wrk1,lwrk=this%lwrk1,     &    ! memory
+                        iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
+                        ier=ier)
+
+            
+        end if
+        
+        call fitpack_error_handling(ier,ierr,'evaluate bivariate derivatives')
+
+    end function surface_derivatives_many
+
+    real(FP_REAL) function surface_derivatives_one(this,x,y,dx,dy,ierr) result(f)
+        class(fitpack_surface), intent(inout) :: this
+        
+        ! Evaluation point
+        real(FP_REAL),          intent(in)      :: x,y    
+
+        ! Order of the partial derivatives w.r.t. x and y
+        integer(FP_SIZE), intent(in) :: dx,dy              
+        
+        ! Optional error flag
+        integer(FP_FLAG), optional, intent(out) :: ierr   
+
+        real(FP_REAL) :: z1(1),x1(1),y1(1)
+        
+        x1 = x
+        y1 = y
+
+        z1 = surface_derivatives_many(this,x1,y1,dx,dy,ierr)
+        f  = z1(1)
+
+    end function surface_derivatives_one
+
 
 end module fitpack_surfaces

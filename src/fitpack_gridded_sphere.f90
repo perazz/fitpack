@@ -155,11 +155,11 @@ module fitpack_gridded_sphere
                         size(this%u),this%u,             &  ! U grid
                         size(this%v),this%v,             &  ! V grid
                         this%z,                          &  ! Sphere radius
-                        this%pole_z0(1),this%pole_z0(2), & ! Data value at the poles
+                        this%pole_z0(1),this%pole_z0(2), &  ! Data value at the poles
                         this%smoothing,                  &  ! Smoothing parameter
                         this%nest(1),this%nest(2),       &  ! Knot space
-                        this%knots(1),this%t(:,1),       &  ! u (0:pi) knots (out)
-                        this%knots(2),this%t(:,2),       &  ! v (-pi:pi) knots (out)
+                        this%knots(1),this%t(:,1),       &  ! u(0:pi) knots (out)
+                        this%knots(2),this%t(:,2),       &  ! v(-pi:pi) knots (out)
                         this%c,this%fp,                  &  ! Spline representation and MSE
                         this%wrk,this%lwrk,              &  ! memory
                         this%iwrk,this%liwrk,            &  ! memory
