@@ -78,8 +78,6 @@ module fitpack_gridded_polar
         ! Runtime flag
         integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
 
-
-
         contains
 
            !> Clean memory
