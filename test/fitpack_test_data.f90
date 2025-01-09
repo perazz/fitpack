@@ -172,8 +172,10 @@ module fitpack_test_data
 
 
     ! Regrid test: x,y grid coordinates
-    real(FP_REAL), parameter :: daregr_x(*) = [real(FP_REAL) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
-    real(FP_REAL), parameter :: daregr_y(*) = [real(FP_REAL) :: -1.5,-1.2,-0.9,-0.6,-0.3,0.0,0.3,0.6,0.9,1.2,1.5]
+    real(FP_REAL), parameter :: daregr_x(*) = [real(FP_REAL) :: -1.5d0,-1.2d0,-0.9d0,-0.6d0,-0.3d0,0.0,&
+                                   0.3d0,0.6d0,0.9d0,1.2d0,1.5d0]
+    real(FP_REAL), parameter :: daregr_y(*) = [real(FP_REAL) :: -1.5d0,-1.2d0,-0.9d0,-0.6d0,-0.3d0,0.0,&
+                                   0.3d0,0.6d0,0.9d0,1.2d0,1.5d0]
 
     ! Regrid: function values at the grid points
     real(FP_REAL), parameter :: daregr_z(*,*) = reshape([real(FP_REAL) :: &

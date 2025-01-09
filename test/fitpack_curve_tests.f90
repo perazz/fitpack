@@ -473,7 +473,7 @@ module fitpack_curve_tests
 
        success = .false.
 
-       ! Try f(x) = x3 Ð 3x2 + 2x = x(x Ð 1)(x Ð 2), with real roots x = 0, x = 1, and x = 2.
+       ! Try f(x) = x3 ï¿½ 3x2 + 2x = x(x ï¿½ 1)(x ï¿½ 2), with real roots x = 0, x = 1, and x = 2.
        x = linspace(-10.0_FP_REAL,10.0_FP_REAL,20)
        y = x**3-3*x**2+2*x
 
@@ -892,6 +892,35 @@ module fitpack_curve_tests
                 exit
             end if
 
+            block
+                ! test Working space update
+                integer, parameter :: NLAR = 100
+                real(FP_REAL), allocatable :: xtest(:), ytest(:)
+                real(FP_REAL), allocatable :: fit_test(:,:)
+                integer :: nx, ny
+                
+                nx = (size(daregr_x) - 1)*NLAR + 1
+                ny = (size(daregr_y) - 1)*NLAR + 1
+                xtest = linspace(minval(daregr_x), maxval(daregr_x), nx)
+                ytest = linspace(minval(daregr_y), maxval(daregr_y), ny)
+                fit_test = surf%eval(xtest,ytest,ierr)
+                
+                if (.not.FITPACK_SUCCESS(ierr)) then
+                    success = .false.
+                    write(useUnit,1000) loop,FITPACK_MESSAGE(ierr)
+                    exit
+                end if
+                if (loop==4) then
+                    success = all(abs(daregr_z-fit_test(::NLAR,::NLAR))*rewt(RTOL,ATOL,daregr_z)<one)
+                    
+                    if (.not.success) then
+                        write(useUnit,1100) loop
+                        print 900, 'daregr=',daregr_z
+                        print 900, 'fit   =',fit_test(::NLAR,::NLAR)
+                        exit
+                    end if
+                end if
+            end block
             if (loop==4) then
                 ! Check that the evaluations match the original data
                 success = all(abs(daregr_z-fit_z)*rewt(RTOL,ATOL,daregr_z)<one)
@@ -904,7 +933,7 @@ module fitpack_curve_tests
             endif
 
         end do
-        
+
          900 format(a,*(1x,1pe12.3))
         1000 format('[test_gridded_surface] test ',i0,' failed: ',a)
         1100 format('[test_gridded_surface] test ',i0,' evaluation failed ')

@@ -19,7 +19,7 @@
 ! **************************************************************************************************
 module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
-                            IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid
+                            IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid, pardtc
     implicit none
     private
 
@@ -266,6 +266,22 @@ module fitpack_grid_surfaces
 
     end function surf_new_fit
 
+    type(fitpack_grid_surface) function surf_derivative(this, nux, nuy, ierr) result(f)
+        class(fitpack_grid_surface), intent(in) :: this
+        integer, intent(in) :: nux, nuy
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_FLAG) :: ierr0
+        ! everything is copied to the output 
+        f = this
+
+        !call pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ierr0)
+
+        ! Error handling
+        call fitpack_error_handling(ierr0, ierr, 'derivative of the spline')
+
+    end function
+
     function gridded_eval_many(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         real(FP_REAL), intent(in) :: x(:),y(:)  ! Evaluation points
@@ -273,16 +289,36 @@ module fitpack_grid_surfaces
         integer(FP_FLAG), optional, intent(out) :: ierr ! Optional error flag
 
         integer(FP_FLAG) :: ier
-
+        integer(FP_SIZE) :: mx, my, kx, ky
+        integer(FP_SIZE) :: lwrk, liwrk
+        
         !  evaluation of the spline approximation.
         !  Assume cubic spline in both directions
 
         ! On successful exit r(j,i) contains the value of s(x,y) at point
         ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
+
+        mx = size(x)
+        my = size(y)
+        kx = this%order(1)
+        ky = this%order(2)
+        ! lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
+        
+        if (this%lwrk < mx*(kx+1)+my*(ky+1)) then
+            if (allocated(this%wrk)) deallocate(this%wrk)
+            this%lwrk = mx*(kx+1)+my*(ky+1)
+            allocate(this%wrk(this%lwrk))
+        endif
+        if (this%liwrk < mx+my) then
+            if (allocated(this%iwrk)) deallocate(this%iwrk)
+            this%liwrk = mx+my
+            allocate(this%iwrk(this%liwrk))
+        endif
+
         call bispev(tx=this%t(:,1),nx=this%knots(1), &
                     ty=this%t(:,2),ny=this%knots(2), &
                     c=this%c, &
-                    kx=3,ky=3, &
+                    kx=kx,ky=ky, &
                     x=x,mx=size(x), &
                     y=y,my=size(y), &
                     z=f, &

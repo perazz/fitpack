@@ -63,7 +63,7 @@ module fitpack_core
     public :: bispev ! * Evaluation of a bivariate spline function
     public :: parder ! Partial derivatives of a bivariate spline
     public :: pardeu ! Partial derivatives of a bivariate spline
-    public :: pardtc ! Create partial derivative splane of a bivariate spline
+    public :: pardtc ! Create partial derivative spline of a bivariate spline
     public :: dblint ! Integration of a bivariate spline
     public :: profil ! Cross-section of a bivariate spline
     public :: evapol ! * Evaluation of a polar spline
