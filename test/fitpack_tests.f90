@@ -2904,7 +2904,9 @@ module fitpack_tests
                      nc = (nu-4)*(nv-4)
 
                      ! we calculate the function values at the different points.
-                     forall(i=1:m) f(i) = evapol(tu,nu,tv,nv,c,rad1,x(i),y(i))
+                     do i=1, m 
+                        f(i) = evapol(tu,nu,tv,nv,c,rad1,x(i),y(i))
+                     enddo
                      write(useUnit,925) s
 
                  case (4,5)
@@ -2919,8 +2921,9 @@ module fitpack_tests
                      c = c+0.4
 
                      !  we calculate the function values at the different points.
-                     forall(i=1:m)  f(i) = evapol(tu,nu,tv,nv,c,rad2,x(i),y(i))
-
+                     do i=1,m  
+                        f(i) = evapol(tu,nu,tv,nv,c,rad2,x(i),y(i))
+                     enddo
                      if (iopt(1)<0) then
                         write(useUnit,935)
                      else

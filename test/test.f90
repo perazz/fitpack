@@ -55,6 +55,7 @@ program test
         call add_test(test_gridded_polar())
         call add_test(test_gridded_sphere())
         call add_test(test_parametric_surface())
+        call add_test(test_gradient_surface())
 
     end subroutine run_interface_tests
 

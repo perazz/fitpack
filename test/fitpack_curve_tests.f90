@@ -40,7 +40,7 @@ module fitpack_curve_tests
     public :: test_gridded_polar
     public :: test_gridded_sphere
     public :: test_parametric_surface
-
+    public :: test_gradient_surface
 
     contains
 
@@ -832,6 +832,7 @@ module fitpack_curve_tests
     logical function test_gridded_fit(iunit) result(success)
         integer, optional, intent(in) :: iunit
         type(fitpack_grid_surface) :: surf
+        type(fitpack_grid_result) :: res
 
         integer :: ierr,loop,useUnit
         real(FP_REAL), allocatable :: fit_z(:,:)
@@ -851,18 +852,18 @@ module fitpack_curve_tests
             select case (loop)
                case (1)
                   ! we start computing the least-squares bicubic polynomial
-                  ierr = surf%new_fit(daregr_x,daregr_y,daregr_z,smoothing=10.0_FP_REAL)
+                  ierr = surf%new_fit(daregr_x,daregr_y,daregr_z,res, smoothing=10.0_FP_REAL)
                case (2)
-                  ierr = surf%fit(smoothing=0.22_FP_REAL)
+                  ierr = surf%fit(res, smoothing=0.22_FP_REAL)
                case (3)
                   ! Overfitting (s is too small
-                  ierr = surf%fit(smoothing=0.1_FP_REAL)
+                  ierr = surf%fit(res, smoothing=0.1_FP_REAL)
                case (4)
                   ! Interpolating spline
-                  ierr = surf%interpolate()
+                  ierr = surf%interpolate(res)
                case (5)
                   ! Quintic spline
-                  ierr = surf%fit(smoothing=0.2_FP_REAL,order=5)
+                  ierr = surf%fit(res, smoothing=0.2_FP_REAL,order=5)
                case (6)
                   ! Finally, calculate a least-squares spline approximation with specified knots
 !                  iopt = -1
@@ -884,7 +885,7 @@ module fitpack_curve_tests
             end if
 
             ! Evaluation of the spline approximation
-            fit_z = surf%eval(daregr_x,daregr_y,ierr)
+            fit_z = res%eval(daregr_x,daregr_y,ierr)
 
             if (.not.FITPACK_SUCCESS(ierr)) then
                 success = .false.
@@ -903,7 +904,7 @@ module fitpack_curve_tests
                 ny = (size(daregr_y) - 1)*NLAR + 1
                 xtest = linspace(minval(daregr_x), maxval(daregr_x), nx)
                 ytest = linspace(minval(daregr_y), maxval(daregr_y), ny)
-                fit_test = surf%eval(xtest,ytest,ierr)
+                fit_test = res%eval(xtest,ytest,ierr)
                 
                 if (.not.FITPACK_SUCCESS(ierr)) then
                     success = .false.
@@ -1246,6 +1247,80 @@ module fitpack_curve_tests
        1000  format('[test_parametric_surface] case ',i0,' failed with message: ',a)
 
     end function test_parametric_surface
+
+    logical function test_gradient_surface(iunit) result(success)
+        use fitpack_core, only: parder
+        integer, optional, intent(in) :: iunit
+
+        type(fitpack_grid_surface) :: surf
+        type(fitpack_grid_result) :: res, dsdx, dsdy
+        integer :: useUnit
+        real(FP_REAL), allocatable :: xtest(:), ytest(:), ztest(:,:), dzdx(:,:), dzdy(:,:)
+        real(FP_REAL), allocatable :: fit_test(:,:), dfit_dx(:,:), dfit_dy(:,:), dfit_dxd(:,:), dfit_dyd(:,:)
+        integer, parameter :: NX = 25, NY=33
+        integer :: ix, iy
+        integer :: ier
+
+        success = .true.
+        if (present(iunit)) then
+            useUnit = iunit
+        else
+            useUnit = output_unit
+        end if
+        
+        xtest = linspace(-2.0_FP_REAL, 2.0_FP_REAL, NX)
+        ytest = linspace(-2.0_FP_REAL, 2.0_FP_REAL, NY)
+        allocate(ztest(NY, NX), dzdx(NY,NX), dzdy(NY,NX))
+
+        do concurrent (ix=1:NX, iy=1:NY)
+            ztest(iy, ix) = cos(xtest(ix)) + sin(ytest(iy))
+            dzdx(iy, ix) = - sin(xtest(ix))
+            dzdy(iy, ix) =   cos(ytest(iy))
+        enddo
+
+        call surf%new_points(xtest, ytest, ztest)
+        ier = surf%interpolate(res)
+        
+        dfit_dxd = res%evald(xtest, ytest, nux=1)
+        dsdx = res%derivative(nux=1)
+        dfit_dx = dsdx%eval(xtest, ytest)
+
+        dfit_dyd = res%evald(xtest, ytest, nuy=1)
+        dsdy = res%derivative(nuy=1)
+        dfit_dy = dsdy%eval(xtest, ytest)
+
+        if (.not.FITPACK_SUCCESS(ier)) then
+            success = .false.
+            write(useUnit,1000) FITPACK_MESSAGE(ier)
+            return
+        end if
+        fit_test = res%eval(xtest, ytest)
+
+        success = all(abs(ztest-fit_test)*rewt(RTOL=1e-6_FP_REAL,ATOL=1e-6_FP_REAL,x=ztest)<one)
+        if (.not. success) return 
+        
+        success = all(abs(dfit_dxd - dfit_dx)*rewt(RTOL=1e-10_FP_REAL,ATOL=1e-10_FP_REAL,x=ztest)<one)
+        if (.not. success) return
+        print *, success
+       
+        success = all(abs(dfit_dyd - dfit_dy)*rewt(RTOL=1e-10_FP_REAL,ATOL=1e-10_FP_REAL,x=ztest)<one)
+        if (.not. success) return
+        print *, success
+        
+        success = all(abs(dfit_dy - dzdy)*rewt(RTOL=1e-3_FP_REAL,ATOL=1e-3_FP_REAL,x=ztest)<one)
+        if (.not. success) return
+
+        success = all(abs(dfit_dx - dzdx)*rewt(RTOL=1e-3_FP_REAL,ATOL=1e-3_FP_REAL,x=ztest)<one)
+        if (.not. success) return
+
+        print *, maxval(dfit_dx - dzdx), maxval(abs(dfit_dx)), maxval(abs(dzdx))
+        print *, maxval(dfit_dy - dzdy), maxval(abs(dfit_dy)), maxval(abs(dzdx))
+        
+        print *, maxval(dfit_dxd - dfit_dx)
+        print *, maxval(dfit_dyd - dfit_dy)
+        
+        1000  format('[test_gradient_surface] failed with message: ',a)
+    end function test_gradient_surface
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)

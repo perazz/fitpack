@@ -18,7 +18,9 @@
 !
 ! **************************************************************************************************
 module fitpack_polar_domains
-    use fitpack_core
+    use fitpack_core, only: FP_REAL, zero, OUTSIDE_EXTRAPOLATE, IOPT_NEW_SMOOTHING, fitpack_error_handling
+    use fitpack_core, only: FITPACK_OK, IOPT_OLD_FIT, IOPT_NEW_LEASTSQUARES, FITPACK_SUCCESS, half, one
+    use fitpack_core, only: fitpack_polar_boundary, get_smoothing, polar, evapol
     implicit none
     private
 

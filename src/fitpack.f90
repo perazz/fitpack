@@ -52,6 +52,7 @@ module fitpack
 
    public :: fitpack_surface
    public :: fitpack_grid_surface
+   public :: fitpack_grid_result
    public :: fitpack_parametric_surface
 
 

@@ -18,7 +18,9 @@
 !
 ! **************************************************************************************************
 module fitpack_gridded_sphere
-    use fitpack_core
+    use fitpack_core, only: FP_REAL, IOPT_NEW_LEASTSQUARES, zero,  IOPT_NEW_SMOOTHING, IOPT_OLD_FIT
+    use fitpack_core, only: fitpack_error_handling, FITPACK_SUCCESS
+    use fitpack_core, only: bispev, get_smoothing, spgrid
     implicit none
     private
 

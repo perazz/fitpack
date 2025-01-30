@@ -18,7 +18,9 @@
 !
 ! **************************************************************************************************
 module fitpack_gridded_polar
-    use fitpack_core
+    use fitpack_core, only: FP_REAL, zero, OUTSIDE_EXTRAPOLATE, IOPT_NEW_SMOOTHING, IOPT_OLD_FIT
+    use fitpack_core, only: IOPT_NEW_LEASTSQUARES, fitpack_error_handling, FITPACK_SUCCESS
+    use fitpack_core, only: bispev,  get_smoothing, pogrid
     implicit none
     private
 

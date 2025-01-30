@@ -78,6 +78,7 @@ module fitpack_core
     public :: fitpack_argsort
     public :: fitpack_error_handling
     public :: get_smoothing
+    public :: resize_if_less_than
 
     ! Spline behavior for points not in the support
     integer(FP_FLAG), parameter,  public :: OUTSIDE_EXTRAPOLATE = 0 ! extrapolated from the end spans
@@ -162,12 +163,39 @@ module fitpack_core
        end function fitpack_polar_boundary
     end interface
 
+    interface resize_if_less_than
+       module procedure resize_if_less_than_double
+       module procedure resize_if_less_than_integer
+    end interface
+
     interface fitpack_swap
         module procedure swap_data
         module procedure swap_size
     end interface fitpack_swap
 
     contains
+
+      ! routines to get enough working space
+      ! for real and integers
+      subroutine resize_if_less_than_double(v, n)
+         real(FP_REAL), allocatable, intent(inout) :: v(:)
+         integer(FP_SIZE), intent(in) :: n
+         if (allocated(v)) then
+            if (size(v) >= n) return 
+            deallocate(v)
+         endif
+         allocate(v(n))
+      end subroutine
+
+      subroutine resize_if_less_than_integer(v, n)
+         integer(FP_SIZE), allocatable, intent(inout) :: v(:)
+         integer(FP_SIZE), intent(in) :: n
+         if (allocated(v)) then
+            if (size(v) >= n) return 
+            deallocate(v)
+         endif
+         allocate(v(n))
+      end subroutine
 
       ! Flow control: on output flag present, return it;
       ! otherwise, halt on error
@@ -2609,7 +2637,7 @@ module fitpack_core
       !  ..local variables..
       integer(FP_SIZE) :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
       real(FP_REAL) :: arg,sp,tb,te,h(MAX_ORDER+1)
-
+      
       ! X
       kx1  = kx+1
       nkx1 = nx-kx1
@@ -15500,7 +15528,7 @@ module fitpack_core
       end subroutine percur
 
 
-       subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
+      pure subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
                              nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  subroutine pogrid fits a function f(x,y) to a set of data points

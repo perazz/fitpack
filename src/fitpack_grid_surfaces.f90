@@ -19,12 +19,38 @@
 ! **************************************************************************************************
 module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
-                            IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid, pardtc
+                            IOPT_NEW_LEASTSQUARES,fitpack_error_handling,get_smoothing,  &
+                            resize_if_less_than
+    use fitpack_core, only: bispev,regrid,pardtc, parder
     implicit none
     private
 
-    public :: fitpack_grid_surface
+    public :: fitpack_grid_surface, fitpack_grid_result
 
+
+    type :: fitpack_grid_result
+        integer(FP_SIZE) :: order(2) = 3
+        ! Knots
+        integer(FP_SIZE) :: knots(2) = 0
+        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+
+        ! Spline coefficients [knots-order-1]
+        real(FP_REAL), allocatable :: c(:)
+
+        integer(FP_SIZE)                  :: lwrk = 0, liwrk = 0
+        integer(FP_SIZE), allocatable     :: iwrk(:)
+        real(FP_REAL), allocatable :: wrk (:)
+
+    contains
+        procedure, private :: resize_working_space
+        procedure :: derivative => surf_derivative
+        procedure, private :: gridded_eval_many
+        procedure, private :: gridded_eval_one
+        procedure, private :: gridded_eval_derivative
+        generic :: eval => gridded_eval_one, gridded_eval_many
+        generic :: evald => gridded_eval_derivative
+    end type
+    
     !> A public type describing a surface fitter z = s(x,y) to gridded x,y data
     type :: fitpack_grid_surface
 
@@ -55,11 +81,11 @@ module fitpack_grid_surfaces
         real(FP_REAL) :: fp = zero
 
         ! Knots
-        integer(FP_SIZE) :: knots(2) = 0
-        real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
+        !integer(FP_SIZE) :: knots(2) = 0
+        !real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
         ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
+        !real(FP_REAL), allocatable :: c(:)
 
         ! Runtime flag
         integer(FP_FLAG) :: iopt = IOPT_NEW_SMOOTHING
@@ -81,9 +107,14 @@ module fitpack_grid_surfaces
            procedure :: interpolate   => surface_fit_interpolating
 
            !> Evaluate gridded domain at given x,y coordinates
-           procedure, private :: gridded_eval_one
-           procedure, private :: gridded_eval_many
-           generic :: eval => gridded_eval_one,gridded_eval_many
+           !procedure, private :: gridded_eval_one
+           !procedure, private :: gridded_eval_many
+           !generic :: eval => gridded_eval_one !,gridded_eval_many
+           
+           !> derivatives
+           !procedure :: derivative => surf_derivative
+           !> private procedure
+           !procedure, private :: resize_working_space
 
     end type fitpack_grid_surface
 
@@ -93,33 +124,48 @@ module fitpack_grid_surfaces
 
     contains
 
+    subroutine resize_working_space(this, lwrk, liwrk)
+        class(fitpack_grid_result), intent(inout) :: this
+        integer(FP_SIZE), intent(in) :: lwrk, liwrk
+
+        call resize_if_less_than(this%wrk, lwrk)
+        this%lwrk = size(this%wrk)
+
+        call resize_if_less_than(this%iwrk, liwrk)
+        this%liwrk = size(this%iwrk)
+    end subroutine
+
     ! Fit a surface to least squares of the current knots
-    integer function surface_fit_least_squares(this) result(ierr)
+    integer function surface_fit_least_squares(this, result) result(ierr)
        class(fitpack_grid_surface), intent(inout) :: this
+       class(fitpack_grid_result), intent(inout) :: result
 
        this%iopt = IOPT_NEW_LEASTSQUARES
-       ierr = this%fit()
+       ierr = this%fit(result)
 
     end function surface_fit_least_squares
 
     ! Find interpolating surface
-    integer function surface_fit_interpolating(this) result(ierr)
+    integer function surface_fit_interpolating(this, result) result(ierr)
         class(fitpack_grid_surface), intent(inout) :: this
+        class(fitpack_grid_result), intent(inout) :: result
 
         ! Set zero smoothing
-        ierr = surface_fit_automatic_knots(this,smoothing=zero)
+        ierr = surface_fit_automatic_knots(this, result, smoothing=zero)
 
     end function surface_fit_interpolating
 
 
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
-    integer(FP_FLAG) function surface_fit_automatic_knots(this,smoothing,order) result(ierr)
+    integer(FP_FLAG) function surface_fit_automatic_knots(this, result,smoothing, order) result(ierr)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
         integer, optional, intent(in) :: order
+        class(fitpack_grid_result), intent(out) :: result
 
-        integer(FP_SIZE) :: loop,nit
+        integer(FP_SIZE) :: loop,nit, nest(2), nmax, clen, m(2)
         real(FP_REAL) :: smooth_now(3)
+        integer(FP_SIZE), parameter :: SAFE = 2
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
@@ -127,8 +173,22 @@ module fitpack_grid_surfaces
         if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
 
         ! User may want to change the order for both x and y
-        if (present(order)) this%order = order
-        
+        if (present(order)) then
+            this%order = order
+        endif
+        result%order = this%order
+        ! Knot space: overestimate (2*order+1 => order+m+1)
+        m = [size(this%x), size(this%y)]
+
+        nest = SAFE*(result%order + m + 1)
+        nmax = maxval(nest)
+        nest = nmax
+        allocate(result%t(nmax,2),source=zero)
+
+        ! Spline coefficients
+        clen = product(nest-result%order-1)
+        allocate(result%c(clen),source=zero)
+
         do loop=1,nit
 
             ! Set current smoothing
@@ -140,12 +200,12 @@ module fitpack_grid_surfaces
                         this%z,                      &  ! z(ix,jy) gridded data points
                         this%left(1),this%right(1),  &  ! x range
                         this%left(2),this%right(2),  &  ! y range
-                        this%order(1),this%order(2), &  ! [1:5] x,y spline order. Recommended: bicubic (x=y=3)
+                        result%order(1), result%order(2), &  ! [1:5] x,y spline order. Recommended: bicubic (x=y=3)
                         this%smoothing,              &  ! spline accuracy (iopt>=0)
                         this%nest(1),this%nest(2),   &  ! estimated number of knots and storage nxest >= 2*(kx+1), nyest >= 2*(ky+1)
-                        this%knots(1),this%t(:,1),   &  ! x knots (out)
-                        this%knots(2),this%t(:,2),   &  ! y knots (out)
-                        this%c,this%fp,              &  ! spline output. size(c)>=(nxest-kx-1)*(nyest-ky-1)
+                        result%knots(1),result%t(:,1),   &  ! x knots (out)
+                        result%knots(2),result%t(:,2),   &  ! y knots (out)
+                        result%c,this%fp,              &  ! spline output. size(c)>=(nxest-kx-1)*(nyest-ky-1)
                         this%wrk,this%lwrk,          &  ! memory
                         this%iwrk,this%liwrk,        &  ! memory
                         ierr)                           ! Error flag
@@ -167,19 +227,19 @@ module fitpack_grid_surfaces
        deallocate(this%z,stat=ierr)
        deallocate(this%iwrk,stat=ierr)
        deallocate(this%wrk,stat=ierr)
-       deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
+       !deallocate(this%t,stat=ierr)
+       !deallocate(this%c,stat=ierr)
        this%left  = zero
        this%right = zero
 
        this%smoothing = 1000.0_FP_REAL
-       this%order     = 3
+       !this%order     = 3
        this%iopt      = 0
        this%nest      = 0
        this%nmax      = 0
        this%lwrk      = 0
        this%liwrk     = 0
-       this%knots     = 0
+       !this%knots     = 0
        this%fp        = zero
 
     end subroutine surf_destroy
@@ -215,11 +275,11 @@ module fitpack_grid_surfaces
         nest = SAFE*(order + m + 1)
         nmax = maxval(nest)
         nest = nmax
-        allocate(this%t(nmax,2),source=zero)
+        !allocate(this%t(nmax,2),source=zero)
 
         ! Spline coefficients
         clen = product(nest-order-1)
-        allocate(this%c(clen),source=zero)
+        !allocate(this%c(clen),source=zero)
 
         this%fp = zero
 
@@ -240,13 +300,13 @@ module fitpack_grid_surfaces
     end subroutine surf_new_points
 
     ! A default constructor
-    type(fitpack_grid_surface) function surf_new_from_points(x,y,z,ierr) result(this)
+    type(fitpack_grid_result) function surf_new_from_points(x,y,z,ierr) result(r)
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
         integer(FP_FLAG), optional, intent(out) :: ierr
-
+        type(fitpack_grid_surface) :: this
         integer(FP_FLAG) :: ierr0
 
-        ierr0 = this%new_fit(x,y,z)
+        ierr0 = this%new_fit(x,y,z,r)
 
         ! Error handling
         call fitpack_error_handling(ierr0,ierr,'new gridded surface fit')
@@ -254,43 +314,121 @@ module fitpack_grid_surfaces
     end function surf_new_from_points
 
     ! Fit a new curve
-    integer function surf_new_fit(this,x,y,z,smoothing,order)
+    integer function surf_new_fit(this,x,y,z, result,smoothing,order)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
         real(FP_REAL), optional, intent(in) :: smoothing
         integer    , optional, intent(in) :: order
+        class(fitpack_grid_result), intent(out) :: result
 
         call this%new_points(x,y,z)
 
-        surf_new_fit = this%fit(smoothing,order)
+        surf_new_fit = this%fit(result, smoothing, order)
 
     end function surf_new_fit
 
-    type(fitpack_grid_surface) function surf_derivative(this, nux, nuy, ierr) result(f)
-        class(fitpack_grid_surface), intent(in) :: this
-        integer, intent(in) :: nux, nuy
+
+    type(fitpack_grid_result) function surf_derivative(this, nux, nuy, ierr) result(f)
+        class(fitpack_grid_result), intent(in) :: this
+        integer(FP_SIZE), intent(in), optional :: nux, nuy
         integer(FP_FLAG), optional, intent(out) :: ierr
 
         integer(FP_FLAG) :: ierr0
+        integer(FP_SIZE) :: nx, ny, kx, ky, nc
+
+        integer(FP_SIZE) :: nux_local, nuy_local
+
+        nux_local = 0
+        if (present(nux)) nux_local = nux
+        nuy_local = 0
+        if (present(nuy)) nuy_local = nuy
+
+        kx = this%order(1)
+        ky = this%order(2)
+        
         ! everything is copied to the output 
         f = this
+        nx = this%knots(1)
+        ny = this%knots(2)
+
+        if (allocated(f%c)) deallocate(f%c)
+        
+        nc = (nx+nux_local-kx-1)*(ny+nuy_local-ky-1)
+        allocate(f%c(nc))
+
+        call pardtc(tx=this%t(:,1),nx=this%knots(1), &
+                    ty=this%t(:,2),ny=this%knots(2), &
+                    c=this%c, &
+                    kx=kx,ky=ky, &
+                    nux=nux_local, nuy=nuy_local, &
+                    newc = f%c, ier=ierr0 &
+                    )
+        f%t(1:nx-2*nux_local,1) = this%t(nux_local+1:nx-nux_local,1)
+        f%t(1:ny-2*nuy_local,2) = this%t(nuy_local+1:ny-nuy_local,2)
+        f%knots(1) = nx - 2*nux_local
+        f%knots(2) = ny - 2*nuy_local
+        
+        f%order(1) = kx - nux_local
+        f%order(2) = ky - nuy_local
 
         !call pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ierr0)
-
+        ! call fpbisp(tx(nux+1),nx-ITWO*nux,ty(nuy+1),ny-ITWO*nuy,wrk,kkx,kky, &
+        !             x,mx,y,my,z,wrk(iwx),wrk(iwy),iwrk(1),iwrk(mx+1))
         ! Error handling
         call fitpack_error_handling(ierr0, ierr, 'derivative of the spline')
 
     end function
 
+    function gridded_eval_derivative(this, x, y, nux, nuy, ierr) result(f)
+        class(fitpack_grid_result), intent(inout)  :: this
+        real(FP_REAL), intent(in) :: x(:),y(:)  ! Evaluation points
+        integer(FP_SIZE), intent(in), optional :: nux, nuy
+
+        real(FP_REAL) :: f(size(y),size(x))
+        integer(FP_FLAG), optional, intent(out) :: ierr ! Optional error flag
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: mx, my, kx, ky, nx, ny, nux_local, nuy_local
+
+        nux_local = 0
+        if (present(nux)) nux_local = nux
+
+        nuy_local = 0
+        if (present(nuy)) nuy_local = nuy
+
+        mx = size(x)
+        my = size(y)
+        kx = this%order(1)
+        ky = this%order(2)
+        nx=this%knots(1)
+        ny=this%knots(2)
+        call this%resize_working_space( &
+                            lwrk=mx*(kx+1-nux_local)+my*(ky+1-nuy_local)+(nx-kx-1)*(ny-ky-1), &
+                            liwrk=mx + my)
+        call parder(  &
+            tx=this%t(:,1),nx=this%knots(1), &
+            ty=this%t(:,2),ny=this%knots(2), &
+            c=this%c,  &
+            kx=kx,ky=ky, &
+            x=x,mx=size(x), &
+            y=y,my=size(y), &
+            z=f, &
+            nux=nux_local, nuy=nuy_local, &
+            wrk=this%wrk,lwrk=this%lwrk, &
+            iwrk=this%iwrk,kwrk=this%liwrk,ier=ier &
+            )
+            
+            call fitpack_error_handling(ier,ierr,'evaluate gridded surface derivative')
+
+    end function
     function gridded_eval_many(this,x,y,ierr) result(f)
-        class(fitpack_grid_surface), intent(inout)  :: this
+        class(fitpack_grid_result), intent(inout)  :: this
         real(FP_REAL), intent(in) :: x(:),y(:)  ! Evaluation points
         real(FP_REAL) :: f(size(y),size(x))
         integer(FP_FLAG), optional, intent(out) :: ierr ! Optional error flag
 
         integer(FP_FLAG) :: ier
         integer(FP_SIZE) :: mx, my, kx, ky
-        integer(FP_SIZE) :: lwrk, liwrk
         
         !  evaluation of the spline approximation.
         !  Assume cubic spline in both directions
@@ -303,17 +441,7 @@ module fitpack_grid_surfaces
         kx = this%order(1)
         ky = this%order(2)
         ! lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
-        
-        if (this%lwrk < mx*(kx+1)+my*(ky+1)) then
-            if (allocated(this%wrk)) deallocate(this%wrk)
-            this%lwrk = mx*(kx+1)+my*(ky+1)
-            allocate(this%wrk(this%lwrk))
-        endif
-        if (this%liwrk < mx+my) then
-            if (allocated(this%iwrk)) deallocate(this%iwrk)
-            this%liwrk = mx+my
-            allocate(this%iwrk(this%liwrk))
-        endif
+        call this%resize_working_space(lwrk=mx*(kx+1)+my*(ky+1), liwrk=mx + my)
 
         call bispev(tx=this%t(:,1),nx=this%knots(1), &
                     ty=this%t(:,2),ny=this%knots(2), &
@@ -331,7 +459,7 @@ module fitpack_grid_surfaces
 
     ! Curve evaluation driver
     real(FP_REAL) function gridded_eval_one(this,x,y,ierr) result(f)
-        class(fitpack_grid_surface), intent(inout)  :: this
+        class(fitpack_grid_result), intent(inout)  :: this
         real(FP_REAL),               intent(in)      :: x,y ! Evaluation point
         integer(FP_FLAG), optional, intent(out)     :: ierr      ! Optional error flag
         real(FP_REAL) :: f1(1,1)
