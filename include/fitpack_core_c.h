@@ -223,6 +223,19 @@ FP_FLAG parsur_c(FP_SIZE iopt, const FP_SIZE* ipar, FP_SIZE idim, FP_SIZE mu, co
                  FP_REAL* tu, FP_SIZE* nv, FP_REAL* tv, FP_REAL* c, FP_REAL* fp, FP_REAL* wrk, 
                  FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk);
               
+FP_FLAG bispeu_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny, const FP_REAL* c,
+                 FP_SIZE kx, FP_SIZE ky, const FP_REAL* x, const FP_REAL* y, FP_REAL* z,
+                 FP_SIZE m, FP_REAL* wrk, FP_SIZE lwrk);
+        
+FP_FLAG bispev_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny, const FP_REAL* c,
+                 FP_SIZE kx, FP_SIZE ky, const FP_REAL* x, FP_SIZE mx, const FP_REAL* y, FP_SIZE my,
+                 FP_REAL* z, FP_REAL* wrk, FP_SIZE lwrk, FP_SIZE* iwrk, FP_SIZE kwrk);
+
+FP_FLAG parder_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny, const FP_REAL* c,
+                 FP_SIZE kx, FP_SIZE ky, FP_SIZE nux, FP_SIZE nuy, const FP_REAL* x, FP_SIZE mx,
+                 const FP_REAL* y, FP_SIZE my, FP_REAL* z, FP_REAL* wrk, FP_SIZE lwrk,
+                 FP_SIZE* iwrk, FP_SIZE kwrk);
+              
 #ifdef __cplusplus
 }
 #endif

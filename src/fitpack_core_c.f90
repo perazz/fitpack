@@ -350,4 +350,42 @@ module fitpack_core_c
           
       end function parsur_c
 
+      integer(FP_FLAG) function bispeu_c(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk) &
+                       result(ier) bind(C,name='bispeu_c')
+
+          integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,m,lwrk
+          real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
+          real(FP_REAL), intent(inout)        :: wrk(lwrk)
+          real(FP_REAL), intent(out)          :: z(m)
+          
+          call bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
+          
+      end function bispeu_c
+
+      integer(FP_FLAG) function bispev_c(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk) &
+                       result(ier) bind(C,name='bispev_c')
+
+          integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,mx,my,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+          real(FP_REAL), intent(out)          :: z(mx*my)
+          real(FP_REAL), intent(inout)        :: wrk(lwrk)
+          
+          call bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
+          
+      end function bispev_c
+
+      integer(FP_FLAG) function parder_c(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk) &
+                       result(ier) bind(C,name='parder_c')
+
+          integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
+          integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
+          real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
+          real(FP_REAL), intent(out)          :: z(mx*my)
+          real(FP_REAL), intent(inout)        :: wrk(lwrk)
+          
+          call parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
+          
+      end function parder_c
+
 end module fitpack_core_c

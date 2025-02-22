@@ -56,10 +56,10 @@ module fitpack_core
     public :: pogrid ! * Surface fitting to data on a polar grid
     public :: sphere ! * Surface fitting using spherical coordinates
     public :: spgrid ! * Surface fitting to data on a spherical grid
-    public :: parsur ! Parametric surface fitting to data on a grid
+    public :: parsur ! * Parametric surface fitting to data on a grid
 
     ! Surface application routines
-    public :: bispeu ! Evaluation of a bivariate spline function
+    public :: bispeu ! * Evaluation of a bivariate spline function
     public :: bispev ! * Evaluation of a bivariate spline function
     public :: parder ! Partial derivatives of a bivariate spline
     public :: pardeu ! Partial derivatives of a bivariate spline
@@ -16415,7 +16415,7 @@ module fitpack_core
              if (nu<ny) return
              if (u<tx(kx1) .or. u>tx(nkx1+1)) return
 
-             !  the b-splinecoefficients of f(y) = s(u,y).
+             ! the b-spline coefficients of f(y) = s(u,y).
              ier = FITPACK_OK
              l   = kx1
              l1  = l+1
@@ -16437,7 +16437,7 @@ module fitpack_core
              if (nu<nx) return
              if (u<ty(ky1) .or. u>ty(nky1+1)) return
 
-             ! the b-splinecoefficients of g(x) = s(x,u).
+             ! the b-spline coefficients of g(x) = s(x,u).
              ier = FITPACK_OK
                l = ky1
               l1 = l+1
