@@ -144,10 +144,11 @@ class fpClosedCurve
 
     protected:
 
+        // Opaque C structure
+        fitpack_closed_curve_c cptr = fitpack_closed_curve_c_null;    
+    
     private:
 
-        // Opaque C structure
-        fitpack_closed_curve_c cptr = fitpack_closed_curve_c_null;
 
 };
 
