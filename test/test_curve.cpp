@@ -45,7 +45,6 @@ FP_BOOL test_cpp_sine_fit()
    for (int i=0; i<N-1; i++)
    {
        // Evaluate function
-       FP_REAL yeval = sine.eval(xrand[i],&ierr);
        if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
        // Get exact function and derivatives here
@@ -535,7 +534,6 @@ FP_BOOL test_cpp_constrained_fit() {
          {
          case 2: // Smaller values of s to get a tighter approximation
             {
-                FP_SIZE i = 0;
                 for (FP_SIZE j=0; j<idim; j++)
                 {
                     if (abs(ybegin[0][j]-ddx_beginv[0][j])>smallnum06) ierr = FITPACK_TEST_ERROR;
