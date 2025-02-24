@@ -189,17 +189,18 @@ module fitpack_curves_c
      end function fitpack_curve_c_new_fit
 
      !> Wrapper to curve_fit_automatic_knots
-     integer(FP_FLAG) function fitpack_curve_c_fit(this,smoothing) result(ierr) &
+     integer(FP_FLAG) function fitpack_curve_c_fit(this,smoothing,order) result(ierr) &
                                bind(c,name='fitpack_curve_c_fit')
         type(fitpack_curve_c), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
+        integer(FP_SIZE), optional, intent(in) :: order
 
         type(fitpack_curve), pointer :: fcurve
 
         !> Get object; allocate it in case
         call fitpack_curve_c_pointer(this, fcurve)
 
-        ierr = fcurve%fit(smoothing)
+        ierr = fcurve%fit(smoothing,order)
 
      end function fitpack_curve_c_fit
 

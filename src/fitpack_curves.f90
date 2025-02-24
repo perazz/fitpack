@@ -295,9 +295,10 @@ module fitpack_curves
     end function interpolating_curve
 
     ! Curve fitting driver: automatic number of knots
-    integer(FP_FLAG) function curve_fit_automatic_knots(this,smoothing) result(ierr)
+    integer(FP_FLAG) function curve_fit_automatic_knots(this,smoothing,order) result(ierr)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
+        integer(FP_SIZE), optional, intent(in) :: order
 
         integer(FP_SIZE) :: loop,nit
         real(FP_REAL) :: smooth_now(3)
@@ -307,6 +308,9 @@ module fitpack_curves
 
         !> Ensure we start with new knots
         if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
+
+        !> Set/update order
+        if (present(order)) this%order = order
 
         do loop=1,nit
 

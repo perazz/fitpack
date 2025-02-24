@@ -449,7 +449,7 @@ module fitpack_parametric_curves
     integer function curve_fit_automatic_knots(this,smoothing,order) result(ierr)
         class(fitpack_parametric_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
-        integer    , optional, intent(in) :: order
+        integer(FP_SIZE), optional, intent(in) :: order
 
         integer :: loop,nit
         real(FP_REAL) :: smooth_now(3)
