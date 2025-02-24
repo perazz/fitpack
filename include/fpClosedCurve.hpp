@@ -75,7 +75,7 @@ class fpClosedCurve
 
             return fitpack_closed_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),u.data(),w.data(),&smoothing,&order);
         }
-
+        
         // Update fit with new parameters
         FP_FLAG fit(FP_SIZE order)                    { return fitpack_closed_curve_c_fit(&cptr,nullptr,&order); }
         FP_FLAG fit(FP_REAL smoothing)                { return fitpack_closed_curve_c_fit(&cptr,&smoothing,nullptr); }

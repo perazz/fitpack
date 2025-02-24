@@ -48,7 +48,7 @@ void    fitpack_periodic_curve_c_copy           (fitpack_periodic_curve_c *self,
 void    fitpack_periodic_curve_c_move_alloc     (fitpack_periodic_curve_c *to, fitpack_periodic_curve_c* from);
 void    fitpack_periodic_curve_c_new_points     (fitpack_periodic_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
 FP_FLAG fitpack_periodic_curve_c_new_fit        (fitpack_periodic_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
-FP_FLAG fitpack_periodic_curve_c_fit            (fitpack_periodic_curve_c *self, FP_REAL* smoothing);
+FP_FLAG fitpack_periodic_curve_c_fit            (fitpack_periodic_curve_c *self, FP_REAL* smoothing, FP_SIZE* order);
 FP_FLAG fitpack_periodic_curve_c_interpolating  (fitpack_periodic_curve_c *self);
 FP_REAL fitpack_periodic_curve_c_eval_one       (fitpack_periodic_curve_c *self, FP_REAL x, FP_FLAG* ierr);
 void    fitpack_periodic_curve_c_eval_many      (fitpack_periodic_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_FLAG* ierr);

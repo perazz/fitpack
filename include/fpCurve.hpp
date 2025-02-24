@@ -29,6 +29,8 @@
 #include <vector>
 using std::vector;
 
+typedef vector<FP_REAL> fpPoint;
+
 class fpCurve
 {
     public:
@@ -57,6 +59,15 @@ class fpCurve
             return fitpack_curve_c_new_fit(&cptr,npts,x.data(),y.data(),w.data(),&smoothing);
         }
 
+        // Update fit with new parameters
+        FP_FLAG fit(FP_SIZE order)                    { return fitpack_curve_c_fit(&cptr,nullptr,&order); }
+        FP_FLAG fit(FP_REAL smoothing)                { return fitpack_curve_c_fit(&cptr,&smoothing,nullptr); }
+        FP_FLAG fit(FP_REAL smoothing, FP_SIZE order) { return fitpack_curve_c_fit(&cptr,&smoothing,&order); }
+        
+        // Get the interpolating fit
+        FP_FLAG interpolate()                         { return fitpack_curve_c_interpolating(&cptr,nullptr); }        
+        FP_FLAG interpolate(FP_SIZE order)            { return fitpack_curve_c_interpolating(&cptr,&order); }        
+        
         // Fit properties
         const FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
         const FP_REAL smoothing() { return fitpack_curve_c_smoothing(&cptr); };
@@ -77,6 +88,30 @@ class fpCurve
            fitpack_curve_c_eval_many(&cptr,npts,x.data(),y.data(),ierr);
            return y;
         }
+        
+        // Get values at a range of x coordinates
+        vector<fpPoint> eval(FP_REAL xmin, FP_REAL xmax, FP_SIZE npts = 100, FP_SIZE* ierr=nullptr)
+        {
+           vector<FP_REAL> x(npts);
+           vector<FP_REAL> y(npts);
+           
+           // Generate linearly spaced x values
+           FP_REAL dx = (xmax - xmin) / (npts - 1);
+           for (FP_SIZE i = 0; i < npts; ++i) {
+               x[i] = xmin + i * dx;
+           }
+           
+           // Evaluate the curve at these x values
+           fitpack_curve_c_eval_many(&cptr, npts, x.data(), y.data(), ierr);
+           
+           // Create the output vector of (x, y) pairs
+           vector<fpPoint> xy(npts);
+           for (FP_SIZE i = 0; i < npts; ++i) {
+               xy[i] = {x[i], y[i]};
+           }
+           
+           return xy;
+        }     
 
         // Get single derivative at x
         FP_REAL ddx(FP_REAL x, FP_SIZE order, FP_SIZE* ierr=nullptr)
