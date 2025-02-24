@@ -284,13 +284,15 @@ module fitpack_curves
     end function curve_eval_many
 
     ! Interpolating curve
-    integer(FP_FLAG) function interpolating_curve(this) result(ierr)
+    integer(FP_FLAG) function interpolating_curve(this,order) result(ierr)
         class(fitpack_curve), intent(inout) :: this
+        integer(FP_SIZE), optional, intent(in) :: order
 
         ! Set zero smoothing
         this%iopt = IOPT_NEW_SMOOTHING
-
-        ierr = curve_fit_automatic_knots(this,smoothing=zero)
+        
+        ! Update order if necessary
+        ierr = curve_fit_automatic_knots(this,smoothing=zero,order=order)
 
     end function interpolating_curve
 

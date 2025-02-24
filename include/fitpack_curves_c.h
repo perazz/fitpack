@@ -49,7 +49,7 @@ void    fitpack_curve_c_move_alloc     (fitpack_curve_c *to, fitpack_curve_c* fr
 void    fitpack_curve_c_new_points     (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w);
 FP_FLAG fitpack_curve_c_new_fit        (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_REAL* w, FP_REAL* smoothing);
 FP_FLAG fitpack_curve_c_fit            (fitpack_curve_c *self, FP_REAL* smoothing, FP_SIZE* order);
-FP_FLAG fitpack_curve_c_interpolating  (fitpack_curve_c *self);
+FP_FLAG fitpack_curve_c_interpolating  (fitpack_curve_c *self, FP_SIZE* order);
 FP_REAL fitpack_curve_c_eval_one       (fitpack_curve_c *self, FP_REAL x, FP_FLAG* ierr);
 void    fitpack_curve_c_eval_many      (fitpack_curve_c *self, FP_SIZE npts, FP_REAL* x, FP_REAL* y, FP_FLAG* ierr);
 FP_REAL fitpack_curve_c_integral       (fitpack_curve_c *self, FP_REAL from, FP_REAL to);
