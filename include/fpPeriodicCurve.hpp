@@ -57,6 +57,14 @@ class fpPeriodicCurve
             return fitpack_periodic_curve_c_new_fit(&cptr,npts,x.data(),y.data(),w.data(),&smoothing);
         }
 
+        // Update fit with new parameters
+        FP_FLAG fit(FP_SIZE order)                    { return fitpack_periodic_curve_c_fit(&cptr,nullptr,&order); }
+        FP_FLAG fit(FP_REAL smoothing)                { return fitpack_periodic_curve_c_fit(&cptr,&smoothing,nullptr); }
+        FP_FLAG fit(FP_REAL smoothing, FP_SIZE order) { return fitpack_periodic_curve_c_fit(&cptr,&smoothing,&order); }
+        
+        // Get the interpolating fit
+        FP_FLAG interpolate()                         { return fitpack_periodic_curve_c_interpolating(&cptr); }        
+        
         // Fit properties
         const FP_SIZE degree   () { return fitpack_periodic_curve_c_degree(&cptr); };
         const FP_REAL smoothing() { return fitpack_periodic_curve_c_smoothing(&cptr); };
