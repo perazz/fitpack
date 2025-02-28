@@ -3615,12 +3615,12 @@ module fitpack_core
       end subroutine fpclos
 
       pure subroutine fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
-         integer(FP_SIZE), intent(in) :: idim,k,m,mx,n,nc,nest
+         integer(FP_SIZE), intent(in)    :: idim,k,m,mx,n,nc,nest
          integer(FP_SIZE), intent(inout) :: kk,kk1
-         real(FP_REAL),    intent(in) :: u(m),x(mx),per,fp0,s
+         real(FP_REAL),    intent(in)    :: u(m),x(mx),per,fp0,s
          real(FP_REAL),    intent(inout) :: t(nest),c(nc),fp,fpint(nest)
          integer(FP_SIZE), intent(inout) :: nrdata(nest)
-         logical(FP_BOOL), intent(out) :: done
+         logical(FP_BOOL), intent(out)   :: done
 
          integer(FP_SIZE) :: i,j,j1,jj,m1
 
@@ -4765,11 +4765,11 @@ module fitpack_core
 
       !  ..
       !  ..scalar arguments..
-      real(FP_REAL),    intent(in)  :: xb,xe,s,tol
-      real(FP_REAL),    intent(out) :: fp
-      integer(FP_SIZE), intent(in)  :: iopt,m,k,nest,maxit,k1,k2
-      integer(FP_SIZE), intent(out) :: n
-      integer(FP_FLAG), intent(out) :: ier
+      real(FP_REAL),    intent(in)    :: xb,xe,s,tol
+      real(FP_REAL),    intent(out)   :: fp
+      integer(FP_SIZE), intent(in)    :: iopt,m,k,nest,maxit,k1,k2
+      integer(FP_SIZE), intent(inout) :: n
+      integer(FP_FLAG), intent(out)   :: ier
 
       !  ..array arguments..
       real(FP_REAL), intent(in)    :: x(m),y(m),w(m)
@@ -4893,7 +4893,7 @@ module fitpack_core
         fp = zero
 
         ! initialize the observation matrix a.
-        z(1:nk1) = zero
+        z(1:nk1)      = zero
         a(1:nk1,1:k1) = zero
         l = k1
         coefs: do it=1,m
@@ -5198,10 +5198,10 @@ module fitpack_core
 
          else
 
-            u = sign(sqrt(abs(q)),r)
+            u  = sign(sqrt(abs(q)),r)
             p3 = atan2(sqrt(-disc),abs(r))*e3
             u2 = u+u
-            n = 3
+            n  = 3
             x(1) = -u2*cos(p3)-b1
             x(2) = u2*cos(pi3-p3)-b1
             x(3) = u2*cos(pi3+p3)-b1
@@ -12232,7 +12232,7 @@ module fitpack_core
       end subroutine fpspgr
 
 
-      pure subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
+      subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
                              ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
 
@@ -12270,6 +12270,8 @@ module fitpack_core
       lwest  = 0
       ntt    = 0
       iband1 = 0
+      
+      print *, 'ib3=',ib3,' size(h)=',size(h)
 
       bootstrap: if (iopt>=0) then
 
@@ -12515,7 +12517,9 @@ module fitpack_core
                      jlt = j+lt
                      htj = ht(j)
                      if (jlt==3) then
-                         h(1:3) = [h(1)+htj,facc*htj,facs*htj]
+                         h(1) = h(1)+htj
+                         h(2) = facc*htj
+                         h(3) = facs*htj
                          j1 = 3
                      elseif (jlt==nt4) then
                          h(j1+1:j1+3) = htj*[facc,facs,one]
@@ -12811,7 +12815,8 @@ module fitpack_core
                   if (j>1 .and. j<nt6) then
                       h(1:npp) = row(1:npp)
                   else
-                      h(1:2) = [facc,facs]
+                      h(1) = facc 
+                      h(2) = facs
                       if(j==1) jrot = 2
                   endif
 
@@ -14201,12 +14206,22 @@ module fitpack_core
       integer(FP_SIZE) :: kk,k1,l,nk,nk1
       !  ..
       !  before starting computations a data check is made. if the input data
-      !  are invalid control is immediately repassed to the calling program.
+      !  are invalid control is immediately repassed to the calling program.      
       ier = FITPACK_INPUT_ERROR
-      if (nest<=n) return
+      if (nest<=n) then 
+         tt = t
+         cc = c
+         nn = n
+         return
+      endif  
       k1 = k+1
       nk = n-k
-      if (x<t(k1) .or. x>t(nk)) return
+      if (x<t(k1) .or. x>t(nk)) then 
+         tt = t
+         cc = c
+         nn = n
+         return
+      endif        
       !  search for knot interval t(l) <= x < t(l+1).
       nk1 = nk-1
       l = k1
@@ -14215,11 +14230,21 @@ module fitpack_core
       end do
 
       !  no interval found in whole range
-      if(t(l)>=t(l+1)) return
+      if (t(l)>=t(l+1)) then 
+         tt = t
+         cc = c
+         nn = n
+         return
+      endif        
 
-      if(iopt/=0) then
+      if (iopt/=0) then
          kk = 2*k
-         if (l<=kk .and. l>=(n-kk)) return
+         if (l<=kk .and. l>=(n-kk)) then 
+             tt = t
+             cc = c
+             nn = n
+             return
+         end if
       endif
 
       ier = FITPACK_OK
@@ -14232,10 +14257,10 @@ module fitpack_core
       ! that called subroutine insert with the same variables as input and output arguments
       pure subroutine insert_inplace(iopt,t,n,c,k,x,nest,ier)
 
-          integer(FP_SIZE), intent(in)        :: iopt,k,nest
-          integer(FP_FLAG), intent(out)       :: ier
-          real(FP_REAL), intent(in)    :: x
-          integer(FP_SIZE), intent(inout)     :: n
+          integer(FP_SIZE), intent(in)    :: iopt,k,nest
+          integer(FP_FLAG), intent(out)   :: ier
+          real(FP_REAL),    intent(in)    :: x
+          integer(FP_SIZE), intent(inout) :: n
           !  ..array arguments..
           real(FP_REAL), intent(inout) :: t(nest),c(nest)
 
@@ -17213,7 +17238,7 @@ module fitpack_core
       end subroutine spgrid
 
 
-      pure subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
+      subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
                              eps,nt,tt,np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
       !  subroutine sphere determines a smooth bicubic spherical spline
