@@ -24,6 +24,10 @@ jobs:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
 
+      - name: Set correct Fortran compiler on macOS
+        if: matrix.os == 'macos-latest'
+        run: echo "FPM_FC=gfortran-${{ matrix.toolchain.version }}" >> $GITHUB_ENV
+
       - name: Setup fpm
         uses: fortran-lang/setup-fpm@v6.1.0
         with:
