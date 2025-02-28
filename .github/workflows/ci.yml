@@ -27,7 +27,7 @@ jobs:
       - name: Setup fpm
         uses: fortran-lang/setup-fpm@v6.1.0
         with:
-          fpm-version: 'v0.10.0'
+          fpm-version: 'v0.10.1'
 
       - name: Build
         run: | 
