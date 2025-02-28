@@ -12232,7 +12232,7 @@ module fitpack_core
       end subroutine fpspgr
 
 
-      subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
+      pure subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
                              ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
 
@@ -12271,8 +12271,6 @@ module fitpack_core
       ntt    = 0
       iband1 = 0
       
-      print *, 'ib3=',ib3,' size(h)=',size(h)
-
       bootstrap: if (iopt>=0) then
 
           !  if iopt=0 we begin by computing the weighted least-squares polynomial of the form
@@ -17238,7 +17236,7 @@ module fitpack_core
       end subroutine spgrid
 
 
-      subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
+      pure subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
                              eps,nt,tt,np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 
       !  subroutine sphere determines a smooth bicubic spherical spline
