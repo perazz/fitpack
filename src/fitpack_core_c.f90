@@ -301,7 +301,7 @@ module fitpack_core_c
           
       end subroutine pogrid_c
 
-      pure subroutine sphere_c(iopt,m,teta,phi,r,w,s,ntest,npest,eps,nt,tt,np,tp,c, &
+      subroutine sphere_c(iopt,m,teta,phi,r,w,s,ntest,npest,eps,nt,tt,np,tp,c, &
                                fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='sphere_c')
           integer(FP_SIZE), intent(in), value :: iopt,m,ntest,npest,lwrk1,lwrk2,kwrk
           real(FP_REAL),    intent(in), value :: s,eps
