@@ -1,0 +1,40 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }} 
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        toolchain: 
+          - {compiler: gcc, version: 13}
+          - {compiler: intel, version: '2025.0'}       
+        exclude:
+          - os: macos-latest
+          - toolchain: {compiler: intel, version: '2025.0'}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup fortran
+        uses: fortran-lang/setup-fortran@v1.6.3
+        with:
+          compiler: ${{ matrix.toolchain.compiler }}
+          version: ${{ matrix.toolchain.version }}
+
+      - name: Setup fpm
+        uses: fortran-lang/setup-fpm@v3
+        with:
+          fpm-version: 'v0.10.0'
+
+      - name: Build
+        run: | 
+          export FPM_FC=${{ env.FC }} 
+          fpm build --profile debug
+
+      - name: Run unit tests 
+        run: fpm test
+
+
