@@ -98,9 +98,9 @@ module fitpack_parametric_curves
            procedure :: interpolate => interpolating_curve
 
            !> Evaluate curve at given coordinates
-           procedure, private :: curve_eval_one
-           procedure, private :: curve_eval_many
-           generic :: eval => curve_eval_one,curve_eval_many
+           procedure :: eval_one  => curve_eval_one
+           procedure :: eval_many => curve_eval_many           
+           generic :: eval => eval_one,eval_many
 
            !> Evaluate derivative at given coordinates
            procedure, private :: curve_derivative
@@ -262,8 +262,8 @@ module fitpack_parametric_curves
         this%has_params = present(u)
         if (this%has_params) then
             isort = fitpack_argsort(u)
-            allocate(this%u,source=u(isort))
-            allocate(this%x,source=x(:,isort))
+            this%u    = u(isort)
+            this%x    = x(:,isort)
             this%w(:) = this%w(isort)
 
             this%ubegin  = minval(u)

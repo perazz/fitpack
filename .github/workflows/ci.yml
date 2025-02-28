@@ -10,8 +10,13 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         toolchain: 
+          - {compiler: gcc, version: 11}
+          - {compiler: gcc, version: 12}
           - {compiler: gcc, version: 13}
-          - {compiler: intel, version: '2025.0'}       
+          - {compiler: gcc, version: 14}
+          - {compiler: intel, version: '2023.2'}
+          - {compiler: intel, version: '2024.0'}
+          - {compiler: intel, version: '2025.0'}          
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

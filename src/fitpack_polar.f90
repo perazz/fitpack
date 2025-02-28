@@ -221,9 +221,9 @@ module fitpack_polar_domains
         m = size(x)
 
         ! Copy scattered points
-        allocate(this%x,source=x)
-        allocate(this%y,source=y)
-        allocate(this%z,source=z)
+        allocate(this%x(m),source=x)
+        allocate(this%y(m),source=y)
+        allocate(this%z(m),source=z)
 
         ! Allocate rectangular coordinates
         allocate(this%u(m),this%v(m))

@@ -216,9 +216,9 @@ module fitpack_gridded_sphere
         m = [size(u),size(v)] ! /= shape(z), == shape(transpose(z))
 
         ! Copy grid and data
-        allocate(this%u,source=u)
-        allocate(this%v,source=v)
-        allocate(this%z,source=z)
+        allocate(this%u(m(1)),source=u)
+        allocate(this%v(m(2)),source=v)
+        allocate(this%z(m(2),m(1)),source=z)
 
         ! Reset run flag
         this%iopt = IOPT_NEW_SMOOTHING

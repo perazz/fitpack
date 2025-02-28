@@ -193,8 +193,8 @@ module fitpack_curves
 
         ! Ensure x are sorted
         isort = fitpack_argsort(x)
-        allocate(this%x,source=x(isort))
-        allocate(this%y,source=y(isort))
+        allocate(this%x(m),source=x(isort))
+        allocate(this%y(m),source=y(isort))
 
         ! set up uniform weights
         if (present(w)) then

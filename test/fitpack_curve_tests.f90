@@ -271,7 +271,7 @@ module fitpack_curve_tests
           end if
 
           ! Evaluate the spline curve
-          y = curve%eval(u,ierr)
+          y = curve%eval_many(u,ierr)
 
           if (.not.FITPACK_SUCCESS(ierr)) then
               success = .false.

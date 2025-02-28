@@ -205,9 +205,9 @@ module fitpack_grid_surfaces
         m = [size(x),size(y)]
 
         ! Ensure x are sorted
-        allocate(this%x,source=x)
-        allocate(this%y,source=y)
-        allocate(this%z,source=z)
+        allocate(this%x(m(1)),source=x)
+        allocate(this%y(m(2)),source=y)
+        allocate(this%z(m(2),m(1)),source=z)
 
         ! Setup boundaries
         this%left(1)  = minval(x,1)
