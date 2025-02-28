@@ -156,7 +156,7 @@ module fitpack_parametric_surfaces
         logical, optional, intent(in) :: periodic_BC(2)
 
         integer, parameter   :: SAFE = 2
-        integer :: m(2),q,clen
+        integer :: m(2)
 
         associate(idim=>this%idim,nest=>this%nest,nmax=>this%nmax,lwrk=>this%lwrk)
 

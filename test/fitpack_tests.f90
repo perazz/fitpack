@@ -3870,7 +3870,6 @@ module fitpack_tests
          980  format(1x,22hposition of the knots )
          985  format(5x,8f9.4)
          990  format(1x,42htotal number of knots in the v-direction =,i3)
-         995  format(23h0b-spline coefficients )
         1000  format(50h0spline value (approximation error) at grid points)
         1005  format(28h spline values at the poles ,f7.3,5x,f7.3)
         1100  format('[mnspgr] test ',i0,' failed: ',a)

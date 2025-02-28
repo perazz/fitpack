@@ -1029,7 +1029,7 @@ module fitpack_curve_tests
         integer, optional, intent(in) :: iunit
         type(fitpack_grid_sphere) :: spgr
 
-        integer :: ierr,loop,useUnit,i
+        integer :: ierr,loop,useUnit
         real(FP_REAL), allocatable :: u(:),v(:),z(:,:),fit_z(:,:),exact_z(:,:),err(:,:)
 
         success = .true.
