@@ -104,7 +104,7 @@ module fitpack_test_data
              0.805]
 
     !> 3D Parametric surface data is provided as a 3D array with dimensions [size(u),3,size(v)]
-    real(FP_REAL), parameter :: dapasu(*,*,*) = reshape([ real(FP_REAL) :: &
+    real(FP_REAL), parameter :: dapasu(11,3,21) = reshape([ real(FP_REAL) :: &
               0.718,  0.737,  0.837,  1.007,  1.206,  1.295,  1.294,  1.154,  0.980,  0.794,  0.701, &
               0.010,  0.004,  0.006, -0.015, -0.005, -0.003,  0.005,  0.013, -0.003, -0.008,  0.003, &
               0.930,  1.104,  1.247,  1.291,  1.242,  1.083,  0.892,  0.736,  0.705,  0.773,  0.914, &
@@ -271,7 +271,7 @@ module fitpack_test_data
                                       140.0, 318.0, 168.0, 327.0, 168.0, 331.0, 153.0, 333.0]
 
    real(FP_REAL), parameter :: dasurf_delta = 0.102569e-01 ! Estimate of the standard deviation
-   real(FP_REAL), parameter :: dasurf_xyz(*,*) = reshape([ real(FP_REAL) :: &
+   real(FP_REAL), parameter :: dasurf_xyz(3,80) = reshape([ real(FP_REAL) :: &
                                           -1.9867, -1.9470,  0.0076, &
                                           -1.5042, -1.4471, -0.0035, &
                                           -1.7742, -1.0253,  0.0144, &
