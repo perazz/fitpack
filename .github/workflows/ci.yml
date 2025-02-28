@@ -24,14 +24,17 @@ jobs:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
 
-      - name: Set correct Fortran compiler on macOS
-        if: matrix.os == 'macos-latest'
-        run: echo "FPM_FC=gfortran-${{ matrix.toolchain.version }}" >> $GITHUB_ENV
-
       - name: Setup fpm
         uses: fortran-lang/setup-fpm@v6.1.0
         with:
           fpm-version: 'v0.10.1'
+
+      - name: Set correct Fortran compiler and library path
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "FPM_FC=gfortran-${{ matrix.toolchain.version }}" >> $GITHUB_ENV
+          echo "$(brew --prefix gcc)/bin" >> $GITHUB_PATH
+          echo "DYLD_FALLBACK_LIBRARY_PATH=$(brew --prefix gcc)/lib/gcc/current" >> $GITHUB_ENV
 
       - name: Build
         run: | 
