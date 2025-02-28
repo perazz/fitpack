@@ -12517,7 +12517,9 @@ module fitpack_core
                      jlt = j+lt
                      htj = ht(j)
                      if (jlt==3) then
-                         h(1:3) = [h(1)+htj,facc*htj,facs*htj]
+                         h(1) = h(1)+htj
+                         h(2) = facc*htj
+                         h(3) = facs*htj
                          j1 = 3
                      elseif (jlt==nt4) then
                          h(j1+1:j1+3) = htj*[facc,facs,one]
