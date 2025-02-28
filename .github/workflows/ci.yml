@@ -10,6 +10,8 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         toolchain: 
+          - {compiler: gcc, version: 9}
+          - {compiler: gcc, version: 10}
           - {compiler: gcc, version: 11}
           - {compiler: gcc, version: 12}
           - {compiler: gcc, version: 13}
