@@ -31,7 +31,6 @@ jobs:
 
       - name: Build
         run: | 
-          export FPM_FC=${{ env.FC }} 
           fpm build --profile debug
 
       - name: Run unit tests 
