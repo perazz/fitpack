@@ -12250,7 +12250,7 @@ module fitpack_core
                                     fpint(intest),coord(intest),ff(nc),bt(ntest,5),bp(npest,5),&
                                     a(ncc,ib1),q(ncc,ib3),spt(m,4),spp(m,4),h(ib3),wrk(lwrk)
       integer(FP_SIZE), intent(inout) ::  index(nrest),nummer(m)
-
+ 
       !  ..local scalars..
       real(FP_REAL) :: aa,acc,arg,cn,co,c1,dmax,d1,d2,eps,fac1,fac2,facc,facs,fn,fpmax,fpms,f1,f2,f3,htj, &
                      p,pinv,piv,p1,p2,p3,ri,si,sigma,sq,store,wi,rn
