@@ -174,9 +174,9 @@ module fitpack_parametric_surfaces
         !end if
 
         ! Load data
-        allocate(this%u,source=u)
-        allocate(this%v,source=v)
-        allocate(this%z,source=z)
+        allocate(this%u(m(1)),source=u)
+        allocate(this%v(m(2)),source=v)
+        allocate(this%z(size(z,1),size(z,2),size(z,3)),source=z)
 
         ! Reset run flag
         this%iopt = IOPT_NEW_SMOOTHING

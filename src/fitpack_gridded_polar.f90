@@ -228,9 +228,9 @@ module fitpack_gridded_polar
         this%r = r
 
         ! Copy grid and data
-        allocate(this%u,source=u)
-        allocate(this%v,source=v)
-        allocate(this%z,source=z)
+        allocate(this%u(m(1)),source=u)
+        allocate(this%v(m(2)),source=v)
+        allocate(this%z(m(2),m(1)),source=z)
 
         call set_origin_BC(this,z0)
 
