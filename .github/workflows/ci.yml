@@ -23,15 +23,18 @@ jobs:
           version: ${{ matrix.toolchain.version }}
 
       - name: Setup fpm
-        run: |
-          # Download fpm source file
-          curl -LO https://github.com/fortran-lang/fpm/releases/download/v0.10.1/fpm-0.10.1.F90
-
-          # Compile fpm with the current Fortran compiler
-          ${FC} -o fpm fpm-0.10.1.F90
-
-          # Install fpm (add to the path)
-          mv fpm /usr/local/bin/
+        uses: fortran-lang/setup-fpm@v6.1.0
+        with:
+          fpm-version: 'v0.10.1'      
+#        run: |
+#          # Download fpm source file
+#          curl -LO https://github.com/fortran-lang/fpm/releases/download/v0.10.1/fpm-0.10.1.F90
+#
+#          # Compile fpm with the current Fortran compiler
+#          ${FC} -o fpm fpm-0.10.1.F90
+#
+#          # Install fpm (add to the path)
+#          mv fpm /usr/local/bin/
 
       - name: Set correct Fortran compiler and library path
         if: matrix.os == 'macos-latest'
