@@ -98,14 +98,14 @@ module fitpack_parametric_curves
            procedure :: interpolate => interpolating_curve
 
            !> Evaluate curve at given coordinates
-           procedure :: curve_eval_one
-           procedure :: curve_eval_many
-           generic :: eval => curve_eval_one,curve_eval_many
+           procedure :: eval_one  => curve_eval_one
+           procedure :: eval_many => curve_eval_many           
+           generic :: eval => eval_one,eval_many
 
            !> Evaluate derivative at given coordinates
-           procedure :: curve_derivative
-           procedure :: curve_derivatives
-           procedure :: curve_all_derivatives
+           procedure, private :: curve_derivative
+           procedure, private :: curve_derivatives
+           procedure, private :: curve_all_derivatives
            generic   :: dfdx => curve_derivative,curve_derivatives
            generic   :: dfdx_all => curve_all_derivatives
 
