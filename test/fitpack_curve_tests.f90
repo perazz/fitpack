@@ -795,14 +795,14 @@ module fitpack_curve_tests
               character(*), intent(in) :: fileName
               real(FP_REAL), intent(in) :: theta(:),phi(:),data(:,:) ! [size(phi),size(theta)]
 
-              integer :: iunit,i
+              integer :: iunit,i,j
 
               open(newunit=iunit,file=fileName,form='formatted',action='write')
 
               write(iunit,1) zero,theta
 
               do i=1,size(phi)
-                 write(iunit,1) phi(i),data(i,:)
+                 write(iunit,1) phi(i),(data(i,j),j=1,size(data,2))
               end do
 
               close(iunit)
