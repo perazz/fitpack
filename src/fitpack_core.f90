@@ -12815,7 +12815,8 @@ module fitpack_core
                   if (j>1 .and. j<nt6) then
                       h(1:npp) = row(1:npp)
                   else
-                      h(1:2) = [facc,facs]
+                      h(1) = facc 
+                      h(2) = facs
                       if(j==1) jrot = 2
                   endif
 
