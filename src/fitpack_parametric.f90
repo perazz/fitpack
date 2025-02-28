@@ -262,8 +262,8 @@ module fitpack_parametric_curves
         this%has_params = present(u)
         if (this%has_params) then
             isort = fitpack_argsort(u)
-            allocate(this%u,source=u(isort))
-            allocate(this%x,source=x(:,isort))
+            this%u    = u(isort)
+            this%x    = x(:,isort)
             this%w(:) = this%w(isort)
 
             this%ubegin  = minval(u)
