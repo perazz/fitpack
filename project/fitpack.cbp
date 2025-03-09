@@ -54,6 +54,7 @@
 			<Add library="gfortran" />
 			<Add library="quadmath" />
 		</Linker>
+		<Unit filename="../include/fitpack.hpp" />
 		<Unit filename="../include/fitpack_closed_curves_c.h" />
 		<Unit filename="../include/fitpack_constrained_curves_c.h" />
 		<Unit filename="../include/fitpack_core_c.h" />
