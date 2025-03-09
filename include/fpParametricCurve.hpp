@@ -29,37 +29,6 @@
 #include <vector>
 using std::vector;
 
-// Flatten a 2D vector
-vector<FP_REAL> flatten_2d_vector(vector<fpPoint> x2d)
-{
-
-    // Get number of points
-    FP_SIZE npts = x2d.size();
-
-    // Get max vector size
-    FP_SIZE ndim = 0;
-    for (FP_SIZE i=0; i<x2d.size(); i++)
-    {
-        ndim = x2d[i].size()>ndim? x2d[i].size() : ndim;
-    }
-
-    // Allocate flattened vector
-    FP_SIZE n = npts*ndim;
-
-    vector<FP_REAL> x(n,0.0);
-
-    for (FP_SIZE pt=0; pt<x2d.size(); pt++)
-    {
-        for (FP_SIZE idim=0; idim<x2d[pt].size(); idim++)
-        {
-            x[pt*ndim+idim] = x2d[pt][idim];
-        }
-    }
-
-    return x;
-
-}
-
 class fpParametricCurve
 {
     public:
@@ -110,7 +79,8 @@ class fpParametricCurve
         FP_FLAG fit(FP_REAL smoothing, FP_SIZE order) { return fitpack_parametric_curve_c_fit(&cptr,&smoothing,&order); }
 
         // Get the interpolating fit
-        FP_FLAG interpolate()                         { return fitpack_parametric_curve_c_interpolating(&cptr); }
+        FP_FLAG interpolate()                         { return fitpack_parametric_curve_c_interpolating(&cptr,nullptr); }
+        FP_FLAG interpolate(FP_SIZE order)            { return fitpack_parametric_curve_c_interpolating(&cptr,nullptr); }
 
         // Fit properties
         const FP_SIZE degree   () { return fitpack_parametric_curve_c_degree(&cptr); };
@@ -148,6 +118,21 @@ class fpParametricCurve
 
         }
 
+        // Get values at a range of parameter values
+        vector<fpPoint> eval(FP_REAL umin, FP_REAL umax, FP_SIZE npts = 100, FP_SIZE* ierr=nullptr)
+        {
+           vector<FP_REAL> uu(npts);
+           
+           // Generate linearly spaced u values
+           FP_REAL du = (umax - umin) / (npts - 1);
+           for (FP_SIZE i = 0; i < npts; ++i) {
+               uu[i] = umin + i * du;
+           }
+           
+           return eval(uu,ierr);
+           
+        }             
+        
         // Get single derivative at u
         fpPoint ddu(FP_REAL u, FP_SIZE order, FP_FLAG* ierr=nullptr)
         {

@@ -50,7 +50,7 @@ void    fitpack_parametric_curve_c_new_points            (fitpack_parametric_cur
 void    fitpack_parametric_curve_c_set_default_parameters(fitpack_parametric_curve_c *self);
 FP_FLAG fitpack_parametric_curve_c_new_fit               (fitpack_parametric_curve_c *self, FP_SIZE ndim, FP_SIZE npts, FP_REAL* x, FP_REAL* u, FP_REAL* w, FP_REAL* smoothing, FP_SIZE* order);
 FP_FLAG fitpack_parametric_curve_c_fit                   (fitpack_parametric_curve_c *self, FP_REAL* smoothing, FP_SIZE* order);
-FP_FLAG fitpack_parametric_curve_c_interpolating         (fitpack_parametric_curve_c *self);
+FP_FLAG fitpack_parametric_curve_c_interpolating         (fitpack_parametric_curve_c *self, FP_SIZE* order);
 FP_FLAG fitpack_parametric_curve_c_eval_one              (fitpack_parametric_curve_c *self, FP_REAL u, FP_REAL* y);
 //FP_REAL fitpack_parametric_curve_c_integral       (fitpack_parametric_curve_c *self, FP_REAL from, FP_REAL to);
 //void    fitpack_parametric_curve_c_fourier        (fitpack_parametric_curve_c *self, FP_SIZE nparm, const FP_REAL* alpha, FP_REAL* A, FP_REAL* B, FP_FLAG* ierr);

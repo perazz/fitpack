@@ -245,8 +245,24 @@ FP_FLAG parder_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny, c
 
 #endif
 
+// Core C++ functions
 #ifdef __cplusplus
-    typedef vector<FP_REAL> fpPoint;
+
+typedef vector<FP_REAL> fpPoint;
+    
+// Flatten a 2D vector
+inline vector<FP_REAL> flatten_2d_vector(const vector<fpPoint>& x2d) {
+    FP_SIZE ndim = 0;
+    for (const auto& p : x2d) ndim = std::max(ndim, static_cast<FP_SIZE>(p.size()));
+
+    vector<FP_REAL> x(x2d.size() * ndim, 0.0);
+    for (FP_SIZE i = 0; i < x2d.size(); i++)
+        copy(x2d[i].begin(), x2d[i].end(), x.begin() + i * ndim);
+
+    return x;
+}
+
+    
 #endif
 
 #endif // FITPACK_CORE_C_H_INCLUDED
