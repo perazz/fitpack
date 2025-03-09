@@ -222,16 +222,17 @@ module fitpack_parametric_curves_c
      end function fitpack_parametric_curve_c_fit
 
      !> Wrapper to interpolating_curve
-     integer(FP_FLAG) function fitpack_parametric_curve_c_interpolating(this) result(ierr) &
+     integer(FP_FLAG) function fitpack_parametric_curve_c_interpolating(this,order) result(ierr) &
                                 bind(c,name='fitpack_parametric_curve_c_interpolating')
         type(fitpack_parametric_curve_c), intent(inout) :: this
+        integer(FP_SIZE), optional, intent(in) :: order
 
         type(fitpack_parametric_curve), pointer :: fcurve
 
         !> Get object; allocate it in case
         call fitpack_parametric_curve_c_pointer(this, fcurve)
 
-        ierr = fcurve%interpolate()
+        ierr = fcurve%interpolate(order)
 
      end function fitpack_parametric_curve_c_interpolating
 

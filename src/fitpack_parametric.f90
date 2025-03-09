@@ -437,11 +437,15 @@ module fitpack_parametric_curves
     end function curve_eval_many
 
     ! Interpolating curve
-    integer function interpolating_curve(this) result(ierr)
+    integer function interpolating_curve(this,order) result(ierr)
         class(fitpack_parametric_curve), intent(inout) :: this
+        integer(FP_SIZE), optional, intent(in) :: order
 
         ! Set zero smoothing
-        ierr = curve_fit_automatic_knots(this,zero)
+        this%iopt = IOPT_NEW_SMOOTHING
+
+        ! Set zero smoothing
+        ierr = curve_fit_automatic_knots(this,smoothing=zero,order=order)
 
     end function interpolating_curve
 
