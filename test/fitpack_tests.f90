@@ -2031,14 +2031,14 @@ module fitpack_tests
 
           !  we will determine a planar curve   x=sx(u) , y=sy(u)
           integer(FP_SIZE), parameter :: idim = 2
-
+          
           !  we set up the dimension information.
           integer(FP_SIZE), parameter :: nest = 40
           integer(FP_SIZE), parameter :: lwrk = 1200
           integer(FP_SIZE), parameter :: nc = 80
-          integer(FP_SIZE), parameter :: mx = 64
+          integer(FP_SIZE), parameter :: mx = m*idim
 
-          real(FP_REAL) :: x(mx),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(mx)
+          real(FP_REAL) :: x(idim,m),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(idim,m)
           integer(FP_SIZE) :: iwrk(40)
           real(FP_REAL) :: al,del,fp,s,ub,ue
           integer(FP_SIZE) :: i,iopt,ipar,is,i1,i2,j,j1,k,l,l1,n,nk1,useUnit
@@ -2056,14 +2056,14 @@ module fitpack_tests
           u = [real(FP_REAL) :: 120.,128.,133.,136.,138.,141.,144.,146.,149.,151.,154.,161.,170.,180.,190.,&
                 200.,210.,220.,230.,240.,250.,262.,269.,273.,278.,282.,287.,291.,295.,299.,305.,315.]
 
-          !  the data absciss values
-          x(1:63:2) = [-1.5141,-2.0906,-1.9253,-0.8724,-0.3074,-0.5534,0.0192,1.2298,2.5479,2.4710,1.7063,&
-                       1.1183,0.5534,0.4727,0.3574,0.1998,0.2882,0.2613,0.2652,0.2805,0.4112,0.9377,1.3527,&
-                       1.5564,1.6141,1.6333,1.1567,0.8109,0.2498,-0.2306,-0.7571,-1.1222]
-          !  the data ordinate values
-          x(2:64:2) = [0.5150,1.3412,2.6094,3.2358,2.7401,2.7823,3.5932,3.8353,2.5863,1.3105,0.6841,0.2575,&
-                       0.2460,0.3689,0.2460,0.2998,0.3651,0.3343,0.3881,0.4573,0.5918,0.7110,0.4035,0.0769,&
-                       -0.3920,-0.8570,-1.3412,-1.5641,-1.7409,-1.7178,-1.2989,-0.5572]
+          ! the 2d data array
+          x = reshape( &
+           [ -1.5141,  0.5150, -2.0906,  1.3412, -1.9253,  2.6094, -0.8724,  3.2358, -0.3074,  2.7401, -0.5534,  2.7823, &
+             0.0192,  3.5932,  1.2298,  3.8353,  2.5479,  2.5863,  2.4710,  1.3105,  1.7063,  0.6841,  1.1183,  0.2575, &
+             0.5534,  0.2460,  0.4727,  0.3689,  0.3574,  0.2460,  0.1998,  0.2998,  0.2882,  0.3651,  0.2613,  0.3343, &
+             0.2652,  0.3881,  0.2805,  0.4573,  0.4112,  0.5918,  0.9377,  0.7110,  1.3527,  0.4035,  1.5564,  0.0769, &
+             1.6141, -0.3920,  1.6333, -0.8570,  1.1567, -1.3412,  0.8109, -1.5641,  0.2498, -1.7409, -0.2306, -1.7178, &
+             -0.7571, -1.2989, -1.1222, -0.5572 ], [2, 32])
 
           !  we set up the weights of the data points
           w = one
@@ -2182,11 +2182,9 @@ module fitpack_tests
               end if
 
               do i=1,8
-                  l = (i-1)*8+3
+                  l  = (i-1)*2+1
                   l1 = l+1
-                  j = l+4
-                  j1 = j+1
-                  write(useUnit,965) x(l),x(l1),sp(l),sp(l1),x(j),x(j1),sp(j),sp(j1)
+                  write(useUnit,965) x(:,l),sp(:,l),x(:,l1),sp(:,l1)
               end do
           end do approximations
 
@@ -2201,8 +2199,8 @@ module fitpack_tests
          945  format(1x,30hb-spline coefficients of sx(u))
          950  format(5x,8f8.4)
          955  format(1x,30hb-spline coefficients of sy(u))
-         960  format(1h0,2(4x,2hxi,7x,2hyi,6x,6hsx(ui),3x,6hsy(ui)))
-         965  format(1h ,8f9.4)
+         960  format(1h0,2(4x,'xi',7x,'yi',6x,'sx(ui)',3x,'sy(ui)'))
+         965  format(1x,8f9.4)
         1000  format('[mnparc] parametric curve test ',i0,' failed: ',a)
       end function mnparc
 
