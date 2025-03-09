@@ -30,8 +30,6 @@
 #include <vector>
 using std::vector;
 
-typedef vector<FP_REAL> fpPoint;
-
 class fpClosedCurve
 {
     public:

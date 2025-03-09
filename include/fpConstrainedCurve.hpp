@@ -31,8 +31,6 @@
 #include <iostream>
 using std::vector;
 
-typedef vector<FP_REAL> fpPoint;
-
 class fpConstrainedCurve
 {
     public:

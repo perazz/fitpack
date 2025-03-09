@@ -29,8 +29,6 @@
 #include <vector>
 using std::vector;
 
-typedef vector<FP_REAL> fpPoint;
-
 // Flatten a 2D vector
 vector<FP_REAL> flatten_2d_vector(vector<fpPoint> x2d)
 {

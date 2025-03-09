@@ -23,6 +23,10 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#ifdef __cplusplus
+    #include <vector>
+    using std::vector;
+#endif // __cplusplus
 
 #ifdef __cplusplus
 extern "C" {
@@ -238,6 +242,11 @@ FP_FLAG parder_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny, c
               
 #ifdef __cplusplus
 }
+
+#endif
+
+#ifdef __cplusplus
+    typedef vector<FP_REAL> fpPoint;
 #endif
 
 #endif // FITPACK_CORE_C_H_INCLUDED
