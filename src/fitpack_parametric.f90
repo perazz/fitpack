@@ -51,7 +51,7 @@ module fitpack_parametric_curves
 
         !> Interval boundaries
         real(FP_REAL) :: ubegin = zero
-        real(FP_REAL) :: uend = zero
+        real(FP_REAL) :: uend   = zero
 
         ! Node weights
         real(FP_REAL), allocatable :: sp(:),w(:)
@@ -270,6 +270,7 @@ module fitpack_parametric_curves
             this%uend    = maxval(u)
 
         else
+            
             allocate(this%u(m),source=zero)
             this%x = x
 
