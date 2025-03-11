@@ -59,8 +59,10 @@ FP_REAL fitpack_parametric_curve_c_smoothing       (fitpack_parametric_curve_c *
 FP_REAL fitpack_parametric_curve_c_mse             (fitpack_parametric_curve_c *self);
 FP_SIZE  fitpack_parametric_curve_c_degree         (fitpack_parametric_curve_c *self);
 FP_SIZE  fitpack_parametric_curve_c_idim           (fitpack_parametric_curve_c *self);
-FP_REAL  fitpack_parametric_curve_c_ubegin         (fitpack_parametric_curve_c *self);
-FP_REAL  fitpack_parametric_curve_c_uend           (fitpack_parametric_curve_c *self);
+FP_REAL  fitpack_parametric_curve_c_ubegin         (const fitpack_parametric_curve_c *self);
+FP_REAL  fitpack_parametric_curve_c_uend           (const fitpack_parametric_curve_c *self);
+FP_REAL* fitpack_parametric_curve_c_ubegin_ref    (fitpack_parametric_curve_c *self);
+FP_REAL* fitpack_parametric_curve_c_uend_ref      (fitpack_parametric_curve_c *self);
 
 #ifdef __cplusplus
 }
