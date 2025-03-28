@@ -68,9 +68,6 @@ module fitpack_curve_tests
        
        ierr = spline%new_fit(x,y,order=1)
        
-       print *, 'nknots *** ',spline%knots
-       stop
-       
        success = FITPACK_SUCCESS(ierr)
     
     end function test_fpknot_crash
