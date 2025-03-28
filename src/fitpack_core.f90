@@ -18,7 +18,7 @@
 !
 ! **************************************************************************************************
 module fitpack_core
-    use iso_c_binding, only: c_double,c_int32_t,c_int64_t,c_bool,c_int8_t
+    use iso_c_binding, only: c_double,c_int32_t,c_bool
     implicit none
     private
 
@@ -92,7 +92,7 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: IOPT_OLD_FIT          =  1 ! Update an old fit
 
     ! Dimensions of last knot addition
-    integer(FP_SIZE), parameter,  public :: MAX_IDIM  = 10      ! Max number of dimensions
+    integer(FP_SIZE), parameter,  public :: MAX_IDIM      = 10  ! Max number of dimensions
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
@@ -288,7 +288,7 @@ module fitpack_core
       !    fpbisp,fpbspl
       !
       !  ..scalar arguments..
-      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,m,lwrk
+      integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,m,lwrk
       integer(FP_FLAG), intent(out) :: ier
 
       !  ..array arguments..
@@ -7605,14 +7605,13 @@ module fitpack_core
       !  corresponding parameters,i.e.
       !    t     : the position of the knots.
       !    n     : the number of knots.
-      !    nrint : the number of knotintervals.
+      !    nrint : the number of knot intervals.
       !    fpint : the sum of squares of residual right hand sides
       !            for each knot interval.
       !    nrdata: the number of data points inside each knot interval.
       !  istart indicates that the smallest data point at which the new knot may be added is x(istart+1)
       pure subroutine fpknot(x,m,t,n,fpint,nrdata,nrint,nest,istart)
 
-      !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: m,nest,istart
       integer(FP_SIZE), intent(inout) :: n,nrint
@@ -7632,8 +7631,8 @@ module fitpack_core
       k      = (n-nrint-1)/2
       !  search for knot interval t(number+k) <= x <= t(number+k+1) where fpint(number) is maximal on the
       !  condition that nrdata(number)/=0 .
-      fpmax = zero
-      jbegin = istart
+      fpmax  = zero
+      jbegin = istart      
       do j=1,nrint
         jpoint = nrdata(j)
 
@@ -7646,6 +7645,7 @@ module fitpack_core
 
         jbegin = jbegin+jpoint+1
       end do
+      
       !  let coincide the new knot t(number+k+1) with a data point x(nrx)
       !  inside the old knot interval t(number+k) <= x <= t(number+k+1).
       ihalf = maxpt/2+1
@@ -7653,7 +7653,7 @@ module fitpack_core
       next  = number+1
 
       !  adjust the different parameters.
-      if(next<=nrint) then
+      if (next<=nrint) then
          do j=next,nrint
             jj = next+nrint-j
             fpint(jj+1) = fpint(jj)
@@ -7662,19 +7662,23 @@ module fitpack_core
             t(jk+1) = t(jk)
          end do
       endif
-
-      nrdata(number) = ihalf-1
-      nrdata(next)   = maxpt-ihalf
-      am = maxpt
-      an = nrdata(number)
-      fpint(number) = fpmax*an/am
+      
+      if (number>0) then 
+          nrdata(number) = ihalf-1
+          nrdata(next)   = maxpt-ihalf
+          am = maxpt
+          an = nrdata(number)
+          fpint(number) = fpmax*an/am
+      endif
+      
       an = nrdata(next)
       fpint(next) = fpmax*an/am
       jk = next+k
       t(jk) = x(nrx)
+      
       n     = n+1
       nrint = nrint+1
-      return
+
       end subroutine fpknot
 
       ! given the set of function values z(i,j) defined on the rectangular grid (u(i),v(j)),

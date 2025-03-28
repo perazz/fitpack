@@ -138,15 +138,16 @@ module fitpack_curves
     end function new_from_points
 
     ! Fit a new curve
-    integer(FP_FLAG) function new_fit(this,x,y,w,smoothing)
+    integer(FP_FLAG) function new_fit(this,x,y,w,smoothing,order)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x))
         real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
         real(FP_REAL), optional, intent(in) :: smoothing
+        integer(FP_SIZE), optional, intent(in) :: order
 
         call this%new_points(x,y,w)
 
-        new_fit = this%fit(smoothing)
+        new_fit = this%fit(smoothing,order)
 
     end function new_fit
 

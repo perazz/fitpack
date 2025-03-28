@@ -2041,7 +2041,7 @@ module fitpack_tests
           real(FP_REAL) :: x(idim,m),w(m),u(m),t(nest),c(nc),wrk(lwrk),sp(idim,m)
           integer(FP_SIZE) :: iwrk(40)
           real(FP_REAL) :: al,del,fp,s,ub,ue
-          integer(FP_SIZE) :: i,iopt,ipar,is,i1,i2,j,j1,k,l,l1,n,nk1,useUnit
+          integer(FP_SIZE) :: i,iopt,ipar,is,i1,i2,j,k,l,l1,n,nk1,useUnit
           integer(FP_FLAG) :: ier
 
           ! Initialization
@@ -3746,7 +3746,7 @@ module fitpack_tests
                   ider(3) = -1
 
                   !  initialisation
-                  iopt(1) = 0
+                  iopt(1) = IOPT_NEW_SMOOTHING
 
                   !  a large value for s for computing the least-squares polynomial
                   s = 60.
@@ -3755,7 +3755,7 @@ module fitpack_tests
 
                   !  iopt(1) = 1 from the second call on
                   s = 0.05
-                  iopt(1) = 1
+                  iopt(1) = IOPT_OLD_FIT
 
                 case (3)
 
@@ -3775,7 +3775,7 @@ module fitpack_tests
                   r1 = exr1
 
                   ! reinitialization
-                  iopt(1) = 0
+                  iopt(1) = IOPT_NEW_SMOOTHING
                   s = 0.05
 
                 case (5)
@@ -3785,13 +3785,13 @@ module fitpack_tests
                   ider(4) = 1
 
                   ! reinitialization
-                  iopt(1) = 0
+                  iopt(1) = IOPT_NEW_SMOOTHING
 
                 case (6)
 
                   ! finally we calculate the least-squares spline according to the current
                   !  set of knots
-                  iopt(1) = -1
+                  iopt(1) = IOPT_NEW_LEASTSQUARES
 
             end select
 

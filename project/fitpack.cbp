@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-fcheck=bounds,mem" />
 					<Add option="-Jobj/Debug" />
 					<Add option="-Wpedantic" />
 					<Add option="-Wcompare-reals" />
@@ -81,82 +82,72 @@
 		<Unit filename="../include/fpParametricCurve.hpp" />
 		<Unit filename="../include/fpPeriodicCurve.hpp" />
 		<Unit filename="../src/fitpack.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_closed_c.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_constrained_c.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_core.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_core_c.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_curves.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_curves_c.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_grid_surfaces.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_polar.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_sphere.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric_c.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric_surfaces.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_periodic_curves_c.f90">
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_polar.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_spheres.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_surfaces.f90">
-			<Option weight="1" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../test/fitpack_cpp_tests.f90">
-			<Option weight="1" />
-			<Option target="Release" />
-			<Option target="Library_Apple" />
-			<Option target="Library_Static" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="../test/fitpack_curve_tests.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="../test/fitpack_test_data.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="../test/fitpack_test_data.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="../test/fitpack_tests.f90">
-			<Option weight="2" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="../test/test.f90">
-			<Option weight="4" />
-			<Option target="Release" />
-			<Option target="Library_Apple" />
-			<Option target="Library_Static" />
+			<Option weight="2" />
 		</Unit>
-		<Unit filename="../test/test_curve.cpp">
-			<Option target="Release" />
-			<Option target="Library_Apple" />
-			<Option target="Library_Static" />
-		</Unit>
+		<Unit filename="../test/test_curve.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
