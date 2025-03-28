@@ -40,9 +40,37 @@ module fitpack_curve_tests
     public :: test_gridded_polar
     public :: test_gridded_sphere
     public :: test_parametric_surface
+    public :: test_fpknot_crash
 
 
     contains
+
+    ! This test reproduces https://github.com/scipy/scipy/issues/3691
+    logical function test_fpknot_crash() result(success)
+       
+       integer(FP_SIZE) :: j,ierr
+       type(fitpack_curve) :: spline
+       real(FP_REAL), parameter :: x(*) = [(j, j=0,108)]
+       real(FP_REAL), parameter :: y(*) = [ &
+            0., 0., 0., 0., 0., 10.9, 0., 11., 0., &
+            0., 0., 10.9, 0., 0., 0., 0., 0., 0., &
+            10.9, 0., 0., 0., 11., 0., 0., 0., 10.9, &
+            0., 0., 0., 10.5, 0., 0., 0., 10.7, 0., &
+            0., 0., 11., 0., 0., 0., 0., 0., 0., &
+            10.9, 0., 0., 10.7, 0., 0., 0., 10.6, 0., &
+            0., 0., 10.5, 0., 0., 10.7, 0., 0., 10.5, &
+            0., 0., 11.5, 0., 0., 0., 10.7, 0., 0., &
+            10.7, 0., 0., 10.9, 0., 0., 10.8, 0., 0., &
+            0., 10.7, 0., 0., 10.6, 0., 0., 0., 10.4, &
+            0., 0., 10.6, 0., 0., 10.5, 0., 0., 0., &
+            10.7, 0., 0., 0., 10.4, 0., 0., 0., 10.8, 0. ]
+  
+       
+       ierr = spline%new_fit(x,y,order=1)
+       
+       success = FITPACK_SUCCESS(ierr)
+    
+    end function test_fpknot_crash
 
     ! Test parametric curve with constraints
     logical function test_constrained_curve(iunit) result(success)
@@ -1002,7 +1030,6 @@ module fitpack_curve_tests
 
         end do
 
-         900 format(a,*(1x,1pe12.3))
          800 format('[test_gridded_polar] spline value at (0,0) = ',f7.3,5x,'error = ',f7.3)
 
          935 format('[test_gridded_polar] error: mean = ',f9.3,'     max. abs. = ',f9.3)
@@ -1116,7 +1143,6 @@ module fitpack_curve_tests
 
         end do
 
-         900 format(a,*(1x,1pe12.3))
          800 format('[test_gridded_sphere] spline value at the poles =',2(1x,f7.3,5x))
 
          935 format('[test_gridded_sphere] error: mean = ',f9.3,'     max. abs. = ',f9.3)
@@ -1227,7 +1253,7 @@ module fitpack_curve_tests
     ! Simple linspace function
     pure function linspace(x1,x2,n)
        real(FP_REAL), intent(in) :: x1,x2
-       integer,     intent(in) :: n
+       integer,       intent(in) :: n
        real(FP_REAL), dimension(max(2,n)) :: linspace
 
        integer :: nx,i
