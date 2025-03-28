@@ -17,9 +17,13 @@ Class      | Description | Degree
 `fitpack_closed_curve` | Closed parametric 1D curves in N dimensions, $x_i = s_i(u)$, $i=1,\ldots,n$, $x_i(0)=x_i(1)$ | up to 5
 `fitpack_constrained_curve` | Parametric 1D curves in N dimensions with value/derivative constraints at the endpoints $x_i = s_i(u)$, $i=1,\ldots,n$, $x_{i}^{(j)}(0)=u_{L,i}^{(j)}$ , $x_{i}^{(j)}(1)=u_{R,i}^{(j)}$, $0\le j \le 2$| up to 5
 
-Here is an example from the `mncurf` 1D curve fitting test:
+Here is an example from the `mncurf` 1D generic curve fitting test:
 
 ![General Curve Fitting](media/mncurf.gif)
+
+This is an example from the parametric curve test `mnpara`: 
+
+![Parametric Curve Fitting](media/mnpara.gif)
 
 ### 2D Spline interpolators:
 
