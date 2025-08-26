@@ -83,12 +83,12 @@ class fpClosedCurve
         FP_FLAG interpolate()                         { return fitpack_closed_curve_c_interpolating(&cptr); }
 
         // Fit properties
-        const FP_SIZE degree   () { return fitpack_closed_curve_c_degree(&cptr); };
-        const FP_REAL smoothing() { return fitpack_closed_curve_c_smoothing(&cptr); };
-        const FP_REAL mse      () { return fitpack_closed_curve_c_mse(&cptr); };
-        const FP_SIZE ndim     () { return fitpack_closed_curve_c_idim(&cptr); };
-        const FP_REAL ubegin   () { return fitpack_closed_curve_c_ubegin(&cptr); };
-        const FP_REAL uend     () { return fitpack_closed_curve_c_uend(&cptr); };
+        FP_SIZE degree   () { return fitpack_closed_curve_c_degree(&cptr); };
+        FP_REAL smoothing() { return fitpack_closed_curve_c_smoothing(&cptr); };
+        FP_REAL mse      () { return fitpack_closed_curve_c_mse(&cptr); };
+        FP_SIZE ndim     () { return fitpack_closed_curve_c_idim(&cptr); };
+        FP_REAL ubegin   () { return fitpack_closed_curve_c_ubegin(&cptr); };
+        FP_REAL uend     () { return fitpack_closed_curve_c_uend(&cptr); };
 
         // Get value at u
         fpPoint eval(FP_REAL u, FP_FLAG* ierr=nullptr)
@@ -106,7 +106,7 @@ class fpClosedCurve
             fpPoint y1(fitpack_closed_curve_c_idim(&cptr),0.0);
             vector<fpPoint> y(u.size(),y1);
 
-            for (FP_SIZE i=0; i<u.size(); i++)
+            for (FP_SIZE i=0; i<static_cast<FP_SIZE>(u.size()); i++)
             {
                 y[i] = eval(u[i],&ierr0);
                 if (!FITPACK_SUCCESS_c(ierr0)) break;

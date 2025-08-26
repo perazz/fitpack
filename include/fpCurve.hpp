@@ -67,9 +67,9 @@ class fpCurve
         FP_FLAG interpolate(FP_SIZE order)            { return fitpack_curve_c_interpolating(&cptr,&order); }        
         
         // Fit properties
-        const FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
-        const FP_REAL smoothing() { return fitpack_curve_c_smoothing(&cptr); };
-        const FP_REAL mse      () { return fitpack_curve_c_mse(&cptr); };
+        FP_SIZE degree   () { return fitpack_curve_c_degree(&cptr); };
+        FP_REAL smoothing() { return fitpack_curve_c_smoothing(&cptr); };
+        FP_REAL mse      () { return fitpack_curve_c_mse(&cptr); };
 
         // Get value at x
         FP_REAL eval(FP_REAL x, FP_SIZE* ierr=nullptr)

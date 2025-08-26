@@ -256,7 +256,7 @@ inline vector<FP_REAL> flatten_2d_vector(const vector<fpPoint>& x2d) {
     for (const auto& p : x2d) ndim = std::max(ndim, static_cast<FP_SIZE>(p.size()));
 
     vector<FP_REAL> x(x2d.size() * ndim, 0.0);
-    for (FP_SIZE i = 0; i < x2d.size(); i++)
+    for (FP_SIZE i = 0; i < static_cast<FP_SIZE>(x2d.size()); i++)
         copy(x2d[i].begin(), x2d[i].end(), x.begin() + i * ndim);
 
     return x;
