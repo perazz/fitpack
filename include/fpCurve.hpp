@@ -133,12 +133,13 @@ class fpCurve
            return fitpack_curve_c_integral(&cptr, from, to);
         }
 
-        // Set or Get extrapolation behavior
+        // Set spline behavior outside the support
         void set_bc(FP_FLAG bc)
         {
            fitpack_curve_c_set_bc(&cptr, bc);
         }
 
+        // Get spline behavior outside the support
         FP_FLAG get_bc()
         {
            return fitpack_curve_c_get_bc(&cptr);

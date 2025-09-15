@@ -361,7 +361,7 @@ module fitpack_curves_c
 
      end function fitpack_curve_c_degree
 
-     !> Set extrapolation behavior outside interpolation domain
+     !> Set spline behavior outside the support
      subroutine fitpack_curve_c_set_bc(this, bc) bind(c,name='fitpack_curve_c_set_bc')
         type(fitpack_curve_c), intent(inout) :: this
         integer(FP_FLAG), intent(in), value :: bc
@@ -379,7 +379,7 @@ module fitpack_curves_c
 
      end subroutine fitpack_curve_c_set_bc
 
-     !> Get extrapolation behavior outside interpolation domain
+     !> Get spline behavior outside the support
      integer(FP_FLAG) function fitpack_curve_c_get_bc(this) bind(c,name='fitpack_curve_c_get_bc')
         type(fitpack_curve_c), intent(inout) :: this
 
