@@ -133,6 +133,17 @@ class fpCurve
            return fitpack_curve_c_integral(&cptr, from, to);
         }
 
+        // Set or Get extrapolation behavior
+        void set_bc(FP_FLAG bc)
+        {
+           fitpack_curve_c_set_bc(&cptr, bc);
+        }
+
+        FP_FLAG get_bc()
+        {
+           return fitpack_curve_c_get_bc(&cptr);
+        }
+
         // Get fourier coefficients
         FP_FLAG fourier(const vector<FP_REAL> &alpha,
                               vector<FP_REAL> &A, vector<FP_REAL> &B)

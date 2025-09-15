@@ -59,6 +59,8 @@ FP_FLAG  fitpack_curve_c_all_derivatives(fitpack_curve_c *self, FP_REAL x, FP_RE
 FP_REAL fitpack_curve_c_smoothing      (fitpack_curve_c *self);
 FP_REAL fitpack_curve_c_mse            (fitpack_curve_c *self);
 FP_SIZE  fitpack_curve_c_degree         (fitpack_curve_c *self);
+void    fitpack_curve_c_set_bc         (fitpack_curve_c *self, FP_FLAG bc);
+FP_FLAG fitpack_curve_c_get_bc         (fitpack_curve_c *self);
 
 #ifdef __cplusplus
 }
