@@ -18909,7 +18909,7 @@ module fitpack_core
     !> Expand communication buffer into 1D integer(FP_SIZE) allocatable array
     pure subroutine FP_SIZE_COMM_EXPAND_1D(array, buffer)
         integer(FP_SIZE), allocatable, intent(out) :: array(:)
-        real(FP_REAL), intent(in) :: buffer(:)
+        real(FP_COMM), intent(in) :: buffer(:)
 
         integer(FP_SIZE) :: bnd(2), ndoubles
         integer(FP_SIZE), parameter :: header = 1

@@ -651,18 +651,18 @@ module fitpack_curves
     !> Pack curve data into communication buffer
     pure subroutine curve_comm_pack(this, buffer)
         class(fitpack_curve), intent(in) :: this
-        real(FP_REAL), intent(out) :: buffer(:)
+        real(FP_COMM), intent(out) :: buffer(:)
 
         integer(FP_SIZE) :: pos, n
 
         ! Pack scalar integers as reals
-        buffer(1)  = real(this%m, FP_REAL)
-        buffer(2)  = real(this%order, FP_REAL)
-        buffer(3)  = real(this%knots, FP_REAL)
-        buffer(4)  = real(this%bc, FP_REAL)
-        buffer(5)  = real(this%iopt, FP_REAL)
-        buffer(6)  = real(this%nest, FP_REAL)
-        buffer(7)  = real(this%lwrk, FP_REAL)
+        buffer(1)  = real(this%m, FP_COMM)
+        buffer(2)  = real(this%order, FP_COMM)
+        buffer(3)  = real(this%knots, FP_COMM)
+        buffer(4)  = real(this%bc, FP_COMM)
+        buffer(5)  = real(this%iopt, FP_COMM)
+        buffer(6)  = real(this%nest, FP_COMM)
+        buffer(7)  = real(this%lwrk, FP_COMM)
         buffer(8)  = this%xleft
         buffer(9)  = this%xright
         buffer(10) = this%smoothing
@@ -685,7 +685,7 @@ module fitpack_curves
     !> Expand curve data from communication buffer
     pure subroutine curve_comm_expand(this, buffer)
         class(fitpack_curve), intent(inout) :: this
-        real(FP_REAL), intent(in) :: buffer(:)
+        real(FP_COMM), intent(in) :: buffer(:)
 
         integer(FP_SIZE) :: pos
 
