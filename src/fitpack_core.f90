@@ -19,7 +19,6 @@
 ! **************************************************************************************************
 module fitpack_core
     use iso_c_binding, only: c_double,c_int32_t,c_bool
-    use iso_fortran_env, only: real64, int32
     implicit none
     private
 
