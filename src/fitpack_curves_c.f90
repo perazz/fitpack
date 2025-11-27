@@ -24,7 +24,8 @@
 ! **************************************************************************************************
 module fitpack_curves_c
      use fitpack_curves, only: fitpack_curve
-     use fitpack_core, only: FP_SIZE, FP_REAL, FP_FLAG, FP_BOOL
+     use fitpack_core, only: FP_SIZE, FP_REAL, FP_FLAG, FP_BOOL, &
+                             OUTSIDE_EXTRAPOLATE, OUTSIDE_ZERO, OUTSIDE_NOT_ALLOWED, OUTSIDE_NEAREST_BND
      use, intrinsic :: iso_c_binding
      implicit none
      private
@@ -48,6 +49,8 @@ module fitpack_curves_c
      public :: fitpack_curve_c_smoothing
      public :: fitpack_curve_c_mse
      public :: fitpack_curve_c_degree
+     public :: fitpack_curve_c_set_bc
+     public :: fitpack_curve_c_get_bc
 
      !> Opaque-pointer C derived type
      type, public, bind(C) :: fitpack_curve_c
@@ -357,6 +360,37 @@ module fitpack_curves_c
         fitpack_curve_c_degree = fcurve%order
 
      end function fitpack_curve_c_degree
+
+     !> Set spline behavior outside the support
+     subroutine fitpack_curve_c_set_bc(this, bc) bind(c,name='fitpack_curve_c_set_bc')
+        type(fitpack_curve_c), intent(inout) :: this
+        integer(FP_FLAG), intent(in), value :: bc
+
+        type(fitpack_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_curve_c_pointer(this,fcurve)
+
+        !> Validate extrapolation behavior value
+        if (bc /= OUTSIDE_EXTRAPOLATE .and. bc /= OUTSIDE_ZERO .and. &
+            bc /= OUTSIDE_NOT_ALLOWED .and. bc /= OUTSIDE_NEAREST_BND) return
+
+        fcurve%bc = bc
+
+     end subroutine fitpack_curve_c_set_bc
+
+     !> Get spline behavior outside the support
+     integer(FP_FLAG) function fitpack_curve_c_get_bc(this) bind(c,name='fitpack_curve_c_get_bc')
+        type(fitpack_curve_c), intent(inout) :: this
+
+        type(fitpack_curve), pointer :: fcurve
+
+        !> Get object; allocate it in case
+        call fitpack_curve_c_pointer(this,fcurve)
+
+        fitpack_curve_c_get_bc = fcurve%bc
+
+     end function fitpack_curve_c_get_bc
 
 
 end module fitpack_curves_c
