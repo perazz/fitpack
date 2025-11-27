@@ -41,6 +41,7 @@ module fitpack_curve_tests
     public :: test_gridded_sphere
     public :: test_parametric_surface
     public :: test_fpknot_crash
+    public :: test_curve_comm_roundtrip
 
 
     contains
@@ -501,7 +502,7 @@ module fitpack_curve_tests
 
        success = .false.
 
-       ! Try f(x) = x3 Ð 3x2 + 2x = x(x Ð 1)(x Ð 2), with real roots x = 0, x = 1, and x = 2.
+       ! Try f(x) = x3 ï¿½ 3x2 + 2x = x(x ï¿½ 1)(x ï¿½ 2), with real roots x = 0, x = 1, and x = 2.
        x = linspace(-10.0_FP_REAL,10.0_FP_REAL,20)
        y = x**3-3*x**2+2*x
 
@@ -1243,6 +1244,99 @@ module fitpack_curve_tests
        1000  format('[test_parametric_surface] case ',i0,' failed with message: ',a)
 
     end function test_parametric_surface
+
+    !> Test that pack/expand round-trip preserves curve data
+    logical function test_curve_comm_roundtrip() result(success)
+
+        integer, parameter :: N = 50
+        type(fitpack_curve) :: curve1, curve2
+        real(FP_REAL) :: x(N), y(N), xtest(10), y1(10), y2(10)
+        real(FP_COMM), allocatable :: buffer(:)
+        integer(FP_SIZE) :: buf_size
+        integer :: ierr, i
+
+        success = .false.
+
+        ! Generate test data: a simple polynomial
+        x = linspace(zero, pi2, N)
+        y = sin(x) + half * cos(2 * x)
+
+        ! Create an interpolating curve
+        ierr = curve1%new_fit(x, y, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_curve_comm_roundtrip] error creating curve: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Get buffer size and allocate
+        buf_size = curve1%comm_size()
+        allocate(buffer(buf_size))
+
+        ! Pack curve into buffer
+        call curve1%comm_pack(buffer)
+
+        ! Expand buffer into new curve
+        call curve2%comm_expand(buffer)
+
+        ! Generate test points (different from fitting points)
+        xtest = linspace(0.1_FP_REAL, pi2 - 0.1_FP_REAL, 10)
+
+        ! Evaluate both curves
+        y1 = curve1%eval(xtest)
+        y2 = curve2%eval(xtest)
+
+        ! Check that evaluations match
+        if (maxval(abs(y1 - y2)) > epsilon(one)) then
+            print *, '[test_curve_comm_roundtrip] evaluation mismatch after round-trip'
+            print *, '  max difference: ', maxval(abs(y1 - y2))
+            return
+        end if
+
+        ! Check scalar members
+        if (curve1%m /= curve2%m) then
+            print *, '[test_curve_comm_roundtrip] m mismatch: ', curve1%m, ' vs ', curve2%m
+            return
+        end if
+        if (curve1%order /= curve2%order) then
+            print *, '[test_curve_comm_roundtrip] order mismatch'
+            return
+        end if
+        if (curve1%knots /= curve2%knots) then
+            print *, '[test_curve_comm_roundtrip] knots mismatch'
+            return
+        end if
+        if (abs(curve1%smoothing - curve2%smoothing) > epsilon(one)) then
+            print *, '[test_curve_comm_roundtrip] smoothing mismatch'
+            return
+        end if
+        if (abs(curve1%fp - curve2%fp) > epsilon(one)) then
+            print *, '[test_curve_comm_roundtrip] fp mismatch'
+            return
+        end if
+
+        ! Check array sizes match
+        if (size(curve1%t) /= size(curve2%t)) then
+            print *, '[test_curve_comm_roundtrip] t array size mismatch'
+            return
+        end if
+        if (size(curve1%c) /= size(curve2%c)) then
+            print *, '[test_curve_comm_roundtrip] c array size mismatch'
+            return
+        end if
+
+        ! Check knot and coefficient values
+        if (maxval(abs(curve1%t - curve2%t)) > epsilon(one)) then
+            print *, '[test_curve_comm_roundtrip] t values mismatch'
+            return
+        end if
+        if (maxval(abs(curve1%c - curve2%c)) > epsilon(one)) then
+            print *, '[test_curve_comm_roundtrip] c values mismatch'
+            return
+        end if
+
+        success = .true.
+
+    end function test_curve_comm_roundtrip
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)
