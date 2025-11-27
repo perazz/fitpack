@@ -18833,11 +18833,14 @@ module fitpack_core
         real(FP_REAL), allocatable, intent(in) :: array(:,:)
         real(FP_COMM), intent(out) :: buffer(:)
 
-        integer(FP_SIZE) :: bnd(2, 2), ndoubles, d
+        integer(FP_SIZE) :: bnd(2, 2), ndoubles
         integer(FP_SIZE), parameter :: header = 2
 
         if (allocated(array)) then
-            forall (d = 1:2) bnd(:, d) = [lbound(array, d, FP_SIZE), ubound(array, d, FP_SIZE)]
+            bnd(1, 1) = lbound(array, 1, FP_SIZE)
+            bnd(2, 1) = ubound(array, 1, FP_SIZE)
+            bnd(1, 2) = lbound(array, 2, FP_SIZE)
+            bnd(2, 2) = ubound(array, 2, FP_SIZE)
         else
             bnd = FP_NOT_ALLOC
         end if
