@@ -112,6 +112,11 @@ module fitpack_curves
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
 
+           !> Parallel communication interface (size/pack/expand)
+           procedure :: comm_size   => curve_comm_size
+           procedure :: comm_pack   => curve_comm_pack
+           procedure :: comm_expand => curve_comm_expand
+
     end type fitpack_curve
 
     !> Derived type describing a periodic curve. No changes are made to the storage,
@@ -617,5 +622,99 @@ module fitpack_curves
         call fitpack_error_handling(ier,ierr,'compute zeros')
 
     end function zeros
+
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION (size/pack/expand)
+    ! =================================================================================================
+
+    !> Return communication buffer size (number of FP_REAL elements)
+    !> This counts storage for all curve data needed to reconstruct the spline
+    pure integer(FP_SIZE) function curve_comm_size(this)
+        class(fitpack_curve), intent(in) :: this
+
+        ! Scalar integers: m, order, knots, bc, iopt, nest, lwrk (7 values)
+        ! Scalar reals: xleft, xright, smoothing, fp (4 values)
+        ! Use 11 FP_REAL slots for 11 scalar values
+        curve_comm_size = 11 &
+                        + FP_COMM_SIZE(this%x) &
+                        + FP_COMM_SIZE(this%y) &
+                        + FP_COMM_SIZE(this%sp) &
+                        + FP_COMM_SIZE(this%w) &
+                        + FP_COMM_SIZE(this%t) &
+                        + FP_COMM_SIZE(this%c) &
+                        + FP_COMM_SIZE(this%wrk) &
+                        + FP_COMM_SIZE(this%iwrk) &
+                        + FP_COMM_SIZE(this%wrk_fou)
+
+    end function curve_comm_size
+
+    !> Pack curve data into communication buffer
+    pure subroutine curve_comm_pack(this, buffer)
+        class(fitpack_curve), intent(in) :: this
+        real(FP_REAL), intent(out) :: buffer(:)
+
+        integer(FP_SIZE) :: pos, n
+
+        ! Pack scalar integers as reals
+        buffer(1)  = real(this%m, FP_REAL)
+        buffer(2)  = real(this%order, FP_REAL)
+        buffer(3)  = real(this%knots, FP_REAL)
+        buffer(4)  = real(this%bc, FP_REAL)
+        buffer(5)  = real(this%iopt, FP_REAL)
+        buffer(6)  = real(this%nest, FP_REAL)
+        buffer(7)  = real(this%lwrk, FP_REAL)
+        buffer(8)  = this%xleft
+        buffer(9)  = this%xright
+        buffer(10) = this%smoothing
+        buffer(11) = this%fp
+        pos = 12
+
+        ! Pack 1D real arrays using FP_COMM_PACK
+        call FP_COMM_PACK(this%x, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_PACK(this%y, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_PACK(this%sp, buffer(pos:));  pos = pos + FP_COMM_SIZE(this%sp)
+        call FP_COMM_PACK(this%w, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_PACK(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_PACK(this%c, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%c)
+        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_PACK(this%iwrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%iwrk)
+        call FP_COMM_PACK(this%wrk_fou, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk_fou)
+
+    end subroutine curve_comm_pack
+
+    !> Expand curve data from communication buffer
+    pure subroutine curve_comm_expand(this, buffer)
+        class(fitpack_curve), intent(inout) :: this
+        real(FP_REAL), intent(in) :: buffer(:)
+
+        integer(FP_SIZE) :: pos
+
+        ! Expand scalar integers
+        this%m     = nint(buffer(1), FP_SIZE)
+        this%order = nint(buffer(2), FP_SIZE)
+        this%knots = nint(buffer(3), FP_SIZE)
+        this%bc    = nint(buffer(4), FP_FLAG)
+        this%iopt  = nint(buffer(5), FP_SIZE)
+        this%nest  = nint(buffer(6), FP_SIZE)
+        this%lwrk  = nint(buffer(7), FP_SIZE)
+        this%xleft     = buffer(8)
+        this%xright    = buffer(9)
+        this%smoothing = buffer(10)
+        this%fp        = buffer(11)
+        pos = 12
+
+        ! Expand arrays using FP_COMM_EXPAND
+        ! After expand, FP_COMM_SIZE returns size based on new allocation
+        call FP_COMM_EXPAND(this%x, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_EXPAND(this%y, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_EXPAND(this%sp, buffer(pos:));      pos = pos + FP_COMM_SIZE(this%sp)
+        call FP_COMM_EXPAND(this%w, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_EXPAND(this%t, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_EXPAND(this%c, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%c)
+        call FP_COMM_EXPAND(this%wrk, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_EXPAND(this%iwrk, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%iwrk)
+        call FP_COMM_EXPAND(this%wrk_fou, buffer(pos:))
+
+    end subroutine curve_comm_expand
 
 end module fitpack_curves
