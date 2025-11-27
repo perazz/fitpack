@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_curves
     use fitpack_core
+    use ieee_arithmetic, only: ieee_value,ieee_quiet_nan
     implicit none
     private
 
@@ -85,8 +86,11 @@ module fitpack_curves
 
            !> Evaluate curve at given coordinates
            procedure, private :: curve_eval_one
+           procedure, private :: curve_eval_one_noerr
            procedure, private :: curve_eval_many
-           generic :: eval => curve_eval_one,curve_eval_many
+           procedure, private :: curve_eval_many_pure
+           generic :: eval => curve_eval_one,curve_eval_one_noerr, &
+                              curve_eval_many,curve_eval_many_pure
 
            !> Integrate
            procedure :: integral
@@ -226,9 +230,9 @@ module fitpack_curves
     end subroutine new_points
 
     real(FP_REAL) function curve_eval_one(this,x,ierr) result(y)
-        class(fitpack_curve), intent(inout)     :: this
-        real(FP_REAL),          intent(in)      :: x      ! Evaluation point
-        integer(FP_FLAG), optional, intent(out) :: ierr   ! Optional error flag
+        class(fitpack_curve), intent(inout) :: this
+        real(FP_REAL),        intent(in)    :: x      ! Evaluation point
+        integer(FP_FLAG),     intent(out)   :: ierr   ! Optional error flag
 
         real(FP_REAL) :: y1(1)
 
@@ -237,12 +241,22 @@ module fitpack_curves
 
     end function curve_eval_one
 
+    pure real(FP_REAL) function curve_eval_one_noerr(this,x) result(y)
+        class(fitpack_curve), intent(in) :: this
+        real(FP_REAL),        intent(in) :: x      ! Evaluation point
+
+        real(FP_REAL) :: y1(1)
+
+        y1 = curve_eval_many_pure(this,[x])
+        y  = y1(1)
+
+    end function curve_eval_one_noerr
 
     ! Curve evaluation driver
     function curve_eval_many(this,x,ierr) result(y)
-        class(fitpack_curve), intent(inout)  :: this
-        real(FP_REAL),          intent(in)     :: x(:)   ! Evaluation points
-        integer(FP_FLAG), optional, intent(out)    :: ierr   ! Optional error flag
+        class(fitpack_curve), intent(inout) :: this
+        real(FP_REAL),        intent(in)    :: x(:)   ! Evaluation points
+        integer(FP_FLAG),     intent(out)   :: ierr   ! Optional error flag
         real(FP_REAL) :: y(size(x))
 
         integer(FP_SIZE) :: npts
@@ -283,6 +297,52 @@ module fitpack_curves
         call fitpack_error_handling(ier,ierr,'evaluate 1d spline')
 
     end function curve_eval_many
+
+    ! Curve evaluation driver
+    pure function curve_eval_many_pure(this,x) result(y)
+        class(fitpack_curve), intent(in)  :: this
+        real(FP_REAL), intent(in) :: x(:)   ! Evaluation points
+        real(FP_REAL) :: y(size(x))
+
+        integer(FP_SIZE) :: npts
+        integer(FP_FLAG) :: ier
+
+        npts = size(x)
+
+        !  subroutine splev evaluates in a number of points x(i),i=1,2,...,m
+        !  a spline s(x) of degree k, given in its b-spline representation.
+        !
+        !  calling sequence:
+        !     call splev(t,n,c,k,x,y,m,e,ier)
+        !
+        !  input parameters:
+        !    t    : array,length n, which contains the position of the knots.
+        !    n    : integer, giving the total number of knots of s(x).
+        !    c    : array,length n, which contains the b-spline coefficients.
+        !    k    : integer, giving the degree of s(x).
+        !    x    : array,length m, which contains the points where s(x) must
+        !           be evaluated.
+        !    m    : integer, giving the number of points where s(x) must be
+        !           evaluated.
+        !    e    : integer, if 0 the spline is extrapolated from the end
+        !           spans for points not in the support, if 1 the spline
+        !           evaluates to zero for those points, if 2 ier is set to
+        !           1 and the subroutine returns, and if 3 the spline evaluates
+        !           to the value of the nearest boundary point.
+
+        call splev(t=this%t,&                      ! the position of the knots
+                   n=this%knots,&                  ! total number of knots of s(x)
+                   c=this%c,&                      ! the b-spline coefficients
+                   k=this%order,&                  ! the degree of s(x)
+                   x=x,m=npts,&                    ! the points where s(x) must be evaluated.
+                   y=y, &                          ! the predictions
+                   e=this%bc,           &          ! What to do outside mapped knot range
+                   ier=ier)
+
+        ! For the pure version, return NaNs on error
+        if (.not.FITPACK_SUCCESS(ier)) y = ieee_value(0.0_FP_REAL,ieee_quiet_nan)
+
+    end function curve_eval_many_pure
 
     ! Interpolating curve
     integer(FP_FLAG) function interpolating_curve(this,order) result(ierr)
