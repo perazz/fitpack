@@ -105,8 +105,9 @@ module fitpack_curves
            procedure, private :: curve_derivative
            procedure, private :: curve_derivatives
            procedure, private :: curve_all_derivatives
+           procedure, private :: curve_all_derivatives_pure
            generic   :: dfdx     => curve_derivative,curve_derivatives
-           generic   :: dfdx_all => curve_all_derivatives
+           generic   :: dfdx_all => curve_all_derivatives,curve_all_derivatives_pure
 
            !> Properties: MSE
            procedure, non_overridable :: mse => curve_error
@@ -423,11 +424,11 @@ module fitpack_curves
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present
     function curve_derivatives(this, x, order, ierr) result(ddx)
-       class(fitpack_curve), intent(inout)     :: this
-       real(FP_REAL),          intent(in)      :: x(:)   ! Evaluation point (scalar)
-       integer,              intent(in)        :: order  ! Derivative order. Default 1
-       integer(FP_FLAG), optional, intent(out) :: ierr  ! Optional error flag
-       real(FP_REAL), dimension(size(x))       :: ddx
+       class(fitpack_curve), intent(inout) :: this
+       real(FP_REAL),        intent(in)    :: x(:)   ! Evaluation point (scalar)
+       integer,              intent(in)    :: order  ! Derivative order. Default 1
+       integer(FP_FLAG), optional, intent(out)   :: ierr  ! Optional error flag
+       real(FP_REAL), dimension(size(x))   :: ddx
 
        integer(FP_SIZE) :: ddx_order,m
        integer(FP_FLAG) :: ierr0
@@ -436,7 +437,6 @@ module fitpack_curves
        ddx_order = max(0,order)
 
        ierr0 = FITPACK_OK
-
 
        m = size(x); if (m<=0) goto 1
 
@@ -458,14 +458,15 @@ module fitpack_curves
 
     end function curve_derivatives
 
+
     !> Evaluate ALL derivatives of the curve at points x
     !>              (j-1)
     !>      d(j) = s     (x) , j=1,2,...,k1
     !>  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
     function curve_all_derivatives(this, x, ierr) result(ddx)
-       class(fitpack_curve), intent(inout)     :: this
-       real(FP_REAL),          intent(in)      :: x   ! Evaluation point (scalar)
-       integer(FP_FLAG), optional, intent(out) :: ierr  ! Optional error flag
+       class(fitpack_curve), intent(inout) :: this
+       real(FP_REAL),        intent(in)    :: x   ! Evaluation point (scalar)
+       integer(FP_FLAG),     intent(out)   :: ierr  ! Optional error flag
        real(FP_REAL), dimension(this%order+1)  :: ddx
 
        integer(FP_FLAG) :: ierr0
@@ -486,13 +487,40 @@ module fitpack_curves
 
     end function curve_all_derivatives
 
+    !> Evaluate ALL derivatives of the curve at points x
+    !>              (j-1)
+    !>      d(j) = s     (x) , j=1,2,...,k1
+    !>  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
+    function curve_all_derivatives_pure(this, x) result(ddx)
+       class(fitpack_curve), intent(in)        :: this
+       real(FP_REAL),        intent(in)        :: x   ! Evaluation point (scalar)
+       real(FP_REAL), dimension(this%order+1)  :: ddx
+
+       integer(FP_FLAG) :: ierr0
+
+       ierr0 = FITPACK_OK
+
+       !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of
+       !  order nu of a spline s(x) of degree k, given in its b-spline representation.
+       call spalde(this%t,       & ! Position of the knots
+                   this%knots,   & ! Number of knots
+                   this%c,       & ! spline coefficients
+                   this%order+1, & ! spline order (=degree+1)
+                   x,            & ! Point where this should be evaluated
+                   ddx,          & ! Evaluated derivatives
+                   ierr0)        ! Output flag
+
+       if (.not.FITPACK_SUCCESS(ierr0)) ddx = ieee_value(0.0_FP_REAL,ieee_quiet_nan)
+
+    end function curve_all_derivatives_pure
+
     !> Evaluate k-th derivative of the curve at points x
     !> Use 1st derivative if order not present
     real(FP_REAL) function curve_derivative(this, x, order, ierr) result(ddx)
-       class(fitpack_curve), intent(inout)     :: this
-       real(FP_REAL),          intent(in)      :: x      ! Evaluation point (scalar)
-       integer,              intent(in)        :: order  ! Derivative order. Default 1
-       integer(FP_FLAG), optional, intent(out) :: ierr   ! Optional error flag
+       class(fitpack_curve), intent(inout) :: this
+       real(FP_REAL),        intent(in)    :: x      ! Evaluation point (scalar)
+       integer,              intent(in)    :: order  ! Derivative order. Default 1
+       integer(FP_FLAG), optional, intent(out)   :: ierr   ! Optional error flag
 
        real(FP_REAL) :: ddxa(1)
 
