@@ -9,13 +9,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        toolchain: 
+        toolchain:
           - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 10}
           - {compiler: gcc, version: 11}
           - {compiler: gcc, version: 12}
           - {compiler: gcc, version: 13}
           - {compiler: gcc, version: 14}
+          # - {compiler: gcc, version: 15}  # Not yet available on ubuntu-latest
           - {compiler: intel, version: '2023.2'}
           - {compiler: intel, version: '2024.0'}
           - {compiler: intel, version: '2025.0'}          

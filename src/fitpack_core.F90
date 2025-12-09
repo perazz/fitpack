@@ -166,7 +166,7 @@ module fitpack_core
 
     abstract interface
        ! Function defining the boundary of the curve approximation domain
-       pure real(FP_REAL) function fitpack_polar_boundary(theta) result(rad)
+       pure real(FP_REAL) function fitpack_polar_boundary(theta)
           import FP_REAL
           real(FP_REAL), intent(in) :: theta
        end function fitpack_polar_boundary
@@ -2018,7 +2018,17 @@ module fitpack_core
       !  ..array arguments..
       real(FP_REAL),    intent(in) :: tu(nu),tv(nv),c((nu-4)*(nv-4))
       !  ..user specified function
+#if defined(__GFORTRAN__) && __GNUC__ == 15
+      ! GCC 15 bug #120163: use inline interface instead of procedure(fitpack_polar_boundary)
+      interface
+         pure real(FP_REAL) function rad(theta)
+            import FP_REAL
+            real(FP_REAL), intent(in) :: theta
+         end function rad
+      end interface
+#else
       procedure(fitpack_polar_boundary) :: rad
+#endif
 
       !  ..local scalars..
       integer(FP_FLAG) :: ier
@@ -10131,7 +10141,17 @@ module fitpack_core
                                     cs(nvest),cosi(5,nvest),a(ncc,ib1),q(ncc,ib3),bu(nuest,5),bv(nvest,5),spu(m,4), &
                                     spv(m,4),h(ib3),wrk(lwrk)
       !  ..user supplied function..
+#if defined(__GFORTRAN__) && __GNUC__ == 15
+      ! GCC 15 bug #120163: use inline interface instead of procedure(fitpack_polar_boundary)
+      interface
+         pure real(FP_REAL) function rad(theta)
+            import FP_REAL
+            real(FP_REAL), intent(in) :: theta
+         end function rad
+      end interface
+#else
       procedure(fitpack_polar_boundary) :: rad
+#endif
       !  ..local scalars..
       real(FP_REAL) :: acc,arg,co,c1,c2,c3,c4,dmax,eps,fac,fac1,fac2,fpmax,fpms,f1,f2,f3,huj,p,pinv,piv,p1,p2,p3, &
                      r,ratio,si,sigma,sq,store,uu,u2,u3,wi,zi,rn
@@ -16297,7 +16317,17 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: iopt(3)
       integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
       !  ..user specified function
+#if defined(__GFORTRAN__) && __GNUC__ == 15
+      ! GCC 15 bug #120163: use inline interface instead of procedure(fitpack_polar_boundary)
+      interface
+         pure real(FP_REAL) function rad(theta)
+            import FP_REAL
+            real(FP_REAL), intent(in) :: theta
+         end function rad
+      end interface
+#else
       procedure(fitpack_polar_boundary) :: rad
+#endif
       !  ..local scalars..
       real(FP_REAL) :: dist,r
       integer(FP_SIZE) :: i,ib1,ib3,ki,kn,kwest,la,lbu,lcc,lcs,lro,lbv,lco,lf,lff,lfp,lh,lq,lsu,lsv,lwest,&
