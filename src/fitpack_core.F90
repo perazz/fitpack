@@ -2166,7 +2166,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
       real(FP_REAL) :: ak,fac
       !  ..local array..
-      real(FP_REAL) :: h(20)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..
       lk = l-k1
       do i=1,k1
@@ -3039,7 +3039,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                           nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6),xi(MAX_IDIM)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_5+2),h2(DEGREE_5+1),xi(MAX_IDIM)
       logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
@@ -5499,7 +5499,7 @@ module fitpack_core
       real(FP_REAL) :: an,fac,prod
       integer(FP_SIZE) :: i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
       !  ..local array..
-      real(FP_REAL) :: h(12)
+      real(FP_REAL) :: h(2*(DEGREE_5+1))
       !  ..
       k1    = k2-1
       k     = k1-1
@@ -5726,7 +5726,7 @@ module fitpack_core
                  numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
 
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  let
       !               |   (spu)    |            |   (spv)    |
@@ -6928,7 +6928,7 @@ module fitpack_core
                  j0,j1,k,k1,l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number, &
                  numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  let
       !               |     (spu)      |            |     (spv)      |
@@ -7603,7 +7603,7 @@ module fitpack_core
       logical(FP_BOOL) :: lmin
       real(FP_REAL) :: a,ak,arg,b,f
       !  ..local arrays..
-      real(FP_REAL) aint(6),h(MAX_ORDER+1),h1(6)
+      real(FP_REAL) aint(DEGREE_5+1),h(MAX_ORDER+1),h1(DEGREE_5+1)
 
       integer(FP_SIZE), parameter :: nit = 2 ! number of iterations
 
@@ -9041,7 +9041,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_5+2),h2(DEGREE_5+1)
       logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
@@ -14031,7 +14031,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,irot,it,ii,i2,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
       integer(FP_SIZE) :: ij,jk,jper,l0,l1,ik
       !  ..local arrays..
-      real(FP_REAL) :: h(5),h1(5),h2(4)
+      real(FP_REAL) :: h(DEGREE_3+2),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  ..
       pinv = merge(one/p,one,p>zero)
