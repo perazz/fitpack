@@ -2657,10 +2657,8 @@ module fitpack_core
         arg = x(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-        do while (.not.(arg<tx(l1) .or. l==nkx1))
-          l = l1
-          l1 = l+1
-        end do
+        l = fp_knot_interval(tx, arg, l, nkx1)
+        l1 = l + 1
         h = fpbspl(tx,nx,kx,arg,l)
         lx(i) = l-kx1
         wx(i,1:kx1) = h(1:kx1)
@@ -2677,10 +2675,8 @@ module fitpack_core
         arg = y(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-        do while (.not.(arg<ty(l1) .or. l==nky1))
-          l  = l1
-          l1 = l+1
-        end do
+        l = fp_knot_interval(ty, arg, l, nky1)
+        l1 = l + 1
         h = fpbspl(ty,ny,ky,arg,l)
         ly(i) = l-ky1
         wy(i,1:ky1) = h(1:ky1)
@@ -5730,15 +5726,13 @@ module fitpack_core
 
           do it=1,mu
             arg = u(it)
-            do while (.not.(arg<tu(l1) .or. l==nu4))
-               l  = l1
-               l1 = l+1
-               number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tu, arg, l, nu4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
-
           end do
           ifsu = 1
 
@@ -5753,11 +5747,10 @@ module fitpack_core
           number = 0
           do it=1,mv
              arg = v(it)
-             do while (.not.(arg<tv(l1) .or. l==nv4))
-                l = l1
-                l1 = l+1
-                number = number+1
-             end do
+             l0 = l
+             l = fp_knot_interval(tv, arg, l, nv4)
+             number = number + (l - l0)
+             l1 = l + 1
              h = fpbspl(tv,nv,DEGREE_3,arg,l)
              spv(it,1:4) = h(1:4)
              nrv(it) = number
@@ -6936,11 +6929,10 @@ module fitpack_core
           number = 0
           do it=1,mu
             arg = u(it)
-            do while (.not.(arg<tu(l1) .or. l==nu4))
-                l = l1
-                l1 = l+1
-                number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tu, arg, l, nu4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
@@ -6958,11 +6950,10 @@ module fitpack_core
           number = 0
           do it=1,mv
             arg = v(it)
-            do while (.not.(arg<tv(l1) .or. l==nv4))
-                l = l1
-                l1 = l+1
-                number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tv, arg, l, nv4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tv,nv,DEGREE_3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
@@ -7585,10 +7576,8 @@ module fitpack_core
       ia  = 0
       iterations: do it=1,nit
       !  search for the knot interval t(l) <= arg < t(l+1).
-        do while (.not.(arg<t(l0) .or. l==nk1))
-           l  = l0
-           l0 = l+1
-        end do
+        l = fp_knot_interval(t, arg, l, nk1)
+        l0 = l + 1
       !  calculation of aint(j), j=1,2,...,k+1.
       !  initialization.
         aint(1)  = (arg-t(l))/(t(l+1)-t(l))
@@ -8167,19 +8156,11 @@ module fitpack_core
       points: do im=1,m
          xi = x(im)
          yi = y(im)
-         l = kx1
-         l1 = l+1
-         do while (.not.(xi<tx(l1) .or. l==nk1x))
-            l = l1
-            l1 = l+1
-         end do
+         l = fp_knot_interval(tx, xi, kx1, nk1x)
+         l1 = l + 1
 
-         k = ky1
-         k1 = k+1
-         do while (.not.(yi<ty(k1) .or. k==nk1y))
-            k = k1
-            k1 = k+1
-         end do
+         k = fp_knot_interval(ty, yi, ky1, nk1y)
+         k1 = k + 1
          num = (l-kx1)*nyy+k-ky
          nummer(im) = index(num)
          index(num) = im
@@ -13069,13 +13050,10 @@ module fitpack_core
       tb = tu(4)
       te = tu(nu4+1)
       l  = 4
-      l1 = l+1
       do i=1,mu
         arg = min(max(tb,u(i)),te)
-        do while (.not.(arg<tu(l1) .or. l==nu4))
-           l = l1
-           l1 = l+1
-        end do
+        l = fp_knot_interval(tu, arg, l, nu4)
+        l1 = l + 1
         h = fpbspl(tu,nu,DEGREE_3,arg,l)
         lu(i) = l-4
         wu(i,1:4) = h(1:4)
@@ -13086,13 +13064,10 @@ module fitpack_core
       tb = tv(4)
       te = tv(nv4+1)
       l = 4
-      l1 = l+1
       do i=1,mv
          arg = min(max(v(i),tb),te)
-         do while (.not.(arg<tv(l1) .or. l==nv4))
-           l = l1
-           l1 = l+1
-         end do
+         l = fp_knot_interval(tv, arg, l, nv4)
+         l1 = l + 1
          h = fpbspl(tv,nv,DEGREE_3,arg,l)
          lv(i) = l-4
          wv(i,1:4) = h(1:4)
