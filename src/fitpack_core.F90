@@ -2736,8 +2736,8 @@ module fitpack_core
 
 
       !> Find knot interval index l such that t(l) <= x < t(l+1).
-      !> Uses linear search starting from l_start, stopping at l_max.
-      !> This is a utility function to replace the repeated pattern:
+      !> Uses hybrid search: linear for small ranges, binary for large.
+      !> This replaces the repeated pattern:
       !>   do while (x >= t(l+1) .and. l /= l_max)
       !>       l = l + 1
       !>   end do
@@ -2748,10 +2748,40 @@ module fitpack_core
           integer(FP_SIZE), intent(in) :: l_max
           integer(FP_SIZE) :: l
 
-          l = l_start
-          do while (x >= t(l+1) .and. l < l_max)
-              l = l + 1
+          integer(FP_SIZE), parameter :: LINEAR_THRESHOLD = 8
+          integer(FP_SIZE) :: lo, hi, mid
+
+          ! For small ranges, use linear search (also optimal for warm starts)
+          if (l_max - l_start <= LINEAR_THRESHOLD) then
+              l = l_start
+              do while (x >= t(l+1) .and. l < l_max)
+                  l = l + 1
+              end do
+              return
+          end if
+
+          ! Handle boundary cases
+          if (x < t(l_start+1)) then
+              l = l_start
+              return
+          end if
+          if (x >= t(l_max)) then
+              l = l_max
+              return
+          end if
+
+          ! Binary search: find largest l such that t(l+1) <= x, then l is the interval
+          lo = l_start
+          hi = l_max
+          do while (hi > lo)
+              mid = (lo + hi) / 2
+              if (t(mid+1) <= x) then
+                  lo = mid + 1
+              else
+                  hi = mid
+              end if
           end do
+          l = lo
       end function fp_knot_interval
 
 
