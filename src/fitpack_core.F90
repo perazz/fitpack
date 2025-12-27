@@ -4988,23 +4988,7 @@ module fitpack_core
             h(:k1) = wi*h(:k1)
 
             ! rotate the new row of the observation matrix into triangle.
-            j = l-k1
-            rotate_row: do i=1,k1
-
-                j = j+1
-
-                piv = h(i); if (equal(piv,zero)) cycle rotate_row
-
-                ! calculate the parameters of the givens transformation.
-                call fpgivs(piv,a(j,1),cos,sin)
-
-                ! transformations to right hand side.
-                call fprota(cos,sin,yi,z(j))
-
-                ! transformations to left hand side.
-                if (i<k1) call fprota(cos,sin,h(i+1:k1),a(j,2:k1-i+1))
-
-            end do rotate_row
+            call fp_rotate_row(h, k1, a, yi, z, l-k1)
 
             !  add contribution of this row to the sum of squares of residual
             !  right hand sides.
@@ -5663,6 +5647,55 @@ module fitpack_core
           ww  = dd
           return
       end subroutine fpgivs
+
+
+      !> Rotate a row h(1:band) into upper triangular matrix A using Givens rotations.
+      !> Also applies the same rotations to scalar RHS value yi and vector z.
+      !>
+      !> This extracts the common pattern:
+      !>   j = j_start
+      !>   do i = 1, band
+      !>       j = j + 1
+      !>       piv = h(i); if (equal(piv,zero)) cycle
+      !>       call fpgivs(piv, a(j,1), cos, sin)
+      !>       call fprota(cos, sin, yi, z(j))
+      !>       if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
+      !>   end do
+      !>
+      !> Arguments:
+      !>   h       - Row to rotate, h(1:band). Modified in place.
+      !>   band    - Number of elements in row (typically k+1)
+      !>   a       - Upper triangular matrix. a(j,1) is diagonal, a(j,2:) is upper.
+      !>   yi      - Scalar RHS contribution. Modified in place.
+      !>   z       - RHS vector. z(j_start+1:j_start+band) modified.
+      !>   j_start - Starting row index minus 1 (j increments before use)
+      pure subroutine fp_rotate_row(h, band, a, yi, z, j_start)
+          real(FP_REAL),    intent(inout) :: h(:)
+          integer(FP_SIZE), intent(in)    :: band
+          real(FP_REAL),    intent(inout) :: a(:,:)
+          real(FP_REAL),    intent(inout) :: yi
+          real(FP_REAL),    intent(inout) :: z(:)
+          integer(FP_SIZE), intent(in)    :: j_start
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i, j
+
+          j = j_start
+          do i = 1, band
+              j = j + 1
+              piv = h(i)
+              if (equal(piv, zero)) cycle
+
+              ! Calculate parameters of Givens transformation
+              call fpgivs(piv, a(j,1), cos, sin)
+
+              ! Apply to right hand side
+              call fprota(cos, sin, yi, z(j))
+
+              ! Apply to remaining row elements and matrix
+              if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
+          end do
+      end subroutine fp_rotate_row
 
 
       ! Compute spline coefficients on a rectangular grid
