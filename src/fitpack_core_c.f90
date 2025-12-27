@@ -277,8 +277,15 @@ module fitpack_core_c
           integer(FP_SIZE), intent(in)        :: iopt(3)
           integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
           procedure(fitpack_polar_boundary), pointer :: frad
-          
+
           call c_f_procpointer(rad,frad)
+
+          ! Check for null function pointer
+          if (.not.associated(frad)) then
+              ier = FITPACK_INPUT_ERROR
+              return
+          end if
+
           call polar(iopt,m,x,y,z,w,frad,s,nuest,nvest,eps,nu,tu,nv,tv,u,v,c,&
                               fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
 

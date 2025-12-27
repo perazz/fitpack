@@ -34,6 +34,7 @@ module fitpack_curve_tests
     public :: test_parametric_fit
     public :: test_closed_fit
     public :: test_polar_fit
+    public :: test_polar_boundary
     public :: test_sphere_fit
     public :: test_gridded_fit
     public :: test_constrained_curve
@@ -736,6 +737,88 @@ module fitpack_curve_tests
           end function rad2_ellipsoid
 
     end function test_polar_fit
+
+    ! Test polar fitting with various boundary shapes
+    ! This specifically tests the abstract interface fitpack_polar_boundary
+    logical function test_polar_boundary(iunit) result(success)
+       integer, optional, intent(in) :: iunit
+
+       type(fitpack_polar) :: polar
+       integer :: useUnit, ierr, m
+       real(FP_REAL), allocatable :: theta(:), r(:), x(:), y(:), z(:), w(:), f(:)
+       real(FP_REAL) :: avg, ermax
+
+       success = .true.
+       useUnit = output_unit; if (present(iunit)) useUnit = iunit
+
+       ! Generate test points inside a cardioid: r = 0.5*(1 + cos(theta))
+       m = 100
+       theta = linspace(zero, pi2, m)
+       r     = 0.4_FP_REAL * (one + cos(theta)) * linspace(0.3_FP_REAL, one, m)
+       x     = r * cos(theta)
+       y     = r * sin(theta)
+       z     = test_func(x, y)
+       w     = [(one, ierr=1,m)]
+
+       ! Test 1: Cardioid boundary
+       ierr = polar%new_fit(x, y, z, cardioid, w, smoothing=0.1_FP_REAL)
+       if (.not.FITPACK_SUCCESS(ierr)) then
+           success = .false.
+           write(useUnit, 1000) 'cardioid', FITPACK_MESSAGE(ierr)
+       else
+           f = polar%eval(x, y, ierr)
+           if (FITPACK_SUCCESS(ierr)) then
+               avg   = sum(abs(f - z)) / m
+               ermax = maxval(abs(f - z))
+               write(useUnit, 920) 'cardioid', polar%smoothing, avg, ermax
+           end if
+       end if
+
+       ! Generate test points inside a 3-petal rose: r = |cos(3*theta)|
+       theta = linspace(zero, pi, m)
+       r     = abs(cos(three * theta)) * linspace(0.3_FP_REAL, 0.9_FP_REAL, m)
+       x     = r * cos(theta)
+       y     = r * sin(theta)
+       z     = test_func(x, y)
+
+       ! Test 2: Rose curve boundary (use higher smoothing to avoid too many knots)
+       ierr = polar%new_fit(x, y, z, rose_3petal, w, smoothing=1.0_FP_REAL)
+       if (.not.FITPACK_SUCCESS(ierr)) then
+           success = .false.
+           write(useUnit, 1000) 'rose', FITPACK_MESSAGE(ierr)
+       else
+           f = polar%eval(x, y, ierr)
+           if (FITPACK_SUCCESS(ierr)) then
+               avg   = sum(abs(f - z)) / m
+               ermax = maxval(abs(f - z))
+               write(useUnit, 920) 'rose', polar%smoothing, avg, ermax
+           end if
+       end if
+
+        920 format('[test_polar_boundary] ',a,': s=',f7.3,', mean error = ',f7.4,5x,'max. error = ',f7.4)
+       1000 format('[test_polar_boundary] ',a,' domain failed: ',a)
+
+    contains
+
+       ! Test function
+       elemental real(FP_REAL) function test_func(x, y)
+           real(FP_REAL), intent(in) :: x, y
+           test_func = sin(pi * x) * cos(pi * y)
+       end function test_func
+
+       ! Cardioid: r = 0.5*(1 + cos(theta))
+       pure real(FP_REAL) function cardioid(theta)
+           real(FP_REAL), intent(in) :: theta
+           cardioid = half * (one + cos(theta))
+       end function cardioid
+
+       ! 3-petal rose: r = |cos(3*theta)|
+       pure real(FP_REAL) function rose_3petal(theta)
+           real(FP_REAL), intent(in) :: theta
+           rose_3petal = max(abs(cos(three * theta)), 0.1_FP_REAL)
+       end function rose_3petal
+
+    end function test_polar_boundary
 
     logical function test_sphere_fit(iunit) result(success)
        integer, optional, intent(in) :: iunit
