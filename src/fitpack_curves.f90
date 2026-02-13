@@ -397,7 +397,7 @@ module fitpack_curves
                               curve%nest,curve%knots,curve%t,  &  ! spline output
                               curve%c,curve%fp,                &  ! spline output
                               curve%wrk,curve%lwrk,curve%iwrk, &  ! memory
-                              ierr)                           ! Error flag
+                              ierr)                               ! Error flag
 
                class default
 
@@ -409,7 +409,7 @@ module fitpack_curves
                               curve%nest,curve%knots,curve%t,  &  ! spline output
                               curve%c,curve%fp,                &  ! spline output
                               curve%wrk,curve%lwrk,curve%iwrk, &  ! memory
-                              ierr)                           ! Error flag
+                              ierr)                               ! Error flag
 
             end select
 
@@ -629,7 +629,7 @@ module fitpack_curves
 
     !> Return communication buffer size (number of FP_REAL elements)
     !> This counts storage for all curve data needed to reconstruct the spline
-    pure integer(FP_SIZE) function curve_comm_size(this)
+    elemental integer(FP_SIZE) function curve_comm_size(this)
         class(fitpack_curve), intent(in) :: this
 
         ! Scalar integers: m, order, knots, bc, iopt, nest, lwrk (7 values)
