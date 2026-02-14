@@ -32,54 +32,40 @@ in `docs/book/` and papers in `docs/papers/`.
 
 **Changes**: Added `fp_rotate_row` subroutine; replaced 1 occurrence in `fpcurf`
 
+### PR 4: Complete Variant A Givens Rotations (DONE)
+
+**Changes**: Replaced all ~15 scalar-RHS rotation patterns with `fp_rotate_row`
+in `fpcurf`, `fpcons`, `fppara`, `fprank`
+
+### PR 5: Variant B Standard Givens Rotations (DONE)
+
+**Changes**: Added `fp_rotate_row_vec` subroutine for vector-RHS rotations
+with explicit-shape arrays `h(band)`, `a(nest,*)`, `xi(idim)`, `z(n,idim)`.
+Replaced 3 standard Variant B call sites in `fpclos`, `fpcons`, `fppara`.
+Removed unused variables `i1`, `i3` from `fpcons` and `fppara`.
+
 ---
 
 ## Remaining Plan
 
-Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 8) can
+Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 9) can
 proceed in parallel with any code PR.
 
-### PR 4: Complete Variant A Givens Rotations
+### PR 6: Variant B/C Shifting-Pivot Givens Rotations
 
-**Scope**: Replace all scalar-RHS rotation patterns with `fp_rotate_row`
-**Occurrences**: ~15 locations in `fpcurf`, `fpcons`, `fppara`, `fprank`
-**Difficulty**: Low — mechanical replacement, same signature as existing helper
-**Variant pattern**:
-```fortran
-do i=1,k1
-    j = j+1
-    piv = h(i); if (equal(piv,zero)) cycle
-    call fpgivs(piv,a(j,1),cos,sin)
-    call fprota(cos,sin,yi,z(j))
-    if (i<k1) call fprota(cos,sin,h(i+1:k1),a(j,2:k1-i+1))
-end do
-```
-**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variant A
+**Scope**: Shifting-pivot and two-matrix periodic rotation variants
+**New routines**: `fp_rotate_row_2mat` (two-matrix rotation for periodic splines),
+possibly `fp_rotate_shifted_vec` (single-matrix with pivot shift)
+**Remaining occurrences** (4 sites, all use shifting-pivot pattern `h(1:n) = [h(2:n), zero]`):
 
----
+| Site | Routine | Pattern | Notes |
+|------|---------|---------|-------|
+| 1 | fpclos | two-matrix (a1,a2) + shift + vec z | Variant C |
+| 2 | fpclos | two-matrix (g1,g2) + shift + vec c | Variant C |
+| 3 | fpcons | single-matrix (g) + shift + vec c | could use `fp_rotate_shifted_vec` |
+| 4 | fppara | single-matrix (g) + shift + vec c | could use `fp_rotate_shifted_vec` |
 
-### PR 5: Reshape Array Indexing in `fpcurf`
-
-**Scope**: Clean up 1D array stride patterns in the main curve fitting routine
-**Goal**: Make band matrix access and multi-dimensional RHS indexing explicit,
-preparing the ground for cleaner Variant B/C/D rotation replacements
-**Difficulty**: Medium — requires careful index verification
-**Key patterns to address**:
-- Strided RHS access: `z(j:j+(idim-1)*n:n)` → clearer views
-- Any remaining manual offset arithmetic for band matrix columns
-
-**Book references**: Ch. 4 Fig. 4.2 (band structure of E and R₁),
-Ch. 5 Fig. 5.1 (band structure of P and R₁*)
-
----
-
-### PR 6: Variant B/C Givens Rotations
-
-**Scope**: Vector RHS and two-matrix periodic variants
-**New routines**: `fp_rotate_row_vec` (vector RHS with stride),
-`fp_rotate_row_2mat` (two-matrix rotation for periodic splines)
-**Occurrences**: ~15 locations in `fpclos`, `fpcons`, `fppara`, `fpperi`
-**Difficulty**: Medium — strided access and secondary matrix add complexity
+**Difficulty**: Medium — shifting pivot and secondary matrix add complexity
 **See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variants B & C
 
 ---
