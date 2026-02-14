@@ -5737,6 +5737,97 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_2mat
 
+      !> Standard-walk Givens rotation with contiguous-block RHS.
+      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
+      !> transformations to right(1:nrhs) and the column q(1:nrhs, irot) of a 2D
+      !> RHS matrix. Used by AX/AUU grid triangularization (fpgrre, fpgrdi, fpgrsp).
+      !>
+      !> Book ref: §10.2 Eq. 10.4-10.8 (Kronecker product decomposition).
+      pure subroutine fp_rotate_row_block(h, band, a, na, right, q, nrhs, irot_start)
+          integer(FP_SIZE), intent(in)    :: band, na, nrhs, irot_start
+          real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), q(nrhs,*)
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i, irot
+
+          irot = irot_start
+          do i = 1, band
+              irot = irot + 1
+              piv = h(i)
+              if (equal(piv, zero)) cycle
+              call fpgivs(piv, a(irot,1), cos, sin)
+              call fprota(cos, sin, right(1:nrhs), q(1:nrhs, irot))
+              if (i < band) call fprota(cos, sin, h(i+1:band), a(irot, 2:band-i+1))
+          end do
+      end subroutine fp_rotate_row_block
+
+      !> Standard-walk Givens rotation with stride (row-access) RHS.
+      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
+      !> transformations to right(1:nrhs) and the row c(irot, 1:nrhs) of a 2D
+      !> RHS matrix c(ldc,*). Used by AY/AVV grid rotations and tensor-product
+      !> triangularization (fpgrre, fpgrdi, fpgrsp, fptrnp, fptrpe).
+      !>
+      !> Book ref: §10.2 Eq. 10.4-10.8 (grid), §10.2 Eq. 10.8 (tensor product).
+      pure subroutine fp_rotate_row_stride(h, band, a, na, right, c, ldc, nrhs, irot_start)
+          integer(FP_SIZE), intent(in)    :: band, na, ldc, nrhs, irot_start
+          real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), c(ldc,*)
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i, irot
+
+          irot = irot_start
+          do i = 1, band
+              irot = irot + 1
+              piv = h(i)
+              if (equal(piv, zero)) cycle
+              call fpgivs(piv, a(irot,1), cos, sin)
+              call fprota(cos, sin, right(1:nrhs), c(irot, 1:nrhs))
+              if (i < band) call fprota(cos, sin, h(i+1:band), a(irot, 2:band-i+1))
+          end do
+      end subroutine fp_rotate_row_stride
+
+      !> Two-matrix shifted-pivot Givens rotation with stride (row-access) RHS.
+      !> Rotates h1 through a1 (shifting left) and h2 through a2, applying the same
+      !> transformations to right(1:nrhs) and the row c(j, 1:nrhs).
+      !> Used by AVV periodic grid rotations and periodic tensor-product triangularization
+      !> (fpgrdi, fpgrsp, fptrpe).
+      !>
+      !> Book ref: §10.2 Eq. 10.4-10.8, §6.1 Eq. 6.10 (periodic system).
+      pure subroutine fp_rotate_2mat_stride(h1, band1, h2, band2, a1, a2, na, &
+                                             right, c, ldc, nrhs, j1_start, j1_end)
+          integer(FP_SIZE), intent(in)    :: band1, band2, na, ldc, nrhs, j1_start, j1_end
+          real(FP_REAL),    intent(inout) :: h1(band1), h2(band2)
+          real(FP_REAL),    intent(inout) :: a1(na,*), a2(na,*)
+          real(FP_REAL),    intent(inout) :: right(nrhs), c(ldc,*)
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i2, ij, j
+
+          ! Phase 1: rotate h1 through a1 with shifting, cross-rotating h2/a2
+          do j = j1_start, j1_end
+              piv = h1(1)
+              i2 = min(j1_end - j, band1 - 1)
+              if (not_equal(piv, zero)) then
+                  call fpgivs(piv, a1(j,1), cos, sin)
+                  call fprota(cos, sin, right(1:nrhs), c(j, 1:nrhs))
+                  call fprota(cos, sin, h2(1:band2), a2(j, 1:band2))
+                  if (i2 > 0) call fprota(cos, sin, h1(2:i2+1), a1(j, 2:i2+1))
+              endif
+              h1(1:i2+1) = [h1(2:i2+1), zero]
+          end do
+
+          ! Phase 2: rotate h2 through a2 (diagonal at a2(ij,j))
+          do j = 1, band2
+              ij = j1_end + j
+              if (ij <= 0) cycle
+              piv = h2(j)
+              if (equal(piv, zero)) cycle
+              call fpgivs(piv, a2(ij,j), cos, sin)
+              call fprota(cos, sin, right(1:nrhs), c(ij, 1:nrhs))
+              if (j < band2) call fprota(cos, sin, h2(j+1:band2), a2(ij, j+1:band2))
+          end do
+      end subroutine fp_rotate_2mat_stride
+
       ! Compute spline coefficients on a rectangular grid
       pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v, &
                              mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
@@ -5758,9 +5849,9 @@ module fitpack_core
                                     aa(2,mv),bb(2,nv),c(nc),cc(nv),q(mvnu)
       integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
-      real(FP_REAL) :: arg,co,dz1,dz2,dz3,fac,fac0,pinv,piv,si,term
+      real(FP_REAL) :: arg,dz1,dz2,dz3,fac,fac0,pinv,term
 
-      integer(FP_SIZE) :: i,ic,ii,ij,ik,iq,irot,it,iz,i0,i1,i2,i3,j,jk,jper,j0,k,k1,&
+      integer(FP_SIZE) :: i,ii,ij,ik,irot,it,iz,i0,i1,i2,j,jk,jper,j0,k,k1,&
                  l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number,numu,numu1,numv,&
                  numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
 
@@ -5977,26 +6068,7 @@ module fitpack_core
             irot = max(0,nrold-iop0-1)
 
             ! rotate the new row of matrix (auu) into triangle.
-            rotate_auu: do i=i0,i1
-               irot = irot+1
-               piv = h(i)
-               if (not_equal(piv,zero)) then
-                  ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,au(irot,1),co,si)
-                  ! apply that transformation to the rows of matrix (qq).
-                  iq = (irot-1)*mvv
-                  call fprota(co,si,right(1:mvv),q(iq+1:iq+mvv))
-
-                  ! apply that transformation to the columns of (auu).
-                  if (i==i1) cycle rotate_auu
-                  i2 = 1
-                  i3 = i+1
-                  do j=i3,i1
-                     i2 = i2+1
-                     call fprota(co,si,h(j),au(irot,i2))
-                  end do
-               endif
-            end do rotate_auu
+            if (i0<=i1) call fp_rotate_row_block(h(i0), i1-i0+1, au, nu, right, q, mvv, irot)
 
             ! we update the sum of squared residuals
             sq = sq+sum(right(:mvv)**2)
@@ -6097,90 +6169,14 @@ module fitpack_core
              end do
 
              ! rotate the new row of (avv) into triangle.
-             if (nv11>0) then
-                ! rotations with the rows 1,2,...,nv11 of (avv).
-                avv_rot: do j=1,nv11
-                   piv = h1(1)
-                   i2 = min(nv11-j,4)
-
-                   if (not_equal(piv,zero)) then
-
-                      ! calculate the parameters of the givens transformation.
-                      call fpgivs(piv,av1(j,1),co,si)
-
-                      ! apply that transformation to the columns of matrix g.
-                      ic = j
-                      do i=1,nuu
-                         call fprota(co,si,right(i),c(ic))
-                         ic = ic+nv7
-                      end do
-
-                      ! apply that transformation to the rows of (avv) with respect to av2.
-                      call fprota(co,si,h2(1:4),av2(j,1:4))
-
-                      ! apply that transformation to the rows of (avv) with respect to av1.
-                      if(i2==0) exit avv_rot
-
-                      call fprota(co,si,h1(2:i2+1),av1(j,2:i2+1))
-                   endif
-
-                   h1(1:i2+1) = [h1(2:i2+1),zero]
-
-                end do avv_rot
-             endif
-
-             ! rotations with the rows nv11+1,...,nv7 of avv.
-             avv_rot2: do j=1,4
-                ij  = nv11+j
-                piv = h2(j)
-                if (ij>0 .and. not_equal(piv,zero)) then
-
-                   ! calculate the parameters of the givens transformation.
-                   call fpgivs(piv,av2(ij,j),co,si)
-
-                   ! apply that transformation to the columns of matrix g.
-                   ic = ij
-                   do i=1,nuu
-                      call fprota(co,si,right(i),c(ic))
-                      ic = ic+nv7
-                   end do
-
-                   ! apply that transformation to the rows of (avv) with respect to av2.
-                   if (j<4) call fprota(co,si,h2(j+1:4),av2(ij,j+1:4))
-
-                endif
-             end do avv_rot2
+             call fp_rotate_2mat_stride(h1, 5, h2, 4, av1, av2, nv, &
+                                        right, c, nv7, nuu, 1, nv11)
 
          else
 
              ! rotation into triangle of the new row of (avv), in case the elements
              ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
-             irot = nrold
-             rot_avv_3: do i=1,5
-                irot = irot+1
-                piv = h(i)
-                if (not_equal(piv,zero)) then
-                   ! calculate the parameters of the givens transformation.
-                   call fpgivs(piv,av1(irot,1),co,si)
-
-                   ! apply that transformation to the columns of matrix g.
-                   ic = irot
-                   do j=1,nuu
-                      call fprota(co,si,right(j),c(ic))
-                      ic = ic+nv7
-                   end do
-
-                   ! apply that transformation to the rows of (avv).
-                   if (i<5) then
-                      i2 = 1
-                      i3 = i+1
-                      do j=i3,5
-                         i2 = i2+1
-                         call fprota(co,si,h(j),av1(irot,i2))
-                      end do
-                   endif
-                endif
-             end do rot_avv_3
+             call fp_rotate_row_stride(h, 5, av1, nv, right, c, nv7, nuu, nrold)
 
          endif
 
@@ -6660,8 +6656,8 @@ module fitpack_core
                                     ay(ny,ky2),by(ny,ky2),fpx(nx),fpy(ny)
       integer(FP_SIZE),  intent(inout) :: nrx(mx),nry(my)
       !  ..local scalars..
-      real(FP_REAL) :: arg,cos,fac,pinv,piv,sin,term
-      integer(FP_SIZE) :: i,ibandx,ibandy,ic,iq,irot,it,iz,i1,i2,i3,j,k,k1,l,l1,ncof,nk1x,nk1y,&
+      real(FP_REAL) :: arg,fac,pinv,term
+      integer(FP_SIZE) :: i,ibandx,ibandy,irot,it,iz,i1,i2,j,k,k1,l,l1,ncof,nk1x,nk1y,&
                  nrold,nroldx,nroldy,number,numx,numx1,numy,numy1,n1
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1)
@@ -6767,27 +6763,7 @@ module fitpack_core
            endif
 
            ! rotate the new row of matrix (ax) into triangle.
-           rot_new_row: do i=1,ibandx
-              irot = irot+1
-              piv = h(i)
-              if (equal(piv,zero)) cycle rot_new_row
-
-              ! calculate the parameters of the givens transformation.
-              call fpgivs(piv,ax(irot,1),cos,sin)
-              ! apply that transformation to the rows of matrix q.
-              iq = (irot-1)*my
-              call fprota(cos,sin,right(1:my),q(iq+1:iq+my))
-
-              ! apply that transformation to the columns of (ax).
-              if (i<ibandx) then
-                 i2 = 1
-                 i3 = i+1
-                 do j=i3,ibandx
-                    i2 = i2+1
-                    call fprota(cos,sin,h(j),ax(irot,i2))
-                 end do
-              endif
-           end do rot_new_row
+           call fp_rotate_row_block(h, ibandx, ax, nx, right, q, my, irot)
 
            if (nrold==number) exit inner_ax
 
@@ -6835,29 +6811,7 @@ module fitpack_core
             endif
 
             ! rotate the new row of matrix (ay) into triangle.
-            rot_new_rowy: do i=1,ibandy
-               irot = irot+1
-               piv = h(i)
-               if (equal(piv,zero)) cycle rot_new_rowy
-
-               ! calculate the parameters of the givens transformation.
-               call fpgivs(piv,ay(irot,1),cos,sin)
-               ! apply that transformation to the columns of matrix g.
-               ic = irot
-               do j=1,nk1x
-                  call fprota(cos,sin,right(j),c(ic))
-                  ic = ic+nk1y
-               end do
-               ! apply that transformation to the columns of matrix (ay).
-               if (i<ibandy) then
-                   i2 = 1
-                   i3 = i+1
-                   do j=i3,ibandy
-                      i2 = i2+1
-                      call fprota(cos,sin,h(j),ay(irot,i2))
-                   end do
-               endif
-            end do rot_new_rowy
+            call fp_rotate_row_stride(h, ibandy, ay, ny, right, c, nk1y, nk1x, irot)
             if (nrold==number) exit inner_ay
             nrold = nrold+1
          end do inner_ay
@@ -6962,8 +6916,8 @@ module fitpack_core
                                     au(nu,5),c(nc),fpu(nu),fpv(nv)
       integer(FP_SIZE), intent(inout) :: nru(mu),nrv(mv)
       !  ..local scalars..
-      real(FP_REAL) :: arg,co,dr01,dr11,fac,fac0,fac1,pinv,piv,si,term
-      integer(FP_SIZE) :: i,ic,ii,ij,ik,iq,irot,it,ir,i0,i1,i2,i3,j,jj,jk,jper, &
+      real(FP_REAL) :: arg,dr01,dr11,fac,fac0,fac1,pinv,term
+      integer(FP_SIZE) :: i,ii,ij,ik,irot,it,ir,i0,i1,i2,j,jj,jk,jper, &
                  j0,j1,k,k1,l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number, &
                  numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
@@ -7217,31 +7171,7 @@ module fitpack_core
          irot = max(0,nrold-iop0-1)
 
          ! rotate the new row of matrix (auu) into triangle.
-         if (i0<=i1) then
-            auu_rot: do i=i0,i1
-               irot = irot+1
-               piv = h(i)
-               if (equal(piv,zero)) cycle auu_rot
-               ! calculate the parameters of the givens transformation.
-               call fpgivs(piv,au(irot,1),co,si)
-               ! apply that transformation to the rows of matrix (qq).
-               iq = (irot-1)*mvv
-
-               do j=1,mvv
-                  iq = iq+1
-                  call fprota(co,si,right(j),q(iq))
-               end do
-               ! apply that transformation to the columns of (auu).
-               if (i<i1) then
-                  i2 = 1
-                  i3 = i+1
-                  do j=i3,i1
-                     i2 = i2+1
-                     call fprota(co,si,h(j),au(irot,i2))
-                  end do
-               endif
-           end do auu_rot
-         endif
+         if (i0<=i1) call fp_rotate_row_block(h(i0), i1-i0+1, au, nu, right, q, mvv, irot)
 
          ! we update the sum of squared residuals.
          sq = sq+sum(right(:mvv)**2)
@@ -7307,25 +7237,7 @@ module fitpack_core
 
                ! rotation into triangle of the new row of (avv), in case the elements
                ! corresponding to the b-splines n(j;v),j=nv7+1,...,nv4 are all zero.
-               do i=1,5
-                  piv  = h(i)
-
-                  if (equal(piv,zero)) cycle
-
-                  ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,av1(nrold+i,1),co,si)
-
-                  ! apply that transformation to the columns of matrix g.
-                  ic = nrold+i
-                  call fprota(co,si,right(1:nuu),c(ic:ic+(nuu-1)*nv7:nv7))
-
-                  ! apply that transformation to the rows of (avv).
-                  if (i<5) then
-                     do j=i+1,5
-                        call fprota(co,si,h(j),av1(nrold+i,j+1-i))
-                     end do
-                  endif
-               end do
+               call fp_rotate_row_stride(h, 5, av1, nv, right, c, nv7, nuu, nrold)
 
             else
 
@@ -7369,51 +7281,8 @@ module fitpack_core
                end do
 
                ! rotate the new row of (avv) into triangle.
-               if (nv11>0) then
-
-                  ! rotations with the rows 1,2,...,nv11 of (avv).
-                  do j=1,nv11
-                     piv = h1(1)
-                     i2 = min(nv11-j,4)
-                     if (not_equal(piv,zero)) then
-
-                        ! calculate the parameters of the givens transformation.
-                        call fpgivs(piv,av1(j,1),co,si)
-
-                        ! apply that transformation to the columns of matrix g.
-                        call fprota(co,si,right(1:nuu),c(j:j+nv7*(nuu-1):nv7))
-
-                        ! apply that transformation to the rows of (avv) with respect to av2.
-                        call fprota(co,si,h2(1:4),av2(j,1:4))
-
-                        ! apply that transformation to the rows of (avv) with respect to av1.
-                        if (i2/=0) call fprota(co,si,h1(2:i2+1),av1(j,2:i2+1))
-
-                     endif
-                     
-                     h1(1:i2+1) = [h1(2:i2+1),zero]
-                  end do
-
-               endif
-
-               ! rotations with the rows nv11+1,...,nv7 of avv.
-               avv_rot: do j=1,4
-                  ij  = nv11+j
-                  j1  = j+1
-                  piv = h2(j)
-
-                  if (ij<=0 .or. equal(piv,zero)) cycle avv_rot
-
-                  ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,av2(ij,j),co,si)
-
-                  ! apply that transformation to the columns of matrix g.
-                  call fprota(co,si,right(1:nuu),c(ij:ij+nv7*(nuu-1):nv7))
-
-                  ! apply that transformation to the rows of (avv) with respect to av2.
-                  if (j<4) call fprota(co,si,h2(j1:4),av2(ij,j1:4))
-
-              end do avv_rot
+               call fp_rotate_2mat_stride(h1, 5, h2, 4, av1, av2, nv, &
+                                          right, c, nv7, nuu, 1, nv11)
 
             end if
 
@@ -13616,8 +13485,8 @@ module fitpack_core
       integer(FP_SIZE), intent(in)  :: nr(m)
 
       !  ..local scalars..
-      real(FP_REAL) :: cos,pinv,piv,sin
-      integer     :: i,iband,irot,it,ii,i2,i3,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1
+      real(FP_REAL) :: pinv
+      integer     :: i,iband,irot,it,ii,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..subroutine references..
@@ -13677,34 +13546,7 @@ module fitpack_core
              endif
 
              ! rotate the new row of matrix (a) into triangle.
-             rotate: do i=1,iband
-                irot = irot+1
-                piv  = h(i); if (equal(piv,zero)) cycle rotate
-
-                ! calculate the parameters of the givens transformation.
-                call fpgivs(piv,a(irot,1),cos,sin)
-
-                ! apply that transformation to the rows of matrix q.
-                j = 0
-                do ii=1,idim
-                   l = (ii-1)*m3+irot
-                   do jj=1,mm
-                      j = j+1
-                      call fprota(cos,sin,right(j),q(l))
-                      l = l+n4
-                   end do
-                end do
-
-                ! apply that transformation to the columns of (a).
-                if (i<iband) then
-                    i2 = 1
-                    i3 = i+1
-                    do j=i3,iband
-                       i2 = i2+1
-                       call fprota(cos,sin,h(j),a(irot,i2))
-                    end do
-                endif
-             end do rotate
+             call fp_rotate_row_stride(h, iband, a, n, right, q, n4, mid, irot)
 
              if (nrold==number) cycle rows
              nrold = nrold+1
@@ -13728,9 +13570,9 @@ module fitpack_core
       integer(FP_SIZE), intent(in) :: nr(m)
 
       !  ..local scalars..
-      real(FP_REAL) :: co,pinv,piv,si
-      integer(FP_SIZE) :: i,irot,it,ii,i2,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
-      integer(FP_SIZE) :: ij,jk,jper,l0,l1,ik
+      real(FP_REAL) :: pinv
+      integer(FP_SIZE) :: i,irot,it,ii,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
+      integer(FP_SIZE) :: jk,jper,l0,l1,ik
       !  ..local arrays..
       real(FP_REAL) :: h(DEGREE_3+2),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
@@ -13833,90 +13675,14 @@ module fitpack_core
                  end do
 
                  ! rotate the new row of (a) into triangle.
-                 if (n11>0) then
-                    ! rotations with the rows 1,2,...,n11 of (a).
-                    one_to_n11: do irot=1,n11
-                        piv = h1(1)
-                        i2  = min(n11-irot,4)
-                        if (not_equal(piv,zero)) then
-                           ! calculate the parameters of the givens transformation.
-                           call fpgivs(piv,a(irot,1),co,si)
-                           ! apply that transformation to the columns of matrix q.
-                           j = 0
-                           do ii=1,idim
-                              l = (ii-1)*m3+irot
-                              do jj=1,mm
-                                 j = j+1
-                                 call fprota(co,si,right(j),q(l))
-                                 l = l+n7
-                              end do
-                           end do
-
-                           ! apply that transformation to the rows of (a) with respect to aa.
-                           call fprota(co,si,h2,aa(irot,:))
-
-                           ! apply that transformation to the rows of (a) with respect to a.
-                           if (i2==0) exit one_to_n11
-
-                           call fprota(co,si,h1(2:i2+1),a(irot,2:i2+1))
-
-                        endif
-                        h1(1:i2+1) = [h1(2:i2+1),zero]
-                    end do one_to_n11
-                 endif
-
-                 ! rotations with the rows n11+1,...,n7 of a.
-                 n11_to_n7: do irot=1,4
-
-                    ij  = n11+irot;  if (ij<=0)     cycle n11_to_n7
-                    piv = h2(irot);  if (equal(piv,zero)) cycle n11_to_n7
-
-                    ! calculate the parameters of the givens transformation.
-                    call fpgivs(piv,aa(ij,irot),co,si)
-
-                    ! apply that transformation to the columns of matrix q.
-                    j = 0
-                    do ii=1,idim
-                       l = (ii-1)*m3+ij
-                       do jj=1,mm
-                         j = j+1
-                         call fprota(co,si,right(j),q(l))
-                         l = l+n7
-                       end do
-                    end do
-
-                    ! apply that transformation to the rows of (a) with respect to aa.
-                    if (irot<4) call fprota(co,si,h2(irot+1:),aa(ij,irot+1:))
-
-                 end do n11_to_n7
+                 call fp_rotate_2mat_stride(h1, 5, h2, 4, a, aa, n, &
+                                            right, q, n7, mid, 1, n11)
 
              else
 
                 ! rotation into triangle of the new row of (a), in case the elements
                 ! corresponding to the b-splines n(j;*),j=n7+1,...,n4 are all zero.
-                irot =nrold
-                all_zero: do i=1,5
-                    irot = irot+1
-                    piv = h(i)
-                    if (equal(piv,zero)) cycle all_zero
-
-                    ! calculate the parameters of the givens transformation.
-                    call fpgivs(piv,a(irot,1),co,si)
-                    ! apply that transformation to the columns of matrix g.
-                    j = 0
-                    do ii=1,idim
-                       l = (ii-1)*m3+irot
-                       do jj=1,mm
-                         j = j+1
-                         call fprota(co,si,right(j),q(l))
-                         l = l+n7
-                       end do
-                    end do
-
-                    ! apply that transformation to the rows of (a).
-                    if (i<5) call fprota(co,si,h(i+1:5),a(irot,2:6-i))
-
-                end do all_zero
+                call fp_rotate_row_stride(h, 5, a, n, right, q, n7, mid, nrold)
              endif
 
              if (nrold==number) exit inner
