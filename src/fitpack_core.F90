@@ -3345,22 +3345,7 @@ module fitpack_core
 
                   ! rotation of the new row of the observation matrix into triangle in case
                   ! the b-splines nj,k+1(u),j=n7+1,...n-k-1 are all zero at ui.
-                  j = l5
-                  rot_zero: do i=1,kk1
-                      j = j+1
-                      piv = h(i)
-
-                      if (equal(piv,zero)) cycle rot_zero
-
-                      ! calculate the parameters of the givens transformation.
-                      call fpgivs(piv,a1(j,1),cos,sin)
-
-                      ! transformations to right hand side.
-                      call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
-
-                      if (i<kk1) call fprota(cos,sin,h(i+1:kk1),a1(j,2:1+kk1-i))
-
-                  end do rot_zero
+                  call fp_rotate_row_vec(h, kk1, a1, xi, z, l5, n, idim)
 
               endif all_zero
 
@@ -3961,7 +3946,7 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: nrdata(nest)
       !  ..local scalars..
       real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer(FP_SIZE) :: i,it,iter,i1,i2,i3,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
+      integer(FP_SIZE) :: i,it,iter,i2,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
                  nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
@@ -4126,28 +4111,7 @@ module fitpack_core
                  endif
 
                  ! rotate the new row of the observation matrix into triangle.
-                 rotate_row: do i=li,lj
-                     j   = j+1
-                     piv = h(i)
-                     if (equal(piv,zero)) cycle rotate_row
-
-                     ! calculate the parameters of the givens transformation.
-                     call fpgivs(piv,a(j,1),cos,sin)
-
-                     ! transformations to right hand side.
-                     call fprota(cos,sin,xi(1:idim),z(j:j+n*(idim-1):n))
-
-                    ! transformations to left hand side.
-                    not_last: if (i<lj) then
-                       i2 = 1
-                       i3 = i+1
-                       do i1 = i3,lj
-                          i2 = i2+1
-                          call fprota(cos,sin,h(i1),a(j,i2))
-                       end do
-                    endif not_last
-
-                 end do rotate_row
+                 call fp_rotate_row_vec(h(li:), lj-li+1, a, xi, z, j, n, idim)
 
                  ! add contribution of this row to the sum of squares of residual right hand sides.
                  fp = fp + sum(xi(1:idim)**2)
@@ -5696,6 +5660,39 @@ module fitpack_core
               if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
           end do
       end subroutine fp_rotate_row
+
+      ! Vector-RHS variant of fp_rotate_row: rotates a new observation row into the
+      ! upper-triangular band matrix, with idim right-hand sides stored in z at stride n.
+      ! Used by parametric/multi-dimensional fitting routines (fpclos, fpcons, fppara).
+      pure subroutine fp_rotate_row_vec(h, band, a, xi, z, j_start, n, idim)
+          real(FP_REAL),    intent(inout) :: h(:)       ! Row to rotate, h(1:band)
+          integer(FP_SIZE), intent(in)    :: band       ! Bandwidth
+          real(FP_REAL),    intent(inout) :: a(:,:)     ! Upper triangular band matrix
+          real(FP_REAL),    intent(inout) :: xi(:)      ! Vector RHS contribution, xi(1:idim)
+          real(FP_REAL),    intent(inout) :: z(:)       ! RHS array, strided access
+          integer(FP_SIZE), intent(in)    :: j_start    ! Starting row index minus 1
+          integer(FP_SIZE), intent(in)    :: n          ! Stride for z
+          integer(FP_SIZE), intent(in)    :: idim       ! Number of dimensions
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i, j
+
+          j = j_start
+          do i = 1, band
+              j = j + 1
+              piv = h(i)
+              if (equal(piv, zero)) cycle
+
+              ! Calculate parameters of Givens transformation
+              call fpgivs(piv, a(j,1), cos, sin)
+
+              ! Apply to vector right hand side (elemental fprota handles idim elements)
+              call fprota(cos, sin, xi(1:idim), z(j:j+(idim-1)*n:n))
+
+              ! Apply to remaining row elements and matrix
+              if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
+          end do
+      end subroutine fp_rotate_row_vec
 
 
       ! Compute spline coefficients on a rectangular grid
@@ -8249,7 +8246,7 @@ module fitpack_core
 
       !  ..local scalars..
       real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer(FP_SIZE) :: i,it,iter,i1,i2,i3,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      integer(FP_SIZE) :: i,it,iter,i2,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1),xi(idim)
@@ -8377,29 +8374,7 @@ module fitpack_core
            h(:k1)     = wi*h(:k1)
 
            ! rotate the new row of the observation matrix into triangle.
-           j = l-k1
-           rotate_row: do i=1,k1
-
-              j = j+1
-
-              piv = h(i); if (equal(piv,zero)) cycle rotate_row
-
-              ! calculate the parameters of the givens transformation.
-              call fpgivs(piv,a(j,1),cos,sin)
-
-              ! transformations to right hand side.
-              call fprota(cos,sin,xi,z(j:j+(idim-1)*n:n))
-
-              ! transformations to left hand side.
-              not_last: if (i<k1) then
-                 i2 = 1
-                 i3 = i+1
-                 do i1 = i3,k1
-                   i2 = i2+1
-                   call fprota(cos,sin,h(i1),a(j,i2))
-                 end do
-              endif not_last
-           end do rotate_row
+           call fp_rotate_row_vec(h, k1, a, xi, z, l-k1, n, idim)
 
            !  add contribution of this row to the sum of squares of residual right hand sides.
            fp = fp + sum(xi**2)
