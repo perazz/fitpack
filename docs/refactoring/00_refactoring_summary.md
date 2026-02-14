@@ -81,19 +81,7 @@ Removed unused variables: `cos`, `sin`, `piv`, `i3`, `iq`, `ic` from `fpgrre`;
 
 ## Remaining Plan
 
-Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 10+) can
-proceed in parallel with any code PR.
-
-### PR 9: Back-Substitution Interface
-
-**Scope**: Unify `fpback` and `fpbacp` under a generic `fp_backsolve` interface
-**Occurrences**: ~25 call sites
-**Difficulty**: Low — clean abstraction, no logic changes
-**Book references**: Ch. 4 Eq. 4.14 (R₁·c = z₁), Ch. 5 Eq. 5.15 (R₁*·c = z₁*)
-
----
-
-### PR 10+: Doxygen + MathJax Documentation
+### PR 9+: Doxygen + MathJax Documentation
 
 **Scope**: Add structured documentation headers to all core routines in `fitpack_core.F90`
 **Format**: See [03_doxygen_convention.md](03_doxygen_convention.md)
