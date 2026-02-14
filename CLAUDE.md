@@ -98,6 +98,10 @@ logical function test_feature(iunit) result(success)
 end function
 ```
 
+## Git
+
+- NEVER mention Claude in any commits or PRs
+
 ## Don'ts
 
 - No preprocessor directives
