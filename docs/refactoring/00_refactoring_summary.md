@@ -4,188 +4,150 @@
 
 ## Overview
 
-The `src/fitpack_core.f90` file (~19,000 lines) was converted from legacy F77 code and contains several repeated patterns that could be extracted into reusable routines. This document summarizes the identified refactoring opportunities.
+The `src/fitpack_core.F90` file (~19,000 lines) was converted from legacy F77 code and contains
+repeated patterns that can be extracted into reusable routines. The full mathematical context is
+now available from the transcribed book (*Curve and Surface Fitting with Splines*, P. Dierckx, 1993)
+in `docs/book/` and papers in `docs/papers/`.
 
-**Important constraint**: Public API/interfaces cannot be changed.
+**Important constraints**:
+- Public API/interfaces cannot change
+- Each refactoring step = one PR, fully tested against previous version
+- Keep the original routine structure; no merging/consolidation of routines
 
 ---
 
-## Identified Refactoring Opportunities
+## Completed Work
 
-### 1. QR Row Rotation Pattern (High Priority)
+### PR 1: Knot Interval Search (DONE)
 
-**Occurrences**: ~45 locations
-**Difficulty**: Low
-**Impact**: High
+**Occurrences**: ~20 locations replaced
+**New routine**: `fp_knot_interval` (hybrid linear/binary search)
 
-Repeated pattern for rotating a row into an upper triangular matrix using Givens transformations:
+### PR 2: Named Constants (DONE)
 
+**Occurrences**: ~10 replacements
+**Changes**: Magic numbers → `MAX_ORDER`, `DEGREE_3`, `DEGREE_5`, etc.
+
+### PR 3: QR Row Rotation — Step 1 (DONE)
+
+**Changes**: Added `fp_rotate_row` subroutine; replaced 1 occurrence in `fpcurf`
+
+---
+
+## Remaining Plan
+
+Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 8) can
+proceed in parallel with any code PR.
+
+### PR 4: Complete Variant A Givens Rotations
+
+**Scope**: Replace all scalar-RHS rotation patterns with `fp_rotate_row`
+**Occurrences**: ~15 locations in `fpcurf`, `fpcons`, `fppara`, `fprank`
+**Difficulty**: Low — mechanical replacement, same signature as existing helper
+**Variant pattern**:
 ```fortran
 do i=1,k1
+    j = j+1
     piv = h(i); if (equal(piv,zero)) cycle
     call fpgivs(piv,a(j,1),cos,sin)
     call fprota(cos,sin,yi,z(j))
     if (i<k1) call fprota(cos,sin,h(i+1:k1),a(j,2:k1-i+1))
 end do
 ```
-
-**Affected routines**: `fpcurf`, `fpclos`, `fpcons`, `fppara`, `fpperi`, `fpgrre`, `fpgrdi`, `fpgrsp`, `fptrnp`, `fptrpe`, `fprank`, `fpsurf`, `fpsphe`, `fppola`, and others.
-
-**See**: `01_qr_row_rotation_refactor.md` for detailed plan.
+**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variant A
 
 ---
 
-### 2. Knot Interval Search (Medium-High Priority)
+### PR 5: Reshape Array Indexing in `fpcurf`
 
-**Occurrences**: ~20 locations
-**Difficulty**: Low
-**Impact**: Medium
+**Scope**: Clean up 1D array stride patterns in the main curve fitting routine
+**Goal**: Make band matrix access and multi-dimensional RHS indexing explicit,
+preparing the ground for cleaner Variant B/C/D rotation replacements
+**Difficulty**: Medium — requires careful index verification
+**Key patterns to address**:
+- Strided RHS access: `z(j:j+(idim-1)*n:n)` → clearer views
+- Any remaining manual offset arithmetic for band matrix columns
 
-Repeated pattern for finding the knot interval containing a point:
-
-```fortran
-! search for knot interval t(l) <= x < t(l+1).
-do while (xi>=t(l+1) .and. l/=nk1)
-    l = l+1
-end do
-```
-
-**Refactor proposal**: Create a utility function:
-
-```fortran
-pure function fp_find_knot_interval(t, n, x, l_start, l_max) result(l)
-    real(FP_REAL), intent(in) :: t(n), x
-    integer(FP_SIZE), intent(in) :: n, l_start, l_max
-    integer(FP_SIZE) :: l
-end function
-```
-
-**Locations**: Lines 3193, 4059, 4415, 4726, 4938, 8312, 9169, 14261, 17819, 17938, etc.
+**Book references**: Ch. 4 Fig. 4.2 (band structure of E and R₁),
+Ch. 5 Fig. 5.1 (band structure of P and R₁*)
 
 ---
 
-### 3. Consolidate `fptrnp` and `fptrpe` (Medium Priority)
+### PR 6: Variant B/C Givens Rotations
 
-**Occurrences**: 2 routines
-**Difficulty**: Medium
-**Impact**: Medium
-
-These routines at lines 13846 and 13959 are nearly identical:
-- `fptrnp`: Reduces (m+n-7) x (n-4) matrix to upper triangular form
-- `fptrpe`: Same for cyclic bandmatrix, with extra `aa` array for periodic handling
-
-**Refactor proposal**: Merge into single routine with `periodic` flag:
-
-```fortran
-pure subroutine fp_triangularize(m,mm,idim,n,nr,sp,p,b,z,a,q,right,periodic,aa)
-    logical(FP_BOOL), intent(in) :: periodic
-    real(FP_REAL), intent(out), optional :: aa(n,4)  ! only for periodic
-```
+**Scope**: Vector RHS and two-matrix periodic variants
+**New routines**: `fp_rotate_row_vec` (vector RHS with stride),
+`fp_rotate_row_2mat` (two-matrix rotation for periodic splines)
+**Occurrences**: ~15 locations in `fpclos`, `fpcons`, `fppara`, `fpperi`
+**Difficulty**: Medium — strided access and secondary matrix add complexity
+**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variants B & C
 
 ---
 
-### 4. Back-Substitution Wrapper (Medium Priority)
+### PR 7: Variant D Givens Rotations
 
-**Occurrences**: ~25 calls
-**Difficulty**: Low
-**Impact**: Medium
-
-Two back-substitution functions are used based on matrix structure:
-- `fpback`: Standard upper triangular solve
-- `fpbacp`: Periodic/cyclic matrix solve (uses both `a1` and `a2` blocks)
-
-**Refactor proposal**: Generic interface or wrapper:
-
-```fortran
-interface fp_backsolve
-    module procedure fpback
-    module procedure fpbacp
-end interface
-```
-
-Or a unified routine that handles both cases internally.
+**Scope**: Grid/surface fitting rotation patterns
+**New routine**: `fp_rotate_row_grid` (2D RHS)
+**Occurrences**: ~15 locations in `fpgrdi`, `fpgrre`, `fpgrsp`, `fptrnp`, `fptrpe`,
+`fpsurf`, `fpsphe`, `fppola`
+**Difficulty**: Medium — 2D indexing and varying loop structures
+**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variant D
 
 ---
 
-### 5. B-spline Evaluation + Weight Pattern (Medium Priority)
+### PR 8: Back-Substitution Interface
 
-**Occurrences**: ~10 locations
-**Difficulty**: Low
-**Impact**: Low-Medium
-
-Repeated pattern:
-
-```fortran
-h = fpbspl(t,n,k,xi,l)
-q(it,1:k1) = h(1:k1)
-h(:k1) = wi*h(:k1)
-```
-
-**Refactor proposal**: Either a combined function `fpbspl_weighted` or a helper that stores and weights in one call.
+**Scope**: Unify `fpback` and `fpbacp` under a generic `fp_backsolve` interface
+**Occurrences**: ~25 call sites
+**Difficulty**: Low — clean abstraction, no logic changes
+**Book references**: Ch. 4 Eq. 4.14 (R₁·c = z₁), Ch. 5 Eq. 5.15 (R₁*·c = z₁*)
 
 ---
 
-### 6. Consolidate Similar Fitting Routines (Lower Priority)
+### PR 9+: Doxygen + MathJax Documentation
 
-**Occurrences**: 6+ major routines
-**Difficulty**: High
-**Impact**: High (long-term maintainability)
+**Scope**: Add structured documentation headers to all core routines in `fitpack_core.F90`
+**Format**: See [03_doxygen_convention.md](03_doxygen_convention.md)
+**Content sources**: Book chapters 1-13, papers in `docs/papers/`
+**Approach**: Incremental — document routines as they are touched by code PRs,
+plus dedicated documentation-only PRs for untouched routines
+**Key routines** (with book references):
 
-Several routines share 80%+ identical logic:
-- `fpcurf` (line 4794) and `fpperi` (line 8964) - 1D curve fitting
-- `fpcons` (line 3899) and `fppara` (line 8176) - constrained/parametric curves
-- `fpgrdi`, `fpgrre`, `fpgrsp` - grid fitting variants
-
-**Refactor proposal**: Extract common core with configuration parameters. This is a larger undertaking requiring careful analysis of the differences.
-
----
-
-### 7. Named Constants for Loop Limits (Quick Win)
-
-**Occurrences**: Many
-**Difficulty**: Trivial
-**Impact**: Low (readability)
-
-Some magic numbers could be named constants:
-- Bandwidth values `4`, `5` → `BAND_CUBIC`, `BAND_QUINTIC`
-- `MAX_ORDER+1` → `BSPLINE_BUFFER_SIZE`
-
----
-
-### 8. Simplify Strided Array Access (Medium Priority)
-
-**Occurrences**: ~30 locations
-**Difficulty**: Medium
-**Impact**: Medium (readability)
-
-Patterns like:
-
-```fortran
-z(j:j+(idim-1)*n:n)  ! strided access across dimensions
-```
-
-Could use helper subroutines for clearer index computation.
-
----
-
-## Recommended Execution Order
-
-1. **Knot Interval Search** - Quick win, isolated change, enables binary search optimization
-2. **QR Row Rotation** - Highest value, lowest risk
-3. **Named Constants** - Trivial, improves readability
-4. **Back-Substitution Wrapper** - Clean abstraction
-5. **B-spline + Weight Pattern** - Minor improvement
-6. **Merge `fptrnp`/`fptrpe`** - Moderate effort
-7. **Similar Fitting Routines** - Major refactor, do last
-
-**See**: `02_knot_interval_search_refactor.md` for detailed plan on item 1.
+| Routine    | Book Section               | Key Equations     | Description                              |
+|------------|----------------------------|-------------------|------------------------------------------|
+| `fpgivs`   | §4.1.2, pp. 55-58          | 4.15, 4.16        | Givens rotation parameters               |
+| `fprota`   | §4.1.2, pp. 55-58          | 4.15              | Apply Givens rotation                    |
+| `fpback`   | §4.1.2, pp. 55-58          | 4.14              | Back-substitution, bandwidth k+1         |
+| `fpbacp`   | §6.1, pp. 95-100           | 6.6               | Back-substitution, periodic (a1+a2)      |
+| `fpbspl`   | §1.3, pp. 8-11             | 1.22, 1.30        | B-spline evaluation (de Boor-Cox)        |
+| `fpcurf`   | §4.1-5.3, pp. 53-94        | 4.12, 5.10, 5.37  | Core curve fitting algorithm             |
+| `fpdisc`   | §5.2.2, pp. 76-79          | 5.5, 5.6          | Discontinuity jumps of k-th derivative   |
+| `fpknot`   | §5.3, pp. 87-94            | 5.37-5.43         | Adaptive knot placement                  |
+| `fprati`   | §5.2.4, pp. 83-86          | 5.30-5.32         | Rational interpolation for F(p) = S      |
+| `fprank`   | §9.1.2, pp. 150-152        | 9.8-9.10          | Rank-deficient system solution           |
+| `fpchec`   | §4.1.1, pp. 53-55          | 4.5, 4.17         | Schoenberg-Whitney condition check       |
+| `fpgrdi`   | §10.2, pp. 170-172         | 10.4-10.8         | Grid fitting (Kronecker decomposition)   |
+| `fpgrre`   | §10.2, pp. 170-172         | 10.4-10.8         | Grid fitting (rectangular)               |
+| `fptrnp`   | §10.2, pp. 170-172         | 10.8              | Triangularize observation matrix         |
+| `fpsurf`   | §9.1-9.2, pp. 147-167      | 9.2-9.6           | Surface fitting to scattered data        |
+| `fpsphe`   | §11.2, pp. 205-213         | 11.12-11.16       | Spherical coordinate fitting             |
+| `fppola`   | §11.1, pp. 197-205         | 11.1-11.9         | Polar coordinate fitting                 |
 
 ---
 
 ## Testing Strategy
 
-All refactors must:
-1. Pass the existing test suite (`fpm test`)
+All PRs must:
+1. Pass the full test suite (`fpm test`) — 49 tests, 0 failures
 2. Maintain `pure` procedure attributes where present
 3. Preserve numerical results to machine precision
 4. Not change any public API signatures
+
+---
+
+## Workflow
+
+1. Each PR branches from `main` (or the previous PR's merge)
+2. Run `fpm test` before and after each change
+3. Small, focused commits within each PR
+4. Squash-merge to `main` for clean history
