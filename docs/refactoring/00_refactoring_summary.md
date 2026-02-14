@@ -53,6 +53,17 @@ Replaced 4 remaining shifting-pivot call sites: 2 in `fpclos` (two-matrix period
 Removed unused variables: `piv`, `ij` from `fpclos`; `cos`, `sin`, `piv`, `i2`
 from `fpcons` and `fppara`.
 
+### PR 7: Scalar Shifted-Pivot and Two-Matrix Givens Rotations (DONE)
+
+**Changes**: Added `fp_rotate_shifted` (scalar-RHS shifted-pivot rotation) and
+`fp_rotate_row_2mat` (scalar-RHS two-matrix rotation for periodic splines).
+Replaced 1 standard-walk site in `fpsurf` with `fp_rotate_row` and 7 shifted-pivot
+sites: 1 in `fpcurf`, 2 in `fpsurf`, 2 in `fppola`, 2 in `fpsphe`.
+Replaced 2 two-matrix sites in `fpperi` (observation and smoothing matrices).
+Removed unused variables: `cos`, `sin`, `piv`, `i2` from `fpcurf`;
+`cos`, `sin`, `piv`, `irot`, `i2` from `fpsurf`; `i2` from `fppola`;
+`piv`, `ij` from `fpperi`.
+
 ---
 
 ## Remaining Plan
@@ -60,7 +71,7 @@ from `fpcons` and `fppara`.
 Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 9) can
 proceed in parallel with any code PR.
 
-### PR 7: Variant D Givens Rotations
+### PR 8: Variant D Givens Rotations
 
 **Scope**: Grid/surface fitting rotation patterns
 **New routine**: `fp_rotate_row_grid` (2D RHS)
@@ -71,7 +82,7 @@ proceed in parallel with any code PR.
 
 ---
 
-### PR 8: Back-Substitution Interface
+### PR 9: Back-Substitution Interface
 
 **Scope**: Unify `fpback` and `fpbacp` under a generic `fp_backsolve` interface
 **Occurrences**: ~25 call sites
@@ -80,7 +91,7 @@ proceed in parallel with any code PR.
 
 ---
 
-### PR 9+: Doxygen + MathJax Documentation
+### PR 10+: Doxygen + MathJax Documentation
 
 **Scope**: Add structured documentation headers to all core routines in `fitpack_core.F90`
 **Format**: See [03_doxygen_convention.md](03_doxygen_convention.md)
