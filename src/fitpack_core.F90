@@ -9328,26 +9328,8 @@ module fitpack_core
 
              ! rotation of the new row of the observation matrix into triangle in case the b-splines
              ! nj,k+1(x),j=n7+1,...n-k-1 are all zero at xi.
-             j = l5
-             new_row: do i=1,kk1
-                j = j+1
-                piv = h(i)
-                if (equal(piv,zero)) cycle new_row
-
-                call fpgivs(piv,a1(j,1),cos,sin)
-                ! calculate the parameters of the givens transformation.
-                ! transformations to right hand side.
-                call fprota(cos,sin,yi,z(j))
-                if (i==kk1) exit new_row
-                i2 = 1
-                i3 = i+1
-
-                !  transformations to left hand side. TODO replace with array call
-                do i1=i3,kk1
-                   i2 = i2+1
-                   call fprota(cos,sin,h(i1),a1(j,i2))
-                end do
-             end do new_row
+             ! rotate the new row of the observation matrix into triangle.
+             call fp_rotate_row(h, kk1, a1, yi, z, l5)
 
           endif
 
@@ -10244,20 +10226,8 @@ module fitpack_core
                  h(2) = merge(u3*wi,zero,iopt3==0)
                  h(3) = merge(u2*(one-uu)*wi,zero,iopt2<=1)
                  h(4) = merge(uu*(one-u2)*wi,zero,iopt2<=0)
-                 do j=1,4
-                    piv = h(j)
-                    if (equal(piv,zero)) cycle
-                    call fpgivs(piv,a(j,1),co,si)
-                    call fprota(co,si,zi,f(j))
-                    if (j<4) then
-                        j1 = j+1
-                        j2 = 1
-                        do l=j1,4
-                           j2 = j2+1
-                           call fprota(co,si,h(l),a(j,j2))
-                        end do
-                    endif
-                 end do
+                 ! rotate the initial polynomial row into triangle.
+                 call fp_rotate_row(h, 4, a, zi, f, 0)
                  sup = sup+zi*zi
               end do initial_poly
 
@@ -10507,22 +10477,7 @@ module fitpack_core
                 h(1:iband) = wi*h(1:iband)
 
                 ! rotate the row into triangle by givens transformations.
-                irot = jrot
-                rotate: do i=1,iband
-                  irot = irot+1
-                  piv  = h(i)
-                  if (equal(piv,zero)) cycle rotate
-
-                  ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,a(irot,1),co,si)
-
-                  ! apply that transformation to the right hand side.
-                  call fprota(co,si,zi,f(irot))
-
-                  ! apply that transformation to the left hand side.
-                  if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
-
-                end do rotate
+                call fp_rotate_row(h, iband, a, zi, f, jrot)
 
                 ! add the contribution of the row to the sum of squares of residual right hand sides.
                 fp = fp+zi**2
@@ -12634,22 +12589,7 @@ module fitpack_core
                   h(:iband) = h(:iband)*wi
 
                   ! rotate the row into triangle by givens transformations.
-                  irot = jrot
-                  rotate: do i=1,iband
-                    irot = irot+1
-                    piv  = h(i)
-                    if (equal(piv,zero)) cycle rotate
-
-                    ! calculate the parameters of the givens transformation.
-                    call fpgivs(piv,a(irot,1),co,si)
-
-                    ! apply that transformation to the right hand side.
-                    call fprota(co,si,ri,f(irot))
-
-                    ! apply that transformation to the left hand side.
-                    if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
-
-                  end do rotate
+                  call fp_rotate_row(h, iband, a, ri, f, jrot)
 
                   ! add the contribution of the row to the sum of squares of residual
                   ! right hand sides.
