@@ -1493,10 +1493,7 @@ module fitpack_core
       if(u<t(k1) .or. u>t(nk1+1)) return
 
       !  search for knot interval t(l) <= u < t(l+1)
-      l = k1
-      do while (.not.(u<t(l+1) .or. l==nk1))
-         l = l+1
-      end do
+      l = fp_knot_interval(t, u, k1, nk1)
       if(t(l)>=t(l+1)) return
 
       ier = FITPACK_OK
@@ -1600,10 +1597,8 @@ module fitpack_core
         arg = min(max(u(i),tb),te)
 
         ! search for knot interval t(l) <= arg < t(l+1)
-        do while (.not.(arg<t(l1) .or. l==nk1))
-          l = l1
-          l1 = l+1
-        end do
+        l = fp_knot_interval(t, arg, l, nk1)
+        l1 = l + 1
 
         ! evaluate the non-zero b-splines at arg.
         h = fpbspl(t,n,k,arg,l)
@@ -2171,7 +2166,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ik,j,jj,j1,j2,ki,kj,li,lj,lk
       real(FP_REAL) :: ak,fac
       !  ..local array..
-      real(FP_REAL) :: h(20)
+      real(FP_REAL) :: h(MAX_ORDER+1)
       !  ..
       lk = l-k1
       do i=1,k1
@@ -2662,10 +2657,8 @@ module fitpack_core
         arg = x(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-        do while (.not.(arg<tx(l1) .or. l==nkx1))
-          l = l1
-          l1 = l+1
-        end do
+        l = fp_knot_interval(tx, arg, l, nkx1)
+        l1 = l + 1
         h = fpbspl(tx,nx,kx,arg,l)
         lx(i) = l-kx1
         wx(i,1:kx1) = h(1:kx1)
@@ -2682,10 +2675,8 @@ module fitpack_core
         arg = y(i)
         if(arg<tb) arg = tb
         if(arg>te) arg = te
-        do while (.not.(arg<ty(l1) .or. l==nky1))
-          l  = l1
-          l1 = l+1
-        end do
+        l = fp_knot_interval(ty, arg, l, nky1)
+        l1 = l + 1
         h = fpbspl(ty,ny,ky,arg,l)
         ly(i) = l-ky1
         wy(i,1:ky1) = h(1:ky1)
@@ -2742,6 +2733,57 @@ module fitpack_core
          end do
 
       end function fpbspl
+
+
+      !> Find knot interval index l such that t(l) <= x < t(l+1).
+      !> Uses hybrid search: linear for small ranges, binary for large.
+      !> This replaces the repeated pattern:
+      !>   do while (x >= t(l+1) .and. l /= l_max)
+      !>       l = l + 1
+      !>   end do
+      pure function fp_knot_interval(t, x, l_start, l_max) result(l)
+          real(FP_REAL),    intent(in) :: t(:)
+          real(FP_REAL),    intent(in) :: x
+          integer(FP_SIZE), intent(in) :: l_start
+          integer(FP_SIZE), intent(in) :: l_max
+          integer(FP_SIZE) :: l
+
+          integer(FP_SIZE), parameter :: LINEAR_THRESHOLD = 8
+          integer(FP_SIZE) :: lo, hi, mid
+
+          ! For small ranges, use linear search (also optimal for warm starts)
+          if (l_max - l_start <= LINEAR_THRESHOLD) then
+              l = l_start
+              do while (x >= t(l+1) .and. l < l_max)
+                  l = l + 1
+              end do
+              return
+          end if
+
+          ! Handle boundary cases
+          if (x < t(l_start+1)) then
+              l = l_start
+              return
+          end if
+          if (x >= t(l_max)) then
+              l = l_max
+              return
+          end if
+
+          ! Binary search: find largest l such that t(l+1) <= x, then l is the interval
+          lo = l_start
+          hi = l_max
+          do while (hi > lo)
+              mid = (lo + hi) / 2
+              if (t(mid+1) <= x) then
+                  lo = mid + 1
+              else
+                  hi = mid
+              end if
+          end do
+          l = lo
+      end function fp_knot_interval
+
 
       !  subroutine fpchec verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
       !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
@@ -2997,7 +3039,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                           nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6),xi(MAX_IDIM)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_5+2),h2(DEGREE_5+1),xi(MAX_IDIM)
       logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
@@ -3200,9 +3242,7 @@ module fitpack_core
               xi(1:idim) = wi*x(idim*(it-1)+1:idim*it)
 
               ! search for knot interval t(l) <= ui < t(l+1).
-              do while (ui>=t(l+1))
-                  l = l+1
-              end do
+              l = fp_knot_interval(t, ui, l, nk1)
 
               ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
               h = fpbspl(t,n,k,ui,l)
@@ -4066,9 +4106,7 @@ module fitpack_core
                  xi(1:idim) = wi*x(idim*(it-1)+1:idim*it)
 
                  ! search for knot interval t(l) <= ui < t(l+1).
-                 do while (ui>=t(l+1) .and. l/=nk1)
-                    l = l+1
-                 end do
+                 l = fp_knot_interval(t, ui, l, nk1)
 
                  ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
                  h = fpbspl(t,n,k,ui,l)
@@ -4422,9 +4460,7 @@ module fitpack_core
           wi = w(i)**2
 
           ! search for knot interval  t(l) <= xi < t(l+1)
-          do while (xi>=t(l+1) .and. l/=n4)
-            l  = l+1
-          end do
+          l = fp_knot_interval(t, xi, l, n4)
 
           ! evaluate the four non-zero cubic b-splines nj(xi),j=l-3,...l.
           h = fpbspl(t,n,DEGREE_3,xi,l)
@@ -4733,9 +4769,7 @@ module fitpack_core
       sq = zero
       l   = 4
       evaluate_error: do i=1,m
-         do while (x(i)>=t(l+1) .and. l/=n4)
-            l = l+1
-         end do
+         l = fp_knot_interval(t, x(i), l, n4)
          sx(i) = c(l-3)*q(i,1)+c(l-2)*q(i,2)+c(l-1)*q(i,3)+c(l)*q(i,4)
          sq = sq+(w(i)*(y(i)-sx(i)))**2
       end do evaluate_error
@@ -4945,9 +4979,7 @@ module fitpack_core
             yi = y(it)*wi
 
             ! search for knot interval t(l) <= xi < t(l+1).
-            do while (xi>=t(l+1) .and. l/=nk1)
-                l = l+1
-            end do
+            l = fp_knot_interval(t, xi, l, nk1)
 
             ! evaluate the (k+1) non-zero b-splines at xi and store them in q.
             h = fpbspl(t,n,k,xi,l)
@@ -4956,23 +4988,7 @@ module fitpack_core
             h(:k1) = wi*h(:k1)
 
             ! rotate the new row of the observation matrix into triangle.
-            j = l-k1
-            rotate_row: do i=1,k1
-
-                j = j+1
-
-                piv = h(i); if (equal(piv,zero)) cycle rotate_row
-
-                ! calculate the parameters of the givens transformation.
-                call fpgivs(piv,a(j,1),cos,sin)
-
-                ! transformations to right hand side.
-                call fprota(cos,sin,yi,z(j))
-
-                ! transformations to left hand side.
-                if (i<k1) call fprota(cos,sin,h(i+1:k1),a(j,2:k1-i+1))
-
-            end do rotate_row
+            call fp_rotate_row(h, k1, a, yi, z, l-k1)
 
             !  add contribution of this row to the sum of squares of residual
             !  right hand sides.
@@ -5483,7 +5499,7 @@ module fitpack_core
       real(FP_REAL) :: an,fac,prod
       integer(FP_SIZE) :: i,ik,j,jk,k,k1,l,lj,lk,lmk,lp,nk1,nrint
       !  ..local array..
-      real(FP_REAL) :: h(12)
+      real(FP_REAL) :: h(2*(DEGREE_5+1))
       !  ..
       k1    = k2-1
       k     = k1-1
@@ -5633,6 +5649,55 @@ module fitpack_core
       end subroutine fpgivs
 
 
+      !> Rotate a row h(1:band) into upper triangular matrix A using Givens rotations.
+      !> Also applies the same rotations to scalar RHS value yi and vector z.
+      !>
+      !> This extracts the common pattern:
+      !>   j = j_start
+      !>   do i = 1, band
+      !>       j = j + 1
+      !>       piv = h(i); if (equal(piv,zero)) cycle
+      !>       call fpgivs(piv, a(j,1), cos, sin)
+      !>       call fprota(cos, sin, yi, z(j))
+      !>       if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
+      !>   end do
+      !>
+      !> Arguments:
+      !>   h       - Row to rotate, h(1:band). Modified in place.
+      !>   band    - Number of elements in row (typically k+1)
+      !>   a       - Upper triangular matrix. a(j,1) is diagonal, a(j,2:) is upper.
+      !>   yi      - Scalar RHS contribution. Modified in place.
+      !>   z       - RHS vector. z(j_start+1:j_start+band) modified.
+      !>   j_start - Starting row index minus 1 (j increments before use)
+      pure subroutine fp_rotate_row(h, band, a, yi, z, j_start)
+          real(FP_REAL),    intent(inout) :: h(:)
+          integer(FP_SIZE), intent(in)    :: band
+          real(FP_REAL),    intent(inout) :: a(:,:)
+          real(FP_REAL),    intent(inout) :: yi
+          real(FP_REAL),    intent(inout) :: z(:)
+          integer(FP_SIZE), intent(in)    :: j_start
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i, j
+
+          j = j_start
+          do i = 1, band
+              j = j + 1
+              piv = h(i)
+              if (equal(piv, zero)) cycle
+
+              ! Calculate parameters of Givens transformation
+              call fpgivs(piv, a(j,1), cos, sin)
+
+              ! Apply to right hand side
+              call fprota(cos, sin, yi, z(j))
+
+              ! Apply to remaining row elements and matrix
+              if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
+          end do
+      end subroutine fp_rotate_row
+
+
       ! Compute spline coefficients on a rectangular grid
       pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v, &
                              mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
@@ -5661,7 +5726,7 @@ module fitpack_core
                  numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
 
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  let
       !               |   (spu)    |            |   (spv)    |
@@ -5724,15 +5789,13 @@ module fitpack_core
 
           do it=1,mu
             arg = u(it)
-            do while (.not.(arg<tu(l1) .or. l==nu4))
-               l  = l1
-               l1 = l+1
-               number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tu, arg, l, nu4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
-
           end do
           ifsu = 1
 
@@ -5747,11 +5810,10 @@ module fitpack_core
           number = 0
           do it=1,mv
              arg = v(it)
-             do while (.not.(arg<tv(l1) .or. l==nv4))
-                l = l1
-                l1 = l+1
-                number = number+1
-             end do
+             l0 = l
+             l = fp_knot_interval(tv, arg, l, nv4)
+             number = number + (l - l0)
+             l1 = l + 1
              h = fpbspl(tv,nv,DEGREE_3,arg,l)
              spv(it,1:4) = h(1:4)
              nrv(it) = number
@@ -6866,7 +6928,7 @@ module fitpack_core
                  j0,j1,k,k1,l,l0,l1,mvv,ncof,nrold,nroldu,nroldv,number, &
                  numu,numu1,numv,numv1,nuu,nu4,nu7,nu8,nu9,nv11,nv4,nv7,nv8,n1
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(5),h2(4)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  let
       !               |     (spu)      |            |     (spv)      |
@@ -6930,11 +6992,10 @@ module fitpack_core
           number = 0
           do it=1,mu
             arg = u(it)
-            do while (.not.(arg<tu(l1) .or. l==nu4))
-                l = l1
-                l1 = l+1
-                number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tu, arg, l, nu4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tu,nu,DEGREE_3,arg,l)
             spu(it,1:4) = h(1:4)
             nru(it) = number
@@ -6952,11 +7013,10 @@ module fitpack_core
           number = 0
           do it=1,mv
             arg = v(it)
-            do while (.not.(arg<tv(l1) .or. l==nv4))
-                l = l1
-                l1 = l+1
-                number = number+1
-            end do
+            l0 = l
+            l = fp_knot_interval(tv, arg, l, nv4)
+            number = number + (l - l0)
+            l1 = l + 1
             h = fpbspl(tv,nv,DEGREE_3,arg,l)
             spv(it,1:4) = h(1:4)
             nrv(it) = number
@@ -7543,7 +7603,7 @@ module fitpack_core
       logical(FP_BOOL) :: lmin
       real(FP_REAL) :: a,ak,arg,b,f
       !  ..local arrays..
-      real(FP_REAL) aint(6),h(MAX_ORDER+1),h1(6)
+      real(FP_REAL) aint(DEGREE_5+1),h(MAX_ORDER+1),h1(DEGREE_5+1)
 
       integer(FP_SIZE), parameter :: nit = 2 ! number of iterations
 
@@ -7579,10 +7639,8 @@ module fitpack_core
       ia  = 0
       iterations: do it=1,nit
       !  search for the knot interval t(l) <= arg < t(l+1).
-        do while (.not.(arg<t(l0) .or. l==nk1))
-           l  = l0
-           l0 = l+1
-        end do
+        l = fp_knot_interval(t, arg, l, nk1)
+        l0 = l + 1
       !  calculation of aint(j), j=1,2,...,k+1.
       !  initialization.
         aint(1)  = (arg-t(l))/(t(l+1)-t(l))
@@ -8161,19 +8219,11 @@ module fitpack_core
       points: do im=1,m
          xi = x(im)
          yi = y(im)
-         l = kx1
-         l1 = l+1
-         do while (.not.(xi<tx(l1) .or. l==nk1x))
-            l = l1
-            l1 = l+1
-         end do
+         l = fp_knot_interval(tx, xi, kx1, nk1x)
+         l1 = l + 1
 
-         k = ky1
-         k1 = k+1
-         do while (.not.(yi<ty(k1) .or. k==nk1y))
-            k = k1
-            k1 = k+1
-         end do
+         k = fp_knot_interval(ty, yi, ky1, nk1y)
+         k1 = k + 1
          num = (l-kx1)*nyy+k-ky
          nummer(im) = index(num)
          index(num) = im
@@ -8319,9 +8369,7 @@ module fitpack_core
            xi = x((it-1)*idim+1:it*idim)*wi
 
            ! search for knot interval t(l) <= ui < t(l+1).
-           do while (ui>=t(l+1) .and. l/=nk1)
-              l = l+1
-           end do
+           l = fp_knot_interval(t, ui, l, nk1)
 
            ! evaluate the (k+1) non-zero b-splines at ui and store them in q.
            h = fpbspl(t,n,k,ui,l)
@@ -8993,7 +9041,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,i3,j,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                  nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1),h1(7),h2(6)
+      real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_5+2),h2(DEGREE_5+1)
       logical(FP_BOOL) :: done,check1,check3,success
 
       fpold = zero
@@ -9176,9 +9224,7 @@ module fitpack_core
             yi = y(it)*wi
 
             ! search for knot interval t(l) <= xi < t(l+1).
-            do while (xi>=t(l+1))
-               l = l+1
-            end do
+            l = fp_knot_interval(t, xi, l, nk1)
 
             ! evaluate the (k+1) non-zero b-splines at xi and store them in q.
             h = fpbspl(t,n,k,xi,l)
@@ -9282,26 +9328,8 @@ module fitpack_core
 
              ! rotation of the new row of the observation matrix into triangle in case the b-splines
              ! nj,k+1(x),j=n7+1,...n-k-1 are all zero at xi.
-             j = l5
-             new_row: do i=1,kk1
-                j = j+1
-                piv = h(i)
-                if (equal(piv,zero)) cycle new_row
-
-                call fpgivs(piv,a1(j,1),cos,sin)
-                ! calculate the parameters of the givens transformation.
-                ! transformations to right hand side.
-                call fprota(cos,sin,yi,z(j))
-                if (i==kk1) exit new_row
-                i2 = 1
-                i3 = i+1
-
-                !  transformations to left hand side. TODO replace with array call
-                do i1=i3,kk1
-                   i2 = i2+1
-                   call fprota(cos,sin,h(i1),a1(j,i2))
-                end do
-             end do new_row
+             ! rotate the new row of the observation matrix into triangle.
+             call fp_rotate_row(h, kk1, a1, yi, z, l5)
 
           endif
 
@@ -10198,20 +10226,8 @@ module fitpack_core
                  h(2) = merge(u3*wi,zero,iopt3==0)
                  h(3) = merge(u2*(one-uu)*wi,zero,iopt2<=1)
                  h(4) = merge(uu*(one-u2)*wi,zero,iopt2<=0)
-                 do j=1,4
-                    piv = h(j)
-                    if (equal(piv,zero)) cycle
-                    call fpgivs(piv,a(j,1),co,si)
-                    call fprota(co,si,zi,f(j))
-                    if (j<4) then
-                        j1 = j+1
-                        j2 = 1
-                        do l=j1,4
-                           j2 = j2+1
-                           call fprota(co,si,h(l),a(j,j2))
-                        end do
-                    endif
-                 end do
+                 ! rotate the initial polynomial row into triangle.
+                 call fp_rotate_row(h, 4, a, zi, f, 0)
                  sup = sup+zi*zi
               end do initial_poly
 
@@ -10461,22 +10477,7 @@ module fitpack_core
                 h(1:iband) = wi*h(1:iband)
 
                 ! rotate the row into triangle by givens transformations.
-                irot = jrot
-                rotate: do i=1,iband
-                  irot = irot+1
-                  piv  = h(i)
-                  if (equal(piv,zero)) cycle rotate
-
-                  ! calculate the parameters of the givens transformation.
-                  call fpgivs(piv,a(irot,1),co,si)
-
-                  ! apply that transformation to the right hand side.
-                  call fprota(co,si,zi,f(irot))
-
-                  ! apply that transformation to the left hand side.
-                  if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
-
-                end do rotate
+                call fp_rotate_row(h, iband, a, zi, f, jrot)
 
                 ! add the contribution of the row to the sum of squares of residual right hand sides.
                 fp = fp+zi**2
@@ -12588,22 +12589,7 @@ module fitpack_core
                   h(:iband) = h(:iband)*wi
 
                   ! rotate the row into triangle by givens transformations.
-                  irot = jrot
-                  rotate: do i=1,iband
-                    irot = irot+1
-                    piv  = h(i)
-                    if (equal(piv,zero)) cycle rotate
-
-                    ! calculate the parameters of the givens transformation.
-                    call fpgivs(piv,a(irot,1),co,si)
-
-                    ! apply that transformation to the right hand side.
-                    call fprota(co,si,ri,f(irot))
-
-                    ! apply that transformation to the left hand side.
-                    if (i<iband) call fprota(co,si,h(i+1:iband),a(irot,2:1+iband-i))
-
-                  end do rotate
+                  call fp_rotate_row(h, iband, a, ri, f, jrot)
 
                   ! add the contribution of the row to the sum of squares of residual
                   ! right hand sides.
@@ -13067,13 +13053,10 @@ module fitpack_core
       tb = tu(4)
       te = tu(nu4+1)
       l  = 4
-      l1 = l+1
       do i=1,mu
         arg = min(max(tb,u(i)),te)
-        do while (.not.(arg<tu(l1) .or. l==nu4))
-           l = l1
-           l1 = l+1
-        end do
+        l = fp_knot_interval(tu, arg, l, nu4)
+        l1 = l + 1
         h = fpbspl(tu,nu,DEGREE_3,arg,l)
         lu(i) = l-4
         wu(i,1:4) = h(1:4)
@@ -13084,13 +13067,10 @@ module fitpack_core
       tb = tv(4)
       te = tv(nv4+1)
       l = 4
-      l1 = l+1
       do i=1,mv
          arg = min(max(v(i),tb),te)
-         do while (.not.(arg<tv(l1) .or. l==nv4))
-           l = l1
-           l1 = l+1
-         end do
+         l = fp_knot_interval(tv, arg, l, nv4)
+         l1 = l + 1
          h = fpbspl(tv,nv,DEGREE_3,arg,l)
          lv(i) = l-4
          wv(i,1:4) = h(1:4)
@@ -13991,7 +13971,7 @@ module fitpack_core
       integer(FP_SIZE) :: i,irot,it,ii,i2,j,jj,l,mid,nmd,m2,m3,nrold,n4,number,n1,n7,n11,m1
       integer(FP_SIZE) :: ij,jk,jper,l0,l1,ik
       !  ..local arrays..
-      real(FP_REAL) :: h(5),h1(5),h2(4)
+      real(FP_REAL) :: h(DEGREE_3+2),h1(DEGREE_3+2),h2(DEGREE_3+1)
 
       !  ..
       pinv = merge(one/p,one,p>zero)
@@ -14277,10 +14257,7 @@ module fitpack_core
       endif        
       !  search for knot interval t(l) <= x < t(l+1).
       nk1 = nk-1
-      l = k1
-      do while (x>=t(l+1) .and. l/=nk1)
-         l = l+1
-      end do
+      l = fp_knot_interval(t, x, k1, nk1)
 
       !  no interval found in whole range
       if (t(l)>=t(l+1)) then 
@@ -16902,10 +16879,7 @@ module fitpack_core
       if (x<t(k1) .or. x>t(nk1+1)) return
 
       !  search for knot interval t(l) <= x < t(l+1)
-      l = k1
-      do while (.not.(x<t(l+1) .or. l==nk1))
-         l = l+1
-      end do
+      l = fp_knot_interval(t, x, k1, nk1)
 
       if(t(l)>=t(l+1)) return
 
