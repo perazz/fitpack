@@ -5,6 +5,8 @@
 build/*
 project/bin/*
 project/obj/*
+docs/book
+docs/papers
 exact_grid
 loop_1
 loop_2
