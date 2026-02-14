@@ -77,21 +77,19 @@ Removed unused variables: `cos`, `sin`, `piv`, `i3`, `iq`, `ic` from `fpgrre`;
 `cos`, `sin`, `piv`, `i2`, `i3` from `fptrnp`;
 `co`, `si`, `piv`, `i2`, `ij` from `fptrpe`.
 
+### PR 9: TVdP Tree Node Type (DONE)
+
+**Changes**: Introduced `fitpack_tree_node` derived type with 4 integer fields (`info`,
+`up`, `left`, `right`) replacing 4 parallel integer arrays for the triply-linked binary
+tree used by the Theil-Van de Panne (TVdP) convexity-constrained spline fitting procedure.
+Refactored `fpcosp` to allocate the tree locally (removing 4 array arguments from its
+signature), and updated all 4 helper routines (`fpadno`, `fpdeno`, `fpfrno`, `fpseno`) to
+take a single `tree(maxtr)` array. Updated callers `cocosp` and `fpcoco` to remove tree
+workspace slicing from `iwrk`, reducing `iwrk` requirement by `4*maxtr` integers.
+
 ---
 
 ## Remaining Plan
-
-Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 10+) can
-proceed in parallel with any code PR.
-
-### PR 9: Back-Substitution Interface
-
-**Scope**: Unify `fpback` and `fpbacp` under a generic `fp_backsolve` interface
-**Occurrences**: ~25 call sites
-**Difficulty**: Low — clean abstraction, no logic changes
-**Book references**: Ch. 4 Eq. 4.14 (R₁·c = z₁), Ch. 5 Eq. 5.15 (R₁*·c = z₁*)
-
----
 
 ### PR 10+: Doxygen + MathJax Documentation
 

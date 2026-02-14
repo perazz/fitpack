@@ -198,6 +198,17 @@ module fitpack_core
         module procedure FP_SIZE_COMM_EXPAND_1D
     end interface FP_COMM_EXPAND
 
+    !> Node of the triply-linked binary tree used by the Theil-Van de Panne
+    !> procedure for convexity-constrained spline fitting (Book §7.2, Fig. 7.1).
+    !> The tree stores subsets of binding inequality constraints; each path from
+    !> root to leaf represents one candidate constraint set.
+    type :: fitpack_tree_node
+        integer(FP_SIZE) :: info  = 0  !> Constraint number stored at this node
+        integer(FP_SIZE) :: up    = 0  !> Parent node index (root points to itself)
+        integer(FP_SIZE) :: left  = 0  !> Left child index (0 = no child)
+        integer(FP_SIZE) :: right = 0  !> Right child index (0 = no child)
+    end type fitpack_tree_node
+
     contains
 
       ! Flow control: on output flag present, return it;
@@ -801,7 +812,7 @@ module fitpack_core
       !   wrk  : real array of dimension at least  m*4+n*7+maxbin*(maxbin+n+1). used as working space.
       !   lwrk : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared in
       !          the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk : integer array of dimension at least (maxtr*4+2*(maxbin+1)). used as working space.
+      !   iwrk : integer array of dimension at least (2*(maxbin+1)). used as working space.
       !   kwrk : integer. on entry,kwrk must specify the actual dimension of the array iwrk as declared in
       !          the calling (sub)program. kwrk must not be too small (see iwrk). unchanged on exit.
       !   ier   : integer. error flag
@@ -817,7 +828,7 @@ module fitpack_core
       !                   m>3, maxtr>=1, maxbin>=1, 8<=n<=m+4,w(i) > 0,
       !                   x(1)<x(2)<...<x(m), t(1)<=t(2)<=t(3)<=t(4)<=x(1),
       !                   x(1)<t(5)<t(6)<...<t(n-4)<x(m)<=t(n-3)<=...<=t(n),
-      !                   kwrk>=maxtr*4+2*(maxbin+1),
+      !                   kwrk>=2*(maxbin+1),
       !                   lwrk>=m*4+n*7+maxbin*(maxbin+n+1),
       !                   the schoenberg-whitney conditions, i.e. there must be a subset of data points
       !                   xx(j) such that
@@ -859,14 +870,14 @@ module fitpack_core
       logical(FP_BOOL), intent(out)   :: bind(n)
 
       !  ..local scalars..
-      integer(FP_SIZE) :: ia,ib,ic,iq,iu,iz,izz,ji,jib,jjb,jl,jr,ju,kwest,lwest,mb,nm,n6
+      integer(FP_SIZE) :: ia,ib,ic,iq,iu,iz,izz,jib,jjb,kwest,lwest,mb,nm,n6
 
       !  before starting computations a data check is made. if the input data
       !  are invalid, control is immediately repassed to the calling program.
       ier = FITPACK_INPUT_ERROR
 
       lwest = 7*n+m*4+maxbin*(1+n+maxbin)
-      kwest = 4*maxtr+2*(maxbin+1)
+      kwest = 2*(maxbin+1)
       n6    = n-6
 
       if (m<4 .or. n<8)               return
@@ -890,16 +901,12 @@ module fitpack_core
       izz = iz+n
       iu  = izz+n
       iq  = iu+maxbin
-      ji  = 1
-      ju  = ji+maxtr
-      jl  = ju+maxtr
-      jr  = jl+maxtr
-      jjb = jr+maxtr
+      jjb = 1
       jib = jjb+mb
 
-      call fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,wrk(ia),    &
-                  wrk(ib),wrk(ic),wrk(iz),wrk(izz),wrk(iu),wrk(iq),iwrk(ji), &
-                  iwrk(ju),iwrk(jl),iwrk(jr),iwrk(jjb),iwrk(jib),ier)
+      call fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,wrk(ia), &
+                  wrk(ib),wrk(ic),wrk(iz),wrk(izz),wrk(iu),wrk(iq),      &
+                  iwrk(jjb),iwrk(jib),ier)
 
       return
       end subroutine cocosp
@@ -978,7 +985,7 @@ module fitpack_core
       !          space.
       !   lwrk : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared in
       !          the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk : integer array of dimension at least (maxtr*4+2*(maxbin+1)) used as working space.
+      !   iwrk : integer array of dimension at least (2*(maxbin+1)) used as working space.
       !   kwrk : integer. on entry,kwrk must specify the actual dimension of the array iwrk as declared in
       !          the calling (sub)program. kwrk must not be too small (see iwrk). unchanged on exit.
       !   ier   : integer. error flag
@@ -1010,7 +1017,7 @@ module fitpack_core
       !        ier=10 : on entry, the input data are controlled on validity. the following restrictions
       !                 must be satisfied
       !                   0<=iopt<=1, m>3, nest>=8, s>=0, maxtr>=1, maxbin>=1,
-      !                   kwrk>=maxtr*4+2*(maxbin+1), w(i)>0, x(i) < x(i+1),
+      !                   kwrk>=2*(maxbin+1), w(i)>0, x(i) < x(i+1),
       !                   lwrk>=m*4+nest*8+maxbin*(maxbin+nest+1)
       !                 if one of these restrictions is found to be violated
       !                 control is immediately repassed to the calling program
@@ -1068,7 +1075,7 @@ module fitpack_core
       ier = FITPACK_INPUT_ERROR
 
       lwest = 8*nest+m*4+maxbin*(1+nest+maxbin)
-      kwest = 4*maxtr+2*(maxbin+1)
+      kwest = 2*(maxbin+1)
 
       if (iopt<0 .or. iopt>1)         return
       if (m<4 .or. nest<8)            return
@@ -2214,12 +2221,12 @@ module fitpack_core
       end subroutine fpader
 
 
-      pure subroutine fpadno(maxtr,up,left,right,info,count,merk,jbind,n1,ier)
+      pure subroutine fpadno(tree,maxtr,count,merk,jbind,n1,ier)
 
       !  subroutine fpadno adds a branch of length n1 to the triply linked tree,the information of
-      !  which is kept in the arrays up,left,right and info. the information field of the nodes of
-      !  this new branch is given in the array jbind. in linking the new branch fpadno takes account
-      !  of the property of the tree that info(k) < info(right(k)) ; info(k) < info(left(k))
+      !  which is kept in the array tree. the information field of the nodes of this new branch is
+      !  given in the array jbind. in linking the new branch fpadno takes account of the property
+      !  of the tree that info(k) < info(right(k)) ; info(k) < info(left(k))
       !  if necessary the subroutine calls subroutine fpfrno to collect the free nodes of the tree.
       !  if no computer words are available at that moment, the error parameter ier is set to 1.
       !  ..
@@ -2228,7 +2235,7 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: count,merk
       integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      type(fitpack_tree_node), intent(inout) :: tree(maxtr)
       integer(FP_SIZE), intent(in)    :: jbind(n1)
       !  ..local scalars..
       integer(FP_SIZE) :: k,level,point
@@ -2237,16 +2244,16 @@ module fitpack_core
       !  ..
       point   = 1
       level   = 1
-      k       = left(point)
+      k       = tree(point)%left
       is_left = .true.
-      loop: do while (k/=0 .and. info(max(1,k))-jbind(min(level,n1))<=0)
+      loop: do while (k/=0 .and. tree(max(1,k))%info-jbind(min(level,n1))<=0)
           point = k
-          if (info(k)-jbind(level)<0) then
-              k       = right(point)
+          if (tree(k)%info-jbind(level)<0) then
+              k       = tree(point)%right
               is_left = FP_FALSE
-          else ! info(k)-jbind(level)==0
+          else ! tree(k)%info-jbind(level)==0
               level  = level+1
-              k       = left(point)
+              k       = tree(point)%left
               is_left = FP_TRUE
           endif
       end do loop
@@ -2254,21 +2261,21 @@ module fitpack_core
       loop2: do while (level<=n1)
           count = count+1
           if (count>maxtr) then
-             call fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
+             call fpfrno(tree,maxtr,point,merk,n1,count,ier)
              if (ier/=FITPACK_OK) return
           endif
 
-          info (count) = jbind(level)
-          left (count) = 0
-          right(count) = k
+          tree(count)%info  = jbind(level)
+          tree(count)%left  = 0
+          tree(count)%right = k
 
           if(is_left) then
-              up   (count) = point
-              left (point) = count
+              tree(count)%up   = point
+              tree(point)%left = count
           else
-              is_left      = .true.
-              right(point) = count
-              up   (count) = up(point)
+              is_left            = .true.
+              tree(point)%right  = count
+              tree(count)%up    = tree(point)%up
           endif
 
           point        = count
@@ -3670,7 +3677,7 @@ module fitpack_core
 
       logical(FP_BOOL), intent(inout) ::  bind(nest)
       !  ..local scalars..
-      integer(FP_SIZE) :: i,ia,ib,ic,iq,it,iu,iz,izz,i1,j,k,l,l1,m1,nmax,nr,n4,n6,n8,ji,jib,jjb,jl,jr,ju,mb,nm
+      integer(FP_SIZE) :: i,ia,ib,ic,iq,it,iu,iz,izz,i1,j,k,l,l1,m1,nmax,nr,n4,n6,n8,jib,jjb,mb,nm
       real(FP_REAL) :: sql,sqmax,term,tj,xi
       !  ..subroutine references..
       !    fpcosp,fpbspl,fpadno,fpdeno,fpseno,fpfrno
@@ -3749,18 +3756,14 @@ module fitpack_core
               izz = iz+n
               iu  = izz+n
               iq  = iu+maxbin
-              ji  = 1
-              ju  = ji+maxtr
-              jl  = ju+maxtr
-              jr  = jl+maxtr
-              jjb = jr+maxtr
+              jjb = 1
               jib = jjb+mb
 
               !  given the set of knots t(j),j=1,2,...n, find the least-squares cubic
               !  spline which satisfies the imposed concavity/convexity constraints.
               call fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,wrk(ia), &
-                          wrk(ib),wrk(ic),wrk(iz),wrk(izz),wrk(iu),wrk(iq),iwrk(ji), &
-                          iwrk(ju),iwrk(jl),iwrk(jr),iwrk(jjb),iwrk(jib),ier)
+                          wrk(ib),wrk(ic),wrk(iz),wrk(izz),wrk(iu),wrk(iq),      &
+                          iwrk(jjb),iwrk(jib),ier)
 
               !  if sq <= s or in case of abnormal exit from fpcosp, control is
               !  repassed to the driver program.
@@ -4261,7 +4264,7 @@ module fitpack_core
       end subroutine fpcons
 
       pure subroutine fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,a, &
-                             b,const,z,zz,u,q,info,up,left,right,jbind,ibind,ier)
+                             b,const,z,zz,u,q,jbind,ibind,ier)
 
       !  ..
       !  ..scalar arguments..
@@ -4271,14 +4274,14 @@ module fitpack_core
       !  ..array arguments..
       real(FP_REAL),    intent(in)  :: x(m),y(m),w(m),t(n),e(n)
       real(FP_REAL),    intent(inout) :: c(n),sx(m),a(n,4),b(nm,maxbin),const(n),z(n),zz(n),u(maxbin),q(m,4)
-      integer(FP_SIZE), intent(inout)   :: info(maxtr),up(maxtr),left(maxtr),right(maxtr)
       integer(FP_SIZE), intent(inout)   :: ibind(mb),jbind(mb)
       logical(FP_BOOL), intent(inout)   :: bind(n)
       !  ..local scalars..
       integer(FP_SIZE) :: count,i,i1,j,j1,j2,j3,k,kdim,k1,k2,k3,k4,k5,k6,l,l1,l2,l3,merk,nbind,violated,n1,n4,n6
       real(FP_REAL) :: f,wi,xi
-      !  ..local array..
+      !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1)
+      type(fitpack_tree_node) :: tree(maxtr)
       !  ..subroutine references..
       !    fpbspl,fpadno,fpdeno,fpfrno,fpseno
       !  ..
@@ -4304,12 +4307,9 @@ module fitpack_core
 
       !  initialize the triply linked tree which is used to find the subset of constraints
       !  ibind(1),...ibind(nbind).
-      count    = 1
-      info(1)  = 0
-      left(1)  = 0
-      right(1) = 0
-      up(1)    = 1
-      merk     = 1
+      count = 1
+      tree(1) = fitpack_tree_node(info=0, up=1, left=0, right=0)
+      merk  = 1
 
       !  set up the normal equations  n'nc=n'y  where n denotes the m x (n-4) observation matrix with
       !  elements ni,j = wi*nj(xi)  and y is the column vector with elements yi*wi.
@@ -4562,7 +4562,7 @@ module fitpack_core
             jbind(k) = j
             if (l>0) jbind(k+1:nbind+1) = ibind(k:nbind)
 
-            call fpadno(maxtr,up,left,right,info,count,merk,jbind,n1,ier)
+            call fpadno(tree,maxtr,count,merk,jbind,n1,ier)
 
             ! test whether the storage space which is required for the tree,
             ! exceeds the available storage space.
@@ -4594,7 +4594,7 @@ module fitpack_core
                      ibind(n1) = 0
                      !  search which cases with nbind constraints in equality form
                      !  are going to be considered.
-                     call fpdeno(maxtr,up,left,right,nbind,merk)
+                     call fpdeno(tree,maxtr,nbind,merk)
                      !  test whether the quadratic programming problem has a solution.
                      if (merk==1) then
                         ier = 3
@@ -4603,7 +4603,7 @@ module fitpack_core
                   endif
 
                   ! find a new case with nbind constraints in equality form.
-                  call fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
+                  call fpseno(tree,maxtr,merk,ibind,nbind)
 
                   exit test_feasible ! cycle least_squares
 
@@ -5251,13 +5251,13 @@ module fitpack_core
       ! subroutine fpdeno frees the nodes of all branches of a triply linked tree with length < nbind
       ! by putting to zero their up field. on exit the parameter merk points to the terminal node of
       ! the most left branch of length nbind or takes the value 1 if there is no such branch.
-      pure subroutine fpdeno(maxtr,up,left,right,nbind,merk)
+      pure subroutine fpdeno(tree,maxtr,nbind,merk)
       !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: maxtr,nbind
       integer(FP_SIZE), intent(out) :: merk
       !  ..array arguments..
-      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr)
+      type(fitpack_tree_node), intent(inout) :: tree(maxtr)
 
       ! ..local scalars ..
       integer(FP_SIZE) :: i,j,k,l,level,point
@@ -5271,7 +5271,7 @@ module fitpack_core
           ! Descend leftward until there are points
           move_left: do
               point = i
-              i = left(point)
+              i = tree(point)%left
               if (i==0) exit move_left
               level = level+1
           end do move_left
@@ -5280,26 +5280,26 @@ module fitpack_core
           if (level/=nbind)then
 
               clear_node: do
-                  i = right(point)
-                  j = up(point)
+                  i = tree(point)%right
+                  j = tree(point)%up
 
                   ! Free node
-                  up (point) = 0
+                  tree(point)%up = 0
 
-                  k = left(j)
+                  k = tree(j)%left
                   if (point/=k) then
                       descend_right: do
-                         l = right(k)
+                         l = tree(k)%right
                          if (point==l) exit descend_right
                          k = l
                       end do descend_right
-                      right(k) = i
+                      tree(k)%right = i
                       point = k
-                      i = right(point)
+                      i = tree(point)%right
                       exit clear_node
                   elseif (i/=0) then
                       ! Attach this node to the right
-                      left(j) = i
+                      tree(j)%left = i
                       cycle new_branch
                   else
                       level = level-1
@@ -5315,11 +5315,11 @@ module fitpack_core
           ! restart from that branch if found
           move_up: do
 
-             i = right(point)
+             i = tree(point)%right
              if (i/=0) exit move_up
 
              ! Move up onw level
-             i     = up(point)
+             i     = tree(point)%up
              level = level-1
              if (level==0) exit new_branch
              ! Restart from upper level
@@ -5329,12 +5329,12 @@ module fitpack_core
       end do new_branch
 
       k = 1
-      l = left(k)
+      l = tree(k)%left
       merk = 1
-      if (up(l)==0) return
+      if (tree(l)%up==0) return
       find_merk: do while (k/=0)
          merk = k
-         k = left(k)
+         k = tree(k)%left
       end do find_merk
       return
       end subroutine fpdeno
@@ -5390,7 +5390,7 @@ module fitpack_core
       !  information of which is kept in the arrays up,left,right and info. the maximal length of the
       !  branches of the tree is given by n1. if no free nodes are found, the error flag ier is set
       !  to 1.
-      pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
+      pure subroutine fpfrno(tree,maxtr,point,merk,n1,count,ier)
 
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: maxtr,n1
@@ -5398,7 +5398,7 @@ module fitpack_core
       integer(FP_SIZE), intent(out)   :: count
       integer(FP_FLAG), intent(out)   :: ier
       !  ..array arguments..
-      integer(FP_SIZE), intent(inout) :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+      type(fitpack_tree_node), intent(inout) :: tree(maxtr)
       !  ..local scalars
       integer(FP_SIZE) :: i,j,k,l,n,level
       !  ..
@@ -5416,7 +5416,7 @@ module fitpack_core
          inner : do
 
             march_left: do while (j/=level)
-               l = left(i)
+               l = tree(i)%left
                if (l==0) exit march_left
                i = l
                j = j+1
@@ -5428,25 +5428,22 @@ module fitpack_core
                elseif (i==count) then
                    count = count+1
                    exit
-               elseif (up(count)==0) then
-                   up   (count) = up   (i)
-                   left (count) = left (i)
-                   right(count) = right(i)
-                   info (count) = info (i)
+               elseif (tree(count)%up==0) then
+                   tree(count) = tree(i)  ! copy entire node
                    if( merk==i) merk  = count
                    if(point==i) point = count
                    if (k==0) then
-                      n = up(i)
-                      left(n) = count
+                      n = tree(i)%up
+                      tree(n)%left = count
                    else
-                      right(k) = count
+                      tree(k)%right = count
                    endif
-                   l = left(i)
+                   l = tree(i)%left
                    do while (l/=0)
-                      up(l) = count
-                      l = right(l)
+                      tree(l)%up = count
+                      l = tree(l)%right
                    end do
-                   up(i) = 0
+                   tree(i)%up = 0
                    i = count
                    count = count+1
                    exit
@@ -5456,11 +5453,11 @@ module fitpack_core
             end do
 
             hundred10: do
-                l = right(i)
+                l = tree(i)%right
                 k = i
 
                 if (l==0) then
-                    l = up(i)
+                    l = tree(i)%up
                     j = j-1
                     if (j==0) then
                         exit inner
@@ -11545,36 +11542,36 @@ module fitpack_core
       ! its terminal node. the information field of the nodes of this branch is stored in the array
       ! ibind. on exit merk points to a new branch of length nbind or takes the value 1 if no such
       !  branch was found.
-      pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
+      pure subroutine fpseno(tree,maxtr,merk,ibind,nbind)
 
           !  ..scalar arguments..
-          integer(FP_SIZE), intent(in)    :: maxtr   ! Tree array sizes
+          integer(FP_SIZE), intent(in)    :: maxtr   ! Tree array size
           integer(FP_SIZE), intent(inout) :: merk    ! (in) terminal node of the branch
           integer(FP_SIZE), intent(in)    :: nbind
           !  ..array arguments..
-          integer(FP_SIZE), intent(in)    :: up(maxtr),left(maxtr),right(maxtr),info(maxtr)
+          type(fitpack_tree_node), intent(in) :: tree(maxtr)
           integer(FP_SIZE), intent(out)   :: ibind(nbind)
-          !  ..scalar arguments..
+          !  ..local scalars..
           integer(FP_SIZE) :: i,j,k
           !  ..
           k = merk
           j = nbind
           do i=1,nbind
-             ibind(j) = info(k)
-             k = up(k)
+             ibind(j) = tree(k)%info
+             k = tree(k)%up
              j = j-1
           end do
 
           do
-              k = right(merk)
+              k = tree(merk)%right
               if (k/=0) exit
-              merk = up(merk)
+              merk = tree(merk)%up
               if (merk<=1) return
           end do
 
           do
               merk = k
-              k = left(merk)
+              k = tree(merk)%left
               if (k==0) exit
           end do
 
