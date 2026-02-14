@@ -64,23 +64,25 @@ Removed unused variables: `cos`, `sin`, `piv`, `i2` from `fpcurf`;
 `cos`, `sin`, `piv`, `irot`, `i2` from `fpsurf`; `i2` from `fppola`;
 `piv`, `ij` from `fpperi`.
 
+### PR 8: Grid/Surface Givens Rotations (DONE)
+
+**Changes**: Added 3 new helpers for grid/surface Givens rotation patterns:
+`fp_rotate_row_block` (contiguous-block RHS), `fp_rotate_row_stride` (stride/row-access
+RHS), and `fp_rotate_2mat_stride` (two-matrix shifted-pivot with stride RHS).
+Replaced 14 `fpgivs` call sites across 5 routines: 2 in `fpgrre` (AX block, AY stride),
+4 in `fpgrdi` (AUU block, AVV two-matrix, AVV simple), 4 in `fpgrsp` (AUU block,
+AVV simple, AVV two-matrix), 1 in `fptrnp` (stride), 3 in `fptrpe` (two-matrix, simple).
+Removed unused variables: `cos`, `sin`, `piv`, `i3`, `iq`, `ic` from `fpgrre`;
+`co`, `si`, `piv`, `i3`, `ic`, `iq` from `fpgrdi` and `fpgrsp`;
+`cos`, `sin`, `piv`, `i2`, `i3` from `fptrnp`;
+`co`, `si`, `piv`, `i2`, `ij` from `fptrpe`.
+
 ---
 
 ## Remaining Plan
 
-Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 9) can
+Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 10+) can
 proceed in parallel with any code PR.
-
-### PR 8: Variant D Givens Rotations
-
-**Scope**: Grid/surface fitting rotation patterns
-**New routine**: `fp_rotate_row_grid` (2D RHS)
-**Occurrences**: ~15 locations in `fpgrdi`, `fpgrre`, `fpgrsp`, `fptrnp`, `fptrpe`,
-`fpsurf`, `fpsphe`, `fppola`
-**Difficulty**: Medium — 2D indexing and varying loop structures
-**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variant D
-
----
 
 ### PR 9: Back-Substitution Interface
 
