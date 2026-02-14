@@ -3034,9 +3034,9 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(FP_REAL) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,piv,p1,p2,p3,sin,store,&
+      real(FP_REAL) :: acc,cos,d1,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,per,pinv,p1,p2,p3,sin,store,&
                      term,ui,wi,rn
-      integer(FP_SIZE) :: i,ij,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
+      integer(FP_SIZE) :: i,ik,it,iter,i1,i2,j,jj,jk,jper,j1,j2,kk,kk1,k3,l,l0,l1,l5,mm,m1,new,&
                           nk1,nk2,nmax,nmin,nplus,npl1,nrint,n10,n11,n7,n8
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1),h1(DEGREE_5+2),h2(DEGREE_5+1),xi(MAX_IDIM)
@@ -3296,50 +3296,7 @@ module fitpack_core
 
                   ! rotate the new row of the observation matrix into triangle
                   ! by givens transformations.
-                  if (n10>0) then
-                      ! rotation with the rows 1,2,...n10 of matrix a.
-                      one_to_n10: do j=1,n10
-                          piv = h1(1)
-                          if (equal(piv,zero)) then
-                             h1(1:kk1) = [h1(2:kk1),zero]
-                          else
-                             ! calculate the parameters of the givens transformation.
-                             call fpgivs(piv,a1(j,1),cos,sin)
-
-                             ! transformation to the right hand side.
-                             call fprota(cos,sin,xi(1:idim),z(j:j+(idim-1)*n:n))
-
-                             ! transformations to the left hand side with respect to a2.
-                             call fprota(cos,sin,h2(1:kk),a2(j,1:kk))
-
-                             if (j==n10) exit one_to_n10
-                             i2 = min(n10-j,kk)+1
-
-                             ! transformations to the left hand side with respect to a1.
-                             call fprota(cos,sin,h1(2:i2),a1(j,2:i2))
-                             h1(1:i2) = [h1(2:i2),zero]
-                          endif
-                      end do one_to_n10
-                  endif ! n10>0
-
-                  ! rotation with the rows n10+1,...n7 of matrix a.
-                  n10_to_n7: do j=1,kk
-                      ij = n10+j
-                      piv = h2(j)
-                      if (ij<=0 .or. equal(piv,zero)) cycle n10_to_n7
-
-                      ! calculate the parameters of the givens transformation.
-                      call fpgivs(piv,a2(ij,j),cos,sin)
-                      ! transformations to right hand side.
-                      call fprota(cos,sin,xi(1:idim),z(ij:ij+(idim-1)*n:n))
-
-                      if (j==kk) exit n10_to_n7
-
-                      ! transformations to left hand side.
-                      j1 = j+1
-                      call fprota(cos,sin,h2(j1:kk),a2(ij,j1:kk))
-
-                  end do n10_to_n7
+                  call fp_rotate_row_2mat_vec(h1, kk1, h2, kk, a1, a2, nest, xi, z, 1, n10, n, idim)
 
               else all_zero
 
@@ -3579,46 +3536,7 @@ module fitpack_core
              endif
 
              ! rotate this row into triangle by givens transformations
-             ! rotation with the rows l,l+1,...n11.
-             rot_n11: do j=l,n11
-                 piv = h1(1)
-
-                 ! calculate the parameters of the givens transformation.
-                 call fpgivs(piv,g1(j,1),cos,sin)
-
-                 ! transformation to right hand side.
-                 call fprota(cos,sin,xi(1:idim),c(j:j+(idim-1)*n:n))
-
-                 ! transformation to the left hand side with respect to g2.
-                 call fprota(cos,sin,h2(1:k1),g2(j,1:k1))
-
-                 if (j==n11) exit rot_n11
-
-                 ! transformation to the left hand side with respect to g1.
-                 i2 = min(n11-j,k1)+1
-                 call fprota(cos,sin,h1(2:i2),g1(j,2:i2))
-                 h1(1:i2) = [h1(2:i2),zero]
-
-             end do rot_n11
-
-             ! rotation with the rows n11+1,...n7
-             rot_n10_n7: do j=1,k1
-                ij = n11+j
-                if (ij<=0) cycle rot_n10_n7
-                piv = h2(j)
-
-                ! calculate the parameters of the givens transformation
-                call fpgivs(piv,g2(ij,j),cos,sin)
-
-                ! transformation to the right hand side.
-                call fprota(cos,sin,xi(1:idim),c(ij:ij+(idim-1)*n:n))
-
-                if (j<k1) then
-                   ! transformation to the left hand side.
-                   j1 = j+1
-                   call fprota(cos,sin,h2(j1:k1),g2(ij,j1:k1))
-                endif
-             end do rot_n10_n7
+             call fp_rotate_row_2mat_vec(h1, k2, h2, k1, g1, g2, nest, xi, c, l, n11, n, idim)
         end do n8_rows
 
         ! backward substitution to obtain the b-spline coefficients
@@ -3945,8 +3863,8 @@ module fitpack_core
       real(FP_REAL), intent(inout) :: t(nest),c(nc),fpint(nest),z(nc),a(nest,k1),b(nest,k2),g(nest,k2),q(m,k1)
       integer(FP_SIZE), intent(inout) :: nrdata(nest)
       !  ..local scalars..
-      real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer(FP_SIZE) :: i,it,iter,i2,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
+      real(FP_REAL) :: acc,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,p1,p2,p3,rn,store,term,ui,wi
+      integer(FP_SIZE) :: i,it,iter,j,jb,je,jj,j1,j2,j3,kbe,l,li,lj,l0,mb,me,mm,nk1,&
                  nmax,nmin,nn,nplus,npl1,nrint,n8,mmin
       logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
@@ -4290,22 +4208,7 @@ module fitpack_core
            endif
 
            jj = max(1,it-ib)
-           b_cols: do j=jj,nn
-              piv = h(1)
-
-              ! calculate the parameters of the givens transformation.
-              call fpgivs(piv,g(j,1),cos,sin)
-
-              ! transformations to right hand side.
-              call fprota(cos,sin,xi(1:idim),c(j:j+(idim-1)*n:n))
-
-              ! transformations to left hand side.
-              if (j<nn) then
-                  i2 = min(nn-j,k1)+1
-                  call fprota(cos,sin,h(2:i2),g(j,2:i2))
-                  h(1:i2) = [h(2:i2),zero]
-              endif
-           end do b_cols
+           call fp_rotate_shifted_vec(h, k2, g, nest, xi, c, jj, nn, n, idim)
         end do b_rows
 
         ! backward substitution to obtain the b-spline coefficients.
@@ -5695,6 +5598,87 @@ module fitpack_core
               if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
           end do
       end subroutine fp_rotate_row_vec
+
+      !> Shifted-pivot variant of fp_rotate_row_vec: rotates a new observation row into
+      !> upper-triangular band matrix a(nest,band) using Givens rotations, with idim
+      !> right-hand sides stored column-wise in z(n,idim).
+      !>
+      !> Unlike fp_rotate_row_vec (which walks h(i) for i=1..band), this routine always
+      !> pivots on h(1) and shifts h left after each rotation step. The effective bandwidth
+      !> shrinks as the loop nears j_end. Used by smoothing iterations in fpcons (§7.2.3,
+      !> Eq. 7.12) and fppara (§6.3.1, Eq. 6.48) where the smoothing-matrix rows are
+      !> rotated into the already-triangularized observation matrix.
+      !>
+      !> Book ref: §4.1.2 Eq. 4.15 (Givens rotation), §5.2.2 Eq. 5.14-5.16 (smoothing
+      !> matrix P with bandwidth k+2), Fig. 5.1 (band structure of P and R₁*).
+      pure subroutine fp_rotate_shifted_vec(h, band, a, nest, xi, z, j_start, j_end, n, idim)
+          integer(FP_SIZE), intent(in)    :: band, nest, n, idim, j_start, j_end
+          real(FP_REAL),    intent(inout) :: h(band), a(nest,*), xi(idim), z(n,idim)
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i2, j
+
+          do j = j_start, j_end
+              piv = h(1)
+              call fpgivs(piv, a(j,1), cos, sin)
+              call fprota(cos, sin, xi, z(j, 1:idim))
+              if (j < j_end) then
+                  i2 = min(j_end - j, band - 1) + 1
+                  call fprota(cos, sin, h(2:i2), a(j, 2:i2))
+                  h(1:i2) = [h(2:i2), zero]
+              endif
+          end do
+      end subroutine fp_rotate_shifted_vec
+
+      !> Two-matrix variant of fp_rotate_row_vec for periodic spline fitting.
+      !> Rotates a split observation row [h1 | h2] into the block-triangular system
+      !> [a1 | a2] using Givens rotations, with idim right-hand sides in z(n,idim).
+      !>
+      !> Phase 1: Rotate h1 through a1 with shifting pivot (h1(1) always), while
+      !>   simultaneously applying cross-rotations to h2 and a2.
+      !> Phase 2: Rotate remaining h2 through a2 (standard, diagonal at a2(ij,j)).
+      !>
+      !> The two-matrix decomposition arises from periodic B-spline constraints that
+      !> wrap the last k columns of the observation matrix into the first k, creating
+      !> a block structure [R₁₁* R₁₂*; 0 R₂₂*] (§6.1.1, Eq. 6.13, Fig. 6.1).
+      !>
+      !> Book ref: §6.1.1 Eq. 6.10, 6.13 (periodic smoothing system and triangular
+      !> decomposition), §4.1.2 Eq. 4.15 (Givens rotation mechanics).
+      pure subroutine fp_rotate_row_2mat_vec(h1, band1, h2, band2, a1, a2, nest, &
+                                              xi, z, j1_start, j1_end, n, idim)
+          integer(FP_SIZE), intent(in)    :: band1, band2, nest, n, idim, j1_start, j1_end
+          real(FP_REAL),    intent(inout) :: h1(band1), h2(band2)
+          real(FP_REAL),    intent(inout) :: a1(nest,*), a2(nest,*)
+          real(FP_REAL),    intent(inout) :: xi(idim), z(n,idim)
+
+          real(FP_REAL) :: cos, sin, piv
+          integer(FP_SIZE) :: i2, ij, j
+
+          ! Phase 1: rotate h1 through a1 with shifting, cross-rotating h2/a2
+          do j = j1_start, j1_end
+              piv = h1(1)
+              call fpgivs(piv, a1(j,1), cos, sin)
+              call fprota(cos, sin, xi, z(j, 1:idim))
+              call fprota(cos, sin, h2(1:band2), a2(j, 1:band2))
+              if (j < j1_end) then
+                  i2 = min(j1_end - j, band1 - 1) + 1
+                  call fprota(cos, sin, h1(2:i2), a1(j, 2:i2))
+                  h1(1:i2) = [h1(2:i2), zero]
+              endif
+          end do
+
+          ! Phase 2: rotate h2 through a2 (diagonal at a2(ij,j))
+          do j = 1, band2
+              ij = j1_end + j
+              if (ij <= 0) cycle
+              piv = h2(j)
+              call fpgivs(piv, a2(ij,j), cos, sin)
+              call fprota(cos, sin, xi, z(ij, 1:idim))
+              if (j < band2) then
+                  call fprota(cos, sin, h2(j+1:band2), a2(ij, j+1:band2))
+              endif
+          end do
+      end subroutine fp_rotate_row_2mat_vec
 
 
       ! Compute spline coefficients on a rectangular grid
@@ -8247,8 +8231,8 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: nrdata(nest)
 
       !  ..local scalars..
-      real(FP_REAL) :: acc,cos,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,piv,p1,p2,p3,rn,sin,store,term,ui,wi
-      integer(FP_SIZE) :: i,it,iter,i2,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
+      real(FP_REAL) :: acc,fac,fpart,fpms,fpold,fp0,f1,f2,f3,p,pinv,p1,p2,p3,rn,store,term,ui,wi
+      integer(FP_SIZE) :: i,it,iter,j,jj,j1,j2,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       logical(FP_BOOL) :: new,check1,check3,success
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1),xi(idim)
@@ -8544,21 +8528,7 @@ module fitpack_core
             ! the row of matrix b is rotated into triangle by givens transformation
             h(1:k2) = b(it,1:k2)*pinv
             xi = zero
-            b_cols: do j=it,nk1
-               piv = h(1)
-
-               ! calculate the parameters of the givens transformation.
-               call fpgivs(piv,g(j,1),cos,sin)
-
-               ! transformations to right hand side.
-               call fprota(cos,sin,xi,c(j:j+(idim-1)*n:n))
-               if (j==nk1) cycle b_rows
-
-               !  transformations to left hand side.
-               i2 = merge(nk1-j,k1,j>n8)+1
-               call fprota(cos,sin,h(2:i2),g(j,2:i2))
-               h(1:i2) = [h(2:i2),zero]
-            end do b_cols
+            call fp_rotate_shifted_vec(h, k2, g, nest, xi, c, it, nk1, n, idim)
          end do b_rows
 
          ! backward substitution to obtain the b-spline coefficients.
