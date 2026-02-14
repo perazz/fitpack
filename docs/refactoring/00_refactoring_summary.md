@@ -44,31 +44,21 @@ with explicit-shape arrays `h(band)`, `a(nest,*)`, `xi(idim)`, `z(n,idim)`.
 Replaced 3 standard Variant B call sites in `fpclos`, `fpcons`, `fppara`.
 Removed unused variables `i1`, `i3` from `fpcons` and `fppara`.
 
+### PR 6: Shifting-Pivot and Two-Matrix Givens Rotations (DONE)
+
+**Changes**: Added `fp_rotate_shifted_vec` (single-matrix shifted-pivot rotation)
+and `fp_rotate_row_2mat_vec` (two-matrix rotation for periodic splines).
+Replaced 4 remaining shifting-pivot call sites: 2 in `fpclos` (two-matrix periodic),
+1 in `fpcons`, 1 in `fppara` (single-matrix smoothing iterations).
+Removed unused variables: `piv`, `ij` from `fpclos`; `cos`, `sin`, `piv`, `i2`
+from `fpcons` and `fppara`.
+
 ---
 
 ## Remaining Plan
 
 Each item below is a separate PR. PRs are ordered by dependency; documentation (PR 9) can
 proceed in parallel with any code PR.
-
-### PR 6: Variant B/C Shifting-Pivot Givens Rotations
-
-**Scope**: Shifting-pivot and two-matrix periodic rotation variants
-**New routines**: `fp_rotate_row_2mat` (two-matrix rotation for periodic splines),
-possibly `fp_rotate_shifted_vec` (single-matrix with pivot shift)
-**Remaining occurrences** (4 sites, all use shifting-pivot pattern `h(1:n) = [h(2:n), zero]`):
-
-| Site | Routine | Pattern | Notes |
-|------|---------|---------|-------|
-| 1 | fpclos | two-matrix (a1,a2) + shift + vec z | Variant C |
-| 2 | fpclos | two-matrix (g1,g2) + shift + vec c | Variant C |
-| 3 | fpcons | single-matrix (g) + shift + vec c | could use `fp_rotate_shifted_vec` |
-| 4 | fppara | single-matrix (g) + shift + vec c | could use `fp_rotate_shifted_vec` |
-
-**Difficulty**: Medium — shifting pivot and secondary matrix add complexity
-**See**: [01_qr_row_rotation_refactor.md](01_qr_row_rotation_refactor.md), Variants B & C
-
----
 
 ### PR 7: Variant D Givens Rotations
 
