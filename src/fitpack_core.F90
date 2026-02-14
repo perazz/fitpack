@@ -3345,7 +3345,7 @@ module fitpack_core
 
                   ! rotation of the new row of the observation matrix into triangle in case
                   ! the b-splines nj,k+1(u),j=n7+1,...n-k-1 are all zero at ui.
-                  call fp_rotate_row_vec(h, kk1, a1, xi, z, l5, n, idim)
+                  call fp_rotate_row_vec(h, kk1, a1, nest, xi, z, l5, n, idim)
 
               endif all_zero
 
@@ -4111,7 +4111,7 @@ module fitpack_core
                  endif
 
                  ! rotate the new row of the observation matrix into triangle.
-                 call fp_rotate_row_vec(h(li:), lj-li+1, a, xi, z, j, n, idim)
+                 call fp_rotate_row_vec(h(li:), lj-li+1, a, nest, xi, z, j, n, idim)
 
                  ! add contribution of this row to the sum of squares of residual right hand sides.
                  fp = fp + sum(xi(1:idim)**2)
@@ -5662,17 +5662,19 @@ module fitpack_core
       end subroutine fp_rotate_row
 
       ! Vector-RHS variant of fp_rotate_row: rotates a new observation row into the
-      ! upper-triangular band matrix, with idim right-hand sides stored in z at stride n.
-      ! Used by parametric/multi-dimensional fitting routines (fpclos, fpcons, fppara).
-      pure subroutine fp_rotate_row_vec(h, band, a, xi, z, j_start, n, idim)
-          real(FP_REAL),    intent(inout) :: h(:)       ! Row to rotate, h(1:band)
-          integer(FP_SIZE), intent(in)    :: band       ! Bandwidth
-          real(FP_REAL),    intent(inout) :: a(:,:)     ! Upper triangular band matrix
-          real(FP_REAL),    intent(inout) :: xi(:)      ! Vector RHS contribution, xi(1:idim)
-          real(FP_REAL),    intent(inout) :: z(:)       ! RHS array, strided access
+      ! upper-triangular band matrix a(nest,band), with idim right-hand sides stored
+      ! column-wise in z(n,idim). Used by parametric fitting (fpclos, fpcons, fppara)
+      ! where idim curves share the same knot vector and B-spline basis.
+      pure subroutine fp_rotate_row_vec(h, band, a, nest, xi, z, j_start, n, idim)
+          integer(FP_SIZE), intent(in)    :: band       ! Bandwidth (k1 or kk1)
+          integer(FP_SIZE), intent(in)    :: nest       ! Leading dimension of a
+          integer(FP_SIZE), intent(in)    :: n          ! Leading dimension of z (number of knots)
+          integer(FP_SIZE), intent(in)    :: idim       ! Number of curve dimensions
           integer(FP_SIZE), intent(in)    :: j_start    ! Starting row index minus 1
-          integer(FP_SIZE), intent(in)    :: n          ! Stride for z
-          integer(FP_SIZE), intent(in)    :: idim       ! Number of dimensions
+          real(FP_REAL),    intent(inout) :: h(band)    ! Row to rotate
+          real(FP_REAL),    intent(inout) :: a(nest,*)  ! Upper triangular band matrix
+          real(FP_REAL),    intent(inout) :: xi(idim)   ! Vector RHS contribution
+          real(FP_REAL),    intent(inout) :: z(n,idim)  ! RHS array, one column per dimension
 
           real(FP_REAL) :: cos, sin, piv
           integer(FP_SIZE) :: i, j
@@ -5686,8 +5688,8 @@ module fitpack_core
               ! Calculate parameters of Givens transformation
               call fpgivs(piv, a(j,1), cos, sin)
 
-              ! Apply to vector right hand side (elemental fprota handles idim elements)
-              call fprota(cos, sin, xi(1:idim), z(j:j+(idim-1)*n:n))
+              ! Apply to all idim right-hand sides (elemental fprota)
+              call fprota(cos, sin, xi, z(j, 1:idim))
 
               ! Apply to remaining row elements and matrix
               if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
@@ -8374,7 +8376,7 @@ module fitpack_core
            h(:k1)     = wi*h(:k1)
 
            ! rotate the new row of the observation matrix into triangle.
-           call fp_rotate_row_vec(h, k1, a, xi, z, l-k1, n, idim)
+           call fp_rotate_row_vec(h, k1, a, nest, xi, z, l-k1, n, idim)
 
            !  add contribution of this row to the sum of squares of residual right hand sides.
            fp = fp + sum(xi**2)
