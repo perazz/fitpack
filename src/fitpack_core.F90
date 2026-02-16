@@ -18360,8 +18360,6 @@ module fitpack_core
         integer(FP_SIZE) :: bnd(2), ndoubles
         integer(FP_SIZE), parameter :: header = 1
 
-        buffer(:) = 0.0_FP_COMM
-
         if (allocated(array)) then
             bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
         else
@@ -18383,8 +18381,6 @@ module fitpack_core
 
         integer(FP_SIZE) :: bnd(2, 2), ndoubles
         integer(FP_SIZE), parameter :: header = 2
-
-        buffer(:) = 0.0_FP_COMM
 
         if (allocated(array)) then
             bnd(1, 1) = lbound(array, 1, FP_SIZE)
@@ -18410,8 +18406,6 @@ module fitpack_core
 
         integer(FP_SIZE) :: bnd(2, 3), ndoubles
         integer(FP_SIZE), parameter :: header = 3
-
-        buffer(:) = 0.0_FP_COMM
 
         if (allocated(array)) then
             bnd(1, 1) = lbound(array, 1, FP_SIZE)
@@ -18440,9 +18434,6 @@ module fitpack_core
         integer(FP_SIZE) :: bnd(2), ndoubles
         integer(FP_SIZE), parameter :: header = 1
 
-        ! Zero buffer to avoid undefined padding when int32 count is odd
-        buffer(:) = 0.0_FP_COMM
-
         if (allocated(array)) then
             bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
         else
@@ -18470,7 +18461,7 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1):bnd(2)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array(:) = transfer(buffer(header+1:header+n), array, size(array))
+            array = transfer(buffer(header+1:header+n), array)
         end if
     end subroutine FP_REAL_COMM_EXPAND_1D
 
@@ -18487,7 +18478,7 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array(:,:) = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
+            array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
         end if
     end subroutine FP_REAL_COMM_EXPAND_2D
 
@@ -18504,7 +18495,7 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2), bnd(1,3):bnd(2,3)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array(:,:,:) = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
+            array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
         end if
     end subroutine FP_REAL_COMM_EXPAND_3D
 
@@ -18521,7 +18512,7 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1):bnd(2)))
             ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array(:) = transfer(buffer(header+1:header+ndoubles), array, size(array))
+            array = transfer(buffer(header+1:header+ndoubles), array)
         end if
     end subroutine FP_SIZE_COMM_EXPAND_1D
 
