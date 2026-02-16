@@ -55,8 +55,7 @@ module fitpack_gridded_polar
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0
-        real(FP_REAL), allocatable :: wrk (:)
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
         ! Knots
         integer     :: knots(2) = 0
@@ -185,14 +184,12 @@ module fitpack_gridded_polar
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
 
        this%bc_boundary = OUTSIDE_EXTRAPOLATE
        this%bc_continuity_origin = 1
        this%nest      = 0
        this%nmax      = 0
-       this%lwrk      = 0
        this%knots     = 0
 
     end subroutine surf_destroy
@@ -384,14 +381,13 @@ module fitpack_gridded_polar
     elemental integer(FP_SIZE) function gridpolar_comm_size(this)
         class(fitpack_grid_polar), intent(in) :: this
         ! Base fields + grid-polar-specific scalars:
-        ! r, z0, z0_present, z0_exact, z0_zero_gradient, nest(2), nmax, lwrk,
-        ! bc_continuity_origin, bc_boundary, knots(2) = 13
+        ! r, z0, z0_present, z0_exact, z0_zero_gradient, nest(2), nmax,
+        ! bc_continuity_origin, bc_boundary, knots(2) = 12
         gridpolar_comm_size = this%core_comm_size() &
-                            + 13 &
+                            + 12 &
                             + FP_COMM_SIZE(this%u) &
                             + FP_COMM_SIZE(this%v) &
                             + FP_COMM_SIZE(this%z) &
-                            + FP_COMM_SIZE(this%wrk) &
                             + FP_COMM_SIZE(this%t)
     end function gridpolar_comm_size
 
@@ -411,7 +407,6 @@ module fitpack_gridded_polar
         buffer(pos) = real(this%nest(1), FP_COMM);                        pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);                        pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);                           pos = pos + 1
-        buffer(pos) = real(this%lwrk, FP_COMM);                           pos = pos + 1
         buffer(pos) = real(this%bc_continuity_origin, FP_COMM);           pos = pos + 1
         buffer(pos) = real(this%bc_boundary, FP_COMM);                    pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);                       pos = pos + 1
@@ -420,7 +415,6 @@ module fitpack_gridded_polar
         call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_PACK(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine gridpolar_comm_pack
 
@@ -440,7 +434,6 @@ module fitpack_gridded_polar
         this%nest(1)              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_continuity_origin = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_boundary          = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1)             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
@@ -449,7 +442,6 @@ module fitpack_gridded_polar
         call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_EXPAND(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_EXPAND(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine gridpolar_comm_expand
 

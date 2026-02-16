@@ -56,8 +56,8 @@ module fitpack_polar_domains
         real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
-        integer                  :: lwrk1 = 0, lwrk2 = 0
-        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+        integer                  :: lwrk2 = 0
+        real(FP_REAL), allocatable :: wrk2(:)
 
         ! Curve behavior
         integer :: bc_continuity_origin = 2 ! Continuity at origin (C0, C1, C2)
@@ -155,7 +155,7 @@ module fitpack_polar_domains
                        this%knots(2),this%t(:,2),    &  ! v (-pi:pi) knots (out)
                        this%u,this%v,                &  ! co-ordinates of the i-th data point w.r.t the rectangular domain
                        this%c,this%fp,               &  ! Spline representation and MSE
-                       this%wrk1,this%lwrk1,         &  ! memory
+                       this%wrk,this%lwrk,         &  ! memory
                        this%wrk2,this%lwrk2,         &  ! memory
                        this%iwrk,this%liwrk,         &  ! memory
                        ierr)                            ! Error flag
@@ -180,12 +180,10 @@ module fitpack_polar_domains
        deallocate(this%w,stat=ierr)
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
-       deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
 
        this%nest      = 0
-       this%lwrk1     = 0
        this%lwrk2     = 0
        this%knots     = 0
        this%bc_continuity_origin = 2
@@ -249,7 +247,7 @@ module fitpack_polar_domains
         this%liwrk = m+product(nest-7)
         allocate(this%iwrk(this%liwrk),source=0)
 
-        ! wrk1
+        ! wrk
         iopt2_max = 2
         iopt3_max = 1
         iopt2_min = 0
@@ -258,8 +256,8 @@ module fitpack_polar_domains
         l = nest(2)-7
         p = 1+iopt2_max*(iopt2_max+3)/2
         q = k+2-iopt2_min-iopt3_min
-        this%lwrk1 = 129+10*k+21*l+k*l+(p+l*q)*(1+8*l+p)+8*m
-        allocate(this%wrk1(this%lwrk1),source=zero)
+        this%lwrk = 129+10*k+21*l+k*l+(p+l*q)*(1+8*l+p)+8*m
+        allocate(this%wrk(this%lwrk),source=zero)
 
         ! wrk2
         this%lwrk2 = (p+l*q+1)*(4*l+p)+p+l*q
@@ -335,14 +333,13 @@ module fitpack_polar_domains
     elemental integer(FP_SIZE) function polar_comm_size(this)
         class(fitpack_polar), intent(in) :: this
         polar_comm_size = this%core_comm_size() &
-                        + 10 &
+                        + 9 &
                         + FP_COMM_SIZE(this%x) &
                         + FP_COMM_SIZE(this%y) &
                         + FP_COMM_SIZE(this%z) &
                         + FP_COMM_SIZE(this%u) &
                         + FP_COMM_SIZE(this%v) &
                         + FP_COMM_SIZE(this%w) &
-                        + FP_COMM_SIZE(this%wrk1) &
                         + FP_COMM_SIZE(this%wrk2) &
                         + FP_COMM_SIZE(this%t)
     end function polar_comm_size
@@ -357,7 +354,6 @@ module fitpack_polar_domains
         pos = this%core_comm_size() + 1
 
         buffer(pos) = real(this%m, FP_COMM);                       pos = pos + 1
-        buffer(pos) = real(this%lwrk1, FP_COMM);                   pos = pos + 1
         buffer(pos) = real(this%lwrk2, FP_COMM);                   pos = pos + 1
         buffer(pos) = real(this%bc_continuity_origin, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%bc_boundary, FP_COMM);             pos = pos + 1
@@ -373,7 +369,6 @@ module fitpack_polar_domains
         call FP_COMM_PACK(this%u, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_PACK(this%v, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_PACK(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
-        call FP_COMM_PACK(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_PACK(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine polar_comm_pack
@@ -388,7 +383,6 @@ module fitpack_polar_domains
         pos = this%core_comm_size() + 1
 
         this%m                       = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk1                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk2                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_continuity_origin    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_boundary             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
@@ -404,7 +398,6 @@ module fitpack_polar_domains
         call FP_COMM_EXPAND(this%u, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_EXPAND(this%v, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_EXPAND(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
-        call FP_COMM_EXPAND(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_EXPAND(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
         call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine polar_comm_expand

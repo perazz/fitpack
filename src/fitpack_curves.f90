@@ -47,8 +47,7 @@ module fitpack_curves
 
         ! Estimated and actual number of knots and their allocations
         integer(FP_SIZE)               :: nest  = 0
-        integer(FP_SIZE)               :: lwrk  = 0
-        real(FP_REAL), allocatable     :: wrk(:),wrk_fou(:,:)
+        real(FP_REAL), allocatable     :: wrk_fou(:,:)
 
         ! Curve extrapolation behavior
         integer(FP_FLAG) :: bc = OUTSIDE_NEAREST_BND
@@ -156,7 +155,6 @@ module fitpack_curves
        deallocate(this%y,stat=ierr)
        deallocate(this%w,stat=ierr)
        deallocate(this%sp,stat=ierr)
-       deallocate(this% wrk,stat=ierr)
        deallocate(this%wrk_fou,stat=ierr)
        deallocate(this%t,stat=ierr)
        this%xleft = zero
@@ -164,7 +162,6 @@ module fitpack_curves
 
        this%order     = 3
        this%nest      = 0
-       this%lwrk      = 0
        this%knots     = 0
        this%bc        = OUTSIDE_NEAREST_BND
 
@@ -615,16 +612,15 @@ module fitpack_curves
     elemental integer(FP_SIZE) function curve_comm_size(this)
         class(fitpack_curve), intent(in) :: this
 
-        ! Base fields (iopt, smoothing, fp, c, iwrk)
-        ! Curve-specific scalars: m, order, knots, bc, nest, lwrk, xleft, xright (8 values)
+        ! Base fields (iopt, smoothing, fp, c, iwrk, wrk)
+        ! Curve-specific scalars: m, order, knots, bc, nest, xleft, xright (7 values)
         curve_comm_size = this%core_comm_size() &
-                        + 8 &
+                        + 7 &
                         + FP_COMM_SIZE(this%x) &
                         + FP_COMM_SIZE(this%y) &
                         + FP_COMM_SIZE(this%sp) &
                         + FP_COMM_SIZE(this%w) &
                         + FP_COMM_SIZE(this%t) &
-                        + FP_COMM_SIZE(this%wrk) &
                         + FP_COMM_SIZE(this%wrk_fou)
 
     end function curve_comm_size
@@ -646,7 +642,6 @@ module fitpack_curves
         buffer(pos)   = real(this%knots, FP_COMM);  pos = pos + 1
         buffer(pos)   = real(this%bc, FP_COMM);     pos = pos + 1
         buffer(pos)   = real(this%nest, FP_COMM);   pos = pos + 1
-        buffer(pos)   = real(this%lwrk, FP_COMM);   pos = pos + 1
         buffer(pos)   = this%xleft;                  pos = pos + 1
         buffer(pos)   = this%xright;                 pos = pos + 1
 
@@ -656,7 +651,6 @@ module fitpack_curves
         call FP_COMM_PACK(this%sp, buffer(pos:));      pos = pos + FP_COMM_SIZE(this%sp)
         call FP_COMM_PACK(this%w, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_PACK(this%t, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_PACK(this%wrk, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_PACK(this%wrk_fou, buffer(pos:))
 
     end subroutine curve_comm_pack
@@ -678,7 +672,6 @@ module fitpack_curves
         this%knots = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc    = nint(buffer(pos), FP_FLAG);  pos = pos + 1
         this%nest  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%xleft     = buffer(pos);              pos = pos + 1
         this%xright    = buffer(pos);              pos = pos + 1
 
@@ -688,7 +681,6 @@ module fitpack_curves
         call FP_COMM_EXPAND(this%sp, buffer(pos:));      pos = pos + FP_COMM_SIZE(this%sp)
         call FP_COMM_EXPAND(this%w, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_EXPAND(this%t, buffer(pos:));       pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_EXPAND(this%wrk, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_EXPAND(this%wrk_fou, buffer(pos:))
 
     end subroutine curve_comm_expand

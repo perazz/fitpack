@@ -44,8 +44,7 @@ module fitpack_parametric_surfaces
         !> Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0
-        real(FP_REAL), allocatable :: wrk (:)
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
 !        ! Space for derivative evaluation
 !        real(FP_REAL), allocatable :: dd(:,:)
@@ -126,11 +125,9 @@ module fitpack_parametric_surfaces
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
 
        this%nest      = 0
-       this%lwrk      = 0
        this%knots     = 0
 
     end subroutine destroy
@@ -369,13 +366,12 @@ module fitpack_parametric_surfaces
     elemental integer(FP_SIZE) function parsurf_comm_size(this)
         class(fitpack_parametric_surface), intent(in) :: this
         ! Base fields + parametric-surface-specific scalars:
-        ! idim, periodic_dim(2), nest(2), nmax, lwrk, knots(2) = 9
+        ! idim, periodic_dim(2), nest(2), nmax, knots(2) = 8
         parsurf_comm_size = this%core_comm_size() &
-                          + 9 &
+                          + 8 &
                           + FP_COMM_SIZE(this%u) &
                           + FP_COMM_SIZE(this%v) &
                           + FP_COMM_SIZE(this%z) &
-                          + FP_COMM_SIZE(this%wrk) &
                           + FP_COMM_SIZE(this%t)
     end function parsurf_comm_size
 
@@ -393,14 +389,12 @@ module fitpack_parametric_surfaces
         buffer(pos) = real(this%nest(1), FP_COMM);                           pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);                           pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);                              pos = pos + 1
-        buffer(pos) = real(this%lwrk, FP_COMM);                              pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);                          pos = pos + 1
         buffer(pos) = real(this%knots(2), FP_COMM);                          pos = pos + 1
 
         call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_PACK(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine parsurf_comm_pack
 
@@ -418,14 +412,12 @@ module fitpack_parametric_surfaces
         this%nest(1)         = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)         = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(2)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
 
         call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
         call FP_COMM_EXPAND(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
         call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_EXPAND(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine parsurf_comm_expand
 

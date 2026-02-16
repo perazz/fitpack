@@ -59,8 +59,7 @@ module fitpack_parametric_curves
 
         ! Estimated and actual number of knots and their allocations
         integer                  :: nest  = 0
-        integer                  :: lwrk  = 0
-        real(FP_REAL), allocatable :: wrk(:)
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
         ! Space for derivative evaluation
         real(FP_REAL), allocatable :: dd(:,:)
@@ -200,7 +199,6 @@ module fitpack_parametric_curves
        deallocate(this%u,stat=ierr)
        deallocate(this%w,stat=ierr)
        deallocate(this%sp,stat=ierr)
-       deallocate(this% wrk,stat=ierr)
        deallocate(this%dd,stat=ierr)
        deallocate(this%t,stat=ierr)
        this%ubegin = zero
@@ -208,7 +206,6 @@ module fitpack_parametric_curves
 
        this%order     = 3
        this%nest      = 0
-       this%lwrk      = 0
        this%knots     = 0
 
     end subroutine destroy
@@ -651,15 +648,14 @@ module fitpack_parametric_curves
     elemental integer(FP_SIZE) function parcur_comm_size(this)
         class(fitpack_parametric_curve), intent(in) :: this
         ! Base fields + parametric-specific scalars:
-        ! m, idim, order, knots, nest, lwrk, ubegin, uend, has_params (9 values)
+        ! m, idim, order, knots, nest, ubegin, uend, has_params (8 values)
         parcur_comm_size = this%core_comm_size() &
-                         + 9 &
+                         + 8 &
                          + FP_COMM_SIZE(this%x) &
                          + FP_COMM_SIZE(this%u) &
                          + FP_COMM_SIZE(this%sp) &
                          + FP_COMM_SIZE(this%w) &
                          + FP_COMM_SIZE(this%t) &
-                         + FP_COMM_SIZE(this%wrk) &
                          + FP_COMM_SIZE(this%dd)
     end function parcur_comm_size
 
@@ -676,7 +672,6 @@ module fitpack_parametric_curves
         buffer(pos) = real(this%order, FP_COMM);          pos = pos + 1
         buffer(pos) = real(this%knots, FP_COMM);          pos = pos + 1
         buffer(pos) = real(this%nest, FP_COMM);           pos = pos + 1
-        buffer(pos) = real(this%lwrk, FP_COMM);           pos = pos + 1
         buffer(pos) = this%ubegin;                         pos = pos + 1
         buffer(pos) = this%uend;                           pos = pos + 1
         buffer(pos) = real(merge(1,0,this%has_params), FP_COMM); pos = pos + 1
@@ -686,7 +681,6 @@ module fitpack_parametric_curves
         call FP_COMM_PACK(this%sp, buffer(pos:));  pos = pos + FP_COMM_SIZE(this%sp)
         call FP_COMM_PACK(this%w, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_PACK(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_PACK(this%dd, buffer(pos:))
     end subroutine parcur_comm_pack
 
@@ -703,7 +697,6 @@ module fitpack_parametric_curves
         this%order = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%ubegin    = buffer(pos);              pos = pos + 1
         this%uend      = buffer(pos);              pos = pos + 1
         this%has_params = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
@@ -713,7 +706,6 @@ module fitpack_parametric_curves
         call FP_COMM_EXPAND(this%sp, buffer(pos:));  pos = pos + FP_COMM_SIZE(this%sp)
         call FP_COMM_EXPAND(this%w, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_EXPAND(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_EXPAND(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
         call FP_COMM_EXPAND(this%dd, buffer(pos:))
     end subroutine parcur_comm_expand
 

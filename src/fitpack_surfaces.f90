@@ -44,8 +44,8 @@ module fitpack_surfaces
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax = 0
-        integer                  :: lwrk1 = 0, lwrk2 = 0
-        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+        integer                  :: lwrk2 = 0
+        real(FP_REAL), allocatable :: wrk2(:)
 
         ! Curve extrapolation behavior
         integer     :: bc = OUTSIDE_NEAREST_BND
@@ -135,7 +135,7 @@ module fitpack_surfaces
                         this%knots(1),this%t(:,1),   &  ! x knots (out)
                         this%knots(2),this%t(:,2),   &  ! y knots (out)
                         this%c,this%fp,              &  ! spline output. size(c)>=(nxest-kx-1)*(nyest-ky-1)
-                        this%wrk1,this%lwrk1,        &  ! memory
+                        this%wrk,this%lwrk,        &  ! memory
                         this%wrk2,this%lwrk2,        &  ! memory
                         this%iwrk,this%liwrk,        &  ! memory
                         ierr)                           ! Error flag
@@ -217,10 +217,10 @@ module fitpack_surfaces
 
         ! Assert real working storage
         min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)
-        if (min_lwrk>this%lwrk1) then
+        if (min_lwrk>this%lwrk) then
             allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
-            call move_alloc(from=min_wrk,to=this%wrk1)
-            this%lwrk1 = min_lwrk
+            call move_alloc(from=min_wrk,to=this%wrk)
+            this%lwrk = min_lwrk
         end if
 
         ! Assert integer working storage
@@ -238,7 +238,7 @@ module fitpack_surfaces
                     x=x,mx=size(x),                    &
                     y=y,my=size(y),                    &
                     z=f,                               &
-                    wrk=this%wrk1,lwrk=this%lwrk1,     &
+                    wrk=this%wrk,lwrk=this%lwrk,     &
                     iwrk=this%iwrk,kwrk=this%liwrk,    &
                     ier=ier)
 
@@ -255,7 +255,6 @@ module fitpack_surfaces
        deallocate(this%y,stat=ierr)
        deallocate(this%z,stat=ierr)
        deallocate(this%w,stat=ierr)
-       deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
        this%left  = zero
@@ -264,7 +263,6 @@ module fitpack_surfaces
        this%order     = 3
        this%nest      = 0
        this%nmax      = 0
-       this%lwrk1     = 0
        this%lwrk2     = 0
        this%knots     = 0
        this%bc        = OUTSIDE_NEAREST_BND
@@ -324,7 +322,7 @@ module fitpack_surfaces
         this%liwrk = m+product(nest-2*order-1)
         allocate(this%iwrk(this%liwrk),source=0)
 
-        ! wrk1
+        ! wrk
         uv  = nest-order-1
         km  = maxval(order,1)+1
         bxy(1) = order(1)*uv(2)+order(2)+1
@@ -334,8 +332,8 @@ module fitpack_surfaces
         else
             b1 = bxy(2); b2 = b1 + uv(1) - order(1)
         end if
-        this%lwrk1 = product(uv)*(2+b1+b2)+2*(sum(uv)+km*(m+nmax)+nmax-sum(order))+b2+1
-        allocate(this%wrk1(this%lwrk1),source=zero)
+        this%lwrk = product(uv)*(2+b1+b2)+2*(sum(uv)+km*(m+nmax)+nmax-sum(order))+b2+1
+        allocate(this%wrk(this%lwrk),source=zero)
 
         ! wrk2
         this%lwrk2 = product(uv)*(b2+1)+b2
@@ -400,10 +398,10 @@ module fitpack_surfaces
         
         ! Assert real working storage
         min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-        if (min_lwrk>this%lwrk1) then 
+        if (min_lwrk>this%lwrk) then 
             allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
-            call move_alloc(from=min_wrk,to=this%wrk1)
-            this%lwrk1 = min_lwrk
+            call move_alloc(from=min_wrk,to=this%wrk)
+            this%lwrk = min_lwrk
         end if
         
         ! Assert integer working storage
@@ -424,7 +422,7 @@ module fitpack_surfaces
                     x=x,mx=size(x),                    &    ! x grid points: tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2:mx.
                     y=y,my=size(y),                    &    ! y grid points: ty(ky+1)<=y(i-1)<=y(i)<=ty(ny-ky), i=2:mx.
                     z=f,                               &    ! Value of the partial derivative
-                    wrk=this%wrk1,lwrk=this%lwrk1,     &    ! memory
+                    wrk=this%wrk,lwrk=this%lwrk,     &    ! memory
                     iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
                     ier=ier)
 
@@ -463,10 +461,10 @@ module fitpack_surfaces
         
             ! Assert real working storage
             min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-            if (min_lwrk>this%lwrk1) then 
+            if (min_lwrk>this%lwrk) then 
                 allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
-                call move_alloc(from=min_wrk,to=this%wrk1)
-                this%lwrk1 = min_lwrk
+                call move_alloc(from=min_wrk,to=this%wrk)
+                this%lwrk = min_lwrk
             end if
             
             ! Assert integer working storage
@@ -487,7 +485,7 @@ module fitpack_surfaces
                         x=x,y=y,                           &    ! list of (x,y) points
                         z=f,                               &    ! Value of the partial derivative
                         m=m(1),                            &    ! Number of input points
-                        wrk=this%wrk1,lwrk=this%lwrk1,     &    ! memory
+                        wrk=this%wrk,lwrk=this%lwrk,     &    ! memory
                         iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
                         ier=ier)
 
@@ -528,15 +526,14 @@ module fitpack_surfaces
     elemental integer(FP_SIZE) function surf_comm_size(this)
         class(fitpack_surface), intent(in) :: this
         ! Base fields + surface-specific scalars:
-        ! m, order(2), left(2), right(2), nest(2), nmax, lwrk1, lwrk2, bc, knots(2) = 15
+        ! m, order(2), left(2), right(2), nest(2), nmax, lwrk2, bc, knots(2) = 14
         surf_comm_size = this%core_comm_size() &
-                       + 15 &
+                       + 14 &
                        + FP_COMM_SIZE(this%x) &
                        + FP_COMM_SIZE(this%y) &
                        + FP_COMM_SIZE(this%z) &
                        + FP_COMM_SIZE(this%w) &
                        + FP_COMM_SIZE(this%t) &
-                       + FP_COMM_SIZE(this%wrk1) &
                        + FP_COMM_SIZE(this%wrk2)
     end function surf_comm_size
 
@@ -558,7 +555,6 @@ module fitpack_surfaces
         buffer(pos) = real(this%nest(1), FP_COMM);   pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);   pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);      pos = pos + 1
-        buffer(pos) = real(this%lwrk1, FP_COMM);     pos = pos + 1
         buffer(pos) = real(this%lwrk2, FP_COMM);     pos = pos + 1
         buffer(pos) = real(this%bc, FP_COMM);        pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);  pos = pos + 1
@@ -569,7 +565,6 @@ module fitpack_surfaces
         call FP_COMM_PACK(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
         call FP_COMM_PACK(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_PACK(this%t, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_PACK(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_PACK(this%wrk2, buffer(pos:))
     end subroutine surf_comm_pack
 
@@ -591,7 +586,6 @@ module fitpack_surfaces
         this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk1    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk2    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc       = nint(buffer(pos), FP_FLAG);  pos = pos + 1
         this%knots(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
@@ -602,7 +596,6 @@ module fitpack_surfaces
         call FP_COMM_EXPAND(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
         call FP_COMM_EXPAND(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
         call FP_COMM_EXPAND(this%t, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_EXPAND(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_EXPAND(this%wrk2, buffer(pos:))
     end subroutine surf_comm_expand
 

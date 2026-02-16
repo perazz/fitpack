@@ -42,8 +42,8 @@ module fitpack_sphere_domains
         real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
-        integer                  :: lwrk1 = 0, lwrk2 = 0
-        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
+        integer                  :: lwrk2 = 0
+        real(FP_REAL), allocatable :: wrk2(:)
 
         ! Knots: extimated max number
         integer :: nest(2)  = 0
@@ -132,7 +132,7 @@ module fitpack_sphere_domains
                        this%knots(1),this%t(:,1),    &  ! theta  knots (out)
                        this%knots(2),this%t(:,2),    &  ! phi knots (out)
                        this%c,this%fp,               &  ! Spline representation and MSE
-                       this%wrk1,this%lwrk1,         &  ! memory
+                       this%wrk,this%lwrk,         &  ! memory
                        this%wrk2,this%lwrk2,         &  ! memory
                        this%iwrk,this%liwrk,         &  ! memory
                        ierr)                            ! Error flag
@@ -154,12 +154,10 @@ module fitpack_sphere_domains
        deallocate(this%phi,stat=ierr)
        deallocate(this%r,stat=ierr)
        deallocate(this%w,stat=ierr)
-       deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
 
        this%nest      = 0
-       this%lwrk1     = 0
        this%lwrk2     = 0
        this%knots     = 0
 
@@ -210,11 +208,11 @@ module fitpack_sphere_domains
         this%liwrk = m+product(nest-7)
         allocate(this%iwrk(this%liwrk),source=0)
 
-        ! wrk1
+        ! wrk
         u = nest(1)-7
         v = nest(2)-7
-        this%lwrk1 = 185+52*v+10*u+14*u*v+8*(u-1)*v**2+8*m
-        allocate(this%wrk1(this%lwrk1),source=zero)
+        this%lwrk = 185+52*v+10*u+14*u*v+8*(u-1)*v**2+8*m
+        allocate(this%wrk(this%lwrk),source=zero)
 
         ! wrk2
         this%lwrk2 = 48+21*v+7*u*v+4*(u-1)*v**2
@@ -298,14 +296,13 @@ module fitpack_sphere_domains
     elemental integer(FP_SIZE) function sphere_comm_size(this)
         class(fitpack_sphere), intent(in) :: this
         ! Base fields + sphere-specific scalars:
-        ! m, lwrk1, lwrk2, nest(2), nmax, knots(2) = 8
+        ! m, lwrk2, nest(2), nmax, knots(2) = 7
         sphere_comm_size = this%core_comm_size() &
-                         + 8 &
+                         + 7 &
                          + FP_COMM_SIZE(this%theta) &
                          + FP_COMM_SIZE(this%phi) &
                          + FP_COMM_SIZE(this%r) &
                          + FP_COMM_SIZE(this%w) &
-                         + FP_COMM_SIZE(this%wrk1) &
                          + FP_COMM_SIZE(this%wrk2) &
                          + FP_COMM_SIZE(this%t)
     end function sphere_comm_size
@@ -319,7 +316,6 @@ module fitpack_sphere_domains
         pos = this%core_comm_size() + 1
 
         buffer(pos) = real(this%m, FP_COMM);        pos = pos + 1
-        buffer(pos) = real(this%lwrk1, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%lwrk2, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%nest(1), FP_COMM);  pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);  pos = pos + 1
@@ -331,7 +327,6 @@ module fitpack_sphere_domains
         call FP_COMM_PACK(this%phi, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%phi)
         call FP_COMM_PACK(this%r, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%r)
         call FP_COMM_PACK(this%w, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%w)
-        call FP_COMM_PACK(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_PACK(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine sphere_comm_pack
@@ -345,7 +340,6 @@ module fitpack_sphere_domains
         pos = this%core_comm_size() + 1
 
         this%m        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk1    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk2    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
@@ -357,7 +351,6 @@ module fitpack_sphere_domains
         call FP_COMM_EXPAND(this%phi, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%phi)
         call FP_COMM_EXPAND(this%r, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%r)
         call FP_COMM_EXPAND(this%w, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%w)
-        call FP_COMM_EXPAND(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
         call FP_COMM_EXPAND(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
         call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine sphere_comm_expand

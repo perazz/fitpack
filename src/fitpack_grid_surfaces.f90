@@ -46,8 +46,7 @@ module fitpack_grid_surfaces
         ! Estimated and actual number of knots and their allocations
         integer(FP_SIZE) :: nest(2)  = 0
         integer(FP_SIZE) :: nmax     = 0
-        integer(FP_SIZE)                  :: lwrk = 0
-        real(FP_REAL), allocatable :: wrk(:)
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
         ! Knots
         integer(FP_SIZE) :: knots(2) = 0
@@ -168,7 +167,6 @@ module fitpack_grid_surfaces
        deallocate(this%x,stat=ierr)
        deallocate(this%y,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
        this%left  = zero
        this%right = zero
@@ -176,7 +174,6 @@ module fitpack_grid_surfaces
        this%order     = 3
        this%nest      = 0
        this%nmax      = 0
-       this%lwrk      = 0
        this%knots     = 0
 
     end subroutine surf_destroy
@@ -455,14 +452,13 @@ module fitpack_grid_surfaces
     elemental integer(FP_SIZE) function gridsurf_comm_size(this)
         class(fitpack_grid_surface), intent(in) :: this
         ! Base fields + grid-surface-specific scalars:
-        ! order(2), left(2), right(2), nest(2), nmax, lwrk, knots(2) = 12
+        ! order(2), left(2), right(2), nest(2), nmax, knots(2) = 11
         gridsurf_comm_size = this%core_comm_size() &
-                           + 12 &
+                           + 11 &
                            + FP_COMM_SIZE(this%x) &
                            + FP_COMM_SIZE(this%y) &
                            + FP_COMM_SIZE(this%z) &
-                           + FP_COMM_SIZE(this%t) &
-                           + FP_COMM_SIZE(this%wrk)
+                           + FP_COMM_SIZE(this%t)
     end function gridsurf_comm_size
 
     pure subroutine gridsurf_comm_pack(this, buffer)
@@ -482,15 +478,13 @@ module fitpack_grid_surfaces
         buffer(pos) = real(this%nest(1), FP_COMM);   pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);   pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);      pos = pos + 1
-        buffer(pos) = real(this%lwrk, FP_COMM);      pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);  pos = pos + 1
         buffer(pos) = real(this%knots(2), FP_COMM);  pos = pos + 1
 
         call FP_COMM_PACK(this%x, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%x)
         call FP_COMM_PACK(this%y, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%y)
         call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_PACK(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_PACK(this%wrk, buffer(pos:))
+        call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine gridsurf_comm_pack
 
     pure subroutine gridsurf_comm_expand(this, buffer)
@@ -510,15 +504,13 @@ module fitpack_grid_surfaces
         this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%lwrk     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(2) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
 
         call FP_COMM_EXPAND(this%x, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%x)
         call FP_COMM_EXPAND(this%y, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%y)
         call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
-        call FP_COMM_EXPAND(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
-        call FP_COMM_EXPAND(this%wrk, buffer(pos:))
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine gridsurf_comm_expand
 
 end module fitpack_grid_surfaces
