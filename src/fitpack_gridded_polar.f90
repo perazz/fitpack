@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_gridded_polar
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -29,7 +30,7 @@ module fitpack_gridded_polar
     !> through the transform:  x = u*rad*cos(v),
     !>                         y = u*rad*sin(v)
     !> Gridded data is provided in terms of (u,v) coordinates and the *constant* boundary radius, r
-    type :: fitpack_grid_polar
+    type, extends(fitpack_fitter) :: fitpack_grid_polar
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size
         real(FP_REAL), allocatable :: u(:),v(:)
@@ -54,29 +55,15 @@ module fitpack_gridded_polar
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
-        real(FP_REAL), allocatable :: wrk (:)
-
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.d0
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
         ! Knots
         integer     :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
 
-        ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
-
         ! Curve behavior
         integer :: bc_continuity_origin = 1 ! Continuity at origin (C0, C1)
         integer :: bc_boundary = OUTSIDE_EXTRAPOLATE ! Extrapolate (=0) or go to zero (=1)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
 
         contains
 
@@ -102,8 +89,10 @@ module fitpack_gridded_polar
            procedure, private :: gridded_eval_many
            generic :: eval => gridded_eval_one,gridded_eval_many
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => gridpolar_error
+           !> Parallel communication interface
+           procedure :: comm_size   => gridpolar_comm_size
+           procedure :: comm_pack   => gridpolar_comm_pack
+           procedure :: comm_expand => gridpolar_comm_expand
 
            !> Write to disk
            procedure :: write => gridded_to_disk
@@ -186,6 +175,7 @@ module fitpack_gridded_polar
     elemental subroutine surf_destroy(this)
        class(fitpack_grid_polar), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%r = zero
        this%z0 = zero
        this%z0_exact = .false.
@@ -194,21 +184,13 @@ module fitpack_gridded_polar
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
-       deallocate(this%wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_FP_REAL
-       this%iopt      = 0
        this%bc_boundary = OUTSIDE_EXTRAPOLATE
        this%bc_continuity_origin = 1
        this%nest      = 0
        this%nmax      = 0
-       this%lwrk      = 0
-       this%liwrk     = 0
        this%knots     = 0
-       this%fp        = zero
 
     end subroutine surf_destroy
 
@@ -392,10 +374,75 @@ module fitpack_gridded_polar
 
     end subroutine gridded_to_disk
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function gridpolar_error(this)
-       class(fitpack_grid_polar), intent(in) :: this
-       gridpolar_error = this%fp
-    end function gridpolar_error
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function gridpolar_comm_size(this)
+        class(fitpack_grid_polar), intent(in) :: this
+        ! Base fields + grid-polar-specific scalars:
+        ! r, z0, z0_present, z0_exact, z0_zero_gradient, nest(2), nmax,
+        ! bc_continuity_origin, bc_boundary, knots(2) = 12
+        gridpolar_comm_size = this%core_comm_size() &
+                            + 12 &
+                            + FP_COMM_SIZE(this%u) &
+                            + FP_COMM_SIZE(this%v) &
+                            + FP_COMM_SIZE(this%z) &
+                            + FP_COMM_SIZE(this%t)
+    end function gridpolar_comm_size
+
+    pure subroutine gridpolar_comm_pack(this, buffer)
+        class(fitpack_grid_polar), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = this%r;                                              pos = pos + 1
+        buffer(pos) = this%z0;                                             pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%z0_present), FP_COMM);          pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%z0_exact), FP_COMM);            pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%z0_zero_gradient), FP_COMM);    pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);                        pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);                        pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);                           pos = pos + 1
+        buffer(pos) = real(this%bc_continuity_origin, FP_COMM);           pos = pos + 1
+        buffer(pos) = real(this%bc_boundary, FP_COMM);                    pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM);                       pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM);                       pos = pos + 1
+
+        call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_PACK(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_PACK(this%t, buffer(pos:))
+    end subroutine gridpolar_comm_pack
+
+    pure subroutine gridpolar_comm_expand(this, buffer)
+        class(fitpack_grid_polar), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%r                    = buffer(pos);                  pos = pos + 1
+        this%z0                   = buffer(pos);                  pos = pos + 1
+        this%z0_present           = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%z0_exact             = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%z0_zero_gradient     = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%nest(1)              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%bc_continuity_origin = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%bc_boundary          = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(1)             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2)             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_EXPAND(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
+    end subroutine gridpolar_comm_expand
 
 end module fitpack_gridded_polar

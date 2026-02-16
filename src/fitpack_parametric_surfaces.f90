@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_parametric_surfaces
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -26,7 +27,7 @@ module fitpack_parametric_surfaces
 
     !> A public type describing a bicubic parametric surface fitter defined by points z(j,i,:) in the
     !> idim-dimensional space, organized on a grid of strictly increasing parameter values u(i), v(j)
-    type :: fitpack_parametric_surface
+    type, extends(fitpack_fitter) :: fitpack_parametric_surface
 
         !> Number of dimensions
         integer :: idim = 0
@@ -43,28 +44,14 @@ module fitpack_parametric_surfaces
         !> Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
-        real(FP_REAL), allocatable :: wrk (:)
+        ! (lwrk/wrk inherited from fitpack_fitter)
 
 !        ! Space for derivative evaluation
 !        real(FP_REAL), allocatable :: dd(:,:)
 
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.0_FP_REAL
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
-
         ! Knots
         integer     :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:)  ! Knot locations (:,1)=u; (:,2)=v
-
-        ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING
 
         contains
 
@@ -87,8 +74,10 @@ module fitpack_parametric_surfaces
            procedure, private :: surf_eval_grid
            generic :: eval => surf_eval_one,surf_eval_grid
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => surf_error
+           !> Parallel communication interface
+           procedure :: comm_size   => parsurf_comm_size
+           procedure :: comm_pack   => parsurf_comm_pack
+           procedure :: comm_expand => parsurf_comm_expand
 
     end type fitpack_parametric_surface
 
@@ -130,23 +119,16 @@ module fitpack_parametric_surfaces
     elemental subroutine destroy(this)
        class(fitpack_parametric_surface), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%idim = 0
        this%periodic_dim = .false.
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
-       deallocate(this% wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_FP_REAL
-       this%iopt      = IOPT_NEW_SMOOTHING
        this%nest      = 0
-       this%lwrk      = 0
-       this%liwrk     = 0
        this%knots     = 0
-       this%fp        = 0.0_FP_REAL
 
     end subroutine destroy
 
@@ -377,10 +359,66 @@ module fitpack_parametric_surfaces
 
     end function surf_fit_automatic_knots
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function surf_error(this)
-       class(fitpack_parametric_surface), intent(in) :: this
-       surf_error = this%fp
-    end function surf_error
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function parsurf_comm_size(this)
+        class(fitpack_parametric_surface), intent(in) :: this
+        ! Base fields + parametric-surface-specific scalars:
+        ! idim, periodic_dim(2), nest(2), nmax, knots(2) = 8
+        parsurf_comm_size = this%core_comm_size() &
+                          + 8 &
+                          + FP_COMM_SIZE(this%u) &
+                          + FP_COMM_SIZE(this%v) &
+                          + FP_COMM_SIZE(this%z) &
+                          + FP_COMM_SIZE(this%t)
+    end function parsurf_comm_size
+
+    pure subroutine parsurf_comm_pack(this, buffer)
+        class(fitpack_parametric_surface), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = real(this%idim, FP_COMM);                              pos = pos + 1
+        buffer(pos) = real(merge(1, 0, this%periodic_dim(1)), FP_COMM);      pos = pos + 1
+        buffer(pos) = real(merge(1, 0, this%periodic_dim(2)), FP_COMM);      pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);                           pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);                           pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);                              pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM);                          pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM);                          pos = pos + 1
+
+        call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_PACK(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_PACK(this%t, buffer(pos:))
+    end subroutine parsurf_comm_pack
+
+    pure subroutine parsurf_comm_expand(this, buffer)
+        class(fitpack_parametric_surface), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%idim            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%periodic_dim(1) = nint(buffer(pos)) /= 0;     pos = pos + 1
+        this%periodic_dim(2) = nint(buffer(pos)) /= 0;     pos = pos + 1
+        this%nest(1)         = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)         = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(1)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_EXPAND(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
+    end subroutine parsurf_comm_expand
 
 end module fitpack_parametric_surfaces

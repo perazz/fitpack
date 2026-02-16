@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_sphere_domains
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -28,7 +29,7 @@ module fitpack_sphere_domains
     !  0 <= teta <= pi   "Latitude"
     !> 0 <= phi <= 2*pi  "Longitude"
     !> which is arbitrarily scattered over the sphere domain
-    type :: fitpack_sphere
+    type, extends(fitpack_fitter) :: fitpack_sphere
 
         !> Scattered data points
         integer :: m = 0
@@ -41,27 +42,14 @@ module fitpack_sphere_domains
         real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
-        integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
-        real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
-
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.d0
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
+        integer                  :: lwrk2 = 0
+        real(FP_REAL), allocatable :: wrk2(:)
 
         ! Knots: extimated max number
         integer :: nest(2)  = 0
         integer :: nmax     = 0
         integer :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
-
-        ! Coefficients of the spline approximation
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
 
         contains
 
@@ -84,8 +72,10 @@ module fitpack_sphere_domains
            procedure, private :: sphere_eval_many
            generic :: eval => sphere_eval_one,sphere_eval_many
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => sphere_error
+           !> Parallel communication interface
+           procedure :: comm_size   => sphere_comm_size
+           procedure :: comm_pack   => sphere_comm_pack
+           procedure :: comm_expand => sphere_comm_expand
 
     end type fitpack_sphere
 
@@ -142,7 +132,7 @@ module fitpack_sphere_domains
                        this%knots(1),this%t(:,1),    &  ! theta  knots (out)
                        this%knots(2),this%t(:,2),    &  ! phi knots (out)
                        this%c,this%fp,               &  ! Spline representation and MSE
-                       this%wrk1,this%lwrk1,         &  ! memory
+                       this%wrk,this%lwrk,         &  ! memory
                        this%wrk2,this%lwrk2,         &  ! memory
                        this%iwrk,this%liwrk,         &  ! memory
                        ierr)                            ! Error flag
@@ -158,24 +148,18 @@ module fitpack_sphere_domains
     elemental subroutine sphere_destroy(this)
        class(fitpack_sphere), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%m = 0
        deallocate(this%theta,stat=ierr)
        deallocate(this%phi,stat=ierr)
        deallocate(this%r,stat=ierr)
        deallocate(this%w,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
-       deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_FP_REAL
        this%nest      = 0
-       this%lwrk1     = 0
        this%lwrk2     = 0
-       this%liwrk     = 0
        this%knots     = 0
-       this%fp        = zero
 
     end subroutine sphere_destroy
 
@@ -224,11 +208,11 @@ module fitpack_sphere_domains
         this%liwrk = m+product(nest-7)
         allocate(this%iwrk(this%liwrk),source=0)
 
-        ! wrk1
+        ! wrk
         u = nest(1)-7
         v = nest(2)-7
-        this%lwrk1 = 185+52*v+10*u+14*u*v+8*(u-1)*v**2+8*m
-        allocate(this%wrk1(this%lwrk1),source=zero)
+        this%lwrk = 185+52*v+10*u+14*u*v+8*(u-1)*v**2+8*m
+        allocate(this%wrk(this%lwrk),source=zero)
 
         ! wrk2
         this%lwrk2 = 48+21*v+7*u*v+4*(u-1)*v**2
@@ -305,10 +289,70 @@ module fitpack_sphere_domains
 
     end function sphere_new_fit
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function sphere_error(this)
-       class(fitpack_sphere), intent(in) :: this
-       sphere_error = this%fp
-    end function sphere_error
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function sphere_comm_size(this)
+        class(fitpack_sphere), intent(in) :: this
+        ! Base fields + sphere-specific scalars:
+        ! m, lwrk2, nest(2), nmax, knots(2) = 7
+        sphere_comm_size = this%core_comm_size() &
+                         + 7 &
+                         + FP_COMM_SIZE(this%theta) &
+                         + FP_COMM_SIZE(this%phi) &
+                         + FP_COMM_SIZE(this%r) &
+                         + FP_COMM_SIZE(this%w) &
+                         + FP_COMM_SIZE(this%wrk2) &
+                         + FP_COMM_SIZE(this%t)
+    end function sphere_comm_size
+
+    pure subroutine sphere_comm_pack(this, buffer)
+        class(fitpack_sphere), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = real(this%m, FP_COMM);        pos = pos + 1
+        buffer(pos) = real(this%lwrk2, FP_COMM);    pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);  pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);  pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);     pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM); pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM); pos = pos + 1
+
+        call FP_COMM_PACK(this%theta, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%theta)
+        call FP_COMM_PACK(this%phi, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%phi)
+        call FP_COMM_PACK(this%r, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%r)
+        call FP_COMM_PACK(this%w, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_PACK(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
+        call FP_COMM_PACK(this%t, buffer(pos:))
+    end subroutine sphere_comm_pack
+
+    pure subroutine sphere_comm_expand(this, buffer)
+        class(fitpack_sphere), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%m        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk2    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%theta, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%theta)
+        call FP_COMM_EXPAND(this%phi, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%phi)
+        call FP_COMM_EXPAND(this%r, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%r)
+        call FP_COMM_EXPAND(this%w, buffer(pos:));     pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_EXPAND(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
+    end subroutine sphere_comm_expand
 
 end module fitpack_sphere_domains

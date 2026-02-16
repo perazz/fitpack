@@ -43,6 +43,7 @@ module fitpack_curve_tests
     public :: test_parametric_surface
     public :: test_fpknot_crash
     public :: test_curve_comm_roundtrip
+    public :: test_comm_roundtrips
     public :: test_umbrella_api
 
 
@@ -1421,6 +1422,310 @@ module fitpack_curve_tests
         success = .true.
 
     end function test_curve_comm_roundtrip
+
+    !> Test pack/expand round-trip for all fitter types.
+    !> Uses the double-roundtrip pattern: pack obj1 -> expand into obj2 -> pack obj2 -> compare buffers.
+    logical function test_comm_roundtrips() result(success)
+
+        character(*), parameter :: PREFIX = '[test_comm_roundtrips] '
+        integer(FP_FLAG) :: ierr
+        integer :: i, j
+
+        success = .true.
+
+        ! --- fitpack_surface (scattered) ---
+        scattered_surface: block
+            integer, parameter :: NX = 5, NY = 5, NS = NX*NY
+            type(fitpack_surface) :: s1, s2
+            real(FP_REAL) :: xs(NS), ys(NS), zs(NS), xg(NX), yg(NY)
+
+            xg = linspace(-one, one, NX)
+            yg = linspace(-one, one, NY)
+            do j = 1,NY
+               do i = 1,NX
+                  xs((j-1)*NX+i) = xg(i)
+                  ys((j-1)*NX+i) = yg(j)
+               end do
+            end do
+            zs = xs**2 + ys**2
+
+            ierr = s1%new_fit(xs, ys, zs)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'surface fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(s1, s2, 'fitpack_surface')) then
+                success = .false.; return
+            end if
+        end block scattered_surface
+
+        ! --- fitpack_grid_surface ---
+        grid_surface: block
+            type(fitpack_grid_surface) :: g1, g2
+
+            ierr = g1%new_fit(daregr_x, daregr_y, daregr_z, smoothing=0.5_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'grid surface fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(g1, g2, 'fitpack_grid_surface')) then
+                success = .false.; return
+            end if
+        end block grid_surface
+
+        ! --- fitpack_polar (scattered) ---
+        scattered_polar: block
+            type(fitpack_polar) :: p1, p2
+            real(FP_REAL), allocatable :: x(:), y(:), z(:), w(:)
+
+            x = dapola(1:600-2:3)
+            y = dapola(2:600-1:3)
+            z = dapola(3:600  :3)
+            allocate(w(size(x)), source=100.0_FP_REAL)
+
+            ierr = p1%new_fit(x, y, z, unit_disk_boundary, w)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'polar fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(p1, p2, 'fitpack_polar')) then
+                success = .false.; return
+            end if
+        end block scattered_polar
+
+        ! --- fitpack_grid_polar ---
+        gridded_polar: block
+            type(fitpack_grid_polar) :: p1, p2
+            real(FP_REAL), allocatable :: u(:), v(:), z(:,:)
+            real(FP_REAL) :: z0, r
+
+            u = linspace(0.1_FP_REAL, 0.9_FP_REAL, 9)
+            v = linspace(-pi, 0.9_FP_REAL*pi, 19)
+            r = one
+            z  = reshape(dapogr(1:9*19), [19,9])
+            z0 = dapogr(9*19+1)
+
+            call p1%new_points(u, v, r, z, z0)
+            ierr = p1%fit(smoothing=0.05_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'grid polar fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(p1, p2, 'fitpack_grid_polar')) then
+                success = .false.; return
+            end if
+        end block gridded_polar
+
+        ! --- fitpack_sphere (scattered) ---
+        scattered_sphere: block
+            type(fitpack_sphere) :: s1, s2
+            real(FP_REAL), allocatable :: theta(:), phi(:), r(:)
+
+            theta = min(deg2rad*dasphe(1:384-1:2), pi)
+            phi   = min(deg2rad*dasphe(2:384  :2), pi2)
+            r     = theta + phi ! simple function of coordinates
+
+            ierr = s1%new_fit(theta, phi, r)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'sphere fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(s1, s2, 'fitpack_sphere')) then
+                success = .false.; return
+            end if
+        end block scattered_sphere
+
+        ! --- fitpack_grid_sphere ---
+        gridded_sphere: block
+            type(fitpack_grid_sphere) :: s1, s2
+            real(FP_REAL), allocatable :: z(:,:)
+
+            z = reshape(daspgr_r, [size(daspgr_v), size(daspgr_u)])
+
+            ierr = s1%new_fit(daspgr_u, daspgr_v, z, smoothing=0.05_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'grid sphere fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(s1, s2, 'fitpack_grid_sphere')) then
+                success = .false.; return
+            end if
+        end block gridded_sphere
+
+        ! --- fitpack_parametric_curve ---
+        parametric_curve: block
+            type(fitpack_parametric_curve) :: c1, c2
+            real(FP_REAL), allocatable :: x(:,:), w(:), u(:)
+
+            u = [real(FP_REAL) :: 120,128,133,136,138,141,144,146,149,151,154,161,170,180,190,&
+                                200,210,220,230,240,250,262,269,273,278,282,287,291,295,299,305,315]
+            allocate(x(2,32))
+            x(1,:) = [-1.5141,-2.0906,-1.9253,-0.8724,-0.3074,-0.5534,0.0192,1.2298,2.5479,2.4710,1.7063,&
+                       1.1183,0.5534,0.4727,0.3574,0.1998,0.2882,0.2613,0.2652,0.2805,0.4112,0.9377,1.3527,&
+                       1.5564,1.6141,1.6333,1.1567,0.8109,0.2498,-0.2306,-0.7571,-1.1222]
+            x(2,:) = [0.5150,1.3412,2.6094,3.2358,2.7401,2.7823,3.5932,3.8353,2.5863,1.3105,0.6841,0.2575,&
+                       0.2460,0.3689,0.2460,0.2998,0.3651,0.3343,0.3881,0.4573,0.5918,0.7110,0.4035,0.0769,&
+                      -0.3920,-0.8570,-1.3412,-1.5641,-1.7409,-1.7178,-1.2989,-0.5572]
+            allocate(w(32), source=one)
+
+            ierr = c1%new_fit(x, w=w, u=u, smoothing=0.2_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'parametric curve fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(c1, c2, 'fitpack_parametric_curve')) then
+                success = .false.; return
+            end if
+        end block parametric_curve
+
+        ! --- fitpack_closed_curve ---
+        closed_curve: block
+            type(fitpack_closed_curve) :: c1, c2
+            real(FP_REAL) :: x(2,19), w(19), u(19)
+
+            x(1,1:18) = [-4.7,-7.048,-6.894,-3.75,-1.042,0.938,2.5,3.524,4.511,5.0,4.886,3.524,3.2,&
+                          1.302,-1.424,-3.0,-3.064,-3.665]
+            x(2,1:18) = [0.0,2.565,5.785,6.495,5.909,5.318,4.33,2.957,1.642,0.0,-1.779,-2.957,-5.543,&
+                         -7.386,-8.075,-5.196,-2.571,-1.334]
+            x(:,19) = x(:,1)
+            w = one
+            u = [(20*i, i=0,18)]
+
+            ierr = c1%new_fit(x, w=w, u=u, smoothing=100.0_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'closed curve fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(c1, c2, 'fitpack_closed_curve')) then
+                success = .false.; return
+            end if
+        end block closed_curve
+
+        ! --- fitpack_constrained_curve ---
+        constrained_curve: block
+            type(fitpack_constrained_curve) :: c1, c2
+            real(FP_REAL) :: x(2,31)
+            real(FP_REAL), allocatable :: w(:)
+
+            x(1,:) = [-3.109,-2.188,-1.351,-0.605,0.093,0.451,0.652,0.701,0.518,0.277,0.008,-0.291,&
+                      -0.562,-0.679,-0.637,-0.425,-0.049,0.575,1.334,2.167,3.206,4.099,4.872,5.710,&
+                       6.330,6.741,6.928,6.965,6.842,6.593,6.269]
+            x(2,:) = [3.040,2.876,2.634,2.183,1.586,1.010,0.382,-0.218,-0.632,-0.879,-0.981,-0.886,&
+                      -0.642,-0.195,0.373,1.070,1.607,2.165,2.618,2.905,2.991,2.897,2.615,2.164,&
+                       1.617,0.977,0.383,-0.194,-0.665,-0.901,-1.010]
+            allocate(w(31), source=one)
+
+            ierr = c1%new_fit(x, w=w, smoothing=60.0_FP_REAL)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'constrained curve fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(c1, c2, 'fitpack_constrained_curve')) then
+                success = .false.; return
+            end if
+        end block constrained_curve
+
+        ! --- fitpack_parametric_surface ---
+        parametric_surface: block
+            integer, parameter :: mu = 21, mv = 11, idim = 3
+            type(fitpack_parametric_surface) :: s1, s2
+            real(FP_REAL), allocatable :: u(:), v(:), f(:,:,:)
+
+            u = [(i-1, i=1,mu)]
+            v = [(u(2*i-1), i=1,mv)]
+            f = reshape(dapasu, [mv,mu,idim], order=[1,3,2])
+
+            ierr = s1%new_fit(u, v, f)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, PREFIX//'parametric surface fit failed: ', FITPACK_MESSAGE(ierr)
+                success = .false.; return
+            end if
+
+            if (.not.check_roundtrip(s1, s2, 'fitpack_parametric_surface')) then
+                success = .false.; return
+            end if
+        end block parametric_surface
+
+    contains
+
+        ! Double roundtrip helper: pack obj1 -> expand into obj2 -> pack obj2 -> compare buffers
+        logical function check_roundtrip(obj1, obj2, name) result(ok)
+            class(fitpack_fitter), intent(in)    :: obj1
+            class(fitpack_fitter), intent(inout) :: obj2
+            character(*), intent(in) :: name
+
+            real(FP_COMM), allocatable :: buf1(:), buf2(:)
+            integer(FP_SIZE) :: n1, n2
+
+            ok = .false.
+
+            ! Pack original
+            n1 = obj1%comm_size()
+            allocate(buf1(n1))
+            call obj1%comm_pack(buf1)
+
+            ! Expand into copy
+            call obj2%comm_expand(buf1)
+
+            ! Re-pack the copy
+            n2 = obj2%comm_size()
+            allocate(buf2(n2))
+            call obj2%comm_pack(buf2)
+
+            ! Check buffer sizes
+            if (n1 /= n2) then
+                print *, PREFIX//name//': buffer size mismatch: ', n1, ' vs ', n2
+                return
+            end if
+
+            ! Check buffer contents (use epsilon tolerance for workspace padding)
+            if (maxval(abs(buf1 - buf2)) > epsilon(1.0_FP_COMM)) then
+                print *, PREFIX//name//': buffer contents mismatch, max diff = ', maxval(abs(buf1-buf2))
+                return
+            end if
+
+            ! Check base fields
+            if (abs(obj1%smoothing - obj2%smoothing) > epsilon(one)) then
+                print *, PREFIX//name//': smoothing mismatch'
+                return
+            end if
+            if (abs(obj1%fp - obj2%fp) > epsilon(one)) then
+                print *, PREFIX//name//': fp mismatch'
+                return
+            end if
+            if (obj1%iopt /= obj2%iopt) then
+                print *, PREFIX//name//': iopt mismatch'
+                return
+            end if
+            if (size(obj1%c) /= size(obj2%c)) then
+                print *, PREFIX//name//': c array size mismatch'
+                return
+            end if
+            if (maxval(abs(obj1%c - obj2%c)) > epsilon(one)) then
+                print *, PREFIX//name//': c values mismatch'
+                return
+            end if
+
+            ok = .true.
+
+        end function check_roundtrip
+
+        ! Unit disk boundary for polar test
+        pure real(FP_REAL) function unit_disk_boundary(v)
+            real(FP_REAL), intent(in) :: v
+            unit_disk_boundary = one
+        end function unit_disk_boundary
+
+    end function test_comm_roundtrips
 
     ! Test that `use fitpack` alone provides access to constants, error flags,
     ! and new methods (eval, mse, interpolate, least_squares on surface/curve)
