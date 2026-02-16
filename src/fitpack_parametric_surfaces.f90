@@ -257,21 +257,36 @@ module fitpack_parametric_surfaces
     end function surf_eval_grid
 
     ! Interpolating curve
-    integer function interpolating_curve(this) result(ierr)
+    integer function interpolating_curve(this,reset_knots) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
+        logical, optional, intent(in) :: reset_knots
 
-        ! Set zero smoothing
-        ierr = surf_fit_automatic_knots(this,zero)
+        logical :: do_reset
+
+        do_reset = .true.; if (present(reset_knots)) do_reset = reset_knots
+        if (do_reset) this%iopt = IOPT_NEW_SMOOTHING
+        ierr = surf_fit_automatic_knots(this,zero,keep_knots=.not.do_reset)
 
     end function interpolating_curve
 
     ! Least-squares surface on current or given knots
-    integer function surface_fit_least_squares(this,u_knots,v_knots) result(ierr)
+    integer function surface_fit_least_squares(this,u_knots,v_knots,smoothing,reset_knots) result(ierr)
        class(fitpack_parametric_surface), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: u_knots(:)
        real(FP_REAL), optional, intent(in) :: v_knots(:)
+       real(FP_REAL), optional, intent(in) :: smoothing
+       logical, optional, intent(in) :: reset_knots
 
        integer :: nuuser,nu,nvuser,nv,new_knots(2)
+       logical :: do_reset
+
+       ! Optionally recompute knots via a smoothing fit first
+       do_reset = .false.; if (present(reset_knots)) do_reset = reset_knots
+       if (do_reset) then
+           this%iopt = IOPT_NEW_SMOOTHING
+           ierr = this%fit(smoothing)
+           if (.not.FITPACK_SUCCESS(ierr)) return
+       end if
 
        this%iopt = IOPT_NEW_LEASTSQUARES
 
@@ -307,18 +322,21 @@ module fitpack_parametric_surfaces
     end function surface_fit_least_squares
 
     ! Curve fitting driver: automatic number of knots
-    integer function surf_fit_automatic_knots(this,smoothing,periodic) result(ierr)
+    integer function surf_fit_automatic_knots(this,smoothing,periodic,keep_knots) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
         logical, optional, intent(in) :: periodic(2)
+        logical, optional, intent(in) :: keep_knots
 
         integer :: loop,nit,ipar(2)
         real(FP_REAL) :: smooth_now(3)
+        logical :: do_guard
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
-        !> Ensure we start with new knots
-        if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
+        !> Ensure we start with new knots (unless caller wants to keep them)
+        do_guard = .true.; if (present(keep_knots)) do_guard = .not.keep_knots
+        if (do_guard .and. this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
 
         ! Optionally set periodicity
         if (present(periodic)) this%periodic_dim = periodic
