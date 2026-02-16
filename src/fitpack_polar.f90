@@ -103,6 +103,9 @@ module fitpack_polar_domains
            procedure, private :: polr_eval_many
            generic :: eval => polr_eval_one,polr_eval_many
 
+           !> Properties: MSE
+           procedure, non_overridable :: mse => polar_error
+
     end type fitpack_polar
 
     interface fitpack_polar
@@ -341,5 +344,11 @@ module fitpack_polar_domains
         polr_new_fit = this%fit(smoothing)
 
     end function polr_new_fit
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function polar_error(this)
+       class(fitpack_polar), intent(in) :: this
+       polar_error = this%fp
+    end function polar_error
 
 end module fitpack_polar_domains

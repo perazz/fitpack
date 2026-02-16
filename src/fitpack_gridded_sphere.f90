@@ -95,6 +95,9 @@ module fitpack_gridded_sphere
            procedure, private :: gridded_eval_many
            generic :: eval => gridded_eval_one,gridded_eval_many
 
+           !> Properties: MSE
+           procedure, non_overridable :: mse => gridsphere_error
+
            !> Write to disk
            procedure :: write => gridded_to_disk
 
@@ -395,5 +398,11 @@ module fitpack_gridded_sphere
            end function numbered
 
     end subroutine gridded_to_disk
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function gridsphere_error(this)
+       class(fitpack_grid_sphere), intent(in) :: this
+       gridsphere_error = this%fp
+    end function gridsphere_error
 
 end module fitpack_gridded_sphere

@@ -81,8 +81,9 @@ module fitpack_curves
            procedure :: new_fit
 
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit         => curve_fit_automatic_knots
-           procedure :: interpolate => interpolating_curve
+           procedure :: fit           => curve_fit_automatic_knots
+           procedure :: interpolate   => interpolating_curve
+           procedure :: least_squares => curve_fit_least_squares
 
            !> Evaluate curve at given coordinates
            procedure, private :: curve_eval_one
@@ -362,6 +363,13 @@ module fitpack_curves
         ierr = curve_fit_automatic_knots(this,smoothing=zero,order=order)
 
     end function interpolating_curve
+
+    ! Least-squares curve fit with current knots
+    integer(FP_FLAG) function curve_fit_least_squares(this) result(ierr)
+        class(fitpack_curve), intent(inout) :: this
+        this%iopt = IOPT_NEW_LEASTSQUARES
+        ierr = this%fit()
+    end function curve_fit_least_squares
 
     ! Curve fitting driver: automatic number of knots
     integer(FP_FLAG) function curve_fit_automatic_knots(this,smoothing,order) result(ierr)

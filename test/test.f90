@@ -58,6 +58,7 @@ program test
         call add_test(test_parametric_surface())
         call add_test(test_fpknot_crash())
         call add_test(test_curve_comm_roundtrip())
+        call add_test(test_umbrella_api())
 
     end subroutine run_interface_tests
 

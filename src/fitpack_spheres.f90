@@ -84,6 +84,9 @@ module fitpack_sphere_domains
            procedure, private :: sphere_eval_many
            generic :: eval => sphere_eval_one,sphere_eval_many
 
+           !> Properties: MSE
+           procedure, non_overridable :: mse => sphere_error
+
     end type fitpack_sphere
 
     interface fitpack_sphere
@@ -301,5 +304,11 @@ module fitpack_sphere_domains
         sphere_new_fit = this%fit(smoothing)
 
     end function sphere_new_fit
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function sphere_error(this)
+       class(fitpack_sphere), intent(in) :: this
+       sphere_error = this%fp
+    end function sphere_error
 
 end module fitpack_sphere_domains
