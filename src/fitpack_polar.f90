@@ -105,8 +105,20 @@ module fitpack_polar_domains
     contains
 
     ! Fit a surface to least squares of the current knots
-    integer function surface_fit_least_squares(this) result(ierr)
+    integer function surface_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_polar), intent(inout) :: this
+       real(FP_REAL), optional, intent(in) :: smoothing
+       logical, optional, intent(in) :: reset_knots
+
+       logical :: do_reset
+
+       ! Optionally recompute knots via a smoothing fit first
+       do_reset = .false.; if (present(reset_knots)) do_reset = reset_knots
+       if (do_reset) then
+           this%iopt = IOPT_NEW_SMOOTHING
+           ierr = this%fit(smoothing)
+           if (.not.FITPACK_SUCCESS(ierr)) return
+       end if
 
        this%iopt = IOPT_NEW_LEASTSQUARES
        ierr = this%fit()
@@ -114,26 +126,33 @@ module fitpack_polar_domains
     end function surface_fit_least_squares
 
     ! Find interpolating surface
-    integer function surface_fit_interpolating(this) result(ierr)
+    integer function surface_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_polar), intent(inout) :: this
+        logical, optional, intent(in) :: reset_knots
 
-        ! Set zero smoothing
-        ierr = surface_fit_automatic_knots(this,smoothing=zero)
+        logical :: do_reset
+
+        do_reset = .true.; if (present(reset_knots)) do_reset = reset_knots
+        if (do_reset) this%iopt = IOPT_NEW_SMOOTHING
+        ierr = surface_fit_automatic_knots(this,smoothing=zero,keep_knots=.not.do_reset)
 
     end function surface_fit_interpolating
 
     ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
-    integer function surface_fit_automatic_knots(this,smoothing) result(ierr)
+    integer function surface_fit_automatic_knots(this,smoothing,keep_knots) result(ierr)
         class(fitpack_polar), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
+        logical, optional, intent(in) :: keep_knots
 
         integer :: loop,nit,iopt(3)
         real(FP_REAL) :: smooth_now(3)
+        logical :: do_guard
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
-        !> Ensure we start with new knots
-        if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
+        !> Ensure we start with new knots (unless caller wants to keep them)
+        do_guard = .true.; if (present(keep_knots)) do_guard = .not.keep_knots
+        if (do_guard .and. this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
 
         do loop=1,nit
 

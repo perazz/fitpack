@@ -82,7 +82,8 @@ module fitpack_parametric_curves
 
            !> Generate/update fitting curve, with optional smoothing
            procedure :: fit         => curve_fit_automatic_knots
-           procedure :: interpolate => interpolating_curve
+           procedure :: interpolate   => interpolating_curve
+           procedure :: least_squares => parcur_fit_least_squares
 
            !> Evaluate curve at given coordinates
            procedure :: eval_one  => curve_eval_one
@@ -427,31 +428,56 @@ module fitpack_parametric_curves
     end function curve_eval_many
 
     ! Interpolating curve
-    integer function interpolating_curve(this,order) result(ierr)
+    integer function interpolating_curve(this,order,reset_knots) result(ierr)
         class(fitpack_parametric_curve), intent(inout) :: this
         integer(FP_SIZE), optional, intent(in) :: order
+        logical, optional, intent(in) :: reset_knots
 
-        ! Set zero smoothing
-        this%iopt = IOPT_NEW_SMOOTHING
+        logical :: do_reset
 
-        ! Set zero smoothing
-        ierr = curve_fit_automatic_knots(this,smoothing=zero,order=order)
+        do_reset = .true.; if (present(reset_knots)) do_reset = reset_knots
+        if (do_reset) this%iopt = IOPT_NEW_SMOOTHING
+
+        ierr = curve_fit_automatic_knots(this,smoothing=zero,order=order,keep_knots=.not.do_reset)
 
     end function interpolating_curve
 
+    ! Least-squares curve fit with current knots
+    integer function parcur_fit_least_squares(this,smoothing,reset_knots) result(ierr)
+        class(fitpack_parametric_curve), intent(inout) :: this
+        real(FP_REAL), optional, intent(in) :: smoothing
+        logical, optional, intent(in) :: reset_knots
+
+        logical :: do_reset
+
+        ! Optionally recompute knots via a smoothing fit first
+        do_reset = .false.; if (present(reset_knots)) do_reset = reset_knots
+        if (do_reset) then
+            this%iopt = IOPT_NEW_SMOOTHING
+            ierr = this%fit(smoothing)
+            if (.not.FITPACK_SUCCESS(ierr)) return
+        end if
+
+        this%iopt = IOPT_NEW_LEASTSQUARES
+        ierr = this%fit()
+    end function parcur_fit_least_squares
+
     ! Curve fitting driver: automatic number of knots
-    integer function curve_fit_automatic_knots(this,smoothing,order) result(ierr)
+    integer function curve_fit_automatic_knots(this,smoothing,order,keep_knots) result(ierr)
         class(fitpack_parametric_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
         integer(FP_SIZE), optional, intent(in) :: order
+        logical, optional, intent(in) :: keep_knots
 
         integer :: loop,nit
         real(FP_REAL) :: smooth_now(3)
+        logical :: do_guard
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
-        !> Ensure we start with new knots
-        if (this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
+        !> Ensure we start with new knots (unless caller wants to keep them)
+        do_guard = .true.; if (present(keep_knots)) do_guard = .not.keep_knots
+        if (do_guard .and. this%iopt==IOPT_OLD_FIT) this%iopt = IOPT_NEW_SMOOTHING
 
         ! Set order
         if (present(order)) this%order = order

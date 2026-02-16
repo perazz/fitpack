@@ -223,7 +223,7 @@ that serializes all allocatable components).
 
 # PR Plans
 
-## PR A: Public API Cleanup & Umbrella Module
+## PR A: Public API Cleanup & Umbrella Module (DONE)
 
 **Goal**: Make the `fitpack` umbrella module self-sufficient — users should never need
 `use fitpack_core` directly.
@@ -270,9 +270,9 @@ A user writing `curve%bc = OUTSIDE_EXTRAPOLATE` must also `use fitpack_core`. Si
 
 ---
 
-## PR B: Abstract Base Type
+## PR B: Abstract Base Type (DONE — PR #41)
 
-**Goal**: Extract shared state and logic into an abstract `fitpack_spline` base type that
+**Goal**: Extract shared state and logic into an abstract `fitpack_fitter` base type that
 all 9 concrete types extend.
 
 ### Design

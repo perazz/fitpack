@@ -1732,6 +1732,7 @@ module fitpack_curve_tests
     logical function test_umbrella_api() result(success)
 
        type(fitpack_curve) :: curve
+       type(fitpack_parametric_curve) :: pcurve
        type(fitpack_surface) :: surf
        type(fitpack_grid_surface) :: gsurf
        integer(FP_FLAG) :: ierr
@@ -1741,6 +1742,7 @@ module fitpack_curve_tests
        ! Curve test data
        integer, parameter :: NC = 50
        real(FP_REAL) :: xc(NC),yc(NC)
+       real(FP_REAL) :: pcxy(2,NC)
 
        ! Surface test data: 5x5 scattered grid
        integer, parameter :: NX = 5, NY = 5, NS = NX*NY
@@ -1766,6 +1768,22 @@ module fitpack_curve_tests
        mse_val = curve%mse()
        ierr = curve%least_squares()
        if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! ---- Test parametric curve interpolate/least_squares ----
+       pcxy(1,:) = cos(xc)
+       pcxy(2,:) = sin(xc)
+
+       ! Smoothing fit, then interpolation: fp must be zero
+       ierr = pcurve%new_fit(pcxy)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+       ierr = pcurve%interpolate()
+       if (.not.FITPACK_SUCCESS(ierr)) return
+       if (pcurve%mse() > zero) return
+
+       ! Least squares with knot reset: large smoothing -> fewer knots -> fp > 0
+       ierr = pcurve%least_squares(smoothing=real(NC,FP_REAL),reset_knots=.true.)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+       if (.not. pcurve%mse() > zero) return
 
        ! ---- Test fitpack_surface eval, eval_ongrid, mse ----
        xg = linspace(-one,one,NX)
