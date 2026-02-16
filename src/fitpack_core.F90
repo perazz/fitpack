@@ -108,7 +108,8 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
 
     ! Spline degrees
-    integer(FP_SIZE), parameter, public :: MAX_ORDER = 19    ! Max spline order (for array allocation)
+    integer(FP_SIZE), parameter, public :: MAX_ORDER = 19        ! Max spline order (for array allocation)
+    integer(FP_SIZE), parameter, public :: MAX_FORT_RANK = 15    ! Max Fortran rank
     integer(FP_SIZE), parameter, public :: DEGREE_3  =  3
     integer(FP_SIZE), parameter, public :: DEGREE_4  =  4
     integer(FP_SIZE), parameter, public :: DEGREE_5  =  5
@@ -177,27 +178,21 @@ module fitpack_core
         module procedure swap_size
     end interface fitpack_swap
 
-    !> Communication size for allocatable 1D arrays
+    !> Communication size for allocatable arrays (assumed-rank)
     interface FP_COMM_SIZE
-        module procedure FP_REAL_COMM_SIZE_1D
-        module procedure FP_REAL_COMM_SIZE_2D
-        module procedure FP_REAL_COMM_SIZE_3D
+        module procedure FP_REAL_COMM_SIZE_ND
         module procedure FP_SIZE_COMM_SIZE_1D
     end interface FP_COMM_SIZE
 
-    !> Pack allocatable arrays into communication buffer
+    !> Pack allocatable arrays into communication buffer (assumed-rank)
     interface FP_COMM_PACK
-        module procedure FP_REAL_COMM_PACK_1D
-        module procedure FP_REAL_COMM_PACK_2D
-        module procedure FP_REAL_COMM_PACK_3D
+        module procedure FP_REAL_COMM_PACK_ND
         module procedure FP_SIZE_COMM_PACK_1D
     end interface FP_COMM_PACK
 
-    !> Expand communication buffer into allocatable arrays
+    !> Expand communication buffer into allocatable arrays (assumed-rank)
     interface FP_COMM_EXPAND
-        module procedure FP_REAL_COMM_EXPAND_1D
-        module procedure FP_REAL_COMM_EXPAND_2D
-        module procedure FP_REAL_COMM_EXPAND_3D
+        module procedure FP_REAL_COMM_EXPAND_ND
         module procedure FP_SIZE_COMM_EXPAND_1D
     end interface FP_COMM_EXPAND
 
@@ -18302,43 +18297,18 @@ module fitpack_core
         FP_RCOMMS_PER_BITS = nbits / COMM_BITS + merge(IONE, IZERO, mod(nbits, COMM_BITS) > 0)
     end function FP_RCOMMS_PER_BITS
 
-    !> Calculate storage size for 1D real(FP_REAL) allocatable array
-    !> Header: 1 FP_COMM storing bounds as 2 int32 (or NOT_ALLOC marker)
+    !> Calculate storage size for any-rank real(FP_REAL) allocatable array
+    !> Header: rank FP_COMM slots storing bounds as 2*rank int32 (or NOT_ALLOC marker)
     !> Data: raw transfer of array contents
-    pure integer(FP_SIZE) function FP_REAL_COMM_SIZE_1D(array)
-        real(FP_REAL), allocatable, intent(in) :: array(:)
-        integer(FP_SIZE) :: n
+    pure integer(FP_SIZE) function FP_REAL_COMM_SIZE_ND(array)
+        real(FP_REAL), allocatable, intent(in) :: array(..)
 
-        FP_REAL_COMM_SIZE_1D = rank(array)  ! Header
+        FP_REAL_COMM_SIZE_ND = rank(array)  ! Header: rank doubles for 2*rank int32 bounds
         if (allocated(array)) then
-            n = size(array, kind=FP_SIZE)
-            FP_REAL_COMM_SIZE_1D = FP_REAL_COMM_SIZE_1D + FP_RCOMMS_PER_BITS(n * storage_size(array))
+            FP_REAL_COMM_SIZE_ND = FP_REAL_COMM_SIZE_ND &
+                + FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
         end if
-    end function FP_REAL_COMM_SIZE_1D
-
-    !> Calculate storage size for 2D real(FP_REAL) allocatable array
-    pure integer(FP_SIZE) function FP_REAL_COMM_SIZE_2D(array)
-        real(FP_REAL), allocatable, intent(in) :: array(:,:)
-        integer(FP_SIZE) :: n
-
-        FP_REAL_COMM_SIZE_2D = rank(array)  ! Header (2 dimensions)
-        if (allocated(array)) then
-            n = size(array, kind=FP_SIZE)
-            FP_REAL_COMM_SIZE_2D = FP_REAL_COMM_SIZE_2D + FP_RCOMMS_PER_BITS(n * storage_size(array))
-        end if
-    end function FP_REAL_COMM_SIZE_2D
-
-    !> Calculate storage size for 3D real(FP_REAL) allocatable array
-    pure integer(FP_SIZE) function FP_REAL_COMM_SIZE_3D(array)
-        real(FP_REAL), allocatable, intent(in) :: array(:,:,:)
-        integer(FP_SIZE) :: n
-
-        FP_REAL_COMM_SIZE_3D = rank(array)  ! Header (3 dimensions)
-        if (allocated(array)) then
-            n = size(array, kind=FP_SIZE)
-            FP_REAL_COMM_SIZE_3D = FP_REAL_COMM_SIZE_3D + FP_RCOMMS_PER_BITS(n * storage_size(array))
-        end if
-    end function FP_REAL_COMM_SIZE_3D
+    end function FP_REAL_COMM_SIZE_ND
 
     !> Calculate storage size for 1D integer(FP_SIZE) allocatable array
     pure integer(FP_SIZE) function FP_SIZE_COMM_SIZE_1D(array)
@@ -18352,79 +18322,37 @@ module fitpack_core
         end if
     end function FP_SIZE_COMM_SIZE_1D
 
-    !> Pack 1D real(FP_REAL) allocatable array into communication buffer
-    pure subroutine FP_REAL_COMM_PACK_1D(array, buffer)
-        real(FP_REAL), allocatable, intent(in) :: array(:)
+    !> Pack any-rank real(FP_REAL) allocatable array into communication buffer
+    pure subroutine FP_REAL_COMM_PACK_ND(array, buffer)
+        real(FP_REAL), allocatable, intent(in) :: array(..)
         real(FP_COMM), intent(out) :: buffer(:)
 
-        integer(FP_SIZE) :: bnd(2), ndoubles
-        integer(FP_SIZE), parameter :: header = 1
+        integer(FP_SIZE) :: bnd(2,MAX_FORT_RANK), ndoubles, header, idim
+
+        header = rank(array)
 
         if (allocated(array)) then
-            bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
+            do idim = 1, rank(array)
+               bnd(:,idim) = [lbound(array, idim, FP_SIZE), ubound(array, idim, FP_SIZE)]
+            end do
         else
             bnd = FP_NOT_ALLOC
         end if
 
-        buffer(1:header) = transfer(bnd, buffer(1:header), int(header))
+        buffer(1:header) = transfer(bnd(:,:header), buffer(1:header), int(header))
 
-        if (all(bnd /= FP_NOT_ALLOC)) then
+        if (all(bnd(:,:header) /= FP_NOT_ALLOC)) then
             ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            buffer(header+1:header+ndoubles) = transfer(array, buffer(header+1:header+ndoubles), int(ndoubles))
+            select rank(aa => array)
+            rank(1)
+                buffer(header+1:header+ndoubles) = transfer(aa, buffer(header+1:header+ndoubles), int(ndoubles))
+            rank(2)
+                buffer(header+1:header+ndoubles) = transfer(aa, buffer(header+1:header+ndoubles), int(ndoubles))
+            rank(3)
+                buffer(header+1:header+ndoubles) = transfer(aa, buffer(header+1:header+ndoubles), int(ndoubles))
+            end select
         end if
-    end subroutine FP_REAL_COMM_PACK_1D
-
-    !> Pack 2D real(FP_REAL) allocatable array into communication buffer
-    pure subroutine FP_REAL_COMM_PACK_2D(array, buffer)
-        real(FP_REAL), allocatable, intent(in) :: array(:,:)
-        real(FP_COMM), intent(out) :: buffer(:)
-
-        integer(FP_SIZE) :: bnd(2, 2), ndoubles
-        integer(FP_SIZE), parameter :: header = 2
-
-        if (allocated(array)) then
-            bnd(1, 1) = lbound(array, 1, FP_SIZE)
-            bnd(2, 1) = ubound(array, 1, FP_SIZE)
-            bnd(1, 2) = lbound(array, 2, FP_SIZE)
-            bnd(2, 2) = ubound(array, 2, FP_SIZE)
-        else
-            bnd = FP_NOT_ALLOC
-        end if
-
-        buffer(1:header) = transfer(bnd, buffer(1:header), int(header))
-
-        if (all(bnd /= FP_NOT_ALLOC)) then
-            ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            buffer(header+1:header+ndoubles) = transfer(array, buffer(header+1:header+ndoubles), int(ndoubles))
-        end if
-    end subroutine FP_REAL_COMM_PACK_2D
-
-    !> Pack 3D real(FP_REAL) allocatable array into communication buffer
-    pure subroutine FP_REAL_COMM_PACK_3D(array, buffer)
-        real(FP_REAL), allocatable, intent(in) :: array(:,:,:)
-        real(FP_COMM), intent(out) :: buffer(:)
-
-        integer(FP_SIZE) :: bnd(2, 3), ndoubles
-        integer(FP_SIZE), parameter :: header = 3
-
-        if (allocated(array)) then
-            bnd(1, 1) = lbound(array, 1, FP_SIZE)
-            bnd(2, 1) = ubound(array, 1, FP_SIZE)
-            bnd(1, 2) = lbound(array, 2, FP_SIZE)
-            bnd(2, 2) = ubound(array, 2, FP_SIZE)
-            bnd(1, 3) = lbound(array, 3, FP_SIZE)
-            bnd(2, 3) = ubound(array, 3, FP_SIZE)
-        else
-            bnd = FP_NOT_ALLOC
-        end if
-
-        buffer(1:header) = transfer(bnd, buffer(1:header), int(header))
-
-        if (all(bnd /= FP_NOT_ALLOC)) then
-            ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            buffer(header+1:header+ndoubles) = transfer(array, buffer(header+1:header+ndoubles), int(ndoubles))
-        end if
-    end subroutine FP_REAL_COMM_PACK_3D
+    end subroutine FP_REAL_COMM_PACK_ND
 
     !> Pack 1D integer(FP_SIZE) allocatable array into communication buffer
     pure subroutine FP_SIZE_COMM_PACK_1D(array, buffer)
@@ -18448,56 +18376,33 @@ module fitpack_core
         end if
     end subroutine FP_SIZE_COMM_PACK_1D
 
-    !> Expand communication buffer into 1D real(FP_REAL) allocatable array
-    pure subroutine FP_REAL_COMM_EXPAND_1D(array, buffer)
-        real(FP_REAL), allocatable, intent(out) :: array(:)
+    !> Expand communication buffer into any-rank real(FP_REAL) allocatable array
+    pure subroutine FP_REAL_COMM_EXPAND_ND(array, buffer)
+        real(FP_REAL), allocatable, intent(out) :: array(..)
         real(FP_COMM), intent(in) :: buffer(:)
 
-        integer(FP_SIZE) :: bnd(2), n
-        integer(FP_SIZE), parameter :: header = 1
+        integer(FP_SIZE) :: bnd(2, MAX_FORT_RANK), header, n
 
-        bnd = transfer(buffer(:header), bnd)
+        header = rank(array)
+        bnd(:,:header) = reshape(transfer(buffer(:header), bnd(:,:header)), [2, header])
 
-        if (all(bnd /= FP_NOT_ALLOC)) then
-            allocate(array(bnd(1):bnd(2)))
-            n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array = transfer(buffer(header+1:header+n), array)
+        if (all(bnd(:,:header) /= FP_NOT_ALLOC)) then
+            select rank(aa => array)
+            rank(1)
+                allocate(aa(bnd(1,1):bnd(2,1)))
+                n = FP_RCOMMS_PER_BITS(size(aa, kind=FP_SIZE) * storage_size(aa))
+                aa = transfer(buffer(header+1:header+n), aa)
+            rank(2)
+                allocate(aa(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2)))
+                n = FP_RCOMMS_PER_BITS(size(aa, kind=FP_SIZE) * storage_size(aa))
+                aa = reshape(transfer(buffer(header+1:header+n), aa, size(aa)), shape(aa))
+            rank(3)
+                allocate(aa(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2), bnd(1,3):bnd(2,3)))
+                n = FP_RCOMMS_PER_BITS(size(aa, kind=FP_SIZE) * storage_size(aa))
+                aa = reshape(transfer(buffer(header+1:header+n), aa, size(aa)), shape(aa))
+            end select
         end if
-    end subroutine FP_REAL_COMM_EXPAND_1D
-
-    !> Expand communication buffer into 2D real(FP_REAL) allocatable array
-    pure subroutine FP_REAL_COMM_EXPAND_2D(array, buffer)
-        real(FP_REAL), allocatable, intent(out) :: array(:,:)
-        real(FP_COMM), intent(in) :: buffer(:)
-
-        integer(FP_SIZE) :: bnd(2, 2), n
-        integer(FP_SIZE), parameter :: header = 2
-
-        bnd = reshape(transfer(buffer(:header), bnd), shape(bnd))
-
-        if (all(bnd /= FP_NOT_ALLOC)) then
-            allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2)))
-            n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
-        end if
-    end subroutine FP_REAL_COMM_EXPAND_2D
-
-    !> Expand communication buffer into 3D real(FP_REAL) allocatable array
-    pure subroutine FP_REAL_COMM_EXPAND_3D(array, buffer)
-        real(FP_REAL), allocatable, intent(out) :: array(:,:,:)
-        real(FP_COMM), intent(in) :: buffer(:)
-
-        integer(FP_SIZE) :: bnd(2, 3), n
-        integer(FP_SIZE), parameter :: header = 3
-
-        bnd = reshape(transfer(buffer(:header), bnd), shape(bnd))
-
-        if (all(bnd /= FP_NOT_ALLOC)) then
-            allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2), bnd(1,3):bnd(2,3)))
-            n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
-            array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
-        end if
-    end subroutine FP_REAL_COMM_EXPAND_3D
+    end subroutine FP_REAL_COMM_EXPAND_ND
 
     !> Expand communication buffer into 1D integer(FP_SIZE) allocatable array
     pure subroutine FP_SIZE_COMM_EXPAND_1D(array, buffer)
