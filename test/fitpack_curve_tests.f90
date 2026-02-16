@@ -43,6 +43,7 @@ module fitpack_curve_tests
     public :: test_parametric_surface
     public :: test_fpknot_crash
     public :: test_curve_comm_roundtrip
+    public :: test_umbrella_api
 
 
     contains
@@ -1420,6 +1421,96 @@ module fitpack_curve_tests
         success = .true.
 
     end function test_curve_comm_roundtrip
+
+    ! Test that `use fitpack` alone provides access to constants, error flags,
+    ! and new methods (eval, mse, interpolate, least_squares on surface/curve)
+    logical function test_umbrella_api() result(success)
+
+       type(fitpack_curve) :: curve
+       type(fitpack_surface) :: surf
+       type(fitpack_grid_surface) :: gsurf
+       integer(FP_FLAG) :: ierr
+       real(FP_REAL) :: mse_val
+       real(FP_REAL), allocatable :: fscatter(:),fgrid(:,:)
+
+       ! Curve test data
+       integer, parameter :: NC = 50
+       real(FP_REAL) :: xc(NC),yc(NC)
+
+       ! Surface test data: 5x5 scattered grid
+       integer, parameter :: NX = 5, NY = 5, NS = NX*NY
+       real(FP_REAL) :: xs(NS),ys(NS),zs(NS),xg(NX),yg(NY),zg(NY,NX)
+
+       integer :: i,j
+
+       success = .false.
+
+       ! ---- Verify constants are accessible from `use fitpack` ----
+       ! (These would not compile if not re-exported)
+       if (FITPACK_OK /= 0) return
+       if (IOPT_NEW_SMOOTHING /= 0) return
+       if (OUTSIDE_NEAREST_BND /= 3) return
+       if (abs(pi - atan2(zero,-one)) > epsilon(one)) return
+
+       ! ---- Test curve least_squares ----
+       xc = linspace(zero,pi,NC)
+       yc = sin(xc)
+       ierr = curve%new_fit(xc,yc)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       mse_val = curve%mse()
+       ierr = curve%least_squares()
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! ---- Test fitpack_surface eval, eval_ongrid, mse ----
+       xg = linspace(-one,one,NX)
+       yg = linspace(-one,one,NY)
+
+       ! Generate scattered points from the grid
+       do j = 1,NY
+          do i = 1,NX
+             xs((j-1)*NX+i) = xg(i)
+             ys((j-1)*NX+i) = yg(j)
+          end do
+       end do
+       zs = xs**2 + ys**2
+
+       ierr = surf%new_fit(xs,ys,zs)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! Evaluate at all scattered points
+       fscatter = surf%eval(xs,ys,ierr)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! Evaluate on a grid
+       fgrid = surf%eval_ongrid(xg,yg,ierr)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+       if (size(fgrid,1)/=NY .or. size(fgrid,2)/=NX) return
+
+       ! MSE
+       mse_val = surf%mse()
+
+       ! Interpolate
+       ierr = surf%interpolate()
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! Least squares (after interpolation, knots are set)
+       ierr = surf%least_squares()
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       ! ---- Test grid_surface mse ----
+       do j = 1,NX
+          zg(:,j) = xg(j)**2 + yg**2
+       end do
+
+       ierr = gsurf%new_fit(xg,yg,zg)
+       if (.not.FITPACK_SUCCESS(ierr)) return
+
+       mse_val = gsurf%mse()
+
+       success = .true.
+
+    end function test_umbrella_api
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)

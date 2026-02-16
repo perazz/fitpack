@@ -32,12 +32,13 @@ module fitpack
    implicit none
    private
 
-   ! Public interface
+   ! Public interface: kind parameters
    public :: FP_REAL
    public :: FP_SIZE
    public :: FP_FLAG
    public :: FP_BOOL
 
+   ! Public interface: types
    public :: fitpack_curve
    public :: fitpack_closed_curve
    public :: fitpack_periodic_curve
@@ -53,6 +54,25 @@ module fitpack
    public :: fitpack_surface
    public :: fitpack_grid_surface
    public :: fitpack_parametric_surface
+
+   ! Public interface: boundary behavior flags
+   public :: OUTSIDE_EXTRAPOLATE, OUTSIDE_ZERO, OUTSIDE_NOT_ALLOWED, OUTSIDE_NEAREST_BND
+
+   ! Public interface: fitting state flags
+   public :: IOPT_NEW_LEASTSQUARES, IOPT_NEW_SMOOTHING, IOPT_OLD_FIT
+
+   ! Public interface: error flags
+   public :: FITPACK_OK, FITPACK_INTERPOLATING_OK, FITPACK_LEASTSQUARES_OK
+   public :: FITPACK_INSUFFICIENT_STORAGE, FITPACK_S_TOO_SMALL, FITPACK_MAXIT
+   public :: FITPACK_TOO_MANY_KNOTS, FITPACK_OVERLAPPING_KNOTS, FITPACK_INVALID_RANGE
+   public :: FITPACK_INPUT_ERROR, FITPACK_TEST_ERROR
+   public :: FITPACK_INVALID_CONSTRAINT, FITPACK_INSUFFICIENT_KNOTS
+
+   ! Public interface: error utility functions
+   public :: FITPACK_SUCCESS, FITPACK_MESSAGE, IOPT_MESSAGE
+
+   ! Public interface: named constants
+   public :: zero, one, half, pi
 
 
 end module fitpack

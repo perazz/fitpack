@@ -78,7 +78,18 @@ module fitpack_surfaces
            procedure :: new_fit    => surf_new_fit
 
            !> Generate/update fitting curve, with optional smoothing
-           procedure :: fit        => surface_fit_automatic_knots
+           procedure :: fit           => surface_fit_automatic_knots
+           procedure :: interpolate   => surface_fit_interpolating
+           procedure :: least_squares => surface_fit_least_squares
+
+           !> Evaluate surface at given coordinates
+           procedure, private :: surface_eval_one
+           procedure, private :: surface_eval_many
+           generic   :: eval => surface_eval_one,surface_eval_many
+
+           !> Evaluate surface on a grid
+           procedure, private :: surface_eval_gridded
+           generic   :: eval_ongrid => surface_eval_gridded
 
            !> Evaluate derivatives at given coordinates
            procedure, private :: surface_derivatives_gridded
@@ -86,6 +97,9 @@ module fitpack_surfaces
            procedure, private :: surface_derivatives_one
            generic   :: dfdx => surface_derivatives_one,surface_derivatives_many
            generic   :: dfdx_ongrid => surface_derivatives_gridded
+
+           !> Properties: MSE
+           procedure, non_overridable :: mse => surface_error
 
     end type fitpack_surface
 
@@ -143,6 +157,104 @@ module fitpack_surfaces
 
     end function surface_fit_automatic_knots
 
+
+    ! Find interpolating surface
+    integer(FP_FLAG) function surface_fit_interpolating(this) result(ierr)
+        class(fitpack_surface), intent(inout) :: this
+        ierr = surface_fit_automatic_knots(this,smoothing=zero)
+    end function surface_fit_interpolating
+
+    ! Fit a surface to least squares of the current knots
+    integer(FP_FLAG) function surface_fit_least_squares(this) result(ierr)
+       class(fitpack_surface), intent(inout) :: this
+       this%iopt = IOPT_NEW_LEASTSQUARES
+       ierr = this%fit()
+    end function surface_fit_least_squares
+
+    !> Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu
+    function surface_eval_many(this,x,y,ierr) result(f)
+        class(fitpack_surface), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x(:),y(size(x))
+        real(FP_REAL) :: f(size(x))
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk
+        real(FP_REAL), allocatable :: wrk(:)
+
+        ! bispeu workspace: lwrk >= kx+ky+2
+        min_lwrk = sum(this%order) + 2
+        allocate(wrk(min_lwrk))
+
+        call bispeu(tx=this%t(:,1),nx=this%knots(1),   &
+                    ty=this%t(:,2),ny=this%knots(2),   &
+                    c=this%c,                          &
+                    kx=this%order(1),ky=this%order(2), &
+                    x=x,y=y,z=f,m=size(x),            &
+                    wrk=wrk,lwrk=min_lwrk,             &
+                    ier=ier)
+
+        call fitpack_error_handling(ier,ierr,'evaluate bivariate surface')
+
+    end function surface_eval_many
+
+    !> Evaluate surface at a single (x,y) point
+    real(FP_REAL) function surface_eval_one(this,x,y,ierr) result(f)
+        class(fitpack_surface), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x,y
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        real(FP_REAL) :: z1(1)
+
+        z1 = surface_eval_many(this,[x],[y],ierr)
+        f  = z1(1)
+
+    end function surface_eval_one
+
+    !> Evaluate surface on a grid domain using bispev
+    function surface_eval_gridded(this,x,y,ierr) result(f)
+        class(fitpack_surface), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x(:),y(:)
+        real(FP_REAL) :: f(size(y),size(x))
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
+        real(FP_REAL), allocatable :: min_wrk(:)
+        integer(FP_SIZE), allocatable :: min_iwrk(:)
+
+        m = [size(x),size(y)]
+
+        ! Assert real working storage
+        min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)
+        if (min_lwrk>this%lwrk1) then
+            allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
+            call move_alloc(from=min_wrk,to=this%wrk1)
+            this%lwrk1 = min_lwrk
+        end if
+
+        ! Assert integer working storage
+        min_kwrk = sum(m)
+        if (min_kwrk>this%liwrk) then
+            allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
+            call move_alloc(from=min_iwrk,to=this%iwrk)
+            this%liwrk = min_kwrk
+        end if
+
+        call bispev(tx=this%t(:,1),nx=this%knots(1),   &
+                    ty=this%t(:,2),ny=this%knots(2),   &
+                    c=this%c,                          &
+                    kx=this%order(1),ky=this%order(2), &
+                    x=x,mx=size(x),                    &
+                    y=y,my=size(y),                    &
+                    z=f,                               &
+                    wrk=this%wrk1,lwrk=this%lwrk1,     &
+                    iwrk=this%iwrk,kwrk=this%liwrk,    &
+                    ier=ier)
+
+        call fitpack_error_handling(ier,ierr,'evaluate gridded surface')
+
+    end function surface_eval_gridded
 
     elemental subroutine surf_destroy(this)
        class(fitpack_surface), intent(inout) :: this
@@ -423,5 +535,11 @@ module fitpack_surfaces
 
     end function surface_derivatives_one
 
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function surface_error(this)
+       class(fitpack_surface), intent(in) :: this
+       surface_error = this%fp
+    end function surface_error
 
 end module fitpack_surfaces

@@ -102,6 +102,9 @@ module fitpack_gridded_polar
            procedure, private :: gridded_eval_many
            generic :: eval => gridded_eval_one,gridded_eval_many
 
+           !> Properties: MSE
+           procedure, non_overridable :: mse => gridpolar_error
+
            !> Write to disk
            procedure :: write => gridded_to_disk
 
@@ -388,5 +391,11 @@ module fitpack_gridded_polar
            end function numbered
 
     end subroutine gridded_to_disk
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function gridpolar_error(this)
+       class(fitpack_grid_polar), intent(in) :: this
+       gridpolar_error = this%fp
+    end function gridpolar_error
 
 end module fitpack_gridded_polar

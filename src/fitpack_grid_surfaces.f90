@@ -92,6 +92,9 @@ module fitpack_grid_surfaces
            generic   :: dfdx => gridded_derivatives_one,gridded_derivatives_many
            generic   :: dfdx_ongrid => gridded_derivatives_gridded
 
+           !> Properties: MSE
+           procedure, non_overridable :: mse => gridsurf_error
+
     end type fitpack_grid_surface
 
     interface fitpack_grid_surface
@@ -457,5 +460,11 @@ module fitpack_grid_surfaces
         f  = z1(1)
 
     end function gridded_derivatives_one
+
+    ! Return fitting MSE
+    elemental real(FP_REAL) function gridsurf_error(this)
+       class(fitpack_grid_surface), intent(in) :: this
+       gridsurf_error = this%fp
+    end function gridsurf_error
 
 end module fitpack_grid_surfaces
