@@ -18461,7 +18461,13 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1):bnd(2)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+#if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
+            ! Intel: avoid transfer() — temporary overflows the stack for large arrays.
+            ! FP_REAL == FP_COMM (both c_double), so direct assignment is valid.
+            array(:) = buffer(header+1:header+n)
+#else
             array = transfer(buffer(header+1:header+n), array)
+#endif
         end if
     end subroutine FP_REAL_COMM_EXPAND_1D
 
@@ -18478,7 +18484,13 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+#if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
+            ! Intel: avoid transfer() — temporary overflows the stack for large arrays.
+            ! FP_REAL == FP_COMM (both c_double), so reshape buffer directly.
+            array(:,:) = reshape(buffer(header+1:header+n), shape(array))
+#else
             array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
+#endif
         end if
     end subroutine FP_REAL_COMM_EXPAND_2D
 
@@ -18495,7 +18507,13 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1,1):bnd(2,1), bnd(1,2):bnd(2,2), bnd(1,3):bnd(2,3)))
             n = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+#if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
+            ! Intel: avoid transfer() — temporary overflows the stack for large arrays.
+            ! FP_REAL == FP_COMM (both c_double), so reshape buffer directly.
+            array(:,:,:) = reshape(buffer(header+1:header+n), shape(array))
+#else
             array = reshape(transfer(buffer(header+1:header+n), array, size(array)), shape(array))
+#endif
         end if
     end subroutine FP_REAL_COMM_EXPAND_3D
 
@@ -18512,7 +18530,11 @@ module fitpack_core
         if (all(bnd /= FP_NOT_ALLOC)) then
             allocate(array(bnd(1):bnd(2)))
             ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+#if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
+            array(:) = transfer(buffer(header+1:header+ndoubles), 0_FP_SIZE, size(array))
+#else
             array = transfer(buffer(header+1:header+ndoubles), array)
+#endif
         end if
     end subroutine FP_SIZE_COMM_EXPAND_1D
 
