@@ -304,6 +304,7 @@ module fitpack_parametric_curves
         end select
 
         ! Setup working space.
+        this%liwrk = nest
         allocate(this%iwrk(nest),this%t(nest),this%c(nest*idim))
         allocate(this%wrk(lwrk),source=zero)
 

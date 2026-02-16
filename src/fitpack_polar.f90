@@ -56,7 +56,7 @@ module fitpack_polar_domains
         real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
-        integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
+        integer                  :: lwrk1 = 0, lwrk2 = 0
         real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
 
         ! Curve behavior
@@ -187,7 +187,6 @@ module fitpack_polar_domains
        this%nest      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
-       this%liwrk     = 0
        this%knots     = 0
        this%bc_continuity_origin = 2
        this%bc_boundary = OUTSIDE_EXTRAPOLATE
@@ -336,7 +335,7 @@ module fitpack_polar_domains
     elemental integer(FP_SIZE) function polar_comm_size(this)
         class(fitpack_polar), intent(in) :: this
         polar_comm_size = this%core_comm_size() &
-                        + 11 &
+                        + 10 &
                         + FP_COMM_SIZE(this%x) &
                         + FP_COMM_SIZE(this%y) &
                         + FP_COMM_SIZE(this%z) &
@@ -360,7 +359,6 @@ module fitpack_polar_domains
         buffer(pos) = real(this%m, FP_COMM);                       pos = pos + 1
         buffer(pos) = real(this%lwrk1, FP_COMM);                   pos = pos + 1
         buffer(pos) = real(this%lwrk2, FP_COMM);                   pos = pos + 1
-        buffer(pos) = real(this%liwrk, FP_COMM);                   pos = pos + 1
         buffer(pos) = real(this%bc_continuity_origin, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%bc_boundary, FP_COMM);             pos = pos + 1
         buffer(pos) = real(this%nest(1), FP_COMM);                 pos = pos + 1
@@ -392,7 +390,6 @@ module fitpack_polar_domains
         this%m                       = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk1                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk2                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%liwrk                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_continuity_origin    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_boundary             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(1)                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1

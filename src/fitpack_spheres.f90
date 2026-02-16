@@ -42,7 +42,7 @@ module fitpack_sphere_domains
         real(FP_REAL), allocatable :: w(:)
 
         ! Internal Storage
-        integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
+        integer                  :: lwrk1 = 0, lwrk2 = 0
         real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
 
         ! Knots: extimated max number
@@ -161,7 +161,6 @@ module fitpack_sphere_domains
        this%nest      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
-       this%liwrk     = 0
        this%knots     = 0
 
     end subroutine sphere_destroy
@@ -299,9 +298,9 @@ module fitpack_sphere_domains
     elemental integer(FP_SIZE) function sphere_comm_size(this)
         class(fitpack_sphere), intent(in) :: this
         ! Base fields + sphere-specific scalars:
-        ! m, lwrk1, lwrk2, liwrk, nest(2), nmax, knots(2) = 9
+        ! m, lwrk1, lwrk2, nest(2), nmax, knots(2) = 8
         sphere_comm_size = this%core_comm_size() &
-                         + 9 &
+                         + 8 &
                          + FP_COMM_SIZE(this%theta) &
                          + FP_COMM_SIZE(this%phi) &
                          + FP_COMM_SIZE(this%r) &
@@ -322,7 +321,6 @@ module fitpack_sphere_domains
         buffer(pos) = real(this%m, FP_COMM);        pos = pos + 1
         buffer(pos) = real(this%lwrk1, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%lwrk2, FP_COMM);    pos = pos + 1
-        buffer(pos) = real(this%liwrk, FP_COMM);    pos = pos + 1
         buffer(pos) = real(this%nest(1), FP_COMM);  pos = pos + 1
         buffer(pos) = real(this%nest(2), FP_COMM);  pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);     pos = pos + 1
@@ -349,7 +347,6 @@ module fitpack_sphere_domains
         this%m        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk1    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk2    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%liwrk    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax     = nint(buffer(pos), FP_SIZE);  pos = pos + 1

@@ -206,6 +206,7 @@ module fitpack_curves
 
         ! Reset estimated knots
         nest = max(SAFE*2*MAX_K+2,ceiling(1.4*this%m))
+        this%liwrk = nest
         allocate(this%iwrk(nest),this%t(nest),this%c(nest))
 
         ! Setup working space.

@@ -40,7 +40,8 @@ module fitpack_fitters
         !> B-spline coefficients
         real(FP_REAL), allocatable :: c(:)
 
-        !> Integer workspace
+        !> Integer workspace and its size
+        integer(FP_SIZE) :: liwrk = 0
         integer(FP_SIZE), allocatable :: iwrk(:)
 
     contains
@@ -89,10 +90,10 @@ contains
     end function fitter_mse
 
     !> Number of FP_COMM slots needed for base fields:
-    !> iopt (1 scalar) + smoothing (1 scalar) + fp (1 scalar) + c(:) + iwrk(:)
+    !> iopt (1) + smoothing (1) + fp (1) + liwrk (1) + c(:) + iwrk(:)
     elemental integer(FP_SIZE) function fitter_core_comm_size(this)
         class(fitpack_fitter), intent(in) :: this
-        fitter_core_comm_size = 3 + FP_COMM_SIZE(this%c) + FP_COMM_SIZE(this%iwrk)
+        fitter_core_comm_size = 4 + FP_COMM_SIZE(this%c) + FP_COMM_SIZE(this%iwrk)
     end function fitter_core_comm_size
 
     !> Pack base fields into communication buffer
@@ -105,7 +106,8 @@ contains
         buffer(1) = real(this%iopt, FP_COMM)
         buffer(2) = this%smoothing
         buffer(3) = this%fp
-        pos = 4
+        buffer(4) = real(this%liwrk, FP_COMM)
+        pos = 5
         call FP_COMM_PACK(this%c, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%c)
         call FP_COMM_PACK(this%iwrk, buffer(pos:))
 
@@ -121,7 +123,8 @@ contains
         this%iopt      = nint(buffer(1), FP_FLAG)
         this%smoothing = buffer(2)
         this%fp        = buffer(3)
-        pos = 4
+        this%liwrk     = nint(buffer(4), FP_SIZE)
+        pos = 5
         call FP_COMM_EXPAND(this%c, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%c)
         call FP_COMM_EXPAND(this%iwrk, buffer(pos:))
 
@@ -134,6 +137,7 @@ contains
         this%iopt      = IOPT_NEW_SMOOTHING
         this%smoothing = 1000.0_FP_REAL
         this%fp        = zero
+        this%liwrk     = 0
         deallocate(this%c, stat=ierr)
         deallocate(this%iwrk, stat=ierr)
     end subroutine fitter_destroy_base

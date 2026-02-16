@@ -44,7 +44,7 @@ module fitpack_parametric_surfaces
         !> Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0, liwrk = 0
+        integer                  :: lwrk = 0
         real(FP_REAL), allocatable :: wrk (:)
 
 !        ! Space for derivative evaluation
@@ -131,7 +131,6 @@ module fitpack_parametric_surfaces
 
        this%nest      = 0
        this%lwrk      = 0
-       this%liwrk     = 0
        this%knots     = 0
 
     end subroutine destroy
@@ -370,9 +369,9 @@ module fitpack_parametric_surfaces
     elemental integer(FP_SIZE) function parsurf_comm_size(this)
         class(fitpack_parametric_surface), intent(in) :: this
         ! Base fields + parametric-surface-specific scalars:
-        ! idim, periodic_dim(2), nest(2), nmax, lwrk, liwrk, knots(2) = 10
+        ! idim, periodic_dim(2), nest(2), nmax, lwrk, knots(2) = 9
         parsurf_comm_size = this%core_comm_size() &
-                          + 10 &
+                          + 9 &
                           + FP_COMM_SIZE(this%u) &
                           + FP_COMM_SIZE(this%v) &
                           + FP_COMM_SIZE(this%z) &
@@ -395,7 +394,6 @@ module fitpack_parametric_surfaces
         buffer(pos) = real(this%nest(2), FP_COMM);                           pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);                              pos = pos + 1
         buffer(pos) = real(this%lwrk, FP_COMM);                              pos = pos + 1
-        buffer(pos) = real(this%liwrk, FP_COMM);                             pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);                          pos = pos + 1
         buffer(pos) = real(this%knots(2), FP_COMM);                          pos = pos + 1
 
@@ -421,7 +419,6 @@ module fitpack_parametric_surfaces
         this%nest(2)         = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%liwrk           = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(2)        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
 

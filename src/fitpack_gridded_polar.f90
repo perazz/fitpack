@@ -55,7 +55,7 @@ module fitpack_gridded_polar
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0, liwrk = 0
+        integer                  :: lwrk = 0
         real(FP_REAL), allocatable :: wrk (:)
 
         ! Knots
@@ -193,7 +193,6 @@ module fitpack_gridded_polar
        this%nest      = 0
        this%nmax      = 0
        this%lwrk      = 0
-       this%liwrk     = 0
        this%knots     = 0
 
     end subroutine surf_destroy
@@ -385,10 +384,10 @@ module fitpack_gridded_polar
     elemental integer(FP_SIZE) function gridpolar_comm_size(this)
         class(fitpack_grid_polar), intent(in) :: this
         ! Base fields + grid-polar-specific scalars:
-        ! r, z0, z0_present, z0_exact, z0_zero_gradient, nest(2), nmax, lwrk, liwrk,
-        ! bc_continuity_origin, bc_boundary, knots(2) = 14
+        ! r, z0, z0_present, z0_exact, z0_zero_gradient, nest(2), nmax, lwrk,
+        ! bc_continuity_origin, bc_boundary, knots(2) = 13
         gridpolar_comm_size = this%core_comm_size() &
-                            + 14 &
+                            + 13 &
                             + FP_COMM_SIZE(this%u) &
                             + FP_COMM_SIZE(this%v) &
                             + FP_COMM_SIZE(this%z) &
@@ -413,7 +412,6 @@ module fitpack_gridded_polar
         buffer(pos) = real(this%nest(2), FP_COMM);                        pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);                           pos = pos + 1
         buffer(pos) = real(this%lwrk, FP_COMM);                           pos = pos + 1
-        buffer(pos) = real(this%liwrk, FP_COMM);                          pos = pos + 1
         buffer(pos) = real(this%bc_continuity_origin, FP_COMM);           pos = pos + 1
         buffer(pos) = real(this%bc_boundary, FP_COMM);                    pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);                       pos = pos + 1
@@ -443,7 +441,6 @@ module fitpack_gridded_polar
         this%nest(2)              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%liwrk                = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_continuity_origin = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%bc_boundary          = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1)             = nint(buffer(pos), FP_SIZE);  pos = pos + 1

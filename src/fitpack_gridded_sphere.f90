@@ -49,7 +49,7 @@ module fitpack_gridded_sphere
         ! Estimated and actual number of knots and their allocations
         integer :: nest(2)  = 0
         integer :: nmax     = 0
-        integer                  :: lwrk = 0, liwrk = 0
+        integer                  :: lwrk = 0
         real(FP_REAL), allocatable :: wrk (:)
 
         ! Knots
@@ -186,7 +186,6 @@ module fitpack_gridded_sphere
        this%nest      = 0
        this%nmax      = 0
        this%lwrk      = 0
-       this%liwrk     = 0
        this%knots     = 0
 
     end subroutine spgrid_destroy
@@ -394,9 +393,9 @@ module fitpack_gridded_sphere
         class(fitpack_grid_sphere), intent(in) :: this
         ! Base fields + grid-sphere-specific scalars:
         ! pole_z0(2), pole_present(2), pole_exct(2), pole_continuity(2), pole_zero_grad(2),
-        ! nest(2), nmax, lwrk, liwrk, knots(2) = 17
+        ! nest(2), nmax, lwrk, knots(2) = 16
         gridsphere_comm_size = this%core_comm_size() &
-                             + 17 &
+                             + 16 &
                              + FP_COMM_SIZE(this%u) &
                              + FP_COMM_SIZE(this%v) &
                              + FP_COMM_SIZE(this%z) &
@@ -426,7 +425,6 @@ module fitpack_gridded_sphere
         buffer(pos) = real(this%nest(2), FP_COMM);                          pos = pos + 1
         buffer(pos) = real(this%nmax, FP_COMM);                             pos = pos + 1
         buffer(pos) = real(this%lwrk, FP_COMM);                             pos = pos + 1
-        buffer(pos) = real(this%liwrk, FP_COMM);                            pos = pos + 1
         buffer(pos) = real(this%knots(1), FP_COMM);                         pos = pos + 1
         buffer(pos) = real(this%knots(2), FP_COMM);                         pos = pos + 1
 
@@ -459,7 +457,6 @@ module fitpack_gridded_sphere
         this%nest(2)            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%nmax               = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%lwrk               = nint(buffer(pos), FP_SIZE);  pos = pos + 1
-        this%liwrk              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(1)           = nint(buffer(pos), FP_SIZE);  pos = pos + 1
         this%knots(2)           = nint(buffer(pos), FP_SIZE);  pos = pos + 1
 
