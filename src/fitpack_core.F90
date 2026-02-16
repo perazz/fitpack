@@ -18360,6 +18360,8 @@ module fitpack_core
         integer(FP_SIZE) :: bnd(2), ndoubles
         integer(FP_SIZE), parameter :: header = 1
 
+        buffer(:) = 0.0_FP_COMM
+
         if (allocated(array)) then
             bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
         else
@@ -18381,6 +18383,8 @@ module fitpack_core
 
         integer(FP_SIZE) :: bnd(2, 2), ndoubles
         integer(FP_SIZE), parameter :: header = 2
+
+        buffer(:) = 0.0_FP_COMM
 
         if (allocated(array)) then
             bnd(1, 1) = lbound(array, 1, FP_SIZE)
@@ -18406,6 +18410,8 @@ module fitpack_core
 
         integer(FP_SIZE) :: bnd(2, 3), ndoubles
         integer(FP_SIZE), parameter :: header = 3
+
+        buffer(:) = 0.0_FP_COMM
 
         if (allocated(array)) then
             bnd(1, 1) = lbound(array, 1, FP_SIZE)
@@ -18433,6 +18439,9 @@ module fitpack_core
 
         integer(FP_SIZE) :: bnd(2), ndoubles
         integer(FP_SIZE), parameter :: header = 1
+
+        ! Zero buffer to avoid undefined padding when int32 count is odd
+        buffer(:) = 0.0_FP_COMM
 
         if (allocated(array)) then
             bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
