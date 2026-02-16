@@ -19,13 +19,14 @@
 ! **************************************************************************************************
 module fitpack_surfaces
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
     public :: fitpack_surface
 
     !> A public type describing a bivariate surface fitter z = s(x,y) to scattered x,y data
-    type :: fitpack_surface
+    type, extends(fitpack_fitter) :: fitpack_surface
 
         !> The input data points
         integer :: m = 0
@@ -44,14 +45,7 @@ module fitpack_surfaces
         integer :: nest(2)  = 0
         integer :: nmax = 0
         integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
         real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
-
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.d0
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
 
         ! Curve extrapolation behavior
         integer     :: bc = OUTSIDE_NEAREST_BND
@@ -59,12 +53,6 @@ module fitpack_surfaces
         ! Knots
         integer     :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
-
-        ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer(FP_FLAG) :: iopt = IOPT_NEW_SMOOTHING
 
         contains
 
@@ -98,8 +86,10 @@ module fitpack_surfaces
            generic   :: dfdx => surface_derivatives_one,surface_derivatives_many
            generic   :: dfdx_ongrid => surface_derivatives_gridded
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => surface_error
+           !> Parallel communication interface
+           procedure :: comm_size   => surf_comm_size
+           procedure :: comm_pack   => surf_comm_pack
+           procedure :: comm_expand => surf_comm_expand
 
     end type fitpack_surface
 
@@ -259,29 +249,25 @@ module fitpack_surfaces
     elemental subroutine surf_destroy(this)
        class(fitpack_surface), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%m = 0
        deallocate(this%x,stat=ierr)
        deallocate(this%y,stat=ierr)
        deallocate(this%z,stat=ierr)
        deallocate(this%w,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
        deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
        this%left  = zero
        this%right = zero
 
-       this%smoothing = 1000.0_FP_REAL
        this%order     = 3
-       this%iopt      = 0
        this%nest      = 0
        this%nmax      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
        this%liwrk     = 0
        this%knots     = 0
-       this%fp        = zero
        this%bc        = OUTSIDE_NEAREST_BND
 
     end subroutine surf_destroy
@@ -536,10 +522,91 @@ module fitpack_surfaces
     end function surface_derivatives_one
 
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function surface_error(this)
-       class(fitpack_surface), intent(in) :: this
-       surface_error = this%fp
-    end function surface_error
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function surf_comm_size(this)
+        class(fitpack_surface), intent(in) :: this
+        ! Base fields + surface-specific scalars:
+        ! m, order(2), left(2), right(2), nest(2), nmax, lwrk1, lwrk2, liwrk, bc, knots(2) = 16
+        surf_comm_size = this%core_comm_size() &
+                       + 16 &
+                       + FP_COMM_SIZE(this%x) &
+                       + FP_COMM_SIZE(this%y) &
+                       + FP_COMM_SIZE(this%z) &
+                       + FP_COMM_SIZE(this%w) &
+                       + FP_COMM_SIZE(this%t) &
+                       + FP_COMM_SIZE(this%wrk1) &
+                       + FP_COMM_SIZE(this%wrk2)
+    end function surf_comm_size
+
+    pure subroutine surf_comm_pack(this, buffer)
+        class(fitpack_surface), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = real(this%m, FP_COMM);         pos = pos + 1
+        buffer(pos) = real(this%order(1), FP_COMM);  pos = pos + 1
+        buffer(pos) = real(this%order(2), FP_COMM);  pos = pos + 1
+        buffer(pos) = this%left(1);                   pos = pos + 1
+        buffer(pos) = this%left(2);                   pos = pos + 1
+        buffer(pos) = this%right(1);                  pos = pos + 1
+        buffer(pos) = this%right(2);                  pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);   pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);   pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);      pos = pos + 1
+        buffer(pos) = real(this%lwrk1, FP_COMM);     pos = pos + 1
+        buffer(pos) = real(this%lwrk2, FP_COMM);     pos = pos + 1
+        buffer(pos) = real(this%liwrk, FP_COMM);     pos = pos + 1
+        buffer(pos) = real(this%bc, FP_COMM);        pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM);  pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM);  pos = pos + 1
+
+        call FP_COMM_PACK(this%x, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_PACK(this%y, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_PACK(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_PACK(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_PACK(this%t, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_PACK(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
+        call FP_COMM_PACK(this%wrk2, buffer(pos:))
+    end subroutine surf_comm_pack
+
+    pure subroutine surf_comm_expand(this, buffer)
+        class(fitpack_surface), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%m        = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%order(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%order(2) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%left(1)  = buffer(pos);                  pos = pos + 1
+        this%left(2)  = buffer(pos);                  pos = pos + 1
+        this%right(1) = buffer(pos);                  pos = pos + 1
+        this%right(2) = buffer(pos);                  pos = pos + 1
+        this%nest(1)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk1    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk2    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%liwrk    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%bc       = nint(buffer(pos), FP_FLAG);  pos = pos + 1
+        this%knots(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%x, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_EXPAND(this%y, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_EXPAND(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_EXPAND(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_EXPAND(this%t, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_EXPAND(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
+        call FP_COMM_EXPAND(this%wrk2, buffer(pos:))
+    end subroutine surf_comm_expand
 
 end module fitpack_surfaces

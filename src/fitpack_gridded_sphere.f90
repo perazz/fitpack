@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_gridded_sphere
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -28,7 +29,7 @@ module fitpack_gridded_sphere
     !> on the latitude-longitude grid (u(i),v(j)), i=1,...,mu ; j=1,...,mv , spgrid determines a smooth
     !> u = latitude, 0<=u<=pi,
     !> v = 2*pi-periodic longitude, vb<=v<=ve (vb = v(1), ve=vb+2*pi).
-    type :: fitpack_grid_sphere
+    type, extends(fitpack_fitter) :: fitpack_grid_sphere
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size
         real(FP_REAL), allocatable :: u(:),v(:)
@@ -49,24 +50,11 @@ module fitpack_gridded_sphere
         integer :: nest(2)  = 0
         integer :: nmax     = 0
         integer                  :: lwrk = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
         real(FP_REAL), allocatable :: wrk (:)
-
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.d0
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
 
         ! Knots
         integer     :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
-
-        ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
 
 
 
@@ -95,8 +83,10 @@ module fitpack_gridded_sphere
            procedure, private :: gridded_eval_many
            generic :: eval => gridded_eval_one,gridded_eval_many
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => gridsphere_error
+           !> Parallel communication interface
+           procedure :: comm_size   => gridsphere_comm_size
+           procedure :: comm_pack   => gridsphere_comm_pack
+           procedure :: comm_expand => gridsphere_comm_expand
 
            !> Write to disk
            procedure :: write => gridded_to_disk
@@ -179,6 +169,8 @@ module fitpack_gridded_sphere
        class(fitpack_grid_sphere), intent(inout) :: this
        integer :: ierr
 
+       call this%destroy_base()
+
        this%pole_z0         = zero
        this%pole_present    = .false.
        this%pole_exct       = .false.
@@ -188,19 +180,14 @@ module fitpack_gridded_sphere
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
        deallocate(this%z,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
        deallocate(this%wrk,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_FP_REAL
-       this%iopt      = 0
        this%nest      = 0
        this%nmax      = 0
        this%lwrk      = 0
        this%liwrk     = 0
        this%knots     = 0
-       this%fp        = zero
 
     end subroutine spgrid_destroy
 
@@ -399,10 +386,88 @@ module fitpack_gridded_sphere
 
     end subroutine gridded_to_disk
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function gridsphere_error(this)
-       class(fitpack_grid_sphere), intent(in) :: this
-       gridsphere_error = this%fp
-    end function gridsphere_error
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function gridsphere_comm_size(this)
+        class(fitpack_grid_sphere), intent(in) :: this
+        ! Base fields + grid-sphere-specific scalars:
+        ! pole_z0(2), pole_present(2), pole_exct(2), pole_continuity(2), pole_zero_grad(2),
+        ! nest(2), nmax, lwrk, liwrk, knots(2) = 17
+        gridsphere_comm_size = this%core_comm_size() &
+                             + 17 &
+                             + FP_COMM_SIZE(this%u) &
+                             + FP_COMM_SIZE(this%v) &
+                             + FP_COMM_SIZE(this%z) &
+                             + FP_COMM_SIZE(this%wrk) &
+                             + FP_COMM_SIZE(this%t)
+    end function gridsphere_comm_size
+
+    pure subroutine gridsphere_comm_pack(this, buffer)
+        class(fitpack_grid_sphere), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = this%pole_z0(1);                                      pos = pos + 1
+        buffer(pos) = this%pole_z0(2);                                      pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_present(1)), FP_COMM);       pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_present(2)), FP_COMM);       pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_exct(1)), FP_COMM);          pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_exct(2)), FP_COMM);          pos = pos + 1
+        buffer(pos) = real(this%pole_continuity(1), FP_COMM);               pos = pos + 1
+        buffer(pos) = real(this%pole_continuity(2), FP_COMM);               pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_zero_grad(1)), FP_COMM);     pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%pole_zero_grad(2)), FP_COMM);     pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);                          pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);                          pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);                             pos = pos + 1
+        buffer(pos) = real(this%lwrk, FP_COMM);                             pos = pos + 1
+        buffer(pos) = real(this%liwrk, FP_COMM);                            pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM);                         pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM);                         pos = pos + 1
+
+        call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_PACK(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_PACK(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_PACK(this%t, buffer(pos:))
+    end subroutine gridsphere_comm_pack
+
+    pure subroutine gridsphere_comm_expand(this, buffer)
+        class(fitpack_grid_sphere), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%pole_z0(1)         = buffer(pos);                  pos = pos + 1
+        this%pole_z0(2)         = buffer(pos);                  pos = pos + 1
+        this%pole_present(1)    = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%pole_present(2)    = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%pole_exct(1)       = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%pole_exct(2)       = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%pole_continuity(1) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%pole_continuity(2) = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%pole_zero_grad(1)  = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%pole_zero_grad(2)  = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+        this%nest(1)            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)            = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax               = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk               = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%liwrk              = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(1)           = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2)           = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_EXPAND(this%v, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_EXPAND(this%z, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_EXPAND(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
+    end subroutine gridsphere_comm_expand
 
 end module fitpack_gridded_sphere

@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_parametric_curves
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -30,7 +31,7 @@ module fitpack_parametric_curves
 
     !> A public type describing a parametric curve fitter defined by points x(:,i) in the idim-dimensional
     !> space, attached to a set of strictly increasing parameter values u(i)
-    type :: fitpack_parametric_curve
+    type, extends(fitpack_fitter) :: fitpack_parametric_curve
 
         !> Number of points
         integer :: m = 0
@@ -59,27 +60,14 @@ module fitpack_parametric_curves
         ! Estimated and actual number of knots and their allocations
         integer                  :: nest  = 0
         integer                  :: lwrk  = 0
-        integer, allocatable     :: iwrk(:)
         real(FP_REAL), allocatable :: wrk(:)
 
         ! Space for derivative evaluation
         real(FP_REAL), allocatable :: dd(:,:)
 
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.0_FP_REAL
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
-
         ! Knots
         integer     :: knots = 0
         real(FP_REAL), allocatable :: t(:)  ! Knot location
-
-        ! Spline coefficients [knots-order-1]
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING
 
         contains
 
@@ -109,8 +97,10 @@ module fitpack_parametric_curves
            generic   :: dfdx => curve_derivative,curve_derivatives
            generic   :: dfdx_all => curve_all_derivatives
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => curve_error
+           !> Parallel communication interface (size/pack/expand)
+           procedure :: comm_size   => parcur_comm_size
+           procedure :: comm_pack   => parcur_comm_pack
+           procedure :: comm_expand => parcur_comm_expand
 
     end type fitpack_parametric_curve
 
@@ -153,6 +143,11 @@ module fitpack_parametric_curves
            !> Curve constraints
            procedure :: clean_constraints
            procedure ::   set_constraints
+
+           !> Override comm to include constraint fields
+           procedure :: comm_size   => concur_comm_size
+           procedure :: comm_pack   => concur_comm_pack
+           procedure :: comm_expand => concur_comm_expand
 
     end type fitpack_constrained_curve
 
@@ -197,6 +192,7 @@ module fitpack_parametric_curves
     elemental subroutine destroy(this)
        class(fitpack_parametric_curve), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%m    = 0
        this%idim = 0
        this%has_params = .false.
@@ -204,21 +200,16 @@ module fitpack_parametric_curves
        deallocate(this%u,stat=ierr)
        deallocate(this%w,stat=ierr)
        deallocate(this%sp,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
        deallocate(this% wrk,stat=ierr)
        deallocate(this%dd,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
        this%ubegin = zero
        this%uend = zero
 
-       this%smoothing = 1000.0_FP_REAL
        this%order     = 3
-       this%iopt      = IOPT_NEW_SMOOTHING
        this%nest      = 0
        this%lwrk      = 0
        this%knots     = 0
-       this%fp        = 0.0_FP_REAL
 
     end subroutine destroy
 
@@ -533,12 +524,6 @@ module fitpack_parametric_curves
 
     end function curve_fit_automatic_knots
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function curve_error(this)
-       class(fitpack_parametric_curve), intent(in) :: this
-       curve_error = this%fp
-    end function curve_error
-
     !> Evaluate k-th derivative of the curve at point u
     function curve_derivative(this, u, order, ierr) result(ddx)
        class(fitpack_parametric_curve), intent(inout) :: this
@@ -657,5 +642,130 @@ module fitpack_parametric_curves
 
     end function curve_derivatives
 
+
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION: fitpack_parametric_curve
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function parcur_comm_size(this)
+        class(fitpack_parametric_curve), intent(in) :: this
+        ! Base fields + parametric-specific scalars:
+        ! m, idim, order, knots, nest, lwrk, ubegin, uend, has_params (9 values)
+        parcur_comm_size = this%core_comm_size() &
+                         + 9 &
+                         + FP_COMM_SIZE(this%x) &
+                         + FP_COMM_SIZE(this%u) &
+                         + FP_COMM_SIZE(this%sp) &
+                         + FP_COMM_SIZE(this%w) &
+                         + FP_COMM_SIZE(this%t) &
+                         + FP_COMM_SIZE(this%wrk) &
+                         + FP_COMM_SIZE(this%dd)
+    end function parcur_comm_size
+
+    pure subroutine parcur_comm_pack(this, buffer)
+        class(fitpack_parametric_curve), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = real(this%m, FP_COMM);              pos = pos + 1
+        buffer(pos) = real(this%idim, FP_COMM);           pos = pos + 1
+        buffer(pos) = real(this%order, FP_COMM);          pos = pos + 1
+        buffer(pos) = real(this%knots, FP_COMM);          pos = pos + 1
+        buffer(pos) = real(this%nest, FP_COMM);           pos = pos + 1
+        buffer(pos) = real(this%lwrk, FP_COMM);           pos = pos + 1
+        buffer(pos) = this%ubegin;                         pos = pos + 1
+        buffer(pos) = this%uend;                           pos = pos + 1
+        buffer(pos) = real(merge(1,0,this%has_params), FP_COMM); pos = pos + 1
+
+        call FP_COMM_PACK(this%x, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_PACK(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_PACK(this%sp, buffer(pos:));  pos = pos + FP_COMM_SIZE(this%sp)
+        call FP_COMM_PACK(this%w, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_PACK(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_PACK(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_PACK(this%dd, buffer(pos:))
+    end subroutine parcur_comm_pack
+
+    pure subroutine parcur_comm_expand(this, buffer)
+        class(fitpack_parametric_curve), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%m     = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%idim  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%order = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk  = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%ubegin    = buffer(pos);              pos = pos + 1
+        this%uend      = buffer(pos);              pos = pos + 1
+        this%has_params = nint(buffer(pos), FP_SIZE) /= 0; pos = pos + 1
+
+        call FP_COMM_EXPAND(this%x, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_EXPAND(this%u, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_EXPAND(this%sp, buffer(pos:));  pos = pos + FP_COMM_SIZE(this%sp)
+        call FP_COMM_EXPAND(this%w, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_EXPAND(this%t, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%t)
+        call FP_COMM_EXPAND(this%wrk, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk)
+        call FP_COMM_EXPAND(this%dd, buffer(pos:))
+    end subroutine parcur_comm_expand
+
+    ! =================================================================================================
+    ! PARALLEL COMMUNICATION: fitpack_constrained_curve (overrides parametric)
+    ! =================================================================================================
+
+    elemental integer(FP_SIZE) function concur_comm_size(this)
+        class(fitpack_constrained_curve), intent(in) :: this
+        ! Parent parametric comm + constrained-specific: ib, ie (2 scalars)
+        ! + deriv_begin(:,:), deriv_end(:,:), xx(:,:), cp(:,:) (4 arrays)
+        concur_comm_size = parcur_comm_size(this) &
+                         + 2 &
+                         + FP_COMM_SIZE(this%deriv_begin) &
+                         + FP_COMM_SIZE(this%deriv_end) &
+                         + FP_COMM_SIZE(this%xx) &
+                         + FP_COMM_SIZE(this%cp)
+    end function concur_comm_size
+
+    pure subroutine concur_comm_pack(this, buffer)
+        class(fitpack_constrained_curve), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        ! Pack parent fields first
+        call parcur_comm_pack(this, buffer)
+        pos = parcur_comm_size(this) + 1
+
+        buffer(pos) = real(this%ib, FP_COMM); pos = pos + 1
+        buffer(pos) = real(this%ie, FP_COMM); pos = pos + 1
+
+        call FP_COMM_PACK(this%deriv_begin, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%deriv_begin)
+        call FP_COMM_PACK(this%deriv_end, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%deriv_end)
+        call FP_COMM_PACK(this%xx, buffer(pos:));          pos = pos + FP_COMM_SIZE(this%xx)
+        call FP_COMM_PACK(this%cp, buffer(pos:))
+    end subroutine concur_comm_pack
+
+    pure subroutine concur_comm_expand(this, buffer)
+        class(fitpack_constrained_curve), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        ! Expand parent fields first
+        call parcur_comm_expand(this, buffer)
+        pos = parcur_comm_size(this) + 1
+
+        this%ib = nint(buffer(pos), FP_SIZE); pos = pos + 1
+        this%ie = nint(buffer(pos), FP_SIZE); pos = pos + 1
+
+        call FP_COMM_EXPAND(this%deriv_begin, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%deriv_begin)
+        call FP_COMM_EXPAND(this%deriv_end, buffer(pos:));   pos = pos + FP_COMM_SIZE(this%deriv_end)
+        call FP_COMM_EXPAND(this%xx, buffer(pos:));          pos = pos + FP_COMM_SIZE(this%xx)
+        call FP_COMM_EXPAND(this%cp, buffer(pos:))
+    end subroutine concur_comm_expand
 
 end module fitpack_parametric_curves

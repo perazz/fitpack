@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack
    use fitpack_core
+   use fitpack_fitters
    use fitpack_curves
    use fitpack_surfaces
    use fitpack_grid_surfaces
@@ -37,6 +38,9 @@ module fitpack
    public :: FP_SIZE
    public :: FP_FLAG
    public :: FP_BOOL
+
+   ! Public interface: abstract base type
+   public :: fitpack_fitter
 
    ! Public interface: types
    public :: fitpack_curve

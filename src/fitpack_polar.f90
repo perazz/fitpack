@@ -19,6 +19,7 @@
 ! **************************************************************************************************
 module fitpack_polar_domains
     use fitpack_core
+    use fitpack_fitters
     implicit none
     private
 
@@ -34,7 +35,7 @@ module fitpack_polar_domains
     !> rad is an external real function defining the boundary of the approximation domain, i.e
     !>          x = rad(v)*cos(v) , y = rad(v)*sin(v), -pi <= v <= pi.
     !> It can be a sphere or anything else.
-    type :: fitpack_polar
+    type, extends(fitpack_fitter) :: fitpack_polar
 
         !> Scattered data points
         integer :: m = 0
@@ -56,14 +57,7 @@ module fitpack_polar_domains
 
         ! Internal Storage
         integer                  :: lwrk1 = 0, lwrk2 = 0, liwrk = 0
-        integer, allocatable     :: iwrk(:)
         real(FP_REAL), allocatable :: wrk1(:),wrk2(:)
-
-        ! Curve fit smoothing parameter (fit vs. points MSE)
-        real(FP_REAL) :: smoothing = 1000.d0
-
-        ! Actual curve MSE
-        real(FP_REAL) :: fp = zero
 
         ! Curve behavior
         integer :: bc_continuity_origin = 2 ! Continuity at origin (C0, C1, C2)
@@ -74,12 +68,6 @@ module fitpack_polar_domains
         integer :: nmax     = 0
         integer :: knots(2) = 0
         real(FP_REAL), allocatable :: t(:,:) ! Knot locations (:,1)=x; (:,2)=y
-
-        ! Coefficients of the spline approximation
-        real(FP_REAL), allocatable :: c(:)
-
-        ! Runtime flag
-        integer :: iopt = IOPT_NEW_SMOOTHING ! -> iopt(1)
 
         contains
 
@@ -103,8 +91,10 @@ module fitpack_polar_domains
            procedure, private :: polr_eval_many
            generic :: eval => polr_eval_one,polr_eval_many
 
-           !> Properties: MSE
-           procedure, non_overridable :: mse => polar_error
+           !> Communication interface
+           procedure :: comm_size   => polar_comm_size
+           procedure :: comm_pack   => polar_comm_pack
+           procedure :: comm_expand => polar_comm_expand
 
     end type fitpack_polar
 
@@ -181,6 +171,7 @@ module fitpack_polar_domains
     elemental subroutine polar_destroy(this)
        class(fitpack_polar), intent(inout) :: this
        integer :: ierr
+       call this%destroy_base()
        this%m = 0
        nullify(this%rad)
        deallocate(this%x,stat=ierr)
@@ -189,19 +180,15 @@ module fitpack_polar_domains
        deallocate(this%w,stat=ierr)
        deallocate(this%u,stat=ierr)
        deallocate(this%v,stat=ierr)
-       deallocate(this%iwrk,stat=ierr)
        deallocate(this%wrk1,stat=ierr)
        deallocate(this%wrk2,stat=ierr)
        deallocate(this%t,stat=ierr)
-       deallocate(this%c,stat=ierr)
 
-       this%smoothing = 1000.0_FP_REAL
        this%nest      = 0
        this%lwrk1     = 0
        this%lwrk2     = 0
        this%liwrk     = 0
        this%knots     = 0
-       this%fp        = zero
        this%bc_continuity_origin = 2
        this%bc_boundary = OUTSIDE_EXTRAPOLATE
 
@@ -345,10 +332,84 @@ module fitpack_polar_domains
 
     end function polr_new_fit
 
-    ! Return fitting MSE
-    elemental real(FP_REAL) function polar_error(this)
-       class(fitpack_polar), intent(in) :: this
-       polar_error = this%fp
-    end function polar_error
+    ! Communication: buffer size
+    elemental integer(FP_SIZE) function polar_comm_size(this)
+        class(fitpack_polar), intent(in) :: this
+        polar_comm_size = this%core_comm_size() &
+                        + 11 &
+                        + FP_COMM_SIZE(this%x) &
+                        + FP_COMM_SIZE(this%y) &
+                        + FP_COMM_SIZE(this%z) &
+                        + FP_COMM_SIZE(this%u) &
+                        + FP_COMM_SIZE(this%v) &
+                        + FP_COMM_SIZE(this%w) &
+                        + FP_COMM_SIZE(this%wrk1) &
+                        + FP_COMM_SIZE(this%wrk2) &
+                        + FP_COMM_SIZE(this%t)
+    end function polar_comm_size
+
+    ! Communication: pack into buffer
+    pure subroutine polar_comm_pack(this, buffer)
+        class(fitpack_polar), intent(in) :: this
+        real(FP_COMM), intent(out) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_pack(buffer)
+        pos = this%core_comm_size() + 1
+
+        buffer(pos) = real(this%m, FP_COMM);                       pos = pos + 1
+        buffer(pos) = real(this%lwrk1, FP_COMM);                   pos = pos + 1
+        buffer(pos) = real(this%lwrk2, FP_COMM);                   pos = pos + 1
+        buffer(pos) = real(this%liwrk, FP_COMM);                   pos = pos + 1
+        buffer(pos) = real(this%bc_continuity_origin, FP_COMM);    pos = pos + 1
+        buffer(pos) = real(this%bc_boundary, FP_COMM);             pos = pos + 1
+        buffer(pos) = real(this%nest(1), FP_COMM);                 pos = pos + 1
+        buffer(pos) = real(this%nest(2), FP_COMM);                 pos = pos + 1
+        buffer(pos) = real(this%nmax, FP_COMM);                    pos = pos + 1
+        buffer(pos) = real(this%knots(1), FP_COMM);                pos = pos + 1
+        buffer(pos) = real(this%knots(2), FP_COMM);                pos = pos + 1
+
+        call FP_COMM_PACK(this%x, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_PACK(this%y, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_PACK(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_PACK(this%u, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_PACK(this%v, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_PACK(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_PACK(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
+        call FP_COMM_PACK(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
+        call FP_COMM_PACK(this%t, buffer(pos:))
+    end subroutine polar_comm_pack
+
+    ! Communication: expand from buffer
+    pure subroutine polar_comm_expand(this, buffer)
+        class(fitpack_polar), intent(inout) :: this
+        real(FP_COMM), intent(in) :: buffer(:)
+        integer(FP_SIZE) :: pos
+
+        call this%core_comm_expand(buffer)
+        pos = this%core_comm_size() + 1
+
+        this%m                       = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk1                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%lwrk2                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%liwrk                   = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%bc_continuity_origin    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%bc_boundary             = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(1)                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nest(2)                 = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%nmax                    = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(1)                = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+        this%knots(2)                = nint(buffer(pos), FP_SIZE);  pos = pos + 1
+
+        call FP_COMM_EXPAND(this%x, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%x)
+        call FP_COMM_EXPAND(this%y, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%y)
+        call FP_COMM_EXPAND(this%z, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%z)
+        call FP_COMM_EXPAND(this%u, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%u)
+        call FP_COMM_EXPAND(this%v, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%v)
+        call FP_COMM_EXPAND(this%w, buffer(pos:));    pos = pos + FP_COMM_SIZE(this%w)
+        call FP_COMM_EXPAND(this%wrk1, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk1)
+        call FP_COMM_EXPAND(this%wrk2, buffer(pos:)); pos = pos + FP_COMM_SIZE(this%wrk2)
+        call FP_COMM_EXPAND(this%t, buffer(pos:))
+    end subroutine polar_comm_expand
 
 end module fitpack_polar_domains
