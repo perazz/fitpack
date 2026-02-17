@@ -97,6 +97,11 @@ module fitpack_curves
            generic   :: dfdx     => curve_derivative,curve_derivatives
            generic   :: dfdx_all => curve_all_derivatives,curve_all_derivatives_pure
 
+           !> Insert knot(s) into the spline representation
+           procedure, private :: curve_insert_knot_one
+           procedure, private :: curve_insert_knot_many
+           generic :: insert_knot => curve_insert_knot_one, curve_insert_knot_many
+
            !> Parallel communication interface (size/pack/expand)
            procedure :: comm_size   => curve_comm_size
            procedure :: comm_pack   => curve_comm_pack
@@ -621,6 +626,83 @@ module fitpack_curves
         call fitpack_error_handling(ier,ierr,'compute zeros')
 
     end function zeros
+
+    ! =================================================================================================
+    ! KNOT INSERTION
+    ! =================================================================================================
+
+    !> Grow t(:) and c(:) arrays when nest is too small
+    subroutine grow_knot_storage(this)
+        class(fitpack_curve), intent(inout) :: this
+
+        integer(FP_SIZE) :: new_nest
+        real(FP_REAL), allocatable :: tmp(:)
+
+        new_nest = max(this%nest + max(8_FP_SIZE, this%nest/2), this%knots + 2)
+
+        ! Grow t(:)
+        allocate(tmp(new_nest), source=zero)
+        tmp(1:this%knots) = this%t(1:this%knots)
+        call move_alloc(tmp, this%t)
+
+        ! Grow c(:)
+        allocate(tmp(new_nest), source=zero)
+        tmp(1:this%knots) = this%c(1:this%knots)
+        call move_alloc(tmp, this%c)
+
+        this%nest = new_nest
+
+    end subroutine grow_knot_storage
+
+    !> Insert a single knot into the spline representation (in-place)
+    subroutine curve_insert_knot_one(this, x, ierr)
+        class(fitpack_curve), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_SIZE) :: iopt
+        integer(FP_FLAG) :: ier
+
+        ! Periodic curves use iopt=1
+        select type (this)
+           type is (fitpack_periodic_curve)
+              iopt = 1
+           class default
+              iopt = 0
+        end select
+
+        ! Ensure there is room for one more knot
+        if (this%knots >= this%nest) call grow_knot_storage(this)
+
+        call insert_inplace(iopt, this%t, this%knots, this%c, this%order, x, this%nest, ier)
+
+        ! Workspace state is invalidated after knot insertion
+        if (FITPACK_SUCCESS(ier)) this%iopt = IOPT_NEW_SMOOTHING
+
+        call fitpack_error_handling(ier, ierr, 'insert knot')
+
+    end subroutine curve_insert_knot_one
+
+    !> Insert multiple knots into the spline representation
+    subroutine curve_insert_knot_many(this, x, ierr)
+        class(fitpack_curve), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x(:)
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_SIZE) :: i
+        integer(FP_FLAG) :: ier
+
+        do i = 1, size(x)
+            call this%curve_insert_knot_one(x(i), ier)
+            if (.not.FITPACK_SUCCESS(ier)) then
+                call fitpack_error_handling(ier, ierr, 'insert knots')
+                return
+            end if
+        end do
+
+        if (present(ierr)) ierr = FITPACK_OK
+
+    end subroutine curve_insert_knot_many
 
     ! =================================================================================================
     ! PARALLEL COMMUNICATION (size/pack/expand)

@@ -45,6 +45,10 @@ module fitpack_curve_tests
     public :: test_curve_comm_roundtrip
     public :: test_comm_roundtrips
     public :: test_umbrella_api
+    public :: test_convex_fit
+    public :: test_convex_least_squares
+    public :: test_insert_knot
+    public :: test_insert_knot_periodic
 
 
     contains
@@ -1834,6 +1838,252 @@ module fitpack_curve_tests
        success = .true.
 
     end function test_umbrella_api
+
+    !> Test convex curve fitting (concon) using mncoco test data
+    logical function test_convex_fit() result(success)
+
+        integer(FP_SIZE), parameter :: m = 16
+        type(fitpack_convex_curve) :: curve
+        real(FP_REAL) :: x(m),y(m),w(m),v(m),s2(m)
+        real(FP_REAL) :: s(3)
+        integer(FP_FLAG) :: ierr
+        integer(FP_SIZE) :: is
+
+        success = .false.
+
+        ! mncoco test data
+        x = [0.1_FP_REAL,0.3_FP_REAL,0.5_FP_REAL,0.7_FP_REAL,0.9_FP_REAL, &
+             1.25_FP_REAL,1.75_FP_REAL,2.25_FP_REAL,2.75_FP_REAL,3.5_FP_REAL, &
+             4.5_FP_REAL,5.5_FP_REAL,6.5_FP_REAL,7.5_FP_REAL,8.5_FP_REAL,9.5_FP_REAL]
+        y = [0.124_FP_REAL,0.234_FP_REAL,0.256_FP_REAL,0.277_FP_REAL,0.278_FP_REAL, &
+             0.291_FP_REAL,0.308_FP_REAL,0.311_FP_REAL,0.315_FP_REAL,0.322_FP_REAL, &
+             0.317_FP_REAL,0.326_FP_REAL,0.323_FP_REAL,0.321_FP_REAL,0.322_FP_REAL, &
+             0.328_FP_REAL]
+
+        w = one
+        w(1) = 10.0_FP_REAL
+        w(2) = 3.0_FP_REAL
+        w(16) = 10.0_FP_REAL
+
+        ! Concave constraints
+        v = one
+
+        s = [0.2_FP_REAL, 0.04_FP_REAL, 0.0002_FP_REAL]
+
+        ! First fit
+        call curve%new_points(x,y,w)
+        ierr = curve%set_convexity(v)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_convex_fit] set_convexity failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        do is=1,3
+
+            ierr = curve%fit(smoothing=s(is),keep_knots=(is>1))
+
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, '[test_convex_fit] fit failed at s=',s(is),': ', FITPACK_MESSAGE(ierr)
+                return
+            end if
+
+            ! Evaluate second derivative at data points
+            s2 = curve%dfdx(x,order=2,ierr=ierr)
+            if (.not.FITPACK_SUCCESS(ierr)) then
+                print *, '[test_convex_fit] derivative failed: ', FITPACK_MESSAGE(ierr)
+                return
+            end if
+
+            ! Check concavity: s''(x) <= 0 at all data points (with small tolerance)
+            if (any(s2 > 1.0e-6_FP_REAL)) then
+                print *, '[test_convex_fit] concavity violated at s=',s(is)
+                print *, '  max s''(x) = ', maxval(s2)
+                return
+            end if
+
+        end do
+
+        success = .true.
+
+    end function test_convex_fit
+
+    !> Test convex least-squares fitting (cocosp) using mncosp test data
+    logical function test_convex_least_squares() result(success)
+
+        integer(FP_SIZE), parameter :: m = 10
+        type(fitpack_convex_curve) :: curve
+        real(FP_REAL) :: x(m),y(m),w(m),v_convex(m),v_concave(m),s2(m)
+        integer(FP_FLAG) :: ierr
+
+        success = .false.
+
+        ! mncosp test data
+        x = [0.25_FP_REAL,0.5_FP_REAL,0.75_FP_REAL,1.25_FP_REAL,1.75_FP_REAL, &
+             2.25_FP_REAL,2.75_FP_REAL,3.25_FP_REAL,6.25_FP_REAL,12.25_FP_REAL]
+        y = [17.0_FP_REAL,15.2_FP_REAL,13.8_FP_REAL,12.2_FP_REAL,11.0_FP_REAL, &
+             10.1_FP_REAL,9.4_FP_REAL,8.6_FP_REAL,6.1_FP_REAL,3.5_FP_REAL]
+        w = one
+
+        ! Convex constraints (v=-1 => s'' >= 0)
+        v_convex  = -one
+        ! Concave constraints (v=1 => s'' <= 0)
+        v_concave = one
+
+        ! First: fit with concon to establish knots, then least-squares with cocosp
+        call curve%new_points(x,y,w)
+        ierr = curve%set_convexity(v_convex)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_convex_least_squares] set_convexity failed'
+            return
+        end if
+
+        ! Use reset_knots to first fit via concon, then do least-squares via cocosp
+        ierr = curve%least_squares(smoothing=1.0e+10_FP_REAL,reset_knots=.true.)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_convex_least_squares] convex LS failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Check convexity: s''(x) >= 0 at data points
+        s2 = curve%dfdx(x,order=2,ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_convex_least_squares] derivative failed'
+            return
+        end if
+        if (any(s2 < -1.0e-6_FP_REAL)) then
+            print *, '[test_convex_least_squares] convexity violated'
+            print *, '  min s''(x) = ', minval(s2)
+            return
+        end if
+
+        ! Now test concave
+        call curve%new_points(x,y,w)
+        ierr = curve%set_convexity(v_concave)
+        if (.not.FITPACK_SUCCESS(ierr)) return
+
+        ierr = curve%least_squares(smoothing=1.0e+10_FP_REAL,reset_knots=.true.)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_convex_least_squares] concave LS failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        s2 = curve%dfdx(x,order=2,ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) return
+        if (any(s2 > 1.0e-6_FP_REAL)) then
+            print *, '[test_convex_least_squares] concavity violated'
+            print *, '  max s''(x) = ', maxval(s2)
+            return
+        end if
+
+        success = .true.
+
+    end function test_convex_least_squares
+
+    !> Test knot insertion for a standard curve
+    logical function test_insert_knot() result(success)
+
+        integer, parameter :: N = 50
+        type(fitpack_curve) :: curve
+        real(FP_REAL) :: x(N), y(N), xtest(20), y_before(20), y_after(20)
+        integer(FP_SIZE) :: knots_before
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL) :: midpt
+
+        success = .false.
+
+        ! Generate sine curve data
+        x = linspace(zero, pi2, N)
+        y = sin(x)
+
+        ierr = curve%new_fit(x,y,smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_insert_knot] fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Evaluate at test points before insertion
+        xtest = linspace(0.1_FP_REAL, pi2 - 0.1_FP_REAL, 20)
+        y_before = curve%eval(xtest)
+        knots_before = curve%knots
+
+        ! Insert a knot at the midpoint
+        midpt = half*(curve%xleft + curve%xright)
+        call curve%insert_knot(midpt,ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_insert_knot] insert_knot failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify knot count increased by 1
+        if (curve%knots /= knots_before + 1) then
+            print *, '[test_insert_knot] expected knots=',knots_before+1,' got ',curve%knots
+            return
+        end if
+
+        ! Evaluate after insertion — values must match to machine precision
+        y_after = curve%eval(xtest)
+        if (maxval(abs(y_before - y_after)) > 100*epsilon(one)) then
+            print *, '[test_insert_knot] values changed after insertion!'
+            print *, '  max diff = ', maxval(abs(y_before - y_after))
+            return
+        end if
+
+        success = .true.
+
+    end function test_insert_knot
+
+    !> Test knot insertion for a periodic curve
+    logical function test_insert_knot_periodic() result(success)
+
+        integer, parameter :: N = 200
+        type(fitpack_periodic_curve) :: curve
+        real(FP_REAL) :: x(N), y(N), xtest(20), y_before(20), y_after(20)
+        integer(FP_SIZE) :: knots_before
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL) :: midpt
+
+        success = .false.
+
+        ! Generate periodic function data (cos+sin is periodic on [0,2pi])
+        x = linspace(zero, pi2, N)
+        y = cos(x) + sin(2*x)
+
+        ierr = curve%new_fit(x,y,smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_insert_knot_periodic] fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Evaluate at test points before insertion
+        xtest = linspace(0.1_FP_REAL, pi2 - 0.1_FP_REAL, 20)
+        y_before = curve%eval(xtest)
+        knots_before = curve%knots
+
+        ! Insert a knot at the midpoint
+        midpt = half*(curve%xleft + curve%xright)
+        call curve%insert_knot(midpt,ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_insert_knot_periodic] insert_knot failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify knot count increased by 1
+        if (curve%knots /= knots_before + 1) then
+            print *, '[test_insert_knot_periodic] expected knots=',knots_before+1,' got ',curve%knots
+            return
+        end if
+
+        ! Evaluate after insertion — values must match to machine precision
+        y_after = curve%eval(xtest)
+        if (maxval(abs(y_before - y_after)) > 100*epsilon(one)) then
+            print *, '[test_insert_knot_periodic] values changed after insertion!'
+            print *, '  max diff = ', maxval(abs(y_before - y_after))
+            return
+        end if
+
+        success = .true.
+
+    end function test_insert_knot_periodic
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)

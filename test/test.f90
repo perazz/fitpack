@@ -60,6 +60,10 @@ program test
         call add_test(test_curve_comm_roundtrip())
         call add_test(test_comm_roundtrips())
         call add_test(test_umbrella_api())
+        call add_test(test_convex_fit())
+        call add_test(test_convex_least_squares())
+        call add_test(test_insert_knot())
+        call add_test(test_insert_knot_periodic())
 
     end subroutine run_interface_tests
 

@@ -27,6 +27,7 @@ module fitpack
    use fitpack_gridded_sphere
    use fitpack_polar_domains
    use fitpack_sphere_domains
+   use fitpack_convex_curves
    use fitpack_parametric_curves
    use fitpack_parametric_surfaces
 
@@ -48,6 +49,7 @@ module fitpack
    public :: fitpack_periodic_curve
    public :: fitpack_parametric_curve
    public :: fitpack_constrained_curve
+   public :: fitpack_convex_curve
 
    public :: fitpack_polar
    public :: fitpack_grid_polar
@@ -71,6 +73,7 @@ module fitpack
    public :: FITPACK_TOO_MANY_KNOTS, FITPACK_OVERLAPPING_KNOTS, FITPACK_INVALID_RANGE
    public :: FITPACK_INPUT_ERROR, FITPACK_TEST_ERROR
    public :: FITPACK_INVALID_CONSTRAINT, FITPACK_INSUFFICIENT_KNOTS
+   public :: CONCON_MAXBIN, CONCON_MAXTR, CONCON_QP_FAIL
 
    ! Public interface: error utility functions
    public :: FITPACK_SUCCESS, FITPACK_MESSAGE, IOPT_MESSAGE
