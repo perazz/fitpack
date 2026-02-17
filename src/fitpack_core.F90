@@ -128,6 +128,9 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: FITPACK_TEST_ERROR           = 11
     integer(FP_FLAG), parameter,  public :: FITPACK_INVALID_CONSTRAINT   = 12
     integer(FP_FLAG), parameter,  public :: FITPACK_INSUFFICIENT_KNOTS   = 13
+    integer(FP_FLAG), parameter,  public :: CONCON_MAXBIN                = 14 ! concon: maxbin too small
+    integer(FP_FLAG), parameter,  public :: CONCON_MAXTR                 = 15 ! concon: maxtr too small
+    integer(FP_FLAG), parameter,  public :: CONCON_QP_FAIL               = 16 ! concon: QP solver failed
 
     ! Internal Parameters
     logical(FP_BOOL), parameter, public :: FP_TRUE  = .true._FP_BOOL
@@ -183,6 +186,7 @@ module fitpack_core
         module procedure FP_REAL_COMM_SIZE_2D
         module procedure FP_REAL_COMM_SIZE_3D
         module procedure FP_SIZE_COMM_SIZE_1D
+        module procedure FP_BOOL_COMM_SIZE_1D
     end interface FP_COMM_SIZE
 
     !> Pack allocatable arrays into communication buffer
@@ -191,6 +195,7 @@ module fitpack_core
         module procedure FP_REAL_COMM_PACK_2D
         module procedure FP_REAL_COMM_PACK_3D
         module procedure FP_SIZE_COMM_PACK_1D
+        module procedure FP_BOOL_COMM_PACK_1D
     end interface FP_COMM_PACK
 
     !> Expand communication buffer into allocatable arrays
@@ -199,6 +204,7 @@ module fitpack_core
         module procedure FP_REAL_COMM_EXPAND_2D
         module procedure FP_REAL_COMM_EXPAND_3D
         module procedure FP_SIZE_COMM_EXPAND_1D
+        module procedure FP_BOOL_COMM_EXPAND_1D
     end interface FP_COMM_EXPAND
 
     contains
@@ -237,6 +243,9 @@ module fitpack_core
             case (FITPACK_TEST_ERROR); msg = 'Test(s) failed'
             case (FITPACK_INVALID_CONSTRAINT); msg = 'Invalid constraint(s) provided'
             case (FITPACK_INSUFFICIENT_KNOTS); msg = 'Not enough knots (n>=10)'
+            case (CONCON_MAXBIN); msg = 'concon: maxbin too small'
+            case (CONCON_MAXTR);  msg = 'concon: maxtr too small'
+            case (CONCON_QP_FAIL); msg = 'concon: QP solver failed'
             case default; msg = 'UNKNOWN ERROR'
          end select
 
@@ -18537,5 +18546,60 @@ module fitpack_core
 #endif
         end if
     end subroutine FP_SIZE_COMM_EXPAND_1D
+
+    !> Calculate storage size for 1D logical(FP_BOOL) allocatable array
+    pure integer(FP_SIZE) function FP_BOOL_COMM_SIZE_1D(array)
+        logical(FP_BOOL), allocatable, intent(in) :: array(:)
+        integer(FP_SIZE) :: n
+
+        FP_BOOL_COMM_SIZE_1D = rank(array)  ! Header
+        if (allocated(array)) then
+            n = size(array, kind=FP_SIZE)
+            FP_BOOL_COMM_SIZE_1D = FP_BOOL_COMM_SIZE_1D + FP_RCOMMS_PER_BITS(n * storage_size(array))
+        end if
+    end function FP_BOOL_COMM_SIZE_1D
+
+    !> Pack 1D logical(FP_BOOL) allocatable array into communication buffer
+    pure subroutine FP_BOOL_COMM_PACK_1D(array, buffer)
+        logical(FP_BOOL), allocatable, intent(in) :: array(:)
+        real(FP_COMM), intent(out) :: buffer(:)
+
+        integer(FP_SIZE) :: bnd(2), ndoubles
+        integer(FP_SIZE), parameter :: header = 1
+
+        if (allocated(array)) then
+            bnd = [lbound(array, 1, FP_SIZE), ubound(array, 1, FP_SIZE)]
+        else
+            bnd = FP_NOT_ALLOC
+        end if
+
+        buffer(1:header) = transfer(bnd, buffer(1:header), int(header))
+
+        if (all(bnd /= FP_NOT_ALLOC)) then
+            ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+            buffer(header+1:header+ndoubles) = transfer(array, buffer(header+1:header+ndoubles), int(ndoubles))
+        end if
+    end subroutine FP_BOOL_COMM_PACK_1D
+
+    !> Expand communication buffer into 1D logical(FP_BOOL) allocatable array
+    pure subroutine FP_BOOL_COMM_EXPAND_1D(array, buffer)
+        logical(FP_BOOL), allocatable, intent(out) :: array(:)
+        real(FP_COMM), intent(in) :: buffer(:)
+
+        integer(FP_SIZE) :: bnd(2), ndoubles
+        integer(FP_SIZE), parameter :: header = 1
+
+        bnd = transfer(buffer(:header), bnd)
+
+        if (all(bnd /= FP_NOT_ALLOC)) then
+            allocate(array(bnd(1):bnd(2)))
+            ndoubles = FP_RCOMMS_PER_BITS(size(array, kind=FP_SIZE) * storage_size(array))
+#if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
+            array(:) = transfer(buffer(header+1:header+ndoubles), FP_FALSE, size(array))
+#else
+            array = transfer(buffer(header+1:header+ndoubles), array)
+#endif
+        end if
+    end subroutine FP_BOOL_COMM_EXPAND_1D
 
 end module fitpack_core
