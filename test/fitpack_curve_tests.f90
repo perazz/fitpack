@@ -49,6 +49,9 @@ module fitpack_curve_tests
     public :: test_convex_least_squares
     public :: test_insert_knot
     public :: test_insert_knot_periodic
+    public :: test_surface_integral
+    public :: test_cross_section
+    public :: test_derivative_spline
 
 
     contains
@@ -1445,12 +1448,7 @@ module fitpack_curve_tests
 
             xg = linspace(-one, one, NX)
             yg = linspace(-one, one, NY)
-            do j = 1,NY
-               do i = 1,NX
-                  xs((j-1)*NX+i) = xg(i)
-                  ys((j-1)*NX+i) = yg(j)
-               end do
-            end do
+            call meshgrid(xg, yg, xs, ys)
             zs = xs**2 + ys**2
 
             ierr = s1%new_fit(xs, ys, zs)
@@ -1794,12 +1792,7 @@ module fitpack_curve_tests
        yg = linspace(-one,one,NY)
 
        ! Generate scattered points from the grid
-       do j = 1,NY
-          do i = 1,NX
-             xs((j-1)*NX+i) = xg(i)
-             ys((j-1)*NX+i) = yg(j)
-          end do
-       end do
+       call meshgrid(xg, yg, xs, ys)
        zs = xs**2 + ys**2
 
        ierr = surf%new_fit(xs,ys,zs)
@@ -2085,6 +2078,392 @@ module fitpack_curve_tests
 
     end function test_insert_knot_periodic
 
+    !> Test double integration of surface over rectangular domain
+    logical function test_surface_integral() result(success)
+
+        type(fitpack_surface) :: surf
+        type(fitpack_grid_surface) :: gsurf
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL) :: val, exact
+        real(FP_REAL), parameter :: TOL = 5.0e-2_FP_REAL
+
+        integer, parameter :: NX = 10, NY = 10, NS = NX*NY
+        real(FP_REAL) :: xg(NX), yg(NY), zg(NY,NX)
+        real(FP_REAL) :: xs(NS), ys(NS), zs(NS)
+        integer :: j
+
+        success = .false.
+
+        ! Grid data for z = x*y on [0,1] x [0,1]
+        xg = linspace(zero, one, NX)
+        yg = linspace(zero, one, NY)
+        do j = 1, NX
+            zg(:,j) = xg(j) * yg
+        end do
+
+        ! Scattered data from the same grid
+        call meshgrid(xg, yg, xs, ys)
+        zs = xs * ys
+
+        ! Fit scattered surface
+        ierr = surf%new_fit(xs, ys, zs, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_surface_integral] scattered fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Integral over full domain: int_0^1 int_0^1 x*y dx dy = 0.25
+        exact = 0.25_FP_REAL
+        val = surf%integral([zero,zero], [one,one])
+        if (abs(val - exact) > TOL) then
+            print *, '[test_surface_integral] scattered full domain: expected', exact, ' got', val
+            return
+        end if
+
+        ! Integral over sub-domain: int_0^0.5 int_0^0.5 x*y dx dy = 0.015625
+        exact = 0.015625_FP_REAL
+        val = surf%integral([zero,zero], [half,half])
+        if (abs(val - exact) > TOL) then
+            print *, '[test_surface_integral] scattered sub-domain: expected', exact, ' got', val
+            return
+        end if
+
+        ! Fit gridded surface
+        ierr = gsurf%new_fit(xg, yg, zg, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_surface_integral] gridded fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Integral over full domain
+        exact = 0.25_FP_REAL
+        val = gsurf%integral([zero,zero], [one,one])
+        if (abs(val - exact) > TOL) then
+            print *, '[test_surface_integral] gridded full domain: expected', exact, ' got', val
+            return
+        end if
+
+        ! Integral over sub-domain: int_0^0.5 int_0^0.5 x*y dx dy = 0.015625
+        exact = 0.015625_FP_REAL
+        val = gsurf%integral([zero,zero], [half,half])
+        if (abs(val - exact) > TOL) then
+            print *, '[test_surface_integral] gridded sub-domain: expected', exact, ' got', val
+            return
+        end if
+
+        success = .true.
+
+    end function test_surface_integral
+
+    !> Test cross-section extraction from a bivariate surface
+    logical function test_cross_section() result(success)
+
+        type(fitpack_surface) :: surf
+        type(fitpack_grid_surface) :: gsurf
+        type(fitpack_curve) :: cs
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL) :: yeval(5), feval(5), exact(5)
+        real(FP_REAL), parameter :: TOL = 5.0e-2_FP_REAL
+
+        integer, parameter :: NX = 10, NY = 10, NS = NX*NY
+        real(FP_REAL) :: xg(NX), yg(NY), zg(NY,NX)
+        real(FP_REAL) :: xs(NS), ys(NS), zs(NS)
+        integer :: j
+
+        success = .false.
+
+        ! Grid data for z = x*y on [0,1] x [0,1]
+        xg = linspace(zero, one, NX)
+        yg = linspace(zero, one, NY)
+        do j = 1, NX
+            zg(:,j) = xg(j) * yg
+        end do
+
+        ! Scattered data
+        call meshgrid(xg, yg, xs, ys)
+        zs = xs * ys
+
+        yeval = linspace(0.1_FP_REAL, 0.9_FP_REAL, 5)
+
+        ! --- Scattered surface ---
+        ierr = surf%new_fit(xs, ys, zs, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] scattered fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! y-profile at u=0.5: f(y) = 0.5*y
+        cs = surf%cross_section(half, along_y=.true., ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] scattered y-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Validate curve order and knots match the profiled direction
+        if (cs%order /= surf%order(2)) then
+            print *, '[test_cross_section] scattered y-profile order mismatch: expected', surf%order(2), ' got', cs%order
+            return
+        end if
+        if (cs%knots /= surf%knots(2)) then
+            print *, '[test_cross_section] scattered y-profile knots mismatch: expected', surf%knots(2), ' got', cs%knots
+            return
+        end if
+
+        feval = cs%eval(yeval)
+        exact = half * yeval
+        if (maxval(abs(feval - exact)) > TOL) then
+            print *, '[test_cross_section] scattered y-profile error:', maxval(abs(feval - exact))
+            return
+        end if
+
+        ! x-profile at u=0.3: g(x) = 0.3*x
+        cs = surf%cross_section(0.3_FP_REAL, along_y=.false., ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] scattered x-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Validate curve order and knots match the profiled direction
+        if (cs%order /= surf%order(1)) then
+            print *, '[test_cross_section] scattered x-profile order mismatch: expected', surf%order(1), ' got', cs%order
+            return
+        end if
+        if (cs%knots /= surf%knots(1)) then
+            print *, '[test_cross_section] scattered x-profile knots mismatch: expected', surf%knots(1), ' got', cs%knots
+            return
+        end if
+
+        feval = cs%eval(yeval)
+        exact = 0.3_FP_REAL * yeval
+        if (maxval(abs(feval - exact)) > TOL) then
+            print *, '[test_cross_section] scattered x-profile error:', maxval(abs(feval - exact))
+            return
+        end if
+
+        ! --- Gridded surface ---
+        ierr = gsurf%new_fit(xg, yg, zg, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] gridded fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! y-profile at u=0.5
+        cs = gsurf%cross_section(half, along_y=.true., ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] gridded y-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        if (cs%order /= gsurf%order(2)) then
+            print *, '[test_cross_section] gridded y-profile order mismatch: expected', gsurf%order(2), ' got', cs%order
+            return
+        end if
+
+        feval = cs%eval(yeval)
+        exact = half * yeval
+        if (maxval(abs(feval - exact)) > TOL) then
+            print *, '[test_cross_section] gridded y-profile error:', maxval(abs(feval - exact))
+            return
+        end if
+
+        ! x-profile at u=0.3: g(x) = 0.3*x
+        cs = gsurf%cross_section(0.3_FP_REAL, along_y=.false., ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] gridded x-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        if (cs%order /= gsurf%order(1)) then
+            print *, '[test_cross_section] gridded x-profile order mismatch: expected', gsurf%order(1), ' got', cs%order
+            return
+        end if
+
+        feval = cs%eval(yeval)
+        exact = 0.3_FP_REAL * yeval
+        if (maxval(abs(feval - exact)) > TOL) then
+            print *, '[test_cross_section] gridded x-profile error:', maxval(abs(feval - exact))
+            return
+        end if
+
+        success = .true.
+
+    end function test_cross_section
+
+    !> Test derivative spline computation from a bivariate surface
+    logical function test_derivative_spline() result(success)
+
+        type(fitpack_grid_surface) :: gsurf, dsurf
+        type(fitpack_surface) :: surf, dsurf_s
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL), parameter :: TOL = 5.0e-2_FP_REAL
+
+        integer, parameter :: NX = 10, NY = 10, NS = NX*NY
+        real(FP_REAL) :: xg(NX), yg(NY), zg(NY,NX)
+        real(FP_REAL) :: xs(NS), ys(NS), zs(NS)
+        real(FP_REAL) :: xeval(3), yeval(3), fgrid(3,3)
+        integer :: i, j
+
+        success = .false.
+
+        ! Grid data for z = x*y on [0,1] x [0,1]
+        xg = linspace(zero, one, NX)
+        yg = linspace(zero, one, NY)
+        do j = 1, NX
+            zg(:,j) = xg(j) * yg
+        end do
+
+        ! Evaluation grid
+        xeval = linspace(0.2_FP_REAL, 0.8_FP_REAL, 3)
+        yeval = linspace(0.2_FP_REAL, 0.8_FP_REAL, 3)
+
+        ! --- Gridded surface ---
+        ierr = gsurf%new_fit(xg, yg, zg, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] gridded fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! ds/dx = y
+        dsurf = gsurf%derivative_spline(1_FP_SIZE, 0_FP_SIZE, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] gridded ds/dx failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify reduced order: kx drops by 1, ky unchanged
+        if (dsurf%order(1) /= gsurf%order(1) - 1) then
+            print *, '[test_derivative_spline] gridded ds/dx order(1) mismatch: expected', &
+                     gsurf%order(1)-1, ' got', dsurf%order(1)
+            return
+        end if
+        if (dsurf%order(2) /= gsurf%order(2)) then
+            print *, '[test_derivative_spline] gridded ds/dx order(2) mismatch: expected', &
+                     gsurf%order(2), ' got', dsurf%order(2)
+            return
+        end if
+
+        ! Verify reduced knots: nx drops by 2, ny unchanged
+        if (dsurf%knots(1) /= gsurf%knots(1) - 2) then
+            print *, '[test_derivative_spline] gridded ds/dx knots(1) mismatch: expected', &
+                     gsurf%knots(1)-2, ' got', dsurf%knots(1)
+            return
+        end if
+        if (dsurf%knots(2) /= gsurf%knots(2)) then
+            print *, '[test_derivative_spline] gridded ds/dx knots(2) mismatch: expected', &
+                     gsurf%knots(2), ' got', dsurf%knots(2)
+            return
+        end if
+
+        fgrid = dsurf%eval(xeval, yeval, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] gridded ds/dx eval failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! fgrid(j,i) should be approximately yeval(j)
+        do i = 1, 3
+            do j = 1, 3
+                if (abs(fgrid(j,i) - yeval(j)) > TOL) then
+                    print *, '[test_derivative_spline] gridded ds/dx mismatch at', i, j, &
+                             ': expected', yeval(j), ' got', fgrid(j,i)
+                    return
+                end if
+            end do
+        end do
+
+        ! ds/dy = x
+        dsurf = gsurf%derivative_spline(0_FP_SIZE, 1_FP_SIZE, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] gridded ds/dy failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify reduced order: kx unchanged, ky drops by 1
+        if (dsurf%order(1) /= gsurf%order(1)) then
+            print *, '[test_derivative_spline] gridded ds/dy order(1) mismatch: expected', &
+                     gsurf%order(1), ' got', dsurf%order(1)
+            return
+        end if
+        if (dsurf%order(2) /= gsurf%order(2) - 1) then
+            print *, '[test_derivative_spline] gridded ds/dy order(2) mismatch: expected', &
+                     gsurf%order(2)-1, ' got', dsurf%order(2)
+            return
+        end if
+
+        ! Verify reduced knots: nx unchanged, ny drops by 2
+        if (dsurf%knots(1) /= gsurf%knots(1)) then
+            print *, '[test_derivative_spline] gridded ds/dy knots(1) mismatch: expected', &
+                     gsurf%knots(1), ' got', dsurf%knots(1)
+            return
+        end if
+        if (dsurf%knots(2) /= gsurf%knots(2) - 2) then
+            print *, '[test_derivative_spline] gridded ds/dy knots(2) mismatch: expected', &
+                     gsurf%knots(2)-2, ' got', dsurf%knots(2)
+            return
+        end if
+
+        fgrid = dsurf%eval(xeval, yeval, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] gridded ds/dy eval failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! fgrid(j,i) should be approximately xeval(i)
+        do i = 1, 3
+            do j = 1, 3
+                if (abs(fgrid(j,i) - xeval(i)) > TOL) then
+                    print *, '[test_derivative_spline] gridded ds/dy mismatch at', i, j, &
+                             ': expected', xeval(i), ' got', fgrid(j,i)
+                    return
+                end if
+            end do
+        end do
+
+        ! --- Scattered surface ---
+        call meshgrid(xg, yg, xs, ys)
+        zs = xs * ys
+
+        ierr = surf%new_fit(xs, ys, zs, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] scattered fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! ds/dx = y (scattered)
+        dsurf_s = surf%derivative_spline(1_FP_SIZE, 0_FP_SIZE, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] scattered ds/dx failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify reduced order
+        if (dsurf_s%order(1) /= surf%order(1) - 1) then
+            print *, '[test_derivative_spline] scattered ds/dx order(1) mismatch: expected', &
+                     surf%order(1)-1, ' got', dsurf_s%order(1)
+            return
+        end if
+
+        ! Evaluate scattered derivative on grid and compare with analytical ds/dx = y
+        fgrid = dsurf_s%eval_ongrid(xeval, yeval, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] scattered ds/dx eval failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        do i = 1, 3
+            do j = 1, 3
+                if (abs(fgrid(j,i) - yeval(j)) > TOL) then
+                    print *, '[test_derivative_spline] scattered ds/dx mismatch at', i, j, &
+                             ': expected', yeval(j), ' got', fgrid(j,i)
+                    return
+                end if
+            end do
+        end do
+
+        success = .true.
+
+    end function test_derivative_spline
+
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)
        real(FP_REAL), intent(in) :: RTOL,ATOL,x
@@ -2105,6 +2484,18 @@ module fitpack_curve_tests
        forall(i=1:nx) linspace(i) = x1+dx*(i-1)
 
     end function linspace
+
+    ! Flatten 1D grid vectors into scattered (x,y) coordinate arrays
+    pure subroutine meshgrid(xg, yg, xs, ys)
+       real(FP_REAL), intent(in)  :: xg(:), yg(:)
+       real(FP_REAL), intent(out) :: xs(size(xg)*size(yg)), ys(size(xg)*size(yg))
+       integer :: i, j, nx
+       nx = size(xg)
+       forall(j=1:size(yg), i=1:nx)
+          xs((j-1)*nx+i) = xg(i)
+          ys((j-1)*nx+i) = yg(j)
+       end forall
+    end subroutine meshgrid
 
 
 end module fitpack_curve_tests

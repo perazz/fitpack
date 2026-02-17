@@ -20,6 +20,7 @@
 module fitpack_surfaces
     use fitpack_core
     use fitpack_fitters
+    use fitpack_curves, only: fitpack_curve
     implicit none
     private
 
@@ -85,6 +86,15 @@ module fitpack_surfaces
            procedure, private :: surface_derivatives_one
            generic   :: dfdx => surface_derivatives_one,surface_derivatives_many
            generic   :: dfdx_ongrid => surface_derivatives_gridded
+
+           !> Double integration over a rectangular domain
+           procedure :: integral => surface_integral
+
+           !> Extract a 1D cross-section curve from the surface
+           procedure :: cross_section => surface_cross_section
+
+           !> Compute the derivative spline coefficients
+           procedure :: derivative_spline => surface_derivative_spline
 
            !> Parallel communication interface
            procedure :: comm_size   => surf_comm_size
@@ -539,6 +549,132 @@ module fitpack_surfaces
         f  = z1(1)
 
     end function surface_derivatives_one
+
+
+    !> Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)]
+    real(FP_REAL) function surface_integral(this, lower, upper)
+        class(fitpack_surface), intent(in) :: this
+        real(FP_REAL), intent(in) :: lower(2), upper(2)
+
+        real(FP_REAL) :: wrk(this%knots(1)+this%knots(2)-this%order(1)-this%order(2)-2)
+
+        surface_integral = dblint(this%t(:,1), this%knots(1), &
+                                  this%t(:,2), this%knots(2), &
+                                  this%c, &
+                                  this%order(1), this%order(2), &
+                                  lower(1), upper(1), lower(2), upper(2), wrk)
+
+    end function surface_integral
+
+    !> Extract a 1D cross-section from the surface.
+    !> If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u).
+    function surface_cross_section(this, u, along_y, ierr) result(curve)
+        class(fitpack_surface), intent(in) :: this
+        real(FP_REAL), intent(in) :: u
+        logical, intent(in) :: along_y
+        integer(FP_FLAG), optional, intent(out) :: ierr
+        type(fitpack_curve) :: curve
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: iopt, nu, nc
+        real(FP_REAL), allocatable :: cu(:)
+
+        if (along_y) then
+            ! f(y) = s(u,y): result has knots=ty, order=ky
+            iopt = 0
+            nu   = this%knots(2)
+            nc   = this%knots(2) - this%order(2) - 1
+        else
+            ! g(x) = s(x,u): result has knots=tx, order=kx
+            iopt = 1
+            nu   = this%knots(1)
+            nc   = this%knots(1) - this%order(1) - 1
+        end if
+
+        allocate(cu(nu))
+
+        call profil(iopt, this%t(:,1), this%knots(1), &
+                          this%t(:,2), this%knots(2), &
+                          this%c, &
+                          this%order(1), this%order(2), &
+                          u, nu, cu, ier)
+
+        if (FITPACK_SUCCESS(ier)) then
+            ! Build a fitpack_curve from the cross-section coefficients
+            curve%order = merge(this%order(2), this%order(1), along_y)
+            curve%knots = nu
+            curve%nest  = nu
+            allocate(curve%t(nu), source=merge_knots(along_y, this%t(:,1), this%t(:,2), nu))
+            allocate(curve%c(nu), source=zero)
+            curve%c(:nc) = cu(:nc)
+            curve%xleft  = curve%t(curve%order + 1)
+            curve%xright = curve%t(curve%knots - curve%order)
+        end if
+
+        call fitpack_error_handling(ier, ierr, 'surface cross-section')
+
+    end function surface_cross_section
+
+    !> Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy.
+    !> Returns a new surface with reduced order [kx-nux, ky-nuy] and trimmed knots.
+    function surface_derivative_spline(this, nux, nuy, ierr) result(dsurf)
+        class(fitpack_surface), intent(in) :: this
+        integer(FP_SIZE), intent(in) :: nux, nuy
+        integer(FP_FLAG), optional, intent(out) :: ierr
+        type(fitpack_surface) :: dsurf
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: nx, ny, newkx, newky, newnx, newny, nc_old, nc_new
+        real(FP_REAL), allocatable :: newc(:)
+
+        nx = this%knots(1)
+        ny = this%knots(2)
+        nc_old = (nx - this%order(1) - 1) * (ny - this%order(2) - 1)
+
+        allocate(newc(nc_old))
+
+        call pardtc(this%t(:,1), nx, this%t(:,2), ny, &
+                    this%c, this%order(1), this%order(2), &
+                    nux, nuy, newc, ier)
+
+        if (FITPACK_SUCCESS(ier)) then
+            newkx  = this%order(1) - nux
+            newky  = this%order(2) - nuy
+            newnx  = nx - 2*nux
+            newny  = ny - 2*nuy
+            nc_new = (newnx - newkx - 1) * (newny - newky - 1)
+
+            dsurf%order  = [newkx, newky]
+            dsurf%knots  = [newnx, newny]
+            dsurf%nmax   = max(newnx, newny)
+            dsurf%nest   = dsurf%nmax
+
+            allocate(dsurf%t(dsurf%nmax, 2), source=zero)
+            dsurf%t(1:newnx, 1) = this%t(1+nux:nx-nux, 1)
+            dsurf%t(1:newny, 2) = this%t(1+nuy:ny-nuy, 2)
+
+            allocate(dsurf%c(nc_new), source=newc(1:nc_new))
+
+            dsurf%left  = [dsurf%t(newkx+1, 1), dsurf%t(newky+1, 2)]
+            dsurf%right = [dsurf%t(newnx-newkx, 1), dsurf%t(newny-newky, 2)]
+        end if
+
+        call fitpack_error_handling(ier, ierr, 'surface derivative spline')
+
+    end function surface_derivative_spline
+
+    !> Helper: select knots from the appropriate direction for cross_section
+    pure function merge_knots(along_y, tx, ty, n) result(knots)
+        logical, intent(in) :: along_y
+        real(FP_REAL), intent(in) :: tx(:), ty(:)
+        integer(FP_SIZE), intent(in) :: n
+        real(FP_REAL) :: knots(n)
+        if (along_y) then
+            knots = ty(1:n)
+        else
+            knots = tx(1:n)
+        end if
+    end function merge_knots
 
 
     ! =================================================================================================

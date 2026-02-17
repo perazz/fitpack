@@ -64,6 +64,9 @@ program test
         call add_test(test_convex_least_squares())
         call add_test(test_insert_knot())
         call add_test(test_insert_knot_periodic())
+        call add_test(test_surface_integral())
+        call add_test(test_cross_section())
+        call add_test(test_derivative_spline())
 
     end subroutine run_interface_tests
 
