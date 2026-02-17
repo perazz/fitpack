@@ -67,6 +67,7 @@ program test
         call add_test(test_surface_integral())
         call add_test(test_cross_section())
         call add_test(test_derivative_spline())
+        call add_test(test_grid_surface_scattered_eval())
 
     end subroutine run_interface_tests
 

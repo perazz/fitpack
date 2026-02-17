@@ -19,7 +19,7 @@
 ! **************************************************************************************************
 module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
-                            IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid, &
+                            IOPT_NEW_LEASTSQUARES,bispev,bispeu,fitpack_error_handling,get_smoothing,regrid, &
                             parder,pardeu,FITPACK_INPUT_ERROR, &
                             dblint,profil,pardtc, &
                             FP_COMM_SIZE,FP_COMM_PACK,FP_COMM_EXPAND
@@ -70,10 +70,15 @@ module fitpack_grid_surfaces
            procedure :: least_squares => surface_fit_least_squares
            procedure :: interpolate   => surface_fit_interpolating
 
-           !> Evaluate gridded domain at given x,y coordinates
+           !> Evaluate at scattered (x,y) points
+           procedure, private :: gridsurf_eval_one
+           procedure, private :: gridsurf_eval_many
+           generic :: eval => gridsurf_eval_one,gridsurf_eval_many
+
+           !> Evaluate on a grid domain
            procedure, private :: gridded_eval_one
            procedure, private :: gridded_eval_many
-           generic :: eval => gridded_eval_one,gridded_eval_many
+           generic :: eval_ongrid => gridded_eval_one,gridded_eval_many
            
            !> Evaluate derivatives at given coordinates
            procedure, private :: gridded_derivatives_gridded
@@ -290,6 +295,47 @@ module fitpack_grid_surfaces
 
     end function surf_new_fit
 
+    !> Evaluate surface at a list of scattered (x(i),y(i)) points using bispeu
+    function gridsurf_eval_many(this,x,y,ierr) result(f)
+        class(fitpack_grid_surface), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x(:),y(size(x))
+        real(FP_REAL) :: f(size(x))
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk
+        real(FP_REAL), allocatable :: wrk(:)
+
+        ! bispeu workspace: lwrk >= kx+ky+2
+        min_lwrk = sum(this%order) + 2
+        allocate(wrk(min_lwrk))
+
+        call bispeu(tx=this%t(:,1),nx=this%knots(1),   &
+                    ty=this%t(:,2),ny=this%knots(2),   &
+                    c=this%c,                          &
+                    kx=this%order(1),ky=this%order(2), &
+                    x=x,y=y,z=f,m=size(x),            &
+                    wrk=wrk,lwrk=min_lwrk,             &
+                    ier=ier)
+
+        call fitpack_error_handling(ier,ierr,'evaluate grid surface at scattered points')
+
+    end function gridsurf_eval_many
+
+    !> Evaluate surface at a single (x,y) point using bispeu
+    real(FP_REAL) function gridsurf_eval_one(this,x,y,ierr) result(f)
+        class(fitpack_grid_surface), intent(inout) :: this
+        real(FP_REAL), intent(in) :: x,y
+        integer(FP_FLAG), optional, intent(out) :: ierr
+
+        real(FP_REAL) :: z1(1)
+
+        z1 = gridsurf_eval_many(this,[x],[y],ierr)
+        f  = z1(1)
+
+    end function gridsurf_eval_one
+
+    !> Evaluate surface on a grid of x(:) x y(:) points using bispev
     function gridded_eval_many(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         real(FP_REAL), intent(in) :: x(:),y(:)  ! Evaluation points

@@ -52,6 +52,7 @@ module fitpack_curve_tests
     public :: test_surface_integral
     public :: test_cross_section
     public :: test_derivative_spline
+    public :: test_grid_surface_scattered_eval
 
 
     contains
@@ -1004,8 +1005,8 @@ module fitpack_curve_tests
                 exit
             end if
 
-            ! Evaluation of the spline approximation
-            fit_z = surf%eval(daregr_x,daregr_y,ierr)
+            ! Evaluation of the spline approximation on grid
+            fit_z = surf%eval_ongrid(daregr_x,daregr_y,ierr)
 
             if (.not.FITPACK_SUCCESS(ierr)) then
                 success = .false.
@@ -2354,7 +2355,7 @@ module fitpack_curve_tests
             return
         end if
 
-        fgrid = dsurf%eval(xeval, yeval, ierr)
+        fgrid = dsurf%eval_ongrid(xeval, yeval, ierr)
         if (.not.FITPACK_SUCCESS(ierr)) then
             print *, '[test_derivative_spline] gridded ds/dx eval failed: ', FITPACK_MESSAGE(ierr)
             return
@@ -2402,7 +2403,7 @@ module fitpack_curve_tests
             return
         end if
 
-        fgrid = dsurf%eval(xeval, yeval, ierr)
+        fgrid = dsurf%eval_ongrid(xeval, yeval, ierr)
         if (.not.FITPACK_SUCCESS(ierr)) then
             print *, '[test_derivative_spline] gridded ds/dy eval failed: ', FITPACK_MESSAGE(ierr)
             return
@@ -2463,6 +2464,78 @@ module fitpack_curve_tests
         success = .true.
 
     end function test_derivative_spline
+
+    !> Test scattered-point evaluation on fitpack_grid_surface
+    logical function test_grid_surface_scattered_eval() result(success)
+
+        type(fitpack_grid_surface) :: gsurf
+        integer(FP_FLAG) :: ierr
+        real(FP_REAL), parameter :: TOL = 1.0e-10_FP_REAL
+
+        integer, parameter :: NX = 15, NY = 15
+        real(FP_REAL) :: xg(NX), yg(NY), zg(NY,NX)
+        real(FP_REAL) :: xp(5), yp(5), fp(5), exact(5)
+        real(FP_REAL) :: fgrid(3,3), xeval(3), yeval(3)
+        integer :: j
+
+        success = .false.
+
+        ! Grid data for z = x^2 + y^2 on [0,1] x [0,1]
+        xg = linspace(zero, one, NX)
+        yg = linspace(zero, one, NY)
+        do j = 1, NX
+            zg(:,j) = xg(j)**2 + yg**2
+        end do
+
+        ierr = gsurf%new_fit(xg, yg, zg, smoothing=zero)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_grid_surface_scattered_eval] fit failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! --- Scattered eval: arbitrary (x,y) pairs ---
+        xp = [0.1_FP_REAL, 0.25_FP_REAL, 0.5_FP_REAL, 0.75_FP_REAL, 0.9_FP_REAL]
+        yp = [0.9_FP_REAL, 0.3_FP_REAL,  0.5_FP_REAL, 0.1_FP_REAL,  0.6_FP_REAL]
+        exact = xp**2 + yp**2
+
+        fp = gsurf%eval(xp, yp, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_grid_surface_scattered_eval] scattered eval failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        if (maxval(abs(fp - exact)) > TOL) then
+            print *, '[test_grid_surface_scattered_eval] scattered eval error:', maxval(abs(fp - exact))
+            return
+        end if
+
+        ! --- Single-point eval ---
+        if (abs(gsurf%eval(0.3_FP_REAL, 0.7_FP_REAL) - (0.09_FP_REAL + 0.49_FP_REAL)) > TOL) then
+            print *, '[test_grid_surface_scattered_eval] single-point eval error'
+            return
+        end if
+
+        ! --- Gridded eval (eval_ongrid) still works ---
+        xeval = linspace(0.2_FP_REAL, 0.8_FP_REAL, 3)
+        yeval = linspace(0.2_FP_REAL, 0.8_FP_REAL, 3)
+
+        fgrid = gsurf%eval_ongrid(xeval, yeval, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_grid_surface_scattered_eval] eval_ongrid failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! fgrid(j,i) = xeval(i)^2 + yeval(j)^2
+        do j = 1, 3
+            if (maxval(abs(fgrid(j,:) - (xeval**2 + yeval(j)**2))) > TOL) then
+                print *, '[test_grid_surface_scattered_eval] eval_ongrid mismatch at j=', j
+                return
+            end if
+        end do
+
+        success = .true.
+
+    end function test_grid_surface_scattered_eval
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)
