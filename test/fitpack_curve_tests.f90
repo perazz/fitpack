@@ -2143,6 +2143,14 @@ module fitpack_curve_tests
             return
         end if
 
+        ! Integral over sub-domain: int_0^0.5 int_0^0.5 x*y dx dy = 0.015625
+        exact = 0.015625_FP_REAL
+        val = gsurf%integral([zero,zero], [half,half])
+        if (abs(val - exact) > TOL) then
+            print *, '[test_surface_integral] gridded sub-domain: expected', exact, ' got', val
+            return
+        end if
+
         success = .true.
 
     end function test_surface_integral
@@ -2191,6 +2199,16 @@ module fitpack_curve_tests
             return
         end if
 
+        ! Validate curve order and knots match the profiled direction
+        if (cs%order /= surf%order(2)) then
+            print *, '[test_cross_section] scattered y-profile order mismatch: expected', surf%order(2), ' got', cs%order
+            return
+        end if
+        if (cs%knots /= surf%knots(2)) then
+            print *, '[test_cross_section] scattered y-profile knots mismatch: expected', surf%knots(2), ' got', cs%knots
+            return
+        end if
+
         feval = cs%eval(yeval)
         exact = half * yeval
         if (maxval(abs(feval - exact)) > TOL) then
@@ -2202,6 +2220,16 @@ module fitpack_curve_tests
         cs = surf%cross_section(0.3_FP_REAL, along_y=.false., ierr=ierr)
         if (.not.FITPACK_SUCCESS(ierr)) then
             print *, '[test_cross_section] scattered x-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Validate curve order and knots match the profiled direction
+        if (cs%order /= surf%order(1)) then
+            print *, '[test_cross_section] scattered x-profile order mismatch: expected', surf%order(1), ' got', cs%order
+            return
+        end if
+        if (cs%knots /= surf%knots(1)) then
+            print *, '[test_cross_section] scattered x-profile knots mismatch: expected', surf%knots(1), ' got', cs%knots
             return
         end if
 
@@ -2226,10 +2254,34 @@ module fitpack_curve_tests
             return
         end if
 
+        if (cs%order /= gsurf%order(2)) then
+            print *, '[test_cross_section] gridded y-profile order mismatch: expected', gsurf%order(2), ' got', cs%order
+            return
+        end if
+
         feval = cs%eval(yeval)
         exact = half * yeval
         if (maxval(abs(feval - exact)) > TOL) then
             print *, '[test_cross_section] gridded y-profile error:', maxval(abs(feval - exact))
+            return
+        end if
+
+        ! x-profile at u=0.3: g(x) = 0.3*x
+        cs = gsurf%cross_section(0.3_FP_REAL, along_y=.false., ierr=ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_cross_section] gridded x-profile failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        if (cs%order /= gsurf%order(1)) then
+            print *, '[test_cross_section] gridded x-profile order mismatch: expected', gsurf%order(1), ' got', cs%order
+            return
+        end if
+
+        feval = cs%eval(yeval)
+        exact = 0.3_FP_REAL * yeval
+        if (maxval(abs(feval - exact)) > TOL) then
+            print *, '[test_cross_section] gridded x-profile error:', maxval(abs(feval - exact))
             return
         end if
 
@@ -2278,6 +2330,30 @@ module fitpack_curve_tests
             return
         end if
 
+        ! Verify reduced order: kx drops by 1, ky unchanged
+        if (dsurf%order(1) /= gsurf%order(1) - 1) then
+            print *, '[test_derivative_spline] gridded ds/dx order(1) mismatch: expected', &
+                     gsurf%order(1)-1, ' got', dsurf%order(1)
+            return
+        end if
+        if (dsurf%order(2) /= gsurf%order(2)) then
+            print *, '[test_derivative_spline] gridded ds/dx order(2) mismatch: expected', &
+                     gsurf%order(2), ' got', dsurf%order(2)
+            return
+        end if
+
+        ! Verify reduced knots: nx drops by 2, ny unchanged
+        if (dsurf%knots(1) /= gsurf%knots(1) - 2) then
+            print *, '[test_derivative_spline] gridded ds/dx knots(1) mismatch: expected', &
+                     gsurf%knots(1)-2, ' got', dsurf%knots(1)
+            return
+        end if
+        if (dsurf%knots(2) /= gsurf%knots(2)) then
+            print *, '[test_derivative_spline] gridded ds/dx knots(2) mismatch: expected', &
+                     gsurf%knots(2), ' got', dsurf%knots(2)
+            return
+        end if
+
         fgrid = dsurf%eval(xeval, yeval, ierr)
         if (.not.FITPACK_SUCCESS(ierr)) then
             print *, '[test_derivative_spline] gridded ds/dx eval failed: ', FITPACK_MESSAGE(ierr)
@@ -2299,6 +2375,30 @@ module fitpack_curve_tests
         dsurf = gsurf%derivative_spline(0_FP_SIZE, 1_FP_SIZE, ierr)
         if (.not.FITPACK_SUCCESS(ierr)) then
             print *, '[test_derivative_spline] gridded ds/dy failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        ! Verify reduced order: kx unchanged, ky drops by 1
+        if (dsurf%order(1) /= gsurf%order(1)) then
+            print *, '[test_derivative_spline] gridded ds/dy order(1) mismatch: expected', &
+                     gsurf%order(1), ' got', dsurf%order(1)
+            return
+        end if
+        if (dsurf%order(2) /= gsurf%order(2) - 1) then
+            print *, '[test_derivative_spline] gridded ds/dy order(2) mismatch: expected', &
+                     gsurf%order(2)-1, ' got', dsurf%order(2)
+            return
+        end if
+
+        ! Verify reduced knots: nx unchanged, ny drops by 2
+        if (dsurf%knots(1) /= gsurf%knots(1)) then
+            print *, '[test_derivative_spline] gridded ds/dy knots(1) mismatch: expected', &
+                     gsurf%knots(1), ' got', dsurf%knots(1)
+            return
+        end if
+        if (dsurf%knots(2) /= gsurf%knots(2) - 2) then
+            print *, '[test_derivative_spline] gridded ds/dy knots(2) mismatch: expected', &
+                     gsurf%knots(2)-2, ' got', dsurf%knots(2)
             return
         end if
 
@@ -2335,6 +2435,30 @@ module fitpack_curve_tests
             print *, '[test_derivative_spline] scattered ds/dx failed: ', FITPACK_MESSAGE(ierr)
             return
         end if
+
+        ! Verify reduced order
+        if (dsurf_s%order(1) /= surf%order(1) - 1) then
+            print *, '[test_derivative_spline] scattered ds/dx order(1) mismatch: expected', &
+                     surf%order(1)-1, ' got', dsurf_s%order(1)
+            return
+        end if
+
+        ! Evaluate scattered derivative on grid and compare with analytical ds/dx = y
+        fgrid = dsurf_s%eval_ongrid(xeval, yeval, ierr)
+        if (.not.FITPACK_SUCCESS(ierr)) then
+            print *, '[test_derivative_spline] scattered ds/dx eval failed: ', FITPACK_MESSAGE(ierr)
+            return
+        end if
+
+        do i = 1, 3
+            do j = 1, 3
+                if (abs(fgrid(j,i) - yeval(j)) > TOL) then
+                    print *, '[test_derivative_spline] scattered ds/dx mismatch at', i, j, &
+                             ': expected', yeval(j), ' got', fgrid(j,i)
+                    return
+                end if
+            end do
+        end do
 
         success = .true.
 
