@@ -70,12 +70,12 @@ module fitpack_grid_surfaces
            procedure :: least_squares => surface_fit_least_squares
            procedure :: interpolate   => surface_fit_interpolating
 
-           !> Evaluate at scattered (x,y) points
+           !> Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid.
            procedure, private :: gridsurf_eval_one
            procedure, private :: gridsurf_eval_many
            generic :: eval => gridsurf_eval_one,gridsurf_eval_many
 
-           !> Evaluate on a grid domain
+           !> Evaluate on a rectangular grid x(:) x y(:) (bispev). Returns f(ny,nx).
            procedure, private :: gridded_eval_one
            procedure, private :: gridded_eval_many
            generic :: eval_ongrid => gridded_eval_one,gridded_eval_many
