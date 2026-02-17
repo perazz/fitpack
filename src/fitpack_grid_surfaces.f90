@@ -21,8 +21,10 @@ module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
                             IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid, &
                             parder,pardeu,FITPACK_INPUT_ERROR, &
+                            dblint,profil,pardtc, &
                             FP_COMM_SIZE,FP_COMM_PACK,FP_COMM_EXPAND
     use fitpack_fitters
+    use fitpack_curves, only: fitpack_curve
     implicit none
     private
 
@@ -79,6 +81,15 @@ module fitpack_grid_surfaces
            procedure, private :: gridded_derivatives_one
            generic   :: dfdx => gridded_derivatives_one,gridded_derivatives_many
            generic   :: dfdx_ongrid => gridded_derivatives_gridded
+
+           !> Double integration over a rectangular domain
+           procedure :: integral => gridsurf_integral
+
+           !> Extract a 1D cross-section curve from the surface
+           procedure :: cross_section => gridsurf_cross_section
+
+           !> Compute the derivative spline coefficients
+           procedure :: derivative_spline => gridsurf_derivative_spline
 
            !> Parallel communication
            procedure :: comm_size   => gridsurf_comm_size
@@ -463,6 +474,126 @@ module fitpack_grid_surfaces
         f  = z1(1)
 
     end function gridded_derivatives_one
+
+    !> Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)]
+    real(FP_REAL) function gridsurf_integral(this, lower, upper)
+        class(fitpack_grid_surface), intent(in) :: this
+        real(FP_REAL), intent(in) :: lower(2), upper(2)
+
+        real(FP_REAL) :: wrk(this%knots(1)+this%knots(2)-this%order(1)-this%order(2)-2)
+
+        gridsurf_integral = dblint(this%t(:,1), this%knots(1), &
+                                   this%t(:,2), this%knots(2), &
+                                   this%c, &
+                                   this%order(1), this%order(2), &
+                                   lower(1), upper(1), lower(2), upper(2), wrk)
+
+    end function gridsurf_integral
+
+    !> Extract a 1D cross-section from the surface.
+    !> If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u).
+    function gridsurf_cross_section(this, u, along_y, ierr) result(curve)
+        class(fitpack_grid_surface), intent(in) :: this
+        real(FP_REAL), intent(in) :: u
+        logical, intent(in) :: along_y
+        integer(FP_FLAG), optional, intent(out) :: ierr
+        type(fitpack_curve) :: curve
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: iopt, nu, nc
+        real(FP_REAL), allocatable :: cu(:)
+
+        if (along_y) then
+            iopt = 0
+            nu   = this%knots(2)
+            nc   = this%knots(2) - this%order(2) - 1
+        else
+            iopt = 1
+            nu   = this%knots(1)
+            nc   = this%knots(1) - this%order(1) - 1
+        end if
+
+        allocate(cu(nu))
+
+        call profil(iopt, this%t(:,1), this%knots(1), &
+                          this%t(:,2), this%knots(2), &
+                          this%c, &
+                          this%order(1), this%order(2), &
+                          u, nu, cu, ier)
+
+        if (FITPACK_SUCCESS(ier)) then
+            curve%order = merge(this%order(2), this%order(1), along_y)
+            curve%knots = nu
+            curve%nest  = nu
+            if (along_y) then
+                allocate(curve%t(nu), source=this%t(1:nu, 2))
+            else
+                allocate(curve%t(nu), source=this%t(1:nu, 1))
+            end if
+            allocate(curve%c(nu), source=zero)
+            curve%c(:nc) = cu(:nc)
+            curve%xleft  = curve%t(curve%order + 1)
+            curve%xright = curve%t(curve%knots - curve%order)
+        end if
+
+        call fitpack_error_handling(ier, ierr, 'grid surface cross-section')
+
+    end function gridsurf_cross_section
+
+    !> Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy.
+    !> Returns a new grid surface with reduced order and trimmed knots.
+    function gridsurf_derivative_spline(this, nux, nuy, ierr) result(dsurf)
+        class(fitpack_grid_surface), intent(in) :: this
+        integer(FP_SIZE), intent(in) :: nux, nuy
+        integer(FP_FLAG), optional, intent(out) :: ierr
+        type(fitpack_grid_surface) :: dsurf
+
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: nx, ny, newkx, newky, newnx, newny, nc_old, nc_new
+        real(FP_REAL), allocatable :: newc(:)
+
+        nx = this%knots(1)
+        ny = this%knots(2)
+        nc_old = (nx - this%order(1) - 1) * (ny - this%order(2) - 1)
+
+        allocate(newc(nc_old))
+
+        call pardtc(this%t(:,1), nx, this%t(:,2), ny, &
+                    this%c, this%order(1), this%order(2), &
+                    nux, nuy, newc, ier)
+
+        if (FITPACK_SUCCESS(ier)) then
+            newkx  = this%order(1) - nux
+            newky  = this%order(2) - nuy
+            newnx  = nx - 2*nux
+            newny  = ny - 2*nuy
+            nc_new = (newnx - newkx - 1) * (newny - newky - 1)
+
+            dsurf%order  = [newkx, newky]
+            dsurf%knots  = [newnx, newny]
+            dsurf%nmax   = max(newnx, newny)
+            dsurf%nest   = dsurf%nmax
+
+            allocate(dsurf%t(dsurf%nmax, 2), source=zero)
+            dsurf%t(1:newnx, 1) = this%t(1+nux:nx-nux, 1)
+            dsurf%t(1:newny, 2) = this%t(1+nuy:ny-nuy, 2)
+
+            allocate(dsurf%c(nc_new), source=newc(1:nc_new))
+
+            dsurf%left  = [dsurf%t(newkx+1, 1), dsurf%t(newky+1, 2)]
+            dsurf%right = [dsurf%t(newnx-newkx, 1), dsurf%t(newny-newky, 2)]
+
+            ! Allocate evaluation workspace (bispev needs lwrk >= mx*(kx+1)+my*(ky+1), kwrk >= mx+my)
+            dsurf%lwrk  = newnx*(newkx+1) + newny*(newky+1) + nc_new
+            dsurf%liwrk = newnx + newny
+            allocate(dsurf%wrk(dsurf%lwrk), source=zero)
+            allocate(dsurf%iwrk(dsurf%liwrk), source=0_FP_SIZE)
+        end if
+
+        call fitpack_error_handling(ier, ierr, 'grid surface derivative spline')
+
+    end function gridsurf_derivative_spline
+
 
     ! =================================================================================================
     ! PARALLEL COMMUNICATION
