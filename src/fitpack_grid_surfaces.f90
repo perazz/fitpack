@@ -17,6 +17,15 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate surface fitting to data on a rectangular grid.
+!!
+!! Provides fitpack_grid_surface, a derived type for fitting tensor-product B-spline
+!! surfaces \f$ z = s(x, y) \f$ to data values given on a rectangular grid
+!! \f$ (x_i, y_j) \f$. The underlying core routine is regrid, which exploits the
+!! grid structure for faster fitting than surfit. Supports evaluation, partial
+!! derivatives, integration, cross-section extraction, and derivative-spline computation.
+!!
+!! @see Dierckx, Ch. 5, §5.4 (pp. 98–103); regrid, bispev, parder, pardeu, dblint, profil
 module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
                             IOPT_NEW_LEASTSQUARES,bispev,fitpack_error_handling,get_smoothing,regrid, &
@@ -30,7 +39,14 @@ module fitpack_grid_surfaces
 
     public :: fitpack_grid_surface
 
-    !> A public type describing a surface fitter z = s(x,y) to gridded x,y data
+    !> @brief Bivariate surface fitter \f$ z = s(x, y) \f$ for gridded data.
+    !!
+    !! Stores grid vectors \f$ x_i \f$ (\f$ i = 1, \ldots, m_x \f$) and
+    !! \f$ y_j \f$ (\f$ j = 1, \ldots, m_y \f$) together with gridded function values
+    !! \f$ z(j, i) \f$, the fitted tensor-product B-spline representation, and the fitting
+    !! state. Uses regrid, which is significantly more efficient than surfit for gridded input.
+    !!
+    !! @see Dierckx, Ch. 5, §5.4 (pp. 98–103)
     type, extends(fitpack_fitter) :: fitpack_grid_surface
 
         !> The data points

@@ -17,6 +17,11 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief Abstract base module for all FITPACK OOP fitters.
+!!
+!! Defines fitpack_fitter, the abstract base type from which all curve and surface
+!! fitters inherit. Provides shared state (smoothing factor, residuals, workspaces)
+!! and the deferred communication interface for parallel serialization.
 module fitpack_fitters
     use fitpack_core
     implicit none
@@ -24,8 +29,11 @@ module fitpack_fitters
 
     public :: fitpack_fitter
 
-    !> Abstract base type for all fitpack OOP fitters.
-    !> Contains the shared fitting state fields and communication helpers.
+    !> @brief Abstract base type for all FITPACK OOP fitters.
+    !!
+    !! Stores the common fitting state: computation mode (`iopt`), smoothing parameter,
+    !! weighted sum of squared residuals (`fp`), B-spline coefficients, and workspaces.
+    !! Subtypes extend this with domain-specific data (knots, data points, etc.).
     type, abstract :: fitpack_fitter
 
         !> Fitting state flag

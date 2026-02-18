@@ -17,6 +17,17 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate spline fitting on the sphere to gridded data.
+!!
+!! Provides fitpack_grid_sphere, a derived type for fitting bicubic splines to data given
+!! on a latitude-longitude grid over the sphere. The colatitude grid
+!! \f$ u_i \in [0, \pi] \f$ (\f$ i = 1, \ldots, m_u \f$) and the \f$ 2\pi \f$-periodic
+!! longitude grid \f$ v_j \f$ (\f$ j = 1, \ldots, m_v \f$) define the sampling.
+!! Boundary conditions at the north (\f$ u = 0 \f$) and south (\f$ u = \pi \f$) poles
+!! can be configured for function value, exactness, continuity order, and gradient
+!! vanishing. Uses the spgrid core routine.
+!!
+!! @see Dierckx, Ch. 11, §11.2 (pp. 263–269); spgrid
 module fitpack_gridded_sphere
     use fitpack_core
     use fitpack_fitters
@@ -25,10 +36,14 @@ module fitpack_gridded_sphere
 
     public :: fitpack_grid_sphere
 
-    !> A public type describing a sphere fitter z = s(u,v) to GRIDDED sphere data,
-    !> on the latitude-longitude grid (u(i),v(j)), i=1,...,mu ; j=1,...,mv , spgrid determines a smooth
-    !> u = latitude, 0<=u<=pi,
-    !> v = 2*pi-periodic longitude, vb<=v<=ve (vb = v(1), ve=vb+2*pi).
+    !> @brief Bicubic spline fitter for data on a latitude-longitude grid.
+    !!
+    !! Stores the colatitude grid \f$ u_i \f$, the \f$ 2\pi \f$-periodic longitude grid
+    !! \f$ v_j \f$, gridded function values \f$ z(j, i) \f$, and the fitted B-spline
+    !! representation. North and south pole boundary conditions (function value,
+    !! continuity order, gradient vanishing) are independently configurable.
+    !!
+    !! @see Dierckx, Ch. 11, §11.2 (pp. 263–269)
     type, extends(fitpack_fitter) :: fitpack_grid_sphere
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size

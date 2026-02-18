@@ -17,6 +17,19 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate spline fitting on scattered polar domains.
+!!
+!! Provides fitpack_polar, a derived type for fitting bicubic splines to data scattered
+!! over a general polar domain \f$ x^2 + y^2 \leq r(\theta)^2 \f$, where \f$ r(\theta) \f$
+!! is a user-supplied boundary function. The Cartesian coordinates are transformed to
+!! normalized polar coordinates:
+!! \f[
+!!     x = u \, r(v) \cos v, \quad y = u \, r(v) \sin v, \quad 0 \leq u \leq 1, \; -\pi \leq v \leq \pi
+!! \f]
+!! and a bicubic spline \f$ s(u, v) \f$ is fitted with appropriate continuity constraints
+!! at the origin.
+!!
+!! @see Dierckx, Ch. 11, §11.1 (pp. 255–263); polar
 module fitpack_polar_domains
     use fitpack_core
     use fitpack_fitters
@@ -25,16 +38,15 @@ module fitpack_polar_domains
 
     public :: fitpack_polar
 
-    !> A public type describing a polar fitter z = f(x,y) to scattered polar data,
-    !> which is arbitrarily scattered over the polar domain x**2+y**2 <= rad(atan(y/x))**2
-    !> through the transform:  x = u*rad(v)*cos(v),
-    !>                         y = u*rad(v)*sin(v)
-    !> the approximation problem is reduced to the determination of a bi-cubic spline s(u,v) fitting a
-    !> corresponding set of data points (u(i),v(i),z(i)) on the rectangle 0<=u<=1,-pi<=v<=pi.
-
-    !> rad is an external real function defining the boundary of the approximation domain, i.e
-    !>          x = rad(v)*cos(v) , y = rad(v)*sin(v), -pi <= v <= pi.
-    !> It can be a sphere or anything else.
+    !> @brief Bicubic spline fitter for data scattered over a general polar domain.
+    !!
+    !! Stores the scattered Cartesian data \f$ (x_i, y_i, z_i) \f$, the user-supplied
+    !! boundary function \f$ r(\theta) \f$, optional weights, and the fitted B-spline
+    !! representation. The smoothing parameter controls the trade-off between closeness
+    !! of fit and smoothness, while continuity at the origin (\f$ u = 0 \f$) is enforced
+    !! up to order \f$ C^0 \f$, \f$ C^1 \f$, or \f$ C^2 \f$.
+    !!
+    !! @see Dierckx, Ch. 11, §11.1 (pp. 255–263)
     type, extends(fitpack_fitter) :: fitpack_polar
 
         !> Scattered data points

@@ -17,6 +17,19 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief Umbrella module that re-exports the complete FITPACK public API.
+!!
+!! Use this single module to access all FITPACK derived types, kind parameters,
+!! error flags, fitting-mode constants, boundary-behavior flags, and named constants.
+!! Individual domain modules (fitpack_curves, fitpack_surfaces, etc.) can also be
+!! imported directly for finer-grained dependency control.
+!!
+!! @par Example
+!! @code{.f90}
+!!   use fitpack, only: fitpack_curve, FP_REAL, FITPACK_OK
+!!   type(fitpack_curve) :: spl
+!!   spl = fitpack_curve(x, y, ierr=ierr)
+!! @endcode
 module fitpack
    use fitpack_core
    use fitpack_fitters

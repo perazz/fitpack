@@ -17,6 +17,15 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for parametric surface fitting in \f$ \mathbb{R}^d \f$.
+!!
+!! Provides fitpack_parametric_surface, a derived type for fitting bicubic parametric
+!! tensor-product spline surfaces through gridded data in \f$ d \f$-dimensional space.
+!! The surface maps parameter pairs \f$ (u, v) \f$ to points
+!! \f$ \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) \f$, with optional periodicity
+!! in either or both parameter directions.
+!!
+!! @see Dierckx, Ch. 10, §10.2 (pp. 241–254); parsur, surev
 module fitpack_parametric_surfaces
     use fitpack_core
     use fitpack_fitters
@@ -25,8 +34,15 @@ module fitpack_parametric_surfaces
 
     public :: fitpack_parametric_surface
 
-    !> A public type describing a bicubic parametric surface fitter defined by points z(j,i,:) in the
-    !> idim-dimensional space, organized on a grid of strictly increasing parameter values u(i), v(j)
+    !> @brief Bicubic parametric surface fitter in \f$ \mathbb{R}^d \f$.
+    !!
+    !! Fits a tensor-product bicubic spline surface
+    !! \f$ \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) \f$ through data points
+    !! \f$ \mathbf{z}(j, i) \in \mathbb{R}^d \f$ given on a rectangular parameter grid
+    !! \f$ (u_i, v_j) \f$. Each dimension \f$ u \f$ and \f$ v \f$ may be flagged as
+    !! periodic. Uses the parsur core routine.
+    !!
+    !! @see Dierckx, Ch. 10, §10.2 (pp. 241–254)
     type, extends(fitpack_fitter) :: fitpack_parametric_surface
 
         !> Number of dimensions

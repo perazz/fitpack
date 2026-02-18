@@ -17,6 +17,14 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate surface fitting to scattered data.
+!!
+!! Provides fitpack_surface, a derived type for fitting tensor-product B-spline surfaces
+!! \f$ z = s(x, y) \f$ to scattered \f$ (x_i, y_i, z_i) \f$ data. The underlying core
+!! routine is surfit, which uses automatic knot placement with a smoothing parameter.
+!! Supports evaluation, partial derivatives, integration, and cross-section extraction.
+!!
+!! @see Dierckx, Ch. 5, §5.3 (pp. 85–98); surfit, bispev, parder, dblint, profil
 module fitpack_surfaces
     use fitpack_core
     use fitpack_fitters
@@ -26,7 +34,14 @@ module fitpack_surfaces
 
     public :: fitpack_surface
 
-    !> A public type describing a bivariate surface fitter z = s(x,y) to scattered x,y data
+    !> @brief Bivariate surface fitter \f$ z = s(x, y) \f$ for scattered data.
+    !!
+    !! Stores the input data points \f$ (x_i, y_i, z_i) \f$, optional weights \f$ w_i \f$,
+    !! the fitted tensor-product B-spline representation (knots and coefficients), and the
+    !! fitting state. The smoothing parameter \f$ s \f$ controls the trade-off between
+    !! closeness of fit and smoothness.
+    !!
+    !! @see Dierckx, Ch. 5, §5.3 (pp. 85–98)
     type, extends(fitpack_fitter) :: fitpack_surface
 
         !> The input data points
