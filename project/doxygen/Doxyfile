@@ -119,10 +119,21 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = "../../src/"
 INPUT                 += "../../doc/mainpage.md"
-INPUT                 += "../../doc/tutorial_curves.md"
-INPUT                 += "../../doc/tutorial_surfaces.md"
-INPUT                 += "../../doc/tutorial_special.md"
 INPUT                 += "../../doc/book_reference.md"
+# Theory pages
+INPUT                 += "../../doc/theory_bsplines.md"
+INPUT                 += "../../doc/theory_curve_fitting.md"
+INPUT                 += "../../doc/theory_surface_fitting.md"
+INPUT                 += "../../doc/theory_special_domains.md"
+# Tutorial pages
+INPUT                 += "../../doc/tutorial_curve.md"
+INPUT                 += "../../doc/tutorial_periodic_curve.md"
+INPUT                 += "../../doc/tutorial_parametric_curves.md"
+INPUT                 += "../../doc/tutorial_convex_curve.md"
+INPUT                 += "../../doc/tutorial_surface.md"
+INPUT                 += "../../doc/tutorial_grid_surface.md"
+INPUT                 += "../../doc/tutorial_polar.md"
+INPUT                 += "../../doc/tutorial_sphere.md"
 
 INPUT_ENCODING         = UTF-8
 
@@ -144,7 +155,7 @@ EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       =
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             =
+IMAGE_PATH             = "../../doc/media"
 INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = NO

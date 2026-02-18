@@ -76,14 +76,50 @@ fpm build          # build the library
 fpm test           # run all tests
 ```
 
+## Spline Theory
+
+- @ref theory_bsplines &mdash; B-spline basis functions, de Boor evaluation, derivatives, integration, knot insertion
+- @ref theory_curve_fitting &mdash; Smoothing criterion, adaptive knot placement, periodic and parametric curves
+- @ref theory_surface_fitting &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency
+- @ref theory_special_domains &mdash; Polar coordinate transform, spherical coordinates, pole boundary conditions
+
 ## Tutorials
 
-- @ref tutorial_curves — Smoothing, interpolation, derivatives, roots, periodic and parametric curves
-- @ref tutorial_surfaces — Scattered and gridded surface fitting, cross-sections, integration
-- @ref tutorial_special — Polar and spherical domains, pole boundary conditions
-- @ref book_reference — Quick-reference table mapping routines to book chapters and equations
+### Curves
+
+- @ref tutorial_curve &mdash; Univariate smoothing and interpolation with `fitpack_curve`
+- @ref tutorial_periodic_curve &mdash; Periodic splines with `fitpack_periodic_curve`
+- @ref tutorial_parametric_curves &mdash; Parametric, closed, and constrained curves
+- @ref tutorial_convex_curve &mdash; Shape-preserving fitting with convexity constraints
+
+### Surfaces
+
+- @ref tutorial_surface &mdash; Scattered bivariate data with `fitpack_surface`
+- @ref tutorial_grid_surface &mdash; Gridded data and parametric surfaces
+
+### Special Domains
+
+- @ref tutorial_polar &mdash; Disc-shaped domains with `fitpack_polar` and `fitpack_grid_polar`
+- @ref tutorial_sphere &mdash; Spherical data with `fitpack_sphere` and `fitpack_grid_sphere`
+
+## Examples
+
+Compilable example programs are in the `examples/` directory. Build and run with:
+
+```bash
+fpm run --example example_curve
+fpm run --example example_periodic_curve
+fpm run --example example_parametric_curves
+fpm run --example example_convex_curve
+fpm run --example example_surface
+fpm run --example example_grid_surface
+fpm run --example example_polar
+fpm run --example example_sphere
+```
 
 ## Reference
+
+- @ref book_reference &mdash; Quick-reference table mapping routines to book chapters and equations
 
 The algorithms are described in:
 

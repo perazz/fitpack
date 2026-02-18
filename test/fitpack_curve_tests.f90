@@ -459,7 +459,7 @@ module fitpack_curve_tests
           dfdx(3) = -dfdx(1)
 
           ! error
-          if (abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))>one) then
+          if (.not.(abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))<=one)) then
              print 1, xrand(i),yeval,dfdx(0)
              return
           end if
@@ -475,7 +475,7 @@ module fitpack_curve_tests
              end if
 
              ! Check error
-             if (abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))>one) then
+             if (.not.(abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))<=one)) then
                 print 3, order,xrand(i),yprime,dfdx(order)
                 return
              end if
@@ -488,7 +488,7 @@ module fitpack_curve_tests
        eint = cos(pi/3)-cos(two*pi)
 
        ! Check error
-       if (abs(eint-fint)*rewt(RTOL,ATOL,eint)>one) then
+       if (.not.(abs(eint-fint)*rewt(RTOL,ATOL,eint)<=one)) then
           print 4, pi/3,two*pi,fint,eint
           success = .false.
           return
@@ -574,7 +574,7 @@ module fitpack_curve_tests
           dfdx(3) = +sin(xrand(i)) - 8*cos(2*xrand(i))
 
           ! error
-          if (abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))>one) then
+          if (.not.(abs(yeval-dfdx(0))*rewt(RTOL,ATOL,dfdx(0))<=one)) then
              print 1, xrand(i),yeval,dfdx(0)
              return
           end if
@@ -590,7 +590,7 @@ module fitpack_curve_tests
              end if
 
              ! Check error
-             if (abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))>one) then
+             if (.not.(abs(yprime-dfdx(order))*rewt(RTOL,ATOL,dfdx(order))<=one)) then
                 print 3, order,xrand(i),yprime,dfdx(order)
                 return
              end if
@@ -603,7 +603,7 @@ module fitpack_curve_tests
        eint = intgl(3*pi)-intgl(half*pi)
 
        ! Check error
-       if (abs(eint-fint)*rewt(RTOL,ATOL,eint)>one) then
+       if (.not.(abs(eint-fint)*rewt(RTOL,ATOL,eint)<=one)) then
           print 4, pi/3,two*pi,fint,eint
           return
        end if
