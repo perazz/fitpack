@@ -145,10 +145,10 @@ Smoothing Parameter</h1>
 \]
 </p>
 <ul>
-<li>** \( s = 0 \)**: Interpolation — the spline passes through every data point. Use <code>curveinterpolate()</code> or set <code>smoothing=0</code>.</li>
+<li>** \( s = 0 \)**: Interpolation — the spline passes through every data point. Use <code>curve\interpolate()</code> or set <code>smoothing=0</code>.</li>
 <li>**Small \( s \)**: Close to the data but may oscillate.</li>
 <li>**Large \( s \)**: Very smooth but may miss data features.</li>
-<li><b>Default</b>: The constructor uses \( s = 1000 \); call <code>curvefit(smoothing=s)</code> to adjust.</li>
+<li><b>Default</b>: The constructor uses \( s = 1000 \); call <code>curve\fit(smoothing=s)</code> to adjust.</li>
 </ul>
 <p>A practical starting point is \( s = m \) (the number of data points) when weights are unity, since the expected sum of squared residuals for a good fit is \( \mathcal{O}(m) \).</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2.4 (pp. 78&ndash;84)</dd></dl>
@@ -159,13 +159,13 @@ Fitting Modes</h1>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Method   </th><th class="markdownTableHeadNone">Call   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Automatic knots   </td><td class="markdownTableBodyNone"><code>curvefit(smoothing=s)</code>   </td><td class="markdownTableBodyNone">Knots chosen to satisfy the smoothing constraint    </td></tr>
+<td class="markdownTableBodyNone">Automatic knots   </td><td class="markdownTableBodyNone"><code>curve\fit(smoothing=s)</code>   </td><td class="markdownTableBodyNone">Knots chosen to satisfy the smoothing constraint    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curveinterpolate()</code>   </td><td class="markdownTableBodyNone">Passes through all data points ( \( s = 0 \))    </td></tr>
+<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curve\interpolate()</code>   </td><td class="markdownTableBodyNone">Passes through all data points ( \( s = 0 \))    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Least-squares   </td><td class="markdownTableBodyNone"><code>curveleast_squares(knots)</code>   </td><td class="markdownTableBodyNone">User-supplied knots, no smoothing constraint   </td></tr>
+<td class="markdownTableBodyNone">Least-squares   </td><td class="markdownTableBodyNone"><code>curve\least_squares(knots)</code>   </td><td class="markdownTableBodyNone">User-supplied knots, no smoothing constraint   </td></tr>
 </table>
-<p>After any fit, <code>curvemse()</code> returns the weighted sum of squared residuals \( f_p \).</p>
+<p>After any fit, <code>curve\mse()</code> returns the weighted sum of squared residuals \( f_p \).</p>
 <h1><a class="anchor" id="autotoc_md11"></a>
 Spline Degree</h1>
 <p>The default spline degree is \( k = 3 \) (cubic). Degrees 1 through 5 are supported. Set the degree at construction:</p>
