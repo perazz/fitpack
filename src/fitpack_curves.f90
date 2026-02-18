@@ -239,7 +239,9 @@ module fitpack_curves
         allocate(this%iwrk(nest),this%t(nest),this%c(nest))
 
         ! Setup working space.
-        lwrk = (m*(MAX_K+1)+nest*(7+3*MAX_K))
+        ! percur needs m*(k+1)+nest*(8+5*k), curfit needs m*(k+1)+nest*(7+3*k).
+        ! Use the larger (percur) formula to support both periodic and non-periodic curves.
+        lwrk = (m*(MAX_K+1)+nest*(8+5*MAX_K))
         allocate(this%wrk(lwrk),source=0.0_FP_REAL)
         allocate(this%wrk_fou(nest,2))
 

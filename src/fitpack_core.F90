@@ -5652,6 +5652,12 @@ module fitpack_core
           ! Phase 1: rotate h1 through a1 with shifting, cross-rotating h2/a2
           do j = j1_start, j1_end
               piv = h1(1)
+              if (equal(piv, zero)) then
+                  ! Zero pivot: shift h1 left without rotation
+                  h1(1:band1-1) = h1(2:band1)
+                  h1(band1) = zero
+                  cycle
+              end if
               call fpgivs(piv, a1(j,1), cos, sin)
               call fprota(cos, sin, xi, z(j, 1:idim))
               call fprota(cos, sin, h2(1:band2), a2(j, 1:band2))
@@ -5667,6 +5673,7 @@ module fitpack_core
               ij = j1_end + j
               if (ij <= 0) cycle
               piv = h2(j)
+              if (equal(piv, zero)) cycle
               call fpgivs(piv, a2(ij,j), cos, sin)
               call fprota(cos, sin, xi, z(ij, 1:idim))
               if (j < band2) then
@@ -5711,6 +5718,12 @@ module fitpack_core
           ! Phase 1: rotate h1 through a1 with shifting, cross-rotating h2/a2
           do j = j1_start, j1_end
               piv = h1(1)
+              if (equal(piv, zero)) then
+                  ! Zero pivot: shift h1 left without rotation
+                  h1(1:band1-1) = h1(2:band1)
+                  h1(band1) = zero
+                  cycle
+              end if
               call fpgivs(piv, a1(j,1), cos, sin)
               call fprota(cos, sin, yi, z(j))
               call fprota(cos, sin, h2(1:band2), a2(j, 1:band2))
@@ -5726,6 +5739,7 @@ module fitpack_core
               ij = j1_end + j
               if (ij <= 0) cycle
               piv = h2(j)
+              if (equal(piv, zero)) cycle
               call fpgivs(piv, a2(ij,j), cos, sin)
               call fprota(cos, sin, yi, z(ij))
               if (j < band2) then
@@ -18543,7 +18557,7 @@ module fitpack_core
       if (.not.(xb<xe .and. yb<ye))              return
       if (any(w<=zero))                          return
       if (any(x<xb .or. x>xe))                   return
-      if (any(y<xb .or. y>xe))                   return
+      if (any(y<yb .or. y>ye))                   return
 
       if (iopt>=0) then
 
