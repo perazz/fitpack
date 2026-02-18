@@ -41,10 +41,10 @@ subject to:
 \f]
 
 - **\f$ s = 0 \f$**: Interpolation — the spline passes through every data point.
-  Use `curve%interpolate()` or set `smoothing=0`.
+  Use `curve\%interpolate()` or set `smoothing=0`.
 - **Small \f$ s \f$**: Close to the data but may oscillate.
 - **Large \f$ s \f$**: Very smooth but may miss data features.
-- **Default**: The constructor uses \f$ s = 1000 \f$; call `curve%fit(smoothing=s)`
+- **Default**: The constructor uses \f$ s = 1000 \f$; call `curve\%fit(smoothing=s)`
   to adjust.
 
 A practical starting point is \f$ s = m \f$ (the number of data points) when weights
@@ -59,11 +59,11 @@ FITPACK offers three fitting strategies:
 
 | Method | Call | Description |
 |--------|------|-------------|
-| Automatic knots | `curve%fit(smoothing=s)` | Knots chosen to satisfy the smoothing constraint |
-| Interpolation | `curve%interpolate()` | Passes through all data points (\f$ s = 0 \f$) |
-| Least-squares | `curve%least_squares(knots)` | User-supplied knots, no smoothing constraint |
+| Automatic knots | `curve\%fit(smoothing=s)` | Knots chosen to satisfy the smoothing constraint |
+| Interpolation | `curve\%interpolate()` | Passes through all data points (\f$ s = 0 \f$) |
+| Least-squares | `curve\%least_squares(knots)` | User-supplied knots, no smoothing constraint |
 
-After any fit, `curve%mse()` returns the weighted sum of squared residuals \f$ f_p \f$.
+After any fit, `curve\%mse()` returns the weighted sum of squared residuals \f$ f_p \f$.
 
 ## Spline Degree
 
