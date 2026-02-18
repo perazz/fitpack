@@ -19,3 +19,43 @@ include-dir = "include"
 
 [install]
 library = true
+
+[[example]]
+name = "example_curve"
+source-dir = "examples"
+main = "example_curve.f90"
+
+[[example]]
+name = "example_periodic_curve"
+source-dir = "examples"
+main = "example_periodic_curve.f90"
+
+[[example]]
+name = "example_parametric_curves"
+source-dir = "examples"
+main = "example_parametric_curves.f90"
+
+[[example]]
+name = "example_convex_curve"
+source-dir = "examples"
+main = "example_convex_curve.f90"
+
+[[example]]
+name = "example_surface"
+source-dir = "examples"
+main = "example_surface.f90"
+
+[[example]]
+name = "example_grid_surface"
+source-dir = "examples"
+main = "example_grid_surface.f90"
+
+[[example]]
+name = "example_polar"
+source-dir = "examples"
+main = "example_polar.f90"
+
+[[example]]
+name = "example_sphere"
+source-dir = "examples"
+main = "example_sphere.f90"
