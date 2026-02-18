@@ -76,6 +76,13 @@ fpm build          # build the library
 fpm test           # run all tests
 ```
 
+## Tutorials
+
+- @ref tutorial_curves — Smoothing, interpolation, derivatives, roots, periodic and parametric curves
+- @ref tutorial_surfaces — Scattered and gridded surface fitting, cross-sections, integration
+- @ref tutorial_special — Polar and spherical domains, pole boundary conditions
+- @ref book_reference — Quick-reference table mapping routines to book chapters and equations
+
 ## Reference
 
 The algorithms are described in:
