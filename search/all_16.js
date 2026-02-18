@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['v_0',['v',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#a9e77575cfb3d428b084e55339a03a503',1,'fitpack_convex_curves::fitpack_convex_curve::v'],['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58',1,'fitpack_gridded_polar::fitpack_grid_polar::v'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a4fe393cc86c03b57f34c9293381b15e3',1,'fitpack_gridded_sphere::fitpack_grid_sphere::v'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#ae5262257079d70de879caaa77b0c9c0c',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::v'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ae32ec17690b07ae050038749ad932638',1,'fitpack_polar_domains::fitpack_polar::v']]],
+  ['vs_20gridded_20data_1',['Scattered vs Gridded Data',['../tutorial_surfaces.html#autotoc_md18',1,'']]]
+];

@@ -1,0 +1,7 @@
+<map id="fitpack_core::fp_rotate_shifted_vec" name="fitpack_core::fp_rotate_shifted_vec">
+<area shape="rect" id="Node000001" title="Rotate a smoothing&#45;matrix row into a band matrix with vector RHS." alt="" coords="5,23,173,63"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="221,5,371,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,30,207,26,208,31,174,36"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="222,55,370,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,50,209,55,208,60,173,56"/>
+</map>

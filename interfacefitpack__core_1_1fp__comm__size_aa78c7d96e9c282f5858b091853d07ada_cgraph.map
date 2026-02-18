@@ -1,0 +1,8 @@
+<map id="fitpack_core::fp_comm_size::fp_size_comm_size_1d" name="fitpack_core::fp_comm_size::fp_size_comm_size_1d">
+<area shape="rect" id="Node000001" title="Calculate storage size for 1D integer(FP_SIZE) allocatable array." alt="" coords="5,61,219,101"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a7d6e951acad3110eb2c3dfb6e5215d8b" title="Number of FP_COMM elements required to store nbits of data." alt="" coords="267,29,449,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,65,252,60,253,66,219,70"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a42f7e37a6f95520f7112ed4437414499" title="Calculate storage size for 1D integer(FP_SIZE) allocatable array." alt="" coords="281,93,435,133"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="219,93,267,99,267,104,219,98"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="312,30,310,20,317,10,333,5,358,3,387,6,402,13,400,18,385,11,358,8,334,10,320,15,315,21,317,28"/>
+</map>

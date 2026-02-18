@@ -1,0 +1,6 @@
+<map id="fitpack_closed_curves_c::fitpack_closed_curve_c_degree" name="fitpack_closed_curves_c::fitpack_closed_curve_c_degree">
+<area shape="rect" id="Node000001" title="Get spline degree." alt="" coords="5,29,185,84"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="51,29,51,19,59,10,74,5,95,3,121,6,136,14,133,18,119,11,95,8,75,10,62,15,56,21,56,29"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__closed__curves__c.html#a3ff276587e3889b8b353b9280fcae943" title="Get pointer to embedded Fortran object." alt="" coords="233,29,413,84"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="186,54,220,54,220,59,186,59"/>
+</map>

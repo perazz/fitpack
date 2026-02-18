@@ -1,0 +1,6 @@
+<map id="fitpack_closed_curves_c::fitpack_closed_curve_c_mse" name="fitpack_closed_curves_c::fitpack_closed_curve_c_mse">
+<area shape="rect" id="Node000001" title="Get MSE." alt="" coords="5,29,235,69"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="73,30,71,20,78,10,95,5,120,3,149,6,165,13,163,18,148,11,120,8,96,10,81,15,76,21,78,28"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__closed__curves__c.html#a3ff276587e3889b8b353b9280fcae943" title="Get pointer to embedded Fortran object." alt="" coords="283,22,463,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,47,269,47,269,52,235,52"/>
+</map>

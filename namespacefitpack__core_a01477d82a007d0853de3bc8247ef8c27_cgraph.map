@@ -1,0 +1,15 @@
+<map id="fitpack_core::parder" name="fitpack_core::parder">
+<area shape="rect" id="Node000001" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid." alt="" coords="5,42,156,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a72432bc4ebc7c5ff0425d188147d7dbb" title="Evaluate a tensor product spline on a grid." alt="" coords="204,42,353,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,52,190,52,190,57,156,57"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="401,5,560,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="353,41,388,36,388,41,354,46"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="406,70,555,95"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="354,62,393,68,392,73,353,68"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="608,70,781,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="556,80,594,80,594,85,556,85"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="661,72,654,62,657,52,671,46,695,43,723,47,735,56,731,60,721,52,695,49,673,51,661,55,659,61,665,68"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="829,70,975,95"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="782,80,816,80,816,85,782,85"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="868,72,861,62,865,52,879,46,902,43,931,47,942,56,939,60,928,52,902,49,880,51,869,55,866,61,872,68"/>
+</map>

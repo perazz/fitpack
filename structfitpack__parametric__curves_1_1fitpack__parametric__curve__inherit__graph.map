@@ -1,0 +1,9 @@
+<map id="fitpack_parametric_curves::fitpack_parametric_curve" name="fitpack_parametric_curves::fitpack_parametric_curve">
+<area shape="rect" id="Node000001" title="Open parametric curve fitter in ." alt="" coords="216,37,461,77"/>
+<area shape="rect" id="Node000003" href="$structfitpack__parametric__curves_1_1fitpack__closed__curve.html" title="Closed (periodic) parametric curve fitter." alt="" coords="527,5,743,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="475,40,526,34,527,40,475,45"/>
+<area shape="rect" id="Node000004" href="$structfitpack__parametric__curves_1_1fitpack__constrained__curve.html" title="Parametric curve fitter with derivative constraints at the endpoints." alt="" coords="509,69,760,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="475,69,509,73,509,78,475,75"/>
+<area shape="rect" id="Node000002" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="5,37,168,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,55,216,55,216,60,182,60"/>
+</map>

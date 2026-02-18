@@ -1,0 +1,13 @@
+<map id="fitpack_core::fpsuev" name="fitpack_core::fpsuev">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,159,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="207,5,365,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,41,193,36,193,41,159,46"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="211,70,361,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,63,198,68,197,73,159,68"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="413,70,587,95"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="361,80,400,80,400,85,361,85"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="466,72,459,62,463,52,477,46,500,43,529,47,540,56,537,60,526,52,500,49,478,51,467,55,464,61,470,68"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="635,70,780,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="587,80,621,80,621,85,587,85"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="674,72,666,62,670,52,684,46,707,43,736,47,747,56,744,60,734,52,707,49,685,51,674,55,672,61,678,68"/>
+</map>

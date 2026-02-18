@@ -1,0 +1,16 @@
+<map id="fitpack_core::fitpack_quicksort" name="fitpack_core::fitpack_quicksort">
+<area shape="rect" id="Node000001" title="In&#45;place quicksort with optional index tracking." alt="" coords="5,95,159,135"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="48,96,46,86,51,77,64,71,82,69,103,72,115,79,112,83,101,77,82,74,65,76,55,81,51,87,53,94"/>
+<area shape="rect" id="Node000002" href="$fitpack__core_8_f90.html#a6e2d25f0c47b08f7fced619525b1a825" title=" " alt="" coords="207,103,316,128"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="159,113,193,113,193,118,159,118"/>
+<area shape="poly" id="edge9_Node000002_Node000002" title=" " alt="" coords="232,104,225,94,229,85,241,78,261,76,286,80,296,88,293,92,284,84,261,81,242,83,233,88,231,94,236,101"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="376,29,521,55"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="285,100,363,64,384,56,386,61,365,68,287,105"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ab9e559a7491e780d631b07d895b4ff98" title="Test &#160;(strict greater&#45;than)." alt="" coords="370,103,527,128"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="316,113,356,113,356,118,316,118"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a69c35a8032dd7dfa0b593ce00610d36f" title="Test &#160;(strict less&#45;than)." alt="" coords="364,176,533,201"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="296,126,403,168,401,173,294,131"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="418,31,411,21,415,11,427,5,449,3,474,6,485,15,482,19,472,11,449,8,429,10,419,15,416,20,422,28"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="418,104,411,94,415,84,427,78,449,76,474,80,485,88,482,92,472,84,449,81,429,83,419,88,416,94,422,101"/>
+<area shape="poly" id="edge8_Node000005_Node000005" title=" " alt="" coords="418,177,411,168,415,158,427,152,449,149,474,153,485,162,482,166,472,158,449,155,429,157,419,161,416,167,422,174"/>
+</map>

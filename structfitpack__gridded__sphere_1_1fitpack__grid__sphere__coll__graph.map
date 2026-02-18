@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_sphere::fitpack_grid_sphere" name="fitpack_gridded_sphere::fitpack_grid_sphere">
+<area shape="rect" id="Node000001" title="Bicubic spline fitter for data on a latitude&#45;longitude grid." alt="" coords="5,93,179,133"/>
+<area shape="rect" id="Node000002" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="11,5,173,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,59,95,93,89,93,89,59"/>
+</map>

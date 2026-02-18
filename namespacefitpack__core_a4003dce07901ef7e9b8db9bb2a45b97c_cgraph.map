@@ -1,0 +1,28 @@
+<map id="fitpack_core::fpcoco" name="fitpack_core::fpcoco">
+<area shape="rect" id="Node000001" title="Fit a convexity&#45;constrained cubic smoothing spline." alt="" coords="5,121,157,146"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="835,67,980,93"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,119,141,81,171,62,204,46,293,20,385,6,478,3,569,8,655,18,733,32,853,61,852,66,732,37,654,23,569,13,478,8,386,12,294,25,206,51,174,66,144,86,98,123"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="205,84,359,124"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="157,120,191,115,192,120,158,125"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a896928a4fbb29c241426ae61e5f2e69c" title="Core algorithm for convexity&#45;constrained cubic spline fitting." alt="" coords="206,149,358,174"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="158,141,193,146,192,152,157,147"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="613,161,787,186"/>
+<area shape="poly" id="edge15_Node000001_Node000009" title=" " alt="" coords="103,144,154,175,227,215,315,254,407,283,452,293,487,298,522,295,564,283,599,266,630,243,678,195,682,199,634,247,602,270,566,288,523,300,487,303,451,298,406,288,313,259,225,220,151,180,101,149"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="874,69,866,59,870,49,884,43,907,41,936,45,947,54,944,58,934,49,907,46,885,48,874,53,872,58,878,66"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="244,84,242,74,248,65,262,60,282,57,306,60,318,68,316,72,304,65,282,63,263,65,251,69,247,75,249,83"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="407,35,565,75"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="331,146,357,134,372,122,381,110,390,98,405,85,414,79,417,84,408,89,394,101,385,113,375,126,360,138,333,151"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a9bcbf8cf99bfb2ac2f3834891c731be7" title="Add a branch to the constraint&#45;set binary tree." alt="" coords="409,99,563,125"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="335,146,419,125,420,131,336,151"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="411,149,561,174"/>
+<area shape="poly" id="edge9_Node000004_Node000008" title=" " alt="" coords="358,159,398,159,398,164,358,164"/>
+<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#ad5d82ac791ec6ae19e9b4671ffb734e0" title="Prune short branches from the constraint&#45;set binary tree." alt="" coords="409,198,563,223"/>
+<area shape="poly" id="edge13_Node000004_Node000010" title=" " alt="" coords="336,172,420,192,419,197,335,177"/>
+<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#a535f9e04981c794c70a60f728e918472" title="Fetch and advance to the next branch in the constraint&#45;set tree." alt="" coords="409,247,563,273"/>
+<area shape="poly" id="edge14_Node000004_Node000011" title=" " alt="" coords="303,172,349,202,408,234,425,241,423,245,406,239,347,207,300,177"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a8006d449287383c5f5c4151086e9a376" title="Collect free nodes from the constraint&#45;set binary tree." alt="" coords="626,87,774,113"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="563,105,612,102,612,108,564,110"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="561,163,600,165,600,171,561,168"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="728,158,864,96,866,101,730,163"/>
+<area shape="poly" id="edge12_Node000009_Node000009" title=" " alt="" coords="666,162,659,152,663,143,677,136,700,134,729,138,740,147,737,151,726,143,700,139,678,141,667,146,664,152,670,159"/>
+</map>

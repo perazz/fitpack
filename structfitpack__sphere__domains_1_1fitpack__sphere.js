@@ -1,0 +1,28 @@
+var structfitpack__sphere__domains_1_1fitpack__sphere =
+[
+    [ "comm_expand", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a9fd98b35dd2d5b6f845a11d0e2357706", null ],
+    [ "comm_pack", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a29f94adee47c017591dd8fafd8758b84", null ],
+    [ "comm_size", "structfitpack__sphere__domains_1_1fitpack__sphere.html#ac30ed3b1aab1d4fe10f17a4474b8ede7", null ],
+    [ "destroy", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a41a3773f761671c41a092607e4109ce4", null ],
+    [ "eval", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a894fa524ad6a7637dfcb696de146c1e4", null ],
+    [ "eval", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a894fa524ad6a7637dfcb696de146c1e4", null ],
+    [ "fit", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a03c783615fecf32f1614eea82166fa96", null ],
+    [ "interpolate", "structfitpack__sphere__domains_1_1fitpack__sphere.html#aea8694a69e137febeb1aff4a4c8af304", null ],
+    [ "least_squares", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a2d498d8466493a418ca276428e6955a0", null ],
+    [ "new_fit", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a60cd95b418d267ab706cc48a7c331d69", null ],
+    [ "new_points", "structfitpack__sphere__domains_1_1fitpack__sphere.html#afe5fff6b8f275b4690a290a9683e8bf6", null ],
+    [ "sphere_eval_many", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a1e3a5f9aa8b7385c81e6ef7b845887b3", null ],
+    [ "sphere_eval_one", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a4a200609f1d85a419ed746a9e931aec6", null ],
+    [ "sphere_new_from_points", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a51e3917456873b8765df36dfadb82c54", null ],
+    [ "knots", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a4d90d6677a804b50854e12069cc1a595", null ],
+    [ "lwrk2", "structfitpack__sphere__domains_1_1fitpack__sphere.html#aec6b32d51ae4ebe7cde0181bee59d7ce", null ],
+    [ "m", "structfitpack__sphere__domains_1_1fitpack__sphere.html#aa768337fec1418a5589d96008da80700", null ],
+    [ "nest", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a41bf2e8a837e987d9408ef4160e612c9", null ],
+    [ "nmax", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a169e8c827d2e1b61ca7416464a946417", null ],
+    [ "phi", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a561042bb0adbb68ad5b528f0d841dd3a", null ],
+    [ "r", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a0a81b797c165dc2c28bc3005f225f906", null ],
+    [ "t", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a7788accceb58102e964479e788328b77", null ],
+    [ "theta", "structfitpack__sphere__domains_1_1fitpack__sphere.html#aa8dba44b26f9b4c94e4e4d1118925b06", null ],
+    [ "w", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a0d3cfa0bffb61db28df9f034c0f24203", null ],
+    [ "wrk2", "structfitpack__sphere__domains_1_1fitpack__sphere.html#a82c37c5b1d86ef30d0f80ab73564bcc3", null ]
+];

@@ -1,0 +1,13 @@
+<map id="fitpack_core::fpbisp" name="fitpack_core::fpbisp">
+<area shape="rect" id="Node000001" title="Evaluate a tensor product spline on a grid." alt="" coords="5,42,155,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="203,5,361,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,41,189,36,190,41,155,46"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="207,70,357,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,62,194,68,194,73,155,68"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="409,70,583,95"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="357,80,396,80,396,85,357,85"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="462,72,455,62,459,52,473,46,496,43,525,47,536,56,533,60,522,52,496,49,474,51,463,55,460,61,466,68"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="631,70,776,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="583,80,617,80,617,85,583,85"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="670,72,662,62,666,52,680,46,703,43,732,47,743,56,740,60,730,52,703,49,681,51,670,55,668,61,674,68"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="fitpack_core::sproot" name="fitpack_core::sproot">
+<area shape="rect" id="Node000001" title="Find the zeros of a cubic spline &#160;given in B&#45;spline representation." alt="" coords="5,109,156,135"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="575,29,720,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,107,147,84,203,63,298,46,394,37,484,34,561,35,561,40,484,39,394,42,299,51,205,69,149,89,104,112"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a91926262dc58e19b1b4345d9696c90db" title="In&#45;place quicksort with optional index tracking." alt="" coords="204,102,357,142"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="156,119,190,119,190,125,156,125"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aef57b5a3a930e0c3aa2eeb311b571aa6" title="Find the real zeros of a cubic polynomial." alt="" coords="205,167,356,192"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="127,132,223,160,222,165,125,137"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="616,31,610,21,613,11,626,5,647,3,673,6,684,15,680,19,671,11,647,8,628,10,617,15,615,20,621,28"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="247,102,245,92,250,83,262,77,281,75,302,78,313,86,310,90,300,83,281,81,264,83,254,87,250,93,252,101"/>
+<area shape="rect" id="Node000004" href="$fitpack__core_8_f90.html#a6e2d25f0c47b08f7fced619525b1a825" title=" " alt="" coords="405,107,515,132"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="357,118,391,118,391,123,357,124"/>
+<area shape="poly" id="edge6_Node000004_Node000002" title=" " alt="" coords="484,104,562,68,591,57,592,62,564,72,487,109"/>
+<area shape="poly" id="edge11_Node000004_Node000004" title=" " alt="" coords="430,108,424,98,427,89,440,82,460,80,485,84,495,92,491,96,482,88,460,85,441,87,431,92,429,98,435,105"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab9e559a7491e780d631b07d895b4ff98" title="Test &#160;(strict greater&#45;than)." alt="" coords="569,105,726,131"/>
+<area shape="poly" id="edge7_Node000004_Node000005" title=" " alt="" coords="515,116,555,116,555,121,515,122"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a69c35a8032dd7dfa0b593ce00610d36f" title="Test &#160;(strict less&#45;than)." alt="" coords="563,179,732,204"/>
+<area shape="poly" id="edge9_Node000004_Node000006" title=" " alt="" coords="495,130,602,171,600,176,493,135"/>
+<area shape="poly" id="edge8_Node000005_Node000005" title=" " alt="" coords="616,107,610,97,613,87,626,81,647,79,673,82,684,91,680,95,671,87,647,84,628,86,617,91,615,96,621,104"/>
+<area shape="poly" id="edge10_Node000006_Node000006" title=" " alt="" coords="616,180,610,170,613,160,626,154,647,152,673,156,684,164,680,168,671,160,647,157,628,159,617,164,615,170,621,177"/>
+</map>
