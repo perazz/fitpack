@@ -2363,8 +2363,33 @@ module fitpack_core
       return
       end subroutine fpadpo
 
-      !  function fpback calculates the solution of the system of equations a*c = z with
-      !  a a n x n upper triangular matrix of bandwidth k.
+      !> @brief Solve an upper triangular banded system by back-substitution.
+      !!
+      !! Computes the B-spline coefficients \f$ c \f$ by solving the triangular system:
+      !!
+      !! \f[
+      !!     R_1 \, c = z_1
+      !!     \tag{4.14}
+      !! \f]
+      !!
+      !! where \f$ R_1 \f$ is an \f$ n \times n \f$ upper triangular matrix with
+      !! bandwidth \f$ k \f$, obtained from the QR factorization of the observation
+      !! matrix \f$ E \f$.
+      !!
+      !! ### Matrix structure
+      !!
+      !! \f$ R_1 \f$ is stored as `a(nest, k)` where `a(i,1)` holds the diagonal
+      !! element \f$ r_{i,i} \f$ and `a(i,j)` for \f$ j > 1 \f$ holds \f$ r_{i,i+j-1} \f$.
+      !!
+      !! @param[in] a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
+      !! @param[in] z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
+      !! @param[in] n     Number of equations (= number of B-spline coefficients)
+      !! @param[in] k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
+      !! @param[in] nest  Leading dimension of array `a`
+      !!
+      !! @return Solution vector \f$ c \f$ of length \f$ n \f$
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.14
       pure function fpback(a,z,n,k,nest) result(c)
 
       !  ..scalar arguments..
@@ -2397,12 +2422,35 @@ module fitpack_core
 
       end function fpback
 
-      !  function fpbacp calculates the solution of the system of equations g * c = z
-      !  with g  a n x n upper triangular matrix of the form
-      !            ! a '   !
-      !        g = !   ' b !
-      !            ! 0 '   !
-      !  with b a n x k matrix and a a (n-k) x (n-k) upper triangular matrix of bandwidth k1.
+      !> @brief Solve a bordered upper triangular system by back-substitution.
+      !!
+      !! Computes the solution \f$ c \f$ of the system \f$ G \, c = z \f$ where
+      !! \f$ G \f$ is an \f$ n \times n \f$ upper triangular matrix of the form:
+      !!
+      !! \f[
+      !!     G = \begin{pmatrix} A & \cdot \\ 0 & B \end{pmatrix}
+      !!     \tag{6.6}
+      !! \f]
+      !!
+      !! with \f$ A \f$ an \f$ (n-k) \times (n-k) \f$ upper triangular band matrix
+      !! of bandwidth \f$ k_1 \f$, and \f$ B \f$ an \f$ n \times k \f$ dense matrix
+      !! accounting for the periodic boundary conditions.
+      !!
+      !! This arises in periodic spline fitting where the periodic B-splines
+      !! \f$ \tilde{N}_{i,k+1} \f$ wrap around the domain, coupling the first
+      !! and last \f$ k \f$ coefficients.
+      !!
+      !! @param[in] a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
+      !! @param[in] b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
+      !! @param[in] z     Right-hand side vector of length \f$ n \f$
+      !! @param[in] n     Number of equations
+      !! @param[in] k     Number of periodic coupling columns
+      !! @param[in] k1    Bandwidth of the triangular part \f$ A \f$
+      !! @param[in] nest  Leading dimension of arrays `a` and `b`
+      !!
+      !! @return Solution vector \f$ c \f$ of length \f$ n \f$
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.6
       pure function fpbacp(a,b,z,n,k,k1,nest) result(c)
 
       !  ..scalar arguments..
@@ -2645,6 +2693,44 @@ module fitpack_core
       end subroutine fpbfou
 
 
+      !> @brief Evaluate a tensor product spline on a grid.
+      !!
+      !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
+      !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
+      !! \f$ (x_i, y_j) \f$, \f$ i = 1, \ldots, m_x \f$, \f$ j = 1, \ldots, m_y \f$.
+      !!
+      !! The evaluation uses the two-step algorithm: first compute the B-spline
+      !! basis values in each direction, then assemble:
+      !!
+      !! \f[
+      !!     s(x, y) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j, k_y+1}(y) \right)
+      !!               N_{i, k_x+1}(x)
+      !!     \tag{2.14-2.15}
+      !! \f]
+      !!
+      !! The B-spline values and knot interval indices are stored in workspace
+      !! arrays `wx`, `wy`, `lx`, `ly` for reuse.
+      !!
+      !! @param[in]  tx    Knot vector in \f$ x \f$, length `nx`
+      !! @param[in]  nx    Number of knots in \f$ x \f$
+      !! @param[in]  ty    Knot vector in \f$ y \f$, length `ny`
+      !! @param[in]  ny    Number of knots in \f$ y \f$
+      !! @param[in]  c     B-spline coefficients \f$ c_{i,j} \f$, length
+      !!                   \f$ (n_x - k_x - 1)(n_y - k_y - 1) \f$
+      !! @param[in]  kx    Spline degree in \f$ x \f$
+      !! @param[in]  ky    Spline degree in \f$ y \f$
+      !! @param[in]  x     Evaluation points in \f$ x \f$, length `mx`
+      !! @param[in]  mx    Number of evaluation points in \f$ x \f$
+      !! @param[in]  y     Evaluation points in \f$ y \f$, length `my`
+      !! @param[in]  my    Number of evaluation points in \f$ y \f$
+      !! @param[out] z     Spline values at grid points, length `mx * my`,
+      !!                   stored in row-major order: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
+      !! @param[out] wx    B-spline basis values in \f$ x \f$, `wx(mx, kx+1)`
+      !! @param[out] wy    B-spline basis values in \f$ y \f$, `wy(my, ky+1)`
+      !! @param[out] lx    Knot interval indices in \f$ x \f$, length `mx`
+      !! @param[out] ly    Knot interval indices in \f$ y \f$, length `my`
+      !!
+      !! @see Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
       pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
 
       !  ..scalar arguments..
@@ -2713,11 +2799,38 @@ module fitpack_core
       end subroutine fpbisp
 
 
-      !  function fpbspl evaluates the (k+1) non-zero b-splines of degree k at t(l) <= x < t(l+1) using
-      !  the stable recurrence relation of de boor and cox.
-      !  Travis Oliphant 2007 changed so that weighting of 0 is used when knots with multiplicity are present.
-      !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
-      !   Thus it is imperative that that k <= l <= n-k but this is not checked.
+      !> @brief Evaluate the non-zero B-splines at a given point.
+      !!
+      !! Computes the \f$ k+1 \f$ non-zero B-splines of degree \f$ k \f$ at the point
+      !! \f$ x \f$ satisfying \f$ \lambda_l \leq x < \lambda_{l+1} \f$, using the
+      !! stable recurrence relation of de Boor and Cox:
+      !!
+      !! \f[
+      !!     N_{i,1}(x) = \begin{cases} 1 & \text{if } \lambda_i \leq x < \lambda_{i+1} \\
+      !!                                 0 & \text{otherwise} \end{cases}
+      !! \f]
+      !! \f[
+      !!     N_{i,l+1}(x) = \frac{x - \lambda_i}{\lambda_{i+l} - \lambda_i} N_{i,l}(x)
+      !!                   + \frac{\lambda_{i+l+1} - x}{\lambda_{i+l+1} - \lambda_{i+1}} N_{i+1,l}(x)
+      !!     \tag{1.24}
+      !! \f]
+      !!
+      !! The result array `h` contains \f$ N_{l-k,k+1}(x), \ldots, N_{l,k+1}(x) \f$
+      !! in positions `h(1:k+1)`. When knots have multiplicity (coincident knots),
+      !! zero weights are used in the recurrence (convention \f$ 0/0 = 0 \f$).
+      !!
+      !! @param[in] t  Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n  Length of the knot vector
+      !! @param[in] k  Spline degree
+      !! @param[in] x  Evaluation point, must satisfy \f$ \lambda_l \leq x < \lambda_{l+1} \f$
+      !! @param[in] l  Knot interval index, must satisfy \f$ k \leq l \leq n-k \f$
+      !!
+      !! @return Array of length `MAX_ORDER+1`; positions `1:k+1` contain the
+      !!         \f$ k+1 \f$ non-zero B-spline values.
+      !!
+      !! @note Requires \f$ k \leq l \leq n-k \f$; this is not checked.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3 (pp. 8-11), Eq. 1.22-1.24, 1.30
       pure function fpbspl(t,n,k,x,l) result(h)
          integer(FP_SIZE), intent(in)  :: n,k,l
          real(FP_REAL), intent(in)  :: x,t(n)
@@ -2797,10 +2910,37 @@ module fitpack_core
       end function fp_knot_interval
 
 
-      !  subroutine fpchec verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
-      !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
-      !  If all of the following conditions are fulfilled, the error parameter ier is set to zero. if one
-      !  of the conditions is violated, an error flag is returned.
+      !> @brief Verify knot positions against data points (Schoenberg-Whitney check).
+      !!
+      !! Checks that the knots \f$ \lambda_j \f$, \f$ j = 1, \ldots, n \f$, of a
+      !! spline of degree \f$ k \f$ satisfy all conditions required for a well-posed
+      !! least-squares problem with data points \f$ x_i \f$, \f$ i = 1, \ldots, m \f$.
+      !!
+      !! The conditions verified are:
+      !!
+      !! 1. \f$ k+1 \leq n-k-1 \leq m \f$
+      !! 2. \f$ \lambda_1 \leq \cdots \leq \lambda_{k+1} \f$ and
+      !!    \f$ \lambda_{n-k} \leq \cdots \leq \lambda_n \f$ (boundary knot monotonicity)
+      !! 3. \f$ \lambda_{k+2} < \lambda_{k+3} < \cdots < \lambda_{n-k} \f$ (interior knots
+      !!    strictly increasing)
+      !! 4. \f$ \lambda_{k+1} \leq x_1 \f$ and \f$ x_m \leq \lambda_{n-k} \f$
+      !! 5. The Schoenberg-Whitney conditions: there exists a subset of data points
+      !!    \f$ y_j \f$ such that
+      !!    \f[
+      !!        \lambda_j < y_j < \lambda_{j+k+1}, \quad j = 1, \ldots, n-k-1
+      !!        \tag{4.5}
+      !!    \f]
+      !!    guaranteeing full rank of the observation matrix.
+      !!
+      !! @param[in] x  Data abscissae, strictly increasing: \f$ x_1 < \cdots < x_m \f$
+      !! @param[in] m  Number of data points
+      !! @param[in] t  Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n  Number of knots
+      !! @param[in] k  Spline degree
+      !!
+      !! @return `FITPACK_OK` if all conditions hold, `FITPACK_INPUT_ERROR` otherwise.
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5, 4.17
       pure integer(FP_FLAG) function fpchec(x,m,t,n,k) result(ier)
          integer(FP_SIZE), intent(in)  :: m,n,k
          real(FP_REAL), intent(in) :: x(m),t(n)
@@ -5351,8 +5491,33 @@ module fitpack_core
       return
       end subroutine fpdeno
 
-      !  subroutine fpdisc calculates the discontinuity jumps of the kth
-      !  derivative of the b-splines of degree k at the knots t(k+2)..t(n-k-1)
+      !> @brief Compute the discontinuity jumps of the B-spline derivatives.
+      !!
+      !! Calculates the discontinuity jumps of the \f$ k \f$-th derivative of the
+      !! B-splines of degree \f$ k \f$ at the interior knots
+      !! \f$ \lambda_{k+2}, \ldots, \lambda_{n-k-1} \f$. These coefficients
+      !! \f$ a_{i,q} \f$ appear in the smoothness measure:
+      !!
+      !! \f[
+      !!     a_{i,q} = \frac{(-1)^{k+1} \, k! \, (\lambda_{i+k+1} - \lambda_i)}
+      !!     {\displaystyle\prod_{\substack{j=q-k \\ j \neq i}}^{q}
+      !!     (\lambda_{q+1} - \lambda_{j+1})}
+      !!     \tag{5.6}
+      !! \f]
+      !!
+      !! for \f$ q - k - 1 \leq i \leq q \f$, and zero otherwise. The output
+      !! matrix \f$ B \f$ stores these values for use in evaluating the smoothing
+      !! functional \f$ \sum_q [\sum_i c_i \, a_{i,q}]^2 \f$ (Eq. 5.5).
+      !!
+      !! @param[in]    t     Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in]    n     Length of the knot vector
+      !! @param[in]    k2    Spline order \f$ k + 1 \f$ (= degree + 1)
+      !! @param[out]   b     Discontinuity jump matrix, stored as `b(nest, k2)`.
+      !!                     Row \f$ q \f$ contains the \f$ k+1 \f$ non-zero jumps
+      !!                     at interior knot \f$ \lambda_{q+k+1} \f$.
+      !! @param[in]    nest  Leading dimension of array `b`
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5-5.6
       pure subroutine fpdisc(t,n,k2,b,nest)
 
       !  ..scalar arguments..
@@ -5496,7 +5661,30 @@ module fitpack_core
 
       end subroutine fpfrno
 
-      !  subroutine fpgivs calculates the parameters of a givens transformation .
+      !> @brief Compute parameters of a Givens plane rotation.
+      !!
+      !! Given a pivot element \f$ e_i \f$ and a diagonal element \f$ r_i \f$, computes
+      !! the cosine \f$ c \f$ and sine \f$ s \f$ of a Givens rotation that eliminates
+      !! \f$ e_i \f$:
+      !!
+      !! \f[
+      !!     r'_i = \sqrt{r_i^2 + e_i^2}, \quad
+      !!     c = \frac{r_i}{r'_i}, \quad
+      !!     s = \frac{e_i}{r'_i}
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! The rotation preserves orthogonality (\f$ c^2 + s^2 = 1 \f$) and is used
+      !! to triangularize the observation matrix \f$ E \f$ row by row during the
+      !! QR decomposition of the least-squares system.
+      !!
+      !! @param[in]     piv  Pivot element \f$ e_i \f$ to be eliminated
+      !! @param[in,out] ww   On entry, diagonal element \f$ r_i \f$.
+      !!                     On exit, updated value \f$ r'_i = \sqrt{r_i^2 + e_i^2} \f$.
+      !! @param[out]    cos  Cosine of rotation angle
+      !! @param[out]    sin  Sine of rotation angle
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
       elemental subroutine fpgivs(piv,ww,cos,sin)
           real(FP_REAL), intent(in)    :: piv
           real(FP_REAL), intent(inout) :: ww
@@ -8113,11 +8301,35 @@ module fitpack_core
       end subroutine fpopsp
 
 
-      !  subroutine fporde sorts the data points (x(i),y(i)),i=1,2,...,m according to the panel
-      !  tx(l)<=x<tx(l+1),ty(k)<=y<ty(k+1), they belong to. for each panel a stack is constructed
-      !  containing the numbers of data points lying inside; index(j),j=1,2,...,nreg points to the first
-      !  data point in the jth panel while nummer(i),i=1,2,...,m gives the number of the next data point
-      !  in the panel.
+      !> @brief Sort scattered data points into rectangular panels.
+      !!
+      !! Assigns each data point \f$ (x_i, y_i) \f$, \f$ i = 1, \ldots, m \f$, to
+      !! the rectangular panel \f$ R_{u,v} \f$ defined by
+      !! \f$ \lambda_u^x \leq x < \lambda_{u+1}^x \f$ and
+      !! \f$ \lambda_v^y \leq y < \lambda_{v+1}^y \f$.
+      !!
+      !! For each panel, a linked-list stack is built:
+      !! - `index(j)` points to the first data point in panel \f$ j \f$
+      !! - `nummer(i)` gives the next data point in the same panel
+      !!
+      !! This panel ordering enables efficient row-by-row construction of the
+      !! observation matrix, since only the \f$ (k_x+1)(k_y+1) \f$ B-splines
+      !! supported on a given panel contribute non-zero entries.
+      !!
+      !! @param[in]  x       Data abscissae, length `m`
+      !! @param[in]  y       Data ordinates, length `m`
+      !! @param[in]  m       Number of data points
+      !! @param[in]  kx      Spline degree in \f$ x \f$
+      !! @param[in]  ky      Spline degree in \f$ y \f$
+      !! @param[in]  tx      Knot vector in \f$ x \f$, length `nx`
+      !! @param[in]  nx      Number of knots in \f$ x \f$
+      !! @param[in]  ty      Knot vector in \f$ y \f$, length `ny`
+      !! @param[in]  ny      Number of knots in \f$ y \f$
+      !! @param[out] nummer  Linked-list next pointers, length `m`
+      !! @param[out] index   Panel head pointers, length `nreg`
+      !! @param[in]  nreg    Number of panels \f$ = (n_x - 2k_x - 1)(n_y - 2k_y - 1) \f$
+      !!
+      !! @see Dierckx, Ch. 9, §9.1 (pp. 147-150)
       pure subroutine fporde(x,y,m,kx,ky,tx,nx,ty,ny,nummer,index,nreg)
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: m,kx,ky,nx,ny,nreg
@@ -10968,8 +11180,41 @@ module fitpack_core
       end subroutine fprank
 
 
-      !  given three points (p1,f1),(p2,f2) and (p3,f3), function fprati  gives the value of p such
-      !  that the rational interpolating function of the form r(p) = (u*p+v)/(p+w) equals zero at p.
+      !> @brief Rational interpolation for the smoothing parameter search.
+      !!
+      !! Given three points \f$ (p_1, F_1) \f$, \f$ (p_2, F_2) \f$, \f$ (p_3, F_3) \f$
+      !! on the curve \f$ F(p) \f$, computes the zero of the rational interpolant:
+      !!
+      !! \f[
+      !!     R(p) = \frac{u \, p + v}{p + w}
+      !!     \tag{5.30}
+      !! \f]
+      !!
+      !! that passes through the three points. The zero \f$ \tilde{p} \f$ gives the
+      !! next estimate of the smoothing parameter \f$ p \f$ satisfying
+      !! \f$ F(p) = S \f$ during the iterative knot-placement strategy.
+      !!
+      !! When \f$ p_3 = \infty \f$ (indicated by `p3 <= 0`), the formula simplifies to:
+      !!
+      !! \f[
+      !!     \tilde{p} = \frac{p_1 (F_1 - F_3)(F_2 - S) - p_2 (F_2 - F_3)(F_1 - S)}
+      !!                      {(F_1 - F_2)(F_3 - S)}
+      !!     \tag{5.31}
+      !! \f]
+      !!
+      !! On exit, \f$ (p_1, F_1) \f$ and \f$ (p_3, F_3) \f$ are updated to bracket
+      !! the root: \f$ F_1 > 0 \f$ and \f$ F_3 < 0 \f$.
+      !!
+      !! @param[in,out] p1  First abscissa; updated to maintain \f$ F_1 > 0 \f$
+      !! @param[in,out] f1  First ordinate; updated with \f$ p_1 \f$
+      !! @param[in]     p2  Second abscissa (most recent iterate)
+      !! @param[in]     f2  Second ordinate \f$ F(p_2) - S \f$
+      !! @param[in,out] p3  Third abscissa; \f$ p_3 \leq 0 \f$ means \f$ p_3 = \infty \f$.
+      !!                    Updated to maintain \f$ F_3 < 0 \f$.
+      !! @param[in,out] f3  Third ordinate; updated with \f$ p_3 \f$
+      !! @param[out]    p   The new estimate \f$ \tilde{p} \f$
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.4 (pp. 83-86), Eq. 5.30-5.32
       elemental subroutine fprati(p1,f1,p2,f2,p3,f3,p)
       !  ..scalar arguments..
       real(FP_REAL), intent(inout) :: p1,f1,p3,f3
@@ -11398,7 +11643,27 @@ module fitpack_core
 
       end function new_knot_dimension
 
-      ! subroutine fprota applies a givens rotation to a and b.
+      !> @brief Apply a Givens plane rotation to two scalars.
+      !!
+      !! Given the cosine \f$ c \f$ and sine \f$ s \f$ of a Givens rotation (as
+      !! computed by fpgivs), transforms a pair of values \f$ (a, b) \f$:
+      !!
+      !! \f[
+      !!     a' = c \, a - s \, b, \qquad
+      !!     b' = s \, a + c \, b
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! This is used to propagate each Givens rotation through the remaining
+      !! columns of the observation matrix and the right-hand side vector
+      !! during QR factorization.
+      !!
+      !! @param[in]     cos  Cosine of the rotation angle
+      !! @param[in]     sin  Sine of the rotation angle
+      !! @param[in,out] a    First element; replaced by \f$ c \, a - s \, b \f$
+      !! @param[in,out] b    Second element; replaced by \f$ s \, a + c \, b \f$
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
       elemental subroutine fprota(cos,sin,a,b)
 
           !  ..scalar arguments..
