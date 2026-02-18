@@ -1,0 +1,43 @@
+# Deploy documentation to gh-pages
+name: Deploy Doxygen Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOXYGEN_VERSION: '1.13.2'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install graphviz -y
+
+      - name: Install Doxygen v${{ env.DOXYGEN_VERSION }}
+        run: |
+          transformed_version=$(echo "${{ env.DOXYGEN_VERSION }}" | tr '.' '_')
+          wget https://github.com/doxygen/doxygen/releases/download/Release_${transformed_version}/doxygen-${{ env.DOXYGEN_VERSION }}.linux.bin.tar.gz
+          tar -xzf doxygen-${{ env.DOXYGEN_VERSION }}.linux.bin.tar.gz
+          sudo mv doxygen-${{ env.DOXYGEN_VERSION }}/bin/doxygen /usr/local/bin/doxygen
+
+      - name: Generate Doxygen Documentation
+        run: cd project/doxygen && doxygen
+
+      - name: Create .nojekyll file
+        run: echo "" > ./project/doxygen/html/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./project/doxygen/html
