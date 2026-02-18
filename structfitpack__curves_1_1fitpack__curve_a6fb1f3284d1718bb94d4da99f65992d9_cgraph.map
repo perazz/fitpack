@@ -1,8 +1,0 @@
-<map id="fitpack_curves::fitpack_curve::dfdx" name="fitpack_curves::fitpack_curve::dfdx">
-<area shape="rect" id="Node000001" title="Evaluate derivative at given coordinates." alt="" coords="5,35,173,75"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__curves.html#a6b8995b3b8d6a21d541a77388c4e3917" title="Evaluate k&#45;th derivative of the curve at points x Use 1st derivative if order not present." alt="" coords="221,5,381,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,40,208,36,208,41,174,46"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__curves.html#a92411defec5d2f4a61058fee21581944" title="Evaluate k&#45;th derivative of the curve at points x Use 1st derivative if order not present." alt="" coords="429,35,589,75"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="174,54,221,55,381,55,416,54,416,60,381,60,221,60,174,59"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,34,416,39,415,44,381,39"/>
-</map>

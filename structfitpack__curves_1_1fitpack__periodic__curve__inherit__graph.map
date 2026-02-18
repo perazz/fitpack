@@ -1,7 +1,0 @@
-<map id="fitpack_curves::fitpack_periodic_curve" name="fitpack_curves::fitpack_periodic_curve">
-<area shape="rect" id="Node000001" title="Derived type describing a periodic curve. No changes are made to the storage, but the appropriate pac..." alt="" coords="5,181,173,221"/>
-<area shape="rect" id="Node000002" href="$structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve ." alt="" coords="5,93,173,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,147,92,181,87,181,87,147"/>
-<area shape="rect" id="Node000003" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="8,5,171,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="92,59,92,93,87,93,87,59"/>
-</map>

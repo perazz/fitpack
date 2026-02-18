@@ -1,9 +1,0 @@
-<map id="fitpack_core::insert_inplace" name="fitpack_core::insert_inplace">
-<area shape="rect" id="Node000001" title="Insert a single knot into a spline in place (avoiding aliasing issues)." alt="" coords="5,35,152,75"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a4a396967312954458c7a650aa76ea906" title="Insert a single knot into a spline, returning a new B&#45;spline representation." alt="" coords="200,42,347,67"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,52,186,52,186,57,152,57"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="395,5,553,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,41,381,36,382,42,347,47"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a3d51410017bf94f298da66b1d80fe524" title="Insert a single knot into a B&#45;spline representation." alt="" coords="401,70,547,95"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="347,62,387,68,387,73,346,67"/>
-</map>

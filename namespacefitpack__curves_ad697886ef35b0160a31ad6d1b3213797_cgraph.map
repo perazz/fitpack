@@ -1,5 +1,0 @@
-<map id="fitpack_curves::curve_insert_knot_one" name="fitpack_curves::curve_insert_knot_one">
-<area shape="rect" id="Node000001" title="Insert a single knot into the spline representation (in&#45;place)" alt="" coords="5,5,165,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__curves.html#a0b26792808063c7ee78d2666d04e690b" title="Grow t(:) and c(:) arrays when nest is too small." alt="" coords="213,5,369,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,23,199,23,199,28,166,28"/>
-</map>

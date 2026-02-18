@@ -1,6 +1,0 @@
-<map id="fitpack_core::fp_comm_pack::fp_bool_comm_pack_1d" name="fitpack_core::fp_comm_pack::fp_bool_comm_pack_1d">
-<area shape="rect" id="Node000001" title="Pack 1D logical(FP_BOOL) allocatable array into communication buffer." alt="" coords="5,29,231,69"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a7d6e951acad3110eb2c3dfb6e5215d8b" title="Number of FP_COMM elements required to store nbits of data." alt="" coords="279,29,461,69"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,47,265,47,265,52,231,52"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="323,30,321,20,328,10,345,5,370,3,399,6,415,13,413,18,398,11,370,8,346,10,331,15,326,21,328,28"/>
-</map>

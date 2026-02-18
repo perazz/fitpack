@@ -1,8 +1,0 @@
-<map id="fitpack_parametric_curves::concur_comm_expand" name="fitpack_parametric_curves::concur_comm_expand">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,53,176,108"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves.html#a396be947c834a3f2f0eace9bd0f47cf3" title=" " alt="" coords="241,5,410,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,61,227,50,228,55,177,66"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves.html#a27cc5949043793919847bec44b813caf" title=" " alt="" coords="224,109,427,149"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,96,215,103,213,109,176,101"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="282,109,279,99,286,90,302,84,325,82,353,85,368,92,365,97,351,90,325,87,303,89,289,94,284,100,287,108"/>
-</map>

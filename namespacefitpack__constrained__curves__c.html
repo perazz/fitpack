@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: fitpack_constrained_curves_c Module Reference</title>
+<title>My Project: fitpack_constrained_curves_c Module Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -129,28 +121,35 @@ Data Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
-<tr class="memitem:a2c58bbfb916ea4597716ed3e52781acc" id="r_a2c58bbfb916ea4597716ed3e52781acc"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c58bbfb916ea4597716ed3e52781acc">fitpack_constrained_curve_c_get_pointer</a> (this, fptr)</td></tr>
-<tr class="memdesc:a2c58bbfb916ea4597716ed3e52781acc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointer to embedded Fortran object.  <br /></td></tr>
+<tr class="memitem:a2c58bbfb916ea4597716ed3e52781acc" id="r_a2c58bbfb916ea4597716ed3e52781acc"><td class="memItemLeft" align="right" valign="top"><a id="a2c58bbfb916ea4597716ed3e52781acc" name="a2c58bbfb916ea4597716ed3e52781acc"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_get_pointer</b> (this, fptr)</td></tr>
+<tr class="memdesc:a2c58bbfb916ea4597716ed3e52781acc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointer to embedded Fortran object. <br /></td></tr>
 <tr class="separator:a2c58bbfb916ea4597716ed3e52781acc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add888f3454c41a3da62cb08d01dea859" id="r_add888f3454c41a3da62cb08d01dea859"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add888f3454c41a3da62cb08d01dea859">fitpack_constrained_curve_c_pointer</a> (this, fthis)</td></tr>
-<tr class="memdesc:add888f3454c41a3da62cb08d01dea859"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get embedded Fortran object; allocate it if not done yet.  <br /></td></tr>
+<tr class="memitem:add888f3454c41a3da62cb08d01dea859" id="r_add888f3454c41a3da62cb08d01dea859"><td class="memItemLeft" align="right" valign="top"><a id="add888f3454c41a3da62cb08d01dea859" name="add888f3454c41a3da62cb08d01dea859"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_pointer</b> (this, fthis)</td></tr>
+<tr class="memdesc:add888f3454c41a3da62cb08d01dea859"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get embedded Fortran object; allocate it if not done yet. <br /></td></tr>
 <tr class="separator:add888f3454c41a3da62cb08d01dea859"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4896412e15668ca563aebd714581b661" id="r_a4896412e15668ca563aebd714581b661"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4896412e15668ca563aebd714581b661">fitpack_constrained_curve_c_allocate</a> (this)</td></tr>
-<tr class="memdesc:a4896412e15668ca563aebd714581b661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate Fortran object.  <br /></td></tr>
+<tr class="memitem:a4896412e15668ca563aebd714581b661" id="r_a4896412e15668ca563aebd714581b661"><td class="memItemLeft" align="right" valign="top"><a id="a4896412e15668ca563aebd714581b661" name="a4896412e15668ca563aebd714581b661"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_allocate</b> (this)</td></tr>
+<tr class="memdesc:a4896412e15668ca563aebd714581b661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate Fortran object. <br /></td></tr>
 <tr class="separator:a4896412e15668ca563aebd714581b661"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af610d2fbf2fdb56cc4cc97eb5343d5bb" id="r_af610d2fbf2fdb56cc4cc97eb5343d5bb"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af610d2fbf2fdb56cc4cc97eb5343d5bb">fitpack_constrained_curve_c_destroy</a> (this)</td></tr>
-<tr class="memdesc:af610d2fbf2fdb56cc4cc97eb5343d5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deallocate Fortran object.  <br /></td></tr>
+<tr class="memitem:af610d2fbf2fdb56cc4cc97eb5343d5bb" id="r_af610d2fbf2fdb56cc4cc97eb5343d5bb"><td class="memItemLeft" align="right" valign="top"><a id="af610d2fbf2fdb56cc4cc97eb5343d5bb" name="af610d2fbf2fdb56cc4cc97eb5343d5bb"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_destroy</b> (this)</td></tr>
+<tr class="memdesc:af610d2fbf2fdb56cc4cc97eb5343d5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deallocate Fortran object. <br /></td></tr>
 <tr class="separator:af610d2fbf2fdb56cc4cc97eb5343d5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33718c754080258b16da3094ca0a6d9d" id="r_a33718c754080258b16da3094ca0a6d9d"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33718c754080258b16da3094ca0a6d9d">fitpack_constrained_curve_c_copy</a> (this, that)</td></tr>
-<tr class="memdesc:a33718c754080258b16da3094ca0a6d9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy contents from another object.  <br /></td></tr>
+<tr class="memitem:a33718c754080258b16da3094ca0a6d9d" id="r_a33718c754080258b16da3094ca0a6d9d"><td class="memItemLeft" align="right" valign="top"><a id="a33718c754080258b16da3094ca0a6d9d" name="a33718c754080258b16da3094ca0a6d9d"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_copy</b> (this, that)</td></tr>
+<tr class="memdesc:a33718c754080258b16da3094ca0a6d9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy contents from another object. <br /></td></tr>
 <tr class="separator:a33718c754080258b16da3094ca0a6d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7732913081269b8b65695584ee345d13" id="r_a7732913081269b8b65695584ee345d13"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7732913081269b8b65695584ee345d13">fitpack_constrained_curve_c_move_alloc</a> (to, from)</td></tr>
-<tr class="memdesc:a7732913081269b8b65695584ee345d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move allocation from one object to another.  <br /></td></tr>
+<tr class="memitem:a7732913081269b8b65695584ee345d13" id="r_a7732913081269b8b65695584ee345d13"><td class="memItemLeft" align="right" valign="top"><a id="a7732913081269b8b65695584ee345d13" name="a7732913081269b8b65695584ee345d13"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_move_alloc</b> (to, from)</td></tr>
+<tr class="memdesc:a7732913081269b8b65695584ee345d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move allocation from one object to another. <br /></td></tr>
 <tr class="separator:a7732913081269b8b65695584ee345d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07094b3c2b2931731d974fe2b438b392" id="r_a07094b3c2b2931731d974fe2b438b392"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07094b3c2b2931731d974fe2b438b392">fitpack_constrained_curve_c_new_points</a> (this, ndim, npts, x, y, w)</td></tr>
 <tr class="memdesc:a07094b3c2b2931731d974fe2b438b392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper to new_points.  <br /></td></tr>
 <tr class="separator:a07094b3c2b2931731d974fe2b438b392"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43780a18b516fd7b7ed7471cf61d642a" id="r_a43780a18b516fd7b7ed7471cf61d642a"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43780a18b516fd7b7ed7471cf61d642a">fitpack_constrained_curve_c_set_default_parameters</a> (this)</td></tr>
+<tr class="memitem:a43780a18b516fd7b7ed7471cf61d642a" id="r_a43780a18b516fd7b7ed7471cf61d642a"><td class="memItemLeft" align="right" valign="top"><a id="a43780a18b516fd7b7ed7471cf61d642a" name="a43780a18b516fd7b7ed7471cf61d642a"></a>
+subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_set_default_parameters</b> (this)</td></tr>
 <tr class="separator:a43780a18b516fd7b7ed7471cf61d642a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a187147954c0d8ee78a033516a52918df" id="r_a187147954c0d8ee78a033516a52918df"><td class="memItemLeft" align="right" valign="top">integer(fp_flag) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a187147954c0d8ee78a033516a52918df">fitpack_constrained_curve_c_new_fit</a> (this, ndim, npts, x, u, w, smoothing, order)</td></tr>
 <tr class="memdesc:a187147954c0d8ee78a033516a52918df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper to new_fit.  <br /></td></tr>
@@ -185,17 +184,12 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:ab77b09c7d2eef60175ce97a72ca44a4d" id="r_ab77b09c7d2eef60175ce97a72ca44a4d"><td class="memItemLeft" align="right" valign="top">integer(fp_size) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab77b09c7d2eef60175ce97a72ca44a4d">fitpack_constrained_curve_c_degree</a> (this)</td></tr>
 <tr class="memdesc:ab77b09c7d2eef60175ce97a72ca44a4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get spline degree.  <br /></td></tr>
 <tr class="separator:ab77b09c7d2eef60175ce97a72ca44a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c384fc9b6e21f0980dbdf0ada1a699c" id="r_a4c384fc9b6e21f0980dbdf0ada1a699c"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c384fc9b6e21f0980dbdf0ada1a699c">fitpack_constrained_curve_c_clean_constraints</a> (this)</td></tr>
-<tr class="memdesc:a4c384fc9b6e21f0980dbdf0ada1a699c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset constraints.  <br /></td></tr>
-<tr class="separator:a4c384fc9b6e21f0980dbdf0ada1a699c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dfa6ecb21affdfb619d853f5d033a73" id="r_a9dfa6ecb21affdfb619d853f5d033a73"><td class="memItemLeft" align="right" valign="top">integer(fp_flag) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9dfa6ecb21affdfb619d853f5d033a73">fitpack_constrained_curve_c_set_constraints</a> (this, nbegin, nend, ddx_begin, ddx_end)</td></tr>
-<tr class="memdesc:a9dfa6ecb21affdfb619d853f5d033a73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set constraints <em>and reset all previous ones</em>: a missing "ddx_end" means: no endpoint constraints Begin/end point constraints: (1:idim,0)=function; (1:idim,i)=i-th derivative.  <br /></td></tr>
-<tr class="separator:a9dfa6ecb21affdfb619d853f5d033a73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ad5db55c552cd054f1f7ada7deef03574" id="r_ad5db55c552cd054f1f7ada7deef03574"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5db55c552cd054f1f7ada7deef03574">fitpack_constrained_curve_c_null</a> = <a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>(cptr=c_null_ptr)</td></tr>
-<tr class="memdesc:ad5db55c552cd054f1f7ada7deef03574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Null-initialized object.  <br /></td></tr>
+<tr class="memitem:ad5db55c552cd054f1f7ada7deef03574" id="r_ad5db55c552cd054f1f7ada7deef03574"><td class="memItemLeft" align="right" valign="top"><a id="ad5db55c552cd054f1f7ada7deef03574" name="ad5db55c552cd054f1f7ada7deef03574"></a>
+type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><b>fitpack_constrained_curve_c_null</b> = <a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>(cptr=c_null_ptr)</td></tr>
+<tr class="memdesc:ad5db55c552cd054f1f7ada7deef03574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Null-initialized object. <br /></td></tr>
 <tr class="separator:ad5db55c552cd054f1f7ada7deef03574"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -203,114 +197,6 @@ Variables</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>Federico Perini <a href="#" onclick="location.href='mai'+'lto:'+'fed'+'er'+'ico'+'.p'+'eri'+'ni'+'@gm'+'ai'+'l.c'+'om'; return false;">feder<span class="obfuscator">.nosp@m.</span>ico.<span class="obfuscator">.nosp@m.</span>perin<span class="obfuscator">.nosp@m.</span>i@gm<span class="obfuscator">.nosp@m.</span>ail.c<span class="obfuscator">.nosp@m.</span>om</a> </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>01/07/2024 </dd></dl>
 </div><h2 class="groupheader">Function/Subroutine Documentation</h2>
-<a id="a4896412e15668ca563aebd714581b661" name="a4896412e15668ca563aebd714581b661"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4896412e15668ca563aebd714581b661">&#9670;&#160;</a></span>fitpack_constrained_curve_c_allocate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_allocate </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Instantiate Fortran object. </p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a4896412e15668ca563aebd714581b661_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a4896412e15668ca563aebd714581b661_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a4896412e15668ca563aebd714581b661_cgraph" id="anamespacefitpack__constrained__curves__c_a4896412e15668ca563aebd714581b661_cgraph">
-<area shape="rect" title="Instantiate Fortran object." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a4c384fc9b6e21f0980dbdf0ada1a699c" name="a4c384fc9b6e21f0980dbdf0ada1a699c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c384fc9b6e21f0980dbdf0ada1a699c">&#9670;&#160;</a></span>fitpack_constrained_curve_c_clean_constraints()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine fitpack_constrained_curves_c::fitpack_constrained_curve_c_clean_constraints </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reset constraints. </p>
-<p>Get object</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a4c384fc9b6e21f0980dbdf0ada1a699c_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a4c384fc9b6e21f0980dbdf0ada1a699c_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a4c384fc9b6e21f0980dbdf0ada1a699c_cgraph" id="anamespacefitpack__constrained__curves__c_a4c384fc9b6e21f0980dbdf0ada1a699c_cgraph">
-<area shape="rect" title="Reset constraints." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a33718c754080258b16da3094ca0a6d9d" name="a33718c754080258b16da3094ca0a6d9d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33718c754080258b16da3094ca0a6d9d">&#9670;&#160;</a></span>fitpack_constrained_curve_c_copy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_copy </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>that</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Copy contents from another object. </p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a33718c754080258b16da3094ca0a6d9d_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a33718c754080258b16da3094ca0a6d9d_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a33718c754080258b16da3094ca0a6d9d_cgraph" id="anamespacefitpack__constrained__curves__c_a33718c754080258b16da3094ca0a6d9d_cgraph">
-<area shape="rect" title="Copy contents from another object." alt="" coords="5,71,227,125"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#af610d2fbf2fdb56cc4cc97eb5343d5bb" title="Deallocate Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="226,69,260,60,262,65,228,74"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,71,765,125"/>
-<area shape="poly" title=" " alt="" coords="227,95,530,95,530,101,227,101"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,136,496,191"/>
-<area shape="poly" title=" " alt="" coords="228,122,262,131,260,136,226,127"/>
-<area shape="poly" title=" " alt="" coords="497,57,531,65,530,70,496,62"/>
-<area shape="poly" title=" " alt="" coords="496,134,530,126,531,131,497,139"/>
-</map>
-</div>
-
-</div>
-</div>
 <a id="ab77b09c7d2eef60175ce97a72ca44a4d" name="ab77b09c7d2eef60175ce97a72ca44a4d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab77b09c7d2eef60175ce97a72ca44a4d">&#9670;&#160;</a></span>fitpack_constrained_curve_c_degree()</h2>
 
@@ -328,17 +214,6 @@ Here is the call graph for this function:</div>
 
 <p>Get spline degree. </p>
 <p>Get object</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_ab77b09c7d2eef60175ce97a72ca44a4d_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_ab77b09c7d2eef60175ce97a72ca44a4d_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_ab77b09c7d2eef60175ce97a72ca44a4d_cgraph" id="anamespacefitpack__constrained__curves__c_ab77b09c7d2eef60175ce97a72ca44a4d_cgraph">
-<area shape="rect" title="Get spline degree." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -373,45 +248,6 @@ Here is the call graph for this function:</div>
 
 <p>Evaluate k-th derivative of the curve at point u. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_ace3ce6221ea21318255efc9afeee0694_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_ace3ce6221ea21318255efc9afeee0694_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_ace3ce6221ea21318255efc9afeee0694_cgraph" id="anamespacefitpack__constrained__curves__c_ace3ce6221ea21318255efc9afeee0694_cgraph">
-<area shape="rect" title="Evaluate k&#45;th derivative of the curve at point u." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="af610d2fbf2fdb56cc4cc97eb5343d5bb" name="af610d2fbf2fdb56cc4cc97eb5343d5bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af610d2fbf2fdb56cc4cc97eb5343d5bb">&#9670;&#160;</a></span>fitpack_constrained_curve_c_destroy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_destroy </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Deallocate Fortran object. </p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_af610d2fbf2fdb56cc4cc97eb5343d5bb_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_af610d2fbf2fdb56cc4cc97eb5343d5bb_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_af610d2fbf2fdb56cc4cc97eb5343d5bb_cgraph" id="anamespacefitpack__constrained__curves__c_af610d2fbf2fdb56cc4cc97eb5343d5bb_cgraph">
-<area shape="rect" title="Deallocate Fortran object." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -441,18 +277,6 @@ Here is the call graph for this function:</div>
 
 <p>Wrapper to curve_eval_one. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a0ffe8ba7fc296003644b3f8837245d23_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a0ffe8ba7fc296003644b3f8837245d23_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a0ffe8ba7fc296003644b3f8837245d23_cgraph" id="anamespacefitpack__constrained__curves__c_a0ffe8ba7fc296003644b3f8837245d23_cgraph">
-<area shape="rect" title="Wrapper to curve_eval_one." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -482,41 +306,6 @@ Here is the call graph for this function:</div>
 
 <p>Wrapper to curve_fit_automatic_knots. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a28748c09285d852c1b0e7b6663ef8c17_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a28748c09285d852c1b0e7b6663ef8c17_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a28748c09285d852c1b0e7b6663ef8c17_cgraph" id="anamespacefitpack__constrained__curves__c_a28748c09285d852c1b0e7b6663ef8c17_cgraph">
-<area shape="rect" title="Wrapper to curve_fit_automatic_knots." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a2c58bbfb916ea4597716ed3e52781acc" name="a2c58bbfb916ea4597716ed3e52781acc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c58bbfb916ea4597716ed3e52781acc">&#9670;&#160;</a></span>fitpack_constrained_curve_c_get_pointer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_get_pointer </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__constrained__curve.html">fitpack_constrained_curve</a>), intent(inout), pointer</td>          <td class="paramname"><span class="paramname"><em>fptr</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get pointer to embedded Fortran object. </p>
 
 </div>
 </div>
@@ -537,17 +326,6 @@ Here is the call graph for this function:</div>
 
 <p>Get dimensions. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a7b9392c8bf18d30e70a59fb9f1dbd993_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a7b9392c8bf18d30e70a59fb9f1dbd993_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a7b9392c8bf18d30e70a59fb9f1dbd993_cgraph" id="anamespacefitpack__constrained__curves__c_a7b9392c8bf18d30e70a59fb9f1dbd993_cgraph">
-<area shape="rect" title="Get dimensions." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -568,53 +346,6 @@ Here is the call graph for this function:</div>
 
 <p>Wrapper to interpolating_curve. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_acc29a5dea633192bbd86820347823d21_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_acc29a5dea633192bbd86820347823d21_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_acc29a5dea633192bbd86820347823d21_cgraph" id="anamespacefitpack__constrained__curves__c_acc29a5dea633192bbd86820347823d21_cgraph">
-<area shape="rect" title="Wrapper to interpolating_curve." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a7732913081269b8b65695584ee345d13" name="a7732913081269b8b65695584ee345d13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7732913081269b8b65695584ee345d13">&#9670;&#160;</a></span>fitpack_constrained_curve_c_move_alloc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_move_alloc </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>to</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>from</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Move allocation from one object to another. </p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a7732913081269b8b65695584ee345d13_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a7732913081269b8b65695584ee345d13_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a7732913081269b8b65695584ee345d13_cgraph" id="anamespacefitpack__constrained__curves__c_a7732913081269b8b65695584ee345d13_cgraph">
-<area shape="rect" title="Move allocation from one object to another." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#af610d2fbf2fdb56cc4cc97eb5343d5bb" title="Deallocate Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -635,17 +366,6 @@ Here is the call graph for this function:</div>
 
 <p>Get MSE. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_aedb18ae1f2fb8b9b8af66947398b4dd0_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_aedb18ae1f2fb8b9b8af66947398b4dd0_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_aedb18ae1f2fb8b9b8af66947398b4dd0_cgraph" id="anamespacefitpack__constrained__curves__c_aedb18ae1f2fb8b9b8af66947398b4dd0_cgraph">
-<area shape="rect" title="Get MSE." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -701,18 +421,6 @@ Here is the call graph for this function:</div>
 <p>Wrapper to new_fit. </p>
 <p>Local variables</p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a187147954c0d8ee78a033516a52918df_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a187147954c0d8ee78a033516a52918df_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a187147954c0d8ee78a033516a52918df_cgraph" id="anamespacefitpack__constrained__curves__c_a187147954c0d8ee78a033516a52918df_cgraph">
-<area shape="rect" title="Wrapper to new_fit." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -758,141 +466,6 @@ Here is the call graph for this function:</div>
 <p>Wrapper to new_points. </p>
 <p>Local variables</p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a07094b3c2b2931731d974fe2b438b392_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a07094b3c2b2931731d974fe2b438b392_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a07094b3c2b2931731d974fe2b438b392_cgraph" id="anamespacefitpack__constrained__curves__c_a07094b3c2b2931731d974fe2b438b392_cgraph">
-<area shape="rect" title="Wrapper to new_points." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="add888f3454c41a3da62cb08d01dea859" name="add888f3454c41a3da62cb08d01dea859"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add888f3454c41a3da62cb08d01dea859">&#9670;&#160;</a></span>fitpack_constrained_curve_c_pointer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_pointer </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__constrained__curve.html">fitpack_constrained_curve</a>), intent(inout), pointer</td>          <td class="paramname"><span class="paramname"><em>fthis</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get embedded Fortran object; allocate it if not done yet. </p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_add888f3454c41a3da62cb08d01dea859_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_add888f3454c41a3da62cb08d01dea859_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_add888f3454c41a3da62cb08d01dea859_cgraph" id="anamespacefitpack__constrained__curves__c_add888f3454c41a3da62cb08d01dea859_cgraph">
-<area shape="rect" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a9dfa6ecb21affdfb619d853f5d033a73" name="a9dfa6ecb21affdfb619d853f5d033a73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9dfa6ecb21affdfb619d853f5d033a73">&#9670;&#160;</a></span>fitpack_constrained_curve_c_set_constraints()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer(fp_flag) function fitpack_constrained_curves_c::fitpack_constrained_curve_c_set_constraints </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(fp_size), intent(in), value</td>          <td class="paramname"><span class="paramname"><em>nbegin</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(fp_size), intent(in), value</td>          <td class="paramname"><span class="paramname"><em>nend</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(fp_real), dimension(*), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>ddx_begin</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(fp_real), dimension  (*), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>ddx_end</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set constraints <em>and reset all previous ones</em>: a missing "ddx_end" means: no endpoint constraints Begin/end point constraints: (1:idim,0)=function; (1:idim,i)=i-th derivative. </p>
-<p>Get dimensions</p>
-<p>Get object</p>
-<p>Use allocatable copies for optional arguments</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a9dfa6ecb21affdfb619d853f5d033a73_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a9dfa6ecb21affdfb619d853f5d033a73_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a9dfa6ecb21affdfb619d853f5d033a73_cgraph" id="anamespacefitpack__constrained__curves__c_a9dfa6ecb21affdfb619d853f5d033a73_cgraph">
-<area shape="rect" title="Set constraints and reset all previous ones: a missing &quot;ddx_end&quot; means: no endpoint constraints Begin..." alt="" coords="5,5,227,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" title=" " alt="" coords="227,14,274,10,385,5,496,10,531,13,530,18,496,15,385,11,275,15,227,20"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a7b9392c8bf18d30e70a59fb9f1dbd993" title="Get dimensions." alt="" coords="275,49,496,104"/>
-<area shape="poly" title=" " alt="" coords="227,48,262,54,261,59,227,53"/>
-<area shape="poly" title=" " alt="" coords="496,56,530,50,531,56,497,61"/>
-<area shape="poly" title=" " alt="" coords="333,49,333,39,343,30,360,25,385,23,416,26,433,34,431,38,414,31,385,28,361,30,345,35,338,41,338,49"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a43780a18b516fd7b7ed7471cf61d642a" name="a43780a18b516fd7b7ed7471cf61d642a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43780a18b516fd7b7ed7471cf61d642a">&#9670;&#160;</a></span>fitpack_constrained_curve_c_set_default_parameters()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_set_default_parameters </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a43780a18b516fd7b7ed7471cf61d642a_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a43780a18b516fd7b7ed7471cf61d642a_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a43780a18b516fd7b7ed7471cf61d642a_cgraph" id="anamespacefitpack__constrained__curves__c_a43780a18b516fd7b7ed7471cf61d642a_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,247,60"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="295,5,516,60"/>
-<area shape="poly" title=" " alt="" coords="247,30,281,30,281,35,247,35"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -913,17 +486,6 @@ Here is the call graph for this function:</div>
 
 <p>Get smoothing. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a58f1f1fe8d354e20015ee9951e0c819c_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a58f1f1fe8d354e20015ee9951e0c819c_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a58f1f1fe8d354e20015ee9951e0c819c_cgraph" id="anamespacefitpack__constrained__curves__c_a58f1f1fe8d354e20015ee9951e0c819c_cgraph">
-<area shape="rect" title="Get smoothing." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -944,17 +506,6 @@ Here is the call graph for this function:</div>
 
 <p>Get begin endpoint. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a7e1ac437434f723144e6ba379c39a829_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a7e1ac437434f723144e6ba379c39a829_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a7e1ac437434f723144e6ba379c39a829_cgraph" id="anamespacefitpack__constrained__curves__c_a7e1ac437434f723144e6ba379c39a829_cgraph">
-<area shape="rect" title="Get begin endpoint." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -975,34 +526,6 @@ Here is the call graph for this function:</div>
 
 <p>Get end endpoint. </p>
 <p>Get object; allocate it in case</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__constrained__curves__c_a5a4b3ed4bafa93e540e76f6e6f52658e_cgraph.png" border="0" usemap="#anamespacefitpack__constrained__curves__c_a5a4b3ed4bafa93e540e76f6e6f52658e_cgraph" alt=""/></div>
-<map name="anamespacefitpack__constrained__curves__c_a5a4b3ed4bafa93e540e76f6e6f52658e_cgraph" id="anamespacefitpack__constrained__curves__c_a5a4b3ed4bafa93e540e76f6e6f52658e_cgraph">
-<area shape="rect" title="Get end endpoint." alt="" coords="5,29,227,84"/>
-<area shape="poly" title=" " alt="" coords="64,29,64,19,73,10,91,5,116,3,146,6,163,14,161,18,145,11,116,8,92,10,76,15,69,21,69,29"/>
-<area shape="rect" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="275,29,496,84"/>
-<area shape="poly" title=" " alt="" coords="227,54,261,54,261,59,227,59"/>
-</map>
-</div>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="ad5db55c552cd054f1f7ada7deef03574" name="ad5db55c552cd054f1f7ada7deef03574"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5db55c552cd054f1f7ada7deef03574">&#9670;&#160;</a></span>fitpack_constrained_curve_c_null</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">type(<a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>), parameter, public fitpack_constrained_curves_c::fitpack_constrained_curve_c_null = <a class="el" href="structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html">fitpack_constrained_curve_c</a>(cptr=c_null_ptr)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Null-initialized object. </p>
 
 </div>
 </div>

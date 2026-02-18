@@ -1,8 +1,0 @@
-<map id="fitpack_core::fpintb" name="fitpack_core::fpintb">
-<area shape="rect" id="Node000001" title="Compute definite integrals of the normalized B&#45;splines." alt="" coords="5,59,152,84"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="207,29,352,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,58,192,52,193,57,152,63"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="200,79,359,119"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="152,79,187,84,186,89,152,84"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="246,31,239,21,243,11,257,5,279,3,307,6,318,16,315,20,305,11,279,8,258,10,247,15,245,20,251,28"/>
-</map>

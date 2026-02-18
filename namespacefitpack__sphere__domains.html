@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: fitpack_sphere_domains Module Reference</title>
+<title>My Project: fitpack_sphere_domains Module Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -111,8 +103,7 @@ $(function(){initNavTree('namespacefitpack__sphere__domains.html',''); initResiz
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Types</a> &#124;
-<a href="#func-members">Functions/Subroutines</a>  </div>
+<a href="#nested-classes">Data Types</a>  </div>
   <div class="headertitle"><div class="title">fitpack_sphere_domains Module Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -125,624 +116,12 @@ Data Types</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bicubic spline fitter for data scattered on the sphere.  <a href="structfitpack__sphere__domains_1_1fitpack__sphere.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions/Subroutines</h2></td></tr>
-<tr class="memitem:a0b119d50edf8b8b51f514703178ebe80" id="r_a0b119d50edf8b8b51f514703178ebe80"><td class="memItemLeft" align="right" valign="top">integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b119d50edf8b8b51f514703178ebe80">surface_fit_least_squares</a> (this, smoothing, reset_knots)</td></tr>
-<tr class="separator:a0b119d50edf8b8b51f514703178ebe80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6b156ff139cb26084e4cd9c04f0ccfb" id="r_ae6b156ff139cb26084e4cd9c04f0ccfb"><td class="memItemLeft" align="right" valign="top">integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6b156ff139cb26084e4cd9c04f0ccfb">surface_fit_interpolating</a> (this, reset_knots)</td></tr>
-<tr class="separator:ae6b156ff139cb26084e4cd9c04f0ccfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ab7e7464b45549a95b4dd4e49ccf587" id="r_a3ab7e7464b45549a95b4dd4e49ccf587"><td class="memItemLeft" align="right" valign="top">integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ab7e7464b45549a95b4dd4e49ccf587">surface_fit_automatic_knots</a> (this, smoothing, keep_knots)</td></tr>
-<tr class="separator:a3ab7e7464b45549a95b4dd4e49ccf587"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a518bce21517616d024f981e8ec5307" id="r_a7a518bce21517616d024f981e8ec5307"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a518bce21517616d024f981e8ec5307">sphere_destroy</a> (this)</td></tr>
-<tr class="separator:a7a518bce21517616d024f981e8ec5307"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b8f2cc0c2781bb750c98a7973ed56b6" id="r_a0b8f2cc0c2781bb750c98a7973ed56b6"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b8f2cc0c2781bb750c98a7973ed56b6">sphere_new_points</a> (this, theta, phi, r, w)</td></tr>
-<tr class="separator:a0b8f2cc0c2781bb750c98a7973ed56b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a009c14055c36b54ebc3e500036f1f1f0" id="r_a009c14055c36b54ebc3e500036f1f1f0"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a009c14055c36b54ebc3e500036f1f1f0">sphere_new_from_points</a> (theta, phi, r, w, ierr)</td></tr>
-<tr class="separator:a009c14055c36b54ebc3e500036f1f1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd3f201c3a0063a15eb45e1526c4a8a4" id="r_afd3f201c3a0063a15eb45e1526c4a8a4"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(phi), size(theta))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd3f201c3a0063a15eb45e1526c4a8a4">sphere_eval_many</a> (this, theta, phi, ierr)</td></tr>
-<tr class="separator:afd3f201c3a0063a15eb45e1526c4a8a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abad0fd3d818cbf502f8c93ff78d0a227" id="r_abad0fd3d818cbf502f8c93ff78d0a227"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abad0fd3d818cbf502f8c93ff78d0a227">sphere_eval_one</a> (this, theta, phi, ierr)</td></tr>
-<tr class="separator:abad0fd3d818cbf502f8c93ff78d0a227"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3123ac6054fa5f49bcb134e71c88ca6" id="r_ab3123ac6054fa5f49bcb134e71c88ca6"><td class="memItemLeft" align="right" valign="top">integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3123ac6054fa5f49bcb134e71c88ca6">sphere_new_fit</a> (this, theta, phi, r, w, smoothing)</td></tr>
-<tr class="separator:ab3123ac6054fa5f49bcb134e71c88ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f4e8a478f0632384fe2439ae8bd99fc" id="r_a2f4e8a478f0632384fe2439ae8bd99fc"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f4e8a478f0632384fe2439ae8bd99fc">sphere_comm_size</a> (this)</td></tr>
-<tr class="separator:a2f4e8a478f0632384fe2439ae8bd99fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c4f65cfce55397e822152f7d1ac3547" id="r_a8c4f65cfce55397e822152f7d1ac3547"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c4f65cfce55397e822152f7d1ac3547">sphere_comm_pack</a> (this, buffer)</td></tr>
-<tr class="separator:a8c4f65cfce55397e822152f7d1ac3547"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afefdf510ec9f6e4bb46140eb34898ca5" id="r_afefdf510ec9f6e4bb46140eb34898ca5"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afefdf510ec9f6e4bb46140eb34898ca5">sphere_comm_expand</a> (this, buffer)</td></tr>
-<tr class="separator:afefdf510ec9f6e4bb46140eb34898ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>OOP wrapper for bivariate spline fitting on the sphere to scattered data. </p>
-<p>Provides <a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html" title="Bicubic spline fitter for data scattered on the sphere.">fitpack_sphere</a>, a derived type for fitting bicubic splines to data scattered over the unit sphere, parameterized by colatitude \( \theta \in [0, \pi] \) and longitude \( \phi \in [0, 2\pi] \). The fitted surface \( r = s(\theta, \phi) \) satisfies appropriate pole constraints to ensure smoothness at \( \theta = 0 \) and \( \theta = \pi \). Uses the sphere core routine.</p>
-<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 11, §11.2 (pp. 263–269); <a class="el" href="namespacefitpack__core.html#aacb3cc3cd0d0028ebcb2525dc3a6001e" title="Fit a smooth bicubic spherical spline to scattered data on a sphere.">sphere</a> </dd></dl>
-</div><h2 class="groupheader">Function/Subroutine Documentation</h2>
-<a id="afefdf510ec9f6e4bb46140eb34898ca5" name="afefdf510ec9f6e4bb46140eb34898ca5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afefdf510ec9f6e4bb46140eb34898ca5">&#9670;&#160;</a></span>sphere_comm_expand()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine fitpack_sphere_domains::sphere_comm_expand </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8c4f65cfce55397e822152f7d1ac3547" name="a8c4f65cfce55397e822152f7d1ac3547"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c4f65cfce55397e822152f7d1ac3547">&#9670;&#160;</a></span>sphere_comm_pack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine fitpack_sphere_domains::sphere_comm_pack </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2f4e8a478f0632384fe2439ae8bd99fc" name="a2f4e8a478f0632384fe2439ae8bd99fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f4e8a478f0632384fe2439ae8bd99fc">&#9670;&#160;</a></span>sphere_comm_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function fitpack_sphere_domains::sphere_comm_size </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_a2f4e8a478f0632384fe2439ae8bd99fc_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_a2f4e8a478f0632384fe2439ae8bd99fc_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_a2f4e8a478f0632384fe2439ae8bd99fc_cgraph" id="anamespacefitpack__sphere__domains_a2f4e8a478f0632384fe2439ae8bd99fc_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,185,69"/>
-<area shape="poly" title=" " alt="" coords="61,30,59,20,65,11,77,5,95,3,117,6,128,13,125,17,115,11,95,8,78,10,68,15,65,21,67,28"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a7a518bce21517616d024f981e8ec5307" name="a7a518bce21517616d024f981e8ec5307"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a518bce21517616d024f981e8ec5307">&#9670;&#160;</a></span>sphere_destroy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">elemental subroutine fitpack_sphere_domains::sphere_destroy </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afd3f201c3a0063a15eb45e1526c4a8a4" name="afd3f201c3a0063a15eb45e1526c4a8a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd3f201c3a0063a15eb45e1526c4a8a4">&#9670;&#160;</a></span>sphere_eval_many()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(phi),size(theta)) fitpack_sphere_domains::sphere_eval_many </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>theta</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>phi</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abad0fd3d818cbf502f8c93ff78d0a227" name="abad0fd3d818cbf502f8c93ff78d0a227"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abad0fd3d818cbf502f8c93ff78d0a227">&#9670;&#160;</a></span>sphere_eval_one()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function fitpack_sphere_domains::sphere_eval_one </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>theta</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>phi</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_abad0fd3d818cbf502f8c93ff78d0a227_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_abad0fd3d818cbf502f8c93ff78d0a227_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_abad0fd3d818cbf502f8c93ff78d0a227_cgraph" id="anamespacefitpack__sphere__domains_abad0fd3d818cbf502f8c93ff78d0a227_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,185,45"/>
-<area shape="rect" href="namespacefitpack__sphere__domains.html#afd3f201c3a0063a15eb45e1526c4a8a4" title=" " alt="" coords="233,5,413,45"/>
-<area shape="poly" title=" " alt="" coords="186,23,220,23,220,28,186,28"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ab3123ac6054fa5f49bcb134e71c88ca6" name="ab3123ac6054fa5f49bcb134e71c88ca6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3123ac6054fa5f49bcb134e71c88ca6">&#9670;&#160;</a></span>sphere_new_fit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer function fitpack_sphere_domains::sphere_new_fit </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>theta</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>phi</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>r</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_ab3123ac6054fa5f49bcb134e71c88ca6_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_ab3123ac6054fa5f49bcb134e71c88ca6_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_ab3123ac6054fa5f49bcb134e71c88ca6_cgraph" id="anamespacefitpack__sphere__domains_ab3123ac6054fa5f49bcb134e71c88ca6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,185,69"/>
-<area shape="poly" title=" " alt="" coords="61,30,59,20,65,11,77,5,95,3,117,6,128,13,125,17,115,11,95,8,78,10,68,15,65,21,67,28"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a009c14055c36b54ebc3e500036f1f1f0" name="a009c14055c36b54ebc3e500036f1f1f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a009c14055c36b54ebc3e500036f1f1f0">&#9670;&#160;</a></span>sphere_new_from_points()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">type(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>) function fitpack_sphere_domains::sphere_new_from_points </td>
-          <td>(</td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>theta</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>phi</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>r</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0b8f2cc0c2781bb750c98a7973ed56b6" name="a0b8f2cc0c2781bb750c98a7973ed56b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b8f2cc0c2781bb750c98a7973ed56b6">&#9670;&#160;</a></span>sphere_new_points()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine fitpack_sphere_domains::sphere_new_points </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>theta</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>phi</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>r</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(theta)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3ab7e7464b45549a95b4dd4e49ccf587" name="a3ab7e7464b45549a95b4dd4e49ccf587"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ab7e7464b45549a95b4dd4e49ccf587">&#9670;&#160;</a></span>surface_fit_automatic_knots()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer function fitpack_sphere_domains::surface_fit_automatic_knots </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>keep_knots</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Ensure we start with new knots (unless caller wants to keep them)</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_a3ab7e7464b45549a95b4dd4e49ccf587_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_a3ab7e7464b45549a95b4dd4e49ccf587_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_a3ab7e7464b45549a95b4dd4e49ccf587_cgraph" id="anamespacefitpack__sphere__domains_a3ab7e7464b45549a95b4dd4e49ccf587_cgraph">
-<area shape="rect" title=" " alt="" coords="5,259,220,299"/>
-<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="295,202,448,242"/>
-<area shape="poly" title=" " alt="" coords="203,257,281,239,282,244,204,262"/>
-<area shape="rect" href="namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="268,267,475,292"/>
-<area shape="poly" title=" " alt="" coords="220,277,254,277,254,282,220,282"/>
-<area shape="rect" href="namespacefitpack__core.html#aacb3cc3cd0d0028ebcb2525dc3a6001e" title="Fit a smooth bicubic spherical spline to scattered data on a sphere." alt="" coords="295,316,448,341"/>
-<area shape="poly" title=" " alt="" coords="219,297,291,311,290,316,218,302"/>
-<area shape="poly" title=" " alt="" coords="329,202,326,192,333,183,348,177,371,175,398,178,412,185,410,190,396,183,371,181,350,183,336,187,332,193,334,201"/>
-<area shape="rect" href="namespacefitpack__core.html#a6b16cd0ae09d295a9bdf3723c10db8e7" title="Core algorithm for spline fitting on the sphere." alt="" coords="523,316,676,341"/>
-<area shape="poly" title=" " alt="" coords="448,326,509,326,509,331,448,331"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1192,208,1337,233"/>
-<area shape="poly" title=" " alt="" coords="640,339,681,350,724,358,844,375,940,383,985,380,1032,371,1084,355,1143,330,1174,312,1202,289,1244,242,1248,246,1205,293,1177,316,1145,335,1086,360,1034,377,986,385,940,388,844,380,724,363,679,355,639,344"/>
-<area shape="rect" href="namespacefitpack__core.html#ab4ec4c90b00749bb021a6ec2f3433781" title="Rotate an observation row into the upper triangular band matrix." alt="" coords="724,208,923,233"/>
-<area shape="poly" title=" " alt="" coords="617,314,664,283,723,250,762,235,764,240,725,255,666,287,620,318"/>
-<area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="983,157,1132,183"/>
-<area shape="poly" title=" " alt="" coords="606,314,623,288,649,254,683,220,723,193,784,171,849,159,912,156,969,157,969,162,912,161,849,165,786,176,725,198,686,224,653,257,627,291,610,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="983,259,1131,284"/>
-<area shape="poly" title=" " alt="" coords="641,313,724,294,852,278,969,271,970,276,853,284,724,299,643,319"/>
-<area shape="rect" href="namespacefitpack__core.html#aa452051613d61831a99b2f9ef8e21bc8" title="Rotate a smoothing&#45;matrix row into a band matrix using shifted pivots." alt="" coords="739,309,907,349"/>
-<area shape="poly" title=" " alt="" coords="676,326,725,326,725,331,676,331"/>
-<area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="747,424,900,449"/>
-<area shape="poly" title=" " alt="" coords="620,339,666,370,725,402,764,417,762,422,723,407,664,375,617,344"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="749,5,898,31"/>
-<area shape="poly" title=" " alt="" coords="600,315,610,266,632,194,648,155,668,116,693,80,722,48,743,34,746,39,726,52,697,83,673,119,653,157,637,196,615,267,605,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="971,56,1144,81"/>
-<area shape="poly" title=" " alt="" coords="600,315,611,270,633,209,650,176,670,144,694,115,723,92,752,75,784,63,850,50,916,47,976,52,975,57,916,53,851,55,785,69,754,80,725,96,697,119,674,147,654,178,638,211,616,272,606,316"/>
-<area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="749,473,897,499"/>
-<area shape="poly" title=" " alt="" coords="611,340,655,397,688,430,725,458,741,466,738,471,723,463,684,434,651,401,607,343"/>
-<area shape="rect" href="namespacefitpack__core.html#a000e6860b30d66fcc8bf487d934c0f28" title="Sort scattered data points into rectangular panels." alt="" coords="748,523,899,548"/>
-<area shape="poly" title=" " alt="" coords="608,340,623,374,648,420,682,468,703,489,726,508,737,515,734,519,722,512,699,493,678,471,644,423,618,377,603,343"/>
-<area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="748,107,899,132"/>
-<area shape="poly" title=" " alt="" coords="604,315,619,282,645,237,680,190,722,149,748,135,751,139,726,153,684,194,649,240,624,284,608,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="748,572,899,597"/>
-<area shape="poly" title=" " alt="" coords="606,341,618,383,642,442,677,504,699,533,726,557,737,565,734,569,722,561,696,536,672,507,637,444,613,385,601,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="756,622,891,662"/>
-<area shape="poly" title=" " alt="" coords="605,341,615,390,636,462,652,502,672,540,697,576,726,608,745,621,742,625,722,612,692,580,668,543,647,504,631,464,610,392,600,342"/>
-<area shape="poly" title=" " alt="" coords="1231,210,1224,200,1227,190,1241,184,1265,181,1293,185,1305,194,1301,198,1291,190,1265,187,1243,189,1231,193,1229,199,1235,206"/>
-<area shape="poly" title=" " alt="" coords="923,218,1178,218,1178,223,923,223"/>
-<area shape="poly" title=" " alt="" coords="882,205,984,183,985,188,884,210"/>
-<area shape="poly" title=" " alt="" coords="884,231,985,253,984,258,882,236"/>
-<area shape="poly" title=" " alt="" coords="907,328,1021,320,1083,309,1143,293,1194,268,1236,240,1239,244,1196,273,1145,298,1084,314,1022,325,908,333"/>
-<area shape="poly" title=" " alt="" coords="852,306,1024,189,1027,193,855,311"/>
-<area shape="poly" title=" " alt="" coords="905,306,991,285,992,290,906,311"/>
-<area shape="poly" title=" " alt="" coords="884,28,985,50,984,56,882,33"/>
-<area shape="poly" title=" " alt="" coords="1105,79,1145,98,1176,121,1204,147,1247,195,1243,199,1200,151,1172,125,1143,103,1102,84"/>
-<area shape="poly" title=" " alt="" coords="1024,58,1016,48,1020,38,1034,32,1057,29,1086,33,1097,42,1094,46,1084,38,1057,35,1035,37,1024,41,1022,47,1028,54"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="978,515,1137,555"/>
-<area shape="poly" title=" " alt="" coords="899,533,964,533,964,538,899,538"/>
-<area shape="poly" title=" " alt="" coords="899,113,1016,117,1081,126,1145,142,1197,167,1240,197,1236,201,1194,172,1143,147,1080,131,1016,122,899,118"/>
-<area shape="poly" title=" " alt="" coords="884,130,985,152,984,157,882,135"/>
-<area shape="poly" title=" " alt="" coords="845,130,1026,249,1023,253,843,134"/>
-<area shape="poly" title=" " alt="" coords="882,104,984,82,985,87,884,109"/>
-<area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="985,629,1129,655"/>
-<area shape="poly" title=" " alt="" coords="891,639,972,639,972,645,891,645"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ae6b156ff139cb26084e4cd9c04f0ccfb" name="ae6b156ff139cb26084e4cd9c04f0ccfb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6b156ff139cb26084e4cd9c04f0ccfb">&#9670;&#160;</a></span>surface_fit_interpolating()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer function fitpack_sphere_domains::surface_fit_interpolating </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_ae6b156ff139cb26084e4cd9c04f0ccfb_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_ae6b156ff139cb26084e4cd9c04f0ccfb_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_ae6b156ff139cb26084e4cd9c04f0ccfb_cgraph" id="anamespacefitpack__sphere__domains_ae6b156ff139cb26084e4cd9c04f0ccfb_cgraph">
-<area shape="rect" title=" " alt="" coords="5,259,193,299"/>
-<area shape="rect" href="namespacefitpack__sphere__domains.html#a3ab7e7464b45549a95b4dd4e49ccf587" title=" " alt="" coords="241,259,456,299"/>
-<area shape="poly" title=" " alt="" coords="194,277,228,277,228,282,194,282"/>
-<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="531,202,684,242"/>
-<area shape="poly" title=" " alt="" coords="439,257,517,239,518,244,440,262"/>
-<area shape="rect" href="namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="504,267,711,292"/>
-<area shape="poly" title=" " alt="" coords="456,277,490,277,490,282,456,282"/>
-<area shape="rect" href="namespacefitpack__core.html#aacb3cc3cd0d0028ebcb2525dc3a6001e" title="Fit a smooth bicubic spherical spline to scattered data on a sphere." alt="" coords="531,316,684,341"/>
-<area shape="poly" title=" " alt="" coords="455,297,527,311,526,316,454,302"/>
-<area shape="poly" title=" " alt="" coords="565,202,562,192,569,183,584,177,607,175,634,178,648,185,646,190,632,183,607,181,586,183,572,187,568,193,570,201"/>
-<area shape="rect" href="namespacefitpack__core.html#a6b16cd0ae09d295a9bdf3723c10db8e7" title="Core algorithm for spline fitting on the sphere." alt="" coords="759,316,912,341"/>
-<area shape="poly" title=" " alt="" coords="684,326,745,326,745,331,684,331"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1428,208,1573,233"/>
-<area shape="poly" title=" " alt="" coords="876,339,917,350,960,358,1080,375,1176,383,1221,380,1268,371,1320,355,1379,330,1410,312,1438,289,1480,242,1484,246,1441,293,1413,316,1381,335,1322,360,1270,377,1222,385,1176,388,1080,380,960,363,915,355,875,344"/>
-<area shape="rect" href="namespacefitpack__core.html#ab4ec4c90b00749bb021a6ec2f3433781" title="Rotate an observation row into the upper triangular band matrix." alt="" coords="960,208,1159,233"/>
-<area shape="poly" title=" " alt="" coords="853,314,900,283,959,250,998,235,1000,240,961,255,902,287,856,318"/>
-<area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="1219,157,1368,183"/>
-<area shape="poly" title=" " alt="" coords="842,314,859,288,885,254,919,220,959,193,1020,171,1085,159,1148,156,1205,157,1205,162,1148,161,1085,165,1022,176,961,198,922,224,889,257,863,291,846,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="1219,259,1367,284"/>
-<area shape="poly" title=" " alt="" coords="877,313,960,294,1088,278,1205,271,1206,276,1089,284,960,299,879,319"/>
-<area shape="rect" href="namespacefitpack__core.html#aa452051613d61831a99b2f9ef8e21bc8" title="Rotate a smoothing&#45;matrix row into a band matrix using shifted pivots." alt="" coords="975,309,1143,349"/>
-<area shape="poly" title=" " alt="" coords="912,326,961,326,961,331,912,331"/>
-<area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="983,424,1136,449"/>
-<area shape="poly" title=" " alt="" coords="856,339,902,370,961,402,1000,417,998,422,959,407,900,375,853,344"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="985,5,1134,31"/>
-<area shape="poly" title=" " alt="" coords="836,315,846,266,868,194,884,155,904,116,929,80,958,48,979,34,982,39,962,52,933,83,909,119,889,157,873,196,851,267,841,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="1207,56,1380,81"/>
-<area shape="poly" title=" " alt="" coords="836,315,847,270,869,209,886,176,906,144,930,115,959,92,988,75,1020,63,1086,50,1152,47,1212,52,1211,57,1152,53,1087,55,1021,69,990,80,961,96,933,119,910,147,890,178,874,211,852,272,842,316"/>
-<area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="985,473,1133,499"/>
-<area shape="poly" title=" " alt="" coords="847,340,891,397,924,430,961,458,977,466,974,471,959,463,920,434,887,401,843,343"/>
-<area shape="rect" href="namespacefitpack__core.html#a000e6860b30d66fcc8bf487d934c0f28" title="Sort scattered data points into rectangular panels." alt="" coords="984,523,1135,548"/>
-<area shape="poly" title=" " alt="" coords="844,340,859,374,884,420,918,468,939,489,962,508,973,515,970,519,958,512,935,493,914,471,880,423,854,377,839,343"/>
-<area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="984,107,1135,132"/>
-<area shape="poly" title=" " alt="" coords="840,315,855,282,881,237,916,190,958,149,984,135,987,139,962,153,920,194,885,240,860,284,844,317"/>
-<area shape="rect" href="namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="984,572,1135,597"/>
-<area shape="poly" title=" " alt="" coords="842,341,854,383,878,442,913,504,935,533,962,557,973,565,970,569,958,561,932,536,908,507,873,444,849,385,837,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="992,622,1127,662"/>
-<area shape="poly" title=" " alt="" coords="841,341,851,390,872,462,888,502,908,540,933,576,962,608,981,621,978,625,958,612,928,580,904,543,883,504,867,464,846,392,836,342"/>
-<area shape="poly" title=" " alt="" coords="1467,210,1460,200,1463,190,1477,184,1501,181,1529,185,1541,194,1537,198,1527,190,1501,187,1479,189,1467,193,1465,199,1471,206"/>
-<area shape="poly" title=" " alt="" coords="1159,218,1414,218,1414,223,1159,223"/>
-<area shape="poly" title=" " alt="" coords="1118,205,1220,183,1221,188,1120,210"/>
-<area shape="poly" title=" " alt="" coords="1120,231,1221,253,1220,258,1118,236"/>
-<area shape="poly" title=" " alt="" coords="1143,328,1257,320,1319,309,1379,293,1430,268,1472,240,1475,244,1432,273,1381,298,1320,314,1258,325,1144,333"/>
-<area shape="poly" title=" " alt="" coords="1088,306,1260,189,1263,193,1091,311"/>
-<area shape="poly" title=" " alt="" coords="1141,306,1227,285,1228,290,1142,311"/>
-<area shape="poly" title=" " alt="" coords="1120,28,1221,50,1220,56,1118,33"/>
-<area shape="poly" title=" " alt="" coords="1341,79,1381,98,1412,121,1440,147,1483,195,1479,199,1436,151,1408,125,1379,103,1338,84"/>
-<area shape="poly" title=" " alt="" coords="1260,58,1252,48,1256,38,1270,32,1293,29,1322,33,1333,42,1330,46,1320,38,1293,35,1271,37,1260,41,1258,47,1264,54"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="1214,515,1373,555"/>
-<area shape="poly" title=" " alt="" coords="1135,533,1200,533,1200,538,1135,538"/>
-<area shape="poly" title=" " alt="" coords="1135,113,1252,117,1317,126,1381,142,1433,167,1476,197,1472,201,1430,172,1379,147,1316,131,1252,122,1135,118"/>
-<area shape="poly" title=" " alt="" coords="1120,130,1221,152,1220,157,1118,135"/>
-<area shape="poly" title=" " alt="" coords="1081,130,1262,249,1259,253,1079,134"/>
-<area shape="poly" title=" " alt="" coords="1118,104,1220,82,1221,87,1120,109"/>
-<area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="1221,629,1365,655"/>
-<area shape="poly" title=" " alt="" coords="1127,639,1208,639,1208,645,1127,645"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a0b119d50edf8b8b51f514703178ebe80" name="a0b119d50edf8b8b51f514703178ebe80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b119d50edf8b8b51f514703178ebe80">&#9670;&#160;</a></span>surface_fit_least_squares()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer function fitpack_sphere_domains::surface_fit_least_squares </td>
-          <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html">fitpack_sphere</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__sphere__domains_a0b119d50edf8b8b51f514703178ebe80_cgraph.png" border="0" usemap="#anamespacefitpack__sphere__domains_a0b119d50edf8b8b51f514703178ebe80_cgraph" alt=""/></div>
-<map name="anamespacefitpack__sphere__domains_a0b119d50edf8b8b51f514703178ebe80_cgraph" id="anamespacefitpack__sphere__domains_a0b119d50edf8b8b51f514703178ebe80_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,200,69"/>
-<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="248,29,401,69"/>
-<area shape="poly" title=" " alt="" coords="200,47,234,47,234,52,200,52"/>
-<area shape="poly" title=" " alt="" coords="283,30,281,20,287,10,302,5,325,3,351,6,365,13,362,18,349,11,325,8,303,10,291,15,286,21,288,28"/>
-</map>
-</div>
-
-</div>
-</div>
-</div><!-- contents -->
+<p>Provides <a class="el" href="structfitpack__sphere__domains_1_1fitpack__sphere.html" title="Bicubic spline fitter for data scattered on the sphere.">fitpack_sphere</a>, a derived type for fitting bicubic splines to data scattered over the unit sphere, parameterized by colatitude <picture><source srcset="form_55_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta \in [0, \pi] $" src="form_55.png"/></picture> and longitude <picture><source srcset="form_56_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \phi \in [0, 2\pi] $" src="form_56.png"/></picture>. The fitted surface <picture><source srcset="form_57_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r = s(\theta, \phi) $" src="form_57.png"/></picture> satisfies appropriate pole constraints to ensure smoothness at <picture><source srcset="form_58_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta = 0 $" src="form_58.png"/></picture> and <picture><source srcset="form_59_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta = \pi $" src="form_59.png"/></picture>. Uses the sphere core routine.</p>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 11, §11.2 (pp. 263–269); sphere </dd></dl>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

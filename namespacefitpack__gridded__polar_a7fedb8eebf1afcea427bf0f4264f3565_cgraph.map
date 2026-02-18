@@ -1,9 +1,0 @@
-<map id="fitpack_gridded_polar::gridded_to_disk" name="fitpack_gridded_polar::gridded_to_disk">
-<area shape="rect" id="Node000001" title="Print gridded polar data to disk." alt="" coords="5,59,168,99"/>
-<area shape="rect" id="Node000002" href="$fitpack__gridded__polar_8f90.html#ac2ef12b839fb73f1a202e9e46776fd88" title=" " alt="" coords="227,29,293,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,59,213,49,214,55,169,64"/>
-<area shape="rect" id="Node000003" href="$fitpack__gridded__polar_8f90.html#ac2f23e8fe57b80bae14c0affe5fc3112" title=" " alt="" coords="216,103,304,128"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="169,94,203,101,202,106,168,99"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="231,31,225,21,228,11,240,5,260,3,284,6,294,15,290,19,282,11,260,8,242,10,232,15,230,20,236,28"/>
-<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="231,104,225,94,228,85,240,78,260,76,284,80,294,88,290,92,282,84,260,81,242,83,232,88,230,94,236,101"/>
-</map>

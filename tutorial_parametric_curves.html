@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: Parametric, Closed, and Constrained Curves</title>
+<title>My Project: Parametric, Closed, and Constrained Curves</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -114,16 +106,16 @@ $(function(){initNavTree('tutorial_parametric_curves.html',''); initResizable(tr
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__parametric__curves"></a></p>
-<p>This tutorial covers parametric curve fitting in \( \mathbb{R}^d \) with FITPACK: open parametric curves, closed (periodic) curves, and curves with prescribed endpoint derivatives.</p>
-<h1><a class="anchor" id="autotoc_md40"></a>
+<p>This tutorial covers parametric curve fitting in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture> with FITPACK: open parametric curves, closed (periodic) curves, and curves with prescribed endpoint derivatives.</p>
+<h1><a class="anchor" id="autotoc_md92"></a>
 Overview</h1>
-<p>A standard 1D spline \( y = s(x) \) cannot represent multi-valued or looping paths. A <b>parametric curve</b> expresses each coordinate as a separate spline over a common parameter \( u \):</p>
+<p>A standard 1D spline <picture><source srcset="form_4_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y = s(x) $" src="form_4.png"/></picture> cannot represent multi-valued or looping paths. A <b>parametric curve</b> expresses each coordinate as a separate spline over a common parameter <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture>:</p>
 <p class="formulaDsp">
-\[    \mathbf{s}(u) = \bigl( s_1(u),\; s_2(u),\; \ldots,\; s_d(u) \bigr),
+<picture><source srcset="form_292_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \mathbf{s}(u) = \bigl( s_1(u),\; s_2(u),\; \ldots,\; s_d(u) \bigr),
     \quad u \in [u_1, u_m]
-\]
+\]" src="form_292.png"/></picture>
 </p>
-<p>All \( d \) component splines share a single knot vector and degree \( k \). Use parametric curves for multi-dimensional paths, closed loops, or constrained endpoints with prescribed positions and derivatives.</p>
+<p>All <picture><source srcset="form_31_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ d $" src="form_31.png"/></picture> component splines share a single knot vector and degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture>. Use parametric curves for multi-dimensional paths, closed loops, or constrained endpoints with prescribed positions and derivatives.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Description   </th><th class="markdownTableHeadNone">Core routine    </th></tr>
@@ -135,19 +127,19 @@ Overview</h1>
 <td class="markdownTableBodyNone"><code>fitpack_constrained_curve</code>   </td><td class="markdownTableBodyNone">Endpoint derivative constraints   </td><td class="markdownTableBodyNone"><code>concur</code>   </td></tr>
 </table>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9 (pp. 199&ndash;228)</dd></dl>
-<h1><a class="anchor" id="autotoc_md41"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 Parametric Curves</h1>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md94"></a>
 Chord-Length Parameterization</h2>
-<p>When no parameter values are supplied, FITPACK computes them from <b>cumulative chord lengths</b>, normalized to \( [0, 1] \):</p>
+<p>When no parameter values are supplied, FITPACK computes them from <b>cumulative chord lengths</b>, normalized to <picture><source srcset="form_293_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0, 1] $" src="form_293.png"/></picture>:</p>
 <p class="formulaDsp">
-\[    u_1 = 0, \quad
+<picture><source srcset="form_294_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    u_1 = 0, \quad
     u_i = u_{i-1} + \| \mathbf{x}_i - \mathbf{x}_{i-1} \|, \quad
     u_m = 1
-\]
+\]" src="form_294.png"/></picture>
 </p>
 <p>You may also supply your own strictly increasing parameter values (e.g. time stamps) via the optional <code>u</code> argument.</p>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 API</h2>
 <p>Construct and fit with <code>new_fit</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_curve, fp_real, fp_flag, &amp;</div>
@@ -159,21 +151,21 @@ API</h2>
 <div class="line"><span class="comment">! x has shape (idim, m): idim dimensions, m points</span></div>
 <div class="line">ierr = curve%new_fit(x, u, w, smoothing, order)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><p>Arguments: <b><code>x(idim, m)</code></b> data points; optional <b><code>u(m)</code></b> parameter values; optional <b><code>w(m)</code></b> weights; optional <b><code>smoothing</code></b> ( \( s \), use <code>zero</code> for interpolation); optional <b><code>order</code></b> (spline degree \( k \), default 3).</p>
+</div><!-- fragment --><p>Arguments: <b><code>x(idim, m)</code></b> data points; optional <b><code>u(m)</code></b> parameter values; optional <b><code>w(m)</code></b> weights; optional <b><code>smoothing</code></b> ( <picture><source srcset="form_62_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s $" src="form_62.png"/></picture>, use <code>zero</code> for interpolation); optional <b><code>order</code></b> (spline degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture>, default 3).</p>
 <p>Evaluation returns arrays whose first dimension is <code>idim</code>:</p>
 <ul>
-<li><code>curve\eval_one(u, ierr)</code> &mdash; returns <code>array(idim)</code> at a single \( u \).</li>
-<li><code>curve\eval_many(u, ierr)</code> &mdash; returns <code>array(idim, m)</code> at multiple \( u \).</li>
+<li><code>curve\eval_one(u, ierr)</code> &mdash; returns <code>array(idim)</code> at a single <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture>.</li>
+<li><code>curve\eval_many(u, ierr)</code> &mdash; returns <code>array(idim, m)</code> at multiple <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture>.</li>
 <li>The generic <code>curve\eval</code> dispatches to either form.</li>
 </ul>
-<p>Derivatives with respect to \( u \):</p>
+<p>Derivatives with respect to <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture>:</p>
 <ul>
 <li><code>curve\dfdx(u, order, ierr)</code> &mdash; returns <code>array(idim)</code>, the <code>order</code>-th derivative.</li>
 <li><code>curve\dfdx_all(u, ierr)</code> &mdash; returns <code>array(idim, 0:k)</code>, all derivatives at once.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md96"></a>
 Example: Lissajous Figure</h2>
-<p>A Lissajous curve \( x = \sin(3t),\; y = \sin(2t) \) is multi-valued in both coordinates, making it a natural test case.</p>
+<p>A Lissajous curve <picture><source srcset="form_295_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x = \sin(3t),\; y = \sin(2t) $" src="form_295.png"/></picture> is multi-valued in both coordinates, making it a natural test case.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_curve, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, pi</div>
 <div class="line"><span class="keywordtype">implicit none</span></div>
@@ -201,16 +193,16 @@ Example: Lissajous Figure</h2>
 <div class="line">dy = curve%dfdx(zero, order=1, ierr=ierr)  <span class="comment">! tangent at u=0</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md45"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md97"></a>
 Closed Curves</h1>
 <p><code>fitpack_closed_curve</code> extends <code>fitpack_parametric_curve</code> with periodic boundary conditions, guaranteeing:</p>
 <p class="formulaDsp">
-\[    s_j^{(\ell)}(u_1) = s_j^{(\ell)}(u_m), \quad
+<picture><source srcset="form_296_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s_j^{(\ell)}(u_1) = s_j^{(\ell)}(u_m), \quad
     \ell = 0, 1, \ldots, k-1, \quad j = 1, \ldots, d
-\]
+\]" src="form_296.png"/></picture>
 </p>
 <p><b>Do not</b> duplicate the first point as the last; periodicity is handled internally by <code>clocur</code>.</p>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md98"></a>
 Example: Ellipse</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_closed_curve, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, pi</div>
@@ -242,21 +234,21 @@ Example: Ellipse</h2>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
 </div><!-- fragment --><p>The fields <code>curve\ubegin</code> and <code>curve\uend</code> give the parameter range. For a closed curve, evaluating at either boundary returns the same point.</p>
-<h1><a class="anchor" id="autotoc_md47"></a>
+<h1><a class="anchor" id="autotoc_md99"></a>
 Constrained Curves</h1>
 <p><code>fitpack_constrained_curve</code> extends <code>fitpack_parametric_curve</code> to prescribe function values and derivatives at the endpoints. This is useful when the curve must join smoothly to another segment, or when physical boundary conditions (position, velocity, acceleration) are known.</p>
-<h2><a class="anchor" id="autotoc_md48"></a>
+<h2><a class="anchor" id="autotoc_md100"></a>
 Setting Constraints</h2>
 <div class="fragment"><div class="line"><span class="keyword">call </span>curve%set_constraints(ddx_begin, ddx_end, ierr)</div>
 </div><!-- fragment --><ul>
-<li><b><code>ddx_begin(idim, 0:nb-1)</code></b> &mdash; Left endpoint: column 0 is position \( \mathbf{s}(u_1) \), column \( \ell \) is \( \mathbf{s}^{(\ell)}(u_1) \).</li>
+<li><b><code>ddx_begin(idim, 0:nb-1)</code></b> &mdash; Left endpoint: column 0 is position <picture><source srcset="form_297_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{s}(u_1) $" src="form_297.png"/></picture>, column <picture><source srcset="form_41_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \ell $" src="form_41.png"/></picture> is <picture><source srcset="form_298_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{s}^{(\ell)}(u_1) $" src="form_298.png"/></picture>.</li>
 <li><b><code>ddx_end(idim, 0:ne-1)</code></b> &mdash; Right endpoint (same layout).</li>
 <li>Both arguments are optional; omitting one removes constraints at that endpoint.</li>
 </ul>
 <p>Shape <code>(idim, 0:1)</code> prescribes position and first derivative; <code>(idim, 0:2)</code> adds the second derivative, and so on.</p>
-<h2><a class="anchor" id="autotoc_md49"></a>
+<h2><a class="anchor" id="autotoc_md101"></a>
 Example: Spiral with Prescribed Tangents</h2>
-<p>Fit \( x = u\cos u,\; y = u\sin u \) over \( [0, \pi] \) with prescribed endpoint positions and tangent vectors.</p>
+<p>Fit <picture><source srcset="form_299_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x = u\cos u,\; y = u\sin u $" src="form_299.png"/></picture> over <picture><source srcset="form_300_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0, \pi] $" src="form_300.png"/></picture> with prescribed endpoint positions and tangent vectors.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_constrained_curve, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, one, pi</div>
 <div class="line"><span class="keywordtype">implicit none</span></div>
@@ -304,11 +296,11 @@ Example: Spiral with Prescribed Tangents</h2>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
 </div><!-- fragment --><p>Note the two-step workflow: <code>new_fit</code> loads data and produces an initial fit; then <code>set_constraints</code> + <code>curve\fit</code> re-fits with boundary conditions enforced.</p>
-<h1><a class="anchor" id="autotoc_md50"></a>
+<h1><a class="anchor" id="autotoc_md102"></a>
 Complete Example</h1>
 <p>A full working program combining all three curve types is provided in <code>examples/example_parametric_curves.f90</code>. Build and run with:</p>
 <div class="fragment"><div class="line">fpm run --example example_parametric_curves</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md51"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md103"></a>
 Error Handling</h1>
 <p>All routines return an <code>integer(FP_FLAG)</code> error code:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_ok, fitpack_success, fitpack_message</div>
@@ -317,13 +309,13 @@ Error Handling</h1>
 <div class="line">    print *, <span class="stringliteral">&#39;Error: &#39;</span>, fitpack_message(ierr)</div>
 <div class="line"><span class="keyword">end </span>if</div>
 </div><!-- fragment --><p>When the optional <code>ierr</code> argument is omitted, the library halts on failure.</p>
-<h1><a class="anchor" id="autotoc_md52"></a>
+<h1><a class="anchor" id="autotoc_md104"></a>
 Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Use case   </th><th class="markdownTableHeadNone">Key methods    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>fitpack_parametric_curve</code>   </td><td class="markdownTableBodyNone">Open paths in \( \mathbb{R}^d \)   </td><td class="markdownTableBodyNone"><code>new_fit</code>, <code>eval</code>, <code>dfdx</code>    </td></tr>
+<td class="markdownTableBodyNone"><code>fitpack_parametric_curve</code>   </td><td class="markdownTableBodyNone">Open paths in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture>   </td><td class="markdownTableBodyNone"><code>new_fit</code>, <code>eval</code>, <code>dfdx</code>    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>fitpack_closed_curve</code>   </td><td class="markdownTableBodyNone">Periodic loops   </td><td class="markdownTableBodyNone"><code>new_fit</code>, <code>eval</code>, <code>ubegin</code>/<code>uend</code>    </td></tr>
 <tr class="markdownTableRowOdd">

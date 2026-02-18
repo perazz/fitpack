@@ -1,26 +1,4 @@
 var searchData=
 [
-  ['a_20curve_0',['Fit a curve',['../index.html#autotoc_md3',1,'']]],
-  ['a_20fit_1',['a Fit',['../tutorial_grid_surface.html#autotoc_md77',1,'Creating a Fit'],['../tutorial_grid_surface.html#autotoc_md85',1,'Creating a Fit']]],
-  ['a_20grid_2',['Example: Peaks Function on a Grid',['../tutorial_grid_surface.html#autotoc_md82',1,'']]],
-  ['a_20lat_20lon_20grid_3',['Example: Function on a Lat-Lon Grid',['../tutorial_sphere.html#autotoc_md113',1,'']]],
-  ['a_20polar_20grid_4',['Example: data on a polar grid',['../tutorial_polar.html#autotoc_md98',1,'']]],
-  ['a_20surface_5',['Fit a surface',['../index.html#autotoc_md4',1,'']]],
-  ['a_20torus_6',['Example: Fitting a Torus',['../tutorial_grid_surface.html#autotoc_md87',1,'']]],
-  ['a_20unit_20disc_7',['Example: smooth function on a unit disc',['../tutorial_polar.html#autotoc_md95',1,'']]],
-  ['across_20the_20boundary_8',['Integration Across the Boundary',['../tutorial_periodic_curve.html#autotoc_md37',1,'']]],
-  ['advanced_20features_9',['Advanced Features',['../tutorial_curve.html#autotoc_md23',1,'']]],
-  ['algorithms_10',['Core Algorithms',['../book_reference.html#autotoc_md13',1,'']]],
-  ['allocate_5fknot_5fstorage_11',['allocate_knot_storage',['../namespacefitpack__parametric__surfaces.html#acaa4898491130825fd5a1ed122aefe58',1,'fitpack_parametric_surfaces']]],
-  ['and_20constrained_20curves_12',['Parametric, Closed, and Constrained Curves',['../tutorial_parametric_curves.html',1,'']]],
-  ['and_20derivative_20splines_13',['Cross-Sections and Derivative Splines',['../tutorial_grid_surface.html#autotoc_md81',1,'']]],
-  ['and_20fitting_14',['and Fitting',['../tutorial_sphere.html#autotoc_md107',1,'Construction and Fitting'],['../tutorial_sphere.html#autotoc_md111',1,'Construction and Fitting']]],
-  ['and_20inspect_15',['Step 3 — Evaluate and Inspect',['../tutorial_convex_curve.html#autotoc_md57',1,'']]],
-  ['and_20interpolation_16',['Smoothing and Interpolation',['../tutorial_periodic_curve.html#autotoc_md38',1,'']]],
-  ['and_20parametric_20surface_20tutorial_17',['Grid and Parametric Surface Tutorial',['../tutorial_grid_surface.html',1,'']]],
-  ['and_20set_20convexity_20flags_18',['Step 1 — Load Data and Set Convexity Flags',['../tutorial_convex_curve.html#autotoc_md55',1,'']]],
-  ['and_20spherical_20domains_19',['Polar and Spherical Domains',['../book_reference.html#autotoc_md18',1,'']]],
-  ['api_20',['API',['../tutorial_parametric_curves.html#autotoc_md43',1,'']]],
-  ['api_20summary_21',['API Summary',['../tutorial_curve.html#autotoc_md30',1,'API Summary'],['../tutorial_convex_curve.html#autotoc_md61',1,'API Summary']]],
-  ['at_20the_20origin_22',['Continuity at the origin',['../tutorial_polar.html#autotoc_md93',1,'']]]
+  ['74_0',['Recurrence for degree  \_form#74',['../theory_bsplines.html#autotoc_md10',1,'']]]
 ];

@@ -1,17 +1,13 @@
 var searchData=
 [
-  ['on_20a_20grid_0',['Example: Peaks Function on a Grid',['../tutorial_grid_surface.html#autotoc_md82',1,'']]],
-  ['on_20a_20lat_20lon_20grid_1',['Example: Function on a Lat-Lon Grid',['../tutorial_sphere.html#autotoc_md113',1,'']]],
-  ['on_20a_20polar_20grid_2',['Example: data on a polar grid',['../tutorial_polar.html#autotoc_md98',1,'']]],
-  ['on_20a_20unit_20disc_3',['Example: smooth function on a unit disc',['../tutorial_polar.html#autotoc_md95',1,'']]],
-  ['one_4',['one',['../namespacefitpack__core.html#a4ef46fb771d804b34407c3ec419f79cc',1,'fitpack_core']]],
-  ['onep5_5',['onep5',['../namespacefitpack__core.html#a641bf26c23c6c7089fe7ab041d8b9d4f',1,'fitpack_core']]],
-  ['order_6',['order',['../structfitpack__curves_1_1fitpack__curve.html#a03d0f2b1596577c156de28b8a34b6339',1,'fitpack_curves::fitpack_curve::order'],['../structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a21d23fbe3b78f6c86a0c24d9739eb928',1,'fitpack_grid_surfaces::fitpack_grid_surface::order'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#ac776021ae76772a0f6308c4e59edab5c',1,'fitpack_parametric_curves::fitpack_parametric_curve::order'],['../structfitpack__surfaces_1_1fitpack__surface.html#a1ee1308d8ce54b2e23af4f4323cc7626',1,'fitpack_surfaces::fitpack_surface::order']]],
-  ['origin_7',['Continuity at the origin',['../tutorial_polar.html#autotoc_md93',1,'']]],
-  ['origin_20boundary_20conditions_8',['Origin boundary conditions',['../tutorial_polar.html#autotoc_md97',1,'']]],
-  ['outside_5fextrapolate_9',['outside_extrapolate',['../namespacefitpack__core.html#ae8c83e115f52c352bdc76759d2c21a21',1,'fitpack_core']]],
-  ['outside_5fnearest_5fbnd_10',['outside_nearest_bnd',['../namespacefitpack__core.html#aa89341217e078cc2593242b8a4184ff6',1,'fitpack_core']]],
-  ['outside_5fnot_5fallowed_11',['outside_not_allowed',['../namespacefitpack__core.html#a90b449513694a8a6e8dd2e0893e9c044',1,'fitpack_core']]],
-  ['outside_5fzero_12',['outside_zero',['../namespacefitpack__core.html#aea35b146c25b52ee76291d55046635a8',1,'fitpack_core']]],
-  ['overview_13',['Overview',['../tutorial_periodic_curve.html#autotoc_md33',1,'Overview'],['../tutorial_parametric_curves.html#autotoc_md40',1,'Overview'],['../tutorial_polar.html#autotoc_md90',1,'Overview'],['../tutorial_sphere.html#autotoc_md102',1,'Overview']]]
+  ['m_0',['m',['../structfitpack__curves_1_1fitpack__curve.html#a4d3c472381ed9f47b16cc001caa26d82',1,'fitpack_curves::fitpack_curve::m'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#aa444acf938855d3a30f3f9fdbfbdb1c9',1,'fitpack_parametric_curves::fitpack_parametric_curve::m'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ab3fc7226342d3c6fa08f0c64dbf1ce4e',1,'fitpack_polar_domains::fitpack_polar::m'],['../structfitpack__sphere__domains_1_1fitpack__sphere.html#aa768337fec1418a5589d96008da80700',1,'fitpack_sphere_domains::fitpack_sphere::m'],['../structfitpack__surfaces_1_1fitpack__surface.html#a96ae7c2223abd75447562d3ddb43d006',1,'fitpack_surfaces::fitpack_surface::m']]],
+  ['mainpage_1',['mainpage',['../md__2home_2runner_2work_2fitpack_2fitpack_2doc_2mainpage.html',1,'']]],
+  ['mathematical_20background_2',['Mathematical Background',['../tutorial_curve.html#autotoc_md71',1,'Mathematical Background'],['../tutorial_periodic_curve.html#autotoc_md86',1,'Mathematical Background'],['../tutorial_convex_curve.html#autotoc_md105',1,'Mathematical Background'],['../tutorial_surface.html#autotoc_md115',1,'Mathematical Background'],['../tutorial_polar.html#autotoc_md143',1,'Mathematical Background'],['../tutorial_sphere.html#autotoc_md155',1,'Mathematical Background']]],
+  ['matrix_3',['The Observation Matrix',['../theory_surface_fitting.html#autotoc_md39',1,'']]],
+  ['maxbin_4',['maxbin',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#aaf16c0217bf4248a2e1520c5c9edf21c',1,'fitpack_convex_curves::fitpack_convex_curve']]],
+  ['maxtr_5',['maxtr',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00',1,'fitpack_convex_curves::fitpack_convex_curve']]],
+  ['mixed_20constraints_6',['Mixed Constraints',['../tutorial_convex_curve.html#autotoc_md111',1,'']]],
+  ['modes_7',['Fitting Modes',['../tutorial_surface.html#autotoc_md125',1,'']]],
+  ['mse_8',['mse',['../structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973',1,'fitpack_fitters::fitpack_fitter']]],
+  ['multi_20component_20surfaces_9',['Multi-Component Surfaces',['../tutorial_grid_surface.html#autotoc_md136',1,'']]]
 ];

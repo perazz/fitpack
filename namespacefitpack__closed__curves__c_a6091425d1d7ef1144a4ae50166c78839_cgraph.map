@@ -1,7 +1,0 @@
-<map id="fitpack_closed_curves_c::fitpack_closed_curve_c_fit" name="fitpack_closed_curves_c::fitpack_closed_curve_c_fit">
-<area shape="rect" id="Node000001" title="Wrapper to curve_fit_automatic_knots." alt="" coords="5,13,220,53"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__closed__curves__c.html#aac6158ca1112a25d506d9cc3ea7e1d9d" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="268,5,448,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,30,254,30,254,35,220,35"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__closed__curves__c.html#a3ff276587e3889b8b353b9280fcae943" title="Get pointer to embedded Fortran object." alt="" coords="496,5,676,60"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,30,482,30,482,35,448,35"/>
-</map>

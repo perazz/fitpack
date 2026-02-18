@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: fitpack — Modern Fortran Spline Fitting</title>
+<title>My Project: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -109,119 +101,10 @@ $(function(){initNavTree('index.html',''); initResizable(true); });
 </div>
 </div>
 
-<div><div class="header">
-  <div class="headertitle"><div class="title">fitpack — Modern Fortran Spline Fitting </div></div>
+<div class="header">
+  <div class="headertitle"><div class="title">My Project Documentation</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="mainpage"></a></p>
-<p><b>fitpack</b> is a Modern Fortran (2008+) library for curve and surface fitting with splines, based on the FITPACK package by Paul Dierckx.</p>
-<p>It provides an object-oriented API with derived types for all major fitting tasks: smoothing, interpolation, least-squares approximation, and constrained fitting. All routines support spline degrees 1 through 5 (cubic by default) and return B-spline representations that can be evaluated, differentiated, integrated, and root-found efficiently.</p>
-<h1><a class="anchor" id="autotoc_md1"></a>
-Type Hierarchy</h1>
-<p>All fitter types extend the abstract base <code>fitpack_fitter</code>:</p>
-<div class="fragment"><div class="line">fitpack_fitter (abstract base)</div>
-<div class="line">├── fitpack_curve                   — 1D spline: y = s(x)</div>
-<div class="line">│   ├── fitpack_periodic_curve      — periodic boundary conditions</div>
-<div class="line">│   └── fitpack_convex_curve        — convexity-constrained fitting</div>
-<div class="line">├── fitpack_parametric_curve        — parametric curves: x_i = s_i(u)</div>
-<div class="line">│   ├── fitpack_closed_curve        — closed parametric curves</div>
-<div class="line">│   └── fitpack_constrained_curve   — endpoint derivative constraints</div>
-<div class="line">├── fitpack_surface                 — 2D spline from scattered data</div>
-<div class="line">├── fitpack_grid_surface            — 2D spline from gridded data</div>
-<div class="line">├── fitpack_parametric_surface      — parametric surfaces</div>
-<div class="line">├── fitpack_polar                   — polar-domain fitting (scattered)</div>
-<div class="line">├── fitpack_grid_polar              — polar-domain fitting (gridded)</div>
-<div class="line">├── fitpack_sphere                  — spherical-domain fitting (scattered)</div>
-<div class="line">└── fitpack_grid_sphere             — spherical-domain fitting (gridded)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2"></a>
-Quick Start</h1>
-<h2><a class="anchor" id="autotoc_md3"></a>
-Fit a curve</h2>
-<div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_curve</div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">type</span>(fitpack_curve) :: curve</div>
-<div class="line"><span class="keywordtype">integer</span> :: ierr</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">! Create a smoothing spline from data</span></div>
-<div class="line">curve = fitpack_curve(x, y, ierr=ierr)</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">! Evaluate at new points</span></div>
-<div class="line">y_new = curve%eval(x_new, ierr)</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">! Compute derivative, integral, zeros</span></div>
-<div class="line">dydx  = curve%dfdx(x_new, ierr)</div>
-<div class="line">area  = curve%integral(x(1), x(<span class="keyword">size</span>(x)), ierr)</div>
-<div class="line">roots = curve%zeros(ierr)</div>
-<div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4"></a>
-Fit a surface</h2>
-<div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface</div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">type</span>(fitpack_grid_surface) :: surf</div>
-<div class="line"><span class="keywordtype">integer</span> :: ierr</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">! Create a smoothing spline from gridded data</span></div>
-<div class="line">surf = fitpack_grid_surface(x, y, z, ierr=ierr)</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">! Evaluate on a new grid</span></div>
-<div class="line">z_new = surf%eval(x_new, y_new, ierr)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
-Building</h1>
-<p>fitpack uses <a href="https://fpm.fortran-lang.org/">fpm</a> (Fortran Package Manager):</p>
-<div class="fragment"><div class="line">fpm build          # build the library</div>
-<div class="line">fpm test           # run all tests</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
-Spline Theory</h1>
-<ul>
-<li>theory_bsplines &mdash; B-spline basis functions, de Boor evaluation, derivatives, integration, knot insertion</li>
-<li>theory_curve_fitting &mdash; Smoothing criterion, adaptive knot placement, periodic and parametric curves</li>
-<li>theory_surface_fitting &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency</li>
-<li>theory_special_domains &mdash; Polar coordinate transform, spherical coordinates, pole boundary conditions</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md7"></a>
-Tutorials</h1>
-<h2><a class="anchor" id="autotoc_md8"></a>
-Curves</h2>
-<ul>
-<li><a class="el" href="tutorial_curve.html">Univariate Curve Fitting with fitpack_curve</a> &mdash; Univariate smoothing and interpolation with <code>fitpack_curve</code></li>
-<li><a class="el" href="tutorial_periodic_curve.html">Periodic Curve Fitting</a> &mdash; Periodic splines with <code>fitpack_periodic_curve</code></li>
-<li><a class="el" href="tutorial_parametric_curves.html">Parametric, Closed, and Constrained Curves</a> &mdash; Parametric, closed, and constrained curves</li>
-<li><a class="el" href="tutorial_convex_curve.html">Convexity-Constrained Curve Fitting</a> &mdash; Shape-preserving fitting with convexity constraints</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md9"></a>
-Surfaces</h2>
-<ul>
-<li><a class="el" href="tutorial_surface.html">Scattered Surface Fitting Tutorial</a> &mdash; Scattered bivariate data with <code>fitpack_surface</code></li>
-<li><a class="el" href="tutorial_grid_surface.html">Grid and Parametric Surface Tutorial</a> &mdash; Gridded data and parametric surfaces</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md10"></a>
-Special Domains</h2>
-<ul>
-<li><a class="el" href="tutorial_polar.html">Polar Domain Fitting Tutorial</a> &mdash; Disc-shaped domains with <code>fitpack_polar</code> and <code>fitpack_grid_polar</code></li>
-<li><a class="el" href="tutorial_sphere.html">Spherical Spline Fitting Tutorial</a> &mdash; Spherical data with <code>fitpack_sphere</code> and <code>fitpack_grid_sphere</code></li>
-</ul>
-<h1><a class="anchor" id="autotoc_md11"></a>
-Examples</h1>
-<p>Compilable example programs are in the <code>examples/</code> directory. Build and run with:</p>
-<div class="fragment"><div class="line">fpm run --example example_curve</div>
-<div class="line">fpm run --example example_periodic_curve</div>
-<div class="line">fpm run --example example_parametric_curves</div>
-<div class="line">fpm run --example example_convex_curve</div>
-<div class="line">fpm run --example example_surface</div>
-<div class="line">fpm run --example example_grid_surface</div>
-<div class="line">fpm run --example example_polar</div>
-<div class="line">fpm run --example example_sphere</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md12"></a>
-Reference</h1>
-<ul>
-<li><a class="el" href="book_reference.html">Book Reference Index</a> &mdash; Quick-reference table mapping routines to book chapters and equations</li>
-</ul>
-<p>The algorithms are described in:</p>
-<blockquote class="doxtable">
-<p>P. Dierckx, <em>Curve and Surface Fitting with Splines</em>, Oxford University Press, 1993. </p>
-</blockquote>
-<p>Each routine's documentation references the relevant book chapter, section, and equation numbers. </p>
-</div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
 </div><!-- doc-content -->

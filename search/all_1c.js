@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['—_20evaluate_20and_20inspect_0',['Step 3 — Evaluate and Inspect',['../tutorial_convex_curve.html#autotoc_md57',1,'']]],
-  ['—_20fit_20with_20constraints_1',['Step 2 — Fit with Constraints',['../tutorial_convex_curve.html#autotoc_md56',1,'']]],
-  ['—_20load_20data_20and_20set_20convexity_20flags_2',['Step 1 — Load Data and Set Convexity Flags',['../tutorial_convex_curve.html#autotoc_md55',1,'']]],
-  ['—_20modern_20fortran_20spline_20fitting_3',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]],
-  ['—_20tt_20fitpack_5fgrid_5fsphere_20tt_4',['Gridded Sphere Data — &lt;tt&gt;fitpack_grid_sphere&lt;/tt&gt;',['../tutorial_sphere.html#autotoc_md110',1,'']]],
-  ['—_20tt_20fitpack_5fsphere_20tt_5',['Scattered Sphere Data — &lt;tt&gt;fitpack_sphere&lt;/tt&gt;',['../tutorial_sphere.html#autotoc_md106',1,'']]]
+  ['z_0',['z',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#abd188fa9c2277e3f58ba5f4c9e7058c6',1,'fitpack_gridded_polar::fitpack_grid_polar::z'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a7f0750428c0898f18ca9a33d973bb1eb',1,'fitpack_gridded_sphere::fitpack_grid_sphere::z'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#a444fb6ddd75a7660b50cf33ae84ce848',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::z'],['../structfitpack__polar__domains_1_1fitpack__polar.html#a8dc72d2f5165e0dd69a2d732124f6685',1,'fitpack_polar_domains::fitpack_polar::z']]],
+  ['z0_1',['z0',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#ae181aaeb75b558f7ac0793751b7bcfd5',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
+  ['z0_5fpresent_2',['z0_present',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a7ecff74ef9824352515fedd35f724c1e',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
+  ['z0_5fzero_5fgradient_3',['z0_zero_gradient',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a87d23232145856156f44f67e1b6a01f2',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
+  ['zero_4',['Degree zero',['../theory_bsplines.html#autotoc_md9',1,'']]],
+  ['zero_20finding_5',['Zero Finding',['../tutorial_curve.html#autotoc_md79',1,'']]],
+  ['zeros_6',['zeros',['../structfitpack__curves_1_1fitpack__curve.html#a2abcd592a21323f4da5a5ccb8faef7d2',1,'fitpack_curves::fitpack_curve']]]
 ];

@@ -1,8 +1,0 @@
-<map id="fitpack_core::fitpack_error_handling" name="fitpack_core::fitpack_error_handling">
-<area shape="rect" id="Node000001" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="5,49,159,89"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="207,5,360,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,50,193,42,194,48,160,55"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="207,93,360,133"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,83,194,91,193,96,158,89"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="246,94,243,84,249,75,263,69,283,67,307,70,320,77,317,82,305,75,283,72,264,74,253,79,249,85,251,92"/>
-</map>

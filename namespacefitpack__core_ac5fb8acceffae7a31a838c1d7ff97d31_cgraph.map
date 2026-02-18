@@ -1,9 +1,0 @@
-<map id="fitpack_core::fpbspl" name="fitpack_core::fpbspl">
-<area shape="rect" id="Node000001" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="5,29,155,55"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="203,29,376,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,39,189,39,189,45,155,45"/>
-<area shape="poly" id="edge4_Node000002_Node000002" title=" " alt="" coords="256,31,248,21,252,11,266,5,289,3,318,6,329,15,326,20,316,11,289,8,267,10,256,15,254,20,260,28"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="424,29,569,55"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="376,39,410,39,410,45,376,45"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="463,31,456,21,459,11,473,5,497,3,525,6,537,15,533,20,523,11,497,8,475,10,463,15,461,20,467,28"/>
-</map>

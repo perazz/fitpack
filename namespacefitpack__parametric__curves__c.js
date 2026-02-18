@@ -1,6 +1,6 @@
 var namespacefitpack__parametric__curves__c =
 [
-    [ "fitpack_parametric_curve_c", "structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c.html", "structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c" ],
+    [ "fitpack_parametric_curve_c", "structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c.html", null ],
     [ "fitpack_parametric_curve_c_allocate", "namespacefitpack__parametric__curves__c.html#a9ddf68fccfb85f859d4508039fcef3c1", null ],
     [ "fitpack_parametric_curve_c_copy", "namespacefitpack__parametric__curves__c.html#a0fbaa2c936c14d5e93339f903e3fff47", null ],
     [ "fitpack_parametric_curve_c_degree", "namespacefitpack__parametric__curves__c.html#aac9f31beadfcf3851ed3647bf884920e", null ],
@@ -16,11 +16,8 @@ var namespacefitpack__parametric__curves__c =
     [ "fitpack_parametric_curve_c_new_fit", "namespacefitpack__parametric__curves__c.html#a39f5a7e28a71ba0b99c1c87e2fe5a861", null ],
     [ "fitpack_parametric_curve_c_new_points", "namespacefitpack__parametric__curves__c.html#a7d2e600572400386c7229ceb89a10589", null ],
     [ "fitpack_parametric_curve_c_pointer", "namespacefitpack__parametric__curves__c.html#ab81e3f7e63cccbcb2771a257f1032fbb", null ],
-    [ "fitpack_parametric_curve_c_set_default_parameters", "namespacefitpack__parametric__curves__c.html#a97fd60f1ddf36ea64ec95552075eb5ee", null ],
     [ "fitpack_parametric_curve_c_smoothing", "namespacefitpack__parametric__curves__c.html#ae5a4a7a7d830ddd210c04a7ea6361159", null ],
     [ "fitpack_parametric_curve_c_ubegin", "namespacefitpack__parametric__curves__c.html#ab53dd6f7649c877f71ea31b5f0fbe9e8", null ],
-    [ "fitpack_parametric_curve_c_ubegin_ref", "namespacefitpack__parametric__curves__c.html#af0a7335d15616f53f8ac8cfc0aba377c", null ],
     [ "fitpack_parametric_curve_c_uend", "namespacefitpack__parametric__curves__c.html#a41d9320a2a73bb3e6819bfae8abcb095", null ],
-    [ "fitpack_parametric_curve_c_uend_ref", "namespacefitpack__parametric__curves__c.html#a99f4fd7761539ba4225d036ecce3b7f1", null ],
     [ "fitpack_parametric_curve_c_null", "namespacefitpack__parametric__curves__c.html#af2d94c339b71179f0167166019707edf", null ]
 ];

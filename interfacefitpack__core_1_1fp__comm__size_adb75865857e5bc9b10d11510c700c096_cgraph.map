@@ -1,8 +1,0 @@
-<map id="fitpack_core::fp_comm_size::fp_bool_comm_size_1d" name="fitpack_core::fp_comm_size::fp_bool_comm_size_1d">
-<area shape="rect" id="Node000001" title="Calculate storage size for 1D logical(FP_BOOL) allocatable array." alt="" coords="5,49,220,89"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a8351ecca3ca1adefde53fc395912d1c2" title="Calculate storage size for 1D logical(FP_BOOL) allocatable array." alt="" coords="281,5,438,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,48,267,39,268,44,221,53"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a7d6e951acad3110eb2c3dfb6e5215d8b" title="Number of FP_COMM elements required to store nbits of data." alt="" coords="268,93,451,133"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="221,86,255,92,254,97,220,91"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="314,94,311,84,318,74,335,69,359,67,388,70,403,77,401,82,386,75,359,72,336,74,321,79,316,85,319,92"/>
-</map>

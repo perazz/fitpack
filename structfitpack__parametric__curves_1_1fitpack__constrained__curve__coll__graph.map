@@ -1,7 +1,0 @@
-<map id="fitpack_parametric_curves::fitpack_constrained_curve" name="fitpack_parametric_curves::fitpack_constrained_curve">
-<area shape="rect" id="Node000001" title="Parametric curve fitter with derivative constraints at the endpoints." alt="" coords="5,181,256,221"/>
-<area shape="rect" id="Node000002" href="$structfitpack__parametric__curves_1_1fitpack__parametric__curve.html" title="Open parametric curve fitter in ." alt="" coords="8,93,253,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,147,133,181,128,181,128,147"/>
-<area shape="rect" id="Node000003" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="49,5,212,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="133,59,133,93,128,93,128,59"/>
-</map>

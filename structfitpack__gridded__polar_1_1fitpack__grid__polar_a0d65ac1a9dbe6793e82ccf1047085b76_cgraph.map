@@ -1,8 +1,0 @@
-<map id="fitpack_gridded_polar::fitpack_grid_polar::eval" name="fitpack_gridded_polar::fitpack_grid_polar::eval">
-<area shape="rect" id="Node000001" title="Evaluate gridded domain at given x,y coordinates." alt="" coords="5,5,188,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__polar.html#a0b3efbcee850e53d8eaab9a2a6e00790" title=" " alt="" coords="447,5,609,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,20,236,19,399,19,433,19,433,25,399,24,236,24,188,25"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__gridded__polar.html#af3f0026cdc1d68ade6936f4221c90642" title=" " alt="" coords="236,33,399,73"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,34,223,39,222,44,188,40"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="399,40,433,35,434,41,399,45"/>
-</map>

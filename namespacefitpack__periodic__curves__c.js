@@ -1,6 +1,6 @@
 var namespacefitpack__periodic__curves__c =
 [
-    [ "fitpack_periodic_curve_c", "structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c.html", "structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c" ],
+    [ "fitpack_periodic_curve_c", "structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c.html", null ],
     [ "fitpack_periodic_curve_c_all_derivatives", "namespacefitpack__periodic__curves__c.html#a5929d29d5d78198732d66df213050b8b", null ],
     [ "fitpack_periodic_curve_c_allocate", "namespacefitpack__periodic__curves__c.html#a96c1605d9236c12239ba7640c5e65c05", null ],
     [ "fitpack_periodic_curve_c_copy", "namespacefitpack__periodic__curves__c.html#a513585d8920edadd45108f606ccafb7d", null ],
@@ -14,7 +14,6 @@ var namespacefitpack__periodic__curves__c =
     [ "fitpack_periodic_curve_c_get_pointer", "namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7", null ],
     [ "fitpack_periodic_curve_c_integral", "namespacefitpack__periodic__curves__c.html#ac19b1d3b2a2b964f9f37d079194faf3e", null ],
     [ "fitpack_periodic_curve_c_interpolating", "namespacefitpack__periodic__curves__c.html#ad4f3db353be2b6ef6fe6068540442b0d", null ],
-    [ "fitpack_periodic_curve_c_move_alloc", "namespacefitpack__periodic__curves__c.html#aa9afb4302f091c9e6e83d9079c11fb3f", null ],
     [ "fitpack_periodic_curve_c_mse", "namespacefitpack__periodic__curves__c.html#ab00fab7e291ebd3a9ff49476a4bd9045", null ],
     [ "fitpack_periodic_curve_c_new_fit", "namespacefitpack__periodic__curves__c.html#a9d131cb9ae4768a26deb40dac089e47f", null ],
     [ "fitpack_periodic_curve_c_new_points", "namespacefitpack__periodic__curves__c.html#a536c0266e869bf5396cab3f4168615cf", null ],

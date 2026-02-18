@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: Polar Domain Fitting Tutorial</title>
+<title>My Project: Polar Domain Fitting Tutorial</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -115,46 +107,46 @@ $(function(){initNavTree('tutorial_polar.html',''); initResizable(true); });
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__polar"></a></p>
 <p>This tutorial covers bivariate spline fitting on disc-shaped domains using FITPACK's polar coordinate types: <code>fitpack_polar</code> for scattered data and <code>fitpack_grid_polar</code> for gridded data.</p>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<h1><a class="anchor" id="autotoc_md142"></a>
 Overview</h1>
 <p>Many physical problems produce data on disc-shaped or circular regions. FITPACK provides two types that handle the polar coordinate transformation internally and enforce the continuity constraints required at the origin:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Input data   </th><th class="markdownTableHeadNone">Boundary   </th><th class="markdownTableHeadNone">Core routine    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>fitpack_polar</code>   </td><td class="markdownTableBodyNone">Scattered \( (x_i, y_i, z_i) \)   </td><td class="markdownTableBodyNone">General \( r(\theta) \)   </td><td class="markdownTableBodyNone"><code>polar</code>    </td></tr>
+<td class="markdownTableBodyNone"><code>fitpack_polar</code>   </td><td class="markdownTableBodyNone">Scattered <picture><source srcset="form_51_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i, z_i) $" src="form_51.png"/></picture>   </td><td class="markdownTableBodyNone">General <picture><source srcset="form_48_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r(\theta) $" src="form_48.png"/></picture>   </td><td class="markdownTableBodyNone"><code>polar</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>fitpack_grid_polar</code>   </td><td class="markdownTableBodyNone">Grid \( z(v_j, u_i) \)   </td><td class="markdownTableBodyNone">Constant radius \( r \)   </td><td class="markdownTableBodyNone"><code>pogrid</code>   </td></tr>
+<td class="markdownTableBodyNone"><code>fitpack_grid_polar</code>   </td><td class="markdownTableBodyNone">Grid <picture><source srcset="form_330_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z(v_j, u_i) $" src="form_330.png"/></picture>   </td><td class="markdownTableBodyNone">Constant radius <picture><source srcset="form_17_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r $" src="form_17.png"/></picture>   </td><td class="markdownTableBodyNone"><code>pogrid</code>   </td></tr>
 </table>
 <p><b>Always prefer <code>fitpack_grid_polar</code> when data lies on a polar grid</b> &ndash; the <code>pogrid</code> algorithm exploits the grid structure and is significantly more efficient.</p>
-<h1><a class="anchor" id="autotoc_md91"></a>
+<h1><a class="anchor" id="autotoc_md143"></a>
 Mathematical Background</h1>
-<h2><a class="anchor" id="autotoc_md92"></a>
+<h2><a class="anchor" id="autotoc_md144"></a>
 Normalized polar coordinates</h2>
-<p>Given a disc bounded by \( r(\theta) \), FITPACK maps Cartesian coordinates to normalized polar coordinates \( (u, v) \):</p>
+<p>Given a disc bounded by <picture><source srcset="form_48_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r(\theta) $" src="form_48.png"/></picture>, FITPACK maps Cartesian coordinates to normalized polar coordinates <picture><source srcset="form_43_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (u, v) $" src="form_43.png"/></picture>:</p>
 <p class="formulaDsp">
-\[    x = u \, r(v) \cos v, \quad y = u \, r(v) \sin v, \quad
+<picture><source srcset="form_331_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    x = u \, r(v) \cos v, \quad y = u \, r(v) \sin v, \quad
     0 \leq u \leq 1, \; -\pi \leq v \leq \pi
-\]
+\]" src="form_331.png"/></picture>
 </p>
-<p>The normalized radial coordinate \( u = \sqrt{x^2 + y^2} / r(\theta) \) lies in \( [0, 1] \) regardless of boundary shape, and \( v = \theta \) is the polar angle. A bicubic spline \( s(u, v) \) is fitted in the rectangular parameter domain \( [0, 1] \times [-\pi, \pi] \).</p>
-<h2><a class="anchor" id="autotoc_md93"></a>
+<p>The normalized radial coordinate <picture><source srcset="form_332_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u = \sqrt{x^2 + y^2} / r(\theta) $" src="form_332.png"/></picture> lies in <picture><source srcset="form_293_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0, 1] $" src="form_293.png"/></picture> regardless of boundary shape, and <picture><source srcset="form_333_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v = \theta $" src="form_333.png"/></picture> is the polar angle. A bicubic spline <picture><source srcset="form_50_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(u, v) $" src="form_50.png"/></picture> is fitted in the rectangular parameter domain <picture><source srcset="form_334_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0, 1] \times [-\pi, \pi] $" src="form_334.png"/></picture>.</p>
+<h2><a class="anchor" id="autotoc_md145"></a>
 Continuity at the origin</h2>
-<p>Because all angles \( v \) map to the same physical point when \( u = 0 \), the spline must satisfy continuity constraints:</p>
+<p>Because all angles <picture><source srcset="form_46_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v $" src="form_46.png"/></picture> map to the same physical point when <picture><source srcset="form_28_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u = 0 $" src="form_28.png"/></picture>, the spline must satisfy continuity constraints:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone"><code>bc_continuity_origin</code>   </th><th class="markdownTableHeadNone">Constraint    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">\( C^0 \): \( s(0, v) = \text{const} \)    </td></tr>
+<td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone"><picture><source srcset="form_52_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^0 $" src="form_52.png"/></picture>: <picture><source srcset="form_335_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(0, v) = \text{const} $" src="form_335.png"/></picture>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">\( C^1 \): additionally \( \partial s / \partial u \) consistent across angles    </td></tr>
+<td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone"><picture><source srcset="form_53_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^1 $" src="form_53.png"/></picture>: additionally <picture><source srcset="form_248_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \partial s / \partial u $" src="form_248.png"/></picture> consistent across angles    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone">\( C^2 \): second-order consistency (default for <code>fitpack_polar</code>)   </td></tr>
+<td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone"><picture><source srcset="form_54_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^2 $" src="form_54.png"/></picture>: second-order consistency (default for <code>fitpack_polar</code>)   </td></tr>
 </table>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 11, &sect;11.1 (pp. 255&ndash;263)</dd></dl>
-<h1><a class="anchor" id="autotoc_md94"></a>
+<h1><a class="anchor" id="autotoc_md146"></a>
 Scattered Data: <code>fitpack_polar</code></h1>
-<p><code>fitpack_polar</code> accepts scattered Cartesian coordinates and a user-supplied boundary function \( r(\theta) \):</p>
+<p><code>fitpack_polar</code> accepts scattered Cartesian coordinates and a user-supplied boundary function <picture><source srcset="form_48_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r(\theta) $" src="form_48.png"/></picture>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_polar, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, one</div>
 <div class="line"><span class="keywordtype">type</span>(fitpack_polar) :: pol</div>
@@ -171,18 +163,18 @@ Scattered Data: <code>fitpack_polar</code></h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>z(:)</code>   </td><td class="markdownTableBodyNone">Function values at those points    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>boundary</code>   </td><td class="markdownTableBodyNone">Procedure matching <code>fitpack_polar_boundary</code> &ndash; returns \( r(\theta) \)    </td></tr>
+<td class="markdownTableBodyNone"><code>boundary</code>   </td><td class="markdownTableBodyNone">Procedure matching <code>fitpack_polar_boundary</code> &ndash; returns <picture><source srcset="form_48_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r(\theta) $" src="form_48.png"/></picture>    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>w(:)</code>   </td><td class="markdownTableBodyNone">Optional per-point weights (default: unit weights)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>smoothing</code>   </td><td class="markdownTableBodyNone">Optional smoothing parameter \( s \)   </td></tr>
+<td class="markdownTableBodyNone"><code>smoothing</code>   </td><td class="markdownTableBodyNone">Optional smoothing parameter <picture><source srcset="form_62_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s $" src="form_62.png"/></picture>   </td></tr>
 </table>
 <p>After the initial fit, adjust smoothing without resupplying data:</p>
 <div class="fragment"><div class="line">ierr = pol%fit(smoothing=10.0_fp_real)</div>
-</div><!-- fragment --><p>Evaluate at Cartesian points &ndash; the \( (u, v) \) transform is internal:</p>
+</div><!-- fragment --><p>Evaluate at Cartesian points &ndash; the <picture><source srcset="form_43_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (u, v) $" src="form_43.png"/></picture> transform is internal:</p>
 <div class="fragment"><div class="line">z_val = pol%eval(x_val, y_val, ierr)        <span class="comment">! single point</span></div>
 <div class="line">z_arr = pol%eval(x_arr, y_arr, ierr)        ! array of points</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md95"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md147"></a>
 Example: smooth function on a unit disc</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: m = 100</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: x(m), y(m), z(m), w(m), r, theta</div>
@@ -201,7 +193,7 @@ Example: smooth function on a unit disc</h2>
 <div class="line">ierr = pol%new_fit(x, y, z, unit_disk, w, smoothing=real(m, fp_real))</div>
 <div class="line">print *, pol%eval(zero, zero, ierr)</div>
 <div class="line"><span class="keyword">call </span>pol%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md96"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md148"></a>
 Gridded Data: <code>fitpack_grid_polar</code></h1>
 <p><code>fitpack_grid_polar</code> accepts data on a polar grid with a <b>constant</b> boundary radius:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_polar, fp_real, fp_flag, &amp;</div>
@@ -214,19 +206,19 @@ Gridded Data: <code>fitpack_grid_polar</code></h1>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Argument   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>u(:)</code>   </td><td class="markdownTableBodyNone">Radial grid, \( 0 &lt; u_1 &lt; \cdots &lt; u_{n_u} \leq 1 \)    </td></tr>
+<td class="markdownTableBodyNone"><code>u(:)</code>   </td><td class="markdownTableBodyNone">Radial grid, <picture><source srcset="form_336_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 &lt; u_1 &lt; \cdots &lt; u_{n_u} \leq 1 $" src="form_336.png"/></picture>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>v(:)</code>   </td><td class="markdownTableBodyNone">Angular grid, \( -\pi \leq v_1 &lt; \cdots &lt; v_{n_v} &lt; \pi \)    </td></tr>
+<td class="markdownTableBodyNone"><code>v(:)</code>   </td><td class="markdownTableBodyNone">Angular grid, <picture><source srcset="form_337_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ -\pi \leq v_1 &lt; \cdots &lt; v_{n_v} &lt; \pi $" src="form_337.png"/></picture>    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>r</code>   </td><td class="markdownTableBodyNone">Constant boundary radius    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>z(nv, nu)</code>   </td><td class="markdownTableBodyNone">Function values (angular index first)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>z0</code>   </td><td class="markdownTableBodyNone">Optional function value at origin \( u = 0 \)    </td></tr>
+<td class="markdownTableBodyNone"><code>z0</code>   </td><td class="markdownTableBodyNone">Optional function value at origin <picture><source srcset="form_28_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u = 0 $" src="form_28.png"/></picture>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>smoothing</code>   </td><td class="markdownTableBodyNone">Optional smoothing parameter \( s \)   </td></tr>
+<td class="markdownTableBodyNone"><code>smoothing</code>   </td><td class="markdownTableBodyNone">Optional smoothing parameter <picture><source srcset="form_62_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s $" src="form_62.png"/></picture>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md97"></a>
+<h2><a class="anchor" id="autotoc_md149"></a>
 Origin boundary conditions</h2>
 <p>Use <code>gpol\set_origin_BC</code> to control spline behavior at the origin:</p>
 <div class="fragment"><div class="line"><span class="keyword">call </span>gpol%set_origin_BC(z0=z0, exact=.true., differentiable=.true.)</div>
@@ -237,15 +229,15 @@ Origin boundary conditions</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>z0</code>   </td><td class="markdownTableBodyNone">Prescribe the function value at the origin    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>exact</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: interpolate \( z_0 \) exactly; <code>.false.</code>: approximate    </td></tr>
+<td class="markdownTableBodyNone"><code>exact</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: interpolate <picture><source srcset="form_23_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z_0 $" src="form_23.png"/></picture> exactly; <code>.false.</code>: approximate    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>differentiable</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce \( C^1 \) at origin; <code>.false.</code>: \( C^0 \) only   </td></tr>
+<td class="markdownTableBodyNone"><code>differentiable</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce <picture><source srcset="form_53_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^1 $" src="form_53.png"/></picture> at origin; <code>.false.</code>: <picture><source srcset="form_52_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^0 $" src="form_52.png"/></picture> only   </td></tr>
 </table>
 <p>When <code>z0</code> is omitted, no origin constraint is imposed.</p>
-<p>Evaluate on \( (u, v) \) coordinates:</p>
+<p>Evaluate on <picture><source srcset="form_43_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (u, v) $" src="form_43.png"/></picture> coordinates:</p>
 <div class="fragment"><div class="line">z_val  = gpol%eval(u_val, v_val, ierr)       <span class="comment">! single point</span></div>
 <div class="line">z_grid = gpol%eval(u_new, v_new, ierr)       ! grid: shape [<span class="keyword">size</span>(v), <span class="keyword">size</span>(u)]</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md150"></a>
 Example: data on a polar grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: nu = 10, nv = 20</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: u(nu), v(nv), zg(nv, nu), z0</div>
@@ -267,9 +259,9 @@ Example: data on a polar grid</h2>
 <div class="line">ierr = gpol%fit(smoothing=real(nu * nv, fp_real))</div>
 <div class="line">print *, <span class="stringliteral">&#39;Residual: &#39;</span>, gpol%mse()</div>
 <div class="line"><span class="keyword">call </span>gpol%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md151"></a>
 Boundary Function</h1>
-<p>The boundary function for <code>fitpack_polar</code> must match the abstract interface <code>fitpack_polar_boundary</code> &ndash; a <code>pure</code> function receiving \( \theta \in [-\pi, \pi] \) and returning a positive radius:</p>
+<p>The boundary function for <code>fitpack_polar</code> must match the abstract interface <code>fitpack_polar_boundary</code> &ndash; a <code>pure</code> function receiving <picture><source srcset="form_338_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta \in [-\pi, \pi] $" src="form_338.png"/></picture> and returning a positive radius:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">pure</span> <span class="keyword">real(FP_REAL) </span><span class="keyword">function </span>my_boundary(theta) <span class="keyword">result</span>(r)</div>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">intent(in)</span> :: theta</div>
 <div class="line">    r = ...</div>
@@ -279,18 +271,18 @@ Boundary Function</h1>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">intent(in)</span> :: theta</div>
 <div class="line">    unit_disk = one</div>
 <div class="line"><span class="keyword">end function</span></div>
-</div><!-- fragment --><p><b>Ellipse</b> with semi-axes \( a \) and \( b \):</p>
+</div><!-- fragment --><p><b>Ellipse</b> with semi-axes <picture><source srcset="form_339_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ a $" src="form_339.png"/></picture> and <picture><source srcset="form_340_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ b $" src="form_340.png"/></picture>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">pure</span> <span class="keyword">real(FP_REAL) </span><span class="keyword">function </span>ellipse(theta)</div>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">intent(in)</span> :: theta</div>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">parameter</span> :: a = 2.0_fp_real, b = 1.0_fp_real</div>
 <div class="line">    ellipse = a * b / sqrt((b * cos(theta))**2 + (a * sin(theta))**2)</div>
 <div class="line"><span class="keyword">end function</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md152"></a>
 Complete Example</h1>
 <p>A fully worked program covering both scattered and gridded polar fitting is provided in the source tree. Build and run with:</p>
 <div class="fragment"><div class="line">fpm run --example example_polar</div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><code>examples/example_polar.f90</code></dd></dl>
-<h1><a class="anchor" id="autotoc_md101"></a>
+<h1><a class="anchor" id="autotoc_md153"></a>
 Error Handling</h1>
 <p>All routines return an <code>integer(FP_FLAG)</code> error code:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) <span class="keywordflow">then</span></div>

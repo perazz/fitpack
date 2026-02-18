@@ -1,6 +1,6 @@
 var namespacefitpack__curves__c =
 [
-    [ "fitpack_curve_c", "structfitpack__curves__c_1_1fitpack__curve__c.html", "structfitpack__curves__c_1_1fitpack__curve__c" ],
+    [ "fitpack_curve_c", "structfitpack__curves__c_1_1fitpack__curve__c.html", null ],
     [ "fitpack_curve_c_all_derivatives", "namespacefitpack__curves__c.html#a0db9d1b68093aac9473972a3e5760e6e", null ],
     [ "fitpack_curve_c_allocate", "namespacefitpack__curves__c.html#a70b29a74673295f6465a91e44f48628e", null ],
     [ "fitpack_curve_c_copy", "namespacefitpack__curves__c.html#a532c03aac50decdaed318ef55c91594b", null ],
@@ -15,7 +15,6 @@ var namespacefitpack__curves__c =
     [ "fitpack_curve_c_get_pointer", "namespacefitpack__curves__c.html#adb479e307b50b9939f9e689ffd385082", null ],
     [ "fitpack_curve_c_integral", "namespacefitpack__curves__c.html#a514af7c0a684f89e26e62f3fd20cfc9b", null ],
     [ "fitpack_curve_c_interpolating", "namespacefitpack__curves__c.html#a7a1b7416dbceebc128a73285bcf5d2fd", null ],
-    [ "fitpack_curve_c_move_alloc", "namespacefitpack__curves__c.html#a208c95e809149dbf3670e98000152196", null ],
     [ "fitpack_curve_c_mse", "namespacefitpack__curves__c.html#a84b4cd4200ebac81de3894b8f69c26d3", null ],
     [ "fitpack_curve_c_new_fit", "namespacefitpack__curves__c.html#a56fdb2523db90e9e61d8a0eaee640f51", null ],
     [ "fitpack_curve_c_new_points", "namespacefitpack__curves__c.html#a9148b723f7256780431b8d17f8272e41", null ],

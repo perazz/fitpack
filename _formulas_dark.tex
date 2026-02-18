@@ -1,0 +1,1220 @@
+\documentclass{article}
+\usepackage{iftex}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\color{white}
+\pagecolor{black}
+\ifPDFTeX
+\usepackage{newunicodechar}
+  \makeatletter
+    \def\doxynewunicodechar#1#2{%
+    \@tempswafalse
+    \edef\nuc@tempa{\detokenize{#1}}%
+    \if\relax\nuc@tempa\relax
+      \nuc@emptyargerr
+    \else
+      \edef\@tempb{\expandafter\@car\nuc@tempa\@nil}%
+      \nuc@check
+      \if@tempswa
+        \@namedef{u8:\nuc@tempa}{#2}%
+      \fi
+    \fi
+  }
+  \makeatother
+  \doxynewunicodechar{⁻}{${}^{-}$}% Superscript minus
+  \doxynewunicodechar{²}{${}^{2}$}% Superscript two
+  \doxynewunicodechar{³}{${}^{3}$}% Superscript three
+
+\fi
+\pagestyle{empty}
+\begin{document}
+$ k = 3 $
+\pagebreak
+
+$ v_i = 1 $
+\pagebreak
+
+$ v_i = -1 $
+\pagebreak
+
+$ v_i = 0 $
+\pagebreak
+
+$ y = s(x) $
+\pagebreak
+
+$ k $
+\pagebreak
+
+$ (x_i, y_i, w_i) $
+\pagebreak
+
+$ s = 0 $
+\pagebreak
+
+$ \int_a^b s(x)\,dx $
+\pagebreak
+
+$ z = s(x, y) $
+\pagebreak
+
+$ (x_i, y_j) $
+\pagebreak
+
+$ x_i $
+\pagebreak
+
+$ i = 1, \ldots, m_x $
+\pagebreak
+
+$ y_j $
+\pagebreak
+
+$ j = 1, \ldots, m_y $
+\pagebreak
+
+$ z(j, i) $
+\pagebreak
+
+$ (u_i, v_j) $
+\pagebreak
+
+$ r $
+\pagebreak
+
+\[        x = u \, r \cos v, \quad y = u \, r \sin v, \quad 0 \leq u \leq 1, \ 
+-\pi \leq v \leq \pi
+\]
+\pagebreak
+
+$ z_0 = f(0,0) $
+\pagebreak
+
+$ u_i $
+\pagebreak
+
+$ v_j $
+\pagebreak
+
+$ z(i, j) $
+\pagebreak
+
+$ z_0 $
+\pagebreak
+
+$ u_i \in [0, \pi] $
+\pagebreak
+
+$ i = 1, \ldots, m_u $
+\pagebreak
+
+$ 2\pi $
+\pagebreak
+
+$ j = 1, \ldots, m_v $
+\pagebreak
+
+$ u = 0 $
+\pagebreak
+
+$ u = \pi $
+\pagebreak
+
+$ \mathbb{R}^d $
+\pagebreak
+
+$ d $
+\pagebreak
+
+$ d \geq 1 $
+\pagebreak
+
+$ s_j(u) $
+\pagebreak
+
+$ u $
+\pagebreak
+
+$ \mathbf{s}(u) = (s_1(u), \ldots, s_d(u)) $
+\pagebreak
+
+$ m $
+\pagebreak
+
+$ \mathbf{x}_i \in \mathbb{R}^d $
+\pagebreak
+
+$ \mathbf{s}(u_1) = \mathbf{s}(u_m) $
+\pagebreak
+
+\[            s_j^{(\ell)}(u_1) = \text{db}(j, \ell), \quad \ell = 0, \ldots, \text{ib} - 1
+\]
+\pagebreak
+
+\[            s_j^{(\ell)}(u_m) = \text{de}(j, \ell), \quad \ell = 0, \ldots, \text{ie} - 1
+\]
+\pagebreak
+
+$ \ell $
+\pagebreak
+
+$ d \times (ib) $
+\pagebreak
+
+$ (u, v) $
+\pagebreak
+
+$ \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) $
+\pagebreak
+
+$ \mathbf{z}(j, i) \in \mathbb{R}^d $
+\pagebreak
+
+$ v $
+\pagebreak
+
+$ x^2 + y^2 \leq r(\theta)^2 $
+\pagebreak
+
+$ r(\theta) $
+\pagebreak
+
+\[        x = u \, r(v) \cos v, \quad y = u \, r(v) \sin v, \quad 0 \leq u \leq 1, \ 
+-\pi \leq v \leq \pi
+\]
+\pagebreak
+
+$ s(u, v) $
+\pagebreak
+
+$ (x_i, y_i, z_i) $
+\pagebreak
+
+$ C^0 $
+\pagebreak
+
+$ C^1 $
+\pagebreak
+
+$ C^2 $
+\pagebreak
+
+$ \theta \in [0, \pi] $
+\pagebreak
+
+$ \phi \in [0, 2\pi] $
+\pagebreak
+
+$ r = s(\theta, \phi) $
+\pagebreak
+
+$ \theta = 0 $
+\pagebreak
+
+$ \theta = \pi $
+\pagebreak
+
+$ (\theta_i, \phi_i, r_i) $
+\pagebreak
+
+$ w_i $
+\pagebreak
+
+$ s $
+\pagebreak
+
+$ k - 1 $
+\pagebreak
+
+\[    t_0 \leq t_1 \leq \cdots \leq t_{n+k+1}
+\]
+\pagebreak
+
+$ [a, b] $
+\pagebreak
+
+$ \mathbf{t} $
+\pagebreak
+
+$ \mathcal{S}(k, \mathbf{t}) $
+\pagebreak
+
+$ n + 1 $
+\pagebreak
+
+$ k + 1 $
+\pagebreak
+
+\[    t_0 = t_1 = \cdots = t_k = a, \qquad
+    t_{n+1} = t_{n+2} = \cdots = t_{n+k+1} = b
+\]
+\pagebreak
+
+$ N_{i,k}(x) $
+\pagebreak
+
+$ k = 0 $
+\pagebreak
+
+\[    N_{i,0}(x) =
+    \begin{cases}
+        1 & \text{if } t_i \leq x < t_{i+1}, \\
+        0 & \text{otherwise}.
+    \end{cases}
+\]
+\pagebreak
+
+$ k \geq 1 $
+\pagebreak
+
+\[    N_{i,k}(x) =
+        \frac{x - t_i}{t_{i+k} - t_i} \, N_{i,k-1}(x)
+      + \frac{t_{i+k+1} - x}{t_{i+k+1} - t_{i+1}} \, N_{i+1,k-1}(x)
+\]
+\pagebreak
+
+$ N_{i,k}(x) \geq 0 $
+\pagebreak
+
+$ x $
+\pagebreak
+
+$ N_{i,k}(x) = 0 $
+\pagebreak
+
+$ [t_i,\, t_{i+k+1}] $
+\pagebreak
+
+$ \sum_{i} N_{i,k}(x) = 1 $
+\pagebreak
+
+$ N_{i,k} $
+\pagebreak
+
+$ s \in \mathcal{S}(k, \mathbf{t}) $
+\pagebreak
+
+\[    s(x) = \sum_{i=0}^{n} c_i \, N_{i,k}(x)
+\]
+\pagebreak
+
+$ c_i $
+\pagebreak
+
+$ x \in [t_j,\, t_{j+1}) $
+\pagebreak
+
+$ s(x) $
+\pagebreak
+
+\[    d_i^{[0]} = c_i, \qquad i = j-k, \ldots, j
+\]
+\pagebreak
+
+$ r = 1, \ldots, k $
+\pagebreak
+
+\[    d_i^{[r]} =
+        \frac{x - t_i}{t_{i+k+1-r} - t_i} \, d_i^{[r-1]}
+      + \frac{t_{i+k+1-r} - x}{t_{i+k+1-r} - t_i} \, d_{i-1}^{[r-1]},
+    \qquad i = j-k+r, \ldots, j
+\]
+\pagebreak
+
+$ s(x) = d_j^{[k]} $
+\pagebreak
+
+$ \mathcal{O}(k^2) $
+\pagebreak
+
+$ s(x) = \sum_i c_i \, N_{i,k}(x) $
+\pagebreak
+
+\[    s'(x) = \sum_{i=1}^{n} c_i^{(1)} \, N_{i,k-1}(x)
+\]
+\pagebreak
+
+\[    c_i^{(1)} = \frac{k}{t_{i+k} - t_i} \, (c_i - c_{i-1})
+\]
+\pagebreak
+
+$ \nu $
+\pagebreak
+
+$ k - \nu $
+\pagebreak
+
+\[    \int_a^b s(x) \, dx = \sum_{i=0}^{n} c_i \, \frac{t_{i+k+1} - t_i}{k + 1}
+\]
+\pagebreak
+
+\[    \int_a^b N_{i,k}(x) \, dx = \frac{t_{i+k+1} - t_i}{k + 1}
+\]
+\pagebreak
+
+$ \bar{t} $
+\pagebreak
+
+$ \bar{t} \in [t_j,\, t_{j+1}) $
+\pagebreak
+
+$ \bar{c}_i $
+\pagebreak
+
+\[    \bar{c}_i =
+    \begin{cases}
+        c_i & \text{if } i \leq j - k, \\[4pt]
+        \alpha_i \, c_i + (1 - \alpha_i) \, c_{i-1}
+            & \text{if } j - k < i \leq j, \\[4pt]
+        c_{i-1} & \text{if } i > j,
+    \end{cases}
+\]
+\pagebreak
+
+\[    \alpha_i = \frac{\bar{t} - t_i}{t_{i+k} - t_i}.
+\]
+\pagebreak
+
+$ 0 \leq \alpha_i \leq 1 $
+\pagebreak
+
+$ \mathbf{t}_x $
+\pagebreak
+
+$ \mathbf{t}_y $
+\pagebreak
+
+$ N_{i,k_x}(x) $
+\pagebreak
+
+$ M_{j,k_y}(y) $
+\pagebreak
+
+\[    s(x, y) = \sum_{i=0}^{n_x} \sum_{j=0}^{n_y}
+        c_{ij} \, N_{i,k_x}(x) \, M_{j,k_y}(y)
+\]
+\pagebreak
+
+$ c_{ij} $
+\pagebreak
+
+$ (n_x + 1)(n_y + 1) $
+\pagebreak
+
+$ y $
+\pagebreak
+
+$ (x_i, y_i) $
+\pagebreak
+
+$ i = 1, \ldots, m $
+\pagebreak
+
+$ S(k, \mathbf{t}) $
+\pagebreak
+
+\[    x_1 < x_2 < \cdots < x_m
+\]
+\pagebreak
+
+$ s \in S(k, \mathbf{t}) $
+\pagebreak
+
+$ s(x_i) = y_i $
+\pagebreak
+
+$ n = m $
+\pagebreak
+
+$ c_j $
+\pagebreak
+
+$ \mathbf{t} = (t_1, \ldots, t_{n+k+1}) $
+\pagebreak
+
+\[    s(x) = \sum_{j=1}^{n} c_j \, B_j(x; k, \mathbf{t})
+\]
+\pagebreak
+
+$ n $
+\pagebreak
+
+\[    \sum_{i=1}^{m} w_i^2 \left( y_i - \sum_{j=1}^{n} c_j \, B_j(x_i) \right)^2
+\]
+\pagebreak
+
+$ \mathbf{c} \in \mathbb{R}^n $
+\pagebreak
+
+$ A^T W^2 A \, \mathbf{c} = A^T W^2 \mathbf{y} $
+\pagebreak
+
+$ A_{ij} = B_j(x_i) $
+\pagebreak
+
+$ m \times n $
+\pagebreak
+
+$ W = \mathrm{diag}(w_i) $
+\pagebreak
+
+$ B_j $
+\pagebreak
+
+$ k+1 $
+\pagebreak
+
+$ A $
+\pagebreak
+
+$ A^T W^2 A $
+\pagebreak
+
+$ W A $
+\pagebreak
+
+$ R $
+\pagebreak
+
+$ \kappa(WA) $
+\pagebreak
+
+$ \kappa(WA)^2 $
+\pagebreak
+
+$ \mathcal{O}(k) $
+\pagebreak
+
+$ \mathcal{O}(m k^2) $
+\pagebreak
+
+$ R \mathbf{c} = Q^T W \mathbf{y} $
+\pagebreak
+
+\[    \min_{s \in S(k, \mathbf{t})} \int_{x_1}^{x_m} \left[ s''(x) \right]^2 \, dx
+    \quad \text{subject to} \quad
+    \sum_{i=1}^{m} w_i^2 \left( y_i - s(x_i) \right)^2 \leq S
+\]
+\pagebreak
+
+$ S \geq 0 $
+\pagebreak
+
+$ S = 0 $
+\pagebreak
+
+$ S $
+\pagebreak
+
+$ 2k + 1 $
+\pagebreak
+
+$ 2(k+1) $
+\pagebreak
+
+$ f_p = \sum w_i^2 (y_i - s(x_i))^2 $
+\pagebreak
+
+$ f_p \leq S $
+\pagebreak
+
+$ [t_j, t_{j+1}) $
+\pagebreak
+
+$ p $
+\pagebreak
+
+\[       \eta(p) = p \sum_{i=1}^{m} w_i^2 (y_i - s_p(x_i))^2
+       + (1 - p) \int [s_p''(x)]^2 \, dx
+\]
+\pagebreak
+
+$ y_i = g(x_i) + \varepsilon_i $
+\pagebreak
+
+$ \varepsilon_i $
+\pagebreak
+
+$ \sigma^2 $
+\pagebreak
+
+$ w_i = 1 $
+\pagebreak
+
+$ m \sigma^2 $
+\pagebreak
+
+\[      S \approx m \, \sigma^2
+\]
+\pagebreak
+
+$ S \approx \sum w_i^2 \sigma_i^2 $
+\pagebreak
+
+$ S = m $
+\pagebreak
+
+$ [x_1, x_m] $
+\pagebreak
+
+\[    s^{(j)}(x_1) = s^{(j)}(x_m), \quad j = 0, 1, \ldots, k-1
+\]
+\pagebreak
+
+$ k-1 $
+\pagebreak
+
+\[    c_j = c_{n - k + j}, \quad j = 1, \ldots, k
+\]
+\pagebreak
+
+$ n - k $
+\pagebreak
+
+\[    \mathbf{x}(u) = \bigl( s_1(u), \, s_2(u), \, \ldots, \, s_d(u) \bigr)
+\]
+\pagebreak
+
+\[    u_1 = 0, \quad u_{i+1} = u_i + \| \mathbf{x}_{i+1} - \mathbf{x}_i \|,
+    \quad i = 1, \ldots, m-1
+\]
+\pagebreak
+
+\[    \sum_{j=1}^{d} \int \left[ s_j''(u) \right]^2 \, du
+    \quad \text{subject to} \quad
+    \sum_{i=1}^{m} \sum_{j=1}^{d} w_i^2 \left( x_{ij} - s_j(u_i) \right)^2 \leq S
+\]
+\pagebreak
+
+\[    s_j^{(l)}(u_1) = s_j^{(l)}(u_m), \quad l = 0, 1, \ldots, k-1, \quad j = 1, \ldots, d
+\]
+\pagebreak
+
+\[    s_j^{(l)}(u_1) = \alpha_{jl}, \quad s_j^{(l)}(u_m) = \beta_{jl}
+\]
+\pagebreak
+
+$ l $
+\pagebreak
+
+$ j $
+\pagebreak
+
+$ k \geq 2 $
+\pagebreak
+
+$ s''(x) \geq 0 $
+\pagebreak
+
+\[    \Delta^2 c_j = c_{j+2} - 2 c_{j+1} + c_j \geq 0
+\]
+\pagebreak
+
+$ \Delta^2 c_j \leq 0 $
+\pagebreak
+
+$ v_i $
+\pagebreak
+
+$ +1 $
+\pagebreak
+
+$ [x_i, x_{i+1}] $
+\pagebreak
+
+$ -1 $
+\pagebreak
+
+$ 0 $
+\pagebreak
+
+$ \Delta^2 c_j $
+\pagebreak
+
+$ [a, b] \times [c, d] $
+\pagebreak
+
+\[    s(x, y) = \sum_{i=1}^{n_x - k_x - 1} \sum_{j=1}^{n_y - k_y - 1}
+    c_{ij} \, N_{i, k_x}(x) \, M_{j, k_y}(y)
+\]
+\pagebreak
+
+$ N_{i, k_x}(x) $
+\pagebreak
+
+$ k_x $
+\pagebreak
+
+$ \mathbf{t}_x = (t_{x,1}, \ldots, t_{x, n_x}) $
+\pagebreak
+
+$ M_{j, k_y}(y) $
+\pagebreak
+
+$ k_y $
+\pagebreak
+
+$ \mathbf{t}_y = (t_{y,1}, \ldots, t_{y, n_y}) $
+\pagebreak
+
+$ (n_x - k_x - 1)(n_y - k_y - 1) $
+\pagebreak
+
+$ k_x = k_y = 3 $
+\pagebreak
+
+$ w_i > 0 $
+\pagebreak
+
+$ s(x, y) $
+\pagebreak
+
+$ \mu $
+\pagebreak
+
+$ \mathbf{A} $
+\pagebreak
+
+\[    A_{i, \ell} = N_{\mu, k_x}(x_i) \, M_{\nu, k_y}(y_i),
+    \qquad \ell = (\mu - 1)(n_y - k_y - 1) + \nu
+\]
+\pagebreak
+
+$ (\mu, \nu) $
+\pagebreak
+
+$ (k_x + 1)(k_y + 1) $
+\pagebreak
+
+\[    \min_{\mathbf{c}} \sum_{i=1}^{m} w_i^2
+    \left( z_i - s(x_i, y_i) \right)^2
+\]
+\pagebreak
+
+$ \min \| \mathbf{W}(\mathbf{z} -
+\mathbf{A} \mathbf{c}) \|_2^2 $
+\pagebreak
+
+$ \mathbf{W} =
+\mathrm{diag}(w_1, \ldots, w_m) $
+\pagebreak
+
+\[    \min \iint \left[
+        \left( \frac{\partial^2 s}{\partial x^2} \right)^2
+        + 2 \left( \frac{\partial^2 s}{\partial x \, \partial y} \right)^2
+        + \left( \frac{\partial^2 s}{\partial y^2} \right)^2
+    \right] dx \, dy
+    \quad \text{subject to} \quad
+    \sum_{i=1}^{m} w_i^2 (z_i - s(x_i, y_i))^2 \leq S
+\]
+\pagebreak
+
+$ \sum w_i^2 (z_i - s(x_i, y_i))^2 \leq S $
+\pagebreak
+
+$ z_{ji} = z(y_j, x_i) $
+\pagebreak
+
+\[    \mathbf{A}_{\text{grid}} = \mathbf{B}_x \otimes \mathbf{B}_y
+\]
+\pagebreak
+
+$ \mathbf{B}_x $
+\pagebreak
+
+$ m_x \times (n_x - k_x - 1) $
+\pagebreak
+
+$ \mathbf{B}_y $
+\pagebreak
+
+$ m_y \times (n_y - k_y - 1) $
+\pagebreak
+
+\[    \mathbf{C} = \mathbf{B}_x^{-1} \, \mathbf{Z} \, (\mathbf{B}_y^T)^{-1}
+\]
+\pagebreak
+
+$ \mathbf{Z} $
+\pagebreak
+
+$ m_x \times m_y $
+\pagebreak
+
+$ \mathbf{C} $
+\pagebreak
+
+$ \mathcal{O}(m \cdot n_x \cdot n_y) $
+\pagebreak
+
+$ \mathcal{O}(m_x \cdot m_y \cdot (k_x + k_y)) $
+\pagebreak
+
+\[    R[s] = \iint \left[
+        \left( \frac{\partial^2 s}{\partial x^2} \right)^2
+        + 2 \left( \frac{\partial^2 s}{\partial x \, \partial y} \right)^2
+        + \left( \frac{\partial^2 s}{\partial y^2} \right)^2
+    \right] dx \, dy
+\]
+\pagebreak
+
+$ \int (s'')^2 \, dx $
+\pagebreak
+
+$ (\partial^2 s / \partial x \, \partial y)^2 $
+\pagebreak
+
+\[    S \approx m
+\]
+\pagebreak
+
+$ \mathcal{O}(m) $
+\pagebreak
+
+\[    S \approx m_x \cdot m_y
+\]
+\pagebreak
+
+$ w_i = 1 / \sigma_i $
+\pagebreak
+
+$ \sigma_i $
+\pagebreak
+
+$ \chi^2 $
+\pagebreak
+
+$ S \approx m $
+\pagebreak
+
+\[    s_l(u, v) = \sum_{i=1}^{n_u - k_u - 1} \sum_{j=1}^{n_v - k_v - 1}
+    c_{ij}^{(l)} \, N_{i, k_u}(u) \, M_{j, k_v}(v),
+    \qquad l = 1, \ldots, d
+\]
+\pagebreak
+
+$ \mathbf{t}_u $
+\pagebreak
+
+$ \mathbf{t}_v $
+\pagebreak
+
+$ k_u $
+\pagebreak
+
+$ k_v $
+\pagebreak
+
+$ c_{ij}^{(l)} $
+\pagebreak
+
+$ s_l^{(p)}(u_{\min}, v) = s_l^{(p)}(u_{\max}, v) $
+\pagebreak
+
+$ p = 0, 1, \ldots, k_u - 1 $
+\pagebreak
+
+$ s_l^{(p)}(u, v_{\min}) = s_l^{(p)}(u, v_{\max}) $
+\pagebreak
+
+$ p = 0, 1, \ldots, k_v - 1 $
+\pagebreak
+
+$ z(y_j, x_i) $
+\pagebreak
+
+$ \mathbf{r}(u, v) $
+\pagebreak
+
+$ (x, y) $
+\pagebreak
+
+$ x^2 + y^2 \leq R(\theta)^2 $
+\pagebreak
+
+$ R(\theta) $
+\pagebreak
+
+$ \theta = \mathrm{atan2}(y, x) $
+\pagebreak
+
+\[    x = u \, R(v) \cos v, \qquad y = u \, R(v) \sin v
+\]
+\pagebreak
+
+$ u \in [0, 1] $
+\pagebreak
+
+$ v \in [-\pi, \pi] $
+\pagebreak
+
+\[    s(u, v) = \sum_{i} \sum_{j} c_{ij} \, N_{i,k}(u) \, M_{j,k}(v)
+\]
+\pagebreak
+
+$ s(0, v) $
+\pagebreak
+
+\[    s(0, v) = c_0 \quad \text{(constant for all } v\text{)}
+\]
+\pagebreak
+
+$ \partial s / \partial u $
+\pagebreak
+
+$ u = 1 $
+\pagebreak
+
+$ s(1, v) = 0 $
+\pagebreak
+
+$ z_0 = s(0, v) $
+\pagebreak
+
+$ \nabla s(0, 0) = 0 $
+\pagebreak
+
+\[    s(\theta, \phi) = \sum_{i} \sum_{j} c_{ij} \, N_{i,k}(\theta) \, M_{j,k}(\phi)
+\]
+\pagebreak
+
+$ \phi $
+\pagebreak
+
+\[    s(\theta, 0) = s(\theta, 2\pi)
+\]
+\pagebreak
+
+$ \phi = 0 $
+\pagebreak
+
+$ \phi = 2\pi $
+\pagebreak
+
+$ (\theta_i, \phi_j) $
+\pagebreak
+
+$ s(0, \phi) $
+\pagebreak
+
+\[    s(0, \phi) = c_{\mathrm{NP}} \quad \text{(constant for all } \phi\text{)},
+    \qquad
+    s(\pi, \phi) = c_{\mathrm{SP}} \quad \text{(constant for all } \phi\text{)}
+\]
+\pagebreak
+
+$ (n_\phi, n_\theta) $
+\pagebreak
+
+$ y_i $
+\pagebreak
+
+\[    \min \int_{x_1}^{x_m} \left[ s''(x) \right]^2 dx
+    \quad \text{subject to} \quad
+    \sum_{i=1}^{m} w_i^2 \left( y_i - s(x_i) \right)^2 \leq S
+\]
+\pagebreak
+
+\[    S \approx m \, \sigma^2
+\]
+\pagebreak
+
+$ 1 / \sigma_i $
+\pagebreak
+
+$ \sum (y_i - s(x_i))^2 / \sigma_i^2 \leq S $
+\pagebreak
+
+$ s'(x) $
+\pagebreak
+
+$ s''(x) $
+\pagebreak
+
+$ s'''(x) $
+\pagebreak
+
+$ \int_a^b s(x) \, dx $
+\pagebreak
+
+$ s(x) = 0 $
+\pagebreak
+
+$ i $
+\pagebreak
+
+$ f_p $
+\pagebreak
+
+$-1$
+\pagebreak
+
+$ x_1 < x_2 < \cdots < x_m $
+\pagebreak
+
+$ P = x_m - x_1 $
+\pagebreak
+
+$ t_{k+2}, \ldots, t_{n-k-1} $
+\pagebreak
+
+$ [x_1, x_m) $
+\pagebreak
+
+\[    t_{j} = t_{n-2k+j} - P, \quad j = 1, \ldots, k, \qquad
+    t_{n-k+j} = t_{k+1+j} + P, \quad j = 1, \ldots, k
+\]
+\pagebreak
+
+$ c_{n-k-1+j} = c_j $
+\pagebreak
+
+$ j = 1, \ldots, k $
+\pagebreak
+
+\[    \sum_{i=1}^{m-1} \left( w_i \bigl(y_i - s(x_i)\bigr) \right)^2 \leq s
+\]
+\pagebreak
+
+$ (x_m, y_m) $
+\pagebreak
+
+$ m-1 $
+\pagebreak
+
+$ f(x) = \cos(x) + \sin(2x) $
+\pagebreak
+
+$ [0, 2\pi] $
+\pagebreak
+
+$ x_m = 2\pi $
+\pagebreak
+
+\[    s(x_1) = s(x_m), \quad
+    s'(x_1) = s'(x_m), \quad
+    s''(x_1) = s''(x_m)
+\]
+\pagebreak
+
+$ \pi/2 $
+\pagebreak
+
+$ 3\pi $
+\pagebreak
+
+\[    \int_{\pi/2}^{3\pi} \bigl[\cos(x) + \sin(2x)\bigr] \, dx
+    = \Bigl[\sin(x) - \tfrac{1}{2}\cos(2x)\Bigr]_{\pi/2}^{3\pi}
+    = -\tfrac{3}{2}
+\]
+\pagebreak
+
+\[    \mathbf{s}(u) = \bigl( s_1(u),\; s_2(u),\; \ldots,\; s_d(u) \bigr),
+    \quad u \in [u_1, u_m]
+\]
+\pagebreak
+
+$ [0, 1] $
+\pagebreak
+
+\[    u_1 = 0, \quad
+    u_i = u_{i-1} + \| \mathbf{x}_i - \mathbf{x}_{i-1} \|, \quad
+    u_m = 1
+\]
+\pagebreak
+
+$ x = \sin(3t),\; y = \sin(2t) $
+\pagebreak
+
+\[    s_j^{(\ell)}(u_1) = s_j^{(\ell)}(u_m), \quad
+    \ell = 0, 1, \ldots, k-1, \quad j = 1, \ldots, d
+\]
+\pagebreak
+
+$ \mathbf{s}(u_1) $
+\pagebreak
+
+$ \mathbf{s}^{(\ell)}(u_1) $
+\pagebreak
+
+$ x = u\cos u,\; y = u\sin u $
+\pagebreak
+
+$ [0, \pi] $
+\pagebreak
+
+$ s(x) = \sum_j c_j B_j(x) $
+\pagebreak
+
+\[    c_{j-1} - 2\,c_j + c_{j+1} \geq 0
+\]
+\pagebreak
+
+$ s''(x) \leq 0 $
+\pagebreak
+
+\[    c_{j-1} - 2\,c_j + c_{j+1} \leq 0
+\]
+\pagebreak
+
+$ v_i \in \{-1, 0, +1\} $
+\pagebreak
+
+$ s''(x_i)\,v_i \leq 0 $
+\pagebreak
+
+$ v_i = +1 $
+\pagebreak
+
+$ s''(x_i) \leq 0 $
+\pagebreak
+
+$ s''(x_i) \geq 0 $
+\pagebreak
+
+\[    s(x, y) = \sum_{i=1}^{n_x - k_x - 1} \sum_{j=1}^{n_y - k_y - 1}
+              c_{ij} \, B_i^{k_x}(x) \, B_j^{k_y}(y)
+\]
+\pagebreak
+
+\[    \sum_{i=1}^{m} \bigl( w_i \, (z_i - s(x_i, y_i)) \bigr)^2 \leq S
+\]
+\pagebreak
+
+$ n_x, n_y $
+\pagebreak
+
+$ f(x,y) = \sin(\pi x) \cos(\pi y) $
+\pagebreak
+
+$ [0,1]^2 $
+\pagebreak
+
+$ \partial^{n_x+n_y} s / \partial x^{n_x} \partial y^{n_y} $
+\pagebreak
+
+$ 0 \leq n_x < k_x $
+\pagebreak
+
+$ 0 \leq n_y < k_y $
+\pagebreak
+
+$ [x_1, x_2] \times [y_1, y_2] $
+\pagebreak
+
+$ (k_x - n_x, \; k_y - n_y) $
+\pagebreak
+
+$ [n_x, n_y] $
+\pagebreak
+
+$ \mathbf{s}(u, v) \in \mathbb{R}^d $
+\pagebreak
+
+$ \mathcal{O}(n_x \, n_y) $
+\pagebreak
+
+$ \mathcal{O}(n_x + n_y) $
+\pagebreak
+
+$ \partial^{n_x + n_y} s / \partial x^{n_x} \partial y^{n_y} $
+\pagebreak
+
+$ n_x $
+\pagebreak
+
+$ n_y $
+\pagebreak
+
+\[    I = \iint_{[x_1, x_2] \times [y_1, y_2]} s(x, y) \, dx \, dy
+\]
+\pagebreak
+
+$ \mathbb{R}^3 $
+\pagebreak
+
+\[    \mathbf{s}(u, v) = \begin{pmatrix}
+        (R + r \cos v) \cos u \\
+        (R + r \cos v) \sin u \\
+        r \sin v
+    \end{pmatrix},
+    \quad u, v \in [0, 2\pi).
+\]
+\pagebreak
+
+$ z(v_j, u_i) $
+\pagebreak
+
+\[    x = u \, r(v) \cos v, \quad y = u \, r(v) \sin v, \quad
+    0 \leq u \leq 1, \; -\pi \leq v \leq \pi
+\]
+\pagebreak
+
+$ u = \sqrt{x^2 + y^2} / r(\theta) $
+\pagebreak
+
+$ v = \theta $
+\pagebreak
+
+$ [0, 1] \times [-\pi, \pi] $
+\pagebreak
+
+$ s(0, v) = \text{const} $
+\pagebreak
+
+$ 0 < u_1 < \cdots < u_{n_u} \leq 1 $
+\pagebreak
+
+$ -\pi \leq v_1 < \cdots < v_{n_v} < \pi $
+\pagebreak
+
+$ \theta \in [-\pi, \pi] $
+\pagebreak
+
+$ a $
+\pagebreak
+
+$ b $
+\pagebreak
+
+$ \phi \in [0, 2\pi) $
+\pagebreak
+
+\[    x = \sin\theta \cos\phi, \quad
+    y = \sin\theta \sin\phi, \quad
+    z = \cos\theta
+\]
+\pagebreak
+
+$ (\theta, \phi) $
+\pagebreak
+
+$ Y_l^m(\theta, \phi) $
+\pagebreak
+
+\[    Y_0^0 = 1, \quad
+    Y_1^0 = \cos\theta, \quad
+    Y_2^2 = \sin^2\!\theta \cos 2\phi
+\]
+\pagebreak
+
+$ s = m $
+\pagebreak
+
+\[    f(\theta, \phi) = Y_0^0 + Y_1^0 + \tfrac{1}{2}\, Y_2^2
+                    = 1 + \cos\theta + \tfrac{1}{2}\sin^2\!\theta\,\cos 2\phi
+\]
+\pagebreak
+
+$ 0 < u_1 < \cdots < u_{n_u} < \pi $
+\pagebreak
+
+$ 0 \leq v_1 < v_2 < \cdots < v_{n_v} < 2\pi $
+\pagebreak
+
+$ \nabla s = 0 $
+\pagebreak
+
+\end{document}

@@ -1,7 +1,0 @@
-<map id="fitpack_periodic_curves_c::fitpack_periodic_curve_c_eval_many" name="fitpack_periodic_curves_c::fitpack_periodic_curve_c_eval_many">
-<area shape="rect" id="Node000001" title="Wrapper to curve_eval_many." alt="" coords="5,5,196,60"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__periodic__curves__c.html#aeef2651aa247d1b16df2bf49c9db5004" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="244,5,435,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,30,230,30,230,35,196,35"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7" title="Get pointer to embedded Fortran object." alt="" coords="483,5,673,60"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,30,469,30,469,35,435,35"/>
-</map>

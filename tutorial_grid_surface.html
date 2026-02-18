@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: Grid and Parametric Surface Tutorial</title>
+<title>My Project: Grid and Parametric Surface Tutorial</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -114,11 +106,11 @@ $(function(){initNavTree('tutorial_grid_surface.html',''); initResizable(true); 
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__grid__surface"></a></p>
-<p>This tutorial covers two specialized surface types for data on rectangular parameter grids: <code>fitpack_grid_surface</code> for scalar-valued surfaces \( z = s(x, y) \), and <code>fitpack_parametric_surface</code> for multi-component surfaces \( \mathbf{s}(u, v) \in \mathbb{R}^d \).</p>
-<p>Both exploit the Kronecker product structure of tensor-product B-splines on rectangular grids. When the data points \( (x_i, y_j) \) form a full grid, the normal equations decouple into smaller systems along each axis, reducing the computational cost from \( \mathcal{O}(n_x \, n_y) \) to \( \mathcal{O}(n_x + n_y) \) per iteration. This makes gridded fitting significantly faster than the general scattered-data algorithm (<code>surfit</code>).</p>
-<h1><a class="anchor" id="autotoc_md76"></a>
+<p>This tutorial covers two specialized surface types for data on rectangular parameter grids: <code>fitpack_grid_surface</code> for scalar-valued surfaces <picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z = s(x, y) $" src="form_9.png"/></picture>, and <code>fitpack_parametric_surface</code> for multi-component surfaces <picture><source srcset="form_321_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{s}(u, v) \in \mathbb{R}^d $" src="form_321.png"/></picture>.</p>
+<p>Both exploit the Kronecker product structure of tensor-product B-splines on rectangular grids. When the data points <picture><source srcset="form_10_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_j) $" src="form_10.png"/></picture> form a full grid, the normal equations decouple into smaller systems along each axis, reducing the computational cost from <picture><source srcset="form_322_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathcal{O}(n_x \, n_y) $" src="form_322.png"/></picture> to <picture><source srcset="form_323_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathcal{O}(n_x + n_y) $" src="form_323.png"/></picture> per iteration. This makes gridded fitting significantly faster than the general scattered-data algorithm (<code>surfit</code>).</p>
+<h1><a class="anchor" id="autotoc_md128"></a>
 fitpack_grid_surface</h1>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md129"></a>
 Creating a Fit</h2>
 <p>Construct a grid surface from coordinate vectors <code>x(nx)</code>, <code>y(ny)</code> and function values <code>z(ny, nx)</code>. Note that <b>the first index of <code>z</code> corresponds to <code>y</code></b> and the second to <code>x</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface, fp_real, fp_flag, &amp;</div>
@@ -131,30 +123,30 @@ Creating a Fit</h2>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p>The <code>smoothing</code> parameter controls the trade-off between fidelity and smoothness, just as for curves. Setting <code>smoothing=zero</code> produces an interpolating spline. An optional <code>order</code> argument sets the B-spline degree (default 3, i.e. bicubic).</p>
-<h2><a class="anchor" id="autotoc_md78"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Evaluation</h2>
 <p>Evaluate the fitted surface at scattered points or on a rectangular output grid:</p>
 <div class="fragment"><div class="line">z_val = gsurf%eval(x0, y0, ierr)              <span class="comment">! single point</span></div>
 <div class="line">z_pts = gsurf%eval(x_pts, y_pts, ierr)        <span class="comment">! scattered points</span></div>
 <div class="line">z_out = gsurf%eval_ongrid(x_out, y_out, ierr)  ! grid -&gt; z_out(my, mx)</div>
 </div><!-- fragment --><p>The <code>gsurf\eval</code> generic dispatches to scattered-point evaluation (<code>bispeu</code>), while <code>gsurf\eval_ongrid</code> uses the faster grid evaluator (<code>bispev</code>) and returns an array with shape <code>(size(y_out), size(x_out))</code>.</p>
-<h2><a class="anchor" id="autotoc_md79"></a>
+<h2><a class="anchor" id="autotoc_md131"></a>
 Partial Derivatives</h2>
-<p>Compute partial derivatives \( \partial^{n_x + n_y} s / \partial x^{n_x} \partial y^{n_y} \):</p>
+<p>Compute partial derivatives <picture><source srcset="form_324_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \partial^{n_x + n_y} s / \partial x^{n_x} \partial y^{n_y} $" src="form_324.png"/></picture>:</p>
 <div class="fragment"><div class="line">dzdx = gsurf%dfdx(x0, y0, 1, 0, ierr)              <span class="comment">! ds/dx at a point</span></div>
 <div class="line">d2z  = gsurf%dfdx(x_pts, y_pts, 1, 1, ierr)         <span class="comment">! d2s/dxdy scattered</span></div>
 <div class="line">dzdy = gsurf%dfdx_ongrid(x_out, y_out, 0, 1, ierr)  ! ds/dy on a grid</div>
-</div><!-- fragment --><p>The integer arguments are the derivative orders \( n_x \) and \( n_y \) (both must satisfy \( 0 \leq n_x &lt; k_x \) and \( 0 \leq n_y &lt; k_y \)).</p>
-<h2><a class="anchor" id="autotoc_md80"></a>
+</div><!-- fragment --><p>The integer arguments are the derivative orders <picture><source srcset="form_325_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n_x $" src="form_325.png"/></picture> and <picture><source srcset="form_326_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n_y $" src="form_326.png"/></picture> (both must satisfy <picture><source srcset="form_316_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 \leq n_x &lt; k_x $" src="form_316.png"/></picture> and <picture><source srcset="form_317_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 \leq n_y &lt; k_y $" src="form_317.png"/></picture>).</p>
+<h2><a class="anchor" id="autotoc_md132"></a>
 Integration</h2>
 <p>Compute the double integral over a rectangular sub-domain:</p>
 <p class="formulaDsp">
-\[    I = \iint_{[x_1, x_2] \times [y_1, y_2]} s(x, y) \, dx \, dy
-\]
+<picture><source srcset="form_327_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    I = \iint_{[x_1, x_2] \times [y_1, y_2]} s(x, y) \, dx \, dy
+\]" src="form_327.png"/></picture>
 </p>
 <div class="fragment"><div class="line">vol = gsurf%integral([x1, y1], [x2, y2])</div>
 </div><!-- fragment --><p>The two arguments are the lower and upper corners of the integration rectangle.</p>
-<h2><a class="anchor" id="autotoc_md81"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Cross-Sections and Derivative Splines</h2>
 <p>Extract a 1D profile at a fixed coordinate value:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_curve) :: profile</div>
@@ -164,7 +156,7 @@ Cross-Sections and Derivative Splines</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_grid_surface) :: dsurf</div>
 <div class="line">dsurf = gsurf%derivative_spline(1, 0, ierr)   <span class="comment">! ds/dx</span></div>
 <div class="line">z_val = dsurf%eval(x0, y0, ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md82"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md134"></a>
 Example: Peaks Function on a Grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, half</div>
@@ -202,12 +194,12 @@ Example: Peaks Function on a Grid</h2>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.6)&#39;</span>, <span class="stringliteral">&#39;s(0, 0) = &#39;</span>, z_val</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>gsurf%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md83"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md135"></a>
 fitpack_parametric_surface</h1>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 Multi-Component Surfaces</h2>
-<p><code>fitpack_parametric_surface</code> fits a bicubic tensor-product spline surface \( \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) \) through data given on a rectangular parameter grid \( (u_i, v_j) \). This is the natural choice for geometry embedded in \( \mathbb{R}^3 \) (or higher dimensions) where the surface is described by a mapping from a 2D parameter domain.</p>
-<h2><a class="anchor" id="autotoc_md85"></a>
+<p><code>fitpack_parametric_surface</code> fits a bicubic tensor-product spline surface <picture><source srcset="form_44_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) $" src="form_44.png"/></picture> through data given on a rectangular parameter grid <picture><source srcset="form_16_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (u_i, v_j) $" src="form_16.png"/></picture>. This is the natural choice for geometry embedded in <picture><source srcset="form_328_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^3 $" src="form_328.png"/></picture> (or higher dimensions) where the surface is described by a mapping from a 2D parameter domain.</p>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Creating a Fit</h2>
 <p>The data array <code>z</code> has shape <code>(nv, nu, idim)</code>, where <code>idim</code> is the number of coordinate components:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_surface, fp_real, fp_flag, &amp;</div>
@@ -220,22 +212,22 @@ Creating a Fit</h2>
 <div class="line">                     periodic_bc=[.true., .true.])</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 </div><!-- fragment --><p>The <code>periodic_BC</code> argument is a 2-element logical array <code>[periodic_u, periodic_v]</code>. When an element is <code>.true.</code>, the corresponding parameter direction is treated as periodic, enforcing continuity of the spline and its derivatives across the boundary.</p>
-<h2><a class="anchor" id="autotoc_md86"></a>
+<h2><a class="anchor" id="autotoc_md138"></a>
 Evaluation</h2>
 <p>Evaluation returns an array with the surface coordinates:</p>
 <div class="fragment"><div class="line">pt = psurf%eval(u0, v0, ierr)        <span class="comment">! single point -&gt; pt(idim)</span></div>
 <div class="line">f  = psurf%eval(u_out, v_out, ierr)  ! grid -&gt; f(mv, mu, idim)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md87"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md139"></a>
 Example: Fitting a Torus</h2>
-<p>A torus with major radius \( R \) and tube radius \( r \) is periodic in both \( u \) (around the hole) and \( v \) (around the tube):</p>
+<p>A torus with major radius <picture><source srcset="form_135_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ R $" src="form_135.png"/></picture> and tube radius <picture><source srcset="form_17_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r $" src="form_17.png"/></picture> is periodic in both <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture> (around the hole) and <picture><source srcset="form_46_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v $" src="form_46.png"/></picture> (around the tube):</p>
 <p class="formulaDsp">
-\[    \mathbf{s}(u, v) = \begin{pmatrix}
+<picture><source srcset="form_329_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \mathbf{s}(u, v) = \begin{pmatrix}
         (R + r \cos v) \cos u \\
         (R + r \cos v) \sin u \\
         r \sin v
     \end{pmatrix},
     \quad u, v \in [0, 2\pi).
-\]
+\]" src="form_329.png"/></picture>
 </p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_surface, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, pi</div>
@@ -277,14 +269,14 @@ Example: Fitting a Torus</h2>
 <div class="line">print <span class="stringliteral">&#39;(a,3f10.4)&#39;</span>, <span class="stringliteral">&#39;s(0, 0) = &#39;</span>, pt</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>psurf%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md88"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md140"></a>
 Grid vs Scattered Fitting</h1>
 <p>Choose the surface type based on the structure of your input data:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Criterion   </th><th class="markdownTableHeadNone"><code>fitpack_grid_surface</code>   </th><th class="markdownTableHeadNone"><code>fitpack_surface</code>    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Input layout   </td><td class="markdownTableBodyNone">Rectangular grid \( z(y_j, x_i) \)   </td><td class="markdownTableBodyNone">Arbitrary \( (x_i, y_i, z_i) \)    </td></tr>
+<td class="markdownTableBodyNone">Input layout   </td><td class="markdownTableBodyNone">Rectangular grid <picture><source srcset="form_236_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z(y_j, x_i) $" src="form_236.png"/></picture>   </td><td class="markdownTableBodyNone">Arbitrary <picture><source srcset="form_51_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i, z_i) $" src="form_51.png"/></picture>    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Core routine   </td><td class="markdownTableBodyNone"><code>regrid</code>   </td><td class="markdownTableBodyNone"><code>surfit</code>    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -295,8 +287,8 @@ Grid vs Scattered Fitting</h1>
 <td class="markdownTableBodyNone">Typical use   </td><td class="markdownTableBodyNone">Tabulated functions, image data   </td><td class="markdownTableBodyNone">Sensor readings, scattered measurements   </td></tr>
 </table>
 <p><b>Rule of thumb</b>: if the data can be arranged on a rectangular grid with no missing values, <code>fitpack_grid_surface</code> is always the better choice. For irregular point clouds, use <code>fitpack_surface</code>.</p>
-<p>For surfaces embedded in \( \mathbb{R}^d \) (e.g. geometry defined by a parameter mapping), use <code>fitpack_parametric_surface</code> instead.</p>
-<h1><a class="anchor" id="autotoc_md89"></a>
+<p>For surfaces embedded in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture> (e.g. geometry defined by a parameter mapping), use <code>fitpack_parametric_surface</code> instead.</p>
+<h1><a class="anchor" id="autotoc_md141"></a>
 Complete Example</h1>
 <p>A full working program demonstrating both <code>fitpack_grid_surface</code> (peaks function with evaluation, integration, cross-sections, and derivative splines) and <code>fitpack_parametric_surface</code> (torus with periodic boundary conditions) is available in:</p>
 <div class="fragment"><div class="line">examples/example_grid_surface.f90</div>

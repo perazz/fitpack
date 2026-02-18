@@ -1,8 +1,0 @@
-<map id="fitpack_surfaces::fitpack_surface::dfdx" name="fitpack_surfaces::fitpack_surface::dfdx">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,185,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__surfaces.html#a1a235356ec006d630c7f77035096a5e6" title="Evaluate derivatives on a list of (x(i),y(i)) points." alt="" coords="465,5,649,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,20,233,19,417,19,452,19,451,25,417,24,233,24,186,25"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__surfaces.html#a9a7489a5b32b589f9137ed9aef0523e3" title=" " alt="" coords="233,33,417,73"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,34,220,38,220,43,186,39"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="418,40,451,35,452,41,418,45"/>
-</map>

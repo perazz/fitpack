@@ -1,4 +1,3 @@
-<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -6,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>fitpack: Periodic Curve Fitting</title>
+<title>My Project: Periodic Curve Fitting</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -19,19 +18,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX","output/HTML-CSS"],
-});
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(function() { init_search(); });
+/* @license-end */
 </script>
-<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
-<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
-        <script type="text/javascript">
-            DoxygenAwesomeDarkModeToggle.init()
-        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -40,10 +32,21 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fitpack
+   <div id="projectname">My Project
    </div>
-   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -60,17 +63,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -114,13 +106,13 @@ $(function(){initNavTree('tutorial_periodic_curve.html',''); initResizable(true)
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__periodic__curve"></a></p>
-<p>This tutorial covers periodic spline fitting with <code>fitpack_periodic_curve</code>: constructing a B-spline \( y = s(x) \) that satisfies periodic boundary conditions, evaluating it, and computing derivatives and integrals across the period boundary.</p>
-<h1><a class="anchor" id="autotoc_md33"></a>
+<p>This tutorial covers periodic spline fitting with <code>fitpack_periodic_curve</code>: constructing a B-spline <picture><source srcset="form_4_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y = s(x) $" src="form_4.png"/></picture> that satisfies periodic boundary conditions, evaluating it, and computing derivatives and integrals across the period boundary.</p>
+<h1><a class="anchor" id="autotoc_md85"></a>
 Overview</h1>
-<p>A periodic spline enforces continuity of the function and all its derivatives up to order \( k-1 \) at the period boundary:</p>
+<p>A periodic spline enforces continuity of the function and all its derivatives up to order <picture><source srcset="form_162_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k-1 $" src="form_162.png"/></picture> at the period boundary:</p>
 <p class="formulaDsp">
-\[    s^{(j)}(x_1) = s^{(j)}(x_m), \quad j = 0, 1, \ldots, k-1
-\]
+<picture><source srcset="form_161_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s^{(j)}(x_1) = s^{(j)}(x_m), \quad j = 0, 1, \ldots, k-1
+\]" src="form_161.png"/></picture>
 </p>
 <p>This is the natural choice whenever the underlying signal is inherently periodic, for example:</p>
 <ul>
@@ -129,24 +121,24 @@ Overview</h1>
 <li><b>Angular measurements</b> such as wind direction, phase angles, or azimuth</li>
 </ul>
 <p>The type <code>fitpack_periodic_curve</code> extends <code>fitpack_curve</code> and inherits all of its methods (<code>eval</code>, <code>dfdx</code>, <code>integral</code>, <code>zeros</code>, <code>destroy</code>, etc.). The only difference is that fitting calls the <code>percur</code> algorithm instead of <code>curfit</code>, which constructs a periodic knot vector and ties the B-spline coefficients at the boundary.</p>
-<h1><a class="anchor" id="autotoc_md34"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 Mathematical Background</h1>
-<p>Given \( m \) data points \( (x_i, y_i) \) with \( x_1 &lt; x_2 &lt; \cdots &lt; x_m \), the period is \( P = x_m - x_1 \). The <code>percur</code> routine places a <b>wrapped knot vector</b>: interior knots \( t_{k+2}, \ldots, t_{n-k-1} \) lie inside \( [x_1, x_m) \), while the boundary knots satisfy</p>
+<p>Given <picture><source srcset="form_36_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m $" src="form_36.png"/></picture> data points <picture><source srcset="form_113_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i) $" src="form_113.png"/></picture> with <picture><source srcset="form_275_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x_1 &lt; x_2 &lt; \cdots &lt; x_m $" src="form_275.png"/></picture>, the period is <picture><source srcset="form_276_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ P = x_m - x_1 $" src="form_276.png"/></picture>. The <code>percur</code> routine places a <b>wrapped knot vector</b>: interior knots <picture><source srcset="form_277_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ t_{k+2}, \ldots, t_{n-k-1} $" src="form_277.png"/></picture> lie inside <picture><source srcset="form_278_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [x_1, x_m) $" src="form_278.png"/></picture>, while the boundary knots satisfy</p>
 <p class="formulaDsp">
-\[    t_{j} = t_{n-2k+j} - P, \quad j = 1, \ldots, k, \qquad
+<picture><source srcset="form_279_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    t_{j} = t_{n-2k+j} - P, \quad j = 1, \ldots, k, \qquad
     t_{n-k+j} = t_{k+1+j} + P, \quad j = 1, \ldots, k
-\]
+\]" src="form_279.png"/></picture>
 </p>
-<p>The B-spline coefficients are tied so that \( c_{n-k-1+j} = c_j \) for \( j = 1, \ldots, k \), which guarantees that the spline and its first \( k-1 \) derivatives are continuous across the period boundary.</p>
-<p>As with <code>fitpack_curve</code>, the smoothing parameter \( s \) controls the trade-off between fidelity and smoothness:</p>
+<p>The B-spline coefficients are tied so that <picture><source srcset="form_280_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ c_{n-k-1+j} = c_j $" src="form_280.png"/></picture> for <picture><source srcset="form_281_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ j = 1, \ldots, k $" src="form_281.png"/></picture>, which guarantees that the spline and its first <picture><source srcset="form_162_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k-1 $" src="form_162.png"/></picture> derivatives are continuous across the period boundary.</p>
+<p>As with <code>fitpack_curve</code>, the smoothing parameter <picture><source srcset="form_62_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s $" src="form_62.png"/></picture> controls the trade-off between fidelity and smoothness:</p>
 <p class="formulaDsp">
-\[    \sum_{i=1}^{m-1} \left( w_i \bigl(y_i - s(x_i)\bigr) \right)^2 \leq s
-\]
+<picture><source srcset="form_282_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \sum_{i=1}^{m-1} \left( w_i \bigl(y_i - s(x_i)\bigr) \right)^2 \leq s
+\]" src="form_282.png"/></picture>
 </p>
-<p>Note that the last data point \( (x_m, y_m) \) defines the period length but is <b>not</b> included in the residual sum (only \( m-1 \) points are fitted).</p>
-<h1><a class="anchor" id="autotoc_md35"></a>
+<p>Note that the last data point <picture><source srcset="form_283_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_m, y_m) $" src="form_283.png"/></picture> defines the period length but is <b>not</b> included in the residual sum (only <picture><source srcset="form_284_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m-1 $" src="form_284.png"/></picture> points are fitted).</p>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Basic Example</h1>
-<p>Fit the periodic function \( f(x) = \cos(x) + \sin(2x) \) on \( [0, 2\pi] \). The data <b>must</b> include the right endpoint \( x_m = 2\pi \) so that <code>percur</code> can determine the period.</p>
+<p>Fit the periodic function <picture><source srcset="form_285_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f(x) = \cos(x) + \sin(2x) $" src="form_285.png"/></picture> on <picture><source srcset="form_286_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0, 2\pi] $" src="form_286.png"/></picture>. The data <b>must</b> include the right endpoint <picture><source srcset="form_287_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x_m = 2\pi $" src="form_287.png"/></picture> so that <code>percur</code> can determine the period.</p>
 <div class="fragment"><div class="line"><span class="keyword">program</span> periodic_demo</div>
 <div class="line">    <span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_periodic_curve, fp_real, fp_flag, &amp;</div>
 <div class="line">                       fitpack_success, fitpack_message, zero, one, half, pi</div>
@@ -181,7 +173,7 @@ Basic Example</h1>
 <div class="line"><span class="keyword">end program </span>periodic_demo</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p>The call to <code>curve\new_fit</code> loads the data and performs a smoothing fit in one step. Because <code>fitpack_periodic_curve</code> extends <code>fitpack_curve</code>, all evaluation and query methods work identically.</p>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md88"></a>
 Periodicity Verification</h1>
 <p>A key property of the periodic spline is that function values <b>and</b> derivatives match at the endpoints. After fitting, verify:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: y_left, y_right, dy_left, dy_right</div>
@@ -195,29 +187,29 @@ Periodicity Verification</h1>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.8)&#39;</span>, <span class="stringliteral">&#39;s(x_m)  = &#39;</span>, y_right</div>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.8)&#39;</span>, <span class="stringliteral">&quot;s&#39;(x_1) = &quot;</span>, dy_left</div>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.8)&#39;</span>, <span class="stringliteral">&quot;s&#39;(x_m) = &quot;</span>, dy_right</div>
-</div><!-- fragment --><p>For a cubic spline ( \( k = 3 \)), the values, first derivatives, and second derivatives all match to machine precision:</p>
+</div><!-- fragment --><p>For a cubic spline ( <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>), the values, first derivatives, and second derivatives all match to machine precision:</p>
 <p class="formulaDsp">
-\[    s(x_1) = s(x_m), \quad
-    s&#39;(x_1) = s&#39;(x_m), \quad
-    s&#39;&#39;(x_1) = s&#39;&#39;(x_m)
-\]
+<picture><source srcset="form_288_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s(x_1) = s(x_m), \quad
+    s'(x_1) = s'(x_m), \quad
+    s''(x_1) = s''(x_m)
+\]" src="form_288.png"/></picture>
 </p>
 <p>This is <b>not</b> the case for a non-periodic <code>fitpack_curve</code>, where the boundary derivatives are generally unrelated.</p>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 Integration Across the Boundary</h1>
-<p>The <code>curve\integral</code> method works with periodic splines exactly as with non-periodic ones. The integration limits need not coincide with the data range. For example, integrate from \( \pi/2 \) to \( 3\pi \) (which crosses the period boundary at \( 2\pi \)):</p>
+<p>The <code>curve\integral</code> method works with periodic splines exactly as with non-periodic ones. The integration limits need not coincide with the data range. For example, integrate from <picture><source srcset="form_289_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \pi/2 $" src="form_289.png"/></picture> to <picture><source srcset="form_290_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 3\pi $" src="form_290.png"/></picture> (which crosses the period boundary at <picture><source srcset="form_26_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 2\pi $" src="form_26.png"/></picture>):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: area</div>
 <div class="line"> </div>
 <div class="line">area = curve%integral(half * pi, 3.0_fp_real * pi)</div>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.8)&#39;</span>, <span class="stringliteral">&#39;integral [pi/2, 3*pi] = &#39;</span>, area</div>
-</div><!-- fragment --><p>For the test function \( f(x) = \cos(x) + \sin(2x) \) the exact integral is</p>
+</div><!-- fragment --><p>For the test function <picture><source srcset="form_285_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f(x) = \cos(x) + \sin(2x) $" src="form_285.png"/></picture> the exact integral is</p>
 <p class="formulaDsp">
-\[    \int_{\pi/2}^{3\pi} \bigl[\cos(x) + \sin(2x)\bigr] \, dx
+<picture><source srcset="form_291_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \int_{\pi/2}^{3\pi} \bigl[\cos(x) + \sin(2x)\bigr] \, dx
     = \Bigl[\sin(x) - \tfrac{1}{2}\cos(2x)\Bigr]_{\pi/2}^{3\pi}
     = -\tfrac{3}{2}
-\]
+\]" src="form_291.png"/></picture>
 </p>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md90"></a>
 Smoothing and Interpolation</h1>
 <p>The periodic variant supports the same fitting modes as <code>fitpack_curve</code>:</p>
 <table class="markdownTable">
@@ -228,7 +220,7 @@ Smoothing and Interpolation</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Re-fit   </td><td class="markdownTableBodyNone"><code>curve\fit(smoothing=s)</code>   </td><td class="markdownTableBodyNone">Change smoothing on existing data    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curve\interpolate()</code>   </td><td class="markdownTableBodyNone">Pass through all data points ( \( s = 0 \))   </td></tr>
+<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curve\interpolate()</code>   </td><td class="markdownTableBodyNone">Pass through all data points ( <picture><source srcset="form_7_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s = 0 $" src="form_7.png"/></picture>)   </td></tr>
 </table>
 <p>Lowering the smoothing parameter increases the number of knots and brings the spline closer to the data:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span> :: i</div>
@@ -240,7 +232,7 @@ Smoothing and Interpolation</h1>
 <div class="line">        print <span class="stringliteral">&#39;(es10.1,i8,es12.3)&#39;</span>, curve%smoothing, curve%knots, curve%mse()</div>
 <div class="line"><span class="keywordflow">    end if</span></div>
 <div class="line"><span class="keyword">end </span>do</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md39"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md91"></a>
 Complete Example</h1>
 <p>A self-contained program demonstrating periodic fitting, evaluation, periodicity verification, integration, interpolation, and a smoothing sweep is provided in the repository:</p>
 <dl class="section see"><dt>See also</dt><dd><code>examples/example_periodic_curve.f90</code></dd>

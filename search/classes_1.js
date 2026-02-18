@@ -17,11 +17,6 @@ var searchData=
   ['fitpack_5fperiodic_5fcurve_14',['fitpack_periodic_curve',['../structfitpack__curves_1_1fitpack__periodic__curve.html',1,'fitpack_curves']]],
   ['fitpack_5fperiodic_5fcurve_5fc_15',['fitpack_periodic_curve_c',['../structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c.html',1,'fitpack_periodic_curves_c']]],
   ['fitpack_5fpolar_16',['fitpack_polar',['../structfitpack__polar__domains_1_1fitpack__polar.html',1,'fitpack_polar_domains']]],
-  ['fitpack_5fpolar_5fboundary_17',['fitpack_polar_boundary',['../interfacefitpack__core_1_1fitpack__polar__boundary.html',1,'fitpack_core']]],
-  ['fitpack_5fsphere_18',['fitpack_sphere',['../structfitpack__sphere__domains_1_1fitpack__sphere.html',1,'fitpack_sphere_domains']]],
-  ['fitpack_5fsurface_19',['fitpack_surface',['../structfitpack__surfaces_1_1fitpack__surface.html',1,'fitpack_surfaces']]],
-  ['fitpack_5fswap_20',['fitpack_swap',['../interfacefitpack__core_1_1fitpack__swap.html',1,'fitpack_core']]],
-  ['fp_5fcomm_5fexpand_21',['fp_comm_expand',['../interfacefitpack__core_1_1fp__comm__expand.html',1,'fitpack_core']]],
-  ['fp_5fcomm_5fpack_22',['fp_comm_pack',['../interfacefitpack__core_1_1fp__comm__pack.html',1,'fitpack_core']]],
-  ['fp_5fcomm_5fsize_23',['fp_comm_size',['../interfacefitpack__core_1_1fp__comm__size.html',1,'fitpack_core']]]
+  ['fitpack_5fsphere_17',['fitpack_sphere',['../structfitpack__sphere__domains_1_1fitpack__sphere.html',1,'fitpack_sphere_domains']]],
+  ['fitpack_5fsurface_18',['fitpack_surface',['../structfitpack__surfaces_1_1fitpack__surface.html',1,'fitpack_surfaces']]]
 ];
