@@ -354,12 +354,19 @@ module fitpack_parametric_curves
        this%ie = 0
     end subroutine clean_constraints
 
-    ! A call to set_constraints will RESET ALL contraints: a missing "ddx_end" means: no constraints
-    ! at the endpoint
+    !> @brief Set or reset endpoint derivative constraints for a constrained parametric curve.
+    !!
+    !! Resets all constraints, then applies the supplied left and/or right boundary conditions.
+    !! Omitting `ddx_begin` or `ddx_end` removes constraints at that endpoint.
+    !!
+    !! @param[in,out] this      The constrained curve object.
+    !! @param[in]     ddx_begin Left endpoint constraints: column 0 = function value,
+    !!                          column \f$ \ell \f$ = \f$ \ell \f$-th derivative (\f$ d \times (ib) \f$).
+    !! @param[in]     ddx_end   Right endpoint constraints (same layout as `ddx_begin`).
+    !! @param[out]    ierr      Error flag (optional).
     subroutine set_constraints(this,ddx_begin,ddx_end,ierr)
         class(fitpack_constrained_curve), intent(inout) :: this
 
-        !> Begin point constraints: (:,0)=function; (:,i)=i-th derivative
         real(FP_REAL), optional, intent(in) :: ddx_begin(:,0:)
         real(FP_REAL), optional, intent(in) :: ddx_end  (:,0:)
 

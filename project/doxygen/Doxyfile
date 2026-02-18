@@ -119,6 +119,10 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = "../../src/"
 INPUT                 += "../../doc/mainpage.md"
+INPUT                 += "../../doc/tutorial_curves.md"
+INPUT                 += "../../doc/tutorial_surfaces.md"
+INPUT                 += "../../doc/tutorial_special.md"
+INPUT                 += "../../doc/book_reference.md"
 
 INPUT_ENCODING         = UTF-8
 
