@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['domains_0',['Polar and Spherical Domains',['../tutorial_special.html',1,'']]]
+  ['domain_20fitting_20tutorial_0',['Polar Domain Fitting Tutorial',['../tutorial_polar.html',1,'']]]
 ];

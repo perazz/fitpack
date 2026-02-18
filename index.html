@@ -171,15 +171,51 @@ Building</h1>
 <div class="fragment"><div class="line">fpm build          # build the library</div>
 <div class="line">fpm test           # run all tests</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
-Tutorials</h1>
+Spline Theory</h1>
 <ul>
-<li><a class="el" href="tutorial_curves.html">Curve Fitting Tutorial</a> — Smoothing, interpolation, derivatives, roots, periodic and parametric curves</li>
-<li><a class="el" href="tutorial_surfaces.html">Surface Fitting Tutorial</a> — Scattered and gridded surface fitting, cross-sections, integration</li>
-<li><a class="el" href="tutorial_special.html">Polar and Spherical Domains</a> — Polar and spherical domains, pole boundary conditions</li>
-<li><a class="el" href="book_reference.html">Book Reference Index</a> — Quick-reference table mapping routines to book chapters and equations</li>
+<li>theory_bsplines &mdash; B-spline basis functions, de Boor evaluation, derivatives, integration, knot insertion</li>
+<li>theory_curve_fitting &mdash; Smoothing criterion, adaptive knot placement, periodic and parametric curves</li>
+<li>theory_surface_fitting &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency</li>
+<li>theory_special_domains &mdash; Polar coordinate transform, spherical coordinates, pole boundary conditions</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md7"></a>
+Tutorials</h1>
+<h2><a class="anchor" id="autotoc_md8"></a>
+Curves</h2>
+<ul>
+<li><a class="el" href="tutorial_curve.html">Univariate Curve Fitting with fitpack_curve</a> &mdash; Univariate smoothing and interpolation with <code>fitpack_curve</code></li>
+<li><a class="el" href="tutorial_periodic_curve.html">Periodic Curve Fitting</a> &mdash; Periodic splines with <code>fitpack_periodic_curve</code></li>
+<li><a class="el" href="tutorial_parametric_curves.html">Parametric, Closed, and Constrained Curves</a> &mdash; Parametric, closed, and constrained curves</li>
+<li><a class="el" href="tutorial_convex_curve.html">Convexity-Constrained Curve Fitting</a> &mdash; Shape-preserving fitting with convexity constraints</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md9"></a>
+Surfaces</h2>
+<ul>
+<li><a class="el" href="tutorial_surface.html">Scattered Surface Fitting Tutorial</a> &mdash; Scattered bivariate data with <code>fitpack_surface</code></li>
+<li><a class="el" href="tutorial_grid_surface.html">Grid and Parametric Surface Tutorial</a> &mdash; Gridded data and parametric surfaces</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md10"></a>
+Special Domains</h2>
+<ul>
+<li><a class="el" href="tutorial_polar.html">Polar Domain Fitting Tutorial</a> &mdash; Disc-shaped domains with <code>fitpack_polar</code> and <code>fitpack_grid_polar</code></li>
+<li><a class="el" href="tutorial_sphere.html">Spherical Spline Fitting Tutorial</a> &mdash; Spherical data with <code>fitpack_sphere</code> and <code>fitpack_grid_sphere</code></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md11"></a>
+Examples</h1>
+<p>Compilable example programs are in the <code>examples/</code> directory. Build and run with:</p>
+<div class="fragment"><div class="line">fpm run --example example_curve</div>
+<div class="line">fpm run --example example_periodic_curve</div>
+<div class="line">fpm run --example example_parametric_curves</div>
+<div class="line">fpm run --example example_convex_curve</div>
+<div class="line">fpm run --example example_surface</div>
+<div class="line">fpm run --example example_grid_surface</div>
+<div class="line">fpm run --example example_polar</div>
+<div class="line">fpm run --example example_sphere</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md12"></a>
 Reference</h1>
+<ul>
+<li><a class="el" href="book_reference.html">Book Reference Index</a> &mdash; Quick-reference table mapping routines to book chapters and equations</li>
+</ul>
 <p>The algorithms are described in:</p>
 <blockquote class="doxtable">
 <p>P. Dierckx, <em>Curve and Surface Fitting with Splines</em>, Oxford University Press, 1993. </p>

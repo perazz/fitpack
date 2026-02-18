@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['—_20modern_20fortran_20spline_20fitting_0',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]]
+  ['tutorial_0',['Tutorial',['../tutorial_grid_surface.html',1,'Grid and Parametric Surface Tutorial'],['../tutorial_polar.html',1,'Polar Domain Fitting Tutorial'],['../tutorial_surface.html',1,'Scattered Surface Fitting Tutorial'],['../tutorial_sphere.html',1,'Spherical Spline Fitting Tutorial']]]
 ];

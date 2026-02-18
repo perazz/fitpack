@@ -1,43 +1,44 @@
 <map id="fitpack_core::percur" name="fitpack_core::percur">
-<area shape="rect" id="Node000001" title="Determine a smooth periodic spline approximation to data." alt="" coords="5,300,156,325"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="873,225,1019,250"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,298,132,244,203,167,247,127,296,89,348,56,404,30,468,11,524,3,575,6,623,19,670,39,718,67,827,137,880,176,923,213,920,217,876,180,824,141,715,71,668,44,621,24,574,12,524,9,469,16,406,35,351,60,299,93,250,131,206,171,136,247,93,301"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="204,349,357,374"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="133,322,216,343,215,348,132,328"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a408ada754639be78ba19d10d4e92d560" title="Core algorithm for univariate periodic spline fitting." alt="" coords="207,300,354,325"/>
-<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="156,310,193,310,193,315,156,315"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="912,226,905,217,909,207,923,200,946,198,975,202,986,211,983,215,972,207,946,204,924,206,913,210,910,216,916,223"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="425,439,584,479"/>
-<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="338,323,359,336,377,359,384,382,390,404,407,425,414,430,411,435,403,429,386,406,379,383,372,361,356,340,335,327"/>
-<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#ab4ec4c90b00749bb021a6ec2f3433781" title="Rotate an observation row into the upper triangular band matrix." alt="" coords="405,325,604,350"/>
-<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="355,318,392,322,391,327,354,323"/>
-<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="664,274,813,300"/>
-<area shape="poly" id="edge19_Node000004_Node000007" title=" " alt="" coords="354,306,650,289,650,294,354,311"/>
-<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="665,382,813,408"/>
-<area shape="poly" id="edge22_Node000004_Node000008" title=" " alt="" coords="341,323,359,336,374,356,380,377,381,417,383,456,391,473,407,489,432,505,455,514,478,518,500,518,547,507,603,488,636,474,666,455,714,415,717,419,669,460,638,479,605,493,548,512,500,523,477,524,454,519,430,509,404,493,387,476,378,457,376,418,375,378,369,358,355,340,338,327"/>
-<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#ab3c656c52c7e12d25083b56910547f2c" title="Rotate a split observation row into the block&#45;triangular periodic system with scalar RHS." alt="" coords="421,375,589,415"/>
-<area shape="poly" id="edge10_Node000004_Node000009" title=" " alt="" coords="325,323,358,335,406,361,425,368,423,373,404,365,356,340,323,328"/>
-<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#ae7f22eea056465653c17c25aaf23b06f" title="Solve a bordered upper triangular system by back&#45;substitution." alt="" coords="428,554,581,580"/>
-<area shape="poly" id="edge13_Node000004_Node000010" title=" " alt="" coords="342,323,359,336,377,361,385,387,386,412,384,437,382,461,383,485,391,509,407,533,423,546,420,550,403,537,386,511,378,486,377,461,379,436,381,412,379,388,372,364,355,339,339,327"/>
-<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="430,224,579,249"/>
-<area shape="poly" id="edge14_Node000004_Node000011" title=" " alt="" coords="316,297,404,266,450,251,451,256,406,271,318,302"/>
-<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="431,604,579,629"/>
-<area shape="poly" id="edge18_Node000004_Node000013" title=" " alt="" coords="343,323,359,336,380,369,388,402,388,435,383,467,378,498,378,529,386,560,407,590,420,600,416,605,403,594,381,562,372,530,373,498,377,466,382,434,383,403,375,371,355,339,339,327"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="429,45,580,70"/>
-<area shape="poly" id="edge20_Node000004_Node000014" title=" " alt="" coords="282,299,295,257,318,198,354,135,377,106,404,81,415,73,418,78,407,85,381,109,358,138,323,200,300,258,288,300"/>
-<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="431,95,578,135"/>
-<area shape="poly" id="edge21_Node000004_Node000015" title=" " alt="" coords="286,298,328,226,362,183,404,145,418,136,420,141,407,149,366,186,332,229,290,301"/>
-<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="437,159,572,199"/>
-<area shape="poly" id="edge23_Node000004_Node000016" title=" " alt="" coords="292,298,339,255,370,230,404,209,423,199,425,204,407,213,373,235,342,259,296,302"/>
-<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="604,339,712,333,769,324,824,310,875,286,917,257,920,261,878,290,826,315,770,329,712,339,604,344"/>
-<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="564,322,666,300,667,305,565,327"/>
-<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="558,348,674,376,672,382,557,353"/>
-<area shape="poly" id="edge11_Node000009_Node000007" title=" " alt="" coords="573,372,603,361,658,333,705,305,707,309,660,338,605,365,575,377"/>
-<area shape="poly" id="edge12_Node000009_Node000008" title=" " alt="" coords="589,392,651,392,651,398,589,398"/>
-<area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="652,225,825,250"/>
-<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="580,234,638,234,638,240,580,239"/>
-<area shape="poly" id="edge16_Node000012_Node000002" title=" " alt="" coords="826,235,860,235,860,240,826,240"/>
-<area shape="poly" id="edge17_Node000012_Node000012" title=" " alt="" coords="705,226,698,217,701,207,715,200,739,198,767,202,779,211,775,215,765,207,739,204,717,206,705,210,703,216,709,223"/>
-<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="667,152,811,177"/>
-<area shape="poly" id="edge24_Node000016_Node000017" title=" " alt="" coords="572,172,653,167,653,172,572,177"/>
+<area shape="rect" id="Node000001" title="Determine a smooth periodic spline approximation to data." alt="" coords="5,613,156,639"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="873,431,1019,456"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,634,289,644,371,646,460,643,553,634,646,617,738,591,824,554,855,535,882,511,925,465,929,469,886,515,858,539,827,559,740,596,648,622,554,639,460,648,371,651,288,650,156,639"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="204,664,357,689"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="132,636,217,658,216,663,131,641"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a408ada754639be78ba19d10d4e92d560" title="Core algorithm for univariate periodic spline fitting." alt="" coords="207,315,354,340"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="88,612,261,350,266,353,93,615"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="912,432,905,422,909,412,923,406,946,404,975,408,986,417,983,421,972,413,946,409,924,411,913,416,910,422,916,429"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="425,399,584,439"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="307,338,406,385,426,392,424,397,404,390,305,342"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#ab4ec4c90b00749bb021a6ec2f3433781" title="Rotate an observation row into the upper triangular band matrix." alt="" coords="405,235,604,260"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="312,312,404,277,449,262,451,267,406,282,314,317"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="664,209,813,235"/>
+<area shape="poly" id="edge20_Node000004_Node000007" title=" " alt="" coords="290,313,335,264,367,239,404,220,470,203,538,197,603,198,661,205,660,210,603,204,538,202,471,208,406,224,370,243,338,268,294,316"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="665,311,813,336"/>
+<area shape="poly" id="edge23_Node000004_Node000008" title=" " alt="" coords="354,322,405,321,651,320,651,325,405,326,354,327"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#ab3c656c52c7e12d25083b56910547f2c" title="Rotate a split observation row into the block&#45;triangular periodic system with scalar RHS." alt="" coords="421,335,589,375"/>
+<area shape="poly" id="edge10_Node000004_Node000009" title=" " alt="" coords="355,334,407,340,407,346,354,339"/>
+<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#ae7f22eea056465653c17c25aaf23b06f" title="Solve a bordered upper triangular system by back&#45;substitution." alt="" coords="428,464,581,489"/>
+<area shape="poly" id="edge14_Node000004_Node000010" title=" " alt="" coords="293,338,338,392,370,423,407,449,423,457,421,462,404,454,367,427,334,396,289,342"/>
+<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="430,563,579,588"/>
+<area shape="poly" id="edge15_Node000004_Node000011" title=" " alt="" coords="288,340,300,381,324,438,359,498,381,526,407,549,419,557,416,561,404,553,377,529,354,501,319,440,295,383,283,341"/>
+<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="431,513,579,539"/>
+<area shape="poly" id="edge19_Node000004_Node000013" title=" " alt="" coords="290,339,305,372,330,416,364,461,407,500,419,507,416,511,404,504,360,465,326,419,300,375,285,341"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="429,5,580,31"/>
+<area shape="poly" id="edge21_Node000004_Node000014" title=" " alt="" coords="281,314,290,263,311,189,327,149,348,110,373,73,404,41,415,33,418,37,407,45,377,76,352,113,332,151,316,191,295,264,286,315"/>
+<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="431,119,578,159"/>
+<area shape="poly" id="edge22_Node000004_Node000015" title=" " alt="" coords="287,313,331,249,365,210,404,176,425,163,428,168,407,180,369,214,336,252,292,316"/>
+<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="437,55,572,95"/>
+<area shape="poly" id="edge24_Node000004_Node000016" title=" " alt="" coords="283,313,297,273,321,217,356,157,378,130,404,105,423,93,426,97,407,109,382,133,360,160,325,220,302,275,288,315"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="604,242,658,246,715,256,773,271,827,296,862,322,893,355,934,417,930,420,888,358,859,326,824,300,771,276,714,261,657,252,604,248"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="604,234,650,229,651,234,604,239"/>
+<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="546,258,605,277,687,304,685,309,603,282,544,263"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="590,369,869,425,868,431,589,375"/>
+<area shape="poly" id="edge12_Node000009_Node000007" title=" " alt="" coords="540,333,702,239,705,244,542,337"/>
+<area shape="poly" id="edge13_Node000009_Node000008" title=" " alt="" coords="588,341,651,333,652,338,589,347"/>
+<area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="652,519,825,544"/>
+<area shape="poly" id="edge16_Node000011_Node000012" title=" " alt="" coords="572,560,657,544,658,549,573,565"/>
+<area shape="poly" id="edge17_Node000012_Node000002" title=" " alt="" coords="769,516,902,459,904,464,771,521"/>
+<area shape="poly" id="edge18_Node000012_Node000012" title=" " alt="" coords="705,520,698,510,701,500,715,494,739,492,767,496,779,505,775,509,765,501,739,497,717,499,705,504,703,510,709,517"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="667,63,811,88"/>
+<area shape="poly" id="edge25_Node000016_Node000017" title=" " alt="" coords="572,73,653,73,653,78,572,78"/>
 </map>
