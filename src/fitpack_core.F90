@@ -2226,14 +2226,33 @@ module fitpack_core
       end subroutine fpader
 
 
+      !> @brief Add a branch to the constraint-set binary tree.
+      !!
+      !! Adds a new branch of length `n1` to the triply linked binary tree used
+      !! by the Theil-Van de Panne convexity procedure (§7.2). The branch
+      !! represents a candidate active-constraint set; its nodes contain
+      !! constraint indices from `jbind(1:n1)`.
+      !!
+      !! The tree maintains the ordering invariant
+      !! \f$ \text{info}(k) < \text{info}(\text{right}(k)) \f$ and
+      !! \f$ \text{info}(k) < \text{info}(\text{left}(k)) \f$, preventing
+      !! duplicate constraint sets. If no free nodes are available, fpfrno is
+      !! called to reclaim nodes; if that also fails, `ier = 1`.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; `up(i) = 0` marks a free node
+      !! @param[in,out] left   Left-child pointers
+      !! @param[in,out] right  Right-child pointers
+      !! @param[in,out] info   Constraint index stored at each node
+      !! @param[in,out] count  Next free node pointer
+      !! @param[in,out] merk   Terminal node of the most recent branch
+      !! @param[in]     jbind  Constraint indices for the new branch, length `n1`
+      !! @param[in]     n1     Length of the new branch
+      !! @param[out]    ier    Error flag: 0 = success, 1 = tree full
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpdeno, fpfrno, fpseno — companion tree operations
       pure subroutine fpadno(maxtr,up,left,right,info,count,merk,jbind,n1,ier)
-
-      !  subroutine fpadno adds a branch of length n1 to the triply linked tree,the information of
-      !  which is kept in the arrays up,left,right and info. the information field of the nodes of
-      !  this new branch is given in the array jbind. in linking the new branch fpadno takes account
-      !  of the property of the tree that info(k) < info(right(k)) ; info(k) < info(left(k))
-      !  if necessary the subroutine calls subroutine fpfrno to collect the free nodes of the tree.
-      !  if no computer words are available at that moment, the error parameter ier is set to 1.
       !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: maxtr,n1
@@ -2294,10 +2313,29 @@ module fitpack_core
       end subroutine fpadno
 
 
-      !  given a idim-dimensional spline curve of degree k, in its b-spline representation ( knots t(j),
-      !  j=1,...,n , b-spline coefficients c(j), j=1,...,nc) and given also a polynomial curve in its
-      !  b-spline representation ( coefficients cp(j), j=1,...,np), subroutine fpadpo calculates the b-spline
-      !  representation (coefficients c(j),j=1,...,nc) of the sum of the two curves.
+      !> @brief Add a polynomial curve to a spline curve in B-spline representation.
+      !!
+      !! Given a \f$ d \f$-dimensional spline curve of degree \f$ k \f$ with
+      !! knots \f$ t \f$ and coefficients \f$ c \f$, and a polynomial curve
+      !! with B-spline coefficients \f$ c_p \f$ (on the knot vector
+      !! \f$ [a, \ldots, a, b, \ldots, b] \f$), computes the B-spline
+      !! coefficients of their sum by inserting knots from \f$ t \f$ into the
+      !! polynomial representation via fpinst, then adding coefficients.
+      !!
+      !! @param[in]     idim  Number of curve dimensions \f$ d \f$
+      !! @param[in]     t     Knot vector of the spline, length `n`
+      !! @param[in]     n     Number of knots
+      !! @param[in,out] c     B-spline coefficients; on exit, contains the sum
+      !! @param[in]     nc    Length of `c`
+      !! @param[in]     k     Spline degree
+      !! @param[in]     cp    Polynomial B-spline coefficients, length `np`
+      !! @param[in]     np    Length of `cp`
+      !! @param[in,out] cc    Work array, length `nest`
+      !! @param[in,out] t1    Work array, length `nest`
+      !! @param[in,out] t2    Work array, length `nest`
+      !!
+      !! @see Dierckx, Ch. 7, §7.1 (pp. 115-120)
+      !! @see fpinst — single knot insertion; fppocu — polynomial construction
       pure subroutine fpadpo(idim,t,n,c,nc,k,cp,np,cc,t1,t2)
 
       !  ..
@@ -2506,14 +2544,29 @@ module fitpack_core
       end function fpbacp
 
 
-      !  subroutine fpbfou calculates the integrals
-      !                    /t(n-3)
-      !    ress(j) =      !        nj,4(x)*sin(par*x) dx    and
-      !              t(4)/
-      !                    /t(n-3)
-      !    resc(j) =      !        nj,4(x)*cos(par*x) dx ,  j=1,2,...n-4
-      !              t(4)/
-      !  where nj,4(x) denotes the cubic b-spline defined on the knots t(j),t(j+1),...,t(j+4).
+      !> @brief Compute Fourier coefficients of cubic B-splines.
+      !!
+      !! Calculates the Fourier sine and cosine integrals of each cubic
+      !! B-spline \f$ N_{j,4}(x) \f$ over the active knot interval:
+      !!
+      !! \f[
+      !!     \text{ress}(j) = \int_{\lambda_4}^{\lambda_{n-3}} N_{j,4}(x) \sin(\omega x) \, dx
+      !! \f]
+      !! \f[
+      !!     \text{resc}(j) = \int_{\lambda_4}^{\lambda_{n-3}} N_{j,4}(x) \cos(\omega x) \, dx
+      !! \f]
+      !!
+      !! for \f$ j = 1, \ldots, n-4 \f$. Uses fpcsin to evaluate the weighted
+      !! integrals over each knot span.
+      !!
+      !! @param[in]  t     Knot vector, length `n`
+      !! @param[in]  n     Number of knots
+      !! @param[in]  par   Frequency \f$ \omega \f$
+      !! @param[out] ress  Sine integrals, length `n-4`
+      !! @param[out] resc  Cosine integrals, length `n-4`
+      !!
+      !! @see Dierckx, Ch. 3, §3.3 (Fourier coefficients)
+      !! @see fpcsin — weighted Fourier integrals of cubics
       pure subroutine fpbfou(t,n,par,ress,resc)
 
       !  calling sequence:
@@ -3168,6 +3221,55 @@ module fitpack_core
       end function fpchep
 
 
+      !> @brief Core algorithm for closed (periodic) parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional closed parametric spline curve where
+      !! \f$ s(u_1) = s(u_m) \f$ and all derivatives match at the closure point.
+      !! The periodicity constraint wraps the last \f$ k \f$ B-spline columns
+      !! into the first \f$ k \f$, creating the block-triangular structure
+      !! (Eq. 6.13):
+      !!
+      !! \f[
+      !!     \begin{pmatrix} R_{11}^* & R_{12}^* \\ 0 & R_{22}^* \end{pmatrix}
+      !!     \tag{6.13}
+      !! \f]
+      !!
+      !! which is factored using two-matrix Givens rotations
+      !! (fp_rotate_row_2mat_vec). The smoothing-parameter search follows
+      !! the same rational interpolation scheme as fpcurf.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in]     nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a1      Work: band matrix \f$ R_{11}^* \f$
+      !! @param[in,out] a2      Work: band matrix \f$ R_{12}^*/R_{22}^* \f$
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g1      Work: band matrix copy
+      !! @param[in,out] g2      Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112), Eq. 6.1-6.13
+      !! @see fp_rotate_row_2mat_vec — two-matrix Givens rotation
       pure subroutine fpclos(iopt,idim,m,u,mx,x,w,k,s,nest,tol, &
                              maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
@@ -3806,7 +3908,48 @@ module fitpack_core
       end subroutine fpclos_reset_interp
 
 
-      ! TODO! output flags in fpcoco and cocosp do not match the global error messages
+      !> @brief Fit a convexity-constrained cubic smoothing spline.
+      !!
+      !! Determines a cubic spline approximation \f$ s(x) \f$ that satisfies
+      !! the convexity (or concavity) constraints specified by \f$ v(i) \f$:
+      !!
+      !! - \f$ v(i) = 1 \f$: \f$ s''(x_i) \geq 0 \f$ (local convexity)
+      !! - \f$ v(i) = -1 \f$: \f$ s''(x_i) \leq 0 \f$ (local concavity)
+      !! - \f$ v(i) = 0 \f$: no constraint at \f$ x_i \f$
+      !!
+      !! while minimizing the weighted sum of squared residuals subject to
+      !! \f$ \sum (w_i (y_i - s(x_i)))^2 \leq S \f$. The algorithm uses the
+      !! Theil-Van de Panne quadratic programming procedure with a binary
+      !! tree (§7.2) to enumerate active-constraint sets.
+      !!
+      !! @param[in]     iopt    Option: -1 = least-squares, 0 = new smoothing,
+      !!                        1 = continue from previous
+      !! @param[in]     m       Number of data points
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m` (positive)
+      !! @param[in]     v       Convexity signs, length `m`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots (workspace dimension)
+      !! @param[in]     maxtr   Max tree nodes
+      !! @param[in]     maxbin  Max active constraints
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nest`
+      !! @param[in,out] sq      Weighted sum of squared residuals
+      !! @param[in,out] sx      Spline values at data points, length `m`
+      !! @param[in,out] bind    Active constraint flags, length `nest`
+      !! @param[in,out] e       Discontinuity coefficients, length `nest`
+      !! @param[in,out] wrk     Work array, length `lwrk`
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] iwrk    Integer work array, length `kwrk`
+      !! @param[in]     kwrk    Length of `iwrk`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @note Error flags in fpcoco/cocosp do not match the global error messages.
+      !!
+      !! @see Dierckx, Ch. 7, §7.2 (pp. 125-130)
+      !! @see fpcosp — core convexity-constrained fitting algorithm
       pure subroutine fpcoco(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,e,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
@@ -4001,6 +4144,55 @@ module fitpack_core
       end subroutine fpcoco
 
 
+      !> @brief Core algorithm for constrained parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric spline curve
+      !! \f$ s(u) = (s_1(u), \ldots, s_d(u)) \f$ subject to derivative
+      !! constraints at the endpoints:
+      !!
+      !! \f[
+      !!     s_j^{(l)}(u_1) = x_j^{(l)}, \quad l = 0, \ldots, i_b - 1
+      !! \f]
+      !! \f[
+      !!     s_j^{(l)}(u_m) = x_j^{(l)}, \quad l = 0, \ldots, i_e - 1
+      !! \f]
+      !!
+      !! The algorithm first constructs a polynomial satisfying the constraints
+      !! (via fppocu), then iteratively refines the knot set and solves the
+      !! constrained least-squares system using Givens rotations.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     ib      Number of derivative constraints at start
+      !! @param[in]     ie      Number of derivative constraints at end
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in]     nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g       Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 8, §8.2 (pp. 141-146)
+      !! @see fppocu — initial polynomial; fp_rotate_shifted_vec — smoothing rotation
       pure subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
                              tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
@@ -4412,6 +4604,46 @@ module fitpack_core
 
       end subroutine fpcons
 
+      !> @brief Core algorithm for convexity-constrained cubic spline fitting.
+      !!
+      !! Given a fixed knot set, solves the constrained least-squares problem
+      !! using the Theil-Van de Panne active-set enumeration (§7.2). For each
+      !! candidate active-constraint set (tracked in a binary tree), solves
+      !! the equality-constrained system and checks feasibility and optimality
+      !! via the Lagrange multipliers.
+      !!
+      !! @param[in]     m       Number of data points
+      !! @param[in]     x       Data abscissae, length `m`
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     n       Number of knots
+      !! @param[in]     t       Knot vector, length `n`
+      !! @param[in]     e       Discontinuity jump coefficients, length `n`
+      !! @param[in]     maxtr   Max tree nodes
+      !! @param[in]     maxbin  Max active constraints
+      !! @param[in,out] c       B-spline coefficients, length `n`
+      !! @param[out]    sq      Weighted sum of squared residuals
+      !! @param[in,out] sx      Spline values at data points, length `m`
+      !! @param[in,out] bind    Active constraint flags, length `n`
+      !! @param[in]     nm      Dimension parameter
+      !! @param[in]     mb      Dimension parameter
+      !! @param[in,out] a       Work matrix `(n, 4)`
+      !! @param[in,out] b       Work matrix `(nm, maxbin)`
+      !! @param[in,out] const   Constraint vector, length `n`
+      !! @param[in,out] z       Work vector, length `n`
+      !! @param[in,out] zz      Work vector, length `n`
+      !! @param[in,out] u       Work vector, length `maxbin`
+      !! @param[in,out] q       Work matrix `(m, 4)`
+      !! @param[in,out] info    Tree info array, length `maxtr`
+      !! @param[in,out] up      Tree parent pointers, length `maxtr`
+      !! @param[in,out] left    Tree left-child pointers, length `maxtr`
+      !! @param[in,out] right   Tree right-child pointers, length `maxtr`
+      !! @param[in,out] jbind   Work array for constraint indices, length `mb`
+      !! @param[in,out] ibind   Work array for constraint indices, length `mb`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 7, §7.1-7.2 (pp. 115-130)
+      !! @see fpcoco — driver routine; fpadno, fpdeno, fpseno — tree operations
       pure subroutine fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,a, &
                              b,const,z,zz,u,q,info,up,left,right,jbind,ibind,ier)
 
@@ -4798,9 +5030,30 @@ module fitpack_core
       end subroutine fpcosp
 
 
-      !  fpcsin calculates the integrals ress=integral((b-x)**3*sin(par*x))
-      !  and resc=integral((b-x)**3*cos(par*x)) over the interval (a,b),
-      !  given sia=sin(par*a),coa=cos(par*a),sib=sin(par*b) and cob=cos(par*b)
+      !> @brief Compute weighted Fourier integrals of a cubic polynomial.
+      !!
+      !! Calculates the integrals:
+      !!
+      !! \f[
+      !!     \text{ress} = \int_a^b (b-x)^3 \sin(\omega x) \, dx, \quad
+      !!     \text{resc} = \int_a^b (b-x)^3 \cos(\omega x) \, dx
+      !! \f]
+      !!
+      !! given precomputed trigonometric values at the endpoints. Used by
+      !! fpbfou to compute Fourier coefficients of B-splines.
+      !!
+      !! @param[in]  a     Left endpoint
+      !! @param[in]  b     Right endpoint
+      !! @param[in]  par   Frequency \f$ \omega \f$
+      !! @param[in]  sia   \f$ \sin(\omega a) \f$
+      !! @param[in]  coa   \f$ \cos(\omega a) \f$
+      !! @param[in]  sib   \f$ \sin(\omega b) \f$
+      !! @param[in]  cob   \f$ \cos(\omega b) \f$
+      !! @param[out] ress  Sine integral result
+      !! @param[out] resc  Cosine integral result
+      !!
+      !! @see Dierckx, Ch. 3, §3.3 (Fourier integrals)
+      !! @see fpbfou — B-spline Fourier coefficient computation
       pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
 
           !  ..scalar arguments..
@@ -4854,6 +5107,54 @@ module fitpack_core
       end subroutine fpcsin
 
 
+      !> @brief Core algorithm for univariate spline curve fitting.
+      !!
+      !! Determines a smooth spline approximation \f$ s(x) \f$ of degree \f$ k \f$
+      !! on the interval \f$ [x_b, x_e] \f$ that satisfies the smoothing criterion:
+      !!
+      !! \f[
+      !!     F_g(p) = \sum_{i=1}^{m} \bigl( w_i (y_i - s(x_i)) \bigr)^2
+      !!     \leq S
+      !!     \tag{4.12}
+      !! \f]
+      !!
+      !! The algorithm iterates over three levels:
+      !!
+      !! 1. **Knot selection** (§5.3): adds knots at locations of maximum residual
+      !!    (Eq. 5.37-5.43) until the smoothing condition can be met.
+      !! 2. **Weighted least-squares** (§4.1): for each knot set, solves the
+      !!    banded system via QR with Givens rotations (Eq. 4.14-4.15).
+      !! 3. **Smoothing parameter search** (§5.2.4): finds \f$ p \f$ such that
+      !!    \f$ F_g(p) = S \f$ using rational interpolation (Eq. 5.30-5.32).
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue with more knots
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m` (positive)
+      !! @param[in]     m       Number of data points
+      !! @param[in]     xb      Left boundary of approximation interval
+      !! @param[in]     xe      Right boundary of approximation interval
+      !! @param[in]     k       Spline degree (\f$ 1 \leq k \leq 5 \f$)
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max number of knots (workspace bound)
+      !! @param[in]     tol     Tolerance for the smoothing condition
+      !! @param[in]     maxit   Maximum iterations for the \f$ p \f$-search
+      !! @param[in]     k1      \f$ k + 1 \f$ (spline order)
+      !! @param[in]     k2      \f$ k + 2 \f$ (smoothing bandwidth)
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[out]    c       B-spline coefficients, length `nest`
+      !! @param[out]    fp      Weighted sum of squared residuals \f$ F_g(p) \f$
+      !! @param[in,out] fpint   Residual sums per knot interval, length `nest`
+      !! @param[in,out] z       Work: transformed RHS, length `nest`
+      !! @param[in,out] a       Work: band matrix, `(nest, k1)`
+      !! @param[in,out] b       Work: smoothing matrix, `(nest, k2)`
+      !! @param[in,out] g       Work: band matrix copy, `(nest, k2)`
+      !! @param[in,out] q       Work: B-spline values, `(m, k1)`
+      !! @param[in,out] nrdata  Interior data-point counts per interval, length `nest`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 4, §4.1-4.2 (pp. 53-65); Ch. 5, §5.2-5.3 (pp. 73-94)
       pure subroutine fpcurf(iopt,x,y,w,m,xb,xe,k,s,nest,tol, &
                              maxit,k1,k2,n,t,c,fp,fpint,z,a,b,g,q,nrdata,ier)
 
@@ -5207,19 +5508,25 @@ module fitpack_core
       end subroutine fpcurf
 
 
-      !  subroutine fpcuro finds the real zeros of a cubic polynomial p(x) = a*x**3+b*x**2+c*x+d.
+      !> @brief Find the real zeros of a cubic polynomial.
+      !!
+      !! Computes all real roots of the cubic polynomial:
+      !!
+      !! \f[
+      !!     p(x) = a x^3 + b x^2 + c x + d
+      !! \f]
+      !!
+      !! Handles the degenerate cases (linear, quadratic) and uses the
+      !! standard trigonometric method for the irreducible case (three real
+      !! roots) and Cardano's formula otherwise.
+      !!
+      !! @param[in]  a  Coefficient of \f$ x^3 \f$
+      !! @param[in]  b  Coefficient of \f$ x^2 \f$
+      !! @param[in]  c  Coefficient of \f$ x \f$
+      !! @param[in]  d  Constant term
+      !! @param[out] x  Array of length 3 containing the real zeros
+      !! @param[out] n  Number of real zeros found (\f$ 0 \leq n \leq 3 \f$)
       pure subroutine fpcuro(a,b,c,d,x,n)
-
-      !
-      !  calling sequence:
-      !     call fpcuro(a,b,c,d,x,n)
-      !
-      !  input parameters:
-      !    a,b,c,d: real values, containing the coefficients of p(x).
-      !
-      !  output parameters:
-      !    x      : real array,length 3, which contains the real zeros of p(x)
-      !    n      : integer(FP_SIZE), giving the number of real zeros of p(x).
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(in) :: a,b,c,d
@@ -5311,15 +5618,33 @@ module fitpack_core
 
       end subroutine fpcuro
 
-      ! (l u)-decomposition of a cyclic tridiagonal matrix with the non-zero
-      ! elements stored as follows
-      !
-      !    | a(1,2) a(1,3)                                    a(1,1)  |
-      !    | a(2,1) a(2,2) a(2,3)                                     |
-      !    |        a(3,1) a(3,2) a(3,3)                              |
-      !    |               ...............                            |
-      !    |                               a(n-1,1) a(n-1,2) a(n-1,3) |
-      !    | a(n,3)                                  a(n,1)   a(n,2)  |
+      !> @brief LU-decompose a cyclic tridiagonal matrix.
+      !!
+      !! Computes the LU decomposition of an \f$ n \times n \f$ cyclic
+      !! tridiagonal matrix arising from periodic spline fitting. The matrix
+      !! has the structure:
+      !!
+      !! \f[
+      !!     \begin{pmatrix}
+      !!     a_{1,2} & a_{1,3} &         &        &         & a_{1,1} \\
+      !!     a_{2,1} & a_{2,2} & a_{2,3} &        &         &         \\
+      !!             & \ddots  & \ddots  & \ddots &         &         \\
+      !!             &         & a_{n-1,1} & a_{n-1,2} & a_{n-1,3} \\
+      !!     a_{n,3} &         &         &        & a_{n,1} & a_{n,2}
+      !!     \end{pmatrix}
+      !! \f]
+      !!
+      !! The decomposition factors are stored in columns 4-6 of the array `a`.
+      !! The back-substitution is performed by fpcyt2.
+      !!
+      !! @param[in,out] a   Matrix stored as `a(nn,6)`. Columns 1-3 hold the
+      !!                    tridiagonal + cyclic entries; columns 4-6 receive
+      !!                    the LU factors.
+      !! @param[in]     n   Matrix dimension
+      !! @param[in]     nn  Leading dimension of `a`
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.5-6.6
+      !! @see fpcyt2 — back-substitution using the LU factors
       pure subroutine fpcyt1(a,n,nn)
 
           !  ..scalar arguments..
@@ -5366,9 +5691,20 @@ module fitpack_core
       end subroutine fpcyt1
 
 
-      ! subroutine fpcyt2 solves a linear n x n system
-      !     a * c = b
-      ! where matrix a is a cyclic tridiagonal matrix, decomposed using subroutine fpsyt1.
+      !> @brief Solve a cyclic tridiagonal system using LU factors from fpcyt1.
+      !!
+      !! Solves the \f$ n \times n \f$ linear system \f$ A \, c = b \f$ where
+      !! \f$ A \f$ is a cyclic tridiagonal matrix whose LU decomposition has
+      !! been computed by fpcyt1 and stored in columns 4-6 of the array `a`.
+      !!
+      !! @param[in]  a   LU-factored matrix from fpcyt1, dimension `(nn, 6)`
+      !! @param[in]  n   System dimension
+      !! @param[in]  b   Right-hand side vector, length `n`
+      !! @param[out] c   Solution vector, length `n`
+      !! @param[in]  nn  Leading dimension of `a`
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.5-6.6
+      !! @see fpcyt1 — LU decomposition of the cyclic tridiagonal matrix
       pure subroutine fpcyt2(a,n,b,c,nn)
           !  ..scalar arguments..
           integer(FP_SIZE), intent(in) :: n,nn
@@ -5400,9 +5736,26 @@ module fitpack_core
       end subroutine fpcyt2
 
 
-      ! subroutine fpdeno frees the nodes of all branches of a triply linked tree with length < nbind
-      ! by putting to zero their up field. on exit the parameter merk points to the terminal node of
-      ! the most left branch of length nbind or takes the value 1 if there is no such branch.
+      !> @brief Prune short branches from the constraint-set binary tree.
+      !!
+      !! Frees all branches whose length is less than `nbind` by setting their
+      !! `up` field to zero. This reclaims memory in the triply linked tree
+      !! used by the Theil-Van de Panne procedure (§7.2), keeping only
+      !! branches at the current search frontier.
+      !!
+      !! On exit, `merk` points to the terminal node of the leftmost branch
+      !! of length `nbind`, or is set to 1 if no such branch exists.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; freed nodes get `up = 0`
+      !! @param[in]     left   Left-child pointers
+      !! @param[in]     right  Right-child pointers
+      !! @param[in]     nbind  Minimum branch length to retain
+      !! @param[out]    merk   Terminal node of the leftmost surviving branch,
+      !!                       or 1 if none
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpfrno, fpseno — companion tree operations
       pure subroutine fpdeno(maxtr,up,left,right,nbind,merk)
       !  ..
       !  ..scalar arguments..
@@ -5563,10 +5916,28 @@ module fitpack_core
       end subroutine fpdisc
 
 
-      !  subroutine fpfrno collects the free nodes (up field zero) of the triply linked tree the
-      !  information of which is kept in the arrays up,left,right and info. the maximal length of the
-      !  branches of the tree is given by n1. if no free nodes are found, the error flag ier is set
-      !  to 1.
+      !> @brief Collect free nodes from the constraint-set binary tree.
+      !!
+      !! Scans the triply linked tree for free nodes (those with `up = 0`,
+      !! previously released by fpdeno) and makes them available for reuse.
+      !! If no free nodes are found, the error flag `ier` is set to 1.
+      !!
+      !! This routine is called by fpadno when the tree needs a new node but
+      !! the `count` pointer has exhausted the pre-allocated array.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; `up(i) = 0` marks a free node
+      !! @param[in,out] left   Left-child pointers
+      !! @param[in,out] right  Right-child pointers
+      !! @param[in,out] info   Constraint index stored at each node
+      !! @param[in,out] point  Pointer to the collected free-node chain
+      !! @param[in,out] merk   Terminal node of the current branch
+      !! @param[in]     n1     Maximum branch length
+      !! @param[out]    count  Number of free nodes found
+      !! @param[out]    ier    Error flag: 0 = success, 1 = no free nodes
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpdeno, fpseno — companion tree operations
       pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
       !  ..scalar arguments..
@@ -5702,26 +6073,36 @@ module fitpack_core
       end subroutine fpgivs
 
 
-      !> Rotate a row h(1:band) into upper triangular matrix A using Givens rotations.
-      !> Also applies the same rotations to scalar RHS value yi and vector z.
-      !>
-      !> This extracts the common pattern:
-      !>   j = j_start
-      !>   do i = 1, band
-      !>       j = j + 1
-      !>       piv = h(i); if (equal(piv,zero)) cycle
-      !>       call fpgivs(piv, a(j,1), cos, sin)
-      !>       call fprota(cos, sin, yi, z(j))
-      !>       if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
-      !>   end do
-      !>
-      !> Arguments:
-      !>   h       - Row to rotate, h(1:band). Modified in place.
-      !>   band    - Number of elements in row (typically k+1)
-      !>   a       - Upper triangular matrix. a(j,1) is diagonal, a(j,2:) is upper.
-      !>   yi      - Scalar RHS contribution. Modified in place.
-      !>   z       - RHS vector. z(j_start+1:j_start+band) modified.
-      !>   j_start - Starting row index minus 1 (j increments before use)
+      !> @brief Rotate an observation row into the upper triangular band matrix.
+      !!
+      !! Incorporates a new observation row \f$ h \f$ (containing the \f$ k+1 \f$
+      !! non-zero B-spline values) into the upper triangular band matrix \f$ R \f$
+      !! using a sequence of Givens plane rotations (Eq. 4.15). Each rotation
+      !! eliminates one element of \f$ h \f$ while updating the corresponding
+      !! diagonal and upper elements of \f$ R \f$, plus the scalar right-hand side:
+      !!
+      !! \f[
+      !!     \begin{pmatrix} c & s \\ -s & c \end{pmatrix}
+      !!     \begin{pmatrix} r_{j,j} \\ h_i \end{pmatrix}
+      !!     = \begin{pmatrix} r'_{j,j} \\ 0 \end{pmatrix}
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! This is the standard-walk variant: \f$ h(i) \f$ pivots for
+      !! \f$ i = 1, \ldots, \texttt{band} \f$, targeting rows
+      !! \f$ j = \texttt{j\_start}+1, \ldots, \texttt{j\_start}+\texttt{band} \f$
+      !! of \f$ R \f$. Zero pivots are skipped.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band    Number of elements in the row (typically \f$ k+1 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R \f$. `a(j,1)` is
+      !!                        the diagonal; `a(j,2:)` stores the upper bandwidth.
+      !! @param[in,out] yi      Scalar RHS contribution; updated by each rotation
+      !! @param[in,out] z       RHS vector; positions `j_start+1 : j_start+band` updated
+      !! @param[in]     j_start Starting row index minus one (loop begins at `j_start+1`)
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
+      !! @see fp_rotate_row_vec — vector-RHS variant for parametric fitting
       pure subroutine fp_rotate_row(h, band, a, yi, z, j_start)
           real(FP_REAL),    intent(inout) :: h(:)
           integer(FP_SIZE), intent(in)    :: band
@@ -5750,10 +6131,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row
 
-      ! Vector-RHS variant of fp_rotate_row: rotates a new observation row into the
-      ! upper-triangular band matrix a(nest,band), with idim right-hand sides stored
-      ! column-wise in z(n,idim). Used by parametric fitting (fpclos, fpcons, fppara)
-      ! where idim curves share the same knot vector and B-spline basis.
+      !> @brief Rotate an observation row into a band matrix with vector RHS.
+      !!
+      !! Vector-RHS variant of fp_rotate_row for parametric curve fitting. Rotates
+      !! a new observation row \f$ h \f$ into the upper triangular band matrix
+      !! \f$ R \f$ using Givens rotations (Eq. 4.15), simultaneously transforming
+      !! \f$ d \f$ right-hand side vectors stored column-wise in \f$ z(n, d) \f$.
+      !!
+      !! In parametric fitting, all \f$ d \f$ coordinate curves share the same knot
+      !! vector and B-spline basis, so a single triangularization of \f$ R \f$
+      !! applies the same rotations to each RHS column.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band    Bandwidth (typically \f$ k+1 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] xi      Vector RHS contribution of length `idim`; updated by rotations
+      !! @param[in,out] z       RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j_start Starting row index minus one
+      !! @param[in]     n       Leading dimension of `z` (number of coefficients)
+      !! @param[in]     idim    Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
+      !! @see fp_rotate_row — scalar-RHS variant
       pure subroutine fp_rotate_row_vec(h, band, a, nest, xi, z, j_start, n, idim)
           integer(FP_SIZE), intent(in)    :: band       ! Bandwidth (k1 or kk1)
           integer(FP_SIZE), intent(in)    :: nest       ! Leading dimension of a
@@ -5785,14 +6185,33 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_vec
 
-      !> Scalar-RHS shifted-pivot Givens rotation: rotates a row h(1:band) into
-      !> upper-triangular band matrix a(nest,*) with scalar RHS yi/z.
-      !>
-      !> Always pivots on h(1) and shifts h left after each step. The effective
-      !> bandwidth shrinks as the loop nears j_end. Includes zero-pivot early exit.
-      !> Used by smoothing iterations in fpcurf, fpsurf, fppola, fpsphe.
-      !>
-      !> Book ref: §5.2.2 Eq. 5.14-5.16 (smoothing matrix), §4.1.2 Eq. 4.15 (Givens).
+      !> @brief Rotate a smoothing-matrix row into a band matrix using shifted pivots.
+      !!
+      !! Shifted-pivot variant of the Givens rotation for incorporating rows of the
+      !! smoothing matrix \f$ P \f$ into the triangularized observation matrix.
+      !! Unlike fp_rotate_row (which walks \f$ h(i) \f$ for \f$ i = 1, \ldots, b \f$),
+      !! this routine always pivots on \f$ h(1) \f$ and shifts \f$ h \f$ left after
+      !! each rotation step:
+      !!
+      !! \f[
+      !!     h \leftarrow (h_2, h_3, \ldots, h_b, 0)
+      !! \f]
+      !!
+      !! The effective bandwidth shrinks as \f$ j \to \texttt{j\_end} \f$. This
+      !! pattern arises because the smoothing matrix \f$ P \f$ (Eq. 5.5) has
+      !! bandwidth \f$ k+2 \f$ and its rows are offset relative to \f$ R \f$.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Shifted left at each step.
+      !! @param[in]     band    Bandwidth (typically \f$ k+2 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] yi      Scalar RHS contribution; updated by rotations
+      !! @param[in,out] z       RHS vector; positions `j_start : j_end` updated
+      !! @param[in]     j_start First row index in \f$ R^* \f$
+      !! @param[in]     j_end   Last row index in \f$ R^* \f$
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5, 5.14-5.16
+      !! @see fp_rotate_shifted_vec — vector-RHS variant for parametric fitting
       pure subroutine fp_rotate_shifted(h, band, a, nest, yi, z, j_start, j_end)
           integer(FP_SIZE), intent(in)    :: band, nest, j_start, j_end
           real(FP_REAL),    intent(inout) :: h(band), a(nest,*), yi, z(*)
@@ -5815,18 +6234,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_shifted
 
-      !> Shifted-pivot variant of fp_rotate_row_vec: rotates a new observation row into
-      !> upper-triangular band matrix a(nest,band) using Givens rotations, with idim
-      !> right-hand sides stored column-wise in z(n,idim).
-      !>
-      !> Unlike fp_rotate_row_vec (which walks h(i) for i=1..band), this routine always
-      !> pivots on h(1) and shifts h left after each rotation step. The effective bandwidth
-      !> shrinks as the loop nears j_end. Used by smoothing iterations in fpcons (§7.2.3,
-      !> Eq. 7.12) and fppara (§6.3.1, Eq. 6.48) where the smoothing-matrix rows are
-      !> rotated into the already-triangularized observation matrix.
-      !>
-      !> Book ref: §4.1.2 Eq. 4.15 (Givens rotation), §5.2.2 Eq. 5.14-5.16 (smoothing
-      !> matrix P with bandwidth k+2), Fig. 5.1 (band structure of P and R₁*).
+      !> @brief Rotate a smoothing-matrix row into a band matrix with vector RHS.
+      !!
+      !! Shifted-pivot, vector-RHS variant of the Givens rotation. Combines the
+      !! shifted-pivot pattern of fp_rotate_shifted (always pivot on \f$ h(1) \f$,
+      !! shift left) with the multi-dimensional RHS of fp_rotate_row_vec. Used by
+      !! smoothing iterations in parametric fitting (fpcons, fppara) where the
+      !! smoothing-matrix rows \f$ P \f$ (Eq. 5.5, bandwidth \f$ k+2 \f$) are
+      !! rotated into the already-triangularized observation matrix \f$ R \f$, with
+      !! \f$ d \f$ coordinate curves sharing the same knot vector.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Shifted left at each step.
+      !! @param[in]     band    Bandwidth (typically \f$ k+2 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] xi      Vector RHS contribution of length `idim`
+      !! @param[in,out] z       RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j_start First row index in \f$ R^* \f$
+      !! @param[in]     j_end   Last row index in \f$ R^* \f$
+      !! @param[in]     n       Leading dimension of `z`
+      !! @param[in]     idim    Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5, 5.14-5.16
+      !! @see fp_rotate_shifted — scalar-RHS variant
       pure subroutine fp_rotate_shifted_vec(h, band, a, nest, xi, z, j_start, j_end, n, idim)
           integer(FP_SIZE), intent(in)    :: band, nest, n, idim, j_start, j_end
           real(FP_REAL),    intent(inout) :: h(band), a(nest,*), xi(idim), z(n,idim)
@@ -5846,20 +6276,44 @@ module fitpack_core
           end do
       end subroutine fp_rotate_shifted_vec
 
-      !> Two-matrix variant of fp_rotate_row_vec for periodic spline fitting.
-      !> Rotates a split observation row [h1 | h2] into the block-triangular system
-      !> [a1 | a2] using Givens rotations, with idim right-hand sides in z(n,idim).
-      !>
-      !> Phase 1: Rotate h1 through a1 with shifting pivot (h1(1) always), while
-      !>   simultaneously applying cross-rotations to h2 and a2.
-      !> Phase 2: Rotate remaining h2 through a2 (standard, diagonal at a2(ij,j)).
-      !>
-      !> The two-matrix decomposition arises from periodic B-spline constraints that
-      !> wrap the last k columns of the observation matrix into the first k, creating
-      !> a block structure [R₁₁* R₁₂*; 0 R₂₂*] (§6.1.1, Eq. 6.13, Fig. 6.1).
-      !>
-      !> Book ref: §6.1.1 Eq. 6.10, 6.13 (periodic smoothing system and triangular
-      !> decomposition), §4.1.2 Eq. 4.15 (Givens rotation mechanics).
+      !> @brief Rotate a split observation row into the block-triangular periodic system
+      !!        with vector RHS.
+      !!
+      !! Two-matrix Givens rotation for periodic spline fitting. The periodic B-spline
+      !! constraint wraps the last \f$ k \f$ columns of the observation matrix into
+      !! the first \f$ k \f$, producing a block-triangular structure:
+      !!
+      !! \f[
+      !!     \begin{pmatrix} R_{11}^* & R_{12}^* \\ 0 & R_{22}^* \end{pmatrix}
+      !!     \tag{6.13}
+      !! \f]
+      !!
+      !! Each observation row is split as \f$ [h_1 \mid h_2] \f$ and rotated in
+      !! two phases:
+      !!
+      !! - **Phase 1**: Rotate \f$ h_1 \f$ through \f$ R_{11}^* \f$ using shifted
+      !!   pivots (always \f$ h_1(1) \f$), simultaneously applying cross-rotations
+      !!   to \f$ h_2 \f$ and \f$ R_{12}^* \f$.
+      !! - **Phase 2**: Rotate remaining \f$ h_2 \f$ through \f$ R_{22}^* \f$
+      !!   using standard walk (diagonal at \f$ R_{22}^*(j,j) \f$).
+      !!
+      !! @param[in,out] h1       First block of the observation row, length `band1`.
+      !!                         Shifted left during Phase 1.
+      !! @param[in]     band1    Length of `h1` (main bandwidth)
+      !! @param[in,out] h2       Second block (wraparound columns), length `band2`
+      !! @param[in]     band2    Length of `h2` (typically \f$ k \f$)
+      !! @param[in,out] a1       Band matrix \f$ R_{11}^* \f$, dimension `(nest,*)`
+      !! @param[in,out] a2       Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest     Leading dimension of `a1` and `a2`
+      !! @param[in,out] xi       Vector RHS contribution of length `idim`
+      !! @param[in,out] z        RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j1_start First row index for Phase 1
+      !! @param[in]     j1_end   Last row index for Phase 1
+      !! @param[in]     n        Leading dimension of `z`
+      !! @param[in]     idim     Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13, Fig. 6.1
+      !! @see fp_rotate_row_2mat — scalar-RHS variant
       pure subroutine fp_rotate_row_2mat_vec(h1, band1, h2, band2, a1, a2, nest, &
                                               xi, z, j1_start, j1_end, n, idim)
           integer(FP_SIZE), intent(in)    :: band1, band2, nest, n, idim, j1_start, j1_end
@@ -5896,11 +6350,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_2mat_vec
 
-      !> Scalar-RHS two-matrix Givens rotation for periodic spline fitting.
-      !> Scalar analog of fp_rotate_row_2mat_vec — identical algorithm but with
-      !> scalar yi/z(j) instead of vector xi(idim)/z(j,1:idim).
-      !>
-      !> Book ref: §6.1.1 Eq. 6.10, 6.13 (periodic system), §4.1.2 Eq. 4.15.
+      !> @brief Rotate a split observation row into the block-triangular periodic system
+      !!        with scalar RHS.
+      !!
+      !! Scalar-RHS variant of fp_rotate_row_2mat_vec. Identical two-phase algorithm
+      !! for the periodic block-triangular system (Eq. 6.13) but with a scalar
+      !! right-hand side \f$ y_i / z(j) \f$ instead of the vector
+      !! \f$ \xi(d) / z(j, 1{:}d) \f$.
+      !!
+      !! @param[in,out] h1       First block of the observation row, length `band1`.
+      !!                         Shifted left during Phase 1.
+      !! @param[in]     band1    Length of `h1`
+      !! @param[in,out] h2       Second block (wraparound columns), length `band2`
+      !! @param[in]     band2    Length of `h2`
+      !! @param[in,out] a1       Band matrix \f$ R_{11}^* \f$, dimension `(nest,*)`
+      !! @param[in,out] a2       Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest     Leading dimension of `a1` and `a2`
+      !! @param[in,out] yi       Scalar RHS contribution; updated by rotations
+      !! @param[in,out] z        RHS vector; entries at rows `j1_start : j1_end+band2` updated
+      !! @param[in]     j1_start First row index for Phase 1
+      !! @param[in]     j1_end   Last row index for Phase 1
+      !!
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13
+      !! @see fp_rotate_row_2mat_vec — vector-RHS variant
       pure subroutine fp_rotate_row_2mat(h1, band1, h2, band2, a1, a2, nest, &
                                           yi, z, j1_start, j1_end)
           integer(FP_SIZE), intent(in)    :: band1, band2, nest, j1_start, j1_end
@@ -5937,12 +6409,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_2mat
 
-      !> Standard-walk Givens rotation with contiguous-block RHS.
-      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
-      !> transformations to right(1:nrhs) and the column q(1:nrhs, irot) of a 2D
-      !> RHS matrix. Used by AX/AUU grid triangularization (fpgrre, fpgrdi, fpgrsp).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8 (Kronecker product decomposition).
+      !> @brief Rotate a row into a band matrix with contiguous-block RHS.
+      !!
+      !! Standard-walk Givens rotation for grid-based surface fitting. Rotates
+      !! row \f$ h \f$ into the upper triangular band matrix \f$ A \f$, applying
+      !! the same rotations to a block right-hand side: the vector `right(1:nrhs)`
+      !! and the column `q(1:nrhs, irot)` of a 2D RHS matrix.
+      !!
+      !! This arises from the Kronecker product decomposition of the bivariate
+      !! system (Eq. 10.4-10.8), where the one-dimensional triangularizations
+      !! \f$ A_x \f$ and \f$ A_{uu} \f$ operate on contiguous blocks of the
+      !! tensor-product RHS.
+      !!
+      !! @param[in,out] h          Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band       Bandwidth
+      !! @param[in,out] a          Upper triangular band matrix, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] q          2D RHS matrix `(nrhs,*)`; column `irot` updated
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     irot_start Starting row index minus one
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_stride — stride (row-access) RHS variant
       pure subroutine fp_rotate_row_block(h, band, a, na, right, q, nrhs, irot_start)
           integer(FP_SIZE), intent(in)    :: band, na, nrhs, irot_start
           real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), q(nrhs,*)
@@ -5961,13 +6450,30 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_block
 
-      !> Standard-walk Givens rotation with stride (row-access) RHS.
-      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
-      !> transformations to right(1:nrhs) and the row c(irot, 1:nrhs) of a 2D
-      !> RHS matrix c(ldc,*). Used by AY/AVV grid rotations and tensor-product
-      !> triangularization (fpgrre, fpgrdi, fpgrsp, fptrnp, fptrpe).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8 (grid), §10.2 Eq. 10.8 (tensor product).
+      !> @brief Rotate a row into a band matrix with stride (row-access) RHS.
+      !!
+      !! Standard-walk Givens rotation for grid-based surface fitting. Rotates
+      !! row \f$ h \f$ into the upper triangular band matrix \f$ A \f$, applying
+      !! the same rotations to the vector `right(1:nrhs)` and the **row**
+      !! `c(irot, 1:nrhs)` of a 2D RHS matrix `c(ldc,*)`.
+      !!
+      !! Unlike fp_rotate_row_block (which accesses RHS by columns), this routine
+      !! accesses RHS by rows — the stride pattern needed for the \f$ A_y \f$ and
+      !! \f$ A_{vv} \f$ triangularizations and the tensor-product back-substitution
+      !! (Eq. 10.8) in the Kronecker product decomposition.
+      !!
+      !! @param[in,out] h          Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band       Bandwidth
+      !! @param[in,out] a          Upper triangular band matrix, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] c          2D RHS matrix `(ldc,*)`; row `irot` updated
+      !! @param[in]     ldc        Leading dimension of `c`
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     irot_start Starting row index minus one
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_block — contiguous-block (column-access) RHS variant
       pure subroutine fp_rotate_row_stride(h, band, a, na, right, c, ldc, nrhs, irot_start)
           integer(FP_SIZE), intent(in)    :: band, na, ldc, nrhs, irot_start
           real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), c(ldc,*)
@@ -5986,13 +6492,33 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_stride
 
-      !> Two-matrix shifted-pivot Givens rotation with stride (row-access) RHS.
-      !> Rotates h1 through a1 (shifting left) and h2 through a2, applying the same
-      !> transformations to right(1:nrhs) and the row c(j, 1:nrhs).
-      !> Used by AVV periodic grid rotations and periodic tensor-product triangularization
-      !> (fpgrdi, fpgrsp, fptrpe).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8, §6.1 Eq. 6.10 (periodic system).
+      !> @brief Rotate a split row into the block-triangular periodic system with stride RHS.
+      !!
+      !! Combines the two-matrix periodic decomposition (Eq. 6.13) with the stride
+      !! (row-access) RHS pattern needed for grid-based surface fitting. Rotates the
+      !! split row \f$ [h_1 \mid h_2] \f$ into \f$ [R_{11}^* \mid R_{12}^*; 0 \mid R_{22}^*] \f$
+      !! in two phases, applying rotations to `right(1:nrhs)` and `c(j, 1:nrhs)`.
+      !!
+      !! Used by \f$ A_{vv} \f$ periodic grid rotations and periodic tensor-product
+      !! triangularization (fpgrdi, fpgrsp, fptrpe).
+      !!
+      !! @param[in,out] h1         First block of the row, length `band1`. Shifted left.
+      !! @param[in]     band1      Length of `h1`
+      !! @param[in,out] h2         Second block (wraparound), length `band2`
+      !! @param[in]     band2      Length of `h2`
+      !! @param[in,out] a1         Band matrix \f$ R_{11}^* \f$, dimension `(na,*)`
+      !! @param[in,out] a2         Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a1` and `a2`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] c          2D RHS matrix `(ldc,*)`; rows updated by rotations
+      !! @param[in]     ldc        Leading dimension of `c`
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     j1_start   First row index for Phase 1
+      !! @param[in]     j1_end     Last row index for Phase 1
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13
+      !! @see fp_rotate_row_2mat_vec — parametric (column-access) variant
       pure subroutine fp_rotate_2mat_stride(h1, band1, h2, band2, a1, a2, na, &
                                              right, c, ldc, nrhs, j1_start, j1_end)
           integer(FP_SIZE), intent(in)    :: band1, band2, na, ldc, nrhs, j1_start, j1_end
@@ -6028,7 +6554,63 @@ module fitpack_core
           end do
       end subroutine fp_rotate_2mat_stride
 
-      ! Compute spline coefficients on a rectangular grid
+      !> @brief Compute spline coefficients on a polar/spherical grid via Kronecker product.
+      !!
+      !! Grid-based variant of the Kronecker product decomposition (Eq. 10.4-10.8)
+      !! adapted for polar and spherical coordinates. Handles the periodic
+      !! \f$ v \f$-direction using two-matrix rotations (fp_rotate_2mat_stride)
+      !! and incorporates origin/pole boundary conditions via the `iop0`/`iop1`
+      !! flags. The `dz` parameter provides prescribed values at \f$ u = 0 \f$
+      !! and/or \f$ u = 1 \f$.
+      !!
+      !! Uses `lback = .true.` for back-substitution only (coefficients from
+      !! a previous triangularization).
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     lback   `.true.` = back-substitution only
+      !! @param[in]     u       Radial grid values, length `mu`
+      !! @param[in]     mu      Number of radial grid points
+      !! @param[in]     v       Angular grid values, length `mv`
+      !! @param[in]     mv      Number of angular grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     dz      Boundary values at origin/edge
+      !! @param[in]     iop0    Boundary condition at \f$ u = 0 \f$
+      !! @param[in]     iop1    Boundary condition at \f$ u = 1 \f$
+      !! @param[in]     tu      Radial knot vector
+      !! @param[in]     nu      Number of radial knots
+      !! @param[in]     tv      Angular knot vector
+      !! @param[in]     nv      Number of angular knots
+      !! @param[out]    p       Smoothing parameter (output)
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[out]    sq      Sum of squared residuals
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per radial interval
+      !! @param[in,out] fpv     Residual sums per angular interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     Radial B-spline observation matrix
+      !! @param[in,out] spv     Angular B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: radial band matrix
+      !! @param[in,out] av1     Work: angular band matrix (main block)
+      !! @param[in,out] av2     Work: angular band matrix (periodic block)
+      !! @param[in,out] bu      Work: radial discontinuity jumps
+      !! @param[in,out] bv      Work: angular discontinuity jumps
+      !! @param[in,out] aa      Work: boundary constraint matrix
+      !! @param[in,out] bb      Work: boundary constraint matrix
+      !! @param[in,out] cc      Work: boundary constraint matrix
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] nru     Work: radial knot interval indices
+      !! @param[in,out] nrv     Work: angular knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_2mat_stride — periodic grid Givens rotation
       pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v, &
                              mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,aa,bb,cc,cosi,nru,nrv)
@@ -6497,10 +7079,54 @@ module fitpack_core
       end subroutine fpgrdi
 
 
-      !  find the least-squares spline sinf(u,v) and calculate for each knot interval tu(j+3)<=u<=tu(j+4)
-      !  (tv(j+3)<=v<=tv(j+4)) the sum of squared residuals fpintu(j),j=1,2,...,nu-7 (fpintv(j),j=1,2,...
-      !  ,nv-7) for the data points having their absciss (ordinate)-value belonging to that interval.
-      !  fp gives the total sum of squared residuals.
+      !> @brief Compute parametric surface spline coefficients on a grid.
+      !!
+      !! Grid-based Kronecker product decomposition (Eq. 10.9-10.12) for
+      !! \f$ d \f$-dimensional parametric surfaces. Computes the least-squares
+      !! spline \f$ s_\infty(u,v) \f$ and the per-interval residual sums
+      !! `fpu(j)` and `fpv(j)` needed for knot-placement decisions. Handles
+      !! optional periodicity in \f$ u \f$ and/or \f$ v \f$ via the `ipar` flags,
+      !! using two-matrix variants for periodic directions.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     ipar    Periodicity flags (packed)
+      !! @param[in]     u       \f$ u \f$-grid values, length `mu`
+      !! @param[in]     mu      Number of \f$ u \f$-grid points
+      !! @param[in]     v       \f$ v \f$-grid values, length `mv`
+      !! @param[in]     mv      Number of \f$ v \f$-grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     tu      \f$ u \f$-knot vector
+      !! @param[in]     nu      Number of \f$ u \f$-knots
+      !! @param[in]     tv      \f$ v \f$-knot vector
+      !! @param[in]     nv      Number of \f$ v \f$-knots
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Total weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ u \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ v \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     \f$ u \f$-B-spline observation matrix
+      !! @param[in,out] spv     \f$ v \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: \f$ u \f$-band matrix (main)
+      !! @param[in,out] au1     Work: \f$ u \f$-band matrix (periodic)
+      !! @param[in,out] av      Work: \f$ v \f$-band matrix (main)
+      !! @param[in,out] av1     Work: \f$ v \f$-band matrix (periodic)
+      !! @param[in,out] bu      Work: \f$ u \f$-discontinuity jumps
+      !! @param[in,out] bv      Work: \f$ v \f$-discontinuity jumps
+      !! @param[in,out] nru     Work: \f$ u \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ v \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.3 (pp. 173-178), Eq. 10.9-10.12
+      !! @see fptrnp, fptrpe — tensor-product triangularization
       pure subroutine fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu,nu,tv,nv,p,c,nc,fp,fpu,fpv, &
                              mm,mvnu,spu,spv,right,q,au,au1,av,av1,bu,bv,nru,nrv)
 
@@ -6821,25 +7447,72 @@ module fitpack_core
       end subroutine fpgrpa
 
 
-      !  ..
-      !  the b-spline coefficients of the smoothing spline are calculated as the least-squares
-      !  solution of the over-determined linear system of equations  (ay) c (ax)' = q  where
-      !
-      !               |   (spx)    |            |   (spy)    |
-      !        (ax) = | ---------- |     (ay) = | ---------- |
-      !               | (1/p) (bx) |            | (1/p) (by) |
-      !
-      !                                | z  ' 0 |
-      !                            q = | ------ |
-      !                                | 0  ' 0 |
-      !
-      !  with c      : the (ny-ky-1) x (nx-kx-1) matrix which contains the b-spline coefficients.
-      !       z      : the my x mx matrix which contains the function values.
-      !       spx,spy: the mx x (nx-kx-1) and  my x (ny-ky-1) observation matrices according to the
-      !                least-squares problems in the x- and y-direction.
-      !       bx,by  : the (nx-2*kx-1) x (nx-kx-1) and (ny-2*ky-1) x (ny-ky-1) matrices which contain
-      !                the discontinuity jumps of the derivatives of the b-splines in the x- and
-      !                y-direction.
+      !> @brief Compute grid-based spline coefficients via Kronecker product decomposition.
+      !!
+      !! For data on a rectangular grid \f$ \{x_i\} \times \{y_j\} \f$, solves
+      !! the smoothing least-squares system using the Kronecker product structure
+      !! (Eq. 10.4-10.8):
+      !!
+      !! \f[
+      !!     A_y \, C \, A_x^T = Q
+      !!     \tag{10.4}
+      !! \f]
+      !!
+      !! where the augmented observation matrices are:
+      !!
+      !! \f[
+      !!     A_x = \begin{pmatrix} S_{px} \\ \frac{1}{\sqrt{p}} B_x \end{pmatrix}, \quad
+      !!     A_y = \begin{pmatrix} S_{py} \\ \frac{1}{\sqrt{p}} B_y \end{pmatrix}
+      !!     \tag{10.5}
+      !! \f]
+      !!
+      !! The \f$ x \f$- and \f$ y \f$-direction QR factorizations are performed
+      !! independently using fp_rotate_row_stride (row-access RHS for
+      !! \f$ A_y \f$) and fp_rotate_row_block (column-access RHS for \f$ A_x \f$),
+      !! followed by back-substitution. Also computes residual sums `fpx`,
+      !! `fpy` per knot interval for knot-placement decisions.
+      !!
+      !! @param[in,out] ifsx    Flag: 0 = recompute \f$ S_{px} \f$
+      !! @param[in,out] ifsy    Flag: 0 = recompute \f$ S_{py} \f$
+      !! @param[in,out] ifbx    Flag: 0 = recompute \f$ B_x \f$
+      !! @param[in,out] ifby    Flag: 0 = recompute \f$ B_y \f$
+      !! @param[in]     x       \f$ x \f$-grid values, length `mx`
+      !! @param[in]     mx      Number of \f$ x \f$-grid points
+      !! @param[in]     y       \f$ y \f$-grid values, length `my`
+      !! @param[in]     my      Number of \f$ y \f$-grid points
+      !! @param[in]     z       Data values on the grid, length `mz`
+      !! @param[in]     mz      Length of `z` (\f$ = mx \cdot my \f$)
+      !! @param[in]     kx      Degree in \f$ x \f$
+      !! @param[in]     ky      Degree in \f$ y \f$
+      !! @param[in]     tx      \f$ x \f$-knot vector
+      !! @param[in]     nx      Number of \f$ x \f$-knots
+      !! @param[in]     ty      \f$ y \f$-knot vector
+      !! @param[in]     ny      Number of \f$ y \f$-knots
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Total weighted sum of squared residuals
+      !! @param[in,out] fpx     Residual sums per \f$ x \f$-interval
+      !! @param[in,out] fpy     Residual sums per \f$ y \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mynx    Work dimension (\f$ my \cdot (nx - kx - 1) \f$)
+      !! @param[in]     kx1     \f$ k_x + 1 \f$
+      !! @param[in]     kx2     \f$ k_x + 2 \f$
+      !! @param[in]     ky1     \f$ k_y + 1 \f$
+      !! @param[in]     ky2     \f$ k_y + 2 \f$
+      !! @param[in,out] spx     \f$ x \f$-B-spline observation matrix
+      !! @param[in,out] spy     \f$ y \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector for row rotations
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] ax      Work: \f$ x \f$-band matrix
+      !! @param[in,out] ay      Work: \f$ y \f$-band matrix
+      !! @param[in,out] bx      Work: \f$ x \f$-discontinuity jumps
+      !! @param[in,out] by      Work: \f$ y \f$-discontinuity jumps
+      !! @param[in,out] nrx     Work: \f$ x \f$-knot interval indices
+      !! @param[in,out] nry     Work: \f$ y \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_block, fp_rotate_row_stride — grid Givens rotations
       pure subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
                              kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
                              spx,spy,right,q,ax,ay,bx,by,nrx,nry)
@@ -7098,6 +7771,62 @@ module fitpack_core
       return
       end subroutine fpgrre
 
+      !> @brief Compute spherical grid spline coefficients via Kronecker product.
+      !!
+      !! Spherical-coordinate variant of fpgrdi for data on a
+      !! \f$ \theta \times \phi \f$ grid. Handles pole-continuity constraints
+      !! at \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$ via the `iop0`/`iop1`
+      !! flags, and the periodic \f$ \phi \f$-direction using two-matrix
+      !! rotations. The `dr` parameter provides prescribed pole values.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     lback   `.true.` = back-substitution only
+      !! @param[in]     u       Co-latitude grid values \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-grid points
+      !! @param[in]     v       Longitude grid values \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-grid points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     dr      Pole boundary values
+      !! @param[in]     iop0    Boundary condition at north pole (\f$ \theta = 0 \f$)
+      !! @param[in]     iop1    Boundary condition at south pole (\f$ \theta = \pi \f$)
+      !! @param[in]     tu      \f$ \theta \f$-knot vector
+      !! @param[in]     nu      Number of \f$ \theta \f$-knots
+      !! @param[in]     tv      \f$ \phi \f$-knot vector
+      !! @param[in]     nv      Number of \f$ \phi \f$-knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] sq      Sum of squared residuals
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ \phi \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     \f$ \theta \f$-B-spline observation matrix
+      !! @param[in,out] spv     \f$ \phi \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: \f$ \theta \f$-band matrix
+      !! @param[in,out] av1     Work: \f$ \phi \f$-band matrix (main)
+      !! @param[in,out] av2     Work: \f$ \phi \f$-band matrix (periodic)
+      !! @param[in,out] bu      Work: \f$ \theta \f$-discontinuity jumps
+      !! @param[in,out] bv      Work: \f$ \phi \f$-discontinuity jumps
+      !! @param[in,out] a0      Work: north-pole constraint row
+      !! @param[in,out] a1      Work: south-pole constraint row
+      !! @param[in,out] b0      Work: north-pole smoothing row
+      !! @param[in,out] b1      Work: south-pole smoothing row
+      !! @param[in,out] c0      Work: north-pole cosine row
+      !! @param[in,out] c1      Work: south-pole cosine row
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] nru     Work: \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ \phi \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpgrdi — polar grid variant; fp_rotate_2mat_stride — periodic rotation
       pure subroutine fpgrsp(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v,                         &
                              mv,r,mr,dr,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,a0,a1,b0,b1,c0,c1,  &
@@ -7605,12 +8334,42 @@ module fitpack_core
       end subroutine fpgrsp
 
 
-      !  given the b-spline representation (knots t(j),j=1,2,...,n, b-spline coefficients c(j),j=1,2,...,
-      !  n-k-1) of a spline of degree k, fpinst calculates the b-spline representation (knots
-      !  tt(j),j=1,2,...,nn, b-spline coefficients cc(j),j=1,2,...,nn-k-1) of the same spline if an
-      !  additional knot is inserted at the point x situated in the inter val t(l)<=x<t(l+1).
-      !  iopt/=0: periodic spline; at leas one of the following conditions must be fulfilled: l>2*k or l<n-2*k.
-      !  iopt==0: non-periodic spline
+      !> @brief Insert a single knot into a B-spline representation.
+      !!
+      !! Given the B-spline representation \f$ (t, c) \f$ of a degree-\f$ k \f$
+      !! spline, computes the new knot vector \f$ t' \f$ and coefficients \f$ c' \f$
+      !! that represent the **same spline** after inserting one additional knot
+      !! \f$ x \in [\lambda_l, \lambda_{l+1}) \f$. Uses the Boehm (1980)
+      !! one-knot-at-a-time algorithm:
+      !!
+      !! \f[
+      !!     d_i = r_i \, c_i + (1 - r_i) \, c_{i-1}
+      !!     \tag{1.47}
+      !! \f]
+      !!
+      !! where each weight \f$ r_i \in [0, 1] \f$ is a convex combination factor:
+      !!
+      !! \f[
+      !!     r_i = \frac{\tau_{j+1} - \tau_i}{\tau_{i+k+1} - \tau_i}
+      !!     \tag{1.48}
+      !! \f]
+      !!
+      !! For periodic splines (`iopt /= 0`), the boundary coefficients are wrapped
+      !! accordingly. At least one of \f$ l > 2k \f$ or \f$ l < n - 2k \f$ must hold.
+      !!
+      !! @param[in]  iopt  0 = non-periodic spline, otherwise periodic
+      !! @param[in]  t     Input knot vector, length `n`
+      !! @param[in]  n     Number of input knots
+      !! @param[in]  c     Input B-spline coefficients, length `n-k-1`
+      !! @param[in]  k     Spline degree
+      !! @param[in]  x     New knot to insert, \f$ \lambda_l \leq x < \lambda_{l+1} \f$
+      !! @param[in]  l     Knot interval index where `x` is inserted
+      !! @param[out] tt    Output knot vector, length `nn`
+      !! @param[out] nn    Number of output knots (\f$ n + 1 \f$)
+      !! @param[out] cc    Output B-spline coefficients, length `nn-k-1`
+      !! @param[in]  nest  Leading dimension of arrays `t`, `c`, `tt`, `cc`
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.4 (pp. 34-37), Eq. 1.46-1.48
       pure subroutine fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
 
       !
@@ -7679,25 +8438,36 @@ module fitpack_core
       end subroutine fpinst
 
 
+      !> @brief Compute definite integrals of the normalized B-splines.
+      !!
+      !! Calculates the definite integrals of each of the \f$ n-k-1 \f$ normalized
+      !! B-splines \f$ N_{j,k+1}(u) \f$ of degree \f$ k \f$ over the interval
+      !! \f$ [x, y] \f$:
+      !!
+      !! \f[
+      !!     \text{bint}(j) = \int_x^y N_{j,k+1}(u) \, du
+      !! \f]
+      !!
+      !! Uses the Gaffney formula for indefinite integrals of B-splines, which
+      !! exploits the identity (Eq. 1.42):
+      !!
+      !! \f[
+      !!     \int_{\lambda_j}^{u} N_{j,k+1}(v) \, dv
+      !!     = \frac{\lambda_{j+k+1} - \lambda_j}{k+1}
+      !!       \sum_{i=j+1}^{g+k+1} N_{i,k+2}(u)
+      !!     \tag{1.42}
+      !! \f]
+      !!
+      !! @param[in]  t     Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in]  n     Number of knots
+      !! @param[out] bint  Array of length `nk1`; \f$ \text{bint}(j) = \int_x^y N_{j,k+1}(u)\,du \f$
+      !! @param[in]  nk1   Number of B-splines (\f$ n - k - 1 \f$)
+      !! @param[in]  x     Lower integration limit
+      !! @param[in]  y     Upper integration limit
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.3 (pp. 30-33), Eq. 1.42-1.44
+      !! @see Dierckx, Ch. 3, §3.2 (pp. 44-46), Eq. 3.8-3.10
       pure subroutine fpintb(t,n,bint,nk1,x,y)
-
-      !  subroutine fpintb calculates integrals of the normalized b-splines
-      !  nj,k+1(x) of degree k, defined on the set of knots t(j),j=1,2,...n.
-      !  it makes use of the formulae of gaffney for the calculation of
-      !  indefinite integrals of b-splines.
-      !
-      !  calling sequence:
-      !     call fpintb(t,n,bint,nk1,x,y)
-      !
-      !  input parameters:
-      !    t    : real array,length n, containing the position of the knots.
-      !    n    : integer value, giving the number of knots.
-      !    nk1  : integer value, giving the number of b-splines of degree k,
-      !           defined on the set of knots ,i.e. nk1 = n-k-1.
-      !    x,y  : real values, containing the end points of the integration
-      !           interval.
-      !  output parameter:
-      !    bint : array,length nk1, containing the integrals of the b-splines.
       !  ..
       !  ..scalars arguments..
       integer(FP_SIZE), intent(in)  :: n,nk1
@@ -7808,15 +8578,36 @@ module fitpack_core
       end subroutine fpintb
 
 
-      !  subroutine fpknot locates an additional knot for a spline of degree k and adjusts the
-      !  corresponding parameters,i.e.
-      !    t     : the position of the knots.
-      !    n     : the number of knots.
-      !    nrint : the number of knot intervals.
-      !    fpint : the sum of squares of residual right hand sides
-      !            for each knot interval.
-      !    nrdata: the number of data points inside each knot interval.
-      !  istart indicates that the smallest data point at which the new knot may be added is x(istart+1)
+      !> @brief Select and insert a new knot at the location of maximum residual.
+      !!
+      !! Locates the knot interval \f$ [\lambda_j, \lambda_{j+1}] \f$ with the
+      !! largest sum of squared residuals \f$ \delta_j \f$ (Eq. 5.43) and inserts
+      !! a new knot at the midpoint of its interior data points. This is the
+      !! greedy knot-placement strategy used by the iterative smoothing spline
+      !! algorithm:
+      !!
+      !! \f[
+      !!     \delta_j = \sideset{}{''}{\sum}_{r=u_j+1}^{u_j+m_j}
+      !!     \bigl( w_r (y_r - S_{g}(x_r)) \bigr)^2
+      !!     \tag{5.43}
+      !! \f]
+      !!
+      !! Only intervals with at least one interior data point (\f$ m_j > 2 \f$)
+      !! are eligible. The new knot is placed at \f$ x_{u_j + \lceil m_j/2 \rceil + 1} \f$.
+      !! After insertion, `fpint` and `nrdata` are split to reflect the two
+      !! new sub-intervals.
+      !!
+      !! @param[in]     x       Data abscissae, length `m`
+      !! @param[in]     m       Number of data points
+      !! @param[in,out] t       Knot vector; new knot inserted on exit
+      !! @param[in,out] n       Number of knots; incremented by 1 on exit
+      !! @param[in,out] fpint   Residual sum of squares per knot interval
+      !! @param[in,out] nrdata  Number of interior data points per interval
+      !! @param[in,out] nrint   Number of knot intervals; incremented by 1
+      !! @param[in]     nest    Leading dimension of arrays `t`, `fpint`, `nrdata`
+      !! @param[in]     istart  Smallest eligible data index minus one
+      !!
+      !! @see Dierckx, Ch. 5, §5.3 (pp. 87-94), Eq. 5.37-5.43
       pure subroutine fpknot(x,m,t,n,fpint,nrdata,nrint,nest,istart)
 
       !  ..scalar arguments..
@@ -7888,43 +8679,57 @@ module fitpack_core
 
       end subroutine fpknot
 
-      ! given the set of function values z(i,j) defined on the rectangular grid (u(i),v(j)),
-      ! i=1,2,...,mu;j=1,2,...,mv, fpopdi determines a smooth bicubic spline approximation with
-      ! given knots tu(i),i=1,..,nu in the u-direction and tv(j),j=1,2,...,nv in the v-direction.
-      ! this spline sp(u,v) will be periodic in the variable v and will satisfy the following
-      ! constraints
-      !
-      !     s(tu(1),v) = dz(1) , tv(4) <=v<= tv(nv-3)
-      !
-      !  and (if iopt(2) = 1)
-      !
-      !     d s(tu(1),v)
-      !     ------------ =  dz(2)*cos(v)+dz(3)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  and (if iopt(3) = 1)
-      !
-      !     s(tu(nu),v)  =  0   tv(4) <=v<= tv(nv-3)
-      !
-      ! where the parameters dz(i) correspond to the derivative values g(i,j) as defined in
-      ! subroutine pogrid.
-      !
-      ! the b-spline coefficients of sp(u,v) are determined as the least-squares solution  of an
-      ! overdetermined linear system which depends on the value of p and on the values dz(i),i=1,2,3.
-      ! the corresponding sum of squared residuals sq is a simple quadratic function in the variables
-      ! dz(i). these may or may not be provided. the values dz(i) which are not given will be
-      ! determined so as to minimize the resulting sum of squared residuals sq. in that case the user
-      ! must provide some initial guess dz(i) and some estimate (dz(i)-step, dz(i)+step) of the range
-      ! of possible values for these latter.
-      !
-      !  sp(u,v) also depends on the parameter p (p>0) in such a way that
-      !    - if p tends to infinity, sp(u,v) becomes the least-squares spline with given knots,
-      !      satisfying the constraints.
-      !    - if p tends to zero, sp(u,v) becomes the least-squares polynomial, satisfying the
-      !      constraints.
-      !    - the function  f(p)=sumi=1,mu(sumj=1,mv((z(i,j)-sp(u(i),v(j)))**2) is continuous and
-      !      strictly decreasing for p>0.
-      !
+      !> @brief Compute smoothing spline on a polar grid with origin constraints.
+      !!
+      !! Given data on a \f$ (u, v) \f$ grid (radial \f$ \times \f$ angular),
+      !! determines the B-spline coefficients of a bicubic smoothing spline
+      !! \f$ s_p(u,v) \f$ periodic in \f$ v \f$, satisfying origin-continuity
+      !! constraints:
+      !!
+      !! - \f$ s(\lambda_1^u, v) = z_0 \f$ (constant at origin)
+      !! - \f$ \partial s / \partial u |_{u=0} = dz(2)\cos v + dz(3)\sin v \f$
+      !!   (if `iopt(2) = 1`)
+      !! - \f$ s(\lambda_{n_u}^u, v) = 0 \f$ (if `iopt(3) = 1`)
+      !!
+      !! The unknown boundary parameters `dz(i)` (when not prescribed) are
+      !! optimized to minimize the residual sum of squares, which is a
+      !! quadratic function of `dz`. Delegates the grid QR factorization
+      !! to fpgrdi.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute radial B-splines
+      !! @param[in,out] ifsv    Flag: 0 = recompute angular B-splines
+      !! @param[in,out] ifbu    Flag: 0 = recompute radial discontinuities
+      !! @param[in,out] ifbv    Flag: 0 = recompute angular discontinuities
+      !! @param[in]     u       Radial grid values, length `mu`
+      !! @param[in]     mu      Number of radial points
+      !! @param[in]     v       Angular grid values, length `mv`
+      !! @param[in]     mv      Number of angular points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     z0      Value at origin (prescribed or initial guess)
+      !! @param[in,out] dz      Boundary derivative parameters (3 values)
+      !! @param[in]     iopt    Constraint options (3 flags)
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     tu      Radial knot vector
+      !! @param[in]     nu      Number of radial knots
+      !! @param[in]     tv      Angular knot vector
+      !! @param[in]     nv      Number of angular knots
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in]     step    Search step for boundary parameter optimization
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per radial interval
+      !! @param[in,out] fpv     Residual sums per angular interval
+      !! @param[in,out] nru     Radial knot interval indices
+      !! @param[in,out] nrv     Angular knot interval indices
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205)
+      !! @see fpgrdi — grid QR factorization; fppogr — polar grid driver
       pure subroutine fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,ider,tu,nu,tv,nv,&
                              nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
 
@@ -8075,53 +8880,59 @@ module fitpack_core
       return
       end subroutine fpopdi
 
+      !> @brief Compute smoothing spline on a spherical grid with pole constraints.
+      !!
+      !! Spherical counterpart of fpopdi. Given data on a
+      !! \f$ (\theta, \phi) \f$ grid, determines a bicubic smoothing spline
+      !! \f$ s_p(\theta,\phi) \f$ periodic in \f$ \phi \f$, satisfying
+      !! pole-continuity constraints at both poles:
+      !!
+      !! - \f$ s(0, \phi) = r_0 \f$ (north pole value)
+      !! - \f$ s(\pi, \phi) = r_1 \f$ (south pole value)
+      !! - Optional derivative constraints:
+      !!   \f$ \partial s / \partial \theta |_{\theta=0} = dr(2)\cos\phi + dr(3)\sin\phi \f$
+      !!
+      !! Unknown pole parameters `dr(i)` are optimized to minimize the
+      !! residual. Delegates to fpgrsp for the grid QR factorization.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ \theta \f$-B-splines
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ \phi \f$-B-splines
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ \theta \f$-discontinuities
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ \phi \f$-discontinuities
+      !! @param[in]     u       Co-latitude grid \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-points
+      !! @param[in]     v       Longitude grid \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     r0      North-pole value (prescribed or initial guess)
+      !! @param[in]     r1      South-pole value (prescribed or initial guess)
+      !! @param[in,out] dr      Pole derivative parameters (6 values)
+      !! @param[in]     iopt    Constraint options
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     tu      \f$ \theta \f$-knot vector
+      !! @param[in]     nu      Number of \f$ \theta \f$-knots
+      !! @param[in]     tv      \f$ \phi \f$-knot vector
+      !! @param[in]     nv      Number of \f$ \phi \f$-knots
+      !! @param[in]     nuest   Max \f$ \theta \f$-knots
+      !! @param[in]     nvest   Max \f$ \phi \f$-knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in]     step    Search step for pole parameter optimization
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ \phi \f$-interval
+      !! @param[in,out] nru     \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     \f$ \phi \f$-knot interval indices
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpgrsp — spherical grid QR factorization; fpspgr — spherical grid driver
       pure subroutine fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r, &
                              mr,r0,r1,dr,iopt,ider,tu,nu,tv,nv,nuest,nvest,p,step,c,nc, &
                              fp,fpu,fpv,nru,nrv,wrk,lwrk)
-
-      !  given the set of function values r(i,j) defined on the rectangular
-      !  grid (u(i),v(j)),i=1,2,...,mu;j=1,2,...,mv, fpopsp determines a
-      !  smooth bicubic spline approximation with given knots tu(i),i=1,..,nu
-      !  in the u-direction and tv(j),j=1,2,...,nv in the v-direction. this
-      !  spline sp(u,v) will be periodic in the variable v and will satisfy
-      !  the following constraints
-      !
-      !     s(tu(1),v) = dr(1) , tv(4) <=v<= tv(nv-3)
-      !
-      !     s(tu(nu),v) = dr(4) , tv(4) <=v<= tv(nv-3)
-      !
-      !  and (if iopt(2) = 1)
-      !
-      !     d s(tu(1),v)
-      !     ------------ =  dr(2)*cos(v)+dr(3)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  and (if iopt(3) = 1)
-      !
-      !     d s(tu(nu),v)
-      !     ------------- =  dr(5)*cos(v)+dr(6)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  where the parameters dr(i) correspond to the derivative values at the
-      !  poles as defined in subroutine spgrid.
-      !
-      !  the b-spline coefficients of sp(u,v) are determined as the least-
-      !  squares solution  of an overdetermined linear system which depends
-      !  on the value of p and on the values dr(i),i=1,...,6. the correspond-
-      !  ing sum of squared residuals sq is a simple quadratic function in
-      !  the variables dr(i). these may or may not be provided. the values
-      !  dr(i) which are not given will be determined so as to minimize the
-      !  resulting sum of squared residuals sq. in that case the user must
-      !  provide some initial guess dr(i) and some estimate (dr(i)-step,
-      !  dr(i)+step) of the range of possible values for these latter.
-      !
-      !  sp(u,v) also depends on the parameter p (p>0) in such a way that
-      !    - if p tends to infinity, sp(u,v) becomes the least-squares spline
-      !      with given knots, satisfying the constraints.
-      !    - if p tends to zero, sp(u,v) becomes the least-squares polynomial,
-      !      satisfying the constraints.
-      !    - the function  f(p)=sumi=1,mu(sumj=1,mv((r(i,j)-sp(u(i),v(j)))**2)
-      !      is continuous and strictly decreasing for p>0.
       !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: mu,mv,mr,nu,nv,nuest,nvest,nc,lwrk
@@ -8364,7 +9175,55 @@ module fitpack_core
       end subroutine fporde
 
 
-
+      !> @brief Core algorithm for open parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric spline curve
+      !! \f$ s(u) = (s_1(u), \ldots, s_d(u)) \f$ of degree \f$ k \f$ on the
+      !! parameter interval \f$ [u_b, u_e] \f$. All \f$ d \f$ coordinate curves
+      !! share the same knot vector and are fitted simultaneously:
+      !!
+      !! \f[
+      !!     \sum_{i=1}^{m} w_i^2 \sum_{j=1}^{d} (x_{i,j} - s_j(u_i))^2 \leq S
+      !!     \tag{6.9}
+      !! \f]
+      !!
+      !! The algorithm follows the same three-level iteration as fpcurf
+      !! (knot selection, QR factorization, smoothing-parameter search) but
+      !! uses vector-RHS Givens rotations (fp_rotate_row_vec) to process all
+      !! dimensions in a single pass.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     ub      Left boundary of parameter interval
+      !! @param[in]     ue      Right boundary of parameter interval
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g       Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.3 (pp. 112-114), Eq. 6.9
+      !! @see fp_rotate_row_vec — vector-RHS Givens rotation
       pure subroutine fppara(iopt,idim,m,u,mx,x,w,ub,ue,k,s,nest,tol,maxit, &
                              k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
@@ -8723,6 +9582,63 @@ module fitpack_core
       end subroutine fppara
 
 
+      !> @brief Core algorithm for parametric surface fitting on a grid.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric tensor-product spline surface
+      !! \f$ s(u,v) = (s_1(u,v), \ldots, s_d(u,v)) \f$ to data on a
+      !! rectangular grid \f$ \{u_i\} \times \{v_j\} \f$. Uses the Kronecker
+      !! product decomposition (Eq. 10.9-10.12) that separates the bivariate
+      !! problem into sequences of univariate operations:
+      !!
+      !! \f[
+      !!     (A_u \otimes A_v) \, c = z
+      !!     \tag{10.9}
+      !! \f]
+      !!
+      !! The \f$ u \f$- and \f$ v \f$-direction triangularizations are performed
+      !! independently (via fp_rotate_row_block and fp_rotate_row_stride),
+      !! followed by back-substitution.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     ipar    Periodicity flags (packed)
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     u       \f$ u \f$-grid values, length `mu`
+      !! @param[in]     mu      Number of \f$ u \f$-grid points
+      !! @param[in]     v       \f$ v \f$-grid values, length `mv`
+      !! @param[in]     mv      Number of \f$ v \f$-grid points
+      !! @param[in]     z       Data values, length `mz` (\f$ = mu \cdot mv \cdot d \f$)
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max \f$ u \f$-knots
+      !! @param[in]     nvest   Max \f$ v \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in,out] nc      Length of coefficient array
+      !! @param[in,out] nu      Number of \f$ u \f$-knots
+      !! @param[in,out] tu      \f$ u \f$-knot vector
+      !! @param[in,out] nv      Number of \f$ v \f$-knots
+      !! @param[in,out] tv      \f$ v \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual sum
+      !! @param[in,out] fpold   Previous residual sum
+      !! @param[in,out] reducu  Residual reduction in \f$ u \f$
+      !! @param[in,out] reducv  Residual reduction in \f$ v \f$
+      !! @param[in,out] fpintu  Residual sums per \f$ u \f$-interval
+      !! @param[in,out] fpintv  Residual sums per \f$ v \f$-interval
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of \f$ u \f$-knots to add
+      !! @param[in,out] nplusv  Number of \f$ v \f$-knots to add
+      !! @param[in,out] nru     Work: \f$ u \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ v \f$-knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per \f$ u \f$-interval
+      !! @param[in,out] nrdatv  Interior data counts per \f$ v \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in,out] lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 10, §10.3 (pp. 173-178), Eq. 10.9-10.12
+      !! @see fpgrre, fpgrdi — grid triangularization helpers
       pure subroutine fppasu(iopt,ipar,idim,u,mu,v,mv,z,mz,s,nuest,nvest, &
                              tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu,reducv,fpintu, &
                              fpintv,lastdi,nplusu,nplusv,nru,nrv,nrdatu,nrdatv,wrk,lwrk,ier)
@@ -9114,7 +10030,47 @@ module fitpack_core
       end subroutine fppasu
 
 
-      ! Periodic spline determination
+      !> @brief Core algorithm for univariate periodic spline fitting.
+      !!
+      !! Fits a periodic spline \f$ s(x) \f$ of degree \f$ k \f$ where
+      !! \f$ s^{(j)}(x_1) = s^{(j)}(x_m) \f$ for \f$ j = 0, \ldots, k-1 \f$.
+      !! The periodicity reduces the number of free coefficients to
+      !! \f$ n - 2k - 1 \f$ and wraps the B-spline columns into the
+      !! block-triangular structure (Eq. 6.13) analogous to fpclos.
+      !!
+      !! This is the scalar-valued counterpart of fpclos (which handles
+      !! multi-dimensional parametric curves). Uses two-matrix Givens
+      !! rotations (fp_rotate_row_2mat) for the periodic block structure.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     m       Number of data points
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nest`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a1      Work: band matrix \f$ R_{11}^* \f$
+      !! @param[in,out] a2      Work: band matrix \f$ R_{12}^*/R_{22}^* \f$
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g1      Work: band matrix copy
+      !! @param[in,out] g2      Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112), Eq. 6.1-6.8
+      !! @see fp_rotate_row_2mat — two-matrix scalar Givens rotation
       pure subroutine fpperi(iopt,x,y,w,m,k,s,nest,tol,maxit, &
                              k1,k2,n,t,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
@@ -9679,14 +10635,39 @@ module fitpack_core
 
       end subroutine fpperi_reset_interp
 
-      !  subroutine fppocu finds a idim-dimensional polynomial curve p(u) = (p1(u),p2(u),...,pidim(u)) of
-      !  degree k, satisfying certain derivative constraints at the end points a and b, i.e.
-      !                  (l)
-      !    if ib > 0 : pj   (a) = db(idim*l+j), l=0,1,...,ib-1
-      !                  (l)
-      !    if ie > 0 : pj   (b) = de(idim*l+j), l=0,1,...,ie-1
-      !
-      !  the polynomial curve is returned in its b-spline representation ( cp(j), j=1,2,...,np )
+      !> @brief Construct a polynomial curve satisfying endpoint derivative constraints.
+      !!
+      !! Finds a \f$ d \f$-dimensional polynomial curve
+      !! \f$ p(u) = (p_1(u), \ldots, p_d(u)) \f$ of degree \f$ k \f$ that
+      !! satisfies prescribed derivative values at the endpoints \f$ a \f$ and
+      !! \f$ b \f$:
+      !!
+      !! \f[
+      !!     p_j^{(l)}(a) = \text{db}(d \cdot l + j), \quad l = 0, \ldots, i_b - 1
+      !! \f]
+      !! \f[
+      !!     p_j^{(l)}(b) = \text{de}(d \cdot l + j), \quad l = 0, \ldots, i_e - 1
+      !! \f]
+      !!
+      !! The result is returned as B-spline coefficients `cp(1:np)` on the
+      !! knot vector \f$ [a, \ldots, a, b, \ldots, b] \f$ (each with
+      !! multiplicity \f$ k+1 \f$). Used by concur to build an initial
+      !! polynomial approximation for constrained parametric curves.
+      !!
+      !! @param[in]  idim  Number of curve dimensions \f$ d \f$
+      !! @param[in]  k     Polynomial degree
+      !! @param[in]  a     Left endpoint
+      !! @param[in]  b     Right endpoint
+      !! @param[in]  ib    Number of derivative conditions at \f$ a \f$
+      !! @param[in]  db    Derivative values at \f$ a \f$, length `nb`
+      !! @param[in]  nb    Length of `db` (\f$ = d \cdot i_b \f$)
+      !! @param[in]  ie    Number of derivative conditions at \f$ b \f$
+      !! @param[in]  de    Derivative values at \f$ b \f$, length `ne`
+      !! @param[in]  ne    Length of `de` (\f$ = d \cdot i_e \f$)
+      !! @param[out] cp    B-spline coefficients of the polynomial, length `np`
+      !! @param[in]  np    Length of `cp` (\f$ = d \cdot (k+1) \f$)
+      !!
+      !! @see Dierckx, Ch. 7, §7.1 (pp. 115-120)
       pure subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
 
       !  ..scalar arguments..
@@ -9757,6 +10738,57 @@ module fitpack_core
       end subroutine fppocu
 
 
+      !> @brief Driver for polar grid smoothing spline with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline on a polar grid.
+      !! Manages the knot-selection strategy (adding knots in the radial
+      !! or angular direction based on residuals) and the smoothing-parameter
+      !! search, delegating the actual grid computation to fpopdi at each step.
+      !!
+      !! @param[in]     iopt    Fitting options (3 flags)
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     u       Radial grid, length `mu`
+      !! @param[in]     mu      Number of radial points
+      !! @param[in]     v       Angular grid, length `mv`
+      !! @param[in]     mv      Number of angular points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     z0      Origin value
+      !! @param[in]     r       Boundary function values, length `mv`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nu      Number of radial knots
+      !! @param[in,out] tu      Radial knot vector
+      !! @param[in,out] nv      Number of angular knots
+      !! @param[in,out] tv      Angular knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducu  Residual reduction in radial direction
+      !! @param[in,out] reducv  Residual reduction in angular direction
+      !! @param[in,out] fpintu  Residual sums per radial interval
+      !! @param[in,out] fpintv  Residual sums per angular interval
+      !! @param[in,out] dz      Boundary derivative parameters
+      !! @param[in]     step    Search step for boundary optimization
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of radial knots to add
+      !! @param[in,out] nplusv  Number of angular knots to add
+      !! @param[in,out] lasttu  Last radial knot change flag
+      !! @param[in,out] nru     Radial knot interval indices
+      !! @param[in,out] nrv     Angular knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per radial interval
+      !! @param[in,out] nrdatv  Interior data counts per angular interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205)
+      !! @see fpopdi — grid computation; fppola — scattered polar fitting
       pure subroutine fppogr(iopt,ider,u,mu,v,mv,z,mz,z0,r,s, &
                              nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
                              reducv,fpintu,fpintv,dz,step,lastdi,nplusu,nplusv,lasttu,nru, &
@@ -10163,6 +11195,75 @@ module fitpack_core
       end subroutine fppogr
 
 
+      !> @brief Core algorithm for spline fitting on a polar domain.
+      !!
+      !! Fits a smooth bivariate spline to data on a polar-like domain
+      !! \f$ D = \{(x,y) : x^2 + y^2 \leq r(\theta)^2\} \f$ by transforming
+      !! to coordinates \f$ (u, v) \f$ where \f$ u = r/r(\theta) \f$ (radial)
+      !! and \f$ v = \theta \f$ (angular). The boundary function \f$ r(\theta) \f$
+      !! is user-supplied.
+      !!
+      !! Continuity at the origin (\f$ u = 0 \f$) imposes constraints on the
+      !! B-spline coefficients (Eq. 11.3-11.5):
+      !!
+      !! - \f$ s(0, v) \f$ must be independent of \f$ v \f$
+      !! - Derivatives at the origin must satisfy symmetry conditions
+      !!
+      !! The algorithm uses the same iterative scheme as fpsurf (knot
+      !! placement, QR factorization with rank-deficiency handling, smoothing
+      !! search) with additional logic for origin-continuity constraints and
+      !! the periodic \f$ v \f$-direction.
+      !!
+      !! @param[in]     iopt1   Fitting option (0 = new, 1 = continue)
+      !! @param[in]     iopt2   Origin BC option (0 = free, 1 = given)
+      !! @param[in]     iopt3   Derivative BC option at origin
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Radial coordinates, length `m`
+      !! @param[in]     v       Angular coordinates, length `m`
+      !! @param[in]     z       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     rad     Boundary function values at data angles
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     ib1     Bandwidth parameter
+      !! @param[in]     ib3     Extended bandwidth parameter
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     ncc     Auxiliary coefficient dimension
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nu      Number of radial knots
+      !! @param[in,out] tu      Radial knot vector
+      !! @param[in,out] nv      Number of angular knots
+      !! @param[in,out] tv      Angular knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] sup     Upper bound for residual
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] row     Work: observation row
+      !! @param[in,out] cs      Work: cosine values
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bu      Work: radial discontinuity coefficients
+      !! @param[in,out] bv      Work: angular discontinuity coefficients
+      !! @param[in,out] spu     Work: radial B-spline values
+      !! @param[in,out] spv     Work: angular B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205), Eq. 11.1-11.9
+      !! @see fprppo — polar representation; fpopdi — polar derivatives
       pure subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, nuest,nvest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv,tv,c,fp,sup,fpint,coord, &
                              f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
@@ -10945,8 +12046,40 @@ module fitpack_core
       end subroutine root_finding_iterate
 
 
-      ! subroutine fprank finds the minimum norm solution of a leastsquares problem in case of
-      ! rank deficiency.
+      !> @brief Compute the minimum-norm least-squares solution under rank deficiency.
+      !!
+      !! When the QR-triangularized observation matrix \f$ R \f$ has rank
+      !! \f$ r < n \f$ (detected by near-zero diagonal elements
+      !! \f$ |R_{ii}| < \varepsilon \f$), the least-squares solution is not unique.
+      !! This routine computes the **minimum-norm** B-spline coefficient vector
+      !! \f$ \tilde{c} \f$ by factoring the reduced upper trapezoidal matrix
+      !! \f$ W = [W_1 \; W_2] \f$ (Eq. 9.9):
+      !!
+      !! \f[
+      !!     \tilde{c} = W^T (W W^T)^{-1} \tilde{z}_1
+      !!     \tag{9.8}
+      !! \f]
+      !!
+      !! The factorization \f$ W = R_1 Q_1 \f$ is computed via Givens rotations
+      !! that zero out the columns of \f$ W_2 \f$ against \f$ W_1 \f$, exploiting
+      !! the band structure. The solution avoids the large oscillations that
+      !! arise from simply setting zero-rank coefficients to zero.
+      !!
+      !! @param[in,out] a     Band matrix from QR, dimension `(na, m)`. On exit,
+      !!                      contains the reduced factorization.
+      !! @param[in,out] f     Transformed RHS vector, length `n`. On exit, modified.
+      !! @param[in]     n     Number of unknowns (B-spline coefficients)
+      !! @param[in]     m     Bandwidth of `a`
+      !! @param[in]     na    Leading dimension of `a`
+      !! @param[in]     tol   Threshold \f$ \varepsilon \f$ for rank detection
+      !! @param[out]    c     Minimum-norm solution vector, length `n`
+      !! @param[out]    sq    Residual sum of squares from the rank reduction
+      !! @param[out]    rank  Detected rank \f$ r \f$ of the system
+      !! @param[in,out] aa    Work array `(n, m)`
+      !! @param[in,out] ff    Work vector, length `n`
+      !! @param[in,out] h     Work vector, length `m`
+      !!
+      !! @see Dierckx, Ch. 9, §9.1.2 (pp. 150-152), Eq. 9.7-9.10
       pure subroutine fprank(a,f,n,m,na,tol,c,sq,rank,aa,ff,h)
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: n         ! the dimension of a.
@@ -11247,6 +12380,58 @@ module fitpack_core
       end subroutine fprati
 
 
+      !> @brief Driver for rectangular grid smoothing surface with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline surface on a
+      !! rectangular grid \f$ \{x_i\} \times \{y_j\} \f$. Manages the knot
+      !! selection strategy (alternating between \f$ x \f$ and \f$ y \f$
+      !! directions based on residuals) and the smoothing-parameter search,
+      !! delegating the grid computation to fpgrre at each step.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in,out] x       \f$ x \f$-grid values, length `mx`
+      !! @param[in]     mx      Number of \f$ x \f$-grid points
+      !! @param[in,out] y       \f$ y \f$-grid values, length `my`
+      !! @param[in]     my      Number of \f$ y \f$-grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     xb      Left \f$ x \f$-boundary
+      !! @param[in]     xe      Right \f$ x \f$-boundary
+      !! @param[in]     yb      Lower \f$ y \f$-boundary
+      !! @param[in]     ye      Upper \f$ y \f$-boundary
+      !! @param[in]     kx      Degree in \f$ x \f$
+      !! @param[in]     ky      Degree in \f$ y \f$
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nxest   Max \f$ x \f$-knots
+      !! @param[in]     nyest   Max \f$ y \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nx      Number of \f$ x \f$-knots
+      !! @param[in,out] tx      \f$ x \f$-knot vector
+      !! @param[in,out] ny      Number of \f$ y \f$-knots
+      !! @param[in,out] ty      \f$ y \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducx  Residual reduction in \f$ x \f$
+      !! @param[in,out] reducy  Residual reduction in \f$ y \f$
+      !! @param[in,out] fpintx  Residual sums per \f$ x \f$-interval
+      !! @param[in,out] fpinty  Residual sums per \f$ y \f$-interval
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusx  Number of \f$ x \f$-knots to add
+      !! @param[in,out] nplusy  Number of \f$ y \f$-knots to add
+      !! @param[in,out] nrx     \f$ x \f$-knot interval indices
+      !! @param[in,out] nry     \f$ y \f$-knot interval indices
+      !! @param[in,out] nrdatx  Interior data counts per \f$ x \f$-interval
+      !! @param[in,out] nrdaty  Interior data counts per \f$ y \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fpgrre — grid Kronecker product computation
       pure subroutine fpregr(iopt,x,mx,y,my,z,mz,xb,xe,yb,ye, &
                              kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
                              reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
@@ -11683,8 +12868,26 @@ module fitpack_core
       end subroutine fprota
 
 
-      !  given the coefficients of a constrained bicubic spline, as determined in subroutine fppola,
-      !  fprppo calculates the coefficients in the standard b-spline representation of bicubic splines.
+      !> @brief Convert constrained polar spline coefficients to standard form.
+      !!
+      !! Transforms the coefficients of a constrained bicubic spline (as
+      !! computed by fppola with origin-continuity constraints) into the
+      !! standard B-spline coefficient representation. The constrained form
+      !! encodes the origin conditions via cosine-weighted combinations;
+      !! this routine expands them into independent coefficients.
+      !!
+      !! @param[in]     nu     Number of radial knots
+      !! @param[in]     nv     Number of angular knots
+      !! @param[in]     if1    Origin constraint type (position)
+      !! @param[in]     if2    Origin constraint type (derivative)
+      !! @param[in]     cosi   Cosine integral values
+      !! @param[in]     ratio  Knot ratio for origin constraint
+      !! @param[in,out] c      Constrained coefficients on entry; work on exit
+      !! @param[in,out] f      Standard B-spline coefficients on exit
+      !! @param[in]     ncoff  Number of coefficients
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205), Eq. 11.3-11.5
+      !! @see fppola — polar fitting; fprpsp — spherical variant
       pure subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
 
       !  ..scalar arguments..
@@ -11758,8 +12961,24 @@ module fitpack_core
       return
       end subroutine fprppo
 
-      ! given the coefficients of a spherical spline function, subroutine fprpsp calculates the
-      ! coefficients in the standard b-spline representation of this bicubic spline.
+      !> @brief Convert constrained spherical spline coefficients to standard form.
+      !!
+      !! Transforms the coefficients of a constrained bicubic spline (as
+      !! computed by fpsphe with pole-continuity constraints) into the
+      !! standard B-spline coefficient representation. The constrained form
+      !! encodes pole conditions via cosine/sine-weighted combinations at
+      !! \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$.
+      !!
+      !! @param[in]     nt     Number of \f$ \theta \f$-knots
+      !! @param[in]     np     Number of \f$ \phi \f$-knots
+      !! @param[in]     co     Cosine values for pole constraints
+      !! @param[in]     si     Sine values for pole constraints
+      !! @param[in,out] c      Constrained coefficients on entry; work on exit
+      !! @param[in,out] f      Standard B-spline coefficients on exit
+      !! @param[in]     ncoff  Number of coefficients
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213), Eq. 11.14-11.16
+      !! @see fpsphe — spherical fitting; fprppo — polar variant
       pure subroutine fprpsp(nt,np,co,si,c,f,ncoff)
           !  ..
           !  ..scalar arguments
@@ -11816,12 +13035,29 @@ module fitpack_core
       end subroutine fprpsp
 
 
-      ! subroutine fpseno fetches a branch of a triply linked tree the information of which is kept
-      ! in the arrays up,left,right and info.
-      ! the branch has a specified length nbind and is determined by the parameter merk which points to
-      ! its terminal node. the information field of the nodes of this branch is stored in the array
-      ! ibind. on exit merk points to a new branch of length nbind or takes the value 1 if no such
-      !  branch was found.
+      !> @brief Fetch and advance to the next branch in the constraint-set tree.
+      !!
+      !! Extracts the constraint indices of the branch ending at terminal node
+      !! `merk` (length `nbind`) into the array `ibind(1:nbind)`. Then advances
+      !! `merk` to point to the next branch of the same length, or sets
+      !! `merk = 1` if no further branch exists.
+      !!
+      !! Used by the Theil-Van de Panne procedure (§7.2) to enumerate candidate
+      !! active-constraint sets level by level.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in]     up     Parent pointers
+      !! @param[in]     left   Left-child pointers
+      !! @param[in]     right  Right-child pointers
+      !! @param[in]     info   Constraint index stored at each node
+      !! @param[in,out] merk   On entry, terminal node of the branch to fetch.
+      !!                       On exit, terminal node of the next branch of
+      !!                       length `nbind`, or 1 if none.
+      !! @param[out]    ibind  Constraint indices of the fetched branch, length `nbind`
+      !! @param[in]     nbind  Required branch length
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpdeno, fpfrno — companion tree operations
       pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
           !  ..scalar arguments..
@@ -11858,6 +13094,59 @@ module fitpack_core
       end subroutine fpseno
 
 
+      !> @brief Driver for spherical grid smoothing spline with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline on a spherical
+      !! grid. Manages knot selection in \f$ \theta \f$ and \f$ \phi \f$
+      !! directions and the smoothing-parameter search, delegating grid
+      !! computation to fpopsp. Handles pole constraints at both
+      !! \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$.
+      !!
+      !! @param[in]     iopt    Fitting options
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     u       Co-latitude grid \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-points
+      !! @param[in]     v       Longitude grid \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     r0      North-pole value
+      !! @param[in]     r1      South-pole value
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max \f$ \theta \f$-knots
+      !! @param[in]     nvest   Max \f$ \phi \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nu      Number of \f$ \theta \f$-knots
+      !! @param[in,out] tu      \f$ \theta \f$-knot vector
+      !! @param[in,out] nv      Number of \f$ \phi \f$-knots
+      !! @param[in,out] tv      \f$ \phi \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducu  Residual reduction in \f$ \theta \f$
+      !! @param[in,out] reducv  Residual reduction in \f$ \phi \f$
+      !! @param[in,out] fpintu  Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpintv  Residual sums per \f$ \phi \f$-interval
+      !! @param[in,out] dr      Pole derivative parameters
+      !! @param[in]     step    Search step for pole parameter optimization
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of \f$ \theta \f$-knots to add
+      !! @param[in,out] nplusv  Number of \f$ \phi \f$-knots to add
+      !! @param[in,out] lastu0  Last north-pole knot change flag
+      !! @param[in,out] lastu1  Last south-pole knot change flag
+      !! @param[in,out] nru     \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     \f$ \phi \f$-knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per \f$ \theta \f$-interval
+      !! @param[in,out] nrdatv  Interior data counts per \f$ \phi \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpopsp — grid computation; fpsphe — scattered spherical fitting
       pure subroutine fpspgr(iopt,ider,u,mu,v,mv,r,mr,r0,r1,s, &
                              nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
                              reducv,fpintu,fpintv,dr,step,lastdi,nplusu,nplusv,lastu0, &
@@ -12306,6 +13595,72 @@ module fitpack_core
       end subroutine fpspgr
 
 
+      !> @brief Core algorithm for spline fitting on the sphere.
+      !!
+      !! Fits a smooth bivariate spline to data on the unit sphere using
+      !! coordinates \f$ (\theta, \phi) \f$ where \f$ \theta \in [0, \pi] \f$
+      !! is co-latitude and \f$ \phi \in [0, 2\pi) \f$ is longitude. The
+      !! spline is periodic in \f$ \phi \f$ and must satisfy pole-continuity
+      !! conditions at \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$ (Eq. 11.12):
+      !!
+      !! \f[
+      !!     s(0, \phi) = \text{const}, \quad
+      !!     s(\pi, \phi) = \text{const}
+      !!     \tag{11.12}
+      !! \f]
+      !!
+      !! with derivative conditions analogous to the polar case (Eq. 11.14-11.16).
+      !! The algorithm follows the same iterative framework as fpsurf with
+      !! additional handling for pole constraints and the periodic
+      !! \f$ \phi \f$-direction.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     m       Number of data points
+      !! @param[in]     teta    Co-latitude values \f$ \theta \f$, length `m`
+      !! @param[in]     phi     Longitude values \f$ \phi \f$, length `m`
+      !! @param[in]     r       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     ntest   Max \f$ \theta \f$-knots
+      !! @param[in]     npest   Max \f$ \phi \f$-knots
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     ib1     Bandwidth parameter
+      !! @param[in]     ib3     Extended bandwidth parameter
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     ncc     Auxiliary coefficient dimension
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nt      Number of \f$ \theta \f$-knots
+      !! @param[in,out] tt      \f$ \theta \f$-knot vector
+      !! @param[in,out] np      Number of \f$ \phi \f$-knots
+      !! @param[in,out] tp      \f$ \phi \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] sup     Upper bound for residual
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] row     Work: observation row
+      !! @param[in,out] coco    Work: cosine values for pole constraints
+      !! @param[in,out] cosi    Work: cosine integrals for pole constraints
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bt      Work: \f$ \theta \f$-discontinuity coefficients
+      !! @param[in,out] bp      Work: \f$ \phi \f$-discontinuity coefficients
+      !! @param[in,out] spt     Work: \f$ \theta \f$-B-spline values
+      !! @param[in,out] spp     Work: \f$ \phi \f$-B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213), Eq. 11.12-11.16
+      !! @see fprpsp — spherical representation; fpopsp — spherical operations
       pure subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
                              ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
@@ -13070,6 +14425,81 @@ module fitpack_core
       end subroutine fpsuev
 
 
+      !> @brief Core algorithm for bivariate tensor-product spline surface fitting.
+      !!
+      !! Fits a tensor-product spline surface \f$ s(x,y) \f$ of degrees
+      !! \f$ k_x \f$ and \f$ k_y \f$ to scattered data by minimizing:
+      !!
+      !! \f[
+      !!     \sum_{i=1}^{m} \bigl( w_i (z_i - s(x_i, y_i)) \bigr)^2
+      !!     \leq S
+      !!     \tag{9.2}
+      !! \f]
+      !!
+      !! The B-spline representation has \f$ (g+k_x+1)(h+k_y+1) \f$
+      !! coefficients on the knot grid \f$ \{t_x\} \times \{t_y\} \f$.
+      !! The algorithm iterates:
+      !!
+      !! 1. **Knot placement** in \f$ x \f$ and \f$ y \f$ based on residuals
+      !! 2. **QR factorization** of the observation matrix via Givens
+      !!    rotations, with rank-deficiency handling via fprank (Eq. 9.7-9.10)
+      !! 3. **Smoothing-parameter search** via rational interpolation
+      !!
+      !! Data points are sorted into knot-interval panels using fporde for
+      !! efficient row-by-row processing.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     m       Number of data points
+      !! @param[in,out] x       Data \f$ x \f$-coordinates, length `m`
+      !! @param[in,out] y       Data \f$ y \f$-coordinates, length `m`
+      !! @param[in]     z       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     xb      Left \f$ x \f$-boundary
+      !! @param[in]     xe      Right \f$ x \f$-boundary
+      !! @param[in]     yb      Lower \f$ y \f$-boundary
+      !! @param[in]     ye      Upper \f$ y \f$-boundary
+      !! @param[in]     kxx     Degree in \f$ x \f$
+      !! @param[in]     kyy     Degree in \f$ y \f$
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nxest   Max knots in \f$ x \f$
+      !! @param[in]     nyest   Max knots in \f$ y \f$
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nmax    Max of `nxest`, `nyest`
+      !! @param[in]     km1     \f$ \max(k_x, k_y) + 1 \f$
+      !! @param[in]     km2     \f$ k_x + k_y + 2 \f$
+      !! @param[in]     ib1     \f$ k_x k_y + 2 \f$
+      !! @param[in]     ib3     \f$ k_x k_y + \max(k_x, k_y) + 2 \f$
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nx0     Number of \f$ x \f$-knots
+      !! @param[in,out] tx      \f$ x \f$-knot vector
+      !! @param[in,out] ny0     Number of \f$ y \f$-knots
+      !! @param[in,out] ty      \f$ y \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial unweighted residual sum
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bx      Work: \f$ x \f$-discontinuity coefficients
+      !! @param[in,out] by      Work: \f$ y \f$-discontinuity coefficients
+      !! @param[in,out] spx     Work: \f$ x \f$-B-spline values
+      !! @param[in,out] spy     Work: \f$ y \f$-B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 9, §9.1-9.2 (pp. 147-167), Eq. 9.2-9.10
+      !! @see fporde — panel sorting; fprank — rank-deficient solver
       pure subroutine fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kxx,kyy, &
                              s,nxest, nyest,eta,tol,maxit,nmax,km1,km2,ib1,ib3,nc,intest, &
                              nrest,nx0,tx,ny0,ty,c,fp,fp0,fpint,coord,f,ff,a,q,bx,by,spx, &
@@ -13647,7 +15077,12 @@ module fitpack_core
 
       contains
 
-          ! Ensure x,y are returned in the original order, if they were interchanged
+          !> @brief Restore original x/y ordering if axes were interchanged.
+          !!
+          !! When fpsurf interchanges the \f$ x \f$- and \f$ y \f$-axes for
+          !! efficiency (ensuring more knots in the outer loop direction),
+          !! this routine swaps them back on exit so the caller sees the
+          !! original orientation.
           pure subroutine sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
               logical(FP_BOOL), intent(in) :: interchanged
               integer(FP_SIZE), intent(in) :: m,nmax,nc,iopt,nk1x,nk1y
@@ -13689,8 +15124,19 @@ module fitpack_core
 
       end subroutine fpsurf
 
-      ! subroutine fpsysy solves a linear n x n symmetric system   (a) * (b) = (g), with n<=6
-      ! on input, vector g contains the right hand side ; on output it will contain the solution (b).
+      !> @brief Solve a small symmetric linear system by Cholesky factorization.
+      !!
+      !! Solves the \f$ n \times n \f$ symmetric positive definite system
+      !! \f$ A \, b = g \f$ with \f$ n \leq 6 \f$ using Cholesky
+      !! decomposition. On exit, `g` contains the solution \f$ b \f$.
+      !!
+      !! Used by fpopdi and fpopsp for the small optimization problems that
+      !! determine the optimal origin/pole boundary parameters.
+      !!
+      !! @param[in,out] a  Symmetric matrix, dimension `(6, 6)`. Only the
+      !!                   first `n` rows and columns are used.
+      !! @param[in]     n  System dimension (\f$ n \leq 6 \f$)
+      !! @param[in,out] g  On entry, right-hand side. On exit, solution.
       pure subroutine fpsysy(a,n,g)
 
       !  ..scalar arguments..
@@ -13747,9 +15193,30 @@ module fitpack_core
       end subroutine fpsysy
 
 
-      !  subroutine fptrnp reduces the (m+n-7) x (n-4) matrix a to upper triangular form and applies the
-      !  same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the (n-4) x (mm) x
-      !  (idim) matrix q
+      !> @brief Triangularize the tensor-product system for non-periodic grids.
+      !!
+      !! Reduces the \f$ (m + n - 7) \times (n - 4) \f$ augmented observation
+      !! matrix to upper triangular form using Givens rotations (Eq. 10.8),
+      !! simultaneously transforming the \f$ m \times mm \times d \f$ data
+      !! matrix \f$ Z \f$ into the \f$ (n-4) \times mm \times d \f$ RHS
+      !! matrix \f$ Q \f$. Used in the second phase of the Kronecker product
+      !! decomposition for parametric grid surfaces (fppasu via fpgrpa).
+      !!
+      !! @param[in]     m       Number of grid points in this direction
+      !! @param[in]     mm      Number of columns in the RHS (other direction size)
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     n       Number of knots in this direction
+      !! @param[in]     nr      Knot interval indices, length `m`
+      !! @param[in]     sp      B-spline values at grid points, `(m, 4)`
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in]     b       Discontinuity jump matrix, `(n, 5)`
+      !! @param[in]     z       Data matrix, length \f$ m \cdot mm \cdot d \f$
+      !! @param[out]    a       Triangularized band matrix, `(n, 5)`
+      !! @param[out]    q       Transformed RHS, length \f$ (n-4) \cdot mm \cdot d \f$
+      !! @param[out]    right   Work: RHS row vector, length \f$ mm \cdot d \f$
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.8
+      !! @see fptrpe — periodic variant; fp_rotate_row_stride — stride rotation
       pure subroutine fptrnp(m,mm,idim,n,nr,sp,p,b,z,a,q,right)
 
       !  ..
@@ -13833,9 +15300,31 @@ module fitpack_core
       end subroutine fptrnp
 
 
-      !  subroutine fptrpe reduces the (m+n-7) x (n-7) cyclic bandmatrix a to upper triangular form and
-      !  applies the same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the
-      !  (n-7) x (mm) x (idim) matrix q.
+      !> @brief Triangularize the tensor-product system for periodic grids.
+      !!
+      !! Periodic variant of fptrnp. Reduces the \f$ (m + n - 7) \times (n - 7) \f$
+      !! cyclic band matrix to upper triangular form using two-matrix Givens
+      !! rotations (fp_rotate_2mat_stride), simultaneously transforming the
+      !! data matrix \f$ Z \f$ into the RHS matrix \f$ Q \f$. The periodicity
+      !! wraps the last columns into the first, creating the block-triangular
+      !! structure stored in `a` (main) and `aa` (periodic block).
+      !!
+      !! @param[in]     m       Number of grid points in this direction
+      !! @param[in]     mm      Number of columns in the RHS
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     n       Number of knots in this direction
+      !! @param[in]     nr      Knot interval indices, length `m`
+      !! @param[in]     sp      B-spline values at grid points, `(m, 4)`
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in]     b       Discontinuity jump matrix, `(n, 5)`
+      !! @param[in]     z       Data matrix, length \f$ m \cdot mm \cdot d \f$
+      !! @param[out]    a       Triangularized band matrix (main block), `(n, 5)`
+      !! @param[out]    aa      Triangularized periodic block, `(n, 4)`
+      !! @param[out]    q       Transformed RHS, length \f$ (n-7) \cdot mm \cdot d \f$
+      !! @param[out]    right   Work: RHS row vector, length \f$ mm \cdot d \f$
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.8 (periodic)
+      !! @see fptrnp — non-periodic variant; fp_rotate_2mat_stride — periodic rotation
       pure subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
       !  ..
       !  ..scalar arguments..
