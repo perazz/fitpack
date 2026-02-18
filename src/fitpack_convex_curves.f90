@@ -17,6 +17,14 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for constrained-convexity curve fitting.
+!!
+!! Provides fitpack_convex_curve, an extension of fitpack_curve that enforces local
+!! convexity or concavity constraints during spline fitting. Always uses cubic splines
+!! (\f$ k = 3 \f$). The underlying core routines are concon (automatic knot placement)
+!! and cocosp (least-squares with user-supplied knots).
+!!
+!! @see Dierckx, Ch. 8, §8.3–8.4 (pp. 173–196); concon, cocosp
 module fitpack_convex_curves
     use fitpack_core
     use fitpack_fitters
@@ -26,9 +34,16 @@ module fitpack_convex_curves
 
     public :: fitpack_convex_curve
 
-    !> A curve fitter with local convexity/concavity constraints.
-    !> Uses concon (automatic knots) and cocosp (least-squares with given knots).
-    !> Always cubic (order=3).
+    !> @brief Cubic spline fitter with pointwise convexity/concavity constraints.
+    !!
+    !! Extends fitpack_curve with per-data-point convexity flags: each point can be
+    !! constrained to lie on a locally concave (\f$ v_i = 1 \f$), convex
+    !! (\f$ v_i = -1 \f$), or unconstrained (\f$ v_i = 0 \f$) portion of the spline.
+    !! The fitting routines solve a constrained quadratic programming problem to determine
+    !! knot positions and coefficients that satisfy these shape constraints while minimizing
+    !! the smoothing functional.
+    !!
+    !! @see Dierckx, Ch. 8, §8.3–8.4 (pp. 173–196)
     type, extends(fitpack_curve) :: fitpack_convex_curve
 
         !> Convexity constraints at data points: 1=concave, -1=convex, 0=unconstrained

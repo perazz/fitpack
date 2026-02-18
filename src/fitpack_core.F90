@@ -209,8 +209,14 @@ module fitpack_core
 
     contains
 
-      ! Flow control: on output flag present, return it;
-      ! otherwise, halt on error
+      !> @brief Dispatch an error code: return it to caller or halt with a message.
+      !!
+      !! If `ierr_out` is present, the error code is returned through it. Otherwise, if `ierr`
+      !! indicates failure, the program halts with a diagnostic message.
+      !!
+      !! @param[in]  ierr      Error flag from a FITPACK routine.
+      !! @param[out] ierr_out  Optional output flag; if present, receives `ierr` instead of halting.
+      !! @param[in]  whereAt   Location string for the diagnostic message.
       subroutine fitpack_error_handling(ierr,ierr_out,whereAt)
           integer(FP_FLAG), intent(in) :: ierr
           integer(FP_FLAG), optional, intent(out) :: ierr_out
@@ -224,7 +230,10 @@ module fitpack_core
           end if
       end subroutine fitpack_error_handling
 
-      ! Wrapper for the error flag
+      !> @brief Convert an integer error flag to a human-readable message string.
+      !!
+      !! @param[in]  ierr  FITPACK error flag (e.g., `FITPACK_OK`, `FITPACK_INPUT_ERROR`).
+      !! @return     Allocatable character string describing the error.
       pure function FITPACK_MESSAGE(ierr) result(msg)
          integer(FP_FLAG), intent(in) :: ierr
          character(len=:), allocatable :: msg
@@ -251,10 +260,16 @@ module fitpack_core
 
       end function FITPACK_MESSAGE
 
-      ! Smoothing parameter choice.
-      ! - If not set yet, choose a smoothing trajectory
-      ! - If a user input is present, use that one
-      ! - If a previous value is available, keep that one
+      !> @brief Choose the smoothing parameter(s) for an iterative fit.
+      !!
+      !! Selects one or more values of the smoothing factor \f$ s \f$ for the next fitting
+      !! iteration(s). If a user-supplied value is present it is used directly; if a previous
+      !! value exists it is re-used; otherwise a default decreasing trajectory is applied.
+      !!
+      !! @param[in]     old_smoothing   Previous smoothing factor.
+      !! @param[in]     user_smoothing  Optional user-supplied value.
+      !! @param[out]    nit             Number of smoothing iterations to perform.
+      !! @param[out]    smooth_now      Array of 3 smoothing values for the iterations.
       subroutine get_smoothing(old_smoothing,user_smoothing,nit,smooth_now)
           integer(FP_SIZE), intent(out)   :: nit
           real(FP_REAL), intent(in), optional :: user_smoothing
@@ -276,7 +291,10 @@ module fitpack_core
 
       end subroutine get_smoothing
 
-      ! Wrapper for iopt
+      !> @brief Convert an `iopt` computation-mode flag to a human-readable string.
+      !!
+      !! @param[in]  iopt  Computation mode flag (`-1` = Least-Squares, `0` = Smoothing, `1` = Old).
+      !! @return     Allocatable character string describing the mode.
       pure function IOPT_MESSAGE(iopt) result(msg)
          integer(FP_FLAG), intent(in) :: iopt
          character(len=:), allocatable :: msg
@@ -288,48 +306,41 @@ module fitpack_core
          end select
       end function IOPT_MESSAGE
 
-      ! Wrapper for OK
+      !> @brief Test whether a FITPACK error flag indicates success.
+      !!
+      !! Returns `.true.` if `ierr <= 0` (i.e., `FITPACK_OK` or any negative success variant).
+      !!
+      !! @param[in]  ierr  Error flag from a FITPACK routine.
+      !! @return     `.true.` on success, `.false.` on error.
       elemental logical(FP_BOOL) function FITPACK_SUCCESS(ierr)
          integer(FP_FLAG), intent(in) :: ierr
          FITPACK_SUCCESS = ierr<=FITPACK_OK
       end function FITPACK_SUCCESS
 
+      !> @brief Evaluate a bivariate spline at scattered points \f$ (x_i, y_i) \f$.
+      !!
+      !! Given a bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x \f$ and \f$ k_y \f$ in
+      !! tensor-product B-spline representation, evaluates \f$ s(x_i, y_i) \f$ for
+      !! \f$ i = 1,\ldots,m \f$ at arbitrary (scattered) points.
+      !!
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     x     \f$ x \f$-coordinates of evaluation points (length \f$ m \f$).
+      !! @param[in]     y     \f$ y \f$-coordinates of evaluation points (length \f$ m \f$).
+      !! @param[out]    z     Spline values \f$ s(x_i, y_i) \f$ (length \f$ m \f$).
+      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge k_x + k_y + 2 \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see bispev — grid evaluation variant; fpbisp — tensor-product evaluation kernel
       pure subroutine bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
 
-      !  subroutine bispeu evaluates on a set of points (x(i),y(i)),i=1,...,m
-      !  a bivariate spline s(x,y) of degrees kx and ky, given in the
-      !  b-spline representation.
-      !
-      !  calling sequence:
-      !     call bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   x     : real array of dimension (mx).
-      !   y     : real array of dimension (my).
-      !   m     : on entry m must specify the number points. m >= 1.
-      !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk. lwrk >= kx+ky+2
-      !
-      !  output parameters:
-      !   z     : real array of dimension m.
-      !           on successful exit z(i) contains the value of s(x,y)
-      !           at the point (x(i),y(i)), i=1,...,m.
-      !   ier   : integer error flag
-      !
-      !  restrictions:
-      !   m >=1, lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
-      !   tx(kx+1) <= x(i-1) <= x(i) <= tx(nx-kx), i=2,...,mx
-      !   ty(ky+1) <= y(j-1) <= y(j) <= ty(ny-ky), j=2,...,my
-      !
-      !  other subroutines required:
-      !    fpbisp,fpbspl
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,m,lwrk
       integer(FP_FLAG), intent(out) :: ier
@@ -361,62 +372,33 @@ module fitpack_core
 
       end subroutine bispeu
 
-      !  subroutine bispev evaluates on a grid (x(i),y(j)),i=1,...,mx; j=1,...,my a bivariate spline
-      !  s(x,y) of degrees kx and ky, given in the b-spline representation.
+      !> @brief Evaluate a bivariate spline on a rectangular grid.
+      !!
+      !! Given a bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x \f$ and \f$ k_y \f$ in
+      !! tensor-product B-spline representation, evaluates \f$ s(x_i, y_j) \f$ on the
+      !! grid \f$ i = 1,\ldots,m_x;\; j = 1,\ldots,m_y \f$.
+      !!
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     x     \f$ x \f$-grid coordinates (length \f$ m_x \f$), non-decreasing.
+      !! @param[in]     mx    Number of grid points in \f$ x \f$, \f$ m_x \ge 1 \f$.
+      !! @param[in]     y     \f$ y \f$-grid coordinates (length \f$ m_y \f$), non-decreasing.
+      !! @param[in]     my    Number of grid points in \f$ y \f$, \f$ m_y \ge 1 \f$.
+      !! @param[out]    z     Spline values: `z(my*(i-1)+j)` = \f$ s(x_i, y_j) \f$ (length \f$ m_x m_y \f$).
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m_x(k_x+1) + m_y(k_y+1) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace, length \f$ \ge m_x + m_y \f$.
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see bispeu — scattered-point variant; fpbisp — tensor-product evaluation kernel
       pure subroutine bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
 
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   x     : real array of dimension (mx).
-      !           before entry x(i) must be set to the x co-ordinate of the i-th grid point along the x-axis.
-      !           tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2,...,mx.
-      !   mx    : on entry mx must specify the number of grid points along the x-axis. mx >=1.
-      !   y     : real array of dimension (my).
-      !           before entry y(j) must be set to the y co-ordinate of the j-th grid point along the y-axis.
-      !           ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
-      !   my    : on entry my must specify the number of grid points along the y-axis. my >=1.
-      !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
-      !           lwrk >= mx*(kx+1)+my*(ky+1)
-      !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
-      !
-      !  output parameters:
-      !   z     : real array of dimension (mx*my).
-      !           on successful exit z(my*(i-1)+j) contains the value of s(x,y)
-      !           at the point (x(i),y(j)),i=1,...,mx;j=1,...,my.
-      !   ier   : integer error flag
-      !
-      !  restrictions:
-      !   mx >=1, my >=1, lwrk>=mx*(kx+1)+my*(ky+1), kwrk>=mx+my
-      !   tx(kx+1) <= x(i-1) <= x(i) <= tx(nx-kx), i=2,...,mx
-      !   ty(ky+1) <= y(j-1) <= y(j) <= ty(ny-ky), j=2,...,my
-      !
-      !  other subroutines required:
-      !    fpbisp,fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,mx,my,lwrk,kwrk
       integer(FP_FLAG), intent(out) :: ier
@@ -471,181 +453,41 @@ module fitpack_core
       !  the fit s(u) is given in the b-spline representation and can be evaluated by means of
       !  subroutine curev.
 
+      !> @brief Determine a smooth closed parametric spline curve approximation.
+      !!
+      !! Given \f$ m \f$ data points \f$ \mathbf{x}_i \in \mathbb{R}^{\text{idim}} \f$ with
+      !! \f$ \mathbf{x}_1 = \mathbf{x}_m \f$ (closure condition) and weights \f$ w_i > 0 \f$,
+      !! computes an `idim`-dimensional periodic spline curve
+      !! \f$ \mathbf{s}(u) = (s_1(u),\ldots,s_{\text{idim}}(u)) \f$ of degree \f$ k \f$.
+      !!
+      !! Parameter values \f$ u_i \f$ can be supplied by the user (`ipar=1`) or computed
+      !! automatically from cumulative chord lengths (`ipar=0`).
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` (LSQ), `0` (new smoothing), `1` (continue).
+      !! @param[in]     ipar  Parameter mode: `0` = automatic (chord-length), `1` = user-supplied.
+      !! @param[in]     idim  Dimension of the curve, \f$ 1 \le \text{idim} \le 10 \f$.
+      !! @param[in]     m     Number of data points, \f$ m > 1 \f$.
+      !! @param[in,out] u     Parameter values (length \f$ m \f$). Output when `ipar=0`.
+      !! @param[in]     mx    Declared dimension of `x`, \f$ \text{mx} \ge \text{idim} \times m \f$.
+      !! @param[in]     x     Data coordinates: `x(idim*(i-1)+j)` is the \f$ j \f$-th coordinate
+      !!   of point \f$ i \f$. First and last points must coincide.
+      !! @param[in]     w     Weights (length \f$ m \f$). \f$ w_m \f$ not used.
+      !! @param[in]     k     Spline degree, \f$ 1 \le k \le 5 \f$. Cubic recommended.
+      !! @param[in]     s     Smoothing factor \f$ S \ge 0 \f$.
+      !! @param[in]     nest  Over-estimate of total knots. `nest=m+2*k` always suffices.
+      !! @param[in,out] n     Total number of knots.
+      !! @param[in,out] t     Knot positions (length `nest`).
+      !! @param[in]     nc    Declared dimension of `c`, \f$ \text{nc} \ge \text{nest} \times \text{idim} \f$.
+      !! @param[in,out] c     B-spline coefficients (length `nc`).
+      !! @param[in,out] fp    Weighted sum of squared residuals.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k+1) + \text{nest}(7+\text{idim}+5k) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `nest`).
+      !! @param[in,out] ier   Error flag (same codes as curfit).
+      !!
+      !! @see Dierckx, Ch. 6, §6.1--6.2; fpclos — core closed-curve fitting algorithm
       pure subroutine clocur(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
 
-      !
-      !  calling sequence:
-      !     call clocur(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
-      !
-      !  parameters:
-      !   iopt  : integer flag. on entry iopt must specify whether a weighted least-squares closed
-      !           spline curve (iopt=-1) or a smoothing closed spline curve (iopt=0 or 1) must be
-      !           determined. if iopt=0 the routine will start with an initial set of knots
-      !           t(i)=u(1)+(u(m)-u(1))*(i-k-1),i=1,2,...,2*k+2. if iopt=1 the routine will continue
-      !           with the knots found at the last call. attention: a call with iopt=1 must always be
-      !           immediately preceded by another call with iopt=1 or iopt=zero.
-      !           unchanged on exit.
-      !   ipar  : integer flag. on entry ipar must specify whether (ipar=1) the user will supply the
-      !           parameter values u(i),or whether (ipar=0) these values are to be calculated by clocur.
-      !           unchanged on exit.
-      !   idim  : integer. on entry idim must specify the dimension of the curve. 0 < idim <= MAX_IDIM.
-      !           unchanged on exit.
-      !   m     : integer. on entry m must specify the number of data points. m>1. unchanged on exit.
-      !   u     : real array of dimension at least (m). in case ipar=1,before entry, u(i) must be set
-      !           to the i-th value of the parameter variable u for i=1,2,...,m. these values must then
-      !           be supplied in strictly ascending order and will be unchanged on exit. in case ipar=0,
-      !           on exit,the array will contain the values u(i) as determined by clocur.
-      !   mx    : integer. on entry mx must specify the actual dimension of the array x as declared in
-      !           the calling (sub)program. mx must not be too small (see x). unchanged on exit.
-      !   x     : real array of dimension at least idim*m.
-      !           before entry, x(idim*(i-1)+j) must contain the j-th coordinate of the i-th data point
-      !           for i=1,2,...,m and j=1,2,...,idim. since first and last data point must coincide it
-      !           means that x(j)=x(idim*(m-1)+j),j=1,2,...,idim.   unchanged on exit.
-      !   w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value
-      !           in the set of weights. the w(i) must be strictly positive. w(m) is not used.
-      !           unchanged on exit. see also further comments.
-      !   k     : integer. on entry k must specify the degree of the splines. 1<=k<=5. it is recommended
-      !           to use cubic splines (k=3). the user is strongly dissuaded from choosing k even,
-      !           together with a small s-value. unchanged on exit.
-      !   s     : real.on entry (in case iopt>=0) s must specify the smoothing factor. s >=zero
-      !           unchanged on exit. for advice on the choice of s see further comments.
-      !   nest  : integer. on entry nest must contain an over-estimate of the total number of knots of
-      !           the splines returned, to indicate the storage space available to the routine.
-      !           nest >=2*k+2. in most practical situation nest=m/2 will be sufficient. always large
-      !           enough is nest=m+2*k, the number of knots needed for interpolation (s=0).
-      !           unchanged on exit.
-      !   n     : integer. unless ier = 10 (in case iopt >=0), n will contain the total number of knots
-      !           of the smoothing spline curve returned if the computation mode iopt=1 is used this
-      !           value of n should be left unchanged between subsequent calls. in case iopt=-1, the
-      !           value of n must be specified on entry.
-      !   t     : real array of dimension at least (nest). on successful exit, this array will contain
-      !           the knots of the spline curve,i.e. the position of the interior knots t(k+2),
-      !           t(k+3),..,t(n-k-1) as well as the position of the additional t(1),t(2),..,t(k+1)=u(1)
-      !           and u(m)=t(n-k),...,t(n) needed for the b-spline representation.
-      !           if the computation mode iopt=1 is used, the values of t(1),t(2),...,t(n) should be
-      !           left unchanged between subsequent calls. if the computation mode iopt=-1 is used, the
-      !           values t(k+2),...,t(n-k-1) must be supplied by the user, before entry. see also the
-      !           restrictions (ier=10).
-      !   nc    : integer. on entry nc must specify the actual dimension of the array c as declared in
-      !           the calling (sub)program. nc must not be too small (see c). unchanged on exit.
-      !   c     : real array of dimension at least (nest*idim). on successful exit, this array will
-      !           contain the coefficients in the b-spline representation of the spline curve s(u),i.e.
-      !           the b-spline coefficients of the spline sj(u) will be given in c(n*(j-1)+i),i=1,2,...,
-      !           n-k-1 for j=1,2,...,idim.
-      !   fp    : real. unless ier = 10, fp contains the weighted sum of squared residuals of the spline
-      !           curve returned.
-      !   wrk   : real array of dimension at least m*(k+1)+nest*(7+idim+5*k). used as working space.
-      !           if the computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left
-      !           unchanged between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared
-      !           in the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
-      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged
-      !           between subsequent calls.
-      !   ier   : integer. unless the routine detects an error, ier contains a non-positive value on
-      !           exit, i.e.
-      !    ier=0  : normal return. the close curve returned has a residual sum of squares fp such that
-      !             abs(fp-s)/s <= tol with tol a relative tolerance set to 0.001 by the program.
-      !    ier=-1 : normal return. the curve returned is an interpolating spline curve (fp=0).
-      !    ier=-2 : normal return. the curve returned is the weighted least-squares point,i.e. each
-      !             spline sj(u) is a constant. in this extreme case fp gives the upper bound fp0 for
-      !             the smoothing factor s.
-      !    ier=1  : error. the required storage space exceeds the available storage space, as specified
-      !             by the parameter nest. likely causes : nest too small. if nest is already large (say
-      !             nest > m/2), it may also indicate that s is too small. the approximation returned is
-      !             the least-squares closed curve according to the knots t(1),t(2),...,t(n). (n=nest)
-      !             the parameter fp gives the corresponding weighted sum of squared residuals (fp>s).
-      !    ier=2  : error. a theoretically impossible result was found during the iteration process for
-      !             finding a smoothing curve with fp = s. probably causes : s too small.
-      !             there is an approximation returned but the corresponding weighted sum of squared
-      !             residuals does not satisfy the condition abs(fp-s)/s < tol.
-      !    ier=3  : error. the maximal number of iterations maxit (set to 20 by the program) allowed for
-      !             finding a smoothing curve with fp=s has been reached. probably causes : s too small
-      !             there is an approximation returned but the corresponding weighted sum of squared
-      !             residuals does not satisfy the condition abs(fp-s)/s < tol.
-      !    ier=10 : error. on entry, the input data are controlled on validity the following
-      !             restrictions must be satisfied.
-      !             -1<=iopt<=1, 1<=k<=5, m>1, nest>2*k+2, w(i)>0,i=1,2,...,m
-      !             0<=ipar<=1, 0<idim<=10, lwrk>=(k+1)*m+nest*(7+idim+5*k),
-      !             nc>=nest*idim, x(j)=x(idim*(m-1)+j), j=1,2,...,idim
-      !             if ipar=0: sum j=1,idim (x(i*idim+j)-x((i-1)*idim+j))**2>0
-      !                        i=1,2,...,m-1.
-      !             if ipar=1: u(1)<u(2)<...<u(m)
-      !             if iopt=-1: 2*k+2<=n<=min(nest,m+2*k)
-      !                         u(1)<t(k+2)<t(k+3)<...<t(n-k-1)<u(m)
-      !                            (u(1)=0 and u(m)=1 in case ipar=0)
-      !                       the schoenberg-whitney conditions, i.e. there
-      !                       must be a subset of data points uu(j) with
-      !                       uu(j) = u(i) or u(i)+(u(m)-u(1)) such that
-      !                         t(j) < uu(j) < t(j+k+1), j=k+1,...,n-k-1
-      !             if iopt>=0: s>=0
-      !                         if s=0 : nest >= m+2*k
-      !             if one of these conditions is found to be violated,control is immediately repassed
-      !             to the calling program. in that case there is no approximation returned.
-      !
-      !  further comments:
-      !   by means of the parameter s, the user can control the tradeoff between closeness of fit and
-      !   smoothness of fit of the approximation. if s is too large, the curve will be too smooth and
-      !   signal will be lost ; if s is too small the curve will pick up too much noise. in the extreme
-      !   cases the program will return an interpolating curve if s=0 and the weighted least-squares
-      !   point if s is very large. between these extremes, a properly chosen s will result in a good
-      !   compromise between closeness of fit and smoothness of fit. to decide whether an approximation,
-      !   corresponding to a certain s is satisfactory the user is highly recommended to inspect the
-      !   fits graphically.
-      !   recommended values for s depend on the weights w(i). if these are taken as 1/d(i) with d(i) an
-      !   estimate of the standard deviation of x(i), a good s-value should be found in the range
-      !   (m-sqrt(2*m),m+sqrt(2*m)). if nothing is known about the statistical error in x(i) each w(i)
-      !   can be set equal to one and s determined by trial and error, taking account of the comments
-      !   above. the best is then to start with a very large value of s ( to determine the weighted
-      !   least-squares point and the upper bound fp0 for s) and then to progressively decrease the
-      !   value of s ( say by a factor 10 in the beginning, i.e. s=fp0/10, fp0/100,...and more carefully
-      !   as the approximating curve shows more detail) to obtain closer fits. to economize the search
-      !   for a good s-value the program provides with different modes of computation. at the first call
-      !   of the routine, or whenever he wants to restart with the initial set of knots the user must set
-      !   iopt=zero.
-      !   if iopt=1 the program will continue with the set of knots found at the last call of the
-      !   routine. this will save a lot of computation time if clocur is called repeatedly for different
-      !   values of s. the number of knots of the spline returned and their location will depend on the
-      !   value of s and on the complexity of the shape of the curve underlying the data. but, if the
-      !   computation mode iopt=1 is used, the knots returned may also depend on the s-values at
-      !   previous calls (if these were smaller). therefore, if after a number of trials with different
-      !   s-values and iopt=1, the user can finally accept a fit as satisfactory, it may be worthwhile
-      !   for him to call clocur once more with the selected value for s but now with iopt=zero indeed,
-      !   clocur may then return an approximation of the same quality of fit but with fewer knots and
-      !   therefore better if data reduction is also an important objective for the user.
-      !
-      !   the form of the approximating curve can strongly be affected by the choice of the parameter
-      !   values u(i). if there is no physical reason for choosing a particular parameter u, often good
-      !   results will be obtained with the choice of clocur(in case ipar=0), i.e.
-      !        v(1)=0, v(i)=v(i-1)+q(i), i=2,...,m, u(i)=v(i)/v(m), i=1,..,m
-      !   where
-      !        q(i)= sqrt(sum j=1,idim (xj(i)-xj(i-1))**2 ) - Euclidean distance
-      !   other possibilities for q(i) are
-      !        q(i)= sum j=1,idim (xj(i)-xj(i-1))**2        - Squared distance
-      !        q(i)= sum j=1,idim abs(xj(i)-xj(i-1))        - Manhattan distance
-      !        q(i)= max j=1,idim abs(xj(i)-xj(i-1))
-      !        q(i)= 1
-      !
-      !
-      !  other subroutines required:
-      !    fpbacp,fpbspl,fpchep,fpclos,fpdisc,fpgivs,fpknot,fprati,fprota
-      !
-      !  references:
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines,
-      !                computer graphics and image processing 20 (1982) 171-184.
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines,
-      !                report tw55, dept. computer science, k.u.leuven, 1981.
-      !   dierckx p. : curve and surface fitting with splines,
-      !                monographs on numerical analysis, oxford university press, 1993.
-      !
-      !  author:
-      !    p.dierckx
-      !    dept. computer science, k.u. leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : may 1979
-      !
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(in)    :: s
@@ -766,97 +608,41 @@ module fitpack_core
       !  the fit is given in the b-spline representation( b-spline coefficients c(j),j=1,2,...n-4) and
       !  can be evaluated by means of subroutine splev.
       !
+      !> @brief Fit a cubic spline with convexity/concavity constraints and user-specified knots.
+      !!
+      !! Given data points \f$ (x_i, y_i) \f$ with weights \f$ w_i > 0 \f$ and a fixed set of
+      !! knots \f$ t_j \f$, computes the weighted least-squares cubic spline \f$ s(x) \f$ subject
+      !! to local convexity/concavity constraints specified by the array `e`:
+      !! - \f$ e_j = +1 \f$: \f$ s''(t_{j+3}) \ge 0 \f$ (locally concave)
+      !! - \f$ e_j = -1 \f$: \f$ s''(t_{j+3}) \le 0 \f$ (locally convex)
+      !! - \f$ e_j = 0 \f$: no constraint at \f$ t_{j+3} \f$
+      !!
+      !! The constrained fitting uses a quadratic programming approach with a binary
+      !! tree structure for managing active constraints.
+      !!
+      !! @param[in]     m      Number of data points, \f$ m > 3 \f$.
+      !! @param[in]     x      Abscissae (strictly ascending).
+      !! @param[in]     y      Ordinates.
+      !! @param[in]     w      Weights, \f$ w_i > 0 \f$.
+      !! @param[in]     n      Total number of knots, \f$ 8 \le n \le m + 4 \f$.
+      !! @param[in]     t      Knot positions (length \f$ n \f$), user-specified.
+      !! @param[in,out] e      Convexity indicators (length \f$ n \f$). Only `e(1:n-6)` used.
+      !! @param[in]     maxtr  Over-estimate of tree records. `maxtr=100` usually sufficient.
+      !! @param[in]     maxbin Over-estimate of inflection knots. `maxbin=10` usually sufficient.
+      !! @param[out]    c      B-spline coefficients (length \f$ n \f$).
+      !! @param[out]    sq     Weighted sum of squared residuals.
+      !! @param[out]    sx     Spline values at data points (length \f$ m \f$).
+      !! @param[out]    bind   Active constraint flags (length \f$ n \f$): `.true.` where \f$ s''=0 \f$.
+      !! @param[in,out] wrk    Real workspace, length \f$ \ge 4m + 7n + \text{maxbin}(\text{maxbin}+n+1) \f$.
+      !! @param[in]     lwrk   Declared dimension of `wrk`.
+      !! @param[in,out] iwrk   Integer workspace, length \f$ \ge 4 \times \text{maxtr} + 2(\text{maxbin}+1) \f$.
+      !! @param[in]     kwrk   Declared dimension of `iwrk`.
+      !! @param[out]    ier    Error flag: `0` = success; `1` = maxbin exceeded; `2` = maxtr exceeded;
+      !!   `3` = QP solver failed; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 7, §7.1--7.2; fpcosp — core convexity-constrained algorithm
       pure subroutine cocosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
 
-      !  calling sequence:
-      !     call cocosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  parameters:
-      !    m   : integer. on entry m must specify the number of data points. m > 3. unchanged on exit.
-      !    x   : real array of dimension at least (m). before entry, x(i) must be set to the i-th value
-      !          of the independent variable x, for i=1,2,...,m.
-      !          these values must be supplied in strictly ascending order. unchanged on exit.
-      !    y   : real array of dimension at least (m). before entry, y(i) must be set to the i-th value
-      !          of the dependent variable y,   for i=1,2,...,m. unchanged on exit.
-      !    w   : real array of dimension at least (m). before entry, w(i) must be set to the i-th value
-      !          in the set of weights. the w(i) must be strictly positive. unchanged on exit.
-      !    n   : integer. on entry n must contain the total number of knots of the cubic spline. m+4>=n>=8.
-      !          unchanged on exit.
-      !    t   : real array of dimension at least (n). before entry, this array must contain the knots of
-      !          the spline, i.e. the position of the interior knots t(5),t(6),...,t(n-4) as well as the
-      !          position of the boundary knots t(1),t(2),t(3),t(4) and t(n-3),t(n-2),t(n-1),t(n) needed
-      !          for the b-spline representation. unchanged on exit. see also the restrictions (ier=10).
-      !    e   : real array of dimension at least (n). before entry, e(j) must be set to 1 if s(x) must be
-      !          locally concave at t(j+3), to (-1) if s(x) must be locally convex at t(j+3) and to 0 if
-      !          no convexity constraint is imposed at t(j+3),j=1,2,..,n-6. e(n-5),...,e(n) are not used.
-      !          unchanged on exit.
-      !  maxtr : integer. on entry maxtr must contain an over-estimate of the total number of records in
-      !          the used tree structure, to indicate the storage space available to the routine. maxtr>=1
-      !          in most practical situation maxtr=100 will be sufficient. always large enough is
-      !                         n-5       n-6
-      !              maxtr =  (     ) + (     )  with l the greatest
-      !                          l        l+1
-      !          integer <= (n-6)/2 . unchanged on exit.
-      !  maxbin: integer. on entry maxbin must contain an over-estimate of the number of knots where s(x)
-      !          will have a zero second derivative maxbin >=1. in most practical situation maxbin = 10
-      !          will be sufficient. always large enough is maxbin=n-6. unchanged on exit.
-      !    c   : real array of dimension at least (n). on successful exit, this array will contain the
-      !          coefficients c(1),c(2),..,c(n-4) in the b-spline representation of s(x)
-      !    sq  : real. on successful exit, sq contains the weighted sum of squared residuals of the spline
-      !          approximation returned.
-      !    sx  : real array of dimension at least m. on successful exit this array will contain the spline
-      !          values s(x(i)),i=1,...,m
-      !   bind : logical array of dimension at least (n). on successful exit this array will indicate the
-      !          knots where s''(x)=0, i.e.
-      !                s''(t(j+3)) == 0 if  bind(j) = .true.
-      !                s''(t(j+3)) /= 0 if  bind(j) = .false., j=1,2,...,n-6
-      !   wrk  : real array of dimension at least  m*4+n*7+maxbin*(maxbin+n+1). used as working space.
-      !   lwrk : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared in
-      !          the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk : integer array of dimension at least (maxtr*4+2*(maxbin+1)). used as working space.
-      !   kwrk : integer. on entry,kwrk must specify the actual dimension of the array iwrk as declared in
-      !          the calling (sub)program. kwrk must not be too small (see iwrk). unchanged on exit.
-      !   ier   : integer. error flag
-      !      ier=0 : successful exit.
-      !      ier>0 : abnormal termination: no approximation is returned
-      !        ier=1  : the number of knots where s''(x)=0 exceeds maxbin. likely cause: maxbin too small.
-      !        ier=2  : the number of records in the tree structure exceeds maxtr.
-      !                 probably causes : maxtr too small.
-      !        ier=3  : the algorithm finds no solution to the posed quadratic programming problem.
-      !                 probably causes : rounding errors.
-      !        ier=10 : on entry, the input data are controlled on validity. the following restrictions
-      !                 must be satisfied:
-      !                   m>3, maxtr>=1, maxbin>=1, 8<=n<=m+4,w(i) > 0,
-      !                   x(1)<x(2)<...<x(m), t(1)<=t(2)<=t(3)<=t(4)<=x(1),
-      !                   x(1)<t(5)<t(6)<...<t(n-4)<x(m)<=t(n-3)<=...<=t(n),
-      !                   kwrk>=maxtr*4+2*(maxbin+1),
-      !                   lwrk>=m*4+n*7+maxbin*(maxbin+n+1),
-      !                   the schoenberg-whitney conditions, i.e. there must be a subset of data points
-      !                   xx(j) such that
-      !                     t(j) < xx(j) < t(j+4), j=1,2,...,n-4
-      !                 if one of these restrictions is found to be violated, control is immediately
-      !                 handled back to the calling program
-      !
-      !
-      !  other subroutines required:
-      !    fpcosp,fpbspl,fpadno,fpdeno,fpseno,fpfrno,fpchec
-      !
-      !  references:
-      !   dierckx p. : an algorithm for cubic spline fitting with convexity constraints,
-      !                computing 24 (1980) 349-371.
-      !   dierckx p. : an algorithm for least-squares cubic spline fitting with convexity and concavity
-      !                constraints, report tw39, dept. computer science, k.u.leuven, 1978.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
-      !
-      !  author:
-      !   p. dierckx
-      !   dept. computer science, k.u.leuven
-      !   celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !   e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : march 1978
-      !
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(out)   :: sq
@@ -924,125 +710,47 @@ module fitpack_core
       !  sq = sum((w(i)*(y(i)-s(x(i))))**2) be <= s.
       !  the fit is given in the b-spline representation (b-spline coefficients c(j),j=1,2,...n-4) and
       !  can be evaluated by means of subroutine splev.
+      !> @brief Fit a cubic spline with convexity/concavity constraints and automatic knot placement.
+      !!
+      !! Given data points \f$ (x_i, y_i) \f$ with weights \f$ w_i > 0 \f$ and local
+      !! convexity/concavity requirements \f$ v_i \in \{-1, 0, +1\} \f$ at the data points,
+      !! determines a cubic spline \f$ s(x) \f$ satisfying the constraints with
+      !! weighted residual sum \f$ \text{sq} \le S \f$.
+      !!
+      !! Unlike cocosp (which takes fixed knots), concon automatically selects the number
+      !! and position of knots, starting from a minimal set and adding knots progressively.
+      !!
+      !! @param[in]     iopt   Computation mode: `0` = start with minimal knots; `1` = continue.
+      !! @param[in]     m      Number of data points, \f$ m > 3 \f$.
+      !! @param[in]     x      Abscissae (strictly ascending).
+      !! @param[in]     y      Ordinates.
+      !! @param[in]     w      Weights, \f$ w_i > 0 \f$.
+      !! @param[in,out] v      Convexity indicators at data points: `+1` (concave), `-1` (convex), `0` (free).
+      !! @param[in]     s      Smoothing factor \f$ S \ge 0 \f$ (target upper bound for sq).
+      !! @param[in]     nest   Over-estimate of total knots, \f$ \ge 8 \f$. `nest=m+4` always suffices.
+      !! @param[in]     maxtr  Over-estimate of tree records. `maxtr=100` usually sufficient.
+      !! @param[in]     maxbin Over-estimate of inflection knots. `maxbin=10` usually sufficient.
+      !! @param[in,out] n      Total number of knots.
+      !! @param[in,out] t      Knot positions (length `nest`).
+      !! @param[in,out] c      B-spline coefficients (length `nest`).
+      !! @param[out]    sq     Weighted sum of squared residuals.
+      !! @param[in,out] sx     Spline values at data points (length \f$ m \f$).
+      !! @param[in,out] bind   Active constraint flags (length `nest`).
+      !! @param[in,out] wrk    Real workspace, length \f$ \ge 4m + 8\,\text{nest} + \text{maxbin}(\text{maxbin}+\text{nest}+1) \f$.
+      !! @param[in]     lwrk   Declared dimension of `wrk`.
+      !! @param[in,out] iwrk   Integer workspace, length \f$ \ge 4\,\text{maxtr} + 2(\text{maxbin}+1) \f$.
+      !! @param[in]     kwrk   Declared dimension of `iwrk`.
+      !! @param[out]    ier    Error flag:
+      !!   - `0`: normal return (\f$ \text{sq} \le S \f$ and constraints satisfied).
+      !!   - `-3`: nest too small.
+      !!   - `-2`: max knots \f$ m+4 \f$ reached.
+      !!   - `-1`: adding knots won't help.
+      !!   - `1`--`5`: various errors (maxbin, maxtr, QP, nest, constraint conflicts).
+      !!   - `10`: invalid input.
+      !!
+      !! @see Dierckx, Ch. 7, §7.2; fpcoco — convexity-constrained driver; fpcosp — core algorithm
       pure subroutine concon(iopt,m,x,y,w,v,s,nest,maxtr,maxbin, &
                              n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
-
-      !
-      !  calling sequence:
-      !
-      !     call concon(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  parameters:
-      !    iopt: integer flag. if iopt=0, the routine will start with the minimal number of knots to
-      !          guarantee that the convexity conditions will be satisfied. if iopt=1, the routine will
-      !          continue with the set of knots found at the last call of the routine. attention: a call
-      !          with iopt=1 must always be immediately preceded by another call with iopt=1 or iopt=zero
-      !          unchanged on exit.
-      !    m   : integer. on entry m must specify the number of data points. m > 3. unchanged on exit.
-      !    x   : real array of dimension at least (m). before entry, x(i) must be set to the i-th value of
-      !          the independent variable x, for i=1,2,...,m. these values must be supplied in strictly
-      !          ascending order. unchanged on exit.
-      !    y   : real array of dimension at least (m). before entry, y(i) must be set to the i-th value of
-      !          the dependent variable y, for i=1,2,...,m. unchanged on exit.
-      !    w   : real array of dimension at least (m). before entry, w(i) must be set to the i-th value in
-      !          the set of weights. the w(i) must be strictly positive. unchanged on exit.
-      !    v   : real array of dimension at least (m). before entry, v(i) must be set to 1 if s(x) must be
-      !          locally concave at x(i), to (-1) if s(x) must be locally convex at x(i) and to 0 if no
-      !          convexity constraint is imposed at x(i).
-      !    s   : real. on entry s must specify an over-estimate for the the weighted sum of squared
-      !          residuals sq of the requested spline. s >=zero unchanged on exit.
-      !   nest : integer. on entry nest must contain an over-estimate of the total number of knots of the
-      !          spline returned, to indicate the storage space available to the routine. nest >=8. in
-      !          most practical situation nest=m/2 will be sufficient. always large enough is  nest=m+4.
-      !          unchanged on exit.
-      !  maxtr : integer. on entry maxtr must contain an over-estimate of the total number of records in
-      !          the used tree structure, to indicate the storage space available to the routine. maxtr
-      !          >=1 in most practical situation maxtr=100 will be sufficient. always large enough is
-      !                         nest-5      nest-6
-      !              maxtr =  (       ) + (        )  with l the greatest
-      !                           l          l+1
-      !          integer <= (nest-6)/2 . unchanged on exit.
-      !  maxbin: integer. on entry maxbin must contain an over-estimate of the number of knots where s(x)
-      !          will have a zero second derivative maxbin >=1. in most practical situation maxbin = 10
-      !          will be sufficient. always large enough is maxbin=nest-6. unchanged on exit.
-      !    n   : integer. on exit with ier <=0, n will contain the total number of knots of the spline
-      !          approximation returned. if the computation mode iopt=1 is used this value of n should be
-      !          left unchanged between subsequent calls.
-      !    t   : real array of dimension at least (nest). on exit with ier<=0, this array will contain the
-      !          knots of the spline,i.e. the position of the interior knots t(5),t(6),...,t(n-4) as well
-      !          as the position of the additional knots t(1)=t(2)=t(3)=t(4)=x(1) and t(n-3)=t(n-2)=t(n-1)
-      !          =t(n)=x(m) needed for the the b-spline representation. if the computation mode iopt=1 is
-      !          used, the values of t(1),t(2),...,t(n) should be left unchanged between subsequent calls.
-      !    c   : real array of dimension at least (nest). on successful exit, this array will contain the
-      !          coefficients c(1),c(2),..,c(n-4) in the b-spline representation of s(x)
-      !    sq  : real. unless ier>0 , sq contains the weighted sum of squared residuals of the spline
-      !          approximation returned.
-      !    sx  : real array of dimension at least m. on exit with ier<=0 this array will contain the
-      !          spline values s(x(i)),i=1,...,m if the computation mode iopt=1 is used, the values of
-      !          sx(1),sx(2),...,sx(m) should be left unchanged between subsequent calls.
-      !    bind: logical array of dimension at least nest. on exit with ier<=0 this array will indicate
-      !          the knots where s''(x)=0, i.e.
-      !                s''(t(j+3)) == 0 if  bind(j) = .true.
-      !                s''(t(j+3)) /= 0 if  bind(j) = .false., j=1,2,...,n-6
-      !          if the computation mode iopt=1 is used, the values of bind(1),...,bind(n-6) should be
-      !          left unchanged between subsequent calls.
-      !   wrk  : real array of dimension at least (m*4+nest*8+maxbin*(maxbin+nest+1)). used as working
-      !          space.
-      !   lwrk : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared in
-      !          the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk : integer array of dimension at least (maxtr*4+2*(maxbin+1)) used as working space.
-      !   kwrk : integer. on entry,kwrk must specify the actual dimension of the array iwrk as declared in
-      !          the calling (sub)program. kwrk must not be too small (see iwrk). unchanged on exit.
-      !   ier   : integer. error flag
-      !      ier=0 : normal return, s(x) satisfies the concavity/convexity constraints and sq <= s.
-      !      ier<0 : abnormal termination: s(x) satisfies the concavity/convexity constraints but sq > s.
-      !        ier=-3 : the requested storage space exceeds the available storage space as specified by
-      !                 the parameter nest. probably causes: nest too small. if nest is already large (say
-      !                 nest > m/2), it may also indicate that s is too small. the approximation returned
-      !                 is the least-squares cubic spline according to the knots t(1),...,t(n) (n=nest)
-      !                 which satisfies the convexity constraints.
-      !        ier=-2 : the maximal number of knots n=m+4 has been reached. probably causes: s too small.
-      !        ier=-1 : the number of knots n is less than the maximal number m+4 but concon finds that
-      !                 adding one or more knots will not further reduce the value of sq. probably causes:
-      !                 s too small.
-      !      ier>0 : abnormal termination: no approximation is returned
-      !        ier=1  : the number of knots where s''(x)=0 exceeds maxbin. probably causes : maxbin too
-      !                 small.
-      !        ier=2  : the number of records in the tree structure exceeds maxtr.
-      !                 probably causes : maxtr too small.
-      !        ier=3  : the algorithm finds no solution to the posed quadratic programming problem.
-      !                 probably causes : rounding errors.
-      !        ier=4  : the minimum number of knots (given by n) to guarantee that the concavity/convexity
-      !                 conditions will be satisfied is greater than nest. probably causes: nest too small.
-      !        ier=5  : the minimum number of knots (given by n) to guarantee that the concavity/convexity
-      !                 conditions will be satisfied is greater than m+4. probably causes: strongly
-      !                 alternating convexity and concavity conditions. normally the situation can be
-      !                 coped with by adding n-m-4 extra data points (found by linear interpolation e.g.)
-      !                 with a small weight w(i) and a v(i) number equal to zero.
-      !        ier=10 : on entry, the input data are controlled on validity. the following restrictions
-      !                 must be satisfied
-      !                   0<=iopt<=1, m>3, nest>=8, s>=0, maxtr>=1, maxbin>=1,
-      !                   kwrk>=maxtr*4+2*(maxbin+1), w(i)>0, x(i) < x(i+1),
-      !                   lwrk>=m*4+nest*8+maxbin*(maxbin+nest+1)
-      !                 if one of these restrictions is found to be violated
-      !                 control is immediately repassed to the calling program
-      !
-      !  further comments:
-      !    as an example of the use of the computation mode iopt=1, the following program segment will
-      !    cause concon to return control each time a spline with a new set of knots has been computed.
-      !     .............
-      !     iopt = 0
-      !     s = 0.1e+60  (s very large)
-      !     do i=1,m
-      !       call concon(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier)
-      !       ......
-      !       s = sq
-      !       iopt=1
-      !     end do
-      !     .............
-      !
-      !  other subroutines required:
-      !    fpcoco,fpcosp,fpbspl,fpadno,fpdeno,fpseno,fpfrno
       !
       !  references:
       !   dierckx p. : an algorithm for cubic spline fitting with convexity constraints,
@@ -1139,194 +847,51 @@ module fitpack_core
       !    called the smoothing factor. the fit s(u) is given in the b-spline representation and can
       !    be evaluated by means of subroutine curev.
 
+      !> @brief Determine a smooth parametric spline curve with derivative constraints at endpoints.
+      !!
+      !! Given \f$ m \f$ ordered points \f$ \mathbf{x}_i \in \mathbb{R}^{\text{idim}} \f$ with
+      !! parameter values \f$ u_i \f$ and weights \f$ w_i > 0 \f$, computes a parametric spline
+      !! curve \f$ \mathbf{s}(u) \f$ of degree \f$ k \f$ that satisfies derivative constraints
+      !! at the endpoints:
+      !! \f[
+      !!   s_j^{(l)}(u_1) = d_b(\text{idim} \cdot l + j), \quad l = 0,\ldots,i_b{-}1
+      !! \f]
+      !! \f[
+      !!   s_j^{(l)}(u_m) = d_e(\text{idim} \cdot l + j), \quad l = 0,\ldots,i_e{-}1
+      !! \f]
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` (LSQ), `0` (new smoothing), `1` (continue).
+      !! @param[in]     idim  Dimension of the curve, \f$ 1 \le \text{idim} \le 10 \f$.
+      !! @param[in]     m     Number of data points.
+      !! @param[in]     u     Parameter values (strictly ascending).
+      !! @param[in]     mx    Declared dimension of `x` and `xx`.
+      !! @param[in]     x     Data coordinates (length `mx`).
+      !! @param[in,out] xx    Workspace (length `mx`). Modified data for constrained fitting.
+      !! @param[in]     w     Weights (length \f$ m \f$), strictly positive.
+      !! @param[in]     ib    Number of derivative constraints at \f$ u_1 \f$, \f$ 0 \le i_b \le (k+1)/2 \f$.
+      !! @param[in]     db    Begin-point derivatives (length `nb`).
+      !! @param[in]     nb    Dimension of `db`, \f$ \ge \max(1, \text{idim} \times i_b) \f$.
+      !! @param[in]     ie    Number of derivative constraints at \f$ u_m \f$, \f$ 0 \le i_e \le (k+1)/2 \f$.
+      !! @param[in]     de    End-point derivatives (length `ne`).
+      !! @param[in]     ne    Dimension of `de`, \f$ \ge \max(1, \text{idim} \times i_e) \f$.
+      !! @param[in]     k     Spline degree: 1, 3, or 5.
+      !! @param[in]     s     Smoothing factor \f$ S \ge 0 \f$.
+      !! @param[in]     nest  Over-estimate of total knots.
+      !! @param[in,out] n     Total number of knots.
+      !! @param[in,out] t     Knot positions (length `nest`).
+      !! @param[in]     nc    Declared dimension of `c`.
+      !! @param[in,out] c     B-spline coefficients (length `nc`).
+      !! @param[in]     np    Declared dimension of `cp`, \f$ \ge 2(k+1) \times \text{idim} \f$.
+      !! @param[in,out] cp    Constraint polynomial coefficients (length `np`).
+      !! @param[in,out] fp    Weighted sum of squared residuals.
+      !! @param[in,out] wrk   Real workspace.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `nest`).
+      !! @param[out]    ier   Error flag (same codes as curfit).
+      !!
+      !! @see Dierckx, Ch. 8, §8.2; fpcons — core constrained fitting algorithm
       pure subroutine concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb, &
                              ie,de,ne,k,s,nest,n,t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
-      !
-      !  calling sequence:
-      !     call concur(iopt,idim,m,u,mx,x,xx,w,ib,db,nb,ie,de,ne,k,s,nest,n, &
-      !                 t,nc,c,np,cp,fp,wrk,lwrk,iwrk,ier)
-      !
-      !  parameters:
-      !   iopt  : integer flag. on entry iopt must specify whether a weighted least-squares spline curve
-      !           (iopt=-1) or a smoothing spline curve (iopt=0 or 1) must be determined.if iopt=0 the
-      !           routine will start with an initial set of knots t(i)=ub,t(i+k+1)=ue, i=1,2,...,k+1.
-      !           if iopt=1 the routine will continue with the knots found at the last call of the routine.
-      !           attention: a call with iopt=1 must always be immediately preceded by another call with
-      !           iopt=1 or iopt=zero. unchanged on exit.
-      !   idim  : integer. on entry idim must specify the dimension of the curve. 0 < idim < 11.
-      !           unchanged on exit.
-      !   m     : integer. on entry m must specify the number of data points. m>k-max(ib-1,0)-max(ie-1,0).
-      !           unchanged on exit.
-      !   u     : real array of dimension at least (m). before entry, u(i) must be set to the i-th value
-      !           of the parameter variable u for i=1,2,...,m. these values must be supplied in strictly
-      !           ascending order and will be unchanged on exit.
-      !   mx    : integer. on entry mx must specify the actual dimension of the arrays x and xx as decla-
-      !           red in the calling (sub)program mx must not be too small (see x). unchanged on exit.
-      !   x     : real array of dimension at least idim*m.
-      !           before entry, x(idim*(i-1)+j) must contain the j-th coordinate of the i-th data point
-      !           for i=1,2,...,m and j=1,2,...,idim. unchanged on exit.
-      !   xx    : real array of dimension at least idim*m. used as working space. on exit xx contains the
-      !           coordinates of the data points to which a spline curve with zero derivative constraints
-      !           has been determined. if the computation mode iopt =1 is used xx should be left unchanged
-      !           between calls.
-      !   w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value
-      !           in the set of weights. the w(i) must be strictly positive. unchanged on exit.
-      !           see also further comments.
-      !   ib    : integer. on entry ib must specify the number of derivative constraints for the curve at
-      !           the begin point. 0<=ib<=(k+1)/2 unchanged on exit.
-      !   db    : real array of dimension nb. before entry db(idim*l+j) must contain the l-th order deri-
-      !           vative of sj(u) at u=u(1) for j=1,2,...,idim and l=0,1,...,ib-1 (if ib>0).
-      !           unchanged on exit.
-      !   nb    : integer(FP_SIZE), specifying the dimension of db. nb>=max(1,idim*ib). unchanged on exit.
-      !   ie    : integer. on entry ie must specify the number of derivative constraints for the curve at
-      !           the end point. 0<=ie<=(k+1)/2. unchanged on exit.
-      !   de    : real array of dimension ne. before entry de(idim*l+j) must contain the l-th order deri-
-      !           vative of sj(u) at u=u(m) for j=1,2,...,idim and l=0,1,...,ie-1 (if ie>0).
-      !           unchanged on exit.
-      !   ne    : integer(FP_SIZE), specifying the dimension of de. ne>=max(1,idim*ie) unchanged on exit.
-      !   k     : integer. on entry k must specify the degree of the splines. k=1,3 or 5. unchanged on exit.
-      !   s     : real.on entry (in case iopt>=0) s must specify the smoothing factor. s >=zero unchanged
-      !           on exit. for advice on the choice of s see further comments.
-      !   nest  : integer. on entry nest must contain an over-estimate of the total number of knots of the
-      !           splines returned, to indicate the storage space available to the routine. nest >=2*k+2.
-      !           in most practical situation nest=m/2 will be sufficient. always large enough is
-      !           nest=m+k+1+max(0,ib-1)+max(0,ie-1), the number of knots needed for interpolation (s=0).
-      !           unchanged on exit.
-      !   n     : integer. unless ier = 10 (in case iopt >=0), n will contain the total number of knots of
-      !           the smoothing spline curve returned. if the computation mode iopt=1 is used this value
-      !           of n should be left unchanged between subsequent calls. in case iopt=-1, the value of n
-      !           must be specified on entry.
-      !   t     : real array of dimension at least (nest). on successful exit, this array will contain the
-      !           knots of the spline curve,i.e. the position of the interior knots t(k+2),t(k+3),..,
-      !           t(n-k-1) as well as the position of the additional t(1)=t(2)=...=t(k+1)=ub and t(n-k)=
-      !           ...=t(n)=ue needed for the b-spline representation.
-      !           if the computation mode iopt=1 is used, the values of t(1),t(2),...,t(n) should be left
-      !           unchanged between subsequent calls. if the computation mode iopt=-1 is used, the values
-      !           t(k+2),...,t(n-k-1) must be supplied by the user, before entry. see also the restric-
-      !           tions (ier=10).
-      !   nc    : integer. on entry nc must specify the actual dimension of the array c as declared in the
-      !           calling (sub)program. nc must not be too small (see c). unchanged on exit.
-      !   c     : real array of dimension at least (nest*idim). on successful exit, this array will con-
-      !           tain the coefficients in the b-spline representation of the spline curve s(u),i.e.
-      !           the b-spline coefficients of the spline sj(u) will be given in c(n*(j-1)+i),i=1,2,...,
-      !           n-k-1 for j=1,2,...,idim.
-      !   cp    : real array of dimension at least 2*(k+1)*idim. on exit cp will contain the b-spline
-      !           coefficients of a polynomial curve which satisfies the boundary constraints. if the
-      !           computation mode iopt =1 is used cp should be left unchanged between calls.
-      !   np    : integer. on entry np must specify the actual dimension of the array cp as declared in
-      !           the calling (sub)program. np must not be too small (see cp). unchanged on exit.
-      !   fp    : real. unless ier = 10, fp contains the weighted sum of squared residuals of the spline
-      !           curve returned.
-      !   wrk   : real array of dimension at least m*(k+1)+nest*(6+idim+3*k). used as working space. if
-      !           the computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left
-      !           unchanged between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared
-      !           in the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
-      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged between
-      !           subsequent calls.
-      !   ier   : integer. unless the routine detects an error, ier contains a non-positive value on exit
-      !           i.e.
-      !     ier=0  : normal return. the curve returned has a residual sum of squares fp such that
-      !              abs(fp-s)/s <= tol with tol a relative tolerance set to 0.001 by the program.
-      !     ier=-1 : normal return. the curve returned is an interpolating spline curve, satisfying the
-      !              constraints (fp=0).
-      !     ier=-2 : normal return. the curve returned is the weighted least-squares polynomial curve of
-      !              degree k, satisfying the constraints. in this extreme case fp gives the upper
-      !              bound fp0 for the smoothing factor s.
-      !     ier=1  : error. the required storage space exceeds the available storage space, as specified
-      !              by the parameter nest. probably causes : nest too small. if nest is already large
-      !              (say nest > m/2), it may also indicate that s is too small
-      !              the approximation returned is the least-squares spline curve according to the knots
-      !              t(1),t(2),...,t(n). (n=nest) the parameter fp gives the corresponding weighted sum of
-      !              squared residuals (fp>s).
-      !     ier=2  : error. a theoretically impossible result was found during the iteration process for
-      !              finding a smoothing spline curve with fp = s. probably causes : s too small. there is
-      !              an approximation returned but the corresponding weighted sum of squared residuals
-      !              does not satisfy the condition abs(fp-s)/s < tol.
-      !     ier=3  : error. the maximal number of iterations maxit (set to 20 by the program) allowed for
-      !              finding a smoothing curve with fp=s has been reached. probably causes : s too small
-      !              there is an approximation returned but the corresponding weighted sum of squared re-
-      !              siduals does not satisfy the condition abs(fp-s)/s < tol.
-      !     ier=10 : error. on entry, the input data are controlled on validity the following restrictions
-      !              must be satisfied.
-      !              -1<=iopt<=1, k = 1,3 or 5, m>k-max(0,ib-1)-max(0,ie-1),
-      !              nest>=2k+2, 0<idim<=10, lwrk>=(k+1)*m+nest*(6+idim+3*k),
-      !              nc >=nest*idim ,u(1)<u(2)<...<u(m),w(i)>0 i=1,2,...,m,
-      !              mx>=idim*m,0<=ib<=(k+1)/2,0<=ie<=(k+1)/2,nb>=1,ne>=1,
-      !              nb>=ib*idim,ne>=ib*idim,np>=2*(k+1)*idim,
-      !              if iopt=-1: 2*k+2<=n<=min(nest,mmax) with mmax = m+k+1+max(0,ib-1)+max(0,ie-1)
-      !                          u(1)<t(k+2)<t(k+3)<...<t(n-k-1)<u(m)
-      !                          the schoenberg-whitney conditions, i.e. there must be a subset of data
-      !                          points uu(j) such that
-      !                          t(j) < uu(j) < t(j+k+1), j=1+max(0,ib-1),...,n+k-1-max(0,ie-1)
-      !             if iopt>=0: s>=0
-      !                         if s=0 : nest >=mmax (see above)
-      !             if one of these conditions is found to be violated, control is immediately repassed to
-      !             the calling program. in that case there is no approximation returned.
-      !
-      !  further comments:
-      !   by means of the parameter s, the user can control the tradeoff between closeness of fit and
-      !   smoothness of fit of the approximation. if s is too large, the curve will be too smooth and !
-      !   signal will be lost ; if s is too small the curve will pick up too much noise. in the extreme
-      !   cases the program will return an interpolating curve if s=0 and the least-squares polynomial
-      !   curve of degree k if s is very large. between these extremes, a properly chosen s will result
-      !   in a good compromise between closeness of fit and smoothness of fit. to decide whether an appro-
-      !   ximation, corresponding to a certain s is satisfactory the user is highly recommended to inspect
-      !   the fits graphically.
-      !   recommended values for s depend on the weights w(i). if these are taken as 1/d(i) with d(i) an
-      !   estimate of the standard deviation of x(i), a good s-value should be found in the range
-      !   (m-sqrt(2*m),m+sqrt(2*m)). if nothing is known about the statistical error in x(i) each w(i) can
-      !   be set equal to one and s determined by trial and error, taking account of the comments above.
-      !   the best is then to start with a very large value of s ( to determine the least-squares
-      !   polynomial curve and the upper bound fp0 for s) and then to progressively decrease the value of
-      !   s ( say by a factor 10 in the beginning, i.e. s=fp0/10, fp0/100,...and more carefully as the
-      !   approximating curve shows more detail) to obtain closer fits. to economize the search for a good
-      !   s-value the program provides with different modes of computation. at the first call of the
-      !   routine, or whenever he wants to restart with the initial set of knots the user must set iopt=0
-      !   if iopt=1 the program will continue with the set of knots found at the last call of the routine.
-      !   this will save a lot of computation time if concur is called repeatedly for different values of
-      !   s. the number of knots of the spline returned and their location will depend on the value of s
-      !   and on the complexity of the shape of the curve underlying the data. but, if the computation
-      !   mode iopt=1 is used, the knots returned may also depend on the s-values at previous calls (if
-      !   these were smaller). therefore, if after a number of trials with different s-values and iopt=1,
-      !   the user can finally accept a fit as satisfactory, it may be worthwhile for him to call concur
-      !   once more with the selected value for s but now with iopt=zero indeed, concur may then return
-      !   an approximation of the same quality of fit but with fewer knots and therefore better if data
-      !   reduction is also an important objective for the user.
-      !
-      !   the form of the approximating curve can strongly be affected by the choice of the parameter
-      !   values u(i). if there is no physical reason for choosing a particular parameter u, often good
-      !   results will be obtained with the choice
-      !        v(1)=0, v(i)=v(i-1)+q(i), i=2,...,m, u(i)=v(i)/v(m), i=1,..,m
-      !   where
-      !        q(i)= sqrt(sum j=1,idim (xj(i)-xj(i-1))**2 )
-      !   other possibilities for q(i) are
-      !        q(i)= sum j=1,idim (xj(i)-xj(i-1))**2
-      !        q(i)= sum j=1,idim abs(xj(i)-xj(i-1))
-      !        q(i)= max j=1,idim abs(xj(i)-xj(i-1))
-      !        q(i)= 1
-      !
-      !  other subroutines required:
-      !    fpback,fpbspl,fpched,fpcons,fpdisc,fpgivs,fpknot,fprati,fprota
-      !    curev,fppocu,fpadpo,fpinst
-      !
-      !  references:
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines,
-      !                computer graphics and image processing 20 (1982) 171-184.
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines, report tw55,
-      !                dept. computer science, k.u.leuven, 1981.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
-      !
-      !  author:
-      !    p.dierckx
-      !    dept. computer science, k.u. leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : may 1979
-      !
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(in)    :: s
@@ -1439,52 +1004,32 @@ module fitpack_core
       !  of a spline curve s(u) of order k1 (degree k=k1-1) and dimension idim
       !  given in its b-spline representation.
 
+      !> @brief Evaluate all derivatives of a parametric spline curve at a single point.
+      !!
+      !! Given an `idim`-dimensional spline curve \f$ \mathbf{s}(u) = (s_1(u),\ldots,s_{\text{idim}}(u)) \f$
+      !! of order \f$ k_1 = k + 1 \f$ with common knots, evaluates all derivatives up to order
+      !! \f$ k \f$ at the point \f$ u \f$. Uses the stable recurrence scheme of de Boor for each
+      !! coordinate component.
+      !!
+      !! @param[in]  idim  Dimension of the curve.
+      !! @param[in]  t     Knot positions (length \f$ n \f$), common to all components.
+      !! @param[in]  n     Total number of knots.
+      !! @param[in]  c     B-spline coefficients (length `nc`), stored as \f$ n \f$ coefficients
+      !!   for each of the `idim` components consecutively.
+      !! @param[in]  nc    Total number of coefficients (\f$ \ge n \times \text{idim} \f$).
+      !! @param[in]  k1    Order of the spline (\f$ k_1 = k + 1 \f$).
+      !! @param[in]  u     Parameter value where derivatives are evaluated.
+      !!   Must satisfy \f$ t_{k_1} \le u \le t_{n-k_1+1} \f$.
+      !! @param[out] d     Derivative values (length `nd`): `d(idim*l+j)` contains the
+      !!   \f$ j \f$-th coordinate of the \f$ l \f$-th derivative.
+      !! @param[in]  nd    Dimension of `d`. Must satisfy \f$ \text{nd} \ge k_1 \times \text{idim} \f$.
+      !! @param[out] ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @note At a knot, right derivatives are computed (left derivatives at the right boundary).
+      !!
+      !! @see spalde — scalar variant; fpader — derivative computation kernel
       pure subroutine cualde(idim,t,n,c,nc,k1,u,d,nd,ier)
 
-      !
-      !  input parameters:
-      !    idim : integer(FP_SIZE), giving the dimension of the spline curve.
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(u).
-      !    c    : array,length nc, which contains the b-spline coefficients.
-      !    nc   : integer(FP_SIZE), giving the total number of coefficients of s(u).
-      !    k1   : integer(FP_SIZE), giving the order of s(u) (order=degree+1).
-      !    u    : real, which contains the point where the derivatives must be evaluated.
-      !    nd   : integer(FP_SIZE), giving the dimension of the array d. nd >= k1*idim
-      !
-      !  output parameters:
-      !    d    : array,length nd,giving the different curve derivatives. d(idim*l+j) will contain the
-      !           j-th coordinate of the l-th derivative of the curve at the point u.
-      !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier =10 : invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !    nd >= k1*idim
-      !    t(k1) <= u <= t(n-k1+1)
-      !
-      !  further comments:
-      !    if u coincides with a knot, right derivatives are computed
-      !    ( left derivatives if u = t(n-k1+1) ).
-      !
-      !  other subroutines required: fpader.
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: idim,n,nc,k1,nd
       integer(FP_FLAG), intent(out) :: ier
@@ -1526,50 +1071,29 @@ module fitpack_core
 
 
 
-      !  subroutine curev evaluates in a number of points u(i),i=1,2,...,m a spline curve s(u) of degree k
-      !  and dimension idim, given in its b-spline representation.
+      !> @brief Evaluate a parametric spline curve at a set of parameter values.
+      !!
+      !! Given an `idim`-dimensional spline curve \f$ \mathbf{s}(u) = (s_1(u),\ldots,s_{\text{idim}}(u)) \f$
+      !! of degree \f$ k \f$ in B-spline representation with common knots, evaluates
+      !! \f$ \mathbf{s}(u_i) \f$ for \f$ i = 1,\ldots,m \f$.
+      !!
+      !! @param[in]  idim  Dimension of the curve (\f$ 1 \le \text{idim} \le 10 \f$).
+      !! @param[in]  t     Knot positions (length \f$ n \f$).
+      !! @param[in]  n     Total number of knots.
+      !! @param[in]  c     B-spline coefficients (length `nc`), stored consecutively for each dimension.
+      !! @param[in]  nc    Total number of coefficients.
+      !! @param[in]  k     Degree of the spline.
+      !! @param[in]  u     Parameter values (length \f$ m \f$), must be non-decreasing and within
+      !!   \f$ [t_{k+1}, t_{n-k}] \f$.
+      !! @param[in]  m     Number of evaluation points, \f$ m \ge 1 \f$.
+      !! @param[out] x     Curve values (length `mx`): `x(idim*(i-1)+j)` is the \f$ j \f$-th
+      !!   coordinate at the \f$ i \f$-th point.
+      !! @param[in]  mx    Dimension of `x`. Must satisfy \f$ \text{mx} \ge m \times \text{idim} \f$.
+      !! @param[out] ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 6, §6.3; fpbspl — B-spline basis evaluation
       pure subroutine curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
 
-      !  calling sequence:
-      !     call curev(idim,t,n,c,nc,k,u,m,x,mx,ier)
-      !
-      !  input parameters:
-      !    idim : integer(FP_SIZE), giving the dimension of the spline curve.
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(u).
-      !    c    : array,length nc, which contains the b-spline coefficients.
-      !    nc   : integer(FP_SIZE), giving the total number of coefficients of s(u).
-      !    k    : integer(FP_SIZE), giving the degree of s(u).
-      !    u    : array,length m, which contains the points where s(u) must be evaluated.
-      !    m    : integer(FP_SIZE), giving the number of points where s(u) must be evaluated.
-      !    mx   : integer(FP_SIZE), giving the dimension of the array x. mx >= m*idim
-      !
-      !  output parameters:
-      !    x    : array,length mx,giving the value of s(u) at the different points. x(idim*(i-1)+j) will
-      !           contain the j-th coordinate of the i-th point on the curve.
-      !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier =10 : invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !    m >= 1
-      !    mx >= m*idim
-      !    t(k+1) <= u(i) <= u(i+1) <= t(n-k) , i=1,2,...,m-1.
-      !
-      !  other subroutines required: fpbspl.
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                 university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: idim,n,nc,k,m,mx
       integer(FP_FLAG), intent(out) :: ier
@@ -1627,213 +1151,62 @@ module fitpack_core
       end subroutine curev
 
 
+      !> @brief Determine a smooth spline approximation of degree \f$ k \f$ to a set of data points.
+      !!
+      !! Given data points \f$ (x_i, y_i) \f$ with positive weights \f$ w_i \f$, \f$ i=1,\ldots,m \f$,
+      !! computes a spline \f$ s(x) \f$ of degree \f$ k \f$ on the interval \f$ [x_b, x_e] \f$.
+      !!
+      !! - If `iopt=-1`: computes the weighted least-squares spline for a given set of knots.
+      !! - If `iopt>=0`: the number and position of knots is chosen automatically.
+      !!   Smoothness is achieved by minimizing discontinuity jumps of the \f$ k \f$-th derivative
+      !!   at interior knots, subject to the constraint
+      !!   \f[
+      !!       F(p) = \sum_{i=1}^{m} \bigl(w_i\,(y_i - s(x_i))\bigr)^2 \le S
+      !!   \f]
+      !!   where \f$ S \ge 0 \f$ is the smoothing factor.
+      !!
+      !! The result is returned in B-spline representation with coefficients
+      !! \f$ c_j,\; j=1,\ldots,n{-}k{-}1 \f$ and can be evaluated with splev.
+      !!
+      !! **Choosing the smoothing factor:** If weights are \f$ w_i = 1/\sigma_i \f$ where
+      !! \f$ \sigma_i \f$ is the standard deviation of \f$ y_i \f$, a good value of \f$ S \f$ lies
+      !! in the range \f$ (m - \sqrt{2m},\; m + \sqrt{2m}) \f$. Otherwise, start with a large
+      !! \f$ S \f$ to get the least-squares polynomial and upper bound \f$ F_0 \f$, then decrease
+      !! progressively (e.g. \f$ S = F_0/10, F_0/100, \ldots \f$). Use `iopt=1` to continue
+      !! with knots from the previous call when searching for a good \f$ S \f$.
+      !!
+      !! @param[in]     iopt  Computation mode:
+      !!   - `-1`: weighted least-squares spline with user-specified knots.
+      !!   - `0`: smoothing spline, starting with initial knots \f$ t_i = x_b,\; t_{i+k+1} = x_e \f$.
+      !!   - `1`: smoothing spline, continuing with knots from the previous call.
+      !! @param[in]     m     Number of data points. Must satisfy \f$ m > k \f$.
+      !! @param[in]     x     Abscissae \f$ x_1 < x_2 < \cdots < x_m \f$ (strictly ascending).
+      !! @param[in]     y     Ordinates \f$ y_1, y_2, \ldots, y_m \f$.
+      !! @param[in]     w     Weights \f$ w_i > 0 \f$.
+      !! @param[in]     xb    Left boundary of the approximation interval. \f$ x_b \le x_1 \f$.
+      !! @param[in]     xe    Right boundary of the approximation interval. \f$ x_e \ge x_m \f$.
+      !! @param[in]     k     Spline degree, \f$ 1 \le k \le 5 \f$. Cubic (\f$ k=3 \f$) recommended.
+      !! @param[in]     s     Smoothing factor \f$ S \ge 0 \f$ (used when `iopt>=0`).
+      !! @param[in]     nest  Over-estimate of total knots. `nest>=2*k+2`; `nest=m+k+1` always suffices.
+      !! @param[in,out] n     Total number of knots. Output when `iopt>=0`; input when `iopt=-1`.
+      !! @param[in,out] t     Knot positions (length `nest`). On exit: \f$ t_1=\cdots=t_{k+1}=x_b \f$,
+      !!   interior knots \f$ t_{k+2},\ldots,t_{n-k-1} \f$, and \f$ t_{n-k}=\cdots=t_n=x_e \f$.
+      !! @param[in,out] c     B-spline coefficients (length `nest`). On exit: \f$ c_1,\ldots,c_{n-k-1} \f$.
+      !! @param[in,out] fp    Weighted sum of squared residuals of the returned spline.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k+1) + \text{nest}(7+3k) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace, length \f$ \ge \text{nest} \f$.
+      !! @param[out]    ier   Error flag:
+      !!   - `0`: normal return, \f$ |F_p - S|/S \le 0.001 \f$.
+      !!   - `-1`: interpolating spline (\f$ F_p = 0 \f$).
+      !!   - `-2`: least-squares polynomial of degree \f$ k \f$ (\f$ F_p = F_0 \f$).
+      !!   - `1`: `nest` too small (returned spline uses all `nest` knots).
+      !!   - `2`: impossible result in iteration (\f$ S \f$ too small).
+      !!   - `3`: iteration limit (20) reached (\f$ S \f$ too small).
+      !!   - `10`: invalid input data.
+      !!
+      !! @see Dierckx, Ch. 4--5, §4.1--5.3; fpcurf — core fitting algorithm
       pure subroutine curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
-
-      !  given the set of data points (x(i),y(i)) and the set of positive
-      !  numbers w(i),i=1,2,...,m,subroutine curfit determines a smooth spline
-      !  approximation of degree k on the interval xb <= x <= xe.
-      !  if iopt=-1 curfit calculates the weighted least-squares spline
-      !  according to a given set of knots.
-      !  if iopt>=0 the number of knots of the spline s(x) and the position
-      !  t(j),j=1,2,...,n is chosen automatically by the routine. the smooth-
-      !  ness of s(x) is then achieved by minimalizing the discontinuity
-      !  jumps of the k-th derivative of s(x) at the knots t(j),j=k+2,k+3,...,
-      !  n-k-1. the amount of smoothness is determined by the condition that
-      !  f(p)=sum((w(i)*(y(i)-s(x(i))))**2) be <= s, with s a given non-
-      !  negative constant, called the smoothing factor.
-      !  the fit s(x) is given in the b-spline representation (b-spline coef-
-      !  ficients c(j),j=1,2,...,n-k-1) and can be evaluated by means of
-      !  subroutine splev.
-      !
-      !  calling sequence:
-      !     call curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,
-      !    * lwrk,iwrk,ier)
-      !
-      !  parameters:
-      !   iopt  : integer flag. on entry iopt must specify whether a weighted
-      !           least-squares spline (iopt=-1) or a smoothing spline (iopt=
-      !           0 or 1) must be determined. if iopt=0 the routine will start
-      !           with an initial set of knots t(i)=xb, t(i+k+1)=xe, i=1,2,...
-      !           k+1. if iopt=1 the routine will continue with the knots
-      !           found at the last call of the routine.
-      !           attention: a call with iopt=1 must always be immediately
-      !           preceded by another call with iopt=1 or iopt=zero
-      !           unchanged on exit.
-      !   m     : integer. on entry m must specify the number of data points.
-      !           m > k. unchanged on exit.
-      !   x     : real array of dimension at least (m). before entry, x(i)
-      !           must be set to the i-th value of the independent variable x,
-      !           for i=1,2,...,m. these values must be supplied in strictly
-      !           ascending order. unchanged on exit.
-      !   y     : real array of dimension at least (m). before entry, y(i)
-      !           must be set to the i-th value of the dependent variable y,
-      !           for i=1,2,...,m. unchanged on exit.
-      !   w     : real array of dimension at least (m). before entry, w(i)
-      !           must be set to the i-th value in the set of weights. the
-      !           w(i) must be strictly positive. unchanged on exit.
-      !           see also further comments.
-      !   xb,xe : real values. on entry xb and xe must specify the boundaries
-      !           of the approximation interval. xb<=x(1), xe>=x(m).
-      !           unchanged on exit.
-      !   k     : integer. on entry k must specify the degree of the spline.
-      !           1<=k<=5. it is recommended to use cubic splines (k=3).
-      !           the user is strongly dissuaded from choosing k even,together
-      !           with a small s-value. unchanged on exit.
-      !   s     : real.on entry (in case iopt>=0) s must specify the smoothing
-      !           factor. s >=zero unchanged on exit.
-      !           for advice on the choice of s see further comments.
-      !   nest  : integer. on entry nest must contain an over-estimate of the
-      !           total number of knots of the spline returned, to indicate
-      !           the storage space available to the routine. nest >=2*k+2.
-      !           in most practical situation nest=m/2 will be sufficient.
-      !           always large enough is  nest=m+k+1, the number of knots
-      !           needed for interpolation (s=0). unchanged on exit.
-      !   n     : integer.
-      !           unless ier =10 (in case iopt >=0), n will contain the
-      !           total number of knots of the spline approximation returned.
-      !           if the computation mode iopt=1 is used this value of n
-      !           should be left unchanged between subsequent calls.
-      !           in case iopt=-1, the value of n must be specified on entry.
-      !   t     : real array of dimension at least (nest).
-      !           on successful exit, this array will contain the knots of the
-      !           spline,i.e. the position of the interior knots t(k+2),t(k+3)
-      !           ...,t(n-k-1) as well as the position of the additional knots
-      !           t(1)=t(2)=...=t(k+1)=xb and t(n-k)=...=t(n)=xe needed for
-      !           the b-spline representation.
-      !           if the computation mode iopt=1 is used, the values of t(1),
-      !           t(2),...,t(n) should be left unchanged between subsequent
-      !           calls. if the computation mode iopt=-1 is used, the values
-      !           t(k+2),...,t(n-k-1) must be supplied by the user, before
-      !           entry. see also the restrictions (ier=10).
-      !   c     : real array of dimension at least (nest).
-      !           on successful exit, this array will contain the coefficients
-      !           c(1),c(2),..,c(n-k-1) in the b-spline representation of s(x)
-      !   fp    : real. unless ier=10, fp contains the weighted sum of
-      !           squared residuals of the spline approximation returned.
-      !   wrk   : real array of dimension at least (m*(k+1)+nest*(7+3*k)).
-      !           used as working space. if the computation mode iopt=1 is
-      !           used, the values wrk(1),...,wrk(n) should be left unchanged
-      !           between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of
-      !           the array wrk as declared in the calling (sub)program.lwrk
-      !           must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest).
-      !           used as working space. if the computation mode iopt=1 is
-      !           used,the values iwrk(1),...,iwrk(n) should be left unchanged
-      !           between subsequent calls.
-      !   ier   : integer. unless the routine detects an error, ier contains a
-      !           non-positive value on exit, i.e.
-      !    ier=0  : normal return. the spline returned has a residual sum of
-      !             squares fp such that abs(fp-s)/s <= tol with tol a relat-
-      !             ive tolerance set to 0.001 by the program.
-      !    ier=-1 : normal return. the spline returned is an interpolating
-      !             spline (fp=0).
-      !    ier=-2 : normal return. the spline returned is the weighted least-
-      !             squares polynomial of degree k. in this extreme case fp
-      !             gives the upper bound fp0 for the smoothing factor s.
-      !    ier=1  : error. the required storage space exceeds the available
-      !             storage space, as specified by the parameter nest.
-      !             probably causes : nest too small. if nest is already
-      !             large (say nest > m/2), it may also indicate that s is
-      !             too small
-      !             the approximation returned is the weighted least-squares
-      !             spline according to the knots t(1),t(2),...,t(n). (n=nest)
-      !             the parameter fp gives the corresponding weighted sum of
-      !             squared residuals (fp>s).
-      !    ier=2  : error. a theoretically impossible result was found during
-      !             the iteration process for finding a smoothing spline with
-      !             fp = s. probably causes : s too small.
-      !             there is an approximation returned but the corresponding
-      !             weighted sum of squared residuals does not satisfy the
-      !             condition abs(fp-s)/s < tol.
-      !    ier=3  : error. the maximal number of iterations maxit (set to 20
-      !             by the program) allowed for finding a smoothing spline
-      !             with fp=s has been reached. probably causes : s too small
-      !             there is an approximation returned but the corresponding
-      !             weighted sum of squared residuals does not satisfy the
-      !             condition abs(fp-s)/s < tol.
-      !    ier=10 : error. on entry, the input data are controlled on validity
-      !             the following restrictions must be satisfied.
-      !             -1<=iopt<=1, 1<=k<=5, m>k, nest>2*k+2, w(i)>0,i=1,2,...,m
-      !             xb<=x(1)<x(2)<...<x(m)<=xe, lwrk>=(k+1)*m+nest*(7+3*k)
-      !             if iopt=-1: 2*k+2<=n<=min(nest,m+k+1)
-      !                         xb<t(k+2)<t(k+3)<...<t(n-k-1)<xe
-      !                       the schoenberg-whitney conditions, i.e. there
-      !                       must be a subset of data points xx(j) such that
-      !                         t(j) < xx(j) < t(j+k+1), j=1,2,...,n-k-1
-      !             if iopt>=0: s>=0
-      !                         if s=0 : nest >= m+k+1
-      !             if one of these conditions is found to be violated,control
-      !             is immediately repassed to the calling program. in that
-      !             case there is no approximation returned.
-      !
-      !  further comments:
-      !   by means of the parameter s, the user can control the tradeoff
-      !   between closeness of fit and smoothness of fit of the approximation.
-      !   if s is too large, the spline will be too smooth and signal will be
-      !   lost ; if s is too small the spline will pick up too much noise. in
-      !   the extreme cases the program will return an interpolating spline if
-      !   s=0 and the weighted least-squares polynomial of degree k if s is
-      !   very large. between these extremes, a properly chosen s will result
-      !   in a good compromise between closeness of fit and smoothness of fit.
-      !   to decide whether an approximation, corresponding to a certain s is
-      !   satisfactory the user is highly recommended to inspect the fits
-      !   graphically.
-      !   recommended values for s depend on the weights w(i). if these are
-      !   taken as 1/d(i) with d(i) an estimate of the standard deviation of
-      !   y(i), a good s-value should be found in the range (m-sqrt(2*m),m+
-      !   sqrt(2*m)). if nothing is known about the statistical error in y(i)
-      !   each w(i) can be set equal to one and s determined by trial and
-      !   error, taking account of the comments above. the best is then to
-      !   start with a very large value of s ( to determine the least-squares
-      !   polynomial and the corresponding upper bound fp0 for s) and then to
-      !   progressively decrease the value of s ( say by a factor 10 in the
-      !   beginning, i.e. s=fp0/10, fp0/100,...and more carefully as the
-      !   approximation shows more detail) to obtain closer fits.
-      !   to economize the search for a good s-value the program provides with
-      !   different modes of computation. at the first call of the routine, or
-      !   whenever he wants to restart with the initial set of knots the user
-      !   must set iopt=zero
-      !   if iopt=1 the program will continue with the set of knots found at
-      !   the last call of the routine. this will save a lot of computation
-      !   time if curfit is called repeatedly for different values of s.
-      !   the number of knots of the spline returned and their location will
-      !   depend on the value of s and on the complexity of the shape of the
-      !   function underlying the data. but, if the computation mode iopt=1
-      !   is used, the knots returned may also depend on the s-values at
-      !   previous calls (if these were smaller). therefore, if after a number
-      !   of trials with different s-values and iopt=1, the user can finally
-      !   accept a fit as satisfactory, it may be worthwhile for him to call
-      !   curfit once more with the selected value for s but now with iopt=0.
-      !   indeed, curfit may then return an approximation of the same quality
-      !   of fit but with fewer knots and therefore better if data reduction
-      !   is also an important objective for the user.
-      !
-      !  other subroutines required:
-      !    fpback,fpbspl,fpchec,fpcurf,fpdisc,fpgivs,fpknot,fprati,fprota
-      !
-      !  references:
-      !   dierckx p. : an algorithm for smoothing, differentiation and integ-
-      !                ration of experimental data using spline functions,
-      !                j.comp.appl.maths 1 (1975) 165-184.
-      !   dierckx p. : a fast algorithm for smoothing data on a rectangular
-      !                grid while using spline functions, siam j.numer.anal.
-      !                19 (1982) 1286-1304.
-      !   dierckx p. : an improved algorithm for curve fitting with spline
-      !                functions, report tw54, dept. computer science,k.u.
-      !                leuven, 1981.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
-      !
-      !  author:
-      !    p.dierckx
-      !    dept. computer science, k.u. leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : may 1979
-      !  latest update : march 1987
-      !
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(in)    :: xb,xe,s
@@ -1895,56 +1268,31 @@ module fitpack_core
       end subroutine curfit
 
 
-      !  function dblint calculates the double integral
-      !         / xe  / ye
-      !        |     |      s(x,y) dx dy
-      !    xb /  yb /
-      !  with s(x,y) a bivariate spline of degrees kx and ky, given in the b-spline representation.
+      !> @brief Compute the double integral of a bivariate spline over a rectangle.
+      !!
+      !! Calculates \f$ \int_{x_b}^{x_e} \int_{y_b}^{y_e} s(x,y)\,dx\,dy \f$ for a bivariate
+      !! spline of degrees \f$ k_x \f$ and \f$ k_y \f$ in tensor-product B-spline representation.
+      !! The spline is considered identically zero outside its support rectangle
+      !! \f$ (t^x_{k_x+1}, t^x_{n_x-k_x}) \times (t^y_{k_y+1}, t^y_{n_y-k_y}) \f$.
+      !!
+      !! @param[in]  tx   Knot positions in \f$ x \f$ (length \f$ n_x \f$).
+      !! @param[in]  nx   Total number of knots in \f$ x \f$.
+      !! @param[in]  ty   Knot positions in \f$ y \f$ (length \f$ n_y \f$).
+      !! @param[in]  ny   Total number of knots in \f$ y \f$.
+      !! @param[in]  c    B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]  kx   Degree in \f$ x \f$.
+      !! @param[in]  ky   Degree in \f$ y \f$.
+      !! @param[in]  xb   Left boundary of integration in \f$ x \f$.
+      !! @param[in]  xe   Right boundary of integration in \f$ x \f$.
+      !! @param[in]  yb   Lower boundary of integration in \f$ y \f$.
+      !! @param[in]  ye   Upper boundary of integration in \f$ y \f$.
+      !! @param[out] wrk  Workspace (length \f$ \ge n_x + n_y - k_x - k_y - 2 \f$). On exit,
+      !!   contains integrals of normalized B-splines in each direction.
+      !! @return The double integral \f$ \iint s(x,y)\,dx\,dy \f$.
+      !!
+      !! @see splint — univariate integral; fpintb — B-spline integration
       real(FP_REAL) function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
 
-      !
-      !  calling sequence:
-      !     aint = dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk)
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   xb,xe : real values, containing the boundaries of the integration
-      !   yb,ye   domain. s(x,y) is considered to be identically zero outside the rectangle
-      !           (tx(kx+1),tx(nx-kx))*(ty(ky+1),ty(ny-ky))
-      !
-      !  output parameters:
-      !   aint  : real , containing the double integral of s(x,y).
-      !   wrk   : real array of dimension at least (nx+ny-kx-ky-2). used as working space.
-      !           on exit, wrk(i) will contain the integral
-      !                / xe
-      !               | ni,kx+1(x) dx , i=1,2,...,nx-kx-1
-      !           xb /
-      !           with ni,kx+1(x) the normalized b-spline defined on the knots tx(i),...,tx(i+kx+1)
-      !           wrk(j+nx-kx-1) will contain the integral
-      !                / ye
-      !               | nj,ky+1(y) dy , j=1,2,...,ny-ky-1
-      !           yb /
-      !           with nj,ky+1(y) the normalized b-spline defined on the knots ty(j),...,ty(j+ky+1)
-      !
-      !  other subroutines required: fpintb
-      !
-      !  references :
-      !    gaffney p.w. : the calculation of indefinite integrals of b-splines
-      !                   j. inst. maths applics 17 (1976) 37-41.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: nx,ny,kx,ky
       real(FP_REAL), intent(in) :: xb,xe,yb,ye
@@ -1981,44 +1329,28 @@ module fitpack_core
       return
       end function dblint
 
-      !  function program evapol evaluates the function f(x,y) = s(u,v), defined through the transformation
-      !      x = u*rad(v)*cos(v)    y = u*rad(v)*sin(v)
-      !  and where s(u,v) is a bicubic spline ( 0<=u<=1 , -pi<=v<=pi ), given in its standard b-spline
-      !  representation.
-
+      !> @brief Evaluate a polar spline \f$ f(x,y) = s(u,v) \f$ at a Cartesian point.
+      !!
+      !! Given a bicubic spline \f$ s(u,v) \f$ (\f$ 0 \le u \le 1 \f$, \f$ -\pi \le v \le \pi \f$)
+      !! fitted by polar, evaluates \f$ f(x,y) \f$ via the polar transformation:
+      !! \f[
+      !!   x = u \cdot r(v) \cos v, \qquad y = u \cdot r(v) \sin v
+      !! \f]
+      !! where \f$ r(v) \f$ is the boundary function defining the polar domain.
+      !!
+      !! @param[in] tu   Knot positions in \f$ u \f$ (length \f$ n_u \f$).
+      !! @param[in] nu   Total number of knots in \f$ u \f$.
+      !! @param[in] tv   Knot positions in \f$ v \f$ (length \f$ n_v \f$).
+      !! @param[in] nv   Total number of knots in \f$ v \f$.
+      !! @param[in] c    B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \f$.
+      !! @param[in] rad  Boundary function \f$ r(v) \f$ defining the polar domain.
+      !! @param[in] x    Cartesian \f$ x \f$-coordinate.
+      !! @param[in] y    Cartesian \f$ y \f$-coordinate.
+      !! @return The value \f$ f(x,y) = s(u,v) \f$.
+      !!
+      !! @see Dierckx, Ch. 11, §11.1; polar — polar spline fitting
       pure real(FP_REAL) function evapol(tu,nu,tv,nv,c,rad,x,y) result(e_res)
 
-      !  calling sequence:
-      !     f = evapol(tu,nu,tv,nv,c,rad,x,y)
-      !
-      !  input parameters:
-      !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
-      !   nu    : integer(FP_SIZE), giving the total number of knots in the u-direction
-      !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
-      !   nv    : integer(FP_SIZE), giving the total number of knots in the v-direction
-      !   c     : real array, length (nu-4)*(nv-4), which contains the b-spline coefficients.
-      !   rad   : real function subprogram, defining the boundary of the approximation domain. must be
-      !           declared external in the calling (sub)-program
-      !   x,y   : the co-ordinates of the point where f(x,y) must be evaluated.
-      !
-      !  output parameter:
-      !   e_res : the value of f(x,y)
-      !
-      !  other subroutines required:
-      !    bispev,fpbisp,fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                 university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: nu,nv
       real(FP_REAL),    intent(in) :: x,y
@@ -2072,47 +1404,30 @@ module fitpack_core
       !    resc(i) =      !        s(x)*cos(alfa(i)*x) dx, i=1,...,m,
       !              t(4)/
       !  where s(x) denotes a cubic spline which is given in its b-spline representation.
+      !> @brief Compute Fourier coefficients of a cubic spline.
+      !!
+      !! For a cubic spline \f$ s(x) \f$ and a set of parameters \f$ \alpha_i \f$,
+      !! \f$ i = 1,\ldots,m \f$, computes the Fourier integrals:
+      !! \f[
+      !!   R_s(i) = \int s(x) \sin(\alpha_i x)\,dx, \qquad
+      !!   R_c(i) = \int s(x) \cos(\alpha_i x)\,dx
+      !! \f]
+      !! over the support of the spline.
+      !!
+      !! @param[in]     t     Knot positions (length \f$ n \f$). Must have \f$ n \ge 10 \f$.
+      !! @param[in]     n     Total number of knots.
+      !! @param[in]     c     B-spline coefficients (length \f$ n \f$).
+      !! @param[in]     alfa  Fourier parameters \f$ \alpha_i \f$ (length \f$ m \f$).
+      !! @param[in]     m     Number of integrals to compute.
+      !! @param[out]    ress  Sine integrals \f$ R_s(i) \f$ (length \f$ m \f$).
+      !! @param[out]    resc  Cosine integrals \f$ R_c(i) \f$ (length \f$ m \f$).
+      !! @param[in,out] wrk1  Real workspace (length \f$ n \f$).
+      !! @param[in,out] wrk2  Real workspace (length \f$ n \f$).
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 3, §3.3; fpbfou — B-spline Fourier integrals; fpcsin — cos/sin integrals
       pure subroutine fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
 
-      !  calling sequence:
-      !     call fourco(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier)
-      !
-      !  input parameters:
-      !    t    : real array,length n, containing the knots of s(x).
-      !    n    : integer(FP_SIZE), containing the total number of knots. n>=10.
-      !    c    : real array,length n, containing the b-spline coefficients.
-      !    alfa : real array,length m, containing the parameters alfa(i).
-      !    m    : integer(FP_SIZE), specifying the number of integrals to be computed.
-      !    wrk1 : real array,length n. used as working space
-      !    wrk2 : real array,length n. used as working space
-      !
-      !  output parameters:
-      !    ress : real array,length m, containing the integrals ress(i).
-      !    resc : real array,length m, containing the integrals resc(i).
-      !    ier  : error flag:
-      !      ier=0 : normal return.
-      !      ier=10: invalid input data (see restrictions).
-      !
-      !  restrictions:
-      !    n >= 10
-      !    t(4)   < t(5) < ... < t(n-4) < t(n-3).
-      !    t(1)   <= t(2) <= t(3) <= t(4).
-      !    t(n-3) <= t(n-2) <= t(n-1) <= t(n).
-      !
-      !  other subroutines required: fpbfou,fpcsin
-      !
-      !  references :
-      !    dierckx p. : calculation of fourier coefficients of discrete functions using cubic splines.
-      !                 j. computational and applied mathematics 3 (1977) 207-209.
-      !    dierckx p. : curve and surface fitting with splines, monographs on
-      !                 numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: n,m
       integer(FP_FLAG), intent(out) :: ier
@@ -2226,14 +1541,33 @@ module fitpack_core
       end subroutine fpader
 
 
+      !> @brief Add a branch to the constraint-set binary tree.
+      !!
+      !! Adds a new branch of length `n1` to the triply linked binary tree used
+      !! by the Theil-Van de Panne convexity procedure (§7.2). The branch
+      !! represents a candidate active-constraint set; its nodes contain
+      !! constraint indices from `jbind(1:n1)`.
+      !!
+      !! The tree maintains the ordering invariant
+      !! \f$ \text{info}(k) < \text{info}(\text{right}(k)) \f$ and
+      !! \f$ \text{info}(k) < \text{info}(\text{left}(k)) \f$, preventing
+      !! duplicate constraint sets. If no free nodes are available, fpfrno is
+      !! called to reclaim nodes; if that also fails, `ier = 1`.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; `up(i) = 0` marks a free node
+      !! @param[in,out] left   Left-child pointers
+      !! @param[in,out] right  Right-child pointers
+      !! @param[in,out] info   Constraint index stored at each node
+      !! @param[in,out] count  Next free node pointer
+      !! @param[in,out] merk   Terminal node of the most recent branch
+      !! @param[in]     jbind  Constraint indices for the new branch, length `n1`
+      !! @param[in]     n1     Length of the new branch
+      !! @param[out]    ier    Error flag: 0 = success, 1 = tree full
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpdeno, fpfrno, fpseno — companion tree operations
       pure subroutine fpadno(maxtr,up,left,right,info,count,merk,jbind,n1,ier)
-
-      !  subroutine fpadno adds a branch of length n1 to the triply linked tree,the information of
-      !  which is kept in the arrays up,left,right and info. the information field of the nodes of
-      !  this new branch is given in the array jbind. in linking the new branch fpadno takes account
-      !  of the property of the tree that info(k) < info(right(k)) ; info(k) < info(left(k))
-      !  if necessary the subroutine calls subroutine fpfrno to collect the free nodes of the tree.
-      !  if no computer words are available at that moment, the error parameter ier is set to 1.
       !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: maxtr,n1
@@ -2294,10 +1628,29 @@ module fitpack_core
       end subroutine fpadno
 
 
-      !  given a idim-dimensional spline curve of degree k, in its b-spline representation ( knots t(j),
-      !  j=1,...,n , b-spline coefficients c(j), j=1,...,nc) and given also a polynomial curve in its
-      !  b-spline representation ( coefficients cp(j), j=1,...,np), subroutine fpadpo calculates the b-spline
-      !  representation (coefficients c(j),j=1,...,nc) of the sum of the two curves.
+      !> @brief Add a polynomial curve to a spline curve in B-spline representation.
+      !!
+      !! Given a \f$ d \f$-dimensional spline curve of degree \f$ k \f$ with
+      !! knots \f$ t \f$ and coefficients \f$ c \f$, and a polynomial curve
+      !! with B-spline coefficients \f$ c_p \f$ (on the knot vector
+      !! \f$ [a, \ldots, a, b, \ldots, b] \f$), computes the B-spline
+      !! coefficients of their sum by inserting knots from \f$ t \f$ into the
+      !! polynomial representation via fpinst, then adding coefficients.
+      !!
+      !! @param[in]     idim  Number of curve dimensions \f$ d \f$
+      !! @param[in]     t     Knot vector of the spline, length `n`
+      !! @param[in]     n     Number of knots
+      !! @param[in,out] c     B-spline coefficients; on exit, contains the sum
+      !! @param[in]     nc    Length of `c`
+      !! @param[in]     k     Spline degree
+      !! @param[in]     cp    Polynomial B-spline coefficients, length `np`
+      !! @param[in]     np    Length of `cp`
+      !! @param[in,out] cc    Work array, length `nest`
+      !! @param[in,out] t1    Work array, length `nest`
+      !! @param[in,out] t2    Work array, length `nest`
+      !!
+      !! @see Dierckx, Ch. 7, §7.1 (pp. 115-120)
+      !! @see fpinst — single knot insertion; fppocu — polynomial construction
       pure subroutine fpadpo(idim,t,n,c,nc,k,cp,np,cc,t1,t2)
 
       !  ..
@@ -2363,8 +1716,33 @@ module fitpack_core
       return
       end subroutine fpadpo
 
-      !  function fpback calculates the solution of the system of equations a*c = z with
-      !  a a n x n upper triangular matrix of bandwidth k.
+      !> @brief Solve an upper triangular banded system by back-substitution.
+      !!
+      !! Computes the B-spline coefficients \f$ c \f$ by solving the triangular system:
+      !!
+      !! \f[
+      !!     R_1 \, c = z_1
+      !!     \tag{4.14}
+      !! \f]
+      !!
+      !! where \f$ R_1 \f$ is an \f$ n \times n \f$ upper triangular matrix with
+      !! bandwidth \f$ k \f$, obtained from the QR factorization of the observation
+      !! matrix \f$ E \f$.
+      !!
+      !! ### Matrix structure
+      !!
+      !! \f$ R_1 \f$ is stored as `a(nest, k)` where `a(i,1)` holds the diagonal
+      !! element \f$ r_{i,i} \f$ and `a(i,j)` for \f$ j > 1 \f$ holds \f$ r_{i,i+j-1} \f$.
+      !!
+      !! @param[in] a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
+      !! @param[in] z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
+      !! @param[in] n     Number of equations (= number of B-spline coefficients)
+      !! @param[in] k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
+      !! @param[in] nest  Leading dimension of array `a`
+      !!
+      !! @return Solution vector \f$ c \f$ of length \f$ n \f$
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.14
       pure function fpback(a,z,n,k,nest) result(c)
 
       !  ..scalar arguments..
@@ -2397,12 +1775,35 @@ module fitpack_core
 
       end function fpback
 
-      !  function fpbacp calculates the solution of the system of equations g * c = z
-      !  with g  a n x n upper triangular matrix of the form
-      !            ! a '   !
-      !        g = !   ' b !
-      !            ! 0 '   !
-      !  with b a n x k matrix and a a (n-k) x (n-k) upper triangular matrix of bandwidth k1.
+      !> @brief Solve a bordered upper triangular system by back-substitution.
+      !!
+      !! Computes the solution \f$ c \f$ of the system \f$ G \, c = z \f$ where
+      !! \f$ G \f$ is an \f$ n \times n \f$ upper triangular matrix of the form:
+      !!
+      !! \f[
+      !!     G = \begin{pmatrix} A & \cdot \\ 0 & B \end{pmatrix}
+      !!     \tag{6.6}
+      !! \f]
+      !!
+      !! with \f$ A \f$ an \f$ (n-k) \times (n-k) \f$ upper triangular band matrix
+      !! of bandwidth \f$ k_1 \f$, and \f$ B \f$ an \f$ n \times k \f$ dense matrix
+      !! accounting for the periodic boundary conditions.
+      !!
+      !! This arises in periodic spline fitting where the periodic B-splines
+      !! \f$ \tilde{N}_{i,k+1} \f$ wrap around the domain, coupling the first
+      !! and last \f$ k \f$ coefficients.
+      !!
+      !! @param[in] a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
+      !! @param[in] b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
+      !! @param[in] z     Right-hand side vector of length \f$ n \f$
+      !! @param[in] n     Number of equations
+      !! @param[in] k     Number of periodic coupling columns
+      !! @param[in] k1    Bandwidth of the triangular part \f$ A \f$
+      !! @param[in] nest  Leading dimension of arrays `a` and `b`
+      !!
+      !! @return Solution vector \f$ c \f$ of length \f$ n \f$
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.6
       pure function fpbacp(a,b,z,n,k,k1,nest) result(c)
 
       !  ..scalar arguments..
@@ -2458,14 +1859,29 @@ module fitpack_core
       end function fpbacp
 
 
-      !  subroutine fpbfou calculates the integrals
-      !                    /t(n-3)
-      !    ress(j) =      !        nj,4(x)*sin(par*x) dx    and
-      !              t(4)/
-      !                    /t(n-3)
-      !    resc(j) =      !        nj,4(x)*cos(par*x) dx ,  j=1,2,...n-4
-      !              t(4)/
-      !  where nj,4(x) denotes the cubic b-spline defined on the knots t(j),t(j+1),...,t(j+4).
+      !> @brief Compute Fourier coefficients of cubic B-splines.
+      !!
+      !! Calculates the Fourier sine and cosine integrals of each cubic
+      !! B-spline \f$ N_{j,4}(x) \f$ over the active knot interval:
+      !!
+      !! \f[
+      !!     \text{ress}(j) = \int_{\lambda_4}^{\lambda_{n-3}} N_{j,4}(x) \sin(\omega x) \, dx
+      !! \f]
+      !! \f[
+      !!     \text{resc}(j) = \int_{\lambda_4}^{\lambda_{n-3}} N_{j,4}(x) \cos(\omega x) \, dx
+      !! \f]
+      !!
+      !! for \f$ j = 1, \ldots, n-4 \f$. Uses fpcsin to evaluate the weighted
+      !! integrals over each knot span.
+      !!
+      !! @param[in]  t     Knot vector, length `n`
+      !! @param[in]  n     Number of knots
+      !! @param[in]  par   Frequency \f$ \omega \f$
+      !! @param[out] ress  Sine integrals, length `n-4`
+      !! @param[out] resc  Cosine integrals, length `n-4`
+      !!
+      !! @see Dierckx, Ch. 3, §3.3 (Fourier coefficients)
+      !! @see fpcsin — weighted Fourier integrals of cubics
       pure subroutine fpbfou(t,n,par,ress,resc)
 
       !  calling sequence:
@@ -2645,6 +2061,44 @@ module fitpack_core
       end subroutine fpbfou
 
 
+      !> @brief Evaluate a tensor product spline on a grid.
+      !!
+      !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
+      !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
+      !! \f$ (x_i, y_j) \f$, \f$ i = 1, \ldots, m_x \f$, \f$ j = 1, \ldots, m_y \f$.
+      !!
+      !! The evaluation uses the two-step algorithm: first compute the B-spline
+      !! basis values in each direction, then assemble:
+      !!
+      !! \f[
+      !!     s(x, y) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j, k_y+1}(y) \right)
+      !!               N_{i, k_x+1}(x)
+      !!     \tag{2.14-2.15}
+      !! \f]
+      !!
+      !! The B-spline values and knot interval indices are stored in workspace
+      !! arrays `wx`, `wy`, `lx`, `ly` for reuse.
+      !!
+      !! @param[in]  tx    Knot vector in \f$ x \f$, length `nx`
+      !! @param[in]  nx    Number of knots in \f$ x \f$
+      !! @param[in]  ty    Knot vector in \f$ y \f$, length `ny`
+      !! @param[in]  ny    Number of knots in \f$ y \f$
+      !! @param[in]  c     B-spline coefficients \f$ c_{i,j} \f$, length
+      !!                   \f$ (n_x - k_x - 1)(n_y - k_y - 1) \f$
+      !! @param[in]  kx    Spline degree in \f$ x \f$
+      !! @param[in]  ky    Spline degree in \f$ y \f$
+      !! @param[in]  x     Evaluation points in \f$ x \f$, length `mx`
+      !! @param[in]  mx    Number of evaluation points in \f$ x \f$
+      !! @param[in]  y     Evaluation points in \f$ y \f$, length `my`
+      !! @param[in]  my    Number of evaluation points in \f$ y \f$
+      !! @param[out] z     Spline values at grid points, length `mx * my`,
+      !!                   stored in row-major order: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
+      !! @param[out] wx    B-spline basis values in \f$ x \f$, `wx(mx, kx+1)`
+      !! @param[out] wy    B-spline basis values in \f$ y \f$, `wy(my, ky+1)`
+      !! @param[out] lx    Knot interval indices in \f$ x \f$, length `mx`
+      !! @param[out] ly    Knot interval indices in \f$ y \f$, length `my`
+      !!
+      !! @see Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
       pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
 
       !  ..scalar arguments..
@@ -2713,11 +2167,38 @@ module fitpack_core
       end subroutine fpbisp
 
 
-      !  function fpbspl evaluates the (k+1) non-zero b-splines of degree k at t(l) <= x < t(l+1) using
-      !  the stable recurrence relation of de boor and cox.
-      !  Travis Oliphant 2007 changed so that weighting of 0 is used when knots with multiplicity are present.
-      !   Also, notice that l+k <= n and 1 <= l+1-k or else the routine will be accessing memory outside t
-      !   Thus it is imperative that that k <= l <= n-k but this is not checked.
+      !> @brief Evaluate the non-zero B-splines at a given point.
+      !!
+      !! Computes the \f$ k+1 \f$ non-zero B-splines of degree \f$ k \f$ at the point
+      !! \f$ x \f$ satisfying \f$ \lambda_l \leq x < \lambda_{l+1} \f$, using the
+      !! stable recurrence relation of de Boor and Cox:
+      !!
+      !! \f[
+      !!     N_{i,1}(x) = \begin{cases} 1 & \text{if } \lambda_i \leq x < \lambda_{i+1} \\
+      !!                                 0 & \text{otherwise} \end{cases}
+      !! \f]
+      !! \f[
+      !!     N_{i,l+1}(x) = \frac{x - \lambda_i}{\lambda_{i+l} - \lambda_i} N_{i,l}(x)
+      !!                   + \frac{\lambda_{i+l+1} - x}{\lambda_{i+l+1} - \lambda_{i+1}} N_{i+1,l}(x)
+      !!     \tag{1.24}
+      !! \f]
+      !!
+      !! The result array `h` contains \f$ N_{l-k,k+1}(x), \ldots, N_{l,k+1}(x) \f$
+      !! in positions `h(1:k+1)`. When knots have multiplicity (coincident knots),
+      !! zero weights are used in the recurrence (convention \f$ 0/0 = 0 \f$).
+      !!
+      !! @param[in] t  Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n  Length of the knot vector
+      !! @param[in] k  Spline degree
+      !! @param[in] x  Evaluation point, must satisfy \f$ \lambda_l \leq x < \lambda_{l+1} \f$
+      !! @param[in] l  Knot interval index, must satisfy \f$ k \leq l \leq n-k \f$
+      !!
+      !! @return Array of length `MAX_ORDER+1`; positions `1:k+1` contain the
+      !!         \f$ k+1 \f$ non-zero B-spline values.
+      !!
+      !! @note Requires \f$ k \leq l \leq n-k \f$; this is not checked.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3 (pp. 8-11), Eq. 1.22-1.24, 1.30
       pure function fpbspl(t,n,k,x,l) result(h)
          integer(FP_SIZE), intent(in)  :: n,k,l
          real(FP_REAL), intent(in)  :: x,t(n)
@@ -2753,6 +2234,16 @@ module fitpack_core
       !>   do while (x >= t(l+1) .and. l /= l_max)
       !>       l = l + 1
       !>   end do
+      !> @brief Find the knot interval containing a given value.
+      !!
+      !! Returns the index \f$ l \f$ such that \f$ t_l \le x < t_{l+1} \f$, using linear search
+      !! for small ranges (or warm starts) and binary search otherwise.
+      !!
+      !! @param[in]  t        Knot array (non-decreasing).
+      !! @param[in]  x        Value to locate.
+      !! @param[in]  l_start  Left bound for the search.
+      !! @param[in]  l_max    Right bound for the search.
+      !! @return     Index of the interval containing `x`.
       pure function fp_knot_interval(t, x, l_start, l_max) result(l)
           real(FP_REAL),    intent(in) :: t(:)
           real(FP_REAL),    intent(in) :: x
@@ -2797,10 +2288,37 @@ module fitpack_core
       end function fp_knot_interval
 
 
-      !  subroutine fpchec verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
-      !  of degree k, in relation to the number and the position of the data points x(i),i=1,2,...,m.
-      !  If all of the following conditions are fulfilled, the error parameter ier is set to zero. if one
-      !  of the conditions is violated, an error flag is returned.
+      !> @brief Verify knot positions against data points (Schoenberg-Whitney check).
+      !!
+      !! Checks that the knots \f$ \lambda_j \f$, \f$ j = 1, \ldots, n \f$, of a
+      !! spline of degree \f$ k \f$ satisfy all conditions required for a well-posed
+      !! least-squares problem with data points \f$ x_i \f$, \f$ i = 1, \ldots, m \f$.
+      !!
+      !! The conditions verified are:
+      !!
+      !! 1. \f$ k+1 \leq n-k-1 \leq m \f$
+      !! 2. \f$ \lambda_1 \leq \cdots \leq \lambda_{k+1} \f$ and
+      !!    \f$ \lambda_{n-k} \leq \cdots \leq \lambda_n \f$ (boundary knot monotonicity)
+      !! 3. \f$ \lambda_{k+2} < \lambda_{k+3} < \cdots < \lambda_{n-k} \f$ (interior knots
+      !!    strictly increasing)
+      !! 4. \f$ \lambda_{k+1} \leq x_1 \f$ and \f$ x_m \leq \lambda_{n-k} \f$
+      !! 5. The Schoenberg-Whitney conditions: there exists a subset of data points
+      !!    \f$ y_j \f$ such that
+      !!    \f[
+      !!        \lambda_j < y_j < \lambda_{j+k+1}, \quad j = 1, \ldots, n-k-1
+      !!        \tag{4.5}
+      !!    \f]
+      !!    guaranteeing full rank of the observation matrix.
+      !!
+      !! @param[in] x  Data abscissae, strictly increasing: \f$ x_1 < \cdots < x_m \f$
+      !! @param[in] m  Number of data points
+      !! @param[in] t  Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n  Number of knots
+      !! @param[in] k  Spline degree
+      !!
+      !! @return `FITPACK_OK` if all conditions hold, `FITPACK_INPUT_ERROR` otherwise.
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5, 4.17
       pure integer(FP_FLAG) function fpchec(x,m,t,n,k) result(ier)
          integer(FP_SIZE), intent(in)  :: m,n,k
          real(FP_REAL), intent(in) :: x(m),t(n)
@@ -3028,6 +2546,55 @@ module fitpack_core
       end function fpchep
 
 
+      !> @brief Core algorithm for closed (periodic) parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional closed parametric spline curve where
+      !! \f$ s(u_1) = s(u_m) \f$ and all derivatives match at the closure point.
+      !! The periodicity constraint wraps the last \f$ k \f$ B-spline columns
+      !! into the first \f$ k \f$, creating the block-triangular structure
+      !! (Eq. 6.13):
+      !!
+      !! \f[
+      !!     \begin{pmatrix} R_{11}^* & R_{12}^* \\ 0 & R_{22}^* \end{pmatrix}
+      !!     \tag{6.13}
+      !! \f]
+      !!
+      !! which is factored using two-matrix Givens rotations
+      !! (fp_rotate_row_2mat_vec). The smoothing-parameter search follows
+      !! the same rational interpolation scheme as fpcurf.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in]     nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a1      Work: band matrix \f$ R_{11}^* \f$
+      !! @param[in,out] a2      Work: band matrix \f$ R_{12}^*/R_{22}^* \f$
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g1      Work: band matrix copy
+      !! @param[in,out] g2      Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112), Eq. 6.1-6.13
+      !! @see fp_rotate_row_2mat_vec — two-matrix Givens rotation
       pure subroutine fpclos(iopt,idim,m,u,mx,x,w,k,s,nest,tol, &
                              maxit,k1,k2,n,t,nc,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
@@ -3666,7 +3233,48 @@ module fitpack_core
       end subroutine fpclos_reset_interp
 
 
-      ! TODO! output flags in fpcoco and cocosp do not match the global error messages
+      !> @brief Fit a convexity-constrained cubic smoothing spline.
+      !!
+      !! Determines a cubic spline approximation \f$ s(x) \f$ that satisfies
+      !! the convexity (or concavity) constraints specified by \f$ v(i) \f$:
+      !!
+      !! - \f$ v(i) = 1 \f$: \f$ s''(x_i) \geq 0 \f$ (local convexity)
+      !! - \f$ v(i) = -1 \f$: \f$ s''(x_i) \leq 0 \f$ (local concavity)
+      !! - \f$ v(i) = 0 \f$: no constraint at \f$ x_i \f$
+      !!
+      !! while minimizing the weighted sum of squared residuals subject to
+      !! \f$ \sum (w_i (y_i - s(x_i)))^2 \leq S \f$. The algorithm uses the
+      !! Theil-Van de Panne quadratic programming procedure with a binary
+      !! tree (§7.2) to enumerate active-constraint sets.
+      !!
+      !! @param[in]     iopt    Option: -1 = least-squares, 0 = new smoothing,
+      !!                        1 = continue from previous
+      !! @param[in]     m       Number of data points
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m` (positive)
+      !! @param[in]     v       Convexity signs, length `m`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots (workspace dimension)
+      !! @param[in]     maxtr   Max tree nodes
+      !! @param[in]     maxbin  Max active constraints
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nest`
+      !! @param[in,out] sq      Weighted sum of squared residuals
+      !! @param[in,out] sx      Spline values at data points, length `m`
+      !! @param[in,out] bind    Active constraint flags, length `nest`
+      !! @param[in,out] e       Discontinuity coefficients, length `nest`
+      !! @param[in,out] wrk     Work array, length `lwrk`
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] iwrk    Integer work array, length `kwrk`
+      !! @param[in]     kwrk    Length of `iwrk`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @note Error flags in fpcoco/cocosp do not match the global error messages.
+      !!
+      !! @see Dierckx, Ch. 7, §7.2 (pp. 125-130)
+      !! @see fpcosp — core convexity-constrained fitting algorithm
       pure subroutine fpcoco(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,e,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
@@ -3861,6 +3469,55 @@ module fitpack_core
       end subroutine fpcoco
 
 
+      !> @brief Core algorithm for constrained parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric spline curve
+      !! \f$ s(u) = (s_1(u), \ldots, s_d(u)) \f$ subject to derivative
+      !! constraints at the endpoints:
+      !!
+      !! \f[
+      !!     s_j^{(l)}(u_1) = x_j^{(l)}, \quad l = 0, \ldots, i_b - 1
+      !! \f]
+      !! \f[
+      !!     s_j^{(l)}(u_m) = x_j^{(l)}, \quad l = 0, \ldots, i_e - 1
+      !! \f]
+      !!
+      !! The algorithm first constructs a polynomial satisfying the constraints
+      !! (via fppocu), then iteratively refines the knot set and solves the
+      !! constrained least-squares system using Givens rotations.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     ib      Number of derivative constraints at start
+      !! @param[in]     ie      Number of derivative constraints at end
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in]     nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g       Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 8, §8.2 (pp. 141-146)
+      !! @see fppocu — initial polynomial; fp_rotate_shifted_vec — smoothing rotation
       pure subroutine fpcons(iopt,idim,m,u,mx,x,w,ib,ie,k,s,nest, &
                              tol,maxit,k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
@@ -4272,6 +3929,46 @@ module fitpack_core
 
       end subroutine fpcons
 
+      !> @brief Core algorithm for convexity-constrained cubic spline fitting.
+      !!
+      !! Given a fixed knot set, solves the constrained least-squares problem
+      !! using the Theil-Van de Panne active-set enumeration (§7.2). For each
+      !! candidate active-constraint set (tracked in a binary tree), solves
+      !! the equality-constrained system and checks feasibility and optimality
+      !! via the Lagrange multipliers.
+      !!
+      !! @param[in]     m       Number of data points
+      !! @param[in]     x       Data abscissae, length `m`
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     n       Number of knots
+      !! @param[in]     t       Knot vector, length `n`
+      !! @param[in]     e       Discontinuity jump coefficients, length `n`
+      !! @param[in]     maxtr   Max tree nodes
+      !! @param[in]     maxbin  Max active constraints
+      !! @param[in,out] c       B-spline coefficients, length `n`
+      !! @param[out]    sq      Weighted sum of squared residuals
+      !! @param[in,out] sx      Spline values at data points, length `m`
+      !! @param[in,out] bind    Active constraint flags, length `n`
+      !! @param[in]     nm      Dimension parameter
+      !! @param[in]     mb      Dimension parameter
+      !! @param[in,out] a       Work matrix `(n, 4)`
+      !! @param[in,out] b       Work matrix `(nm, maxbin)`
+      !! @param[in,out] const   Constraint vector, length `n`
+      !! @param[in,out] z       Work vector, length `n`
+      !! @param[in,out] zz      Work vector, length `n`
+      !! @param[in,out] u       Work vector, length `maxbin`
+      !! @param[in,out] q       Work matrix `(m, 4)`
+      !! @param[in,out] info    Tree info array, length `maxtr`
+      !! @param[in,out] up      Tree parent pointers, length `maxtr`
+      !! @param[in,out] left    Tree left-child pointers, length `maxtr`
+      !! @param[in,out] right   Tree right-child pointers, length `maxtr`
+      !! @param[in,out] jbind   Work array for constraint indices, length `mb`
+      !! @param[in,out] ibind   Work array for constraint indices, length `mb`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 7, §7.1-7.2 (pp. 115-130)
+      !! @see fpcoco — driver routine; fpadno, fpdeno, fpseno — tree operations
       pure subroutine fpcosp(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,nm,mb,a, &
                              b,const,z,zz,u,q,info,up,left,right,jbind,ibind,ier)
 
@@ -4658,9 +4355,30 @@ module fitpack_core
       end subroutine fpcosp
 
 
-      !  fpcsin calculates the integrals ress=integral((b-x)**3*sin(par*x))
-      !  and resc=integral((b-x)**3*cos(par*x)) over the interval (a,b),
-      !  given sia=sin(par*a),coa=cos(par*a),sib=sin(par*b) and cob=cos(par*b)
+      !> @brief Compute weighted Fourier integrals of a cubic polynomial.
+      !!
+      !! Calculates the integrals:
+      !!
+      !! \f[
+      !!     \text{ress} = \int_a^b (b-x)^3 \sin(\omega x) \, dx, \quad
+      !!     \text{resc} = \int_a^b (b-x)^3 \cos(\omega x) \, dx
+      !! \f]
+      !!
+      !! given precomputed trigonometric values at the endpoints. Used by
+      !! fpbfou to compute Fourier coefficients of B-splines.
+      !!
+      !! @param[in]  a     Left endpoint
+      !! @param[in]  b     Right endpoint
+      !! @param[in]  par   Frequency \f$ \omega \f$
+      !! @param[in]  sia   \f$ \sin(\omega a) \f$
+      !! @param[in]  coa   \f$ \cos(\omega a) \f$
+      !! @param[in]  sib   \f$ \sin(\omega b) \f$
+      !! @param[in]  cob   \f$ \cos(\omega b) \f$
+      !! @param[out] ress  Sine integral result
+      !! @param[out] resc  Cosine integral result
+      !!
+      !! @see Dierckx, Ch. 3, §3.3 (Fourier integrals)
+      !! @see fpbfou — B-spline Fourier coefficient computation
       pure elemental subroutine fpcsin(a,b,par,sia,coa,sib,cob,ress,resc)
 
           !  ..scalar arguments..
@@ -4714,6 +4432,54 @@ module fitpack_core
       end subroutine fpcsin
 
 
+      !> @brief Core algorithm for univariate spline curve fitting.
+      !!
+      !! Determines a smooth spline approximation \f$ s(x) \f$ of degree \f$ k \f$
+      !! on the interval \f$ [x_b, x_e] \f$ that satisfies the smoothing criterion:
+      !!
+      !! \f[
+      !!     F_g(p) = \sum_{i=1}^{m} \bigl( w_i (y_i - s(x_i)) \bigr)^2
+      !!     \leq S
+      !!     \tag{4.12}
+      !! \f]
+      !!
+      !! The algorithm iterates over three levels:
+      !!
+      !! 1. **Knot selection** (§5.3): adds knots at locations of maximum residual
+      !!    (Eq. 5.37-5.43) until the smoothing condition can be met.
+      !! 2. **Weighted least-squares** (§4.1): for each knot set, solves the
+      !!    banded system via QR with Givens rotations (Eq. 4.14-4.15).
+      !! 3. **Smoothing parameter search** (§5.2.4): finds \f$ p \f$ such that
+      !!    \f$ F_g(p) = S \f$ using rational interpolation (Eq. 5.30-5.32).
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue with more knots
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m` (positive)
+      !! @param[in]     m       Number of data points
+      !! @param[in]     xb      Left boundary of approximation interval
+      !! @param[in]     xe      Right boundary of approximation interval
+      !! @param[in]     k       Spline degree (\f$ 1 \leq k \leq 5 \f$)
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max number of knots (workspace bound)
+      !! @param[in]     tol     Tolerance for the smoothing condition
+      !! @param[in]     maxit   Maximum iterations for the \f$ p \f$-search
+      !! @param[in]     k1      \f$ k + 1 \f$ (spline order)
+      !! @param[in]     k2      \f$ k + 2 \f$ (smoothing bandwidth)
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[out]    c       B-spline coefficients, length `nest`
+      !! @param[out]    fp      Weighted sum of squared residuals \f$ F_g(p) \f$
+      !! @param[in,out] fpint   Residual sums per knot interval, length `nest`
+      !! @param[in,out] z       Work: transformed RHS, length `nest`
+      !! @param[in,out] a       Work: band matrix, `(nest, k1)`
+      !! @param[in,out] b       Work: smoothing matrix, `(nest, k2)`
+      !! @param[in,out] g       Work: band matrix copy, `(nest, k2)`
+      !! @param[in,out] q       Work: B-spline values, `(m, k1)`
+      !! @param[in,out] nrdata  Interior data-point counts per interval, length `nest`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 4, §4.1-4.2 (pp. 53-65); Ch. 5, §5.2-5.3 (pp. 73-94)
       pure subroutine fpcurf(iopt,x,y,w,m,xb,xe,k,s,nest,tol, &
                              maxit,k1,k2,n,t,c,fp,fpint,z,a,b,g,q,nrdata,ier)
 
@@ -5067,19 +4833,25 @@ module fitpack_core
       end subroutine fpcurf
 
 
-      !  subroutine fpcuro finds the real zeros of a cubic polynomial p(x) = a*x**3+b*x**2+c*x+d.
+      !> @brief Find the real zeros of a cubic polynomial.
+      !!
+      !! Computes all real roots of the cubic polynomial:
+      !!
+      !! \f[
+      !!     p(x) = a x^3 + b x^2 + c x + d
+      !! \f]
+      !!
+      !! Handles the degenerate cases (linear, quadratic) and uses the
+      !! standard trigonometric method for the irreducible case (three real
+      !! roots) and Cardano's formula otherwise.
+      !!
+      !! @param[in]  a  Coefficient of \f$ x^3 \f$
+      !! @param[in]  b  Coefficient of \f$ x^2 \f$
+      !! @param[in]  c  Coefficient of \f$ x \f$
+      !! @param[in]  d  Constant term
+      !! @param[out] x  Array of length 3 containing the real zeros
+      !! @param[out] n  Number of real zeros found (\f$ 0 \leq n \leq 3 \f$)
       pure subroutine fpcuro(a,b,c,d,x,n)
-
-      !
-      !  calling sequence:
-      !     call fpcuro(a,b,c,d,x,n)
-      !
-      !  input parameters:
-      !    a,b,c,d: real values, containing the coefficients of p(x).
-      !
-      !  output parameters:
-      !    x      : real array,length 3, which contains the real zeros of p(x)
-      !    n      : integer(FP_SIZE), giving the number of real zeros of p(x).
       !  ..
       !  ..scalar arguments..
       real(FP_REAL),    intent(in) :: a,b,c,d
@@ -5171,15 +4943,33 @@ module fitpack_core
 
       end subroutine fpcuro
 
-      ! (l u)-decomposition of a cyclic tridiagonal matrix with the non-zero
-      ! elements stored as follows
-      !
-      !    | a(1,2) a(1,3)                                    a(1,1)  |
-      !    | a(2,1) a(2,2) a(2,3)                                     |
-      !    |        a(3,1) a(3,2) a(3,3)                              |
-      !    |               ...............                            |
-      !    |                               a(n-1,1) a(n-1,2) a(n-1,3) |
-      !    | a(n,3)                                  a(n,1)   a(n,2)  |
+      !> @brief LU-decompose a cyclic tridiagonal matrix.
+      !!
+      !! Computes the LU decomposition of an \f$ n \times n \f$ cyclic
+      !! tridiagonal matrix arising from periodic spline fitting. The matrix
+      !! has the structure:
+      !!
+      !! \f[
+      !!     \begin{pmatrix}
+      !!     a_{1,2} & a_{1,3} &         &        &         & a_{1,1} \\
+      !!     a_{2,1} & a_{2,2} & a_{2,3} &        &         &         \\
+      !!             & \ddots  & \ddots  & \ddots &         &         \\
+      !!             &         & a_{n-1,1} & a_{n-1,2} & a_{n-1,3} \\
+      !!     a_{n,3} &         &         &        & a_{n,1} & a_{n,2}
+      !!     \end{pmatrix}
+      !! \f]
+      !!
+      !! The decomposition factors are stored in columns 4-6 of the array `a`.
+      !! The back-substitution is performed by fpcyt2.
+      !!
+      !! @param[in,out] a   Matrix stored as `a(nn,6)`. Columns 1-3 hold the
+      !!                    tridiagonal + cyclic entries; columns 4-6 receive
+      !!                    the LU factors.
+      !! @param[in]     n   Matrix dimension
+      !! @param[in]     nn  Leading dimension of `a`
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.5-6.6
+      !! @see fpcyt2 — back-substitution using the LU factors
       pure subroutine fpcyt1(a,n,nn)
 
           !  ..scalar arguments..
@@ -5226,9 +5016,20 @@ module fitpack_core
       end subroutine fpcyt1
 
 
-      ! subroutine fpcyt2 solves a linear n x n system
-      !     a * c = b
-      ! where matrix a is a cyclic tridiagonal matrix, decomposed using subroutine fpsyt1.
+      !> @brief Solve a cyclic tridiagonal system using LU factors from fpcyt1.
+      !!
+      !! Solves the \f$ n \times n \f$ linear system \f$ A \, c = b \f$ where
+      !! \f$ A \f$ is a cyclic tridiagonal matrix whose LU decomposition has
+      !! been computed by fpcyt1 and stored in columns 4-6 of the array `a`.
+      !!
+      !! @param[in]  a   LU-factored matrix from fpcyt1, dimension `(nn, 6)`
+      !! @param[in]  n   System dimension
+      !! @param[in]  b   Right-hand side vector, length `n`
+      !! @param[out] c   Solution vector, length `n`
+      !! @param[in]  nn  Leading dimension of `a`
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100), Eq. 6.5-6.6
+      !! @see fpcyt1 — LU decomposition of the cyclic tridiagonal matrix
       pure subroutine fpcyt2(a,n,b,c,nn)
           !  ..scalar arguments..
           integer(FP_SIZE), intent(in) :: n,nn
@@ -5260,9 +5061,26 @@ module fitpack_core
       end subroutine fpcyt2
 
 
-      ! subroutine fpdeno frees the nodes of all branches of a triply linked tree with length < nbind
-      ! by putting to zero their up field. on exit the parameter merk points to the terminal node of
-      ! the most left branch of length nbind or takes the value 1 if there is no such branch.
+      !> @brief Prune short branches from the constraint-set binary tree.
+      !!
+      !! Frees all branches whose length is less than `nbind` by setting their
+      !! `up` field to zero. This reclaims memory in the triply linked tree
+      !! used by the Theil-Van de Panne procedure (§7.2), keeping only
+      !! branches at the current search frontier.
+      !!
+      !! On exit, `merk` points to the terminal node of the leftmost branch
+      !! of length `nbind`, or is set to 1 if no such branch exists.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; freed nodes get `up = 0`
+      !! @param[in]     left   Left-child pointers
+      !! @param[in]     right  Right-child pointers
+      !! @param[in]     nbind  Minimum branch length to retain
+      !! @param[out]    merk   Terminal node of the leftmost surviving branch,
+      !!                       or 1 if none
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpfrno, fpseno — companion tree operations
       pure subroutine fpdeno(maxtr,up,left,right,nbind,merk)
       !  ..
       !  ..scalar arguments..
@@ -5351,8 +5169,33 @@ module fitpack_core
       return
       end subroutine fpdeno
 
-      !  subroutine fpdisc calculates the discontinuity jumps of the kth
-      !  derivative of the b-splines of degree k at the knots t(k+2)..t(n-k-1)
+      !> @brief Compute the discontinuity jumps of the B-spline derivatives.
+      !!
+      !! Calculates the discontinuity jumps of the \f$ k \f$-th derivative of the
+      !! B-splines of degree \f$ k \f$ at the interior knots
+      !! \f$ \lambda_{k+2}, \ldots, \lambda_{n-k-1} \f$. These coefficients
+      !! \f$ a_{i,q} \f$ appear in the smoothness measure:
+      !!
+      !! \f[
+      !!     a_{i,q} = \frac{(-1)^{k+1} \, k! \, (\lambda_{i+k+1} - \lambda_i)}
+      !!     {\displaystyle\prod_{\substack{j=q-k \\ j \neq i}}^{q}
+      !!     (\lambda_{q+1} - \lambda_{j+1})}
+      !!     \tag{5.6}
+      !! \f]
+      !!
+      !! for \f$ q - k - 1 \leq i \leq q \f$, and zero otherwise. The output
+      !! matrix \f$ B \f$ stores these values for use in evaluating the smoothing
+      !! functional \f$ \sum_q [\sum_i c_i \, a_{i,q}]^2 \f$ (Eq. 5.5).
+      !!
+      !! @param[in]    t     Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in]    n     Length of the knot vector
+      !! @param[in]    k2    Spline order \f$ k + 1 \f$ (= degree + 1)
+      !! @param[out]   b     Discontinuity jump matrix, stored as `b(nest, k2)`.
+      !!                     Row \f$ q \f$ contains the \f$ k+1 \f$ non-zero jumps
+      !!                     at interior knot \f$ \lambda_{q+k+1} \f$.
+      !! @param[in]    nest  Leading dimension of array `b`
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5-5.6
       pure subroutine fpdisc(t,n,k2,b,nest)
 
       !  ..scalar arguments..
@@ -5398,10 +5241,28 @@ module fitpack_core
       end subroutine fpdisc
 
 
-      !  subroutine fpfrno collects the free nodes (up field zero) of the triply linked tree the
-      !  information of which is kept in the arrays up,left,right and info. the maximal length of the
-      !  branches of the tree is given by n1. if no free nodes are found, the error flag ier is set
-      !  to 1.
+      !> @brief Collect free nodes from the constraint-set binary tree.
+      !!
+      !! Scans the triply linked tree for free nodes (those with `up = 0`,
+      !! previously released by fpdeno) and makes them available for reuse.
+      !! If no free nodes are found, the error flag `ier` is set to 1.
+      !!
+      !! This routine is called by fpadno when the tree needs a new node but
+      !! the `count` pointer has exhausted the pre-allocated array.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in,out] up     Parent pointers; `up(i) = 0` marks a free node
+      !! @param[in,out] left   Left-child pointers
+      !! @param[in,out] right  Right-child pointers
+      !! @param[in,out] info   Constraint index stored at each node
+      !! @param[in,out] point  Pointer to the collected free-node chain
+      !! @param[in,out] merk   Terminal node of the current branch
+      !! @param[in]     n1     Maximum branch length
+      !! @param[out]    count  Number of free nodes found
+      !! @param[out]    ier    Error flag: 0 = success, 1 = no free nodes
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpdeno, fpseno — companion tree operations
       pure subroutine fpfrno(maxtr,up,left,right,info,point,merk,n1,count,ier)
 
       !  ..scalar arguments..
@@ -5496,7 +5357,30 @@ module fitpack_core
 
       end subroutine fpfrno
 
-      !  subroutine fpgivs calculates the parameters of a givens transformation .
+      !> @brief Compute parameters of a Givens plane rotation.
+      !!
+      !! Given a pivot element \f$ e_i \f$ and a diagonal element \f$ r_i \f$, computes
+      !! the cosine \f$ c \f$ and sine \f$ s \f$ of a Givens rotation that eliminates
+      !! \f$ e_i \f$:
+      !!
+      !! \f[
+      !!     r'_i = \sqrt{r_i^2 + e_i^2}, \quad
+      !!     c = \frac{r_i}{r'_i}, \quad
+      !!     s = \frac{e_i}{r'_i}
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! The rotation preserves orthogonality (\f$ c^2 + s^2 = 1 \f$) and is used
+      !! to triangularize the observation matrix \f$ E \f$ row by row during the
+      !! QR decomposition of the least-squares system.
+      !!
+      !! @param[in]     piv  Pivot element \f$ e_i \f$ to be eliminated
+      !! @param[in,out] ww   On entry, diagonal element \f$ r_i \f$.
+      !!                     On exit, updated value \f$ r'_i = \sqrt{r_i^2 + e_i^2} \f$.
+      !! @param[out]    cos  Cosine of rotation angle
+      !! @param[out]    sin  Sine of rotation angle
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
       elemental subroutine fpgivs(piv,ww,cos,sin)
           real(FP_REAL), intent(in)    :: piv
           real(FP_REAL), intent(inout) :: ww
@@ -5514,26 +5398,36 @@ module fitpack_core
       end subroutine fpgivs
 
 
-      !> Rotate a row h(1:band) into upper triangular matrix A using Givens rotations.
-      !> Also applies the same rotations to scalar RHS value yi and vector z.
-      !>
-      !> This extracts the common pattern:
-      !>   j = j_start
-      !>   do i = 1, band
-      !>       j = j + 1
-      !>       piv = h(i); if (equal(piv,zero)) cycle
-      !>       call fpgivs(piv, a(j,1), cos, sin)
-      !>       call fprota(cos, sin, yi, z(j))
-      !>       if (i < band) call fprota(cos, sin, h(i+1:band), a(j, 2:band-i+1))
-      !>   end do
-      !>
-      !> Arguments:
-      !>   h       - Row to rotate, h(1:band). Modified in place.
-      !>   band    - Number of elements in row (typically k+1)
-      !>   a       - Upper triangular matrix. a(j,1) is diagonal, a(j,2:) is upper.
-      !>   yi      - Scalar RHS contribution. Modified in place.
-      !>   z       - RHS vector. z(j_start+1:j_start+band) modified.
-      !>   j_start - Starting row index minus 1 (j increments before use)
+      !> @brief Rotate an observation row into the upper triangular band matrix.
+      !!
+      !! Incorporates a new observation row \f$ h \f$ (containing the \f$ k+1 \f$
+      !! non-zero B-spline values) into the upper triangular band matrix \f$ R \f$
+      !! using a sequence of Givens plane rotations (Eq. 4.15). Each rotation
+      !! eliminates one element of \f$ h \f$ while updating the corresponding
+      !! diagonal and upper elements of \f$ R \f$, plus the scalar right-hand side:
+      !!
+      !! \f[
+      !!     \begin{pmatrix} c & s \\ -s & c \end{pmatrix}
+      !!     \begin{pmatrix} r_{j,j} \\ h_i \end{pmatrix}
+      !!     = \begin{pmatrix} r'_{j,j} \\ 0 \end{pmatrix}
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! This is the standard-walk variant: \f$ h(i) \f$ pivots for
+      !! \f$ i = 1, \ldots, \texttt{band} \f$, targeting rows
+      !! \f$ j = \texttt{j\_start}+1, \ldots, \texttt{j\_start}+\texttt{band} \f$
+      !! of \f$ R \f$. Zero pivots are skipped.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band    Number of elements in the row (typically \f$ k+1 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R \f$. `a(j,1)` is
+      !!                        the diagonal; `a(j,2:)` stores the upper bandwidth.
+      !! @param[in,out] yi      Scalar RHS contribution; updated by each rotation
+      !! @param[in,out] z       RHS vector; positions `j_start+1 : j_start+band` updated
+      !! @param[in]     j_start Starting row index minus one (loop begins at `j_start+1`)
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
+      !! @see fp_rotate_row_vec — vector-RHS variant for parametric fitting
       pure subroutine fp_rotate_row(h, band, a, yi, z, j_start)
           real(FP_REAL),    intent(inout) :: h(:)
           integer(FP_SIZE), intent(in)    :: band
@@ -5562,10 +5456,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row
 
-      ! Vector-RHS variant of fp_rotate_row: rotates a new observation row into the
-      ! upper-triangular band matrix a(nest,band), with idim right-hand sides stored
-      ! column-wise in z(n,idim). Used by parametric fitting (fpclos, fpcons, fppara)
-      ! where idim curves share the same knot vector and B-spline basis.
+      !> @brief Rotate an observation row into a band matrix with vector RHS.
+      !!
+      !! Vector-RHS variant of fp_rotate_row for parametric curve fitting. Rotates
+      !! a new observation row \f$ h \f$ into the upper triangular band matrix
+      !! \f$ R \f$ using Givens rotations (Eq. 4.15), simultaneously transforming
+      !! \f$ d \f$ right-hand side vectors stored column-wise in \f$ z(n, d) \f$.
+      !!
+      !! In parametric fitting, all \f$ d \f$ coordinate curves share the same knot
+      !! vector and B-spline basis, so a single triangularization of \f$ R \f$
+      !! applies the same rotations to each RHS column.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band    Bandwidth (typically \f$ k+1 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] xi      Vector RHS contribution of length `idim`; updated by rotations
+      !! @param[in,out] z       RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j_start Starting row index minus one
+      !! @param[in]     n       Leading dimension of `z` (number of coefficients)
+      !! @param[in]     idim    Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
+      !! @see fp_rotate_row — scalar-RHS variant
       pure subroutine fp_rotate_row_vec(h, band, a, nest, xi, z, j_start, n, idim)
           integer(FP_SIZE), intent(in)    :: band       ! Bandwidth (k1 or kk1)
           integer(FP_SIZE), intent(in)    :: nest       ! Leading dimension of a
@@ -5597,14 +5510,33 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_vec
 
-      !> Scalar-RHS shifted-pivot Givens rotation: rotates a row h(1:band) into
-      !> upper-triangular band matrix a(nest,*) with scalar RHS yi/z.
-      !>
-      !> Always pivots on h(1) and shifts h left after each step. The effective
-      !> bandwidth shrinks as the loop nears j_end. Includes zero-pivot early exit.
-      !> Used by smoothing iterations in fpcurf, fpsurf, fppola, fpsphe.
-      !>
-      !> Book ref: §5.2.2 Eq. 5.14-5.16 (smoothing matrix), §4.1.2 Eq. 4.15 (Givens).
+      !> @brief Rotate a smoothing-matrix row into a band matrix using shifted pivots.
+      !!
+      !! Shifted-pivot variant of the Givens rotation for incorporating rows of the
+      !! smoothing matrix \f$ P \f$ into the triangularized observation matrix.
+      !! Unlike fp_rotate_row (which walks \f$ h(i) \f$ for \f$ i = 1, \ldots, b \f$),
+      !! this routine always pivots on \f$ h(1) \f$ and shifts \f$ h \f$ left after
+      !! each rotation step:
+      !!
+      !! \f[
+      !!     h \leftarrow (h_2, h_3, \ldots, h_b, 0)
+      !! \f]
+      !!
+      !! The effective bandwidth shrinks as \f$ j \to \texttt{j\_end} \f$. This
+      !! pattern arises because the smoothing matrix \f$ P \f$ (Eq. 5.5) has
+      !! bandwidth \f$ k+2 \f$ and its rows are offset relative to \f$ R \f$.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Shifted left at each step.
+      !! @param[in]     band    Bandwidth (typically \f$ k+2 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] yi      Scalar RHS contribution; updated by rotations
+      !! @param[in,out] z       RHS vector; positions `j_start : j_end` updated
+      !! @param[in]     j_start First row index in \f$ R^* \f$
+      !! @param[in]     j_end   Last row index in \f$ R^* \f$
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5, 5.14-5.16
+      !! @see fp_rotate_shifted_vec — vector-RHS variant for parametric fitting
       pure subroutine fp_rotate_shifted(h, band, a, nest, yi, z, j_start, j_end)
           integer(FP_SIZE), intent(in)    :: band, nest, j_start, j_end
           real(FP_REAL),    intent(inout) :: h(band), a(nest,*), yi, z(*)
@@ -5627,18 +5559,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_shifted
 
-      !> Shifted-pivot variant of fp_rotate_row_vec: rotates a new observation row into
-      !> upper-triangular band matrix a(nest,band) using Givens rotations, with idim
-      !> right-hand sides stored column-wise in z(n,idim).
-      !>
-      !> Unlike fp_rotate_row_vec (which walks h(i) for i=1..band), this routine always
-      !> pivots on h(1) and shifts h left after each rotation step. The effective bandwidth
-      !> shrinks as the loop nears j_end. Used by smoothing iterations in fpcons (§7.2.3,
-      !> Eq. 7.12) and fppara (§6.3.1, Eq. 6.48) where the smoothing-matrix rows are
-      !> rotated into the already-triangularized observation matrix.
-      !>
-      !> Book ref: §4.1.2 Eq. 4.15 (Givens rotation), §5.2.2 Eq. 5.14-5.16 (smoothing
-      !> matrix P with bandwidth k+2), Fig. 5.1 (band structure of P and R₁*).
+      !> @brief Rotate a smoothing-matrix row into a band matrix with vector RHS.
+      !!
+      !! Shifted-pivot, vector-RHS variant of the Givens rotation. Combines the
+      !! shifted-pivot pattern of fp_rotate_shifted (always pivot on \f$ h(1) \f$,
+      !! shift left) with the multi-dimensional RHS of fp_rotate_row_vec. Used by
+      !! smoothing iterations in parametric fitting (fpcons, fppara) where the
+      !! smoothing-matrix rows \f$ P \f$ (Eq. 5.5, bandwidth \f$ k+2 \f$) are
+      !! rotated into the already-triangularized observation matrix \f$ R \f$, with
+      !! \f$ d \f$ coordinate curves sharing the same knot vector.
+      !!
+      !! @param[in,out] h       Row to rotate, length `band`. Shifted left at each step.
+      !! @param[in]     band    Bandwidth (typically \f$ k+2 \f$)
+      !! @param[in,out] a       Upper triangular band matrix \f$ R^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest    Leading dimension of `a`
+      !! @param[in,out] xi      Vector RHS contribution of length `idim`
+      !! @param[in,out] z       RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j_start First row index in \f$ R^* \f$
+      !! @param[in]     j_end   Last row index in \f$ R^* \f$
+      !! @param[in]     n       Leading dimension of `z`
+      !! @param[in]     idim    Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.2 (pp. 76-79), Eq. 5.5, 5.14-5.16
+      !! @see fp_rotate_shifted — scalar-RHS variant
       pure subroutine fp_rotate_shifted_vec(h, band, a, nest, xi, z, j_start, j_end, n, idim)
           integer(FP_SIZE), intent(in)    :: band, nest, n, idim, j_start, j_end
           real(FP_REAL),    intent(inout) :: h(band), a(nest,*), xi(idim), z(n,idim)
@@ -5658,20 +5601,44 @@ module fitpack_core
           end do
       end subroutine fp_rotate_shifted_vec
 
-      !> Two-matrix variant of fp_rotate_row_vec for periodic spline fitting.
-      !> Rotates a split observation row [h1 | h2] into the block-triangular system
-      !> [a1 | a2] using Givens rotations, with idim right-hand sides in z(n,idim).
-      !>
-      !> Phase 1: Rotate h1 through a1 with shifting pivot (h1(1) always), while
-      !>   simultaneously applying cross-rotations to h2 and a2.
-      !> Phase 2: Rotate remaining h2 through a2 (standard, diagonal at a2(ij,j)).
-      !>
-      !> The two-matrix decomposition arises from periodic B-spline constraints that
-      !> wrap the last k columns of the observation matrix into the first k, creating
-      !> a block structure [R₁₁* R₁₂*; 0 R₂₂*] (§6.1.1, Eq. 6.13, Fig. 6.1).
-      !>
-      !> Book ref: §6.1.1 Eq. 6.10, 6.13 (periodic smoothing system and triangular
-      !> decomposition), §4.1.2 Eq. 4.15 (Givens rotation mechanics).
+      !> @brief Rotate a split observation row into the block-triangular periodic system
+      !!        with vector RHS.
+      !!
+      !! Two-matrix Givens rotation for periodic spline fitting. The periodic B-spline
+      !! constraint wraps the last \f$ k \f$ columns of the observation matrix into
+      !! the first \f$ k \f$, producing a block-triangular structure:
+      !!
+      !! \f[
+      !!     \begin{pmatrix} R_{11}^* & R_{12}^* \\ 0 & R_{22}^* \end{pmatrix}
+      !!     \tag{6.13}
+      !! \f]
+      !!
+      !! Each observation row is split as \f$ [h_1 \mid h_2] \f$ and rotated in
+      !! two phases:
+      !!
+      !! - **Phase 1**: Rotate \f$ h_1 \f$ through \f$ R_{11}^* \f$ using shifted
+      !!   pivots (always \f$ h_1(1) \f$), simultaneously applying cross-rotations
+      !!   to \f$ h_2 \f$ and \f$ R_{12}^* \f$.
+      !! - **Phase 2**: Rotate remaining \f$ h_2 \f$ through \f$ R_{22}^* \f$
+      !!   using standard walk (diagonal at \f$ R_{22}^*(j,j) \f$).
+      !!
+      !! @param[in,out] h1       First block of the observation row, length `band1`.
+      !!                         Shifted left during Phase 1.
+      !! @param[in]     band1    Length of `h1` (main bandwidth)
+      !! @param[in,out] h2       Second block (wraparound columns), length `band2`
+      !! @param[in]     band2    Length of `h2` (typically \f$ k \f$)
+      !! @param[in,out] a1       Band matrix \f$ R_{11}^* \f$, dimension `(nest,*)`
+      !! @param[in,out] a2       Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest     Leading dimension of `a1` and `a2`
+      !! @param[in,out] xi       Vector RHS contribution of length `idim`
+      !! @param[in,out] z        RHS array `(n, idim)`, one column per coordinate dimension
+      !! @param[in]     j1_start First row index for Phase 1
+      !! @param[in]     j1_end   Last row index for Phase 1
+      !! @param[in]     n        Leading dimension of `z`
+      !! @param[in]     idim     Number of coordinate dimensions
+      !!
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13, Fig. 6.1
+      !! @see fp_rotate_row_2mat — scalar-RHS variant
       pure subroutine fp_rotate_row_2mat_vec(h1, band1, h2, band2, a1, a2, nest, &
                                               xi, z, j1_start, j1_end, n, idim)
           integer(FP_SIZE), intent(in)    :: band1, band2, nest, n, idim, j1_start, j1_end
@@ -5708,11 +5675,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_2mat_vec
 
-      !> Scalar-RHS two-matrix Givens rotation for periodic spline fitting.
-      !> Scalar analog of fp_rotate_row_2mat_vec — identical algorithm but with
-      !> scalar yi/z(j) instead of vector xi(idim)/z(j,1:idim).
-      !>
-      !> Book ref: §6.1.1 Eq. 6.10, 6.13 (periodic system), §4.1.2 Eq. 4.15.
+      !> @brief Rotate a split observation row into the block-triangular periodic system
+      !!        with scalar RHS.
+      !!
+      !! Scalar-RHS variant of fp_rotate_row_2mat_vec. Identical two-phase algorithm
+      !! for the periodic block-triangular system (Eq. 6.13) but with a scalar
+      !! right-hand side \f$ y_i / z(j) \f$ instead of the vector
+      !! \f$ \xi(d) / z(j, 1{:}d) \f$.
+      !!
+      !! @param[in,out] h1       First block of the observation row, length `band1`.
+      !!                         Shifted left during Phase 1.
+      !! @param[in]     band1    Length of `h1`
+      !! @param[in,out] h2       Second block (wraparound columns), length `band2`
+      !! @param[in]     band2    Length of `h2`
+      !! @param[in,out] a1       Band matrix \f$ R_{11}^* \f$, dimension `(nest,*)`
+      !! @param[in,out] a2       Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(nest,*)`
+      !! @param[in]     nest     Leading dimension of `a1` and `a2`
+      !! @param[in,out] yi       Scalar RHS contribution; updated by rotations
+      !! @param[in,out] z        RHS vector; entries at rows `j1_start : j1_end+band2` updated
+      !! @param[in]     j1_start First row index for Phase 1
+      !! @param[in]     j1_end   Last row index for Phase 1
+      !!
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13
+      !! @see fp_rotate_row_2mat_vec — vector-RHS variant
       pure subroutine fp_rotate_row_2mat(h1, band1, h2, band2, a1, a2, nest, &
                                           yi, z, j1_start, j1_end)
           integer(FP_SIZE), intent(in)    :: band1, band2, nest, j1_start, j1_end
@@ -5749,12 +5734,29 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_2mat
 
-      !> Standard-walk Givens rotation with contiguous-block RHS.
-      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
-      !> transformations to right(1:nrhs) and the column q(1:nrhs, irot) of a 2D
-      !> RHS matrix. Used by AX/AUU grid triangularization (fpgrre, fpgrdi, fpgrsp).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8 (Kronecker product decomposition).
+      !> @brief Rotate a row into a band matrix with contiguous-block RHS.
+      !!
+      !! Standard-walk Givens rotation for grid-based surface fitting. Rotates
+      !! row \f$ h \f$ into the upper triangular band matrix \f$ A \f$, applying
+      !! the same rotations to a block right-hand side: the vector `right(1:nrhs)`
+      !! and the column `q(1:nrhs, irot)` of a 2D RHS matrix.
+      !!
+      !! This arises from the Kronecker product decomposition of the bivariate
+      !! system (Eq. 10.4-10.8), where the one-dimensional triangularizations
+      !! \f$ A_x \f$ and \f$ A_{uu} \f$ operate on contiguous blocks of the
+      !! tensor-product RHS.
+      !!
+      !! @param[in,out] h          Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band       Bandwidth
+      !! @param[in,out] a          Upper triangular band matrix, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] q          2D RHS matrix `(nrhs,*)`; column `irot` updated
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     irot_start Starting row index minus one
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_stride — stride (row-access) RHS variant
       pure subroutine fp_rotate_row_block(h, band, a, na, right, q, nrhs, irot_start)
           integer(FP_SIZE), intent(in)    :: band, na, nrhs, irot_start
           real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), q(nrhs,*)
@@ -5773,13 +5775,30 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_block
 
-      !> Standard-walk Givens rotation with stride (row-access) RHS.
-      !> Rotates row h(1:band) into upper-triangular a(na,*), applying the same
-      !> transformations to right(1:nrhs) and the row c(irot, 1:nrhs) of a 2D
-      !> RHS matrix c(ldc,*). Used by AY/AVV grid rotations and tensor-product
-      !> triangularization (fpgrre, fpgrdi, fpgrsp, fptrnp, fptrpe).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8 (grid), §10.2 Eq. 10.8 (tensor product).
+      !> @brief Rotate a row into a band matrix with stride (row-access) RHS.
+      !!
+      !! Standard-walk Givens rotation for grid-based surface fitting. Rotates
+      !! row \f$ h \f$ into the upper triangular band matrix \f$ A \f$, applying
+      !! the same rotations to the vector `right(1:nrhs)` and the **row**
+      !! `c(irot, 1:nrhs)` of a 2D RHS matrix `c(ldc,*)`.
+      !!
+      !! Unlike fp_rotate_row_block (which accesses RHS by columns), this routine
+      !! accesses RHS by rows — the stride pattern needed for the \f$ A_y \f$ and
+      !! \f$ A_{vv} \f$ triangularizations and the tensor-product back-substitution
+      !! (Eq. 10.8) in the Kronecker product decomposition.
+      !!
+      !! @param[in,out] h          Row to rotate, length `band`. Modified in place.
+      !! @param[in]     band       Bandwidth
+      !! @param[in,out] a          Upper triangular band matrix, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] c          2D RHS matrix `(ldc,*)`; row `irot` updated
+      !! @param[in]     ldc        Leading dimension of `c`
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     irot_start Starting row index minus one
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_block — contiguous-block (column-access) RHS variant
       pure subroutine fp_rotate_row_stride(h, band, a, na, right, c, ldc, nrhs, irot_start)
           integer(FP_SIZE), intent(in)    :: band, na, ldc, nrhs, irot_start
           real(FP_REAL),    intent(inout) :: h(band), a(na,*), right(nrhs), c(ldc,*)
@@ -5798,13 +5817,33 @@ module fitpack_core
           end do
       end subroutine fp_rotate_row_stride
 
-      !> Two-matrix shifted-pivot Givens rotation with stride (row-access) RHS.
-      !> Rotates h1 through a1 (shifting left) and h2 through a2, applying the same
-      !> transformations to right(1:nrhs) and the row c(j, 1:nrhs).
-      !> Used by AVV periodic grid rotations and periodic tensor-product triangularization
-      !> (fpgrdi, fpgrsp, fptrpe).
-      !>
-      !> Book ref: §10.2 Eq. 10.4-10.8, §6.1 Eq. 6.10 (periodic system).
+      !> @brief Rotate a split row into the block-triangular periodic system with stride RHS.
+      !!
+      !! Combines the two-matrix periodic decomposition (Eq. 6.13) with the stride
+      !! (row-access) RHS pattern needed for grid-based surface fitting. Rotates the
+      !! split row \f$ [h_1 \mid h_2] \f$ into \f$ [R_{11}^* \mid R_{12}^*; 0 \mid R_{22}^*] \f$
+      !! in two phases, applying rotations to `right(1:nrhs)` and `c(j, 1:nrhs)`.
+      !!
+      !! Used by \f$ A_{vv} \f$ periodic grid rotations and periodic tensor-product
+      !! triangularization (fpgrdi, fpgrsp, fptrpe).
+      !!
+      !! @param[in,out] h1         First block of the row, length `band1`. Shifted left.
+      !! @param[in]     band1      Length of `h1`
+      !! @param[in,out] h2         Second block (wraparound), length `band2`
+      !! @param[in]     band2      Length of `h2`
+      !! @param[in,out] a1         Band matrix \f$ R_{11}^* \f$, dimension `(na,*)`
+      !! @param[in,out] a2         Band matrix \f$ R_{12}^* / R_{22}^* \f$, dimension `(na,*)`
+      !! @param[in]     na         Leading dimension of `a1` and `a2`
+      !! @param[in,out] right      Block RHS vector of length `nrhs`; updated by rotations
+      !! @param[in,out] c          2D RHS matrix `(ldc,*)`; rows updated by rotations
+      !! @param[in]     ldc        Leading dimension of `c`
+      !! @param[in]     nrhs       Number of RHS entries per rotation
+      !! @param[in]     j1_start   First row index for Phase 1
+      !! @param[in]     j1_end     Last row index for Phase 1
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see Dierckx, Ch. 6, §6.1.1 (pp. 95-100), Eq. 6.10, 6.13
+      !! @see fp_rotate_row_2mat_vec — parametric (column-access) variant
       pure subroutine fp_rotate_2mat_stride(h1, band1, h2, band2, a1, a2, na, &
                                              right, c, ldc, nrhs, j1_start, j1_end)
           integer(FP_SIZE), intent(in)    :: band1, band2, na, ldc, nrhs, j1_start, j1_end
@@ -5840,7 +5879,63 @@ module fitpack_core
           end do
       end subroutine fp_rotate_2mat_stride
 
-      ! Compute spline coefficients on a rectangular grid
+      !> @brief Compute spline coefficients on a polar/spherical grid via Kronecker product.
+      !!
+      !! Grid-based variant of the Kronecker product decomposition (Eq. 10.4-10.8)
+      !! adapted for polar and spherical coordinates. Handles the periodic
+      !! \f$ v \f$-direction using two-matrix rotations (fp_rotate_2mat_stride)
+      !! and incorporates origin/pole boundary conditions via the `iop0`/`iop1`
+      !! flags. The `dz` parameter provides prescribed values at \f$ u = 0 \f$
+      !! and/or \f$ u = 1 \f$.
+      !!
+      !! Uses `lback = .true.` for back-substitution only (coefficients from
+      !! a previous triangularization).
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     lback   `.true.` = back-substitution only
+      !! @param[in]     u       Radial grid values, length `mu`
+      !! @param[in]     mu      Number of radial grid points
+      !! @param[in]     v       Angular grid values, length `mv`
+      !! @param[in]     mv      Number of angular grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     dz      Boundary values at origin/edge
+      !! @param[in]     iop0    Boundary condition at \f$ u = 0 \f$
+      !! @param[in]     iop1    Boundary condition at \f$ u = 1 \f$
+      !! @param[in]     tu      Radial knot vector
+      !! @param[in]     nu      Number of radial knots
+      !! @param[in]     tv      Angular knot vector
+      !! @param[in]     nv      Number of angular knots
+      !! @param[out]    p       Smoothing parameter (output)
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[out]    sq      Sum of squared residuals
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per radial interval
+      !! @param[in,out] fpv     Residual sums per angular interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     Radial B-spline observation matrix
+      !! @param[in,out] spv     Angular B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: radial band matrix
+      !! @param[in,out] av1     Work: angular band matrix (main block)
+      !! @param[in,out] av2     Work: angular band matrix (periodic block)
+      !! @param[in,out] bu      Work: radial discontinuity jumps
+      !! @param[in,out] bv      Work: angular discontinuity jumps
+      !! @param[in,out] aa      Work: boundary constraint matrix
+      !! @param[in,out] bb      Work: boundary constraint matrix
+      !! @param[in,out] cc      Work: boundary constraint matrix
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] nru     Work: radial knot interval indices
+      !! @param[in,out] nrv     Work: angular knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_2mat_stride — periodic grid Givens rotation
       pure subroutine fpgrdi(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v, &
                              mv,z,mz,dz,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,aa,bb,cc,cosi,nru,nrv)
@@ -6309,10 +6404,54 @@ module fitpack_core
       end subroutine fpgrdi
 
 
-      !  find the least-squares spline sinf(u,v) and calculate for each knot interval tu(j+3)<=u<=tu(j+4)
-      !  (tv(j+3)<=v<=tv(j+4)) the sum of squared residuals fpintu(j),j=1,2,...,nu-7 (fpintv(j),j=1,2,...
-      !  ,nv-7) for the data points having their absciss (ordinate)-value belonging to that interval.
-      !  fp gives the total sum of squared residuals.
+      !> @brief Compute parametric surface spline coefficients on a grid.
+      !!
+      !! Grid-based Kronecker product decomposition (Eq. 10.9-10.12) for
+      !! \f$ d \f$-dimensional parametric surfaces. Computes the least-squares
+      !! spline \f$ s_\infty(u,v) \f$ and the per-interval residual sums
+      !! `fpu(j)` and `fpv(j)` needed for knot-placement decisions. Handles
+      !! optional periodicity in \f$ u \f$ and/or \f$ v \f$ via the `ipar` flags,
+      !! using two-matrix variants for periodic directions.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     ipar    Periodicity flags (packed)
+      !! @param[in]     u       \f$ u \f$-grid values, length `mu`
+      !! @param[in]     mu      Number of \f$ u \f$-grid points
+      !! @param[in]     v       \f$ v \f$-grid values, length `mv`
+      !! @param[in]     mv      Number of \f$ v \f$-grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     tu      \f$ u \f$-knot vector
+      !! @param[in]     nu      Number of \f$ u \f$-knots
+      !! @param[in]     tv      \f$ v \f$-knot vector
+      !! @param[in]     nv      Number of \f$ v \f$-knots
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Total weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ u \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ v \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     \f$ u \f$-B-spline observation matrix
+      !! @param[in,out] spv     \f$ v \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: \f$ u \f$-band matrix (main)
+      !! @param[in,out] au1     Work: \f$ u \f$-band matrix (periodic)
+      !! @param[in,out] av      Work: \f$ v \f$-band matrix (main)
+      !! @param[in,out] av1     Work: \f$ v \f$-band matrix (periodic)
+      !! @param[in,out] bu      Work: \f$ u \f$-discontinuity jumps
+      !! @param[in,out] bv      Work: \f$ v \f$-discontinuity jumps
+      !! @param[in,out] nru     Work: \f$ u \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ v \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.3 (pp. 173-178), Eq. 10.9-10.12
+      !! @see fptrnp, fptrpe — tensor-product triangularization
       pure subroutine fpgrpa(ifsu,ifsv,ifbu,ifbv,idim,ipar,u,mu,v,mv,z,mz,tu,nu,tv,nv,p,c,nc,fp,fpu,fpv, &
                              mm,mvnu,spu,spv,right,q,au,au1,av,av1,bu,bv,nru,nrv)
 
@@ -6633,25 +6772,72 @@ module fitpack_core
       end subroutine fpgrpa
 
 
-      !  ..
-      !  the b-spline coefficients of the smoothing spline are calculated as the least-squares
-      !  solution of the over-determined linear system of equations  (ay) c (ax)' = q  where
-      !
-      !               |   (spx)    |            |   (spy)    |
-      !        (ax) = | ---------- |     (ay) = | ---------- |
-      !               | (1/p) (bx) |            | (1/p) (by) |
-      !
-      !                                | z  ' 0 |
-      !                            q = | ------ |
-      !                                | 0  ' 0 |
-      !
-      !  with c      : the (ny-ky-1) x (nx-kx-1) matrix which contains the b-spline coefficients.
-      !       z      : the my x mx matrix which contains the function values.
-      !       spx,spy: the mx x (nx-kx-1) and  my x (ny-ky-1) observation matrices according to the
-      !                least-squares problems in the x- and y-direction.
-      !       bx,by  : the (nx-2*kx-1) x (nx-kx-1) and (ny-2*ky-1) x (ny-ky-1) matrices which contain
-      !                the discontinuity jumps of the derivatives of the b-splines in the x- and
-      !                y-direction.
+      !> @brief Compute grid-based spline coefficients via Kronecker product decomposition.
+      !!
+      !! For data on a rectangular grid \f$ \{x_i\} \times \{y_j\} \f$, solves
+      !! the smoothing least-squares system using the Kronecker product structure
+      !! (Eq. 10.4-10.8):
+      !!
+      !! \f[
+      !!     A_y \, C \, A_x^T = Q
+      !!     \tag{10.4}
+      !! \f]
+      !!
+      !! where the augmented observation matrices are:
+      !!
+      !! \f[
+      !!     A_x = \begin{pmatrix} S_{px} \\ \frac{1}{\sqrt{p}} B_x \end{pmatrix}, \quad
+      !!     A_y = \begin{pmatrix} S_{py} \\ \frac{1}{\sqrt{p}} B_y \end{pmatrix}
+      !!     \tag{10.5}
+      !! \f]
+      !!
+      !! The \f$ x \f$- and \f$ y \f$-direction QR factorizations are performed
+      !! independently using fp_rotate_row_stride (row-access RHS for
+      !! \f$ A_y \f$) and fp_rotate_row_block (column-access RHS for \f$ A_x \f$),
+      !! followed by back-substitution. Also computes residual sums `fpx`,
+      !! `fpy` per knot interval for knot-placement decisions.
+      !!
+      !! @param[in,out] ifsx    Flag: 0 = recompute \f$ S_{px} \f$
+      !! @param[in,out] ifsy    Flag: 0 = recompute \f$ S_{py} \f$
+      !! @param[in,out] ifbx    Flag: 0 = recompute \f$ B_x \f$
+      !! @param[in,out] ifby    Flag: 0 = recompute \f$ B_y \f$
+      !! @param[in]     x       \f$ x \f$-grid values, length `mx`
+      !! @param[in]     mx      Number of \f$ x \f$-grid points
+      !! @param[in]     y       \f$ y \f$-grid values, length `my`
+      !! @param[in]     my      Number of \f$ y \f$-grid points
+      !! @param[in]     z       Data values on the grid, length `mz`
+      !! @param[in]     mz      Length of `z` (\f$ = mx \cdot my \f$)
+      !! @param[in]     kx      Degree in \f$ x \f$
+      !! @param[in]     ky      Degree in \f$ y \f$
+      !! @param[in]     tx      \f$ x \f$-knot vector
+      !! @param[in]     nx      Number of \f$ x \f$-knots
+      !! @param[in]     ty      \f$ y \f$-knot vector
+      !! @param[in]     ny      Number of \f$ y \f$-knots
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Total weighted sum of squared residuals
+      !! @param[in,out] fpx     Residual sums per \f$ x \f$-interval
+      !! @param[in,out] fpy     Residual sums per \f$ y \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mynx    Work dimension (\f$ my \cdot (nx - kx - 1) \f$)
+      !! @param[in]     kx1     \f$ k_x + 1 \f$
+      !! @param[in]     kx2     \f$ k_x + 2 \f$
+      !! @param[in]     ky1     \f$ k_y + 1 \f$
+      !! @param[in]     ky2     \f$ k_y + 2 \f$
+      !! @param[in,out] spx     \f$ x \f$-B-spline observation matrix
+      !! @param[in,out] spy     \f$ y \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector for row rotations
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] ax      Work: \f$ x \f$-band matrix
+      !! @param[in,out] ay      Work: \f$ y \f$-band matrix
+      !! @param[in,out] bx      Work: \f$ x \f$-discontinuity jumps
+      !! @param[in,out] by      Work: \f$ y \f$-discontinuity jumps
+      !! @param[in,out] nrx     Work: \f$ x \f$-knot interval indices
+      !! @param[in,out] nry     Work: \f$ y \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fp_rotate_row_block, fp_rotate_row_stride — grid Givens rotations
       pure subroutine fpgrre(ifsx,ifsy,ifbx,ifby,x,mx,y,my,z,mz, &
                              kx,ky,tx,nx,ty,ny,p,c,nc,fp,fpx,fpy,mm,mynx,kx1,kx2,ky1,ky2, &
                              spx,spy,right,q,ax,ay,bx,by,nrx,nry)
@@ -6910,6 +7096,62 @@ module fitpack_core
       return
       end subroutine fpgrre
 
+      !> @brief Compute spherical grid spline coefficients via Kronecker product.
+      !!
+      !! Spherical-coordinate variant of fpgrdi for data on a
+      !! \f$ \theta \times \phi \f$ grid. Handles pole-continuity constraints
+      !! at \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$ via the `iop0`/`iop1`
+      !! flags, and the periodic \f$ \phi \f$-direction using two-matrix
+      !! rotations. The `dr` parameter provides prescribed pole values.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ S_{pu} \f$
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ S_{pv} \f$
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ B_u \f$
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ B_v \f$
+      !! @param[in]     lback   `.true.` = back-substitution only
+      !! @param[in]     u       Co-latitude grid values \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-grid points
+      !! @param[in]     v       Longitude grid values \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-grid points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     dr      Pole boundary values
+      !! @param[in]     iop0    Boundary condition at north pole (\f$ \theta = 0 \f$)
+      !! @param[in]     iop1    Boundary condition at south pole (\f$ \theta = \pi \f$)
+      !! @param[in]     tu      \f$ \theta \f$-knot vector
+      !! @param[in]     nu      Number of \f$ \theta \f$-knots
+      !! @param[in]     tv      \f$ \phi \f$-knot vector
+      !! @param[in]     nv      Number of \f$ \phi \f$-knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] sq      Sum of squared residuals
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ \phi \f$-interval
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mvnu    Work dimension
+      !! @param[in,out] spu     \f$ \theta \f$-B-spline observation matrix
+      !! @param[in,out] spv     \f$ \phi \f$-B-spline observation matrix
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] au      Work: \f$ \theta \f$-band matrix
+      !! @param[in,out] av1     Work: \f$ \phi \f$-band matrix (main)
+      !! @param[in,out] av2     Work: \f$ \phi \f$-band matrix (periodic)
+      !! @param[in,out] bu      Work: \f$ \theta \f$-discontinuity jumps
+      !! @param[in,out] bv      Work: \f$ \phi \f$-discontinuity jumps
+      !! @param[in,out] a0      Work: north-pole constraint row
+      !! @param[in,out] a1      Work: south-pole constraint row
+      !! @param[in,out] b0      Work: north-pole smoothing row
+      !! @param[in,out] b1      Work: south-pole smoothing row
+      !! @param[in,out] c0      Work: north-pole cosine row
+      !! @param[in,out] c1      Work: south-pole cosine row
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] nru     Work: \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ \phi \f$-knot interval indices
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpgrdi — polar grid variant; fp_rotate_2mat_stride — periodic rotation
       pure subroutine fpgrsp(ifsu,ifsv,ifbu,ifbv,lback,u,mu,v,                         &
                              mv,r,mr,dr,iop0,iop1,tu,nu,tv,nv,p,c,nc,sq,fp,fpu,fpv,mm, &
                              mvnu,spu,spv,right,q,au,av1,av2,bu,bv,a0,a1,b0,b1,c0,c1,  &
@@ -7417,12 +7659,42 @@ module fitpack_core
       end subroutine fpgrsp
 
 
-      !  given the b-spline representation (knots t(j),j=1,2,...,n, b-spline coefficients c(j),j=1,2,...,
-      !  n-k-1) of a spline of degree k, fpinst calculates the b-spline representation (knots
-      !  tt(j),j=1,2,...,nn, b-spline coefficients cc(j),j=1,2,...,nn-k-1) of the same spline if an
-      !  additional knot is inserted at the point x situated in the inter val t(l)<=x<t(l+1).
-      !  iopt/=0: periodic spline; at leas one of the following conditions must be fulfilled: l>2*k or l<n-2*k.
-      !  iopt==0: non-periodic spline
+      !> @brief Insert a single knot into a B-spline representation.
+      !!
+      !! Given the B-spline representation \f$ (t, c) \f$ of a degree-\f$ k \f$
+      !! spline, computes the new knot vector \f$ t' \f$ and coefficients \f$ c' \f$
+      !! that represent the **same spline** after inserting one additional knot
+      !! \f$ x \in [\lambda_l, \lambda_{l+1}) \f$. Uses the Boehm (1980)
+      !! one-knot-at-a-time algorithm:
+      !!
+      !! \f[
+      !!     d_i = r_i \, c_i + (1 - r_i) \, c_{i-1}
+      !!     \tag{1.47}
+      !! \f]
+      !!
+      !! where each weight \f$ r_i \in [0, 1] \f$ is a convex combination factor:
+      !!
+      !! \f[
+      !!     r_i = \frac{\tau_{j+1} - \tau_i}{\tau_{i+k+1} - \tau_i}
+      !!     \tag{1.48}
+      !! \f]
+      !!
+      !! For periodic splines (`iopt /= 0`), the boundary coefficients are wrapped
+      !! accordingly. At least one of \f$ l > 2k \f$ or \f$ l < n - 2k \f$ must hold.
+      !!
+      !! @param[in]  iopt  0 = non-periodic spline, otherwise periodic
+      !! @param[in]  t     Input knot vector, length `n`
+      !! @param[in]  n     Number of input knots
+      !! @param[in]  c     Input B-spline coefficients, length `n-k-1`
+      !! @param[in]  k     Spline degree
+      !! @param[in]  x     New knot to insert, \f$ \lambda_l \leq x < \lambda_{l+1} \f$
+      !! @param[in]  l     Knot interval index where `x` is inserted
+      !! @param[out] tt    Output knot vector, length `nn`
+      !! @param[out] nn    Number of output knots (\f$ n + 1 \f$)
+      !! @param[out] cc    Output B-spline coefficients, length `nn-k-1`
+      !! @param[in]  nest  Leading dimension of arrays `t`, `c`, `tt`, `cc`
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.4 (pp. 34-37), Eq. 1.46-1.48
       pure subroutine fpinst(iopt,t,n,c,k,x,l,tt,nn,cc,nest)
 
       !
@@ -7491,25 +7763,36 @@ module fitpack_core
       end subroutine fpinst
 
 
+      !> @brief Compute definite integrals of the normalized B-splines.
+      !!
+      !! Calculates the definite integrals of each of the \f$ n-k-1 \f$ normalized
+      !! B-splines \f$ N_{j,k+1}(u) \f$ of degree \f$ k \f$ over the interval
+      !! \f$ [x, y] \f$:
+      !!
+      !! \f[
+      !!     \text{bint}(j) = \int_x^y N_{j,k+1}(u) \, du
+      !! \f]
+      !!
+      !! Uses the Gaffney formula for indefinite integrals of B-splines, which
+      !! exploits the identity (Eq. 1.42):
+      !!
+      !! \f[
+      !!     \int_{\lambda_j}^{u} N_{j,k+1}(v) \, dv
+      !!     = \frac{\lambda_{j+k+1} - \lambda_j}{k+1}
+      !!       \sum_{i=j+1}^{g+k+1} N_{i,k+2}(u)
+      !!     \tag{1.42}
+      !! \f]
+      !!
+      !! @param[in]  t     Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in]  n     Number of knots
+      !! @param[out] bint  Array of length `nk1`; \f$ \text{bint}(j) = \int_x^y N_{j,k+1}(u)\,du \f$
+      !! @param[in]  nk1   Number of B-splines (\f$ n - k - 1 \f$)
+      !! @param[in]  x     Lower integration limit
+      !! @param[in]  y     Upper integration limit
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.3 (pp. 30-33), Eq. 1.42-1.44
+      !! @see Dierckx, Ch. 3, §3.2 (pp. 44-46), Eq. 3.8-3.10
       pure subroutine fpintb(t,n,bint,nk1,x,y)
-
-      !  subroutine fpintb calculates integrals of the normalized b-splines
-      !  nj,k+1(x) of degree k, defined on the set of knots t(j),j=1,2,...n.
-      !  it makes use of the formulae of gaffney for the calculation of
-      !  indefinite integrals of b-splines.
-      !
-      !  calling sequence:
-      !     call fpintb(t,n,bint,nk1,x,y)
-      !
-      !  input parameters:
-      !    t    : real array,length n, containing the position of the knots.
-      !    n    : integer value, giving the number of knots.
-      !    nk1  : integer value, giving the number of b-splines of degree k,
-      !           defined on the set of knots ,i.e. nk1 = n-k-1.
-      !    x,y  : real values, containing the end points of the integration
-      !           interval.
-      !  output parameter:
-      !    bint : array,length nk1, containing the integrals of the b-splines.
       !  ..
       !  ..scalars arguments..
       integer(FP_SIZE), intent(in)  :: n,nk1
@@ -7620,15 +7903,36 @@ module fitpack_core
       end subroutine fpintb
 
 
-      !  subroutine fpknot locates an additional knot for a spline of degree k and adjusts the
-      !  corresponding parameters,i.e.
-      !    t     : the position of the knots.
-      !    n     : the number of knots.
-      !    nrint : the number of knot intervals.
-      !    fpint : the sum of squares of residual right hand sides
-      !            for each knot interval.
-      !    nrdata: the number of data points inside each knot interval.
-      !  istart indicates that the smallest data point at which the new knot may be added is x(istart+1)
+      !> @brief Select and insert a new knot at the location of maximum residual.
+      !!
+      !! Locates the knot interval \f$ [\lambda_j, \lambda_{j+1}] \f$ with the
+      !! largest sum of squared residuals \f$ \delta_j \f$ (Eq. 5.43) and inserts
+      !! a new knot at the midpoint of its interior data points. This is the
+      !! greedy knot-placement strategy used by the iterative smoothing spline
+      !! algorithm:
+      !!
+      !! \f[
+      !!     \delta_j = \sideset{}{''}{\sum}_{r=u_j+1}^{u_j+m_j}
+      !!     \bigl( w_r (y_r - S_{g}(x_r)) \bigr)^2
+      !!     \tag{5.43}
+      !! \f]
+      !!
+      !! Only intervals with at least one interior data point (\f$ m_j > 2 \f$)
+      !! are eligible. The new knot is placed at \f$ x_{u_j + \lceil m_j/2 \rceil + 1} \f$.
+      !! After insertion, `fpint` and `nrdata` are split to reflect the two
+      !! new sub-intervals.
+      !!
+      !! @param[in]     x       Data abscissae, length `m`
+      !! @param[in]     m       Number of data points
+      !! @param[in,out] t       Knot vector; new knot inserted on exit
+      !! @param[in,out] n       Number of knots; incremented by 1 on exit
+      !! @param[in,out] fpint   Residual sum of squares per knot interval
+      !! @param[in,out] nrdata  Number of interior data points per interval
+      !! @param[in,out] nrint   Number of knot intervals; incremented by 1
+      !! @param[in]     nest    Leading dimension of arrays `t`, `fpint`, `nrdata`
+      !! @param[in]     istart  Smallest eligible data index minus one
+      !!
+      !! @see Dierckx, Ch. 5, §5.3 (pp. 87-94), Eq. 5.37-5.43
       pure subroutine fpknot(x,m,t,n,fpint,nrdata,nrint,nest,istart)
 
       !  ..scalar arguments..
@@ -7700,43 +8004,57 @@ module fitpack_core
 
       end subroutine fpknot
 
-      ! given the set of function values z(i,j) defined on the rectangular grid (u(i),v(j)),
-      ! i=1,2,...,mu;j=1,2,...,mv, fpopdi determines a smooth bicubic spline approximation with
-      ! given knots tu(i),i=1,..,nu in the u-direction and tv(j),j=1,2,...,nv in the v-direction.
-      ! this spline sp(u,v) will be periodic in the variable v and will satisfy the following
-      ! constraints
-      !
-      !     s(tu(1),v) = dz(1) , tv(4) <=v<= tv(nv-3)
-      !
-      !  and (if iopt(2) = 1)
-      !
-      !     d s(tu(1),v)
-      !     ------------ =  dz(2)*cos(v)+dz(3)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  and (if iopt(3) = 1)
-      !
-      !     s(tu(nu),v)  =  0   tv(4) <=v<= tv(nv-3)
-      !
-      ! where the parameters dz(i) correspond to the derivative values g(i,j) as defined in
-      ! subroutine pogrid.
-      !
-      ! the b-spline coefficients of sp(u,v) are determined as the least-squares solution  of an
-      ! overdetermined linear system which depends on the value of p and on the values dz(i),i=1,2,3.
-      ! the corresponding sum of squared residuals sq is a simple quadratic function in the variables
-      ! dz(i). these may or may not be provided. the values dz(i) which are not given will be
-      ! determined so as to minimize the resulting sum of squared residuals sq. in that case the user
-      ! must provide some initial guess dz(i) and some estimate (dz(i)-step, dz(i)+step) of the range
-      ! of possible values for these latter.
-      !
-      !  sp(u,v) also depends on the parameter p (p>0) in such a way that
-      !    - if p tends to infinity, sp(u,v) becomes the least-squares spline with given knots,
-      !      satisfying the constraints.
-      !    - if p tends to zero, sp(u,v) becomes the least-squares polynomial, satisfying the
-      !      constraints.
-      !    - the function  f(p)=sumi=1,mu(sumj=1,mv((z(i,j)-sp(u(i),v(j)))**2) is continuous and
-      !      strictly decreasing for p>0.
-      !
+      !> @brief Compute smoothing spline on a polar grid with origin constraints.
+      !!
+      !! Given data on a \f$ (u, v) \f$ grid (radial \f$ \times \f$ angular),
+      !! determines the B-spline coefficients of a bicubic smoothing spline
+      !! \f$ s_p(u,v) \f$ periodic in \f$ v \f$, satisfying origin-continuity
+      !! constraints:
+      !!
+      !! - \f$ s(\lambda_1^u, v) = z_0 \f$ (constant at origin)
+      !! - \f$ \partial s / \partial u |_{u=0} = dz(2)\cos v + dz(3)\sin v \f$
+      !!   (if `iopt(2) = 1`)
+      !! - \f$ s(\lambda_{n_u}^u, v) = 0 \f$ (if `iopt(3) = 1`)
+      !!
+      !! The unknown boundary parameters `dz(i)` (when not prescribed) are
+      !! optimized to minimize the residual sum of squares, which is a
+      !! quadratic function of `dz`. Delegates the grid QR factorization
+      !! to fpgrdi.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute radial B-splines
+      !! @param[in,out] ifsv    Flag: 0 = recompute angular B-splines
+      !! @param[in,out] ifbu    Flag: 0 = recompute radial discontinuities
+      !! @param[in,out] ifbv    Flag: 0 = recompute angular discontinuities
+      !! @param[in]     u       Radial grid values, length `mu`
+      !! @param[in]     mu      Number of radial points
+      !! @param[in]     v       Angular grid values, length `mv`
+      !! @param[in]     mv      Number of angular points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     z0      Value at origin (prescribed or initial guess)
+      !! @param[in,out] dz      Boundary derivative parameters (3 values)
+      !! @param[in]     iopt    Constraint options (3 flags)
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     tu      Radial knot vector
+      !! @param[in]     nu      Number of radial knots
+      !! @param[in]     tv      Angular knot vector
+      !! @param[in]     nv      Number of angular knots
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in]     step    Search step for boundary parameter optimization
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per radial interval
+      !! @param[in,out] fpv     Residual sums per angular interval
+      !! @param[in,out] nru     Radial knot interval indices
+      !! @param[in,out] nrv     Angular knot interval indices
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205)
+      !! @see fpgrdi — grid QR factorization; fppogr — polar grid driver
       pure subroutine fpopdi(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,z,mz,z0,dz,iopt,ider,tu,nu,tv,nv,&
                              nuest,nvest,p,step,c,nc,fp,fpu,fpv,nru,nrv,wrk,lwrk)
 
@@ -7887,53 +8205,59 @@ module fitpack_core
       return
       end subroutine fpopdi
 
+      !> @brief Compute smoothing spline on a spherical grid with pole constraints.
+      !!
+      !! Spherical counterpart of fpopdi. Given data on a
+      !! \f$ (\theta, \phi) \f$ grid, determines a bicubic smoothing spline
+      !! \f$ s_p(\theta,\phi) \f$ periodic in \f$ \phi \f$, satisfying
+      !! pole-continuity constraints at both poles:
+      !!
+      !! - \f$ s(0, \phi) = r_0 \f$ (north pole value)
+      !! - \f$ s(\pi, \phi) = r_1 \f$ (south pole value)
+      !! - Optional derivative constraints:
+      !!   \f$ \partial s / \partial \theta |_{\theta=0} = dr(2)\cos\phi + dr(3)\sin\phi \f$
+      !!
+      !! Unknown pole parameters `dr(i)` are optimized to minimize the
+      !! residual. Delegates to fpgrsp for the grid QR factorization.
+      !!
+      !! @param[in,out] ifsu    Flag: 0 = recompute \f$ \theta \f$-B-splines
+      !! @param[in,out] ifsv    Flag: 0 = recompute \f$ \phi \f$-B-splines
+      !! @param[in,out] ifbu    Flag: 0 = recompute \f$ \theta \f$-discontinuities
+      !! @param[in,out] ifbv    Flag: 0 = recompute \f$ \phi \f$-discontinuities
+      !! @param[in]     u       Co-latitude grid \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-points
+      !! @param[in]     v       Longitude grid \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     r0      North-pole value (prescribed or initial guess)
+      !! @param[in]     r1      South-pole value (prescribed or initial guess)
+      !! @param[in,out] dr      Pole derivative parameters (6 values)
+      !! @param[in]     iopt    Constraint options
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     tu      \f$ \theta \f$-knot vector
+      !! @param[in]     nu      Number of \f$ \theta \f$-knots
+      !! @param[in]     tv      \f$ \phi \f$-knot vector
+      !! @param[in]     nv      Number of \f$ \phi \f$-knots
+      !! @param[in]     nuest   Max \f$ \theta \f$-knots
+      !! @param[in]     nvest   Max \f$ \phi \f$-knots
+      !! @param[in,out] p       Smoothing parameter
+      !! @param[in]     step    Search step for pole parameter optimization
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpu     Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpv     Residual sums per \f$ \phi \f$-interval
+      !! @param[in,out] nru     \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     \f$ \phi \f$-knot interval indices
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpgrsp — spherical grid QR factorization; fpspgr — spherical grid driver
       pure subroutine fpopsp(ifsu,ifsv,ifbu,ifbv,u,mu,v,mv,r, &
                              mr,r0,r1,dr,iopt,ider,tu,nu,tv,nv,nuest,nvest,p,step,c,nc, &
                              fp,fpu,fpv,nru,nrv,wrk,lwrk)
-
-      !  given the set of function values r(i,j) defined on the rectangular
-      !  grid (u(i),v(j)),i=1,2,...,mu;j=1,2,...,mv, fpopsp determines a
-      !  smooth bicubic spline approximation with given knots tu(i),i=1,..,nu
-      !  in the u-direction and tv(j),j=1,2,...,nv in the v-direction. this
-      !  spline sp(u,v) will be periodic in the variable v and will satisfy
-      !  the following constraints
-      !
-      !     s(tu(1),v) = dr(1) , tv(4) <=v<= tv(nv-3)
-      !
-      !     s(tu(nu),v) = dr(4) , tv(4) <=v<= tv(nv-3)
-      !
-      !  and (if iopt(2) = 1)
-      !
-      !     d s(tu(1),v)
-      !     ------------ =  dr(2)*cos(v)+dr(3)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  and (if iopt(3) = 1)
-      !
-      !     d s(tu(nu),v)
-      !     ------------- =  dr(5)*cos(v)+dr(6)*sin(v) , tv(4) <=v<= tv(nv-3)
-      !     d u
-      !
-      !  where the parameters dr(i) correspond to the derivative values at the
-      !  poles as defined in subroutine spgrid.
-      !
-      !  the b-spline coefficients of sp(u,v) are determined as the least-
-      !  squares solution  of an overdetermined linear system which depends
-      !  on the value of p and on the values dr(i),i=1,...,6. the correspond-
-      !  ing sum of squared residuals sq is a simple quadratic function in
-      !  the variables dr(i). these may or may not be provided. the values
-      !  dr(i) which are not given will be determined so as to minimize the
-      !  resulting sum of squared residuals sq. in that case the user must
-      !  provide some initial guess dr(i) and some estimate (dr(i)-step,
-      !  dr(i)+step) of the range of possible values for these latter.
-      !
-      !  sp(u,v) also depends on the parameter p (p>0) in such a way that
-      !    - if p tends to infinity, sp(u,v) becomes the least-squares spline
-      !      with given knots, satisfying the constraints.
-      !    - if p tends to zero, sp(u,v) becomes the least-squares polynomial,
-      !      satisfying the constraints.
-      !    - the function  f(p)=sumi=1,mu(sumj=1,mv((r(i,j)-sp(u(i),v(j)))**2)
-      !      is continuous and strictly decreasing for p>0.
       !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: mu,mv,mr,nu,nv,nuest,nvest,nc,lwrk
@@ -8113,11 +8437,35 @@ module fitpack_core
       end subroutine fpopsp
 
 
-      !  subroutine fporde sorts the data points (x(i),y(i)),i=1,2,...,m according to the panel
-      !  tx(l)<=x<tx(l+1),ty(k)<=y<ty(k+1), they belong to. for each panel a stack is constructed
-      !  containing the numbers of data points lying inside; index(j),j=1,2,...,nreg points to the first
-      !  data point in the jth panel while nummer(i),i=1,2,...,m gives the number of the next data point
-      !  in the panel.
+      !> @brief Sort scattered data points into rectangular panels.
+      !!
+      !! Assigns each data point \f$ (x_i, y_i) \f$, \f$ i = 1, \ldots, m \f$, to
+      !! the rectangular panel \f$ R_{u,v} \f$ defined by
+      !! \f$ \lambda_u^x \leq x < \lambda_{u+1}^x \f$ and
+      !! \f$ \lambda_v^y \leq y < \lambda_{v+1}^y \f$.
+      !!
+      !! For each panel, a linked-list stack is built:
+      !! - `index(j)` points to the first data point in panel \f$ j \f$
+      !! - `nummer(i)` gives the next data point in the same panel
+      !!
+      !! This panel ordering enables efficient row-by-row construction of the
+      !! observation matrix, since only the \f$ (k_x+1)(k_y+1) \f$ B-splines
+      !! supported on a given panel contribute non-zero entries.
+      !!
+      !! @param[in]  x       Data abscissae, length `m`
+      !! @param[in]  y       Data ordinates, length `m`
+      !! @param[in]  m       Number of data points
+      !! @param[in]  kx      Spline degree in \f$ x \f$
+      !! @param[in]  ky      Spline degree in \f$ y \f$
+      !! @param[in]  tx      Knot vector in \f$ x \f$, length `nx`
+      !! @param[in]  nx      Number of knots in \f$ x \f$
+      !! @param[in]  ty      Knot vector in \f$ y \f$, length `ny`
+      !! @param[in]  ny      Number of knots in \f$ y \f$
+      !! @param[out] nummer  Linked-list next pointers, length `m`
+      !! @param[out] index   Panel head pointers, length `nreg`
+      !! @param[in]  nreg    Number of panels \f$ = (n_x - 2k_x - 1)(n_y - 2k_y - 1) \f$
+      !!
+      !! @see Dierckx, Ch. 9, §9.1 (pp. 147-150)
       pure subroutine fporde(x,y,m,kx,ky,tx,nx,ty,ny,nummer,index,nreg)
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: m,kx,ky,nx,ny,nreg
@@ -8152,7 +8500,55 @@ module fitpack_core
       end subroutine fporde
 
 
-
+      !> @brief Core algorithm for open parametric curve fitting.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric spline curve
+      !! \f$ s(u) = (s_1(u), \ldots, s_d(u)) \f$ of degree \f$ k \f$ on the
+      !! parameter interval \f$ [u_b, u_e] \f$. All \f$ d \f$ coordinate curves
+      !! share the same knot vector and are fitted simultaneously:
+      !!
+      !! \f[
+      !!     \sum_{i=1}^{m} w_i^2 \sum_{j=1}^{d} (x_{i,j} - s_j(u_i))^2 \leq S
+      !!     \tag{6.9}
+      !! \f]
+      !!
+      !! The algorithm follows the same three-level iteration as fpcurf
+      !! (knot selection, QR factorization, smoothing-parameter search) but
+      !! uses vector-RHS Givens rotations (fp_rotate_row_vec) to process all
+      !! dimensions in a single pass.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     idim    Number of curve dimensions \f$ d \f$
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     mx      Length of `x` (\f$ = m \cdot d \f$)
+      !! @param[in]     x       Data coordinates, interleaved, length `mx`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     ub      Left boundary of parameter interval
+      !! @param[in]     ue      Right boundary of parameter interval
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] nc      Length of coefficient array `c`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g       Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.3 (pp. 112-114), Eq. 6.9
+      !! @see fp_rotate_row_vec — vector-RHS Givens rotation
       pure subroutine fppara(iopt,idim,m,u,mx,x,w,ub,ue,k,s,nest,tol,maxit, &
                              k1,k2,n,t,nc,c,fp,fpint,z,a,b,g,q,nrdata,ier)
       !  ..
@@ -8511,6 +8907,63 @@ module fitpack_core
       end subroutine fppara
 
 
+      !> @brief Core algorithm for parametric surface fitting on a grid.
+      !!
+      !! Fits a \f$ d \f$-dimensional parametric tensor-product spline surface
+      !! \f$ s(u,v) = (s_1(u,v), \ldots, s_d(u,v)) \f$ to data on a
+      !! rectangular grid \f$ \{u_i\} \times \{v_j\} \f$. Uses the Kronecker
+      !! product decomposition (Eq. 10.9-10.12) that separates the bivariate
+      !! problem into sequences of univariate operations:
+      !!
+      !! \f[
+      !!     (A_u \otimes A_v) \, c = z
+      !!     \tag{10.9}
+      !! \f]
+      !!
+      !! The \f$ u \f$- and \f$ v \f$-direction triangularizations are performed
+      !! independently (via fp_rotate_row_block and fp_rotate_row_stride),
+      !! followed by back-substitution.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     ipar    Periodicity flags (packed)
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     u       \f$ u \f$-grid values, length `mu`
+      !! @param[in]     mu      Number of \f$ u \f$-grid points
+      !! @param[in]     v       \f$ v \f$-grid values, length `mv`
+      !! @param[in]     mv      Number of \f$ v \f$-grid points
+      !! @param[in]     z       Data values, length `mz` (\f$ = mu \cdot mv \cdot d \f$)
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max \f$ u \f$-knots
+      !! @param[in]     nvest   Max \f$ v \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in,out] nc      Length of coefficient array
+      !! @param[in,out] nu      Number of \f$ u \f$-knots
+      !! @param[in,out] tu      \f$ u \f$-knot vector
+      !! @param[in,out] nv      Number of \f$ v \f$-knots
+      !! @param[in,out] tv      \f$ v \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual sum
+      !! @param[in,out] fpold   Previous residual sum
+      !! @param[in,out] reducu  Residual reduction in \f$ u \f$
+      !! @param[in,out] reducv  Residual reduction in \f$ v \f$
+      !! @param[in,out] fpintu  Residual sums per \f$ u \f$-interval
+      !! @param[in,out] fpintv  Residual sums per \f$ v \f$-interval
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of \f$ u \f$-knots to add
+      !! @param[in,out] nplusv  Number of \f$ v \f$-knots to add
+      !! @param[in,out] nru     Work: \f$ u \f$-knot interval indices
+      !! @param[in,out] nrv     Work: \f$ v \f$-knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per \f$ u \f$-interval
+      !! @param[in,out] nrdatv  Interior data counts per \f$ v \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in,out] lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 10, §10.3 (pp. 173-178), Eq. 10.9-10.12
+      !! @see fpgrre, fpgrdi — grid triangularization helpers
       pure subroutine fppasu(iopt,ipar,idim,u,mu,v,mv,z,mz,s,nuest,nvest, &
                              tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu,reducv,fpintu, &
                              fpintv,lastdi,nplusu,nplusv,nru,nrv,nrdatu,nrdatv,wrk,lwrk,ier)
@@ -8902,7 +9355,47 @@ module fitpack_core
       end subroutine fppasu
 
 
-      ! Periodic spline determination
+      !> @brief Core algorithm for univariate periodic spline fitting.
+      !!
+      !! Fits a periodic spline \f$ s(x) \f$ of degree \f$ k \f$ where
+      !! \f$ s^{(j)}(x_1) = s^{(j)}(x_m) \f$ for \f$ j = 0, \ldots, k-1 \f$.
+      !! The periodicity reduces the number of free coefficients to
+      !! \f$ n - 2k - 1 \f$ and wraps the B-spline columns into the
+      !! block-triangular structure (Eq. 6.13) analogous to fpclos.
+      !!
+      !! This is the scalar-valued counterpart of fpclos (which handles
+      !! multi-dimensional parametric curves). Uses two-matrix Givens
+      !! rotations (fp_rotate_row_2mat) for the periodic block structure.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     x       Data abscissae, length `m` (strictly increasing)
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     m       Number of data points
+      !! @param[in]     k       Spline degree
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots
+      !! @param[in]     tol     Tolerance for smoothing condition
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     k1      \f$ k + 1 \f$
+      !! @param[in]     k2      \f$ k + 2 \f$
+      !! @param[in,out] n       Number of knots
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nest`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval
+      !! @param[in,out] z       Work: transformed RHS
+      !! @param[in,out] a1      Work: band matrix \f$ R_{11}^* \f$
+      !! @param[in,out] a2      Work: band matrix \f$ R_{12}^*/R_{22}^* \f$
+      !! @param[in,out] b       Work: smoothing matrix
+      !! @param[in,out] g1      Work: band matrix copy
+      !! @param[in,out] g2      Work: band matrix copy
+      !! @param[in,out] q       Work: B-spline values
+      !! @param[in,out] nrdata  Interior data-point counts
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112), Eq. 6.1-6.8
+      !! @see fp_rotate_row_2mat — two-matrix scalar Givens rotation
       pure subroutine fpperi(iopt,x,y,w,m,k,s,nest,tol,maxit, &
                              k1,k2,n,t,c,fp,fpint,z,a1,a2,b,g1,g2,q,nrdata,ier)
 
@@ -9467,14 +9960,39 @@ module fitpack_core
 
       end subroutine fpperi_reset_interp
 
-      !  subroutine fppocu finds a idim-dimensional polynomial curve p(u) = (p1(u),p2(u),...,pidim(u)) of
-      !  degree k, satisfying certain derivative constraints at the end points a and b, i.e.
-      !                  (l)
-      !    if ib > 0 : pj   (a) = db(idim*l+j), l=0,1,...,ib-1
-      !                  (l)
-      !    if ie > 0 : pj   (b) = de(idim*l+j), l=0,1,...,ie-1
-      !
-      !  the polynomial curve is returned in its b-spline representation ( cp(j), j=1,2,...,np )
+      !> @brief Construct a polynomial curve satisfying endpoint derivative constraints.
+      !!
+      !! Finds a \f$ d \f$-dimensional polynomial curve
+      !! \f$ p(u) = (p_1(u), \ldots, p_d(u)) \f$ of degree \f$ k \f$ that
+      !! satisfies prescribed derivative values at the endpoints \f$ a \f$ and
+      !! \f$ b \f$:
+      !!
+      !! \f[
+      !!     p_j^{(l)}(a) = \text{db}(d \cdot l + j), \quad l = 0, \ldots, i_b - 1
+      !! \f]
+      !! \f[
+      !!     p_j^{(l)}(b) = \text{de}(d \cdot l + j), \quad l = 0, \ldots, i_e - 1
+      !! \f]
+      !!
+      !! The result is returned as B-spline coefficients `cp(1:np)` on the
+      !! knot vector \f$ [a, \ldots, a, b, \ldots, b] \f$ (each with
+      !! multiplicity \f$ k+1 \f$). Used by concur to build an initial
+      !! polynomial approximation for constrained parametric curves.
+      !!
+      !! @param[in]  idim  Number of curve dimensions \f$ d \f$
+      !! @param[in]  k     Polynomial degree
+      !! @param[in]  a     Left endpoint
+      !! @param[in]  b     Right endpoint
+      !! @param[in]  ib    Number of derivative conditions at \f$ a \f$
+      !! @param[in]  db    Derivative values at \f$ a \f$, length `nb`
+      !! @param[in]  nb    Length of `db` (\f$ = d \cdot i_b \f$)
+      !! @param[in]  ie    Number of derivative conditions at \f$ b \f$
+      !! @param[in]  de    Derivative values at \f$ b \f$, length `ne`
+      !! @param[in]  ne    Length of `de` (\f$ = d \cdot i_e \f$)
+      !! @param[out] cp    B-spline coefficients of the polynomial, length `np`
+      !! @param[in]  np    Length of `cp` (\f$ = d \cdot (k+1) \f$)
+      !!
+      !! @see Dierckx, Ch. 7, §7.1 (pp. 115-120)
       pure subroutine fppocu(idim,k,a,b,ib,db,nb,ie,de,ne,cp,np)
 
       !  ..scalar arguments..
@@ -9545,6 +10063,57 @@ module fitpack_core
       end subroutine fppocu
 
 
+      !> @brief Driver for polar grid smoothing spline with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline on a polar grid.
+      !! Manages the knot-selection strategy (adding knots in the radial
+      !! or angular direction based on residuals) and the smoothing-parameter
+      !! search, delegating the actual grid computation to fpopdi at each step.
+      !!
+      !! @param[in]     iopt    Fitting options (3 flags)
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     u       Radial grid, length `mu`
+      !! @param[in]     mu      Number of radial points
+      !! @param[in]     v       Angular grid, length `mv`
+      !! @param[in]     mv      Number of angular points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     z0      Origin value
+      !! @param[in]     r       Boundary function values, length `mv`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nu      Number of radial knots
+      !! @param[in,out] tu      Radial knot vector
+      !! @param[in,out] nv      Number of angular knots
+      !! @param[in,out] tv      Angular knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducu  Residual reduction in radial direction
+      !! @param[in,out] reducv  Residual reduction in angular direction
+      !! @param[in,out] fpintu  Residual sums per radial interval
+      !! @param[in,out] fpintv  Residual sums per angular interval
+      !! @param[in,out] dz      Boundary derivative parameters
+      !! @param[in]     step    Search step for boundary optimization
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of radial knots to add
+      !! @param[in,out] nplusv  Number of angular knots to add
+      !! @param[in,out] lasttu  Last radial knot change flag
+      !! @param[in,out] nru     Radial knot interval indices
+      !! @param[in,out] nrv     Angular knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per radial interval
+      !! @param[in,out] nrdatv  Interior data counts per angular interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205)
+      !! @see fpopdi — grid computation; fppola — scattered polar fitting
       pure subroutine fppogr(iopt,ider,u,mu,v,mv,z,mz,z0,r,s, &
                              nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
                              reducv,fpintu,fpintv,dz,step,lastdi,nplusu,nplusv,lasttu,nru, &
@@ -9951,6 +10520,75 @@ module fitpack_core
       end subroutine fppogr
 
 
+      !> @brief Core algorithm for spline fitting on a polar domain.
+      !!
+      !! Fits a smooth bivariate spline to data on a polar-like domain
+      !! \f$ D = \{(x,y) : x^2 + y^2 \leq r(\theta)^2\} \f$ by transforming
+      !! to coordinates \f$ (u, v) \f$ where \f$ u = r/r(\theta) \f$ (radial)
+      !! and \f$ v = \theta \f$ (angular). The boundary function \f$ r(\theta) \f$
+      !! is user-supplied.
+      !!
+      !! Continuity at the origin (\f$ u = 0 \f$) imposes constraints on the
+      !! B-spline coefficients (Eq. 11.3-11.5):
+      !!
+      !! - \f$ s(0, v) \f$ must be independent of \f$ v \f$
+      !! - Derivatives at the origin must satisfy symmetry conditions
+      !!
+      !! The algorithm uses the same iterative scheme as fpsurf (knot
+      !! placement, QR factorization with rank-deficiency handling, smoothing
+      !! search) with additional logic for origin-continuity constraints and
+      !! the periodic \f$ v \f$-direction.
+      !!
+      !! @param[in]     iopt1   Fitting option (0 = new, 1 = continue)
+      !! @param[in]     iopt2   Origin BC option (0 = free, 1 = given)
+      !! @param[in]     iopt3   Derivative BC option at origin
+      !! @param[in]     m       Number of data points
+      !! @param[in]     u       Radial coordinates, length `m`
+      !! @param[in]     v       Angular coordinates, length `m`
+      !! @param[in]     z       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     rad     Boundary function values at data angles
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max radial knots
+      !! @param[in]     nvest   Max angular knots
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     ib1     Bandwidth parameter
+      !! @param[in]     ib3     Extended bandwidth parameter
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     ncc     Auxiliary coefficient dimension
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nu      Number of radial knots
+      !! @param[in,out] tu      Radial knot vector
+      !! @param[in,out] nv      Number of angular knots
+      !! @param[in,out] tv      Angular knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] sup     Upper bound for residual
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] row     Work: observation row
+      !! @param[in,out] cs      Work: cosine values
+      !! @param[in,out] cosi    Work: cosine integrals
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bu      Work: radial discontinuity coefficients
+      !! @param[in,out] bv      Work: angular discontinuity coefficients
+      !! @param[in,out] spu     Work: radial B-spline values
+      !! @param[in,out] spv     Work: angular B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205), Eq. 11.1-11.9
+      !! @see fprppo — polar representation; fpopdi — polar derivatives
       pure subroutine fppola(iopt1,iopt2,iopt3,m,u,v,z,w,rad,s, nuest,nvest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nu,tu,nv,tv,c,fp,sup,fpint,coord, &
                              f,ff,row,cs,cosi,a,q,bu,bv,spu,spv,h,index,nummer,wrk,lwrk,ier)
@@ -10733,8 +11371,40 @@ module fitpack_core
       end subroutine root_finding_iterate
 
 
-      ! subroutine fprank finds the minimum norm solution of a leastsquares problem in case of
-      ! rank deficiency.
+      !> @brief Compute the minimum-norm least-squares solution under rank deficiency.
+      !!
+      !! When the QR-triangularized observation matrix \f$ R \f$ has rank
+      !! \f$ r < n \f$ (detected by near-zero diagonal elements
+      !! \f$ |R_{ii}| < \varepsilon \f$), the least-squares solution is not unique.
+      !! This routine computes the **minimum-norm** B-spline coefficient vector
+      !! \f$ \tilde{c} \f$ by factoring the reduced upper trapezoidal matrix
+      !! \f$ W = [W_1 \; W_2] \f$ (Eq. 9.9):
+      !!
+      !! \f[
+      !!     \tilde{c} = W^T (W W^T)^{-1} \tilde{z}_1
+      !!     \tag{9.8}
+      !! \f]
+      !!
+      !! The factorization \f$ W = R_1 Q_1 \f$ is computed via Givens rotations
+      !! that zero out the columns of \f$ W_2 \f$ against \f$ W_1 \f$, exploiting
+      !! the band structure. The solution avoids the large oscillations that
+      !! arise from simply setting zero-rank coefficients to zero.
+      !!
+      !! @param[in,out] a     Band matrix from QR, dimension `(na, m)`. On exit,
+      !!                      contains the reduced factorization.
+      !! @param[in,out] f     Transformed RHS vector, length `n`. On exit, modified.
+      !! @param[in]     n     Number of unknowns (B-spline coefficients)
+      !! @param[in]     m     Bandwidth of `a`
+      !! @param[in]     na    Leading dimension of `a`
+      !! @param[in]     tol   Threshold \f$ \varepsilon \f$ for rank detection
+      !! @param[out]    c     Minimum-norm solution vector, length `n`
+      !! @param[out]    sq    Residual sum of squares from the rank reduction
+      !! @param[out]    rank  Detected rank \f$ r \f$ of the system
+      !! @param[in,out] aa    Work array `(n, m)`
+      !! @param[in,out] ff    Work vector, length `n`
+      !! @param[in,out] h     Work vector, length `m`
+      !!
+      !! @see Dierckx, Ch. 9, §9.1.2 (pp. 150-152), Eq. 9.7-9.10
       pure subroutine fprank(a,f,n,m,na,tol,c,sq,rank,aa,ff,h)
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: n         ! the dimension of a.
@@ -10968,8 +11638,41 @@ module fitpack_core
       end subroutine fprank
 
 
-      !  given three points (p1,f1),(p2,f2) and (p3,f3), function fprati  gives the value of p such
-      !  that the rational interpolating function of the form r(p) = (u*p+v)/(p+w) equals zero at p.
+      !> @brief Rational interpolation for the smoothing parameter search.
+      !!
+      !! Given three points \f$ (p_1, F_1) \f$, \f$ (p_2, F_2) \f$, \f$ (p_3, F_3) \f$
+      !! on the curve \f$ F(p) \f$, computes the zero of the rational interpolant:
+      !!
+      !! \f[
+      !!     R(p) = \frac{u \, p + v}{p + w}
+      !!     \tag{5.30}
+      !! \f]
+      !!
+      !! that passes through the three points. The zero \f$ \tilde{p} \f$ gives the
+      !! next estimate of the smoothing parameter \f$ p \f$ satisfying
+      !! \f$ F(p) = S \f$ during the iterative knot-placement strategy.
+      !!
+      !! When \f$ p_3 = \infty \f$ (indicated by `p3 <= 0`), the formula simplifies to:
+      !!
+      !! \f[
+      !!     \tilde{p} = \frac{p_1 (F_1 - F_3)(F_2 - S) - p_2 (F_2 - F_3)(F_1 - S)}
+      !!                      {(F_1 - F_2)(F_3 - S)}
+      !!     \tag{5.31}
+      !! \f]
+      !!
+      !! On exit, \f$ (p_1, F_1) \f$ and \f$ (p_3, F_3) \f$ are updated to bracket
+      !! the root: \f$ F_1 > 0 \f$ and \f$ F_3 < 0 \f$.
+      !!
+      !! @param[in,out] p1  First abscissa; updated to maintain \f$ F_1 > 0 \f$
+      !! @param[in,out] f1  First ordinate; updated with \f$ p_1 \f$
+      !! @param[in]     p2  Second abscissa (most recent iterate)
+      !! @param[in]     f2  Second ordinate \f$ F(p_2) - S \f$
+      !! @param[in,out] p3  Third abscissa; \f$ p_3 \leq 0 \f$ means \f$ p_3 = \infty \f$.
+      !!                    Updated to maintain \f$ F_3 < 0 \f$.
+      !! @param[in,out] f3  Third ordinate; updated with \f$ p_3 \f$
+      !! @param[out]    p   The new estimate \f$ \tilde{p} \f$
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.4 (pp. 83-86), Eq. 5.30-5.32
       elemental subroutine fprati(p1,f1,p2,f2,p3,f3,p)
       !  ..scalar arguments..
       real(FP_REAL), intent(inout) :: p1,f1,p3,f3
@@ -11002,6 +11705,58 @@ module fitpack_core
       end subroutine fprati
 
 
+      !> @brief Driver for rectangular grid smoothing surface with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline surface on a
+      !! rectangular grid \f$ \{x_i\} \times \{y_j\} \f$. Manages the knot
+      !! selection strategy (alternating between \f$ x \f$ and \f$ y \f$
+      !! directions based on residuals) and the smoothing-parameter search,
+      !! delegating the grid computation to fpgrre at each step.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in,out] x       \f$ x \f$-grid values, length `mx`
+      !! @param[in]     mx      Number of \f$ x \f$-grid points
+      !! @param[in,out] y       \f$ y \f$-grid values, length `my`
+      !! @param[in]     my      Number of \f$ y \f$-grid points
+      !! @param[in]     z       Data values, length `mz`
+      !! @param[in]     mz      Length of `z`
+      !! @param[in]     xb      Left \f$ x \f$-boundary
+      !! @param[in]     xe      Right \f$ x \f$-boundary
+      !! @param[in]     yb      Lower \f$ y \f$-boundary
+      !! @param[in]     ye      Upper \f$ y \f$-boundary
+      !! @param[in]     kx      Degree in \f$ x \f$
+      !! @param[in]     ky      Degree in \f$ y \f$
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nxest   Max \f$ x \f$-knots
+      !! @param[in]     nyest   Max \f$ y \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nx      Number of \f$ x \f$-knots
+      !! @param[in,out] tx      \f$ x \f$-knot vector
+      !! @param[in,out] ny      Number of \f$ y \f$-knots
+      !! @param[in,out] ty      \f$ y \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducx  Residual reduction in \f$ x \f$
+      !! @param[in,out] reducy  Residual reduction in \f$ y \f$
+      !! @param[in,out] fpintx  Residual sums per \f$ x \f$-interval
+      !! @param[in,out] fpinty  Residual sums per \f$ y \f$-interval
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusx  Number of \f$ x \f$-knots to add
+      !! @param[in,out] nplusy  Number of \f$ y \f$-knots to add
+      !! @param[in,out] nrx     \f$ x \f$-knot interval indices
+      !! @param[in,out] nry     \f$ y \f$-knot interval indices
+      !! @param[in,out] nrdatx  Interior data counts per \f$ x \f$-interval
+      !! @param[in,out] nrdaty  Interior data counts per \f$ y \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.4-10.8
+      !! @see fpgrre — grid Kronecker product computation
       pure subroutine fpregr(iopt,x,mx,y,my,z,mz,xb,xe,yb,ye, &
                              kx,ky,s,nxest,nyest,tol,maxit,nc,nx,tx,ny,ty,c,fp,fp0,fpold, &
                              reducx,reducy,fpintx,fpinty,lastdi,nplusx,nplusy,nrx,nry, &
@@ -11398,7 +12153,27 @@ module fitpack_core
 
       end function new_knot_dimension
 
-      ! subroutine fprota applies a givens rotation to a and b.
+      !> @brief Apply a Givens plane rotation to two scalars.
+      !!
+      !! Given the cosine \f$ c \f$ and sine \f$ s \f$ of a Givens rotation (as
+      !! computed by fpgivs), transforms a pair of values \f$ (a, b) \f$:
+      !!
+      !! \f[
+      !!     a' = c \, a - s \, b, \qquad
+      !!     b' = s \, a + c \, b
+      !!     \tag{4.15}
+      !! \f]
+      !!
+      !! This is used to propagate each Givens rotation through the remaining
+      !! columns of the observation matrix and the right-hand side vector
+      !! during QR factorization.
+      !!
+      !! @param[in]     cos  Cosine of the rotation angle
+      !! @param[in]     sin  Sine of the rotation angle
+      !! @param[in,out] a    First element; replaced by \f$ c \, a - s \, b \f$
+      !! @param[in,out] b    Second element; replaced by \f$ s \, a + c \, b \f$
+      !!
+      !! @see Dierckx, Ch. 4, §4.1.2 (pp. 55-58), Eq. 4.15
       elemental subroutine fprota(cos,sin,a,b)
 
           !  ..scalar arguments..
@@ -11418,8 +12193,26 @@ module fitpack_core
       end subroutine fprota
 
 
-      !  given the coefficients of a constrained bicubic spline, as determined in subroutine fppola,
-      !  fprppo calculates the coefficients in the standard b-spline representation of bicubic splines.
+      !> @brief Convert constrained polar spline coefficients to standard form.
+      !!
+      !! Transforms the coefficients of a constrained bicubic spline (as
+      !! computed by fppola with origin-continuity constraints) into the
+      !! standard B-spline coefficient representation. The constrained form
+      !! encodes the origin conditions via cosine-weighted combinations;
+      !! this routine expands them into independent coefficients.
+      !!
+      !! @param[in]     nu     Number of radial knots
+      !! @param[in]     nv     Number of angular knots
+      !! @param[in]     if1    Origin constraint type (position)
+      !! @param[in]     if2    Origin constraint type (derivative)
+      !! @param[in]     cosi   Cosine integral values
+      !! @param[in]     ratio  Knot ratio for origin constraint
+      !! @param[in,out] c      Constrained coefficients on entry; work on exit
+      !! @param[in,out] f      Standard B-spline coefficients on exit
+      !! @param[in]     ncoff  Number of coefficients
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 197-205), Eq. 11.3-11.5
+      !! @see fppola — polar fitting; fprpsp — spherical variant
       pure subroutine fprppo(nu,nv,if1,if2,cosi,ratio,c,f,ncoff)
 
       !  ..scalar arguments..
@@ -11493,8 +12286,24 @@ module fitpack_core
       return
       end subroutine fprppo
 
-      ! given the coefficients of a spherical spline function, subroutine fprpsp calculates the
-      ! coefficients in the standard b-spline representation of this bicubic spline.
+      !> @brief Convert constrained spherical spline coefficients to standard form.
+      !!
+      !! Transforms the coefficients of a constrained bicubic spline (as
+      !! computed by fpsphe with pole-continuity constraints) into the
+      !! standard B-spline coefficient representation. The constrained form
+      !! encodes pole conditions via cosine/sine-weighted combinations at
+      !! \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$.
+      !!
+      !! @param[in]     nt     Number of \f$ \theta \f$-knots
+      !! @param[in]     np     Number of \f$ \phi \f$-knots
+      !! @param[in]     co     Cosine values for pole constraints
+      !! @param[in]     si     Sine values for pole constraints
+      !! @param[in,out] c      Constrained coefficients on entry; work on exit
+      !! @param[in,out] f      Standard B-spline coefficients on exit
+      !! @param[in]     ncoff  Number of coefficients
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213), Eq. 11.14-11.16
+      !! @see fpsphe — spherical fitting; fprppo — polar variant
       pure subroutine fprpsp(nt,np,co,si,c,f,ncoff)
           !  ..
           !  ..scalar arguments
@@ -11551,12 +12360,29 @@ module fitpack_core
       end subroutine fprpsp
 
 
-      ! subroutine fpseno fetches a branch of a triply linked tree the information of which is kept
-      ! in the arrays up,left,right and info.
-      ! the branch has a specified length nbind and is determined by the parameter merk which points to
-      ! its terminal node. the information field of the nodes of this branch is stored in the array
-      ! ibind. on exit merk points to a new branch of length nbind or takes the value 1 if no such
-      !  branch was found.
+      !> @brief Fetch and advance to the next branch in the constraint-set tree.
+      !!
+      !! Extracts the constraint indices of the branch ending at terminal node
+      !! `merk` (length `nbind`) into the array `ibind(1:nbind)`. Then advances
+      !! `merk` to point to the next branch of the same length, or sets
+      !! `merk = 1` if no further branch exists.
+      !!
+      !! Used by the Theil-Van de Panne procedure (§7.2) to enumerate candidate
+      !! active-constraint sets level by level.
+      !!
+      !! @param[in]     maxtr  Size of the tree arrays
+      !! @param[in]     up     Parent pointers
+      !! @param[in]     left   Left-child pointers
+      !! @param[in]     right  Right-child pointers
+      !! @param[in]     info   Constraint index stored at each node
+      !! @param[in,out] merk   On entry, terminal node of the branch to fetch.
+      !!                       On exit, terminal node of the next branch of
+      !!                       length `nbind`, or 1 if none.
+      !! @param[out]    ibind  Constraint indices of the fetched branch, length `nbind`
+      !! @param[in]     nbind  Required branch length
+      !!
+      !! @see Dierckx, Ch. 7, §7.2.4 (pp. 125-130)
+      !! @see fpadno, fpdeno, fpfrno — companion tree operations
       pure subroutine fpseno(maxtr,up,left,right,info,merk,ibind,nbind)
 
           !  ..scalar arguments..
@@ -11593,6 +12419,59 @@ module fitpack_core
       end subroutine fpseno
 
 
+      !> @brief Driver for spherical grid smoothing spline with knot selection.
+      !!
+      !! Outer iteration loop for fitting a smoothing spline on a spherical
+      !! grid. Manages knot selection in \f$ \theta \f$ and \f$ \phi \f$
+      !! directions and the smoothing-parameter search, delegating grid
+      !! computation to fpopsp. Handles pole constraints at both
+      !! \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$.
+      !!
+      !! @param[in]     iopt    Fitting options
+      !! @param[in]     ider    Derivative specification flags
+      !! @param[in]     u       Co-latitude grid \f$ \theta \f$, length `mu`
+      !! @param[in]     mu      Number of \f$ \theta \f$-points
+      !! @param[in]     v       Longitude grid \f$ \phi \f$, length `mv`
+      !! @param[in]     mv      Number of \f$ \phi \f$-points
+      !! @param[in]     r       Data values, length `mr`
+      !! @param[in]     mr      Length of `r`
+      !! @param[in]     r0      North-pole value
+      !! @param[in]     r1      South-pole value
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nuest   Max \f$ \theta \f$-knots
+      !! @param[in]     nvest   Max \f$ \phi \f$-knots
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] nu      Number of \f$ \theta \f$-knots
+      !! @param[in,out] tu      \f$ \theta \f$-knot vector
+      !! @param[in,out] nv      Number of \f$ \phi \f$-knots
+      !! @param[in,out] tv      \f$ \phi \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reducu  Residual reduction in \f$ \theta \f$
+      !! @param[in,out] reducv  Residual reduction in \f$ \phi \f$
+      !! @param[in,out] fpintu  Residual sums per \f$ \theta \f$-interval
+      !! @param[in,out] fpintv  Residual sums per \f$ \phi \f$-interval
+      !! @param[in,out] dr      Pole derivative parameters
+      !! @param[in]     step    Search step for pole parameter optimization
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplusu  Number of \f$ \theta \f$-knots to add
+      !! @param[in,out] nplusv  Number of \f$ \phi \f$-knots to add
+      !! @param[in,out] lastu0  Last north-pole knot change flag
+      !! @param[in,out] lastu1  Last south-pole knot change flag
+      !! @param[in,out] nru     \f$ \theta \f$-knot interval indices
+      !! @param[in,out] nrv     \f$ \phi \f$-knot interval indices
+      !! @param[in,out] nrdatu  Interior data counts per \f$ \theta \f$-interval
+      !! @param[in,out] nrdatv  Interior data counts per \f$ \phi \f$-interval
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213)
+      !! @see fpopsp — grid computation; fpsphe — scattered spherical fitting
       pure subroutine fpspgr(iopt,ider,u,mu,v,mv,r,mr,r0,r1,s, &
                              nuest,nvest,tol,maxit,nc,nu,tu,nv,tv,c,fp,fp0,fpold,reducu, &
                              reducv,fpintu,fpintv,dr,step,lastdi,nplusu,nplusv,lastu0, &
@@ -12041,6 +12920,72 @@ module fitpack_core
       end subroutine fpspgr
 
 
+      !> @brief Core algorithm for spline fitting on the sphere.
+      !!
+      !! Fits a smooth bivariate spline to data on the unit sphere using
+      !! coordinates \f$ (\theta, \phi) \f$ where \f$ \theta \in [0, \pi] \f$
+      !! is co-latitude and \f$ \phi \in [0, 2\pi) \f$ is longitude. The
+      !! spline is periodic in \f$ \phi \f$ and must satisfy pole-continuity
+      !! conditions at \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$ (Eq. 11.12):
+      !!
+      !! \f[
+      !!     s(0, \phi) = \text{const}, \quad
+      !!     s(\pi, \phi) = \text{const}
+      !!     \tag{11.12}
+      !! \f]
+      !!
+      !! with derivative conditions analogous to the polar case (Eq. 11.14-11.16).
+      !! The algorithm follows the same iterative framework as fpsurf with
+      !! additional handling for pole constraints and the periodic
+      !! \f$ \phi \f$-direction.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     m       Number of data points
+      !! @param[in]     teta    Co-latitude values \f$ \theta \f$, length `m`
+      !! @param[in]     phi     Longitude values \f$ \phi \f$, length `m`
+      !! @param[in]     r       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     ntest   Max \f$ \theta \f$-knots
+      !! @param[in]     npest   Max \f$ \phi \f$-knots
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     ib1     Bandwidth parameter
+      !! @param[in]     ib3     Extended bandwidth parameter
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     ncc     Auxiliary coefficient dimension
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nt      Number of \f$ \theta \f$-knots
+      !! @param[in,out] tt      \f$ \theta \f$-knot vector
+      !! @param[in,out] np      Number of \f$ \phi \f$-knots
+      !! @param[in,out] tp      \f$ \phi \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] sup     Upper bound for residual
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] row     Work: observation row
+      !! @param[in,out] coco    Work: cosine values for pole constraints
+      !! @param[in,out] cosi    Work: cosine integrals for pole constraints
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bt      Work: \f$ \theta \f$-discontinuity coefficients
+      !! @param[in,out] bp      Work: \f$ \phi \f$-discontinuity coefficients
+      !! @param[in,out] spt     Work: \f$ \theta \f$-B-spline values
+      !! @param[in,out] spp     Work: \f$ \phi \f$-B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[out]    ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 205-213), Eq. 11.12-11.16
+      !! @see fprpsp — spherical representation; fpopsp — spherical operations
       pure subroutine fpsphe(iopt,m,teta,phi,r,w,s,ntest,npest,eta,tol,maxit, &
                              ib1,ib3,nc,ncc,intest,nrest,nt,tt,np,tp,c,fp,sup,fpint,coord,f, &
                              ff,row,coco,cosi,a,q,bt,bp,spt,spp,h,index,nummer,wrk,lwrk,ier)
@@ -12805,6 +13750,81 @@ module fitpack_core
       end subroutine fpsuev
 
 
+      !> @brief Core algorithm for bivariate tensor-product spline surface fitting.
+      !!
+      !! Fits a tensor-product spline surface \f$ s(x,y) \f$ of degrees
+      !! \f$ k_x \f$ and \f$ k_y \f$ to scattered data by minimizing:
+      !!
+      !! \f[
+      !!     \sum_{i=1}^{m} \bigl( w_i (z_i - s(x_i, y_i)) \bigr)^2
+      !!     \leq S
+      !!     \tag{9.2}
+      !! \f]
+      !!
+      !! The B-spline representation has \f$ (g+k_x+1)(h+k_y+1) \f$
+      !! coefficients on the knot grid \f$ \{t_x\} \times \{t_y\} \f$.
+      !! The algorithm iterates:
+      !!
+      !! 1. **Knot placement** in \f$ x \f$ and \f$ y \f$ based on residuals
+      !! 2. **QR factorization** of the observation matrix via Givens
+      !!    rotations, with rank-deficiency handling via fprank (Eq. 9.7-9.10)
+      !! 3. **Smoothing-parameter search** via rational interpolation
+      !!
+      !! Data points are sorted into knot-interval panels using fporde for
+      !! efficient row-by-row processing.
+      !!
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     m       Number of data points
+      !! @param[in,out] x       Data \f$ x \f$-coordinates, length `m`
+      !! @param[in,out] y       Data \f$ y \f$-coordinates, length `m`
+      !! @param[in]     z       Data values, length `m`
+      !! @param[in]     w       Data weights, length `m`
+      !! @param[in]     xb      Left \f$ x \f$-boundary
+      !! @param[in]     xe      Right \f$ x \f$-boundary
+      !! @param[in]     yb      Lower \f$ y \f$-boundary
+      !! @param[in]     ye      Upper \f$ y \f$-boundary
+      !! @param[in]     kxx     Degree in \f$ x \f$
+      !! @param[in]     kyy     Degree in \f$ y \f$
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nxest   Max knots in \f$ x \f$
+      !! @param[in]     nyest   Max knots in \f$ y \f$
+      !! @param[in]     eta     Rank-deficiency tolerance factor
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nmax    Max of `nxest`, `nyest`
+      !! @param[in]     km1     \f$ \max(k_x, k_y) + 1 \f$
+      !! @param[in]     km2     \f$ k_x + k_y + 2 \f$
+      !! @param[in]     ib1     \f$ k_x k_y + 2 \f$
+      !! @param[in]     ib3     \f$ k_x k_y + \max(k_x, k_y) + 2 \f$
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in]     intest  Length of `fpint`
+      !! @param[in]     nrest   Length of `index`
+      !! @param[in,out] nx0     Number of \f$ x \f$-knots
+      !! @param[in,out] tx      \f$ x \f$-knot vector
+      !! @param[in,out] ny0     Number of \f$ y \f$-knots
+      !! @param[in,out] ty      \f$ y \f$-knot vector
+      !! @param[in,out] c       B-spline coefficients
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial unweighted residual sum
+      !! @param[in,out] fpint   Work: residual sums per panel
+      !! @param[in,out] coord   Work: coordinates
+      !! @param[in,out] f       Work: RHS vector
+      !! @param[in,out] ff      Work: RHS copy
+      !! @param[in,out] a       Work: band matrix
+      !! @param[in,out] q       Work: extended band matrix
+      !! @param[in,out] bx      Work: \f$ x \f$-discontinuity coefficients
+      !! @param[in,out] by      Work: \f$ y \f$-discontinuity coefficients
+      !! @param[in,out] spx     Work: \f$ x \f$-B-spline values
+      !! @param[in,out] spy     Work: \f$ y \f$-B-spline values
+      !! @param[in,out] h       Work vector
+      !! @param[in,out] index   Work: panel sorting indices
+      !! @param[in,out] nummer  Work: data-to-panel mapping
+      !! @param[in,out] wrk     Work array
+      !! @param[in]     lwrk    Length of `wrk`
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see Dierckx, Ch. 9, §9.1-9.2 (pp. 147-167), Eq. 9.2-9.10
+      !! @see fporde — panel sorting; fprank — rank-deficient solver
       pure subroutine fpsurf(iopt,m,x,y,z,w,xb,xe,yb,ye,kxx,kyy, &
                              s,nxest, nyest,eta,tol,maxit,nmax,km1,km2,ib1,ib3,nc,intest, &
                              nrest,nx0,tx,ny0,ty,c,fp,fp0,fpint,coord,f,ff,a,q,bx,by,spx, &
@@ -13382,7 +14402,12 @@ module fitpack_core
 
       contains
 
-          ! Ensure x,y are returned in the original order, if they were interchanged
+          !> @brief Restore original x/y ordering if axes were interchanged.
+          !!
+          !! When fpsurf interchanges the \f$ x \f$- and \f$ y \f$-axes for
+          !! efficiency (ensuring more knots in the outer loop direction),
+          !! this routine swaps them back on exit so the caller sees the
+          !! original orientation.
           pure subroutine sort_xy(interchanged,m,nmax,nc,nk1x,nk1y,iopt,l1,l2,c,f,x,y,tx,ty,nx,ny,nx0,ny0)
               logical(FP_BOOL), intent(in) :: interchanged
               integer(FP_SIZE), intent(in) :: m,nmax,nc,iopt,nk1x,nk1y
@@ -13424,8 +14449,19 @@ module fitpack_core
 
       end subroutine fpsurf
 
-      ! subroutine fpsysy solves a linear n x n symmetric system   (a) * (b) = (g), with n<=6
-      ! on input, vector g contains the right hand side ; on output it will contain the solution (b).
+      !> @brief Solve a small symmetric linear system by Cholesky factorization.
+      !!
+      !! Solves the \f$ n \times n \f$ symmetric positive definite system
+      !! \f$ A \, b = g \f$ with \f$ n \leq 6 \f$ using Cholesky
+      !! decomposition. On exit, `g` contains the solution \f$ b \f$.
+      !!
+      !! Used by fpopdi and fpopsp for the small optimization problems that
+      !! determine the optimal origin/pole boundary parameters.
+      !!
+      !! @param[in,out] a  Symmetric matrix, dimension `(6, 6)`. Only the
+      !!                   first `n` rows and columns are used.
+      !! @param[in]     n  System dimension (\f$ n \leq 6 \f$)
+      !! @param[in,out] g  On entry, right-hand side. On exit, solution.
       pure subroutine fpsysy(a,n,g)
 
       !  ..scalar arguments..
@@ -13482,9 +14518,30 @@ module fitpack_core
       end subroutine fpsysy
 
 
-      !  subroutine fptrnp reduces the (m+n-7) x (n-4) matrix a to upper triangular form and applies the
-      !  same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the (n-4) x (mm) x
-      !  (idim) matrix q
+      !> @brief Triangularize the tensor-product system for non-periodic grids.
+      !!
+      !! Reduces the \f$ (m + n - 7) \times (n - 4) \f$ augmented observation
+      !! matrix to upper triangular form using Givens rotations (Eq. 10.8),
+      !! simultaneously transforming the \f$ m \times mm \times d \f$ data
+      !! matrix \f$ Z \f$ into the \f$ (n-4) \times mm \times d \f$ RHS
+      !! matrix \f$ Q \f$. Used in the second phase of the Kronecker product
+      !! decomposition for parametric grid surfaces (fppasu via fpgrpa).
+      !!
+      !! @param[in]     m       Number of grid points in this direction
+      !! @param[in]     mm      Number of columns in the RHS (other direction size)
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     n       Number of knots in this direction
+      !! @param[in]     nr      Knot interval indices, length `m`
+      !! @param[in]     sp      B-spline values at grid points, `(m, 4)`
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in]     b       Discontinuity jump matrix, `(n, 5)`
+      !! @param[in]     z       Data matrix, length \f$ m \cdot mm \cdot d \f$
+      !! @param[out]    a       Triangularized band matrix, `(n, 5)`
+      !! @param[out]    q       Transformed RHS, length \f$ (n-4) \cdot mm \cdot d \f$
+      !! @param[out]    right   Work: RHS row vector, length \f$ mm \cdot d \f$
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.8
+      !! @see fptrpe — periodic variant; fp_rotate_row_stride — stride rotation
       pure subroutine fptrnp(m,mm,idim,n,nr,sp,p,b,z,a,q,right)
 
       !  ..
@@ -13568,9 +14625,31 @@ module fitpack_core
       end subroutine fptrnp
 
 
-      !  subroutine fptrpe reduces the (m+n-7) x (n-7) cyclic bandmatrix a to upper triangular form and
-      !  applies the same givens transformations to the (m) x (mm) x (idim) matrix z to obtain the
-      !  (n-7) x (mm) x (idim) matrix q.
+      !> @brief Triangularize the tensor-product system for periodic grids.
+      !!
+      !! Periodic variant of fptrnp. Reduces the \f$ (m + n - 7) \times (n - 7) \f$
+      !! cyclic band matrix to upper triangular form using two-matrix Givens
+      !! rotations (fp_rotate_2mat_stride), simultaneously transforming the
+      !! data matrix \f$ Z \f$ into the RHS matrix \f$ Q \f$. The periodicity
+      !! wraps the last columns into the first, creating the block-triangular
+      !! structure stored in `a` (main) and `aa` (periodic block).
+      !!
+      !! @param[in]     m       Number of grid points in this direction
+      !! @param[in]     mm      Number of columns in the RHS
+      !! @param[in]     idim    Number of surface dimensions \f$ d \f$
+      !! @param[in]     n       Number of knots in this direction
+      !! @param[in]     nr      Knot interval indices, length `m`
+      !! @param[in]     sp      B-spline values at grid points, `(m, 4)`
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in]     b       Discontinuity jump matrix, `(n, 5)`
+      !! @param[in]     z       Data matrix, length \f$ m \cdot mm \cdot d \f$
+      !! @param[out]    a       Triangularized band matrix (main block), `(n, 5)`
+      !! @param[out]    aa      Triangularized periodic block, `(n, 4)`
+      !! @param[out]    q       Transformed RHS, length \f$ (n-7) \cdot mm \cdot d \f$
+      !! @param[out]    right   Work: RHS row vector, length \f$ mm \cdot d \f$
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 170-172), Eq. 10.8 (periodic)
+      !! @see fptrnp — non-periodic variant; fp_rotate_2mat_stride — periodic rotation
       pure subroutine fptrpe(m,mm,idim,n,nr,sp,p,b,z,a,aa,q,right)
       !  ..
       !  ..scalar arguments..
@@ -13717,55 +14796,31 @@ module fitpack_core
       !       tt(i+nn-2*k-1) = tt(i)+per  ,i=1,2,...,2*k+1
       !       cc(i+nn-2*k-1) = cc(i)      ,i=1,2,...,k
 
+      !> @brief Insert a single knot into a spline, returning a new B-spline representation.
+      !!
+      !! Inserts the knot \f$ x \f$ into the B-spline representation of \f$ s(x) \f$ using
+      !! the Boehm knot insertion algorithm. The spline itself is unchanged; only its
+      !! representation (knots and coefficients) is updated.
+      !!
+      !! Can be called with output arrays aliased to input arrays to replace the
+      !! representation in place: `call insert(iopt,t,n,c,k,x,t,n,c,nest,ier)`.
+      !!
+      !! @param[in]  iopt  Periodicity flag: `0` = non-periodic; `/=0` = periodic spline.
+      !! @param[in]  t     Input knot positions (length `nest`).
+      !! @param[in]  n     Number of knots before insertion.
+      !! @param[in]  c     Input B-spline coefficients (length `nest`).
+      !! @param[in]  k     Degree of the spline.
+      !! @param[in]  x     Location of the knot to insert.
+      !!   Must satisfy \f$ t_{k+1} \le x \le t_{n-k} \f$.
+      !! @param[out] tt    Output knot positions (length `nest`).
+      !! @param[out] nn    Number of knots after insertion (\f$ n + 1 \f$).
+      !! @param[out] cc    Output B-spline coefficients (length `nest`).
+      !! @param[in]  nest  Array dimension. Must satisfy `nest > n`.
+      !! @param[out] ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.4 (pp. 13--14), Eq. 1.46--1.48; fpinst — knot insertion kernel
       pure subroutine insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
 
-      !
-      !  calling sequence:
-      !     call insert(iopt,t,n,c,k,x,tt,nn,cc,nest,ier)
-      !
-      !  input parameters:
-      !    iopt : integer flag, specifying whether (iopt/=0) or not (iopt=0) the given spline must be
-      !           considered as being periodic.
-      !    t    : array,length nest, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
-      !    c    : array,length nest, which contains the b-spline coefficients.
-      !    k    : integer(FP_SIZE), giving the degree of s(x).
-      !    x    : real, which gives the location of the knot to be inserted.
-      !    nest : integer specifying the dimension of the arrays t,c,tt and cc. nest > n.
-      !
-      !  output parameters:
-      !    tt   : array,length nest, which contains the position of the knots after insertion.
-      !    nn   : integer(FP_SIZE), giving the total number of knots after insertion
-      !    cc   : array,length nest, which contains the b-spline coefficients of s(x) with respect to the
-      !           new set of knots.
-      !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier =10 : invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !    nest > n
-      !    t(k+1) <= x <= t(n-k)
-      !    in case of a periodic spline (iopt/=0) there must be either at least k interior knots t(j)
-      !       satisfying t(k+1)<t(j)<=x or at least k interior knots t(j) satisfying x<=t(j)<t(n-k)
-      !
-      !  other subroutines required: fpinst.
-      !
-      !  further comments:
-      !   subroutine insert may be called as follows
-      !        call insert(iopt,t,n,c,k,x,t,n,c,nest,ier)
-      !   in which case the new representation will simply replace the old one
-      !
-      !  references :
-      !    boehm w : inserting new knots into b-spline curves. computer aided design 12 (1980) 199-201.
-      !   dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: iopt,n,k,nest
       integer(FP_SIZE), intent(out) :: nn
@@ -13822,8 +14877,22 @@ module fitpack_core
 
       end subroutine insert
 
-      ! Subroutine insert_inplace was created to avoid alising issues with the original package
-      ! that called subroutine insert with the same variables as input and output arguments
+      !> @brief Insert a single knot into a spline in place (avoiding aliasing issues).
+      !!
+      !! Wrapper around insert that uses temporary arrays to safely update the knot
+      !! and coefficient arrays in place, avoiding the aliasing of input/output arguments
+      !! present in the original Fortran 77 calling convention.
+      !!
+      !! @param[in]     iopt  Periodicity flag: `0` = non-periodic; `/=0` = periodic.
+      !! @param[in,out] t     Knot positions (length `nest`). Updated on exit.
+      !! @param[in,out] n     Number of knots. Updated to \f$ n + 1 \f$ on exit.
+      !! @param[in,out] c     B-spline coefficients (length `nest`). Updated on exit.
+      !! @param[in]     k     Degree of the spline.
+      !! @param[in]     x     Location of the knot to insert.
+      !! @param[in]     nest  Array dimension. Must satisfy `nest > n`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see insert — non-aliased variant
       pure subroutine insert_inplace(iopt,t,n,c,k,x,nest,ier)
 
           integer(FP_SIZE), intent(in)    :: iopt,k,nest
@@ -13848,196 +14917,47 @@ module fitpack_core
       end subroutine insert_inplace
 
 
+      !> @brief Determine a smooth parametric spline curve approximation.
+      !!
+      !! Given \f$ m \f$ ordered points \f$ \mathbf{x}_i \in \mathbb{R}^{\text{idim}} \f$ with
+      !! weights \f$ w_i > 0 \f$ and parameter values \f$ u_i \f$, computes an open parametric
+      !! spline curve \f$ \mathbf{s}(u) = (s_1(u),\ldots,s_{\text{idim}}(u)) \f$ of degree
+      !! \f$ k \f$ on \f$ [u_b, u_e] \f$.
+      !!
+      !! If `ipar=0`, parameter values are computed automatically from cumulative
+      !! chord lengths: \f$ u_i = v_i / v_m \f$ where \f$ v_i = v_{i-1} + \|\mathbf{x}_i - \mathbf{x}_{i-1}\| \f$,
+      !! with \f$ u_b = 0 \f$ and \f$ u_e = 1 \f$.
+      !!
+      !! Smoothness is controlled by requiring
+      !! \f$ F(p) = \sum w_i^2 \|\mathbf{x}_i - \mathbf{s}(u_i)\|^2 \le S \f$.
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` (LSQ), `0` (new smoothing), `1` (continue).
+      !! @param[in]     ipar  Parameter mode: `0` = automatic, `1` = user-supplied.
+      !! @param[in]     idim  Dimension of the curve, \f$ 1 \le \text{idim} \le 10 \f$.
+      !! @param[in]     m     Number of data points, \f$ m > k \f$.
+      !! @param[in,out] u     Parameter values (length \f$ m \f$). Output when `ipar=0`.
+      !! @param[in]     mx    Declared dimension of `x`, \f$ \ge \text{idim} \times m \f$.
+      !! @param[in]     x     Data coordinates (length `mx`): `x(idim*(i-1)+j)` = \f$ j \f$-th
+      !!   coordinate of point \f$ i \f$.
+      !! @param[in,out] w     Weights (length \f$ m \f$), strictly positive.
+      !! @param[in,out] ub    Lower parameter bound. Set to 0 when `ipar=0`.
+      !! @param[in,out] ue    Upper parameter bound. Set to 1 when `ipar=0`.
+      !! @param[in]     k     Spline degree, \f$ 1 \le k \le 5 \f$. Cubic recommended.
+      !! @param[in,out] s     Smoothing factor \f$ S \ge 0 \f$.
+      !! @param[in]     nest  Over-estimate of total knots. `nest=m+k+1` always suffices.
+      !! @param[in,out] n     Total number of knots.
+      !! @param[in,out] t     Knot positions (length `nest`).
+      !! @param[in]     nc    Declared dimension of `c`, \f$ \ge \text{nest} \times \text{idim} \f$.
+      !! @param[in,out] c     B-spline coefficients (length `nc`).
+      !! @param[out]    fp    Weighted sum of squared residuals.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k+1) + \text{nest}(6+\text{idim}+3k) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `nest`).
+      !! @param[out]    ier   Error flag (same codes as curfit).
+      !!
+      !! @see Dierckx, Ch. 6, §6.3; fppara — core parametric fitting algorithm
       pure subroutine parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
 
-      !  given the ordered set of m points x(i) in the idim-dimensional space and given also a corresponding
-      !  set of strictly increasing values u(i) and the set of positive numbers w(i),i=1,2,...,m, subroutine
-      !  parcur determines a smooth approximating spline curve s(u), i.e.
-      !      x1 = s1(u)
-      !      x2 = s2(u)       ub <= u <= ue
-      !      .........
-      !      xidim = sidim(u)
-      !  with sj(u),j=1,2,...,idim spline functions of degree k with common knots t(j),j=1,2,...,n.
-      !  if ipar=1 the values ub,ue and u(i),i=1,2,...,m must be supplied by the user. if ipar=0 these values
-      !  are chosen automatically by parcur as
-      !      v(1) = 0
-      !      v(i) = v(i-1) + dist(x(i),x(i-1)) ,i=2,3,...,m
-      !      u(i) = v(i)/v(m) ,i=1,2,...,m
-      !      ub = u(1) = 0, ue = u(m) = 1.
-      !  if iopt=-1 parcur calculates the weighted least-squares spline according to a given set of knots.
-      !  if iopt>=0 the number of knots of the splines sj(u) and the position t(j),j=1,2,...,n is chosen
-      !  automatically by the routine. the smoothness of s(u) is then achieved by minimalizing the
-      !  discontinuity jumps of the k-th derivative of s(u) at the knots t(j),j=k+2,k+3,...,n-k-1. the amount
-      !  of smoothness is determined by the condition that f(p)=sum((w(i)*dist(x(i),s(u(i))))**2) be <= s,
-      !  with s a given non-negative constant, called the smoothing factor. the fit s(u) is given in the
-      !  b-spline representation and can be evaluated by means of subroutine curev.
-      !
-      !  calling sequence:
-      !     call parcur(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier)
-      !
-      !  parameters:
-      !   iopt  : integer flag. on entry iopt must specify whether a weighted least-squares spline curve
-      !           (iopt=-1) or a smoothing spline curve (iopt=0 or 1) must be determined.if iopt=0 the routine
-      !           will start with an initial set of knots t(i)=ub,t(i+k+1)=ue, i=1,2,...,k+1. if iopt=1
-      !           the routine will continue with the knots found at the last call of the routine. attention:
-      !           a call with iopt=1 must always be immediately preceded by another call with iopt=1 or iopt=0.
-      !           unchanged on exit.
-      !   ipar  : integer flag. on entry ipar must specify whether (ipar=1) the user will supply the parameter
-      !           values u(i),ub and ue or whether (ipar=0) these values are to be calculated by parcur.
-      !           unchanged on exit.
-      !   idim  : integer. on entry idim must specify the dimension of the curve. 0 < idim < 11.
-      !           unchanged on exit.
-      !   m     : integer. on entry m must specify the number of data points. m > k. unchanged on exit.
-      !   u     : real array of dimension at least (m). in case ipar=1,before entry, u(i) must be set to the
-      !           i-th value of the parameter variable u for i=1,2,...,m. these values must then be supplied
-      !           in strictly ascending order and will be unchanged on exit. in case ipar=0, on exit,array
-      !           u will contain the values u(i) as determined by parcur.
-      !   mx    : integer. on entry mx must specify the actual dimension of the array x as declared in the
-      !           calling (sub)program. mx must not be too small (see x). unchanged on exit.
-      !   x     : real array of dimension at least idim*m.
-      !           before entry, x(idim*(i-1)+j) must contain the j-th coordinate of the i-th data point for
-      !           i=1,2,...,m and j=1,2,...,idim. unchanged on exit.
-      !   w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value in
-      !           the set of weights. the w(i) must be strictly positive. unchanged on exit. see also further
-      !           comments.
-      !   ub,ue : real values. on entry (in case ipar=1) ub and ue must contain the lower and upper bound for
-      !           the parameter u. ub <=u(1), ue>= u(m). if ipar = 0 these values will automatically be set
-      !           to 0 and 1 by parcur.
-      !   k     : integer. on entry k must specify the degree of the splines. 1<=k<=5. it is recommended to
-      !           use cubic splines (k=3). the user is strongly dissuaded from choosing k even,together
-      !           with a small s-value. unchanged on exit.
-      !   s     : real.on entry (in case iopt>=0) s must specify the smoothing factor. s >=0. unchanged on exit.
-      !           for advice on the choice of s see further comments.
-      !   nest  : integer. on entry nest must contain an over-estimate of the total number of knots of the
-      !           splines returned, to indicate the storage space available to the routine. nest >=2*k+2.
-      !           in most practical situation nest=m/2 will be sufficient. always large enough is nest=m+k+1,
-      !           the number of knots needed for interpolation (s=0). unchanged on exit.
-      !   n     : integer.
-      !           unless ier = 10 (in case iopt >=0), n will contain the total number of knots of the
-      !           smoothing spline curve returned if the computation mode iopt=1 is used this value of n
-      !           should be left unchanged between subsequent calls. in case iopt=-1, the value of n must be
-      !           specified on entry.
-      !   t     : real array of dimension at least (nest).
-      !           on successful exit, this array will contain the knots of the spline curve,i.e. the position
-      !           of the interior knots t(k+2),t(k+3),..,t(n-k-1) as well as the position of the additional
-      !           t(1)=t(2)=...=t(k+1)=ub and t(n-k)=...=t(n)=ue needed for the b-spline representation.
-      !           if the computation mode iopt=1 is used, the values of t(1),t(2),...,t(n) should be left
-      !           unchanged between subsequent calls. if the computation mode iopt=-1 is used, the values
-      !           t(k+2),...,t(n-k-1) must be supplied by the user, before entry. see also the restrictions
-      !           (ier=10).
-      !   nc    : integer. on entry nc must specify the actual dimension of the array c as declared in the
-      !           calling (sub)program. nc must not be too small (see c). unchanged on exit.
-      !   c     : real array of dimension at least (nest*idim). on successful exit, this array will contain
-      !           the coefficients in the b-spline representation of the spline curve s(u),i.e. the b-spline
-      !           coefficients of the spline sj(u) will be given in c(n*(j-1)+i),i=1,2,...,n-k-1 for
-      !           j=1,2,...,idim.
-      !   fp    : real. unless ier = 10, fp contains the weighted sum of squared residuals of the spline
-      !           curve returned.
-      !   wrk   : real array of dimension at least m*(k+1)+nest*(6+idim+3*k). used as working space. if the
-      !           computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left unchanged
-      !           between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared in
-      !           the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
-      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged between
-      !           subsequent calls.
-      !   ier   : integer. unless the routine detects an error, ier contains a non-positive value on exit, i.e.
-      !    ier=0  : normal return. the curve returned has a residual sum of squares fp such that abs(fp-s)/s
-      !             <= tol with tol a relative tolerance set to 0.001 by the program.
-      !    ier=-1 : normal return. the curve returned is an interpolating spline curve (fp=0).
-      !    ier=-2 : normal return. the curve returned is the weighted least squares polynomial curve of
-      !             degree k. in this extreme case fp gives the upper bound fp0 for the smoothing factor s.
-      !    ier=1  : error. the required storage space exceeds the available storage space, as specified by the
-      !             parameter nest.
-      !             likely causes : nest too small. if nest is already large (say nest > m/2), it may also
-      !             indicate that s is too small. the approximation returned is the least-squares spline
-      !             curve according to the knots t(1),t(2),...,t(n). (n=nest) the parameter fp gives the
-      !             corresponding weighted sum of squared residuals (fp>s).
-      !    ier=2  : error. a theoretically impossible result was found during the iteration process for
-      !             finding a smoothing spline curve with fp = s. probably causes : s too small.
-      !             there is an approximation returned but the corresponding weighted sum of squared residuals
-      !             does not satisfy the condition abs(fp-s)/s < tol.
-      !    ier=3  : error. the maximal number of iterations maxit (set to 20 by the program) allowed for
-      !             finding a smoothing curve with fp=s has been reached. probably causes : s too small
-      !             there is an approximation returned but the corresponding weighted sum of squared residuals
-      !             does not satisfy the condition abs(fp-s)/s < tol.
-      !    ier=10 : error. on entry, the input data are controlled on validity the following restrictions
-      !             must be satisfied.
-      !             -1<=iopt<=1, 1<=k<=5, m>k, nest>2*k+2, w(i)>0,i=1,2,...,m
-      !             0<=ipar<=1, 0<idim<=10, lwrk>=(k+1)*m+nest*(6+idim+3*k),
-      !             nc>=nest*idim
-      !             if ipar=0: sum j=1,idim (x(idim*i+j)-x(idim*(i-1)+j))**2>0 i=1,2,...,m-1.
-      !             if ipar=1: ub<=u(1)<u(2)<...<u(m)<=ue
-      !             if iopt=-1: 2*k+2<=n<=min(nest,m+k+1)
-      !                         ub<t(k+2)<t(k+3)<...<t(n-k-1)<ue
-      !                            (ub=0 and ue=1 in case ipar=0)
-      !                       the schoenberg-whitney conditions, i.e. there must be a subset of data points
-      !                       uu(j) such that
-      !                         t(j) < uu(j) < t(j+k+1), j=1,2,...,n-k-1
-      !             if iopt>=0: s>=0
-      !                         if s=0 : nest >= m+k+1
-      !             if one of these conditions is found to be violated,control is immediately repassed to the
-      !             calling program. in that case there is no approximation returned.
-      !
-      !  further comments:
-      !   by means of the parameter s, the user can control the tradeoff between closeness of fit and
-      !   smoothness of fit of the approximation. if s is too large, the curve will be too smooth and signal
-      !   will be lost ; if s is too small the curve will pick up too much noise. in the extreme cases the
-      !   program will return an interpolating curve if s=0 and the least-squares polynomial curve of degree
-      !   k if s is very large. between these extremes, a properly chosen s will result in a good compromise
-      !   between closeness of fit and smoothness of fit. to decide whether an approximation, corresponding
-      !   to a certain s is satisfactory the user is highly recommended to inspect the fits graphically.
-      !   recommended values for s depend on the weights w(i). if these are taken as 1/d(i) with d(i) an
-      !   estimate of the standard deviation of x(i), a good s-value should be found in the range
-      !   (m-sqrt(2*m),m+sqrt(2*m)). if nothing is known about the statistical error in x(i) each w(i) can be
-      !   set equal to one and s determined by trial and error, taking account of the comments above. the best
-      !   is then to start with a very large value of s ( to determine the least-squares polynomial curve and
-      !   the upper bound fp0 for s) and then to progressively decrease the value of s ( say by a factor 10
-      !   in the beginning, i.e. s=fp0/10, fp0/100,...and more carefully as the approximating curve shows
-      !   more detail) to obtain closer fits. to economize the search for a good s-value the program provides
-      !   with different modes of computation. at the first call of the routine, or whenever he wants to
-      !   restart with the initial set of knots the user must set iopt=0. if iopt=1 the program will continue
-      !   with the set of knots found at the last call of the routine. this will save a lot of computation
-      !   time if parcur is called repeatedly for different values of s. the number of knots of the spline
-      !   returned and their location will depend on the value of s and on the complexity of the shape of the
-      !   curve underlying the data. but, if the computation mode iopt=1 is used, the knots returned may also
-      !   depend on the s-values at previous calls (if these were smaller). therefore, if after a number of
-      !   trials with different s-values and iopt=1, the user can finally accept a fit as satisfactory, it
-      !   may be worthwhile for him to call parcur once more with the selected value for s but now with iopt=0.
-      !   indeed, parcur may then return an approximation of the same quality of fit but with fewer knots and
-      !   therefore better if data reduction is also an important objective for the user.
-      !
-      !   the form of the approximating curve can strongly be affected by the choice of the parameter values
-      !   u(i). if there is no physical reason for choosing a particular parameter u, often good results will
-      !   be obtained with the choice of parcur (in case ipar=0), i.e.
-      !        v(1)=0, v(i)=v(i-1)+q(i), i=2,...,m, u(i)=v(i)/v(m), i=1,..,m
-      !   where
-      !        q(i)= sqrt(sum j=1,idim (xj(i)-xj(i-1))**2 )
-      !   other possibilities for q(i) are
-      !        q(i)= sum j=1,idim (xj(i)-xj(i-1))**2
-      !        q(i)= sum j=1,idim abs(xj(i)-xj(i-1))
-      !        q(i)= max j=1,idim abs(xj(i)-xj(i-1))
-      !        q(i)= 1
-      !
-      !  other subroutines required:
-      !    fpback,fpbspl,fpchec,fppara,fpdisc,fpgivs,fpknot,fprati,fprota
-      !
-      !  references:
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines, computer graphics
-      !                and image processing 20 (1982) 171-184.
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines, report tw55, dept.
-      !                computer science, k.u.leuven, 1981.
-      !   dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                university press, 1993.
-      !
-      !  author:
-      !    p.dierckx
-      !    dept. computer science, k.u. leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : may 1979
-      !
       !  ..scalar arguments..
       real(FP_REAL), intent(inout) :: ub,ue,s
       real(FP_REAL), intent(out) :: fp
@@ -14123,65 +15043,44 @@ module fitpack_core
       end subroutine parcur
 
 
+      !> @brief Evaluate a partial derivative of a bivariate spline on a rectangular grid.
+      !!
+      !! Computes the partial derivative \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial
+      !! y^{\nu_y}} s(x,y) \f$ of a bivariate spline of degrees \f$ k_x \f$ and \f$ k_y \f$ on the grid
+      !! \f$ (x_i, y_j) \f$, \f$ i=1,\ldots,m_x;\; j=1,\ldots,m_y \f$.
+      !!
+      !! The derivative spline of degrees \f$ k_x - \nu_x \f$ and \f$ k_y - \nu_y \f$ is first computed
+      !! by differencing the B-spline coefficients, then evaluated via fpbisp.
+      !!
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
+      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
+      !! @param[in]     x     Grid \f$ x \f$-coordinates (length \f$ m_x \f$), non-decreasing in
+      !!                      \f$ [t_{k_x+1}, t_{n_x-k_x}] \f$.
+      !! @param[in]     mx    Number of grid points along \f$ x \f$, \f$ m_x \ge 1 \f$.
+      !! @param[in]     y     Grid \f$ y \f$-coordinates (length \f$ m_y \f$), non-decreasing in
+      !!                      \f$ [t_{k_y+1}, t_{n_y-k_y}] \f$.
+      !! @param[in]     my    Number of grid points along \f$ y \f$, \f$ m_y \ge 1 \f$.
+      !! @param[out]    z     Derivative values, length \f$ m_x \cdot m_y \f$. On exit,
+      !!                      `z(my*(i-1)+j)` = \f$ \partial^{\nu_x+\nu_y} s / \partial x^{\nu_x}\partial
+      !!                      y^{\nu_y} \f$ at \f$ (x_i, y_j) \f$.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m_x(k_x{+}1{-}\nu_x) + m_y(k_y{+}1{-}\nu_y)
+      !!                      + (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length \f$ \ge m_x + m_y \f$).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see pardeu — scattered-point variant; pardtc — coefficient transformation only;
+      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
       pure subroutine parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
 
-      !  subroutine parder evaluates on a grid (x(i),y(j)),i=1,...,mx; j=1,...,my the partial derivative
-      !  (order nux,nuy) of a bivariate spline s(x,y) of degrees kx and ky, given in the b-spline
-      !  representation.
-      !
-      !  calling sequence:
-      !     call parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   nux/y : integer values, specifying the order of the partial derivative. 0<=nux<kx, 0<=nuy<ky.
-      !   x     : real array of dimension (mx).
-      !           before entry x(i) must be set to the x co-ordinate of the i-th grid point along the x-axis.
-      !           tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2,...,mx.
-      !   mx    : on entry mx must specify the number of grid points along the x-axis. mx >=1.
-      !   y     : real array of dimension (my).
-      !           before entry y(j) must be set to the y co-ordinate of the j-th grid point along the y-axis.
-      !           ty(ky+1)<=y(j-1)<=y(j)<=ty(ny-ky), j=2,...,my.
-      !   my    : on entry my must specify the number of grid points along the y-axis. my >=1.
-      !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
-      !           lwrk >= mx*(kx+1-nux)+my*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1)
-      !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
-      !
-      !  output parameters:
-      !   z     : real array of dimension (mx*my).
-      !           on successful exit z(my*(i-1)+j) contains the value of the specified partial derivative of
-      !           s(x,y) at the point (x(i),y(j)),i=1,...,mx;j=1,...,my.
-      !   ier   : integer error flag
-      !    ier=0 : normal return
-      !    ier=10: invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !   mx >=1, my >=1, 0 <= nux < kx, 0 <= nuy < ky, kwrk>=mx+my
-      !   lwrk>=mx*(kx+1-nux)+my*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1),
-      !   tx(kx+1) <= x(i-1) <= x(i) <= tx(nx-kx), i=2,...,mx
-      !   ty(ky+1) <= y(j-1) <= y(j) <= ty(ny-ky), j=2,...,my
-      !
-      !  other subroutines required:
-      !    fpbisp,fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !   dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)      :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
       integer(FP_FLAG), intent(out)     :: ier
@@ -14290,55 +15189,36 @@ module fitpack_core
 
 
 
+      !> @brief Evaluate a partial derivative of a bivariate spline at scattered points.
+      !!
+      !! Computes \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x_i,y_i)
+      !! \f$ for \f$ i=1,\ldots,m \f$ at arbitrary (unstructured) points. This is the scattered-point
+      !! counterpart of parder, which evaluates on a rectangular grid.
+      !!
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
+      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
+      !! @param[in]     x     \f$ x \f$-coordinates of evaluation points (length \f$ m \f$).
+      !! @param[in]     y     \f$ y \f$-coordinates of evaluation points (length \f$ m \f$).
+      !! @param[out]    z     Derivative values (length \f$ m \f$).
+      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k_x{+}1{-}\nu_x) + m(k_y{+}1{-}\nu_y)
+      !!                      + (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length \f$ \ge 2m \f$).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see parder — grid variant; pardtc — coefficient transformation only;
+      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
       pure subroutine pardeu(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,y,z,m,wrk,lwrk,iwrk,kwrk,ier)
 
-      !  subroutine pardeu evaluates on a set of points (x(i),y(i)),i=1,...,m the partial derivative
-      !  ( order nux,nuy) of a bivariate spline s(x,y) of degrees kx and ky, given in the b-spline
-      !  representation.
-      !
-      !  calling sequence:
-      !     call pardeu(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,y,z,m,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   nux/y : integer values, specifying the order of the partial derivative. 0<=nux<kx, 0<=nuy<ky.
-      !   x     : real array of dimension (mx).
-      !   y     : real array of dimension (my).
-      !   m     : on entry m must specify the number points. m >= 1.
-      !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk.
-      !           lwrk >= mx*(kx+1-nux)+my*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1)
-      !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mx+my.
-      !
-      !  output parameters:
-      !   z     : real array of dimension (m).
-      !           on successful exit z(i) contains the value of the specified partial derivative of s(x,y)
-      !           at the point (x(i),y(i)),i=1,...,m.
-      !   ier   : integer error flag
-      !
-      !  restrictions:
-      !   lwrk>=m*(kx+1-nux)+m*(ky+1-nuy)+(nx-kx-1)*(ny-ky-1),
-      !
-      !  other subroutines required:
-      !    fpbisp,fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !   dierckx p. : curve and surface fitting with splines, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !
       !  ..scalar arguments..
       integer(FP_SIZE),  intent(in)    :: nx,ny,kx,ky,m,lwrk,kwrk,nux,nuy
       integer(FP_SIZE),  intent(out)   :: ier
@@ -14448,48 +15328,33 @@ module fitpack_core
       end subroutine pardeu
 
 
+      !> @brief Transform B-spline coefficients to obtain the partial derivative spline.
+      !!
+      !! Given a bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x, k_y \f$, computes the B-spline
+      !! coefficients of the derivative spline
+      !! \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x,y) \f$
+      !! of degrees \f$ k_x - \nu_x, k_y - \nu_y \f$.
+      !!
+      !! Unlike parder / pardeu, this routine does **not** evaluate the derivative at any point; it only
+      !! transforms the coefficient array. The resulting spline can then be evaluated with bispev or bispeu.
+      !!
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
+      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
+      !! @param[out]    newc  Derivative-spline coefficients, dimension
+      !!                      \f$ (n_x{-}\nu_x{-}k_x{-}1)(n_y{-}\nu_y{-}k_y{-}1) \f$.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see parder — evaluate derivative on a grid; pardeu — evaluate at scattered points;
+      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
       pure subroutine pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ier)
 
-      !  subroutine pardtc takes the knots and coefficients of a bivariate spline, and returns the
-      !  coefficients for a new bivariate spline that evaluates the partial derivative (order nux, nuy) of
-      !  the original spline.
-      !
-      !  calling sequence:
-      !     call pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ier)
-      !
-      !  input parameters:
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction (hidden)
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction (hidden)
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   nux   : integer values, specifying the order of the partial
-      !   nuy     derivative. 0<=nux<kx, 0<=nuy<ky.
-      !
-      !  output parameters:
-      !   newc  : real array containing the coefficients of the derivative.
-      !           the dimension is (nx-nux-kx-1)*(ny-nuy-ky-1).
-      !   ier   : integer error flag
-      !
-      !  restrictions:
-      !   0 <= nux < kx, 0 <= nuy < kyc
-      !
-      !  other subroutines required:
-      !    none
-      !
-      !  references :
-      !   de boor c  : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !   dierckx p. : curve and surface fitting with splines, oxford university press, 1993.
-      !
-      !  based on the subroutine "parder" by Paul Dierckx.
-      !
-      !  author :
-      !    Cong Ma
-      !    Department of Mathematics and Applied Mathematics, U. of Cape Town
-      !    Cross Campus Road, Rondebosch 7700, Cape Town, South Africa.
-      !    e-mail : cong.ma@uct.ac.za
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,nux,nuy
       integer(FP_FLAG), intent(out) :: ier
@@ -14586,86 +15451,49 @@ module fitpack_core
 
 
 
+      !> @brief Fit a smooth parametric surface to gridded data.
+      !!
+      !! Given data points \f$ \mathbf{f}(i,j) \in \mathbb{R}^d \f$ at the grid nodes \f$ (u_i, v_j) \f$,
+      !! \f$ i=1,\ldots,m_u;\; j=1,\ldots,m_v \f$, determines a smooth \f$ d \f$-dimensional bicubic spline
+      !! surface \f$ \mathbf{s}(u,v) = (s_1(u,v),\ldots,s_d(u,v)) \f$ with common knots.
+      !!
+      !! The smoothing factor \f$ s \ge 0 \f$ controls the trade-off:
+      !! \f[
+      !!     \sum_{i,j} \|\mathbf{f}(i,j) - \mathbf{s}(u_i, v_j)\|^2 \le s.
+      !! \f]
+      !! Optional periodicity in \f$ u \f$ and/or \f$ v \f$ is specified via the `ipar` array.
+      !! The result can be evaluated with surev.
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` = least-squares with user knots;
+      !!                      `0` = smoothing, fresh start; `1` = smoothing, continue.
+      !! @param[in]     ipar  Periodicity flags: `ipar(1)=1` for periodic in \f$ u \f$,
+      !!                      `ipar(2)=1` for periodic in \f$ v \f$.
+      !! @param[in]     idim  Dimension of the surface, \f$ 1 \le d \le 3 \f$.
+      !! @param[in]     mu    Number of grid points along \f$ u \f$, \f$ m_u \ge 4 - 2\cdot\text{ipar}(1) \f$.
+      !! @param[in]     u     Strictly increasing \f$ u \f$-grid coordinates (length \f$ m_u \f$).
+      !! @param[in]     mv    Number of grid points along \f$ v \f$, \f$ m_v \ge 4 - 2\cdot\text{ipar}(2) \f$.
+      !! @param[in]     v     Strictly increasing \f$ v \f$-grid coordinates (length \f$ m_v \f$).
+      !! @param[in]     f     Data values, length \f$ m_u \cdot m_v \cdot d \f$:
+      !!                      `f(mu*mv*(l-1)+mv*(i-1)+j)` = \f$ l \f$-th coordinate at \f$ (u_i, v_j) \f$.
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt=-1`).
+      !! @param[in]     nuest Upper bound for \f$ n_u \f$, \f$ \ge 8 \f$.
+      !! @param[in]     nvest Upper bound for \f$ n_v \f$, \f$ \ge 8 \f$.
+      !! @param[in,out] nu    Total number of knots in \f$ u \f$.
+      !! @param[in,out] tu    Knot positions in \f$ u \f$ (length `nuest`).
+      !! @param[in,out] nv    Total number of knots in \f$ v \f$.
+      !! @param[in,out] tv    Knot positions in \f$ v \f$ (length `nvest`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \cdot d \f$.
+      !! @param[in,out] fp    Sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk   Real workspace (length `lwrk`).
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 10, §10.2 (pp. 215–226); surev — evaluate the parametric surface
       pure subroutine parsur(iopt,ipar,idim,mu,u,mv,v,f,s,nuest, &
                              nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-
-      !  given the set of ordered points f(i,j) in the idim-dimensional space, corresponding to grid values 
-      !  (u(i),v(j)) ,i=1:mu  j=1:mv,
-      !  parsur determines a smooth approximating spline surface s(u,v) , i.e.
-      !    f1 = s1(u,v)
-      !      ...                u(1) <= u <= u(mu) ; v(1) <= v <= v(mv)
-      !    fidim = sidim(u,v)
-      !  with sl(u,v), l=1,:idim bicubic spline functions with common knots tu(i),i=1:nu in the u-variable 
-      !  and tv(j),j=1:nv in the v-variable.
-      
-      !  in addition, these splines will be: 
-      !  - periodic in the variable u if ipar(1) = 1 and 
-      !  - periodic in the variable v if ipar(2) = 1.
-      !  if iopt=-1, parsur determines the least-squares bicubic spline surface according to a given set of 
-      !  knots.
-      !  if iopt>=0, the number of knots of s(u,v) and their position is chosen automatically by the routine. 
-      !  the smoothness of s(u,v) is achieved by minimalizing the discontinuity jumps of the derivatives of
-      !  the splines at the knots. the amount of smoothness of s(u,v) is determined by the condition that
-      !  fp=sumi=1,mu(sumj=1,mv(dist(f(i,j)-s(u(i),v(j)))**2))<=s, with s>=0 a given constant.
-      !  the fit s(u,v) is given in its b-spline representation and can be evaluated by means of routine surev.
-      !
-      ! calling sequence:
-      !     call parsur(iopt,ipar,idim,mu,u,mv,v,f,s,nuest,nvest,nu,tu, &
-      !                 nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer flag. unchanged on exit.
-      !          on entry iopt must specify whether a least-squares surface (iopt=-1) or a smoothing surface 
-      !          (iopt=0 or 1)must be determined. if iopt=0 the routine will start with the initial set of
-      !          knots needed for determining the least-squares polynomial surface. if iopt=1 the routine will 
-      !          continue with the set of knots found at the last call of the routine.
-      !          ATTENTION: a call with iopt=1 must always be immediately preceded by another call with 
-      !          iopt = 1 or iopt = 0.
-      !  ipar  : integer array of dimension 2. unchanged on exit. on entry ipar(1) must specify whether
-      !          (ipar(1)=1) or not (ipar(1)=0) the splines must be periodic in the variable u.
-      !          on entry ipar(2) must specify whether (ipar(2)=1) or not (ipar(2)=0) the splines must be 
-      !          periodic in the variable v.
-      !  idim  : integer. on entry idim must specify the dimension of the surface. 1 <= idim <= 3. 
-      !          unchanged on exit.
-      !  mu    : integer. on entry mu must specify the number of grid points along the u-axis. unchanged on 
-      !          exit. mu >= mumin where mumin=4-2*ipar(1)
-      !  u     : real array of dimension at least (mu). before entry, u(i) must be set to the u-co-ordinate of
-      !          the i-th grid point along the u-axis, for i=1,2,...,mu. these values must be supplied in 
-      !          strictly ascending order. unchanged on exit.
-      !  mv    : integer. on entry mv must specify the number of grid points along the v-axis.
-      !          unchanged on exit. mv >= mvmin where mvmin=4-2*ipar(2)
-      !  v     : real array of dimension at least (mv). before entry, v(j) must be set to the v-co-ordinate of 
-      !          the j-th grid point along the v-axis, for j=1:mv. these values must be supplied in strictly
-      !          ascending order. unchanged on exit.
-      !  f     : real array of dimension at least (mu*mv*idim). before entry, f(mu*mv*(l-1)+mv*(i-1)+j) must 
-      !          be set to the l-th co-ordinate of the data point corresponding to the
-      !          the grid point (u(i),v(j)) for l=1:idim ,i=1:mu and j=1:mv. unchanged on exit.
-      !          Periodic BCs: it is expected that
-      !          if ipar(1)=1 => f(mu*mv*(l-1)+mv*(mu-1)+j) = f(mu*mv*(l-1)+j), l=1:idim; j=1:mv
-      !          if ipar(2)=1 => f(mu*mv*(l-1)+mv*(i-1)+mv) = f(mu*mv*(l-1)+mv*(i-1)+1), l=1:idim; i=1:mu
-      !  s     : real. on entry (if iopt>=0) s must specify the smoothing factor. s >=0. unchanged on exit.
-      !          for advice on the choice of s see further comments
-      !  nuest : integer. unchanged on exit.
-      !  nvest : integer. unchanged on exit.
-      !          on entry, nuest and nvest must specify an upper bound for the number of knots required in the 
-      !          u- and v-directions respect. these numbers will also determine the storage space needed by
-      !          the routine. nuest >= 8, nvest >= 8. in most practical situation nuest = mu/2, nvest=mv/2,
-      !          will  be sufficient. always large enough are nuest=mu+4+2*ipar(1), nvest = mv+4+2*ipar(2), 
-      !          the number of knots needed for interpolation (s=0). see also further comments.
-      !  nu    : integer. unless ier=10 (in case iopt>=0), nu will contain the total number of knots with 
-      !          respect to the u-variable, of the spline surface returned. if the computation mode iopt=1 is
-      !          used, the value of nu should be left unchanged between subsequent calls. in case iopt=-1, the 
-      !          value of nu should be specified on entry.
-      !  tu    : real array of dimension at least (nuest). on successful exit, this array will contain the 
-      !          knots of the splines with respect to the u-variable, i.e. the position of the interior knots 
-      !          tu(5:nu-4) as well as the position of the additional knots tu(1:4) and tu(nu-3:nu) needed for 
-      !          the b-spline representation. if the computation mode iopt=1 is used,the values of tu(1:nu)
-      !          should be left unchanged between subsequent calls. if the computation mode iopt=-1 is used,
-      !          the values tu(5:nu-4), must be supplied by the user, before entry. see also the restrictions
-      !          (ier=10).
-      !  nv    : integer. unless ier=10 (in case iopt>=0), nv will contain the total number of knots with 
-      !          respect to the v-variable, of the spline surface returned. if the computation mode iopt=1 is
-      !          used, the value of nv should be left unchanged between subsequent calls. in case iopt=-1, the
       !          value of nv should be specified on entry.
       !  tv    : real array of dimension at least (nvest). on successful exit, this array will contain the 
       !          knots of the splines with respect to the v-variable, i.e. the position of the interior knots
@@ -14892,127 +15720,37 @@ module fitpack_core
       !           the smoothing factor.
       !  the fit s(x) is given in the b-spline representation (b-spline coefficients c(j),j=1:n-k-1) and
       !  can be evaluated by means of subroutine splev.
+      !> @brief Determine a smooth periodic spline approximation to data.
+      !!
+      !! Given data points \f$ (x_i, y_i) \f$ with weights \f$ w_i > 0 \f$, \f$ i=1,\ldots,m \f$,
+      !! computes a periodic spline \f$ s(x) \f$ of degree \f$ k \f$ with period
+      !! \f$ P = x_m - x_1 \f$. The periodicity means \f$ s(x_1) = s(x_m) \f$ and all
+      !! derivatives match at the boundary.
+      !!
+      !! - If `iopt=-1`: weighted least-squares spline with user-specified knots.
+      !! - If `iopt>=0`: automatic knot placement minimizing the discontinuity jumps
+      !!   of the \f$ k \f$-th derivative, subject to \f$ F(p) \le S \f$.
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` (LSQ), `0` (new smoothing), `1` (continue).
+      !! @param[in]     m     Number of data points, \f$ m > 1 \f$.
+      !! @param[in]     x     Abscissae (strictly ascending). \f$ x_m \f$ defines the period length.
+      !! @param[in]     y     Ordinates \f$ y_1,\ldots,y_{m-1} \f$ (element \f$ y_m \f$ not used).
+      !! @param[in]     w     Weights \f$ w_1,\ldots,w_{m-1} > 0 \f$ (\f$ w_m \f$ not used).
+      !! @param[in]     k     Spline degree, \f$ 1 \le k \le 5 \f$. Cubic (\f$ k=3 \f$) recommended.
+      !! @param[in]     s     Smoothing factor \f$ S \ge 0 \f$ (used when `iopt>=0`).
+      !! @param[in]     nest  Over-estimate of total knots. `nest>=2*k+2`; `nest=m+2*k` always suffices.
+      !! @param[in,out] n     Total number of knots.
+      !! @param[in,out] t     Knot positions (length `nest`).
+      !! @param[in,out] c     B-spline coefficients (length `nest`).
+      !! @param[in,out] fp    Weighted sum of squared residuals.
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k+1) + \text{nest}(8+5k) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `nest`).
+      !! @param[in,out] ier   Error flag (same codes as curfit, plus periodic constraints).
+      !!
+      !! @see Dierckx, Ch. 6, §6.1--6.2; fpperi — core periodic fitting algorithm
       pure subroutine percur(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
 
-      !  calling sequence:
-      !     call percur(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier)
-      !
-      !  parameters:
-      !   iopt  : integer flag. on entry iopt must specify whether a weighted least-squares spline (iopt
-      !           =-1) or a smoothing spline (iopt=0 or 1) must be determined. if iopt=0 the routine will
-      !           start with an initial set of knots t(i)=x(1)+(x(m)-x(1))*(i-k-1), i=1:2*k+2.
-      !           if iopt=1 the routine will continue with the knots found at the last call of the
-      !           routine. caution: a call with iopt=1 must always be immediately preceded by another
-      !           call with iopt=1 or iopt=0.  unchanged on exit.
-      !   m     : integer. on entry m must specify the number of data points. m > 1. unchanged on exit.
-      !   x     : real array of dimension at least (m). before entry, x(i) must be set to the i-th value
-      !           of the independent variable x, for i=1:m. these values must be supplied in strictly
-      !           ascending order. x(m) only indicates the length of the period of the spline, i.e
-      !           per=x(m)-x(1). unchanged on exit.
-      !   y     : real array of dimension at least (m). before entry, y(i) must be set to the i-th value
-      !           of the dependent variable y, for i=1,2,...,m-1. the element y(m) is not used.
-      !           unchanged on exit.
-      !   w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value
-      !           in the set of weights. the w(i) must be strictly positive. w(m) is not used.
-      !           see also further comments. unchanged on exit.
-      !   k     : integer. on entry k must specify the degree of the spline, 1<=k<=5. it is recommended
-      !           to use cubic splines (k=3). the user is strongly dissuaded from choosing k even,
-      !           together with a small s-value. unchanged on exit.
-      !   s     : real.on entry (in case iopt>=0) s must specify the smoothing factor. s >=0. unchanged
-      !           on exit. for advice on the choice of s see further comments.
-      !   nest  : integer. on entry nest must contain an over-estimate of the total number of knots of
-      !           the spline returned, to indicate the storage space available to the routine. nest
-      !           >=2*k+2. in most practical situation nest=m/2 will be sufficient. always large enough
-      !           is nest=m+2*k,the number of knots needed for interpolation (s=0). unchanged on exit.
-      !   n     : unless ier = 10 (in case iopt >=0), n will contain the total number of knots of the
-      !           spline approximation returned. if the computation mode iopt=1 is used this value of n
-      !           should be left unchanged between subsequent calls. in case iopt=-1, the value of n must
-      !           be specified on entry.
-      !   t     : real array of dimension at least (nest).
-      !           on successful exit, this array will contain the knots of the spline,i.e. the position
-      !           of the interior knots t(k+2:n-k-1) as well as the position of the additional knots
-      !           t(1:k+1)=x(1) and t(n-k)=x(m),..,t(n) needed for the b-spline representation.
-      !           if the computation mode iopt=1 is used, the values of t(1), t(2:n) should be left
-      !           unchanged between subsequent calls. if the computation mode iopt=-1 is used, the values
-      !           t(k+2),...,t(n-k-1) must be supplied by the user, before entry. see also the
-      !           restrictions (ier=10).
-      !   c     : real array of dimension at least (nest). on successful exit, this array will contain
-      !           the coefficients c(1:n-k-1) in the b-spline representation of s(x)
-      !   fp    : real. unless ier = 10, fp contains the weighted sum of squared residuals of the spline
-      !           approximation returned.
-      !   wrk   : real array of dimension at least (m*(k+1)+nest*(8+5*k)). used as working space. if the
-      !           computation mode iopt=1 is used, the values wrk(1),...,wrk(n) should be left unchanged
-      !           between subsequent calls.
-      !   lwrk  : integer. on entry,lwrk must specify the actual dimension of the array wrk as declared
-      !           in the calling (sub)program. lwrk must not be too small (see wrk). unchanged on exit.
-      !   iwrk  : integer array of dimension at least (nest). used as working space. if the computation
-      !           mode iopt=1 is used,the values iwrk(1),...,iwrk(n) should be left unchanged between
-      !           subsequent calls.
-      !   ier   : integer. output error flag
-      !    ier=10 : error. onon input, the following constraints must be satisfied.
-      !             -1<=iopt<=1, 1<=k<=5, m>1, nest>2*k+2, w(i)>0,i=1,...,m-1
-      !             x(1)<x(2)<...<x(m), lwrk>=(k+1)*m+nest*(8+5*k)
-      !             if iopt=-1: 2*k+2<=n<=min(nest,m+2*k)
-      !                         x(1)<t(k+2)<t(k+3)<...<t(n-k-1)<x(m)
-      !                       the schoenberg-whitney conditions, i.e. there
-      !                       must be a subset of data points xx(j) with
-      !                       xx(j) = x(i) or x(i)+(x(m)-x(1)) such that
-      !                         t(j) < xx(j) < t(j+k+1), j=k+1,...,n-k-1
-      !             if iopt>=0: s>=0
-      !                         if s=0 : nest >= m+2*k
-      !             if one of these conditions is found to be violated,control is immediately repassed
-      !             to the calling program. in that case there is no approximation returned.
-      !
-      !  further comments:
-      !   by means of the parameter s, the user can control the tradeoff between closeness of fit and
-      !   smoothness of fit of the approximation. if s is too large, the spline will be too smooth and
-      !   signal will be lost ; if s is too small the spline will pick up too much noise. in the extreme
-      !   cases the program will return an interpolating periodic spline if s=0 and the weighted least-
-      !   squares constant if s is very large. between these extremes, a properly chosen s will result in
-      !   a good compromise between closeness of fit and smoothness of fit. to decide whether an
-      !   approximation, corresponding to a certain s is satisfactory the user is highly recommended to
-      !   inspect the fits graphically.
-      !   recommended values for s depend on the weights w(i). if these are taken as 1/d(i) with d(i) an
-      !   estimate of the standard deviation of y(i), a good s-value should be found in the range
-      !   (m-sqrt(2*m),m+sqrt(2*m)). if nothing is known about the statistical error in y(i) each w(i)
-      !   can be set equal to one and s determined by trial and error, taking account of the comments
-      !   above. the best is then to start with a very large value of s ( to determine the least-squares
-      !   constant and the corresponding upper bound fp0 for s) and then to progressively decrease the
-      !   value of s ( say by a factor 10 in the beginning, i.e. s=fp0/10, fp0/100,...and more carefully
-      !   as the approximation shows more detail) to obtain closer fits. to economize the search for a
-      !   good s-value the program provides with different modes of computation. at the first call of the
-      !   routine, or whenever he wants to restart with the initial set of knots the user must set iopt=0.
-      !
-      !   if iopt=1 the program will continue with the set of knots found at the last call of the routine.
-      !   this will save a lot of computation time if percur is called repeatedly for different values of
-      !   s. the number of knots of the spline returned and their location will depend on the value of s
-      !   and on the complexity of the shape of the function underlying the data. but, if the computation
-      !   mode iopt=1 is used, the knots returned may also depend on the s-values at previous calls (if
-      !   these were smaller). therefore, if after a number of trials with different s-values and iopt=1,
-      !   the user can finally accept a fit as satisfactory, it may be worthwhile for him to call percur
-      !   once more with the selected value for s but now with iopt=0. indeed, percur may then return an
-      !   approximation of the same quality of fit but with fewer knots and therefore better if data
-      !   reduction is also an important objective for the user.
-      !
-      !  other subroutines required:
-      !    fpbacp,fpbspl,fpchep,fpperi,fpdisc,fpgivs,fpknot,fprati,fprota
-      !
-      !  references:
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines, computer
-      !                graphics and image processing 20 (1982) 171-184.
-      !   dierckx p. : algorithms for smoothing data with periodic and parametric splines, report tw55,
-      !                dept. computer science, k.u.leuven, 1981.
-      !   dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                university press, 1993.
-      !
-      !  author:
-      !    p.dierckx
-      !    dept. computer science, k.u. leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  creation date : may 1979
-      !
       !  ..
       !  ..scalar arguments..
       real(FP_REAL), intent(in)    :: s
@@ -15093,101 +15831,52 @@ module fitpack_core
       end subroutine percur
 
 
+      !> @brief Fit a smooth bivariate spline to gridded data on a polar (disc) domain.
+      !!
+      !! Fits a function \f$ f(x,y) \f$ to data \f$ z_{ij} \f$ at the nodes
+      !! \f$ (x,y) = (u_i \cos v_j,\; u_i \sin v_j) \f$ of a radius-angle grid over the disc
+      !! \f$ x^2 + y^2 \le r^2 \f$.
+      !!
+      !! The problem is reduced to fitting a bicubic spline \f$ s(u,v) \f$ on the rectangle
+      !! \f$ 0 \le u \le r,\; v_1 \le v \le v_1 + 2\pi \f$, subject to continuity constraints at
+      !! the origin and periodicity in \f$ v \f$:
+      !! \f[
+      !!     F_p = \sum_{i,j}(z_{ij} - s(u_i,v_j))^2 + (z_0 - s(0,v))^2 \le s.
+      !! \f]
+      !!
+      !! @param[in]     iopt  Integer array(3): `iopt(1)` = computation mode (`-1`/`0`/`1`);
+      !!                      `iopt(2)` = continuity order at origin (`0`/`1`);
+      !!                      `iopt(3)` = `1` to enforce vanishing at boundary.
+      !! @param[in]     ider  Integer array(2): `ider(1)` = origin data flag (`-1`/`0`/`1`);
+      !!                      `ider(2)` = `1` for vanishing derivatives at origin.
+      !! @param[in]     mu    Number of radial grid points.
+      !! @param[in]     u     Strictly increasing radial coordinates (length \f$ m_u \f$), \f$ u_i > 0 \f$.
+      !! @param[in]     mv    Number of angular grid points, \f$ m_v > 3 \f$.
+      !! @param[in]     v     Strictly increasing angles (length \f$ m_v \f$),
+      !!                      \f$ -\pi \le v_1 < \pi,\; v_{m_v} < v_1 + 2\pi \f$.
+      !! @param[in]     z     Data values, length \f$ m_u \cdot m_v \f$: `z(mv*(i-1)+j)` at \f$ (u_i, v_j) \f$.
+      !! @param[in]     z0    Data value at the origin (used when `ider(1)>=0`).
+      !! @param[in]     r     Disc radius, \f$ r \ge u_{m_u} \f$.
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt(1)=-1`).
+      !! @param[in]     nuest Upper bound for \f$ n_u \f$, \f$ \ge 8 \f$.
+      !! @param[in]     nvest Upper bound for \f$ n_v \f$, \f$ \ge 8 \f$.
+      !! @param[in,out] nu    Total number of knots in \f$ u \f$.
+      !! @param[in,out] tu    Knot positions in \f$ u \f$ (length `nuest`).
+      !! @param[in,out] nv    Total number of knots in \f$ v \f$.
+      !! @param[in,out] tv    Knot positions in \f$ v \f$ (length `nvest`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \f$.
+      !! @param[out]    fp    Sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk   Real workspace (length `lwrk`).
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 237–254); polar — scattered polar variant;
+      !!      evapol — evaluate polar spline at Cartesian point
        subroutine pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s, &
                              nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-
-      !  subroutine pogrid fits a function f(x,y) to a set of data points
-      !  z(i,j) given at the nodes (x,y)=(u(i)*cos(v(j)),u(i)*sin(v(j))),
-      !  i=1,...,mu ; j=1,...,mv , of a radius-angle grid over a disc
-      !    x ** 2  +  y ** 2  <=  r ** 2 .
-      !
-      !  this approximation problem is reduced to the determination of a
-      !  bicubic spline s(u,v) smoothing the data (u(i),v(j),z(i,j)) on the
-      !  rectangle 0<=u<=r, v(1)<=v<=v(1)+2*pi
-      !  in order to have continuous partial derivatives
-      !              i+j
-      !             d   f(0,0)
-      !    g(i,j) = ----------
-      !                i   j
-      !              dx  dy
-      !
-      !  s(u,v)=f(x,y) must satisfy the following conditions
-      !
-      !    (1) s(0,v) = g(0,0)   v(1)<=v<= v(1)+2*pi
-      !
-      !        d s(0,v)
-      !    (2) -------- = cos(v)*g(1,0)+sin(v)*g(0,1)  v(1)<=v<= v(1)+2*pi
-      !        d u
-      !
-      !  moreover, s(u,v) must be periodic in the variable v, i.e.
-      !
-      !         j            j
-      !        d s(u,vb)   d s(u,ve)
-      !    (3) ---------- = ---------   0 <=u<= r, j=0,1,2 , vb=v(1),
-      !           j            j                             ve=vb+2*pi
-      !        d v          d v
-      !
-      !  the number of knots of s(u,v) and their position tu(i),i=1,2,...,nu;
-      !  tv(j),j=1,2,...,nv, is chosen automatically by the routine. the
-      !  smoothness of s(u,v) is achieved by minimalizing the discontinuity
-      !  jumps of the derivatives of the spline at the knots. the amount of
-      !  smoothness of s(u,v) is determined by the condition that
-      !  fp=sumi=1,mu(sumj=1,mv((z(i,j)-s(u(i),v(j)))**2))+(z0-g(0,0))**2<=s,
-      !  with s a given non-negative constant.
-      !  the fit s(u,v) is given in its b-spline representation and can be
-      !  evaluated by means of routine bispev. f(x,y) = s(u,v) can also be
-      !  evaluated by means of function program evapol.
-      !
-      ! calling sequence:
-      !     call pogrid(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest,nu,tu,
-      !    *  ,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer array of dimension 3, specifying different options.
-      !          unchanged on exit.
-      !  iopt(1):on entry iopt(1) must specify whether a least-squares spline
-      !          (iopt(1)=-1) or a smoothing spline (iopt(1)=0 or 1) must be
-      !          determined.
-      !          if iopt(1)=0 the routine will start with an initial set of
-      !          knots tu(i)=0,tu(i+4)=r,i=1,...,4;tv(i)=v(1)+(i-4)*2*pi,i=1,.
-      !          ...,8.
-      !          if iopt(1)=1 the routine will continue with the set of knots
-      !          found at the last call of the routine.
-      !          attention: a call with iopt(1)=1 must always be immediately
-      !          preceded by another call with iopt(1) = 1 or iopt(1) = 0.
-      !  iopt(2):on entry iopt(2) must specify the requested order of conti-
-      !          nuity for f(x,y) at the origin.
-      !          if iopt(2)=0 only condition (1) must be fulfilled and
-      !          if iopt(2)=1 conditions (1)+(2) must be fulfilled.
-      !  iopt(3):on entry iopt(3) must specify whether (iopt(3)=1) or not
-      !          (iopt(3)=0) the approximation f(x,y) must vanish at the
-      !          boundary of the approximation domain.
-      !  ider  : integer array of dimension 2, specifying different options.
-      !          unchanged on exit.
-      !  ider(1):on entry ider(1) must specify whether (ider(1)=0 or 1) or not
-      !          (ider(1)=-1) there is a data value z0 at the origin.
-      !          if ider(1)=1, z0 will be considered to be the right function
-      !          value, and it will be fitted exactly (g(0,0)=z0=c(1)).
-      !          if ider(1)=0, z0 will be considered to be a data value just
-      !          like the other data values z(i,j).
-      !  ider(2):on entry ider(2) must specify whether (ider(2)=1) or not
-      !          (ider(2)=0) f(x,y) must have vanishing partial derivatives
-      !          g(1,0) and g(0,1) at the origin. (in case iopt(2)=1)
-      !  mu    : integer. on entry mu must specify the number of grid points
-      !          along the u-axis. unchanged on exit.
-      !          mu >= mumin where mumin=4-iopt(3)-ider(2) if ider(1)<0
-      !                                 =3-iopt(3)-ider(2) if ider(1)>=0
-      !  u     : real array of dimension at least (mu). before entry, u(i)
-      !          must be set to the u-co-ordinate of the i-th grid point
-      !          along the u-axis, for i=1,2,...,mu. these values must be
-      !          positive and supplied in strictly ascending order.
-      !          unchanged on exit.
-      !  mv    : integer. on entry mv must specify the number of grid points
-      !          along the v-axis. mv > 3 . unchanged on exit.
-      !  v     : real array of dimension at least (mv). before entry, v(j)
-      !          must be set to the v-co-ordinate of the j-th grid point
-      !          along the v-axis, for j=1,2,...,mv. these values must be
-      !          supplied in strictly ascending order. unchanged on exit.
       !          -pi <= v(1) < pi , v(mv) < v(1)+2*pi.
       !  z     : real array of dimension at least (mu*mv).
       !          before entry, z(mv*(i-1)+j) must be set to the data value at
@@ -15557,96 +16246,53 @@ module fitpack_core
       ! the approximation problem is reduced to the determination of a bi-cubic spline s(u,v) fitting a
       ! corresponding set of data points (u(i),v(i),z(i)) on the rectangle 0<=u<=1,-pi<=v<=pi.
 
+      !> @brief Fit a smooth bivariate spline to scattered data on a polar domain.
+      !!
+      !! Given weighted data points \f$ (x_i, y_i, z_i, w_i) \f$ on a polar domain bounded by
+      !! \f$ x = r(v)\cos v,\; y = r(v)\sin v \f$ for \f$ -\pi \le v \le \pi \f$, determines a
+      !! bicubic spline \f$ s(u,v) \f$ with \f$ f(x,y) = s(u,v) \f$ satisfying continuity constraints
+      !! at the origin up to order `iopt(2)` and periodicity in \f$ v \f$.
+      !!
+      !! The smoothing factor \f$ s \ge 0 \f$ controls the trade-off:
+      !! \f[
+      !!     \sum_{i=1}^{m} \bigl[w_i\,(z_i - s(u_i, v_i))\bigr]^2 \le s.
+      !! \f]
+      !! The result can be evaluated with evapol.
+      !!
+      !! @param[in]     iopt  Integer array(3): `iopt(1)` = computation mode (`-1`/`0`/`1`);
+      !!                      `iopt(2)` = continuity order at origin (`0`/`1`/`2`);
+      !!                      `iopt(3)` = `1` to enforce vanishing at boundary.
+      !! @param[in]     m     Number of data points, \f$ m \ge 4 - \text{iopt}(2) - \text{iopt}(3) \f$.
+      !! @param[in]     x     Cartesian \f$ x \f$-coordinates (length \f$ m \f$).
+      !! @param[in]     y     Cartesian \f$ y \f$-coordinates (length \f$ m \f$).
+      !! @param[in]     z     Data values (length \f$ m \f$).
+      !! @param[in]     w     Positive weights (length \f$ m \f$).
+      !! @param[in]     rad   External function defining the polar boundary: \f$ r(v) \f$.
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt(1)=-1`).
+      !! @param[in]     nuest Upper bound for \f$ n_u \f$, \f$ \ge 8 \f$.
+      !! @param[in]     nvest Upper bound for \f$ n_v \f$, \f$ \ge 8 \f$.
+      !! @param[in]     eps   Rank-deficiency threshold, \f$ 0 < \varepsilon < 1 \f$.
+      !! @param[in,out] nu    Total number of knots in \f$ u \f$.
+      !! @param[in,out] tu    Knot positions in \f$ u \f$ (length `nuest`).
+      !! @param[in,out] nv    Total number of knots in \f$ v \f$.
+      !! @param[in,out] tv    Knot positions in \f$ v \f$ (length `nvest`).
+      !! @param[in,out] u     Transformed \f$ u \f$-coordinates (length \f$ m \f$).
+      !! @param[in,out] v     Transformed \f$ v \f$-coordinates (length \f$ m \f$).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \f$.
+      !! @param[out]    fp    Weighted sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk1  Real workspace (length `lwrk1`).
+      !! @param[in]     lwrk1 Declared dimension of `wrk1`.
+      !! @param[in,out] wrk2  Secondary workspace for rank-deficient systems (length `lwrk2`).
+      !! @param[in]     lwrk2 Declared dimension of `wrk2`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input, `>10` = `lwrk2` too small.
+      !!
+      !! @see Dierckx, Ch. 11, §11.1 (pp. 237–254); evapol — evaluate the polar spline;
+      !!      pogrid — gridded polar variant
       pure subroutine polar(iopt,m,x,y,z,w,rad,s,nuest,nvest, &
                             eps,nu,tu,nv,tv,u,v,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-
-      ! in order to have continuous partial derivatives
-      !              i+j
-      !             d   f(0,0)
-      !    g(i,j) = ----------
-      !                i   j
-      !              dx  dy
-      !
-      !  s(u,v)=f(x,y) must satisfy the following conditions
-      !
-      !    (1) s(0,v) = g(0,0)   -pi <=v<= pi.
-      !
-      !        d s(0,v)
-      !    (2) -------- = rad(v)*(cos(v)*g(1,0)+sin(v)*g(0,1))
-      !        d u
-      !                                                    -pi <=v<= pi
-      !         2
-      !        d s(0,v)         2       2             2
-      !    (3) -------- = rad(v)*(cos(v)*g(2,0)+sin(v)*g(0,2)+sin(2*v)*g(1,1))
-      !           2
-      !        d u                                         -pi <=v<= pi
-      !
-      !  moreover, s(u,v) must be periodic in the variable v, i.e.
-      !
-      !         j            j
-      !        d s(u,-pi)   d s(u,pi)
-      !    (4) ---------- = ---------   0 <=u<= 1, j=0,1,2
-      !           j           j
-      !        d v         d v
-      !
-      !  if iopt(1) < 0 circle calculates a weighted least-squares spline according to a given set of
-      !  knots in u- and v- direction.
-      !  if iopt(1) >=0, the number of knots in each direction and their position tu(j),j=1,2,...,nu ;
-      !  tv(j),j=1,2,...,nv are chosen automatically by the routine. the smoothness of s(u,v) is then
-      !  achieved by minimizing the discontinuity jumps of the derivatives of the spline at the knots.
-      !  the amount of smoothness of s(u,v) is determined  by the condition that
-      !  fp = sum((w(i)*(z(i)-s(u(i),v(i))))**2) be <= s, with s a given non-negative constant.
-      !  the bicubic spline is given in its standard b-spline representation and the corresponding
-      !  function f(x,y) can be evaluated by means of function program evapol.
-      !
-      ! calling sequence:
-      !     call polar(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu, &
-      !                nv,tv,u,v,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer array of dimension 3, specifying different options. unchanged on exit.
-      !  iopt(1):on entry iopt(1) must specify whether a weighted least-squares polar spline (iopt(1)=-1)
-      !          or a smoothing polar spline (iopt(1)=0 or 1) must be determined.
-      !          if iopt(1)=0 the routine will start with an initial set of knots tu(i)=0,tu(i+4)=1,i=1:4;
-      !          tv(i)=(2*i-9)*pi,i=1:8. if iopt(1)=1 the routine will continue with the set of knots
-      !          found at the last call of the routine.
-      !          attention: a call with iopt(1)=1 must always be immediately preceded by another call with
-      !          iopt(1) = 1 or iopt(1) = 0.
-      !  iopt(2):on entry iopt(2) must specify the requested order of continuity for f(x,y) at the origin.
-      !          if iopt(2)=0 only condition (1) must be fulfilled,
-      !          if iopt(2)=1 conditions (1)+(2) must be fulfilled and
-      !          if iopt(2)=2 conditions (1)+(2)+(3) must be fulfilled.
-      !  iopt(3):on entry iopt(3) must specify whether (iopt(3)=1) or not (iopt(3)=0) the approximation
-      !          f(x,y) must vanish at the boundary of the approximation domain.
-      !  m     : integer. on entry m must specify the number of data points.
-      !          m >= 4-iopt(2)-iopt(3) unchanged on exit.
-      !  x     : real array of dimension at least (m).
-      !  y     : real array of dimension at least (m).
-      !  z     : real array of dimension at least (m).
-      !          before entry, x(i),y(i),z(i) must be set to the co-ordinates of the i-th data point,
-      !          for i=1,...,m. the order of the data points is immaterial. unchanged on exit.
-      !  w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value in
-      !          the set of weights. the w(i) must be strictly positive. unchanged on exit.
-      !  rad   : real function subprogram defining the boundary of the approximation domain, i.e
-      !          x = rad(v)*cos(v) , y = rad(v)*sin(v), -pi <= v <= pi.
-      !          must be declared external in the calling (sub)program.
-      !  s     : real. on entry (in case iopt(1) >=0) s must specify the smoothing factor. s >=0.
-      !          unchanged on exit. for advice on the choice of s see further comments
-      !  nuest : integer. unchanged on exit.
-      !  nvest : integer. unchanged on exit.
-      !          on entry, nuest and nvest must specify an upper bound for the number of knots required in
-      !          the u- and v-directions resp. these numbers will also determine the storage space needed
-      !          by the routine. nuest >= 8, nvest >= 8. in most practical situation
-      !          nuest = nvest = 8+sqrt(m/2) will be sufficient. see also further comments.
-      !  eps   : real.
-      !          on entry, eps must specify a threshold for determining the effective rank of an over-
-      !          determined linear system of equations. 0 < eps < 1.  if the number of decimal digits in
-      !          the computer representation of a real number is q, then 10**(-q) is a suitable value for
-      !          eps in most practical applications. unchanged on exit.
-      !  nu    : integer.
-      !          unless ier=10 (in case iopt(1) >=0),nu will contain the total number of knots with respect
-      !          to the u-variable, of the spline approximation returned. if the computation mode iopt(1)=1
-      !          is used, the value of nu should be left unchanged between subsequent calls.
       !          in case iopt(1)=-1,the value of nu must be specified on entry
       !  tu    : real array of dimension at least nuest.
       !          on successful exit, this array will contain the knots of the spline with respect to the
@@ -15953,44 +16599,36 @@ module fitpack_core
       ! if iopt=0, f(y) = s(u,y)
       ! if iopt=1, g(x) = s(x,u)
       ! with s(x,y) a bivariate spline of degrees kx and ky, given in the b-spline representation.
+      !> @brief Extract a cross-section (profile) of a bivariate spline.
+      !!
+      !! Given a bivariate spline \f$ s(x,y) \f$, computes the B-spline coefficients of a
+      !! univariate cross-section:
+      !!
+      !! - `iopt=0`: \f$ f(y) = s(u, y) \f$ — profile at fixed \f$ x = u \f$.
+      !! - `iopt=1`: \f$ g(x) = s(x, u) \f$ — profile at fixed \f$ y = u \f$.
+      !!
+      !! The resulting 1-D spline can be evaluated using splev or other univariate routines.
+      !!
+      !! @param[in]     iopt  Profile direction: `0` = fix \f$ x \f$, extract \f$ f(y) \f$;
+      !!                      `1` = fix \f$ y \f$, extract \f$ g(x) \f$.
+      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
+      !! @param[in]     nx    Total number of knots in \f$ x \f$.
+      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
+      !! @param[in]     ny    Total number of knots in \f$ y \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$.
+      !! @param[in]     ky    Degree in \f$ y \f$.
+      !! @param[in]     u     Cross-section coordinate. Must satisfy
+      !!                      \f$ t_{k_x+1} \le u \le t_{n_x-k_x} \f$ if `iopt=0`, or
+      !!                      \f$ t_{k_y+1} \le u \le t_{n_y-k_y} \f$ if `iopt=1`.
+      !! @param[in]     nu    Declared dimension of `cu`. Must be \f$ \ge n_y \f$ if `iopt=0`,
+      !!                      \f$ \ge n_x \f$ if `iopt=1`.
+      !! @param[out]    cu    B-spline coefficients of the 1-D cross-section (length `nu`).
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see bispev — full surface evaluation; fpbspl — B-spline basis evaluation
       pure subroutine profil(iopt,tx,nx,ty,ny,c,kx,ky,u,nu,cu,ier)
 
-      !
-      !  calling sequence:
-      !     call profil(iopt,tx,nx,ty,ny,c,kx,ky,u,nu,cu,ier)
-      !
-      !  input parameters:
-      !   iopt  : integer flag, specifying whether the profile f(y) (iopt=0) or the profile g(x) (iopt=1)
-      !           must be determined.
-      !   tx    : real array, length nx, which contains the position of the knots in the x-direction.
-      !   nx    : integer(FP_SIZE), giving the total number of knots in the x-direction
-      !   ty    : real array, length ny, which contains the position of the knots in the y-direction.
-      !   ny    : integer(FP_SIZE), giving the total number of knots in the y-direction
-      !   c     : real array, length (nx-kx-1)*(ny-ky-1), which contains the b-spline coefficients.
-      !   kx,ky : integer values, giving the degrees of the spline.
-      !   u     : real value, specifying the requested profile.
-      !           tx(kx+1)<=u<=tx(nx-kx), if iopt=0.
-      !           ty(ky+1)<=u<=ty(ny-ky), if iopt=1.
-      !   nu    : on entry nu must specify the dimension of the array cu.
-      !           nu >= ny if iopt=0, nu >= nx if iopt=1.
-      !
-      !  output parameters:
-      !   cu    : real array of dimension (nu). on successful exit this array contains the b-spline
-      !   ier   : integer error flag
-      !
-      !  restrictions:
-      !   if iopt=0 : tx(kx+1) <= u <= tx(nx-kx), nu >=ny.
-      !   if iopt=1 : ty(ky+1) <= u <= ty(ny-ky), nu >=nx.
-      !
-      !  other subroutines required:
-      !    fpbspl
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: iopt,nx,ny,kx,ky,nu
       integer(FP_FLAG), intent(out) :: ier
@@ -16076,86 +16714,56 @@ module fitpack_core
       ! smoothing factor. the fit is given in the b-spline representation (b-spline coefficients
       ! c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be evaluated by means of subroutine
       ! bispev.
+      !> @brief Fit a smoothing bivariate spline to data on a rectangular grid.
+      !!
+      !! Determines a smooth bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x, k_y \f$ approximating
+      !! data values \f$ z_{ij} \f$ at the grid nodes \f$ (x_i, y_j) \f$, \f$ i=1,\ldots,m_x;\;
+      !! j=1,\ldots,m_y \f$, on the rectangle \f$ [x_b, x_e] \times [y_b, y_e] \f$.
+      !!
+      !! The smoothing factor \f$ s \ge 0 \f$ controls the trade-off: the routine minimizes
+      !! discontinuity jumps in the spline derivatives subject to
+      !! \f[
+      !!     \sum_{i=1}^{m_x} \sum_{j=1}^{m_y} \bigl(z_{ij} - s(x_i, y_j)\bigr)^2 \le s.
+      !! \f]
+      !! Setting \f$ s = 0 \f$ produces an interpolating spline.
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` = least-squares with user knots;
+      !!                      `0` = smoothing, fresh start; `1` = smoothing, continue with previous knots.
+      !! @param[in]     mx    Number of grid points along \f$ x \f$, \f$ m_x > k_x \f$.
+      !! @param[in]     x     Strictly increasing \f$ x \f$-grid coordinates (length \f$ m_x \f$).
+      !! @param[in]     my    Number of grid points along \f$ y \f$, \f$ m_y > k_y \f$.
+      !! @param[in]     y     Strictly increasing \f$ y \f$-grid coordinates (length \f$ m_y \f$).
+      !! @param[in]     z     Data values, length \f$ m_x \cdot m_y \f$: `z(my*(i-1)+j)` = value at
+      !!                      \f$ (x_i, y_j) \f$.
+      !! @param[in]     xb    Lower \f$ x \f$-boundary, \f$ x_b \le x_1 \f$.
+      !! @param[in]     xe    Upper \f$ x \f$-boundary, \f$ x_e \ge x_{m_x} \f$.
+      !! @param[in]     yb    Lower \f$ y \f$-boundary, \f$ y_b \le y_1 \f$.
+      !! @param[in]     ye    Upper \f$ y \f$-boundary, \f$ y_e \ge y_{m_y} \f$.
+      !! @param[in]     kx    Degree in \f$ x \f$, \f$ 1 \le k_x \le 5 \f$ (bicubic \f$ k_x{=}3 \f$
+      !!                      recommended).
+      !! @param[in]     ky    Degree in \f$ y \f$, \f$ 1 \le k_y \le 5 \f$.
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt=-1`).
+      !! @param[in]     nxest Upper bound for \f$ n_x \f$, \f$ \ge 2(k_x{+}1) \f$.
+      !! @param[in]     nyest Upper bound for \f$ n_y \f$, \f$ \ge 2(k_y{+}1) \f$.
+      !! @param[in,out] nx    Total number of knots in \f$ x \f$.
+      !! @param[in,out] tx    Knot positions in \f$ x \f$ (length `nxest`).
+      !! @param[in,out] ny    Total number of knots in \f$ y \f$.
+      !! @param[in,out] ty    Knot positions in \f$ y \f$ (length `nyest`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[out]    fp    Sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk   Real workspace (length `lwrk`).
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input.
+      !!
+      !! @note Unlike surfit, this routine exploits the grid structure for a significantly faster algorithm.
+      !!
+      !! @see Dierckx, Ch. 5, §5.4 (pp. 117–121); surfit — scattered-data variant;
+      !!      Dierckx (1982), *SIAM J. Numer. Anal.* 19, 1286–1304
       pure subroutine regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s, &
                              nxest,nyest,nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-
-      !
-      ! calling sequence:
-      !     call regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest,
-      !    *  nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer flag. on entry iopt must specify whether a least-squares spline (iopt=-1) or a
-      !          smoothing spline (iopt=0 or 1) must be determined.
-      !          if iopt=0 the routine will start with an initial set of knots
-      !          tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=1,...,ky+1.
-      !          if iopt=1 the routine will continue with the set of knots found at the last call of the
-      !          routine. attention: a call with iopt=1 must always be immediately preceded by another call
-      !          with iopt=1 or iopt=0 and s/=0. unchanged on exit.
-      !  mx    : integer. on entry mx must specify the number of grid points along the x-axis. mx > kx .
-      !          unchanged on exit.
-      !  x     : real array of dimension at least (mx). before entry, x(i) must be set to the x-co-ordinate of
-      !          the i-th grid point along the x-axis, for i=1,2,...,mx. these values must be supplied in
-      !          strictly ascending order. unchanged on exit.
-      !  my    : integer. on entry my must specify the number of grid points along the y-axis. my > ky .
-      !          unchanged on exit.
-      !  y     : real array of dimension at least (my). before entry, y(j) must be set to the y-co-ordinate of
-      !          the j-th grid point along the y-axis, for j=1,2,...,my. these values must be supplied in
-      !          strictly ascending order. unchanged on exit.
-      !  z     : real array of dimension at least (mx*my). before entry, z(my*(i-1)+j) must be set to the data
-      !          value at the grid point (x(i),y(j)) for i=1,...,mx and j=1,...,my. unchanged on exit.
-      !  xb,xe : real values. on entry xb,xe,yb and ye must specify the boundaries of the rectangular approxi-
-      !  yb,ye   mation domain. xb<=x(i)<=xe,i=1,...,mx; yb<=y(j)<=ye,j=1,...,my. unchanged on exit.
-      !  kx,ky : integer values. on entry kx and ky must specify the degrees of the spline. 1<=kx,ky<=5. it is
-      !          recommended to use bicubic (kx=ky=3) splines. unchanged on exit.
-      !  s     : real. on entry (in case iopt>=0) s must specify the smoothing factor. s>=0. unchanged on exit.
-      !          for advice on the choice of s see further comments
-      !  nxest : integer. unchanged on exit.
-      !  nyest : integer. unchanged on exit.
-      !          on entry, nxest and nyest must specify an upper bound for the number of knots required in the
-      !          x- and y-directions respect. these numbers will also determine the storage space needed by the
-      !          routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1). in most practical situation nxest = mx/2,
-      !          nyest=my/2, will be sufficient. always large enough are nxest=mx+kx+1, nyest=my+ky+1, the
-      !          number of knots needed for interpolation (s=0). see also further comments.
-      !  nx    : integer.
-      !          unless ier=10 (in case iopt >=0), nx will contain the total number of knots with respect to
-      !          the x-variable, of the spline approximation returned. if the computation mode iopt=1 is used,
-      !          the value of nx should be left unchanged between subsequent calls.
-      !          in case iopt=-1, the value of nx should be specified on entry
-      !  tx    : real array of dimension nmax.  on successful exit, this array will contain the knots of the
-      !          spline with respect to the x-variable, i.e. the position of the interior knots tx(kx+2),...,
-      !          tx(nx-kx-1) as well as the position of the additional knots tx(1)=...=tx(kx+1)=xb and
-      !          tx(nx-kx)=...=tx(nx)=xe needed for the b-spline representat. if the computation mode iopt=1
-      !          is used, the values of tx(1),...,tx(nx) should be left unchanged between subsequent calls.
-      !          if the computation mode iopt=-1 is used, the values tx(kx+2),...tx(nx-kx-1) must be supplied
-      !          by the user, before entry. see also the restrictions (ier=10).
-      !  ny    : integer.
-      !          unless ier=10 (in case iopt >=0), ny will contain the total number of knots with respect to
-      !          the y-variable, of the spline approximation returned. if the computation mode iopt=1 is used,
-      !          the value of ny should be left unchanged between subsequent calls.
-      !          in case iopt=-1, the value of ny should be specified on entry
-      !  ty    : real array of dimension nmax.
-      !          on successful exit, this array will contain the knots of the spline with respect to the
-      !          y-variable, i.e. the position of the interior knots ty(ky+2),...,ty(ny-ky-1) as well as the
-      !          position of the additional knots ty(1)=...=ty(ky+1)=yb and ty(ny-ky)=...=ty(ny)=ye needed for
-      !          the b-spline representat. if the computation mode iopt=1 is used, the values of ty(1),...,
-      !          ty(ny) should be left unchanged between subsequent calls.
-      !          if the computation mode iopt=-1 is used, the values ty(ky+2),...ty(ny-ky-1) must be supplied
-      !          by the user, before entry. see also the restrictions (ier=10).
-      !  c     : real array of dimension at least (nxest-kx-1)*(nyest-ky-1).
-      !          on successful exit, c contains the coefficients of the spline approximation s(x,y)
-      !  fp    : real. unless ier=10, fp contains the sum of squared residuals of the spline approximation
-      !          returned.
-      !  wrk   : real array of dimension (lwrk). used as workspace. if the computation mode iopt=1 is used the
-      !          values of wrk(1),...,wrk(4) should be left unchanged between subsequent calls.
-      !  lwrk  : integer. on entry lwrk must specify the actual dimension of the array wrk as declared in the
-      !          calling (sub)program. lwrk must not be too small.
-      !           lwrk >= 4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+mx*(kx+1)+ my*(ky+1) +u
-      !           where u is the larger of my and nxest.
-      !  iwrk  : integer array of dimension (kwrk). used as workspace. if the computation mode iopt=1 is used
-      !          the values of iwrk(1),...,iwrk(3) should be left unchanged between subsequent calls
-      !  kwrk  : integer. on entry kwrk must specify the actual dimension of the array iwrk as declared in the
-      !          calling (sub)program. kwrk >= 3+mx+my+nxest+nyest.
       !  ier   : integer. unless the routine detects an error, ier contains a non-positive value on exit, i.e.
       !   ier=0  : normal return. the spline returned has a residual sum of squares fp such that abs(fp-s)/s
       !            <= tol with tol a relative tolerance set to 0.001 by the program.
@@ -16354,50 +16962,27 @@ module fitpack_core
       !              (j-1)
       !      d(j) = s     (x) , j=1,2,...,k1
       !  of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.
+      !> @brief Evaluate all derivatives of a spline at a single point.
+      !!
+      !! Given a spline \f$ s(x) \f$ of order \f$ k_1 = k + 1 \f$ (degree \f$ k \f$) in B-spline
+      !! representation, computes \f$ d_j = s^{(j-1)}(x) \f$ for \f$ j = 1,\ldots,k_1 \f$
+      !! using the stable recurrence scheme of de Boor.
+      !!
+      !! @param[in]  t    Knot positions (length \f$ n \f$).
+      !! @param[in]  n    Total number of knots.
+      !! @param[in]  c    B-spline coefficients (length \f$ n \f$).
+      !! @param[in]  k1   Order of the spline (\f$ k_1 = k + 1 \f$).
+      !! @param[in]  x    Point where derivatives are evaluated.
+      !!   Must satisfy \f$ t_{k_1} \le x \le t_{n-k_1+1} \f$.
+      !! @param[out] d    Derivative values (length \f$ k_1 \f$):
+      !!   \f$ d(j) = s^{(j-1)}(x) \f$ for \f$ j = 1,\ldots,k_1 \f$.
+      !! @param[out] ier  Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @note At a knot, right derivatives are computed (left derivatives at the right boundary).
+      !!
+      !! @see Dierckx, Ch. 1, §1.3; fpader — derivative computation kernel
       pure subroutine spalde(t,n,c,k1,x,d,ier)
 
-      !  calling sequence:
-      !     call spalde(t,n,c,k1,x,d,ier)
-      !
-      !  input parameters:
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
-      !    c    : array,length n, which contains the b-spline coefficients.
-      !    k1   : integer(FP_SIZE), giving the order of s(x) (order=degree+1)
-      !    x    : real, which contains the point where the derivatives must
-      !           be evaluated.
-      !
-      !  output parameters:
-      !    d    : array,length k1, containing the derivative values of s(x).
-      !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier =10 : invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !    t(k1) <= x <= t(n-k1+1)
-      !
-      !  further comments:
-      !    if x coincides with a knot, right derivatives are computed
-      !    ( left derivatives if x = t(n-k1+1) ).
-      !
-      !  other subroutines required: fpader.
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory
-      !                6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths
-      !                applics 10 (1972) 134-149.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : march 1987
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)      :: n,k1
       integer(FP_FLAG), intent(out)     :: ier
@@ -16429,90 +17014,51 @@ module fitpack_core
       end subroutine spalde
 
 
+      !> @brief Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).
+      !!
+      !! Given data values \f$ r_{ij} \f$ on the latitude-longitude grid \f$ (u_i, v_j) \f$ with
+      !! \f$ 0 < u_i < \pi \f$ (colatitude), \f$ v_b \le v_j < v_b + 2\pi \f$ (longitude), determines
+      !! a bicubic spline \f$ s(u,v) \f$ satisfying pole continuity constraints (value and optional
+      !! gradient at \f$ u=0 \f$ and \f$ u=\pi \f$) and periodicity in \f$ v \f$:
+      !! \f[
+      !!     \sum_{i,j}(r_{ij} - s(u_i,v_j))^2 + (r_0 - s(0,v))^2 + (r_1 - s(\pi,v))^2 \le s.
+      !! \f]
+      !!
+      !! @param[in]     iopt  Integer array(3): `iopt(1)` = computation mode (`-1`/`0`/`1`);
+      !!                      `iopt(2)` = continuity order at pole \f$ u=0 \f$ (`0`/`1`);
+      !!                      `iopt(3)` = continuity order at pole \f$ u=\pi \f$ (`0`/`1`).
+      !! @param[in]     ider  Integer array(4): pole data/derivative flags — `ider(1)` and `ider(3)`
+      !!                      specify whether data at poles exist; `ider(2)` and `ider(4)` specify
+      !!                      vanishing derivatives.
+      !! @param[in]     mu    Number of latitude grid points, \f$ 0 < u_i < \pi \f$.
+      !! @param[in]     u     Strictly increasing colatitudes (length \f$ m_u \f$).
+      !! @param[in]     mv    Number of longitude grid points, \f$ m_v > 3 \f$.
+      !! @param[in]     v     Strictly increasing longitudes (length \f$ m_v \f$),
+      !!                      \f$ -\pi \le v_1 < \pi,\; v_{m_v} < v_1 + 2\pi \f$.
+      !! @param[in]     r     Data values, length \f$ m_u \cdot m_v \f$:
+      !!                      `r(mv*(i-1)+j)` at \f$ (u_i, v_j) \f$.
+      !! @param[in]     r0    Data value at the north pole \f$ u=0 \f$ (used when `ider(1)>=0`).
+      !! @param[in]     r1    Data value at the south pole \f$ u=\pi \f$ (used when `ider(3)>=0`).
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt(1)=-1`).
+      !! @param[in]     nuest Upper bound for \f$ n_u \f$, \f$ \ge 8 \f$.
+      !! @param[in]     nvest Upper bound for \f$ n_v \f$, \f$ \ge 8 \f$.
+      !! @param[in,out] nu    Total number of knots in \f$ u \f$.
+      !! @param[in,out] tu    Knot positions in \f$ u \f$ (length `nuest`).
+      !! @param[in,out] nv    Total number of knots in \f$ v \f$.
+      !! @param[in,out] tv    Knot positions in \f$ v \f$ (length `nvest`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \f$.
+      !! @param[out]    fp    Sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk   Real workspace (length `lwrk`).
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 254–270); sphere — scattered spherical variant;
+      !!      bispev — evaluate the result
       pure subroutine spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s, &
-                             nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-
-      !  given the function values r(i,j) on the latitude-longitude grid  (u(i),v(j)), i=1:mu; j=1:mv,
-      !  spgrid determines a smooth bicubic spline approximation on the rectangular domain 0<=u<=pi,
-      !  vb<=v<=ve (vb = v(1), ve=vb+2*pi). this approximation s(u,v) will satisfy the properties
-      !
-      !    (1) s(0,v) = s(0,0) = dr(1)
-      !
-      !        d s(0,v)           d s(0,0)           d s(0,pi/2)
-      !    (2) -------- = cos(v)* -------- + sin(v)* -----------
-      !        d u                d u                d u
-      !
-      !                 = cos(v)*dr(2)+sin(v)*dr(3)
-      !                                                     vb <= v <= ve
-      !    (3) s(pi,v) = s(pi,0) = dr(4)
-      !
-      !        d s(pi,v)           d s(pi,0)           d s(pi,pi/2)
-      !    (4) -------- = cos(v)*  --------- + sin(v)* ------------
-      !        d u                 d u                 d u
-      !
-      !                 = cos(v)*dr(5)+sin(v)*dr(6)
-      !
-      !  and will be periodic in the variable v, i.e.
-      !
-      !         j           j
-      !        d s(u,vb)   d s(u,ve)
-      !    (5) --------- = ---------   0 <=u<= pi , j=0,1,2
-      !           j           j
-      !        d v         d v
-      !
-      !  the number of knots of s(u,v) and their position tu(i),i=1:nu; tv(j),j=1,:nv, is chosen 
-      !  automatically by the routine. the smoothness of s(u,v) is achieved by minimalizing the 
-      !  discontinuity jumps of the derivatives of the spline at the knots. the amount of smoothness 
-      !  of s(u,v) is determined by the condition that 
-      !  fp=sumi=1,mu(sumj=1,mv((r(i,j)-s(u(i),v(j)))**2))+(r0-s(0,v))**2 + (r1-s(pi,v))**2 <= s, 
-      !  with s a given non-negative constant. the fit s(u,v) is given in its b-spline representation 
-      !  and can be evaluated by means of routine bispev
-      !
-      ! calling sequence:
-      !     call spgrid(iopt,ider,mu,u,mv,v,r,r0,r1,s,nuest,nvest,nu,tu,
-      !    *  ,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer array of dimension 3, specifying different options. unchanged on exit.
-      !  iopt(1):on entry iopt(1) must specify whether a least-squares spline (iopt(1)=-1) or a 
-      !          smoothing spline (iopt(1)=0 or 1) must be determined.
-      !          if iopt(1)=0 the routine will start with an initial set of knots tu(i)=0,tu(i+4)=pi,i=1:4;
-      !          tv(i)=v(1)+(i-4)*2*pi, i=1:8.
-      !          if iopt(1)=1 the routine will continue with the set of knots found at the last call of 
-      !          the routine. attention: a call with iopt(1)=1 must always be immediately preceded by
-      !          another call with iopt(1) = 1 or iopt(1) = 0.
-      !  iopt(2):on entry iopt(2) must specify the requested order of continuity at the pole u=0.
-      !          if iopt(2)=0 only condition (1) must be fulfilled and
-      !          if iopt(2)=1 conditions (1)+(2) must be fulfilled.
-      !  iopt(3):on entry iopt(3) must specify the requested order of continuity at the pole u=pi.
-      !          if iopt(3)=0 only condition (3) must be fulfilled and
-      !          if iopt(3)=1 conditions (3)+(4) must be fulfilled.
-      !  ider  : integer array of dimension 4, specifying different options. unchanged on exit.
-      !  ider(1):on entry ider(1) must specify whether (ider(1)=0 or 1) or not (ider(1)=-1) there is a 
-      !          data value r0 at the pole u=0. if ider(1)=1, r0 will be considered to be the right 
-      !          function value, and it will be fitted exactly (s(0,v)=r0). if ider(1)=0, r0 will be 
-      !          considered to be a data value just like the other data values r(i,j).
-      !  ider(2):on entry ider(2) must specify whether (ider(2)=1) or not (ider(2)=0) the approximation 
-      !          has vanishing derivatives dr(2) and dr(3) at the pole u=0  (in case iopt(2)=1)
-      !  ider(3):on entry ider(3) must specify whether (ider(3)=0 or 1) or not (ider(3)=-1) there is a 
-      !          data value r1 at the pole u=pi. if ider(3)=1, r1 will be considered to be the right 
-      !          function value, and it will be fitted exactly (s(pi,v)=r1). if ider(3)=0, r1 will be 
-      !          considered to be a data value just like the other data values r(i,j).
-      !  ider(4):on entry ider(4) must specify whether (ider(4)=1) or not (ider(4)=0) the approximation has
-      !          vanishing derivatives dr(5) and dr(6) at the pole u=pi (in case iopt(3)=1)
-      !  mu    : integer. on entry mu must specify the number of grid points along the u-axis. unchanged on exit.
-      !          mu >= 1, mu >=mumin=4-i0-i1-ider(2)-ider(4) with i0=min(1,ider(1)+1), i1=min(1,ider(3)+1)
-      !  u     : real array of dimension at least (mu). before entry, u(i) must be set to the u-co-ordinate 
-      !          of the i-th grid point along the u-axis, for i=1,2,...,mu. these values must be supplied in 
-      !          strictly ascending order. unchanged on exit. 0 < u(i) < pi.
-      !  mv    : integer. on entry mv must specify the number of grid points along the v-axis. mv > 3 . 
-      !          unchanged on exit.
-      !  v     : real array of dimension at least (mv). before entry, v(j) must be set to the v-co-ordinate 
-      !          of the j-th grid point along the v-axis, for j=1,2,...,mv. these values must be supplied in 
-      !          strictly ascending order. unchanged on exit. -pi <= v(1) < pi , v(mv) < v(1)+2*pi.
-      !  r     : real array of dimension at least (mu*mv). before entry, r(mv*(i-1)+j) must be set to the data 
-      !          value at the grid point (u(i),v(j)) for i=1,...,mu and j=1,...,mv. unchanged on exit.
-      !  r0    : real value. on entry (if ider(1) >=0 ) r0 must specify the data value at the pole u=0. 
+                             nuest,nvest,nu,tu,nv,tv,c,fp,wrk,lwrk,iwrk,kwrk,ier) 
       !          unchanged on exit.
       !  r1    : real value. on entry (if ider(1) >=0 ) r1 must specify the data value at the pole u=pi. 
       !          unchanged on exit.
@@ -16814,35 +17360,50 @@ module fitpack_core
       end subroutine spgrid
 
 
+      !> @brief Fit a smooth bicubic spherical spline to scattered data on a sphere.
+      !!
+      !! Given weighted data points \f$ (\theta_i, \phi_i, r_i, w_i) \f$, \f$ i=1,\ldots,m \f$, with
+      !! \f$ 0 \le \theta \le \pi \f$ (colatitude) and \f$ 0 \le \phi \le 2\pi \f$ (longitude),
+      !! determines a bicubic spline \f$ s(\theta, \phi) \f$ satisfying:
+      !!
+      !! - Pole constraints: \f$ s(0,\phi) \f$ and \f$ s(\pi,\phi) \f$ are constant.
+      !! - Periodicity in \f$ \phi \f$: derivatives match at \f$ \phi = 0 \f$ and \f$ \phi = 2\pi \f$.
+      !! - Gradient constraints at poles for smooth angular dependence.
+      !!
+      !! The smoothing factor \f$ s \ge 0 \f$ controls the trade-off:
+      !! \f[
+      !!     \sum_{i=1}^{m} \bigl[w_i\,(r_i - s(\theta_i, \phi_i))\bigr]^2 \le s.
+      !! \f]
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` = least-squares with user knots;
+      !!                      `0` = smoothing, fresh start; `1` = smoothing, continue.
+      !! @param[in]     m     Number of data points, \f$ m \ge 2 \f$.
+      !! @param[in]     teta  Colatitudes \f$ \theta_i \in [0, \pi] \f$ (length \f$ m \f$).
+      !! @param[in]     phi   Longitudes \f$ \phi_i \in [0, 2\pi] \f$ (length \f$ m \f$).
+      !! @param[in]     r     Data values (length \f$ m \f$).
+      !! @param[in]     w     Positive weights (length \f$ m \f$).
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt=-1`).
+      !! @param[in]     ntest Upper bound for \f$ n_\theta \f$, \f$ \ge 8 \f$.
+      !! @param[in]     npest Upper bound for \f$ n_\phi \f$, \f$ \ge 8 \f$.
+      !! @param[in]     eps   Rank-deficiency threshold, \f$ 0 < \varepsilon < 1 \f$.
+      !! @param[in,out] nt    Total number of knots in \f$ \theta \f$.
+      !! @param[in,out] tt    Knot positions in \f$ \theta \f$ (length `ntest`).
+      !! @param[in,out] np    Total number of knots in \f$ \phi \f$.
+      !! @param[in,out] tp    Knot positions in \f$ \phi \f$ (length `npest`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_\theta{-}4)(n_\phi{-}4) \f$.
+      !! @param[out]    fp    Weighted sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk1  Real workspace (length `lwrk1`).
+      !! @param[in]     lwrk1 Declared dimension of `wrk1`.
+      !! @param[in,out] wrk2  Secondary workspace for rank-deficient systems (length `lwrk2`).
+      !! @param[in]     lwrk2 Declared dimension of `wrk2`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input, `>10` = `lwrk2` too small.
+      !!
+      !! @see Dierckx, Ch. 11, §11.2 (pp. 254–270); spgrid — gridded spherical variant
       pure subroutine sphere(iopt,m,teta,phi,r,w,s,ntest,npest, &
                              eps,nt,tt,np,tp,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-
-      !  subroutine sphere determines a smooth bicubic spherical spline
-      !  approximation s(teta,phi), 0 <= teta <= pi ; 0 <= phi <= 2*pi
-      !  to a given set of data points (teta(i),phi(i),r(i)),i=1,2,...,m.
-      !  such a spline has the following specific properties
-      !
-      !    (1) s(0,phi)  = constant   0 <=phi<= 2*pi.
-      !
-      !    (2) s(pi,phi) = constant   0 <=phi<= 2*pi
-      !
-      !         j             j
-      !        d s(teta,0)   d s(teta,2*pi)
-      !    (3) ----------- = ------------   0 <=teta<=pi, j=0,1,2
-      !             j             j
-      !        d phi         d phi
-      !
-      !        d s(0,phi)    d s(0,0)             d s(0,pi/2)
-      !    (4) ----------  = -------- *cos(phi) + ----------- *sin(phi)
-      !        d teta        d teta               d teta
-      !
-      !        d s(pi,phi)   d s(pi,0)            d s(pi,pi/2)
-      !    (5) ----------- = ---------*cos(phi) + ------------*sin(phi)
-      !        d teta        d teta               d teta
-      !
-      !  if iopt =-1 sphere calculates a weighted least-squares spherical
-      !  spline according to a given set of knots in teta- and phi- direction.
-      !  if iopt >=0, the number of knots in each direction and their position
       !  tt(j),j=1,2,...,nt ; tp(j),j=1,2,...,np are chosen automatically by
       !  the routine. the smoothness of s(teta,phi) is then achieved by mini-
       !  malizing the discontinuity jumps of the derivatives of the spline
@@ -17231,58 +17792,31 @@ module fitpack_core
 
       !  subroutine splder evaluates in a number of points x(i),i=1,2,...,m the derivative of order nu
       !  of a spline s(x) of degree k,given in its b-spline representation.
+      !> @brief Evaluate the \f$ \nu \f$-th derivative of a spline \f$ s(x) \f$ at a set of points.
+      !!
+      !! Given a spline of degree \f$ k \f$ in B-spline representation, evaluates
+      !! \f$ s^{(\nu)}(x_i) \f$ for \f$ i = 1,\ldots,m \f$ using the recurrence scheme of de Boor.
+      !! The derivative of order \f$ \nu \f$ of a degree-\f$ k \f$ spline is a degree-\f$ (k{-}\nu) \f$
+      !! spline whose B-spline coefficients are computed via the de Boor recurrence.
+      !!
+      !! @param[in]     t    Knot positions (length \f$ n \f$).
+      !! @param[in]     n    Total number of knots.
+      !! @param[in]     c    B-spline coefficients (length \f$ n \f$).
+      !! @param[in]     k    Degree of the spline.
+      !! @param[in]     nu   Order of derivative, \f$ 0 \le \nu \le k \f$.
+      !! @param[in]     x    Evaluation points (length \f$ m \f$).
+      !! @param[out]    y    Derivative values \f$ s^{(\nu)}(x_i) \f$ (length \f$ m \f$).
+      !! @param[in]     m    Number of evaluation points, \f$ m \ge 1 \f$.
+      !! @param[in]     e    Extrapolation mode for points outside the support:
+      !!   - `0`: extrapolate from end spans.
+      !!   - `1`: return zero.
+      !!   - `2`: set `ier=1` and return.
+      !! @param[in,out] wrk  Real workspace (length \f$ n \f$). Contains derivative coefficients on exit.
+      !! @param[out]    ier  Error flag: `0` = normal; `1` = out of bounds with `e=2`; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3; fpbspl — B-spline basis evaluation
       pure subroutine splder(t,n,c,k,nu,x,y,m,e,wrk,ier)
 
-      !
-      !  calling sequence:
-      !     call splder(t,n,c,k,nu,x,y,m,e,wrk,ier)
-      !
-      !  input parameters:
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
-      !    c    : array,length n, which contains the b-spline coefficients.
-      !    k    : integer(FP_SIZE), giving the degree of s(x).
-      !    nu   : integer(FP_SIZE), specifying the order of the derivative. 0<=nu<=k
-      !    x    : array,length m, which contains the points where the derivative of s(x) must be evaluated.
-      !    m    : integer(FP_SIZE), giving the number of points where the derivative of s(x) must be evaluated
-      !    e    : integer(FP_FLAG), if 0 the spline is extrapolated from the end spans for points not in the
-      !           support, if 1 the spline evaluates to zero for those points, and if 2 ier is set to
-      !           1 and the subroutine returns.
-      !    wrk  : real array of dimension n. used as working space.
-      !
-      !  output parameters:
-      !    y    : array,length m, giving the value of the derivative of s(x) at the different points.
-      !    ier  : error flag
-      !      ier = 0 : normal return
-      !      ier = 1 : argument out of bounds and e == 2
-      !      ier =10 : invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !    0 <= nu <= k
-      !    m >= 1
-      !    t(k+1) <= x(i) <= x(i+1) <= t(n-k) , i=1,2,...,m-1.
-      !
-      !  other subroutines required: fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !   dierckx p. : curve and surface fitting with splines, monographs on
-      !                numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : march 1987
-      !
-      !++ pearu: 13 aug 2003
-      !++   - disabled cliping x values to interval [min(t),max(t)]
-      !++   - removed the restriction of the orderness of x values
-      !++   - fixed initialization of sp to real(FP_REAL) value
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: n,k,nu,m
       integer(FP_FLAG), intent(in)  :: e
@@ -17388,45 +17922,28 @@ module fitpack_core
 
       ! subroutine splev evaluates in a number of points x(i),i=1,2,...,m a spline s(x) of degree k,
       ! given in its b-spline representation.
+      !> @brief Evaluate a spline \f$ s(x) \f$ of degree \f$ k \f$ at a set of points.
+      !!
+      !! Given a spline in its B-spline representation (knots \f$ t \f$, coefficients \f$ c \f$,
+      !! degree \f$ k \f$), evaluates \f$ s(x_i) \f$ for \f$ i = 1,\ldots,m \f$.
+      !!
+      !! @param[in]  t    Knot positions (length \f$ n \f$).
+      !! @param[in]  n    Total number of knots.
+      !! @param[in]  c    B-spline coefficients (length \f$ n \f$).
+      !! @param[in]  k    Degree of the spline.
+      !! @param[in]  x    Evaluation points (length \f$ m \f$).
+      !! @param[out] y    Spline values \f$ s(x_i) \f$ (length \f$ m \f$).
+      !! @param[in]  m    Number of evaluation points. Must satisfy \f$ m \ge 1 \f$.
+      !! @param[in]  e    Extrapolation mode for points outside \f$ [t_{k+1}, t_{n-k}] \f$:
+      !!   - `0` (`OUTSIDE_EXTRAPOLATE`): extrapolate from end spans.
+      !!   - `1` (`OUTSIDE_ZERO`): return zero.
+      !!   - `2` (`OUTSIDE_NOT_ALLOWED`): set `ier=1` and return.
+      !!   - `3` (`OUTSIDE_NEAREST_BND`): clamp to nearest boundary value.
+      !! @param[out] ier  Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3 (pp. 4--14); fpbspl — B-spline basis evaluation
       pure subroutine splev(t,n,c,k,x,y,m,e,ier)
 
-      !  calling sequence:
-      !     call splev(t,n,c,k,x,y,m,e,ier)
-      !
-      !  input parameters:
-      !    t    : array,length n, which contains the position of the knots.
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
-      !    c    : array,length n, which contains the b-spline coefficients.
-      !    k    : integer(FP_SIZE), giving the degree of s(x).
-      !    x    : array,length m, which contains the points where s(x) must be evaluated.
-      !    m    : integer(FP_SIZE), giving the number of points where s(x) must be evaluated.
-      !    e    : integer(FP_SIZE), boundary condition for points outside the support
-      !           0 = the spline is extrapolated from the end spans
-      !           1 = the spline evaluates to zero for those points,
-      !           2 = extrapolation not allowed, ier is set to 1 and the subroutine returns,
-      !           3 = the spline evaluates to the value of the nearest boundary point.
-      !
-      !  output parameter:
-      !    y    : array,length m, giving the value of s(x) at the different points.
-      !    ier  : error flag
-      !
-      !  restrictions:
-      !    m >= 1
-      !
-      !  other subroutines required: fpbspl.
-      !
-      !  references :
-      !    de boor c  : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !    cox m.g.   : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford
-      !                 university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: n, k, m
       integer(FP_FLAG), intent(in)  :: e
@@ -17497,39 +18014,29 @@ module fitpack_core
 
       end subroutine splev
 
-      !  function splint calculates the integral of a spline function s(x)
-      !  of degree k, which is given in its normalized b-spline representation
-
+      !> @brief Compute the definite integral of a spline \f$ s(x) \f$ over \f$ [a, b] \f$.
+      !!
+      !! Calculates \f$ \int_a^b s(x)\,dx \f$ for a spline of degree \f$ k \f$ given in B-spline
+      !! representation. The spline is considered identically zero outside its support
+      !! \f$ (t_{k+1}, t_{n-k}) \f$.
+      !!
+      !! Uses the method of Gaffney (1976): first computes the integrals of each normalized
+      !! B-spline \f$ N_{i,k+1}(x) \f$ over \f$ [a, b] \f$, then forms the weighted sum with
+      !! the spline coefficients.
+      !!
+      !! @param[in]     t    Knot positions (length \f$ n \f$).
+      !! @param[in]     n    Total number of knots.
+      !! @param[in]     c    B-spline coefficients (length \f$ n \f$).
+      !! @param[in]     k    Degree of the spline.
+      !! @param[in]     a    Left endpoint of the integration interval.
+      !! @param[in]     b    Right endpoint of the integration interval.
+      !! @param[in,out] wrk  Real workspace (length \f$ n \f$). On exit, contains integrals of
+      !!   normalized B-splines.
+      !! @return The integral \f$ \int_a^b s(x)\,dx \f$.
+      !!
+      !! @see Dierckx, Ch. 1, §1.3.3 (pp. 10--12), Eq. 1.42--1.44; fpintb — B-spline integration
       real(FP_REAL) function splint(t,n,c,k,a,b,wrk) result(integral)
 
-      !  calling sequence:
-      !     aint = splint(t,n,c,k,a,b,wrk)
-      !
-      !  input parameters:
-      !    t    : array,length n,which contains the position of the knots of s(x).
-      !    n    : integer(FP_SIZE), giving the total number of knots of s(x).
-      !    c    : array,length n, containing the b-spline coefficients.
-      !    k    : integer(FP_SIZE), giving the degree of s(x).
-      !    a,b  : real values, containing the end points of the integration interval. s(x) is considered to be identically
-      !           zero outside the interval (t(k+1),t(n-k)).
-      !
-      !  output parameter:
-      !    aint : real, containing the integral of s(x) between a and b.
-      !    wrk  : real array, length n, used as working space. on output, wrk will contain the integrals of the normalized
-      !           b-splines defined on the set of knots.
-      !
-      !  other subroutines required: fpintb.
-      !
-      !  references :
-      !    gaffney p.w. : the calculation of indefinite integrals of b-splines. j. inst. maths applics 17 (1976) 37-41.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis, oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       real(FP_REAL), intent(in) :: a,b
       integer(FP_SIZE), intent(in) :: n,k
@@ -17550,41 +18057,29 @@ module fitpack_core
       return
       end function splint
 
-      !  subroutine sproot finds the zeros of a cubic spline s(x),which is given in its normalized
-      ! b-spline representation.
+      !> @brief Find the zeros of a cubic spline \f$ s(x) \f$ given in B-spline representation.
+      !!
+      !! Locates all real roots of a cubic spline (\f$ k = 3 \f$) by reducing the problem
+      !! to finding zeros of the cubic polynomial on each knot interval
+      !! \f$ [t_l, t_{l+1}] \f$. Uses continuity of the spline and its derivative to
+      !! propagate endpoint values across intervals, calling fpcuro for each cubic piece.
+      !!
+      !! @param[in]  t      Knot positions (length \f$ n \f$). Must satisfy \f$ n \ge 8 \f$.
+      !! @param[in]  n      Total number of knots.
+      !! @param[in]  c      B-spline coefficients (length \f$ n \f$).
+      !! @param[out] zeros  Array of zeros found (length `mest`).
+      !! @param[in]  mest   Maximum number of zeros that can be stored.
+      !! @param[out] m      Actual number of zeros found.
+      !! @param[out] ier    Error flag:
+      !!   - `0`: normal return.
+      !!   - `1`: number of zeros exceeds `mest`.
+      !!   - `10`: invalid input data.
+      !!
+      !! @note Only works for cubic splines (\f$ k = 3 \f$).
+      !!
+      !! @see fpcuro — cubic polynomial root finder
       pure subroutine sproot(t,n,c,zeros,mest,m,ier)
 
-      !
-      !  input parameters:
-      !    t    : real array,length n, containing the knots of s(x).
-      !    n    : integer(FP_SIZE), containing the number of knots.  n>=8
-      !    c    : real array,length n, containing the b-spline coefficients.
-      !    mest : integer(FP_SIZE), specifying the dimension of array zero.
-      !
-      !  output parameters:
-      !    zeros : real array,length mest, containing the zeros of s(x).
-      !    m     : integer(FP_SIZE),giving the number of zeros.
-      !    ier   : error flag:
-      !      ier = 0: normal return.
-      !      ier = 1: the number of zeros exceeds mest.
-      !      ier =10: invalid input data (see restrictions).
-      !
-      !  other subroutines required: fpcuro
-      !
-      !  restrictions:
-      !    1) n>= 8.
-      !    2) t(4) < t(5) < ... < t(n-4) < t(n-3).
-      !       t(1) <= t(2) <= t(3) <= t(4)
-      !       t(n-3) <= t(n-2) <= t(n-1) <= t(n)
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
-      !  latest update : october 2022
-      !
       ! ..
       ! ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: n,mest
@@ -17732,63 +18227,37 @@ module fitpack_core
 
       end subroutine sproot
 
-      !  subroutine surev evaluates on a grid (u(i),v(j)),i=1,...,mu; j=1,...,mv a bicubic spline
-      !  surface of dimension idim, given in the b-spline representation.
+      !> @brief Evaluate a parametric bicubic spline surface on a grid.
+      !!
+      !! Evaluates an \f$ d \f$-dimensional (\f$ d = \f$ `idim`) bicubic spline surface at the grid
+      !! \f$ (u_i, v_j) \f$, \f$ i=1,\ldots,m_u;\; j=1,\ldots,m_v \f$.
+      !!
+      !! On exit, `f(mu*mv*(l-1)+mv*(i-1)+j)` contains the \f$ l \f$-th coordinate of the surface
+      !! at \f$ (u_i, v_j) \f$, for \f$ l=1,\ldots,d \f$.
+      !!
+      !! @param[in]     idim  Dimension of the surface (\f$ 1 \le d \le 3 \f$).
+      !! @param[in]     tu    Knot positions in \f$ u \f$-direction (length \f$ n_u \f$).
+      !! @param[in]     nu    Total number of knots in \f$ u \f$.
+      !! @param[in]     tv    Knot positions in \f$ v \f$-direction (length \f$ n_v \f$).
+      !! @param[in]     nv    Total number of knots in \f$ v \f$.
+      !! @param[in]     c     B-spline coefficients, length \f$ (n_u{-}4)(n_v{-}4) \cdot d \f$.
+      !! @param[in]     u     Grid \f$ u \f$-coordinates (length \f$ m_u \f$), non-decreasing in
+      !!                      \f$ [t_{u,4}, t_{u,n_u-3}] \f$.
+      !! @param[in]     mu    Number of grid points along \f$ u \f$, \f$ m_u \ge 1 \f$.
+      !! @param[in]     v     Grid \f$ v \f$-coordinates (length \f$ m_v \f$), non-decreasing in
+      !!                      \f$ [t_{v,4}, t_{v,n_v-3}] \f$.
+      !! @param[in]     mv    Number of grid points along \f$ v \f$, \f$ m_v \ge 1 \f$.
+      !! @param[in]     mf    Declared dimension of `f`, \f$ \ge m_u \cdot m_v \cdot d \f$.
+      !! @param[out]    f     Surface values (length `mf`).
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge 4(m_u + m_v) \f$.
+      !! @param[in]     lwrk  Declared dimension of `wrk`.
+      !! @param[in,out] iwrk  Integer workspace (length \f$ \ge m_u + m_v \f$).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !!
+      !! @see parsur — parametric surface fitting; bispev — scalar bivariate evaluation on grid
       pure subroutine surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
 
-      !
-      !  calling sequence:
-      !     call surev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,mf,wrk,lwrk,iwrk,kwrk,ier)
-      !
-      !  input parameters:
-      !   idim  : integer(FP_SIZE), specifying the dimension of the spline surface.
-      !   tu    : real array, length nu, which contains the position of the knots in the u-direction.
-      !   nu    : integer(FP_SIZE), giving the total number of knots in the u-direction
-      !   tv    : real array, length nv, which contains the position of the knots in the v-direction.
-      !   nv    : integer(FP_SIZE), giving the total number of knots in the v-direction
-      !   c     : real array, length (nu-4)*(nv-4)*idim, which contains the b-spline coefficients.
-      !   u     : real array of dimension (mu).
-      !           before entry u(i) must be set to the u co-ordinate of the i-th grid point along the u-axis.
-      !           tu(4)<=u(i-1)<=u(i)<=tu(nu-3), i=2,...,mu.
-      !   mu    : on entry mu must specify the number of grid points along the u-axis. mu >=1.
-      !   v     : real array of dimension (mv).
-      !           before entry v(j) must be set to the v co-ordinate of the j-th grid point along the
-      !           v-axis.  tv(4)<=v(j-1)<=v(j)<=tv(nv-3), j=2,...,mv.
-      !   mv    : on entry mv must specify the number of grid points along the v-axis. mv >=1.
-      !   mf    : on entry, mf must specify the dimension of the array f. mf >= mu*mv*idim
-      !   wrk   : real array of dimension lwrk. used as workspace.
-      !   lwrk  : integer(FP_SIZE), specifying the dimension of wrk. lwrk >= 4*(mu+mv)
-      !   iwrk  : integer array of dimension kwrk. used as workspace.
-      !   kwrk  : integer(FP_SIZE), specifying the dimension of iwrk. kwrk >= mu+mv.
-      !
-      !  output parameters:
-      !   f     : real array of dimension (mf).
-      !           on successful exit f(mu*mv*(l-1)+mv*(i-1)+j) contains the l-th co-ordinate of the bicubic
-      !           spline surface at the point (u(i),v(j)),l=1,...,idim,i=1,...,mu;j=1,...,mv.
-      !   ier   : integer error flag
-      !    ier=0 : normal return
-      !    ier=10: invalid input data (see restrictions)
-      !
-      !  restrictions:
-      !   mu >=1, mv >=1, lwrk>=4*(mu+mv), kwrk>=mu+mv , mf>=mu*mv*idim
-      !   tu(4) <= u(i-1) <= u(i) <= tu(nu-3), i=2,...,mu
-      !   tv(4) <= v(j-1) <= v(j) <= tv(nv-3), j=2,...,mv
-      !
-      !  other subroutines required:
-      !    fpsuev,fpbspl
-      !
-      !  references :
-      !    de boor c : on calculating with b-splines, j. approximation theory 6 (1972) 50-62.
-      !    cox m.g.  : the numerical evaluation of b-splines, j. inst. maths applics 10 (1972) 134-149.
-      !    dierckx p. : curve and surface fitting with splines, monographs on numerical analysis,
-      !                 oxford university press, 1993.
-      !
-      !  author :
-      !    p.dierckx
-      !    dept. computer science, k.u.leuven
-      !    celestijnenlaan 200a, b-3001 heverlee, belgium.
-      !    e-mail : Paul.Dierckx@cs.kuleuven.ac.be
-      !
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: idim,nu,nv,mu,mv,mf,lwrk,kwrk
       integer(FP_FLAG), intent(out)   :: ier
@@ -17822,80 +18291,59 @@ module fitpack_core
       end subroutine surev
 
 
+      !> @brief Fit a smoothing bivariate spline to scattered data.
+      !!
+      !! Given weighted data points \f$ (x_i, y_i, z_i, w_i) \f$, \f$ i=1,\ldots,m \f$, determines a
+      !! bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x, k_y \f$ on the rectangle
+      !! \f$ [x_b, x_e] \times [y_b, y_e] \f$.
+      !!
+      !! The smoothing factor \f$ s \ge 0 \f$ controls the trade-off: the routine minimizes
+      !! discontinuity jumps in the spline derivatives subject to
+      !! \f[
+      !!     \sum_{i=1}^{m} \bigl[w_i\,(z_i - s(x_i, y_i))\bigr]^2 \le s.
+      !! \f]
+      !! Setting \f$ s = 0 \f$ produces an interpolating spline. The result is given in
+      !! tensor-product B-spline representation and can be evaluated with bispev / bispeu.
+      !!
+      !! @param[in]     iopt  Computation mode: `-1` = least-squares with user knots;
+      !!                      `0` = smoothing, fresh start; `1` = smoothing, continue.
+      !! @param[in]     m     Number of data points, \f$ m \ge (k_x{+}1)(k_y{+}1) \f$.
+      !! @param[in,out] x     \f$ x \f$-coordinates of data points (length \f$ m \f$).
+      !! @param[in,out] y     \f$ y \f$-coordinates of data points (length \f$ m \f$).
+      !! @param[in]     z     Data values (length \f$ m \f$).
+      !! @param[in]     w     Positive weights (length \f$ m \f$).
+      !! @param[in]     xb    Lower \f$ x \f$-boundary.
+      !! @param[in]     xe    Upper \f$ x \f$-boundary.
+      !! @param[in]     yb    Lower \f$ y \f$-boundary.
+      !! @param[in]     ye    Upper \f$ y \f$-boundary.
+      !! @param[in]     kx    Degree in \f$ x \f$, \f$ 1 \le k_x \le 5 \f$ (bicubic recommended).
+      !! @param[in]     ky    Degree in \f$ y \f$, \f$ 1 \le k_y \le 5 \f$.
+      !! @param[in]     s     Smoothing factor, \f$ s \ge 0 \f$ (ignored when `iopt=-1`).
+      !! @param[in]     nxest Upper bound for \f$ n_x \f$, \f$ \ge 2(k_x{+}1) \f$.
+      !! @param[in]     nyest Upper bound for \f$ n_y \f$, \f$ \ge 2(k_y{+}1) \f$.
+      !! @param[in]     nmax  Dimension of `tx`/`ty` arrays, \f$ \ge \max(n_x^{\text{est}}, n_y^{\text{est}}) \f$.
+      !! @param[in]     eps   Rank-deficiency threshold, \f$ 0 < \varepsilon < 1 \f$.
+      !! @param[in,out] nx    Total number of knots in \f$ x \f$.
+      !! @param[in,out] tx    Knot positions in \f$ x \f$ (length `nmax`).
+      !! @param[in,out] ny    Total number of knots in \f$ y \f$.
+      !! @param[in,out] ty    Knot positions in \f$ y \f$ (length `nmax`).
+      !! @param[out]    c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
+      !! @param[out]    fp    Weighted sum of squared residuals \f$ F_p \f$.
+      !! @param[in,out] wrk1  Real workspace (length `lwrk1`).
+      !! @param[in]     lwrk1 Declared dimension of `wrk1`.
+      !! @param[in,out] wrk2  Secondary workspace for rank-deficient systems (length `lwrk2`).
+      !! @param[in]     lwrk2 Declared dimension of `wrk2`.
+      !! @param[in,out] iwrk  Integer workspace (length `kwrk`).
+      !! @param[in]     kwrk  Declared dimension of `iwrk`.
+      !! @param[out]    ier   Error flag: \f$ \le 0 \f$ = success, `1`–`5` = convergence warnings,
+      !!                      `10` = invalid input, `>10` = `lwrk2` too small.
+      !!
+      !! @note For gridded data, use regrid instead — it is significantly faster.
+      !!
+      !! @see Dierckx, Ch. 5, §5.3 (pp. 107–117); regrid — gridded variant;
+      !!      bispev — evaluate the result
       pure subroutine surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx,tx,ny,ty,&
                              c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-
-      ! given the set of data points (x(i),y(i),z(i)) and the set of positive numbers w(i),i=1,...,m,
-      ! subroutine surfit determines a smooth bivariate spline approximation s(x,y) of degrees kx and
-      ! ky on the rect angle xb <= x <= xe, yb <= y <= ye.
-      ! if iopt = -1 surfit calculates the weighted least-squares spline according to a given set of knots.
-      ! if iopt >= 0 the total numbers nx and ny of these knots and their position tx(j),j=1,...,nx and
-      ! ty(j),j=1,...,ny are chosen automatically by the routine. the smoothness of s(x,y) is then achieved
-      ! by minimizing the discontinuity jumps in the derivatives of s(x,y) across the boundaries of the
-      ! subpanels (tx(i),tx(i+1))*(ty(j),ty(j+1).
-      ! The amounth of smoothness is determined by the condition that, for a given smoothing factor s>=0,
-      ! f(p) = sum ((w(i)*(z(i)-s(x(i),y(i))))**2) be <= s. the fit is given in the b-spline representation
-      ! (b-spline coefficients c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be evaluated
-      ! by means of subroutine bispev.
-      !
-      ! calling sequence:
-      !     call surfit(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,
-      !    *  nmax,eps,nx,tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
-      !
-      ! parameters:
-      !  iopt  : integer flag. on entry iopt must specify whether a weighted least-squares spline (iopt=-1)
-      !          or a smoothing spline (iopt=0 or 1) must be determined.
-      !          if iopt=0 the routine will start with an initial set of knots
-      !          tx(i)=xb,tx(i+kx+1)=xe,i=1,...,kx+1;ty(i)=yb,ty(i+ky+1)=ye,i=1,...,ky+1.
-      !          if iopt=1 the routine will continue with the set of knots found at the last call of the
-      !          routine. attention: a call with iopt=1 must always be immediately preceded by another call
-      !          with iopt=1 or iopt=0. unchanged on exit.
-      !  m     : integer. on entry m must specify the number of data points.
-      !          m >= (kx+1)*(ky+1). unchanged on exit.
-      !  x     : real array of dimension at least (m).
-      !  y     : real array of dimension at least (m).
-      !  z     : real array of dimension at least (m).
-      !          before entry, x(i),y(i),z(i) must be set to the co-ordinates of the i-th data point, for
-      !          i=1,...,m. the order of the data points is immaterial. unchanged on exit.
-      !  w     : real array of dimension at least (m). before entry, w(i) must be set to the i-th value in
-      !          the set of weights. the w(i) must be strictly positive. unchanged on exit.
-      !  xb,xe : real values. on entry xb,xe,yb and ye must specify the boundaries of the rectangular
-      !  yb,ye   approximation domain. xb<=x(i)<=xe,yb<=y(i)<=ye,i=1,...,m. unchanged on exit.
-      !  kx,ky : integer values. on entry kx and ky must specify the degrees of the spline. 1<=kx,ky<=5. it
-      !          is recommended to use bicubic (kx=ky=3) splines. unchanged on exit.
-      !  s     : real. on entry (in case iopt>=0) s must specify the smoothing factor. s>=0. unchanged
-      !          on exit. for advice on the choice of s see further comments
-      !  nxest : integer. unchanged on exit.
-      !  nyest : integer. unchanged on exit.
-      !          on entry, nxest and nyest must specify an upper bound for the number of knots required in
-      !          the x- and y-directions respect. these numbers will also determine the storage space needed
-      !          by the routine. nxest >= 2*(kx+1), nyest >= 2*(ky+1). in most practical situation
-      !          nxest = kx+1+sqrt(m/2), nyest = ky+1+sqrt(m/2) will be sufficient. see also further comments.
-      !  nmax  : integer. on entry nmax must specify the actual dimension of the arrays tx and ty.
-      !          nmax >= nxest, nmax >=nyest. unchanged on exit.
-      !  eps   : real. on entry, eps must specify a threshold for determining the effective rank of an
-      !          over-determined linear system of equations. 0 < eps < 1.  if the number of decimal digits
-      !          in the computer representation of a real number is q, then 10**(-q)
-      !          is a suitable value for eps in most practical applications. unchanged on exit.
-      !  nx    : integer. unless ier=10 (in case iopt >=0), nx will contain the total number of knots with
-      !          respect to the x-variable, of the spline approximation returned. if the computation mode
-      !          iopt=1 is used, the value of nx should be left unchanged between subsequent calls.
-      !          in case iopt=-1, the value of nx should be specified on entry.
-      !  tx    : real array of dimension nmax.
-      !          on successful exit, this array will contain the knots of the spline with respect to the
-      !          x-variable, i.e. the position of the interior knots tx(kx+2),...,tx(nx-kx-1) as well as the
-      !          position of the additional knots tx(1)=...=tx(kx+1)=xb and tx(nx-kx)=...=tx(nx)=xe needed
-      !          for the b-spline representation. if the computation mode iopt=1 is used, the values of tx(1),
-      !          ...,tx(nx) should be left unchanged between subsequent calls. if the computation mode
-      !          iopt=-1 is used, the values tx(kx+2),...tx(nx-kx-1) must be supplied by the user, before
-      !          entry. see also the restrictions (ier=10).
-      !  ny    : integer. unless ier=10 (in case iopt >=0), ny will contain the total number of knots with
-      !          respect to the y-variable, of the spline approximation returned. if the computation mode
-      !          iopt=1 is used, the value of ny should be left unchanged between subsequent calls.
-      !          in case iopt=-1, the value of ny should be specified on entry
-      !  ty    : real array of dimension nmax. on successful exit, this array will contain the knots of the
-      !          spline with respect to the y-variable, i.e. the position of the interior knots ty(ky+2),...,
-      !          ty(ny-ky-1) as well as the position of the additional knots ty(1)=...=ty(ky+1)=yb and
       !          ty(ny-ky)=...=ty(ny)=ye needed for the b-spline representation. if the computation mode
       !          iopt=1 is used, the values of ty(1),...,ty(ny) should be left unchanged between subsequent
       !          calls. if the computation mode iopt=-1 is used, the values ty(ky+2),...ty(ny-ky-1) must be
@@ -18148,6 +18596,12 @@ module fitpack_core
 
       ! Utilities: argsort
       ! Return indices of sorted array
+      !> @brief Return the permutation indices that would sort an array.
+      !!
+      !! Returns an index array `ilist` such that `list(ilist)` is in ascending order.
+      !!
+      !! @param[in]  list   Array of values to sort.
+      !! @return     Index permutation (length `size(list)`).
       pure function fitpack_argsort(list) result(ilist)
           real(FP_REAL), dimension(:), intent(in) :: list
           integer(FP_SIZE), dimension(size(list)) :: ilist
@@ -18166,7 +18620,14 @@ module fitpack_core
 
       end function fitpack_argsort
 
-      ! Quicksort
+      !> @brief In-place quicksort with optional index tracking.
+      !!
+      !! Sorts `list` in ascending order (or descending if `down=.true.`). If `ilist` is present,
+      !! its elements are permuted in parallel to track the original positions.
+      !!
+      !! @param[in,out] list   Array to sort.
+      !! @param[in,out] ilist  Optional index array, permuted alongside `list`.
+      !! @param[in]     down   Optional flag for descending order.
       pure recursive subroutine fitpack_quicksort(list,ilist,down)
 
         real(FP_REAL), dimension(:), intent(inout) :: list
@@ -18252,6 +18713,7 @@ module fitpack_core
 
     end subroutine fitpack_quicksort
 
+    !> @brief Swap two real values in place.
     elemental subroutine swap_data(a,b)
       real(FP_REAL), intent(inout) :: a, b
       real(FP_REAL)                :: tmp
@@ -18261,6 +18723,7 @@ module fitpack_core
       return
     end subroutine swap_data
 
+    !> @brief Swap two integer values in place.
     elemental subroutine swap_size(a,b)
       integer(FP_SIZE), intent(inout) :: a, b
       integer(FP_SIZE)                :: tmp
@@ -18270,31 +18733,38 @@ module fitpack_core
       return
     end subroutine swap_size
 
+    !> @brief Test \f$ a < b \f$ (strict less-than).
     elemental logical(FP_BOOL) function is_before(a,b)
        real(FP_REAL), intent(in) :: a,b
        is_before = a<b
     end function is_before
 
+    !> @brief Test \f$ a > b \f$ (strict greater-than).
     elemental logical(FP_BOOL) function is_after(a,b)
        real(FP_REAL), intent(in) :: a,b
        is_after = a>b
     end function is_after
 
+    !> @brief Test \f$ a \ge b \f$.
     elemental logical(FP_BOOL) function is_ge(a,b)
        real(FP_REAL), intent(in) :: a,b
        is_ge = a>=b
     end function is_ge
 
+    !> @brief Test \f$ a \le b \f$.
     elemental logical(FP_BOOL) function is_le(a,b)
        real(FP_REAL), intent(in) :: a,b
        is_le = a<=b
     end function is_le
 
-    ! Test if two reals have the same representation at the current precision
+    !> @brief Test whether two reals are equal within machine precision.
+    !!
+    !! Returns `.true.` if \f$ |a - b| < \text{spacing}(\min(|a|,|b|)) \f$.
     elemental logical(FP_BOOL) function equal(a,b)
        real(FP_REAL), intent(in) :: a,b
        equal = abs(a-b)<spacing(merge(a,b,abs(a)<abs(b)))
     end function equal
+    !> @brief Test whether two reals differ beyond machine precision.
     elemental logical(FP_BOOL) function not_equal(a,b)
        real(FP_REAL), intent(in) :: a,b
        not_equal = .not.equal(a,b)

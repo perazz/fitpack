@@ -17,6 +17,18 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate spline fitting on a gridded polar disc.
+!!
+!! Provides fitpack_grid_polar, a derived type for fitting bicubic splines to data
+!! sampled on a polar grid \f$ (u_i, v_j) \f$ over a disc of constant radius \f$ r \f$.
+!! The coordinate mapping is:
+!! \f[
+!!     x = u \, r \cos v, \quad y = u \, r \sin v, \quad 0 \leq u \leq 1, \; -\pi \leq v \leq \pi
+!! \f]
+!! Continuity constraints at the origin and optional specification of the function value
+!! \f$ z_0 = f(0,0) \f$ are supported. Uses the pogrid core routine.
+!!
+!! @see Dierckx, Ch. 11, §11.1 (pp. 255–263); pogrid
 module fitpack_gridded_polar
     use fitpack_core
     use fitpack_fitters
@@ -25,11 +37,14 @@ module fitpack_gridded_polar
 
     public :: fitpack_grid_polar
 
-    !> A public type describing a polar fitter z = f(x,y) to GRIDDED polar data,
-    !> which is distributed across the domain x**2+y**2 <= rad(atan(y/x))**2
-    !> through the transform:  x = u*rad*cos(v),
-    !>                         y = u*rad*sin(v)
-    !> Gridded data is provided in terms of (u,v) coordinates and the *constant* boundary radius, r
+    !> @brief Bicubic spline fitter for data on a gridded polar disc.
+    !!
+    !! Stores the grid coordinates \f$ u_i \f$, \f$ v_j \f$, the constant boundary
+    !! radius \f$ r \f$, gridded function values \f$ z(i, j) \f$, and the fitted B-spline
+    !! representation. The origin value \f$ z_0 \f$ may optionally be prescribed (exactly
+    !! or approximately), and zero-gradient boundary conditions at the origin can be enforced.
+    !!
+    !! @see Dierckx, Ch. 11, §11.1 (pp. 255–263)
     type, extends(fitpack_fitter) :: fitpack_grid_polar
 
         !> Coordinates of the data points in grid coordinates (u,v) and domain size

@@ -17,6 +17,15 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrapper for bivariate spline fitting on the sphere to scattered data.
+!!
+!! Provides fitpack_sphere, a derived type for fitting bicubic splines to data scattered
+!! over the unit sphere, parameterized by colatitude \f$ \theta \in [0, \pi] \f$ and
+!! longitude \f$ \phi \in [0, 2\pi] \f$. The fitted surface
+!! \f$ r = s(\theta, \phi) \f$ satisfies appropriate pole constraints to ensure smoothness
+!! at \f$ \theta = 0 \f$ and \f$ \theta = \pi \f$. Uses the sphere core routine.
+!!
+!! @see Dierckx, Ch. 11, §11.2 (pp. 263–269); sphere
 module fitpack_sphere_domains
     use fitpack_core
     use fitpack_fitters
@@ -25,10 +34,14 @@ module fitpack_sphere_domains
 
     public :: fitpack_sphere
 
-    !> A public type describing a smooth bicubic surface fitter r = s(teta,phi),
-    !  0 <= teta <= pi   "Latitude"
-    !> 0 <= phi <= 2*pi  "Longitude"
-    !> which is arbitrarily scattered over the sphere domain
+    !> @brief Bicubic spline fitter for data scattered on the sphere.
+    !!
+    !! Stores the scattered spherical data \f$ (\theta_i, \phi_i, r_i) \f$, optional
+    !! weights, and the fitted B-spline representation. The smoothing parameter controls
+    !! closeness of fit versus smoothness. Pole constraints ensure regularity at
+    !! \f$ \theta = 0 \f$ (north pole) and \f$ \theta = \pi \f$ (south pole).
+    !!
+    !! @see Dierckx, Ch. 11, §11.2 (pp. 263–269)
     type, extends(fitpack_fitter) :: fitpack_sphere
 
         !> Scattered data points

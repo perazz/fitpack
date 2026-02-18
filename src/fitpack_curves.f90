@@ -17,6 +17,14 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief Univariate spline curve fitting module.
+!!
+!! Provides fitpack_curve for fitting and evaluating a spline \f$ y = s(x) \f$ to data,
+!! and fitpack_periodic_curve for periodic splines. Wraps curfit / percur for fitting,
+!! splev for evaluation, splder / spalde for derivatives, splint for integration,
+!! sproot for zero-finding, and fourco for Fourier coefficients.
+!!
+!! @see Dierckx, Ch. 4–5 (smoothing curves), Ch. 6 §6.1–6.2 (periodic curves)
 module fitpack_curves
     use fitpack_core
     use fitpack_fitters
@@ -29,7 +37,20 @@ module fitpack_curves
 
     integer, parameter :: MAX_K = 5
 
-    !> A public type describing a curve fitter y = c(x)
+    !> @brief Univariate spline curve \f$ y = s(x) \f$.
+    !!
+    !! Fits a smoothing or interpolating spline of degree \f$ k \f$ (default 3 = cubic) to
+    !! weighted data points \f$ (x_i, y_i, w_i) \f$. After fitting, the curve can be evaluated,
+    !! differentiated, integrated, and its zeros found.
+    !!
+    !! **Typical usage:**
+    !! @code
+    !! type(fitpack_curve) :: curve
+    !! curve = fitpack_curve(x, y)          ! construct and fit
+    !! y_eval = curve%eval(x_new)           ! evaluate at new points
+    !! dy = curve%dfdx(x_new, order=1)      ! first derivative
+    !! area = curve%integral(a, b)          ! definite integral
+    !! @endcode
     type, extends(fitpack_fitter) :: fitpack_curve
 
         !> The data points
@@ -115,14 +136,20 @@ module fitpack_curves
 
     end type fitpack_periodic_curve
 
-    ! Default constructor
+    !> @brief Default constructor: create a curve from data points and fit it.
     interface fitpack_curve
        module procedure new_from_points
     end interface fitpack_curve
 
     contains
 
-    ! A default constructor
+    !> @brief Construct a fitpack_curve from data points and perform a default fit.
+    !!
+    !! @param[in]  x     Independent variable values (must be sortable).
+    !! @param[in]  y     Dependent variable values, same size as `x`.
+    !! @param[in]  w     Optional weights (positive), same size as `x`.
+    !! @param[out] ierr  Optional error flag.
+    !! @return     Fitted curve object.
     type(fitpack_curve) function new_from_points(x,y,w,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(size(x))
         real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
@@ -137,7 +164,7 @@ module fitpack_curves
 
     end function new_from_points
 
-    ! Fit a new curve
+    !> @brief Load new data points and perform a fresh fit.
     integer(FP_FLAG) function new_fit(this,x,y,w,smoothing,order)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x))
@@ -243,7 +270,7 @@ module fitpack_curves
 
     end function curve_eval_one_noerr
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the spline at multiple points (with error flag).
     function curve_eval_many(this,x,ierr) result(y)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL),        intent(in)    :: x(:)   ! Evaluation points
@@ -289,7 +316,7 @@ module fitpack_curves
 
     end function curve_eval_many
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the spline at multiple points (pure, returns NaN on error).
     pure function curve_eval_many_pure(this,x) result(y)
         class(fitpack_curve), intent(in)  :: this
         real(FP_REAL), intent(in) :: x(:)   ! Evaluation points
@@ -335,7 +362,7 @@ module fitpack_curves
 
     end function curve_eval_many_pure
 
-    ! Interpolating curve
+    !> @brief Fit an interpolating spline (\f$ s = 0 \f$) through the data points.
     integer(FP_FLAG) function interpolating_curve(this,order,reset_knots) result(ierr)
         class(fitpack_curve), intent(inout) :: this
         integer(FP_SIZE), optional, intent(in) :: order
@@ -350,7 +377,7 @@ module fitpack_curves
 
     end function interpolating_curve
 
-    ! Least-squares curve fit with current knots
+    !> @brief Fit a least-squares spline with fixed knots.
     integer(FP_FLAG) function curve_fit_least_squares(this,smoothing,reset_knots) result(ierr)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -370,7 +397,7 @@ module fitpack_curves
         ierr = this%fit()
     end function curve_fit_least_squares
 
-    ! Curve fitting driver: automatic number of knots
+    !> @brief Fit a smoothing spline with automatic knot placement (curfit / percur).
     integer(FP_FLAG) function curve_fit_automatic_knots(this,smoothing,order,keep_knots) result(ierr)
         class(fitpack_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -539,7 +566,7 @@ module fitpack_curves
 
     end function curve_derivative
 
-    ! Calculates the integral of the spline function in interval [from,to]
+    !> @brief Compute the definite integral \f$ \int_a^b s(x)\,dx \f$ via splint.
     real(FP_REAL) function integral(this,from,to)
        class(fitpack_curve), intent(inout) :: this
        real(FP_REAL), intent(in) :: from,to

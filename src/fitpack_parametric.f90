@@ -17,6 +17,19 @@
 !                    Oxford university press, 1993.
 !
 ! **************************************************************************************************
+!> @brief OOP wrappers for parametric curve fitting in \f$ \mathbb{R}^d \f$.
+!!
+!! Provides three types for fitting parametric curves through data points in
+!! \f$ d \f$-dimensional space (\f$ d \geq 1 \f$):
+!! - fitpack_parametric_curve — open parametric spline (parcur)
+!! - fitpack_closed_curve — closed (periodic) parametric spline (clocur)
+!! - fitpack_constrained_curve — parametric spline with derivative constraints at endpoints (concur)
+!!
+!! Each component \f$ s_j(u) \f$ of the curve is represented as a B-spline of degree \f$ k \f$
+!! over a common knot vector, with the parameter \f$ u \f$ either user-supplied or
+!! automatically computed from cumulative chord lengths.
+!!
+!! @see Dierckx, Ch. 9 (pp. 199–228); parcur, clocur, concur
 module fitpack_parametric_curves
     use fitpack_core
     use fitpack_fitters
@@ -29,8 +42,14 @@ module fitpack_parametric_curves
 
     integer, parameter :: MAX_K = 5
 
-    !> A public type describing a parametric curve fitter defined by points x(:,i) in the idim-dimensional
-    !> space, attached to a set of strictly increasing parameter values u(i)
+    !> @brief Open parametric curve fitter in \f$ \mathbb{R}^d \f$.
+    !!
+    !! Fits a parametric spline curve \f$ \mathbf{s}(u) = (s_1(u), \ldots, s_d(u)) \f$
+    !! through \f$ m \f$ data points \f$ \mathbf{x}_i \in \mathbb{R}^d \f$ associated with
+    !! strictly increasing parameter values \f$ u_i \f$. If no parameter values are provided,
+    !! they are computed automatically from cumulative chord lengths.
+    !!
+    !! @see Dierckx, Ch. 9, §9.1 (pp. 199–212); parcur
     type, extends(fitpack_fitter) :: fitpack_parametric_curve
 
         !> Number of points
@@ -104,18 +123,31 @@ module fitpack_parametric_curves
 
     end type fitpack_parametric_curve
 
-    !> Derived type describing a closed parametric curve. No changes are made to the storage,
-    !> but the appropriate package functions will be called depending on the type
+    !> @brief Closed (periodic) parametric curve fitter.
+    !!
+    !! Extension of fitpack_parametric_curve for curves that close on themselves,
+    !! i.e. \f$ \mathbf{s}(u_1) = \mathbf{s}(u_m) \f$. Uses the clocur core routine
+    !! which enforces periodic boundary conditions on the B-spline representation.
+    !!
+    !! @see Dierckx, Ch. 9, §9.2 (pp. 213–216); clocur
     type, extends(fitpack_parametric_curve) :: fitpack_closed_curve
 
     end type fitpack_closed_curve
 
-    !> Derived type describing a parametric curve with constraints at the boundaries.
-    !> The dimensional splines will satisfy the following boundary constraints
-    !>                     (l)
-    !>       if ib >= 0 :  sj   (u(1)) = db(1:idim,0:ib-1), ib = boundary constraint on the (i-1)-th derivative
-    !>   and                (l)
-    !>       if ie >= 0 :  sj   (u(m)) = de(1:idim,0:ie-1), ie = boundary constraint on the (i-1)-th derivative
+    !> @brief Parametric curve fitter with derivative constraints at the endpoints.
+    !!
+    !! Extension of fitpack_parametric_curve that enforces prescribed values of
+    !! derivatives at the left and/or right boundaries. For each component
+    !! \f$ s_j(u) \f$, the constraints are:
+    !! \f[
+    !!     s_j^{(\ell)}(u_1) = \text{db}(j, \ell), \quad \ell = 0, \ldots, \text{ib} - 1
+    !! \f]
+    !! \f[
+    !!     s_j^{(\ell)}(u_m) = \text{de}(j, \ell), \quad \ell = 0, \ldots, \text{ie} - 1
+    !! \f]
+    !! Uses the concur core routine.
+    !!
+    !! @see Dierckx, Ch. 9, §9.3 (pp. 217–228); concur
     type, extends(fitpack_parametric_curve) :: fitpack_constrained_curve
 
         !> Left boundary derivatives
@@ -322,12 +354,19 @@ module fitpack_parametric_curves
        this%ie = 0
     end subroutine clean_constraints
 
-    ! A call to set_constraints will RESET ALL contraints: a missing "ddx_end" means: no constraints
-    ! at the endpoint
+    !> @brief Set or reset endpoint derivative constraints for a constrained parametric curve.
+    !!
+    !! Resets all constraints, then applies the supplied left and/or right boundary conditions.
+    !! Omitting `ddx_begin` or `ddx_end` removes constraints at that endpoint.
+    !!
+    !! @param[in,out] this      The constrained curve object.
+    !! @param[in]     ddx_begin Left endpoint constraints: column 0 = function value,
+    !!                          column \f$ \ell \f$ = \f$ \ell \f$-th derivative (\f$ d \times (ib) \f$).
+    !! @param[in]     ddx_end   Right endpoint constraints (same layout as `ddx_begin`).
+    !! @param[out]    ierr      Error flag (optional).
     subroutine set_constraints(this,ddx_begin,ddx_end,ierr)
         class(fitpack_constrained_curve), intent(inout) :: this
 
-        !> Begin point constraints: (:,0)=function; (:,i)=i-th derivative
         real(FP_REAL), optional, intent(in) :: ddx_begin(:,0:)
         real(FP_REAL), optional, intent(in) :: ddx_end  (:,0:)
 
