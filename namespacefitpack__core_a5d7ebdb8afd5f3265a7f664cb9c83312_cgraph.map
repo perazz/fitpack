@@ -1,0 +1,13 @@
+<map id="fitpack_core::curev" name="fitpack_core::curev">
+<area shape="rect" id="Node000001" title="Evaluate a parametric spline curve at a set of parameter values." alt="" coords="5,42,151,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="199,5,357,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,41,185,36,186,42,152,47"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="203,70,353,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,62,190,68,190,73,151,67"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="405,70,579,95"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="353,80,392,80,392,85,353,85"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="458,72,451,62,455,52,469,46,492,43,521,47,532,56,529,60,518,52,492,49,470,51,459,55,456,61,462,68"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="627,70,772,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="579,80,613,80,613,85,579,85"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="666,72,658,62,662,52,676,46,699,43,728,47,739,56,736,60,726,52,699,49,677,51,666,55,664,61,670,68"/>
+</map>

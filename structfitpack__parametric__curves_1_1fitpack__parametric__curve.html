@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: fitpack_parametric_curves::fitpack_parametric_curve Interface Reference</title>
+<title>fitpack: fitpack_parametric_curves::fitpack_parametric_curve Interface Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -105,211 +113,1046 @@ $(function(){initNavTree('structfitpack__parametric__curves_1_1fitpack__parametr
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="structfitpack__parametric__curves_1_1fitpack__parametric__curve-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">fitpack_parametric_curves::fitpack_parametric_curve Interface Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Open parametric curve fitter in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture>.  
+<p>Open parametric curve fitter in \( \mathbb{R}^d \).  
  <a href="#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for fitpack_parametric_curves::fitpack_parametric_curve:</div>
 <div class="dyncontent">
- <div class="center">
-  <img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve.png" usemap="#fitpack_5Fparametric_5Fcurves::fitpack_5Fparametric_5Fcurve_map" alt=""/>
-  <map id="fitpack_5Fparametric_5Fcurves::fitpack_5Fparametric_5Fcurve_map" name="fitpack_5Fparametric_5Fcurves::fitpack_5Fparametric_5Fcurve_map">
-<area href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="fitpack_fitters::fitpack_fitter" shape="rect" coords="164,0,482,24"/>
-<area href="structfitpack__parametric__curves_1_1fitpack__closed__curve.html" title="Closed (periodic) parametric curve fitter." alt="fitpack_parametric_curves::fitpack_closed_curve" shape="rect" coords="0,112,318,136"/>
-<area href="structfitpack__parametric__curves_1_1fitpack__constrained__curve.html" title="Parametric curve fitter with derivative constraints at the endpoints." alt="fitpack_parametric_curves::fitpack_constrained_curve" shape="rect" coords="328,112,646,136"/>
-  </map>
-</div></div>
+<div class="center"><img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve__inherit__graph.png" border="0" usemap="#afitpack__parametric__curves_1_1fitpack__parametric__curve_inherit__map" alt="Inheritance graph"/></div>
+<map name="afitpack__parametric__curves_1_1fitpack__parametric__curve_inherit__map" id="afitpack__parametric__curves_1_1fitpack__parametric__curve_inherit__map">
+<area shape="rect" title="Open parametric curve fitter in ." alt="" coords="216,37,461,77"/>
+<area shape="rect" href="structfitpack__parametric__curves_1_1fitpack__closed__curve.html" title="Closed (periodic) parametric curve fitter." alt="" coords="527,5,743,45"/>
+<area shape="poly" title=" " alt="" coords="475,40,526,34,527,40,475,45"/>
+<area shape="rect" href="structfitpack__parametric__curves_1_1fitpack__constrained__curve.html" title="Parametric curve fitter with derivative constraints at the endpoints." alt="" coords="509,69,760,109"/>
+<area shape="poly" title=" " alt="" coords="475,69,509,73,509,78,475,75"/>
+<area shape="rect" href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="5,37,168,77"/>
+<area shape="poly" title=" " alt="" coords="182,55,216,55,216,60,182,60"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for fitpack_parametric_curves::fitpack_parametric_curve:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve__coll__graph.png" border="0" usemap="#afitpack__parametric__curves_1_1fitpack__parametric__curve_coll__map" alt="Collaboration graph"/></div>
+<map name="afitpack__parametric__curves_1_1fitpack__parametric__curve_coll__map" id="afitpack__parametric__curves_1_1fitpack__parametric__curve_coll__map">
+<area shape="rect" title="Open parametric curve fitter in ." alt="" coords="5,93,251,133"/>
+<area shape="rect" href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="47,5,209,45"/>
+<area shape="poly" title=" " alt="" coords="131,59,131,93,125,93,125,59"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9c8c428d600a080a1d0ea672f2d25c7c" id="r_a9c8c428d600a080a1d0ea672f2d25c7c"><td class="memItemLeft" align="right" valign="top"><a id="a9c8c428d600a080a1d0ea672f2d25c7c" name="a9c8c428d600a080a1d0ea672f2d25c7c"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>destroy</b> (this)</td></tr>
-<tr class="memdesc:a9c8c428d600a080a1d0ea672f2d25c7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean memory. <br /></td></tr>
+<tr class="memitem:a9c8c428d600a080a1d0ea672f2d25c7c" id="r_a9c8c428d600a080a1d0ea672f2d25c7c"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c8c428d600a080a1d0ea672f2d25c7c">destroy</a> (this)</td></tr>
+<tr class="memdesc:a9c8c428d600a080a1d0ea672f2d25c7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean memory.  <br /></td></tr>
 <tr class="separator:a9c8c428d600a080a1d0ea672f2d25c7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cd28c0a47f734471742469a85fb0bdf" id="r_a2cd28c0a47f734471742469a85fb0bdf"><td class="memItemLeft" align="right" valign="top"><a id="a2cd28c0a47f734471742469a85fb0bdf" name="a2cd28c0a47f734471742469a85fb0bdf"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>new_points</b> (this, <a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, u, w)</td></tr>
-<tr class="memdesc:a2cd28c0a47f734471742469a85fb0bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set new points. <br /></td></tr>
+<tr class="memitem:a2cd28c0a47f734471742469a85fb0bdf" id="r_a2cd28c0a47f734471742469a85fb0bdf"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2cd28c0a47f734471742469a85fb0bdf">new_points</a> (this, <a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#a7c0e2d874c2227b34ccf256d9f98c702">w</a>)</td></tr>
+<tr class="memdesc:a2cd28c0a47f734471742469a85fb0bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set new points.  <br /></td></tr>
 <tr class="separator:a2cd28c0a47f734471742469a85fb0bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade4dbe07065bc7754892650823630863" id="r_ade4dbe07065bc7754892650823630863"><td class="memItemLeft" align="right" valign="top"><a id="ade4dbe07065bc7754892650823630863" name="ade4dbe07065bc7754892650823630863"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>set_default_parameters</b> (this)</td></tr>
+<tr class="memitem:ade4dbe07065bc7754892650823630863" id="r_ade4dbe07065bc7754892650823630863"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade4dbe07065bc7754892650823630863">set_default_parameters</a> (this)</td></tr>
 <tr class="separator:ade4dbe07065bc7754892650823630863"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e1e4bd1215241682768ab974b68390d" id="r_a2e1e4bd1215241682768ab974b68390d"><td class="memItemLeft" align="right" valign="top"><a id="a2e1e4bd1215241682768ab974b68390d" name="a2e1e4bd1215241682768ab974b68390d"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>new_fit</b> (this, <a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, u, w, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>)</td></tr>
-<tr class="memdesc:a2e1e4bd1215241682768ab974b68390d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate new fit. <br /></td></tr>
+<tr class="memitem:a2e1e4bd1215241682768ab974b68390d" id="r_a2e1e4bd1215241682768ab974b68390d"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e1e4bd1215241682768ab974b68390d">new_fit</a> (this, <a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#a7c0e2d874c2227b34ccf256d9f98c702">w</a>, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>)</td></tr>
+<tr class="memdesc:a2e1e4bd1215241682768ab974b68390d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate new fit.  <br /></td></tr>
 <tr class="separator:a2e1e4bd1215241682768ab974b68390d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30529a8f06a2fee344f327fab09528ce" id="r_a30529a8f06a2fee344f327fab09528ce"><td class="memItemLeft" align="right" valign="top"><a id="a30529a8f06a2fee344f327fab09528ce" name="a30529a8f06a2fee344f327fab09528ce"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>fit</b> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, keep_knots)</td></tr>
-<tr class="memdesc:a30529a8f06a2fee344f327fab09528ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional smoothing. <br /></td></tr>
+<tr class="memitem:a30529a8f06a2fee344f327fab09528ce" id="r_a30529a8f06a2fee344f327fab09528ce"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a30529a8f06a2fee344f327fab09528ce">fit</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, keep_knots)</td></tr>
+<tr class="memdesc:a30529a8f06a2fee344f327fab09528ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional smoothing.  <br /></td></tr>
 <tr class="separator:a30529a8f06a2fee344f327fab09528ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a671f94792caf09152b945b33d7f8225a" id="r_a671f94792caf09152b945b33d7f8225a"><td class="memItemLeft" align="right" valign="top"><a id="a671f94792caf09152b945b33d7f8225a" name="a671f94792caf09152b945b33d7f8225a"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>interpolate</b> (this, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, reset_knots)</td></tr>
+<tr class="memitem:a671f94792caf09152b945b33d7f8225a" id="r_a671f94792caf09152b945b33d7f8225a"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a671f94792caf09152b945b33d7f8225a">interpolate</a> (this, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, reset_knots)</td></tr>
 <tr class="separator:a671f94792caf09152b945b33d7f8225a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5572cc869e8b9a88fa67b192839cbb4e" id="r_a5572cc869e8b9a88fa67b192839cbb4e"><td class="memItemLeft" align="right" valign="top"><a id="a5572cc869e8b9a88fa67b192839cbb4e" name="a5572cc869e8b9a88fa67b192839cbb4e"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>least_squares</b> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
+<tr class="memitem:a5572cc869e8b9a88fa67b192839cbb4e" id="r_a5572cc869e8b9a88fa67b192839cbb4e"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5572cc869e8b9a88fa67b192839cbb4e">least_squares</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
 <tr class="separator:a5572cc869e8b9a88fa67b192839cbb4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b2686062953553e48a47065998c779f" id="r_a8b2686062953553e48a47065998c779f"><td class="memItemLeft" align="right" valign="top"><a id="a8b2686062953553e48a47065998c779f" name="a8b2686062953553e48a47065998c779f"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>eval_one</b> (this, u, ierr)</td></tr>
-<tr class="memdesc:a8b2686062953553e48a47065998c779f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates. <br /></td></tr>
+<tr class="memitem:a8b2686062953553e48a47065998c779f" id="r_a8b2686062953553e48a47065998c779f"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b2686062953553e48a47065998c779f">eval_one</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
+<tr class="memdesc:a8b2686062953553e48a47065998c779f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates.  <br /></td></tr>
 <tr class="separator:a8b2686062953553e48a47065998c779f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8aef881a8fcc0621022b76622fae7cea" id="r_a8aef881a8fcc0621022b76622fae7cea"><td class="memItemLeft" align="right" valign="top"><a id="a8aef881a8fcc0621022b76622fae7cea" name="a8aef881a8fcc0621022b76622fae7cea"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>eval_many</b> (this, u, ierr)</td></tr>
+<tr class="memitem:a8aef881a8fcc0621022b76622fae7cea" id="r_a8aef881a8fcc0621022b76622fae7cea"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8aef881a8fcc0621022b76622fae7cea">eval_many</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
 <tr class="separator:a8aef881a8fcc0621022b76622fae7cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81fff570cc8f40280fc49d64def9d23b" id="r_a81fff570cc8f40280fc49d64def9d23b"><td class="memItemLeft" align="right" valign="top"><a id="a81fff570cc8f40280fc49d64def9d23b" name="a81fff570cc8f40280fc49d64def9d23b"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (this, u, ierr)</td></tr>
-<tr class="memdesc:a81fff570cc8f40280fc49d64def9d23b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates. <br /></td></tr>
+<tr class="memitem:a81fff570cc8f40280fc49d64def9d23b" id="r_a81fff570cc8f40280fc49d64def9d23b"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81fff570cc8f40280fc49d64def9d23b">eval</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
+<tr class="memdesc:a81fff570cc8f40280fc49d64def9d23b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates.  <br /></td></tr>
 <tr class="separator:a81fff570cc8f40280fc49d64def9d23b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81fff570cc8f40280fc49d64def9d23b" id="r_a81fff570cc8f40280fc49d64def9d23b"><td class="memItemLeft" align="right" valign="top"><a id="a81fff570cc8f40280fc49d64def9d23b" name="a81fff570cc8f40280fc49d64def9d23b"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (this, u, ierr)</td></tr>
+<tr class="memitem:a81fff570cc8f40280fc49d64def9d23b" id="r_a81fff570cc8f40280fc49d64def9d23b"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81fff570cc8f40280fc49d64def9d23b">eval</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
 <tr class="separator:a81fff570cc8f40280fc49d64def9d23b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d01de274053cb7f77f5baf33236769f" id="r_a9d01de274053cb7f77f5baf33236769f"><td class="memItemLeft" align="right" valign="top"><a id="a9d01de274053cb7f77f5baf33236769f" name="a9d01de274053cb7f77f5baf33236769f"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>dfdx</b> (this, u, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
-<tr class="memdesc:a9d01de274053cb7f77f5baf33236769f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivative at given coordinates. <br /></td></tr>
+<tr class="memitem:a9d01de274053cb7f77f5baf33236769f" id="r_a9d01de274053cb7f77f5baf33236769f"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d01de274053cb7f77f5baf33236769f">dfdx</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
+<tr class="memdesc:a9d01de274053cb7f77f5baf33236769f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivative at given coordinates.  <br /></td></tr>
 <tr class="separator:a9d01de274053cb7f77f5baf33236769f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d01de274053cb7f77f5baf33236769f" id="r_a9d01de274053cb7f77f5baf33236769f"><td class="memItemLeft" align="right" valign="top"><a id="a9d01de274053cb7f77f5baf33236769f" name="a9d01de274053cb7f77f5baf33236769f"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>dfdx</b> (this, u, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
-<tr class="memdesc:a9d01de274053cb7f77f5baf33236769f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present. <br /></td></tr>
+<tr class="memitem:a9d01de274053cb7f77f5baf33236769f" id="r_a9d01de274053cb7f77f5baf33236769f"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d01de274053cb7f77f5baf33236769f">dfdx</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
+<tr class="memdesc:a9d01de274053cb7f77f5baf33236769f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present.  <br /></td></tr>
 <tr class="separator:a9d01de274053cb7f77f5baf33236769f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae11186ac56d08924f40b3ea72a517186" id="r_ae11186ac56d08924f40b3ea72a517186"><td class="memItemLeft" align="right" valign="top"><a id="ae11186ac56d08924f40b3ea72a517186" name="ae11186ac56d08924f40b3ea72a517186"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>dfdx_all</b> (this, u, ierr)</td></tr>
-<tr class="memdesc:ae11186ac56d08924f40b3ea72a517186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives (0:k) of the curve at point u. <br /></td></tr>
+<tr class="memitem:ae11186ac56d08924f40b3ea72a517186" id="r_ae11186ac56d08924f40b3ea72a517186"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae11186ac56d08924f40b3ea72a517186">dfdx_all</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
+<tr class="memdesc:ae11186ac56d08924f40b3ea72a517186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives (0:k) of the curve at point u.  <br /></td></tr>
 <tr class="separator:ae11186ac56d08924f40b3ea72a517186"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affa5c2c69c91582ae0b8cb7670c8cbe1" id="r_affa5c2c69c91582ae0b8cb7670c8cbe1"><td class="memItemLeft" align="right" valign="top"><a id="affa5c2c69c91582ae0b8cb7670c8cbe1" name="affa5c2c69c91582ae0b8cb7670c8cbe1"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_size</b> (this)</td></tr>
-<tr class="memdesc:affa5c2c69c91582ae0b8cb7670c8cbe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication interface (size/pack/expand) <br /></td></tr>
+<tr class="memitem:affa5c2c69c91582ae0b8cb7670c8cbe1" id="r_affa5c2c69c91582ae0b8cb7670c8cbe1"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affa5c2c69c91582ae0b8cb7670c8cbe1">comm_size</a> (this)</td></tr>
+<tr class="memdesc:affa5c2c69c91582ae0b8cb7670c8cbe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication interface (size/pack/expand)  <br /></td></tr>
 <tr class="separator:affa5c2c69c91582ae0b8cb7670c8cbe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af419f1a7b3ef6898116742fd576c0c81" id="r_af419f1a7b3ef6898116742fd576c0c81"><td class="memItemLeft" align="right" valign="top"><a id="af419f1a7b3ef6898116742fd576c0c81" name="af419f1a7b3ef6898116742fd576c0c81"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_pack</b> (this, buffer)</td></tr>
+<tr class="memitem:af419f1a7b3ef6898116742fd576c0c81" id="r_af419f1a7b3ef6898116742fd576c0c81"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af419f1a7b3ef6898116742fd576c0c81">comm_pack</a> (this, buffer)</td></tr>
 <tr class="separator:af419f1a7b3ef6898116742fd576c0c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a997322e9e5dbc97b8ec239f659a20bfe" id="r_a997322e9e5dbc97b8ec239f659a20bfe"><td class="memItemLeft" align="right" valign="top"><a id="a997322e9e5dbc97b8ec239f659a20bfe" name="a997322e9e5dbc97b8ec239f659a20bfe"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_expand</b> (this, buffer)</td></tr>
+<tr class="memitem:a997322e9e5dbc97b8ec239f659a20bfe" id="r_a997322e9e5dbc97b8ec239f659a20bfe"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a997322e9e5dbc97b8ec239f659a20bfe">comm_expand</a> (this, buffer)</td></tr>
 <tr class="separator:a997322e9e5dbc97b8ec239f659a20bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f63dc7bebefb11700aebcab30216170" id="r_a3f63dc7bebefb11700aebcab30216170"><td class="memItemLeft" align="right" valign="top"><a id="a3f63dc7bebefb11700aebcab30216170" name="a3f63dc7bebefb11700aebcab30216170"></a>
-type(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><b>new_from_points</b> (<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, u, w, ierr)</td></tr>
+<tr class="memitem:a3f63dc7bebefb11700aebcab30216170" id="r_a3f63dc7bebefb11700aebcab30216170"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f63dc7bebefb11700aebcab30216170">new_from_points</a> (<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#a7c0e2d874c2227b34ccf256d9f98c702">w</a>, ierr)</td></tr>
 <tr class="separator:a3f63dc7bebefb11700aebcab30216170"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
-<tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>mse</b> (this)</td></tr>
-<tr class="memdesc:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">MSE accessor (shared by all types) <br /></td></tr>
+<tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a> (this)</td></tr>
+<tr class="memdesc:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">MSE accessor (shared by all types)  <br /></td></tr>
 <tr class="separator:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_ac96427338601093ec28b0462966cc138"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_size</b> (this)</td></tr>
-<tr class="memdesc:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field helpers for comm (non-overridable, called by subtypes) <br /></td></tr>
+<tr class="memitem:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_ac96427338601093ec28b0462966cc138"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#ac96427338601093ec28b0462966cc138">core_comm_size</a> (this)</td></tr>
+<tr class="memdesc:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field helpers for comm (non-overridable, called by subtypes)  <br /></td></tr>
 <tr class="separator:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a71f8f7fd77934f74258803c4518a4c56"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_pack</b> (this, buffer)</td></tr>
-<tr class="memdesc:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack base fields into communication buffer. <br /></td></tr>
+<tr class="memitem:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a71f8f7fd77934f74258803c4518a4c56"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a71f8f7fd77934f74258803c4518a4c56">core_comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack base fields into communication buffer.  <br /></td></tr>
 <tr class="separator:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a84b552fc80bf0d9e48dab0528518510a"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_expand</b> (this, buffer)</td></tr>
-<tr class="memdesc:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand base fields from communication buffer. <br /></td></tr>
+<tr class="memitem:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a84b552fc80bf0d9e48dab0528518510a"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a84b552fc80bf0d9e48dab0528518510a">core_comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand base fields from communication buffer.  <br /></td></tr>
 <tr class="separator:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a599af639c06dff9d7ab349cb514e54c1"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>destroy_base</b> (this)</td></tr>
-<tr class="memdesc:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field reset (called by subtype destroy methods) <br /></td></tr>
+<tr class="memitem:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a599af639c06dff9d7ab349cb514e54c1"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a599af639c06dff9d7ab349cb514e54c1">destroy_base</a> (this)</td></tr>
+<tr class="memdesc:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field reset (called by subtype destroy methods)  <br /></td></tr>
 <tr class="separator:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_af3f1bd18f36011f74337f85bf5a160a4"><td class="memItemLeft" align="right" valign="top">
-procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__size__if.html">comm_size_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_size</b> (this)</td></tr>
-<tr class="memdesc:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deferred communication interface. <br /></td></tr>
+<tr class="memitem:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_af3f1bd18f36011f74337f85bf5a160a4"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__size__if.html">comm_size_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#af3f1bd18f36011f74337f85bf5a160a4">comm_size</a> (this)</td></tr>
+<tr class="memdesc:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deferred communication interface.  <br /></td></tr>
 <tr class="separator:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a1060bacf4ad0a9e229784e407087365c"><td class="memItemLeft" align="right" valign="top">
-procedure(comm_pack_if), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_pack</b> (this, buffer)</td></tr>
+<tr class="memitem:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a1060bacf4ad0a9e229784e407087365c"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__pack__if.html">comm_pack_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a1060bacf4ad0a9e229784e407087365c">comm_pack</a> (this, buffer)</td></tr>
 <tr class="separator:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a20a29631c1d4f97f391ebae7335ac524"><td class="memItemLeft" align="right" valign="top">
-procedure(comm_expand_if), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_expand</b> (this, buffer)</td></tr>
+<tr class="memitem:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a20a29631c1d4f97f391ebae7335ac524"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__expand__if.html">comm_expand_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a20a29631c1d4f97f391ebae7335ac524">comm_expand</a> (this, buffer)</td></tr>
 <tr class="separator:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa444acf938855d3a30f3f9fdbfbdb1c9" id="r_aa444acf938855d3a30f3f9fdbfbdb1c9"><td class="memItemLeft" align="right" valign="top"><a id="aa444acf938855d3a30f3f9fdbfbdb1c9" name="aa444acf938855d3a30f3f9fdbfbdb1c9"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>m</b> = 0</td></tr>
-<tr class="memdesc:aa444acf938855d3a30f3f9fdbfbdb1c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of points. <br /></td></tr>
+<tr class="memitem:aa444acf938855d3a30f3f9fdbfbdb1c9" id="r_aa444acf938855d3a30f3f9fdbfbdb1c9"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa444acf938855d3a30f3f9fdbfbdb1c9">m</a> = 0</td></tr>
+<tr class="memdesc:aa444acf938855d3a30f3f9fdbfbdb1c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of points.  <br /></td></tr>
 <tr class="separator:aa444acf938855d3a30f3f9fdbfbdb1c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f53ab7f2eda5e372cb55570801ab690" id="r_a2f53ab7f2eda5e372cb55570801ab690"><td class="memItemLeft" align="right" valign="top"><a id="a2f53ab7f2eda5e372cb55570801ab690" name="a2f53ab7f2eda5e372cb55570801ab690"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>idim</b> = 0</td></tr>
-<tr class="memdesc:a2f53ab7f2eda5e372cb55570801ab690"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of dimensions. <br /></td></tr>
+<tr class="memitem:a2f53ab7f2eda5e372cb55570801ab690" id="r_a2f53ab7f2eda5e372cb55570801ab690"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f53ab7f2eda5e372cb55570801ab690">idim</a> = 0</td></tr>
+<tr class="memdesc:a2f53ab7f2eda5e372cb55570801ab690"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of dimensions.  <br /></td></tr>
 <tr class="separator:a2f53ab7f2eda5e372cb55570801ab690"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f83b91c7177c398a7ec18370c04a50d" id="r_a2f83b91c7177c398a7ec18370c04a50d"><td class="memItemLeft" align="right" valign="top"><a id="a2f83b91c7177c398a7ec18370c04a50d" name="a2f83b91c7177c398a7ec18370c04a50d"></a>
-real(fp_real), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>x</b></td></tr>
-<tr class="memdesc:a2f83b91c7177c398a7ec18370c04a50d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The data points. <br /></td></tr>
+<tr class="memitem:a2f83b91c7177c398a7ec18370c04a50d" id="r_a2f83b91c7177c398a7ec18370c04a50d"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a></td></tr>
+<tr class="memdesc:a2f83b91c7177c398a7ec18370c04a50d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The data points.  <br /></td></tr>
 <tr class="separator:a2f83b91c7177c398a7ec18370c04a50d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a569f3e04ec00a8340e7a4b1d9b9f9dd5" id="r_a569f3e04ec00a8340e7a4b1d9b9f9dd5"><td class="memItemLeft" align="right" valign="top"><a id="a569f3e04ec00a8340e7a4b1d9b9f9dd5" name="a569f3e04ec00a8340e7a4b1d9b9f9dd5"></a>
-logical&#160;</td><td class="memItemRight" valign="bottom"><b>has_params</b> = .false.</td></tr>
-<tr class="memdesc:a569f3e04ec00a8340e7a4b1d9b9f9dd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameter values: one for each point. They may be optional, in which case, they will be internally calculated by fitpack. <br /></td></tr>
+<tr class="memitem:a569f3e04ec00a8340e7a4b1d9b9f9dd5" id="r_a569f3e04ec00a8340e7a4b1d9b9f9dd5"><td class="memItemLeft" align="right" valign="top">logical&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a569f3e04ec00a8340e7a4b1d9b9f9dd5">has_params</a> = .false.</td></tr>
+<tr class="memdesc:a569f3e04ec00a8340e7a4b1d9b9f9dd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameter values: one for each point. They may be optional, in which case, they will be internally calculated by fitpack.  <br /></td></tr>
 <tr class="separator:a569f3e04ec00a8340e7a4b1d9b9f9dd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8949d3e6064784681efb615d1963aa2" id="r_ac8949d3e6064784681efb615d1963aa2"><td class="memItemLeft" align="right" valign="top"><a id="ac8949d3e6064784681efb615d1963aa2" name="ac8949d3e6064784681efb615d1963aa2"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>u</b></td></tr>
+<tr class="memitem:ac8949d3e6064784681efb615d1963aa2" id="r_ac8949d3e6064784681efb615d1963aa2"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a></td></tr>
 <tr class="separator:ac8949d3e6064784681efb615d1963aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac776021ae76772a0f6308c4e59edab5c" id="r_ac776021ae76772a0f6308c4e59edab5c"><td class="memItemLeft" align="right" valign="top"><a id="ac776021ae76772a0f6308c4e59edab5c" name="ac776021ae76772a0f6308c4e59edab5c"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>order</b> = 3</td></tr>
-<tr class="memdesc:ac776021ae76772a0f6308c4e59edab5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spline degree. <br /></td></tr>
+<tr class="memitem:ac776021ae76772a0f6308c4e59edab5c" id="r_ac776021ae76772a0f6308c4e59edab5c"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a> = 3</td></tr>
+<tr class="memdesc:ac776021ae76772a0f6308c4e59edab5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spline degree.  <br /></td></tr>
 <tr class="separator:ac776021ae76772a0f6308c4e59edab5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a276e0df7c4b4348d1ef6406fb8e1ed51" id="r_a276e0df7c4b4348d1ef6406fb8e1ed51"><td class="memItemLeft" align="right" valign="top"><a id="a276e0df7c4b4348d1ef6406fb8e1ed51" name="a276e0df7c4b4348d1ef6406fb8e1ed51"></a>
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>ubegin</b> = zero</td></tr>
-<tr class="memdesc:a276e0df7c4b4348d1ef6406fb8e1ed51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interval boundaries. <br /></td></tr>
+<tr class="memitem:a276e0df7c4b4348d1ef6406fb8e1ed51" id="r_a276e0df7c4b4348d1ef6406fb8e1ed51"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a276e0df7c4b4348d1ef6406fb8e1ed51">ubegin</a> = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td></tr>
+<tr class="memdesc:a276e0df7c4b4348d1ef6406fb8e1ed51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interval boundaries.  <br /></td></tr>
 <tr class="separator:a276e0df7c4b4348d1ef6406fb8e1ed51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a442c8456b7146153ddb30ab09de900b4" id="r_a442c8456b7146153ddb30ab09de900b4"><td class="memItemLeft" align="right" valign="top"><a id="a442c8456b7146153ddb30ab09de900b4" name="a442c8456b7146153ddb30ab09de900b4"></a>
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>uend</b> = zero</td></tr>
+<tr class="memitem:a442c8456b7146153ddb30ab09de900b4" id="r_a442c8456b7146153ddb30ab09de900b4"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a442c8456b7146153ddb30ab09de900b4">uend</a> = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td></tr>
 <tr class="separator:a442c8456b7146153ddb30ab09de900b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a597b50e6d19b75854658387c2369e4e5" id="r_a597b50e6d19b75854658387c2369e4e5"><td class="memItemLeft" align="right" valign="top"><a id="a597b50e6d19b75854658387c2369e4e5" name="a597b50e6d19b75854658387c2369e4e5"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>sp</b></td></tr>
+<tr class="memitem:a597b50e6d19b75854658387c2369e4e5" id="r_a597b50e6d19b75854658387c2369e4e5"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a597b50e6d19b75854658387c2369e4e5">sp</a></td></tr>
 <tr class="separator:a597b50e6d19b75854658387c2369e4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c0e2d874c2227b34ccf256d9f98c702" id="r_a7c0e2d874c2227b34ccf256d9f98c702"><td class="memItemLeft" align="right" valign="top"><a id="a7c0e2d874c2227b34ccf256d9f98c702" name="a7c0e2d874c2227b34ccf256d9f98c702"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>w</b></td></tr>
+<tr class="memitem:a7c0e2d874c2227b34ccf256d9f98c702" id="r_a7c0e2d874c2227b34ccf256d9f98c702"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c0e2d874c2227b34ccf256d9f98c702">w</a></td></tr>
 <tr class="separator:a7c0e2d874c2227b34ccf256d9f98c702"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f64bae7285d6215c0cc2eb89245342e" id="r_a0f64bae7285d6215c0cc2eb89245342e"><td class="memItemLeft" align="right" valign="top"><a id="a0f64bae7285d6215c0cc2eb89245342e" name="a0f64bae7285d6215c0cc2eb89245342e"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>nest</b> = 0</td></tr>
+<tr class="memitem:a0f64bae7285d6215c0cc2eb89245342e" id="r_a0f64bae7285d6215c0cc2eb89245342e"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f64bae7285d6215c0cc2eb89245342e">nest</a> = 0</td></tr>
 <tr class="separator:a0f64bae7285d6215c0cc2eb89245342e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbb3c81072f15dd247ae4f41ca831b72" id="r_adbb3c81072f15dd247ae4f41ca831b72"><td class="memItemLeft" align="right" valign="top"><a id="adbb3c81072f15dd247ae4f41ca831b72" name="adbb3c81072f15dd247ae4f41ca831b72"></a>
-real(fp_real), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>dd</b></td></tr>
+<tr class="memitem:adbb3c81072f15dd247ae4f41ca831b72" id="r_adbb3c81072f15dd247ae4f41ca831b72"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adbb3c81072f15dd247ae4f41ca831b72">dd</a></td></tr>
 <tr class="separator:adbb3c81072f15dd247ae4f41ca831b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b93b39dde60026661148f767deb76b7" id="r_a1b93b39dde60026661148f767deb76b7"><td class="memItemLeft" align="right" valign="top"><a id="a1b93b39dde60026661148f767deb76b7" name="a1b93b39dde60026661148f767deb76b7"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>knots</b> = 0</td></tr>
+<tr class="memitem:a1b93b39dde60026661148f767deb76b7" id="r_a1b93b39dde60026661148f767deb76b7"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b93b39dde60026661148f767deb76b7">knots</a> = 0</td></tr>
 <tr class="separator:a1b93b39dde60026661148f767deb76b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a671acc4f04dbd187cd60fd86fc89e350" id="r_a671acc4f04dbd187cd60fd86fc89e350"><td class="memItemLeft" align="right" valign="top"><a id="a671acc4f04dbd187cd60fd86fc89e350" name="a671acc4f04dbd187cd60fd86fc89e350"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>t</b></td></tr>
+<tr class="memitem:a671acc4f04dbd187cd60fd86fc89e350" id="r_a671acc4f04dbd187cd60fd86fc89e350"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a671acc4f04dbd187cd60fd86fc89e350">t</a></td></tr>
 <tr class="separator:a671acc4f04dbd187cd60fd86fc89e350"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_attribs_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
-<tr class="memitem:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a37789f6e2aef4d11695e20f84a5f0e30"><td class="memItemLeft" align="right" valign="top">
-integer(fp_flag)&#160;</td><td class="memItemRight" valign="bottom"><b>iopt</b> = IOPT_NEW_SMOOTHING</td></tr>
-<tr class="memdesc:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitting state flag. <br /></td></tr>
+<tr class="memitem:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a37789f6e2aef4d11695e20f84a5f0e30"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a37789f6e2aef4d11695e20f84a5f0e30">iopt</a> = IOPT_NEW_SMOOTHING</td></tr>
+<tr class="memdesc:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitting state flag.  <br /></td></tr>
 <tr class="separator:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a2ef622360564515e14a40a24a1896163"><td class="memItemLeft" align="right" valign="top">
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>smoothing</b> = 1000.0_FP_REAL</td></tr>
-<tr class="memdesc:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smoothing parameter. <br /></td></tr>
+<tr class="memitem:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a2ef622360564515e14a40a24a1896163"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a> = 1000.0_FP_REAL</td></tr>
+<tr class="memdesc:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smoothing parameter.  <br /></td></tr>
 <tr class="separator:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa9428cc7448785fb9a2697225760296e"><td class="memItemLeft" align="right" valign="top">
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>fp</b> = zero</td></tr>
-<tr class="memdesc:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted sum of squared residuals. <br /></td></tr>
+<tr class="memitem:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa9428cc7448785fb9a2697225760296e"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa9428cc7448785fb9a2697225760296e">fp</a> = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td></tr>
+<tr class="memdesc:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted sum of squared residuals.  <br /></td></tr>
 <tr class="separator:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a17057c7a2aa35ac6c0e87329a2e6ec66"><td class="memItemLeft" align="right" valign="top">
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
-<tr class="memdesc:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">B-spline coefficients. <br /></td></tr>
+<tr class="memitem:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a17057c7a2aa35ac6c0e87329a2e6ec66"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a17057c7a2aa35ac6c0e87329a2e6ec66">c</a></td></tr>
+<tr class="memdesc:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">B-spline coefficients.  <br /></td></tr>
 <tr class="separator:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa5eaddf25a40b1612e978249464a28fb"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size)&#160;</td><td class="memItemRight" valign="bottom"><b>lwrk</b> = 0</td></tr>
-<tr class="memdesc:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real workspace and its size. <br /></td></tr>
+<tr class="memitem:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa5eaddf25a40b1612e978249464a28fb"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa5eaddf25a40b1612e978249464a28fb">lwrk</a> = 0</td></tr>
+<tr class="memdesc:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real workspace and its size.  <br /></td></tr>
 <tr class="separator:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_adcb5a0862065efdc9a6a9b7ac3a144e3"><td class="memItemLeft" align="right" valign="top">
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>wrk</b></td></tr>
+<tr class="memitem:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_adcb5a0862065efdc9a6a9b7ac3a144e3"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#adcb5a0862065efdc9a6a9b7ac3a144e3">wrk</a></td></tr>
 <tr class="separator:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a40e456707e34524cb2b4d80d7b2ac3b7"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size)&#160;</td><td class="memItemRight" valign="bottom"><b>liwrk</b> = 0</td></tr>
-<tr class="memdesc:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer workspace and its size. <br /></td></tr>
+<tr class="memitem:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a40e456707e34524cb2b4d80d7b2ac3b7"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a40e456707e34524cb2b4d80d7b2ac3b7">liwrk</a> = 0</td></tr>
+<tr class="memdesc:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer workspace and its size.  <br /></td></tr>
 <tr class="separator:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a79e872bcc881c071816f4a9560b7991a"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>iwrk</b></td></tr>
+<tr class="memitem:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a79e872bcc881c071816f4a9560b7991a"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a79e872bcc881c071816f4a9560b7991a">iwrk</a></td></tr>
 <tr class="separator:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a26f4186e9cd280f1d75bcda14168520f" id="r_a26f4186e9cd280f1d75bcda14168520f"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26f4186e9cd280f1d75bcda14168520f">curve_derivative</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
+<tr class="memdesc:a26f4186e9cd280f1d75bcda14168520f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivative at given coordinates.  <br /></td></tr>
+<tr class="separator:a26f4186e9cd280f1d75bcda14168520f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad733d0cba6deaa830c0a1a90dba2b06" id="r_aad733d0cba6deaa830c0a1a90dba2b06"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad733d0cba6deaa830c0a1a90dba2b06">curve_derivatives</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, <a class="el" href="#ac776021ae76772a0f6308c4e59edab5c">order</a>, ierr)</td></tr>
+<tr class="memdesc:aad733d0cba6deaa830c0a1a90dba2b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present.  <br /></td></tr>
+<tr class="separator:aad733d0cba6deaa830c0a1a90dba2b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63d8d10eb32063562107b34cf6cce632" id="r_a63d8d10eb32063562107b34cf6cce632"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63d8d10eb32063562107b34cf6cce632">curve_all_derivatives</a> (this, <a class="el" href="#ac8949d3e6064784681efb615d1963aa2">u</a>, ierr)</td></tr>
+<tr class="memdesc:a63d8d10eb32063562107b34cf6cce632"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives (0:k) of the curve at point u.  <br /></td></tr>
+<tr class="separator:a63d8d10eb32063562107b34cf6cce632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Open parametric curve fitter in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture>. </p>
-<p>Fits a parametric spline curve <picture><source srcset="form_35_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{s}(u) = (s_1(u), \ldots, s_d(u)) $" src="form_35.png"/></picture> through <picture><source srcset="form_36_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m $" src="form_36.png"/></picture> data points <picture><source srcset="form_37_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{x}_i \in \mathbb{R}^d $" src="form_37.png"/></picture> associated with strictly increasing parameter values <picture><source srcset="form_20_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u_i $" src="form_20.png"/></picture>. If no parameter values are provided, they are computed automatically from cumulative chord lengths.</p>
-<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9, §9.1 (pp. 199–212); parcur </dd></dl>
-</div><hr/>The documentation for this interface was generated from the following file:<ul>
-<li>/home/runner/work/fitpack/fitpack/src/<b>fitpack_parametric.f90</b></li>
+<div class="textblock"><p>Open parametric curve fitter in \( \mathbb{R}^d \). </p>
+<p>Fits a parametric spline curve \( \mathbf{s}(u) = (s_1(u), \ldots, s_d(u)) \) through \( m \) data points \( \mathbf{x}_i \in \mathbb{R}^d \) associated with strictly increasing parameter values \( u_i \). If no parameter values are provided, they are computed automatically from cumulative chord lengths.</p>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9, §9.1 (pp. 199–212); <a class="el" href="namespacefitpack__core.html#ae2ad7fd4cae431c05938a167488df6f0" title="Determine a smooth parametric spline curve approximation.">parcur</a> </dd></dl>
+</div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
+<a id="a997322e9e5dbc97b8ec239f659a20bfe" name="a997322e9e5dbc97b8ec239f659a20bfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a997322e9e5dbc97b8ec239f659a20bfe">&#9670;&#160;</a></span>comm_expand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::comm_expand </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af419f1a7b3ef6898116742fd576c0c81" name="af419f1a7b3ef6898116742fd576c0c81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af419f1a7b3ef6898116742fd576c0c81">&#9670;&#160;</a></span>comm_pack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::comm_pack </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="affa5c2c69c91582ae0b8cb7670c8cbe1" name="affa5c2c69c91582ae0b8cb7670c8cbe1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affa5c2c69c91582ae0b8cb7670c8cbe1">&#9670;&#160;</a></span>comm_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::comm_size </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parallel communication interface (size/pack/expand) </p>
+
+</div>
+</div>
+<a id="a63d8d10eb32063562107b34cf6cce632" name="a63d8d10eb32063562107b34cf6cce632"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63d8d10eb32063562107b34cf6cce632">&#9670;&#160;</a></span>curve_all_derivatives()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_parametric_curves::fitpack_parametric_curve::curve_all_derivatives </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate all derivatives (0:k) of the curve at point u. </p>
+
+</div>
+</div>
+<a id="a26f4186e9cd280f1d75bcda14168520f" name="a26f4186e9cd280f1d75bcda14168520f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26f4186e9cd280f1d75bcda14168520f">&#9670;&#160;</a></span>curve_derivative()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_parametric_curves::fitpack_parametric_curve::curve_derivative </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in)</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate derivative at given coordinates. </p>
+
+</div>
+</div>
+<a id="aad733d0cba6deaa830c0a1a90dba2b06" name="aad733d0cba6deaa830c0a1a90dba2b06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad733d0cba6deaa830c0a1a90dba2b06">&#9670;&#160;</a></span>curve_derivatives()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_parametric_curves::fitpack_parametric_curve::curve_derivatives </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in)</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present. </p>
+
+</div>
+</div>
+<a id="a9c8c428d600a080a1d0ea672f2d25c7c" name="a9c8c428d600a080a1d0ea672f2d25c7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c8c428d600a080a1d0ea672f2d25c7c">&#9670;&#160;</a></span>destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::destroy </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clean memory. </p>
+
+</div>
+</div>
+<a id="a9d01de274053cb7f77f5baf33236769f" name="a9d01de274053cb7f77f5baf33236769f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d01de274053cb7f77f5baf33236769f">&#9670;&#160;</a></span>dfdx() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_parametric_curves::fitpack_parametric_curve::dfdx </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in)</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate derivative at given coordinates. </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve_a9d01de274053cb7f77f5baf33236769f_cgraph.png" border="0" usemap="#astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a9d01de274053cb7f77f5baf33236769f_cgraph" alt=""/></div>
+<map name="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a9d01de274053cb7f77f5baf33236769f_cgraph" id="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a9d01de274053cb7f77f5baf33236769f_cgraph">
+<area shape="rect" title="Evaluate derivative at given coordinates." alt="" coords="5,5,208,60"/>
+<area shape="rect" href="namespacefitpack__parametric__curves.html#a20096fac45d9a78e839428aa53a170b7" title="Evaluate k&#45;th derivative of the curve at point u." alt="" coords="500,13,689,53"/>
+<area shape="poly" title=" " alt="" coords="208,27,256,26,452,26,486,27,486,32,452,31,256,31,208,32"/>
+<area shape="rect" href="namespacefitpack__parametric__curves.html#a511910f980d1a18779b6337439e513f4" title="Evaluate k&#45;th derivative of the curve at points x Use 1st derivative if order not present." alt="" coords="256,41,452,81"/>
+<area shape="poly" title=" " alt="" coords="209,41,243,45,242,51,208,47"/>
+<area shape="poly" title=" " alt="" coords="452,47,486,43,487,48,452,52"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a9d01de274053cb7f77f5baf33236769f" name="a9d01de274053cb7f77f5baf33236769f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d01de274053cb7f77f5baf33236769f">&#9670;&#160;</a></span>dfdx() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_parametric_curves::fitpack_parametric_curve::dfdx </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in)</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present. </p>
+
+</div>
+</div>
+<a id="ae11186ac56d08924f40b3ea72a517186" name="ae11186ac56d08924f40b3ea72a517186"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae11186ac56d08924f40b3ea72a517186">&#9670;&#160;</a></span>dfdx_all()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_parametric_curves::fitpack_parametric_curve::dfdx_all </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate all derivatives (0:k) of the curve at point u. </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve_ae11186ac56d08924f40b3ea72a517186_cgraph.png" border="0" usemap="#astructfitpack__parametric__curves_1_1fitpack__parametric__curve_ae11186ac56d08924f40b3ea72a517186_cgraph" alt=""/></div>
+<map name="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_ae11186ac56d08924f40b3ea72a517186_cgraph" id="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_ae11186ac56d08924f40b3ea72a517186_cgraph">
+<area shape="rect" title="Evaluate all derivatives (0:k) of the curve at point u." alt="" coords="5,5,208,60"/>
+<area shape="rect" href="namespacefitpack__parametric__curves.html#a28cb26a467c7f0f3e5385d8338b7d53d" title="Evaluate all derivatives (0:k) of the curve at point u." alt="" coords="256,13,475,53"/>
+<area shape="poly" title=" " alt="" coords="208,30,242,30,242,35,208,35"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a81fff570cc8f40280fc49d64def9d23b" name="a81fff570cc8f40280fc49d64def9d23b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81fff570cc8f40280fc49d64def9d23b">&#9670;&#160;</a></span>eval() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_parametric_curves::fitpack_parametric_curve::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate curve at given coordinates. </p>
+
+</div>
+</div>
+<a id="a81fff570cc8f40280fc49d64def9d23b" name="a81fff570cc8f40280fc49d64def9d23b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81fff570cc8f40280fc49d64def9d23b">&#9670;&#160;</a></span>eval() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_parametric_curves::fitpack_parametric_curve::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8aef881a8fcc0621022b76622fae7cea" name="a8aef881a8fcc0621022b76622fae7cea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8aef881a8fcc0621022b76622fae7cea">&#9670;&#160;</a></span>eval_many()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::eval_many </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8b2686062953553e48a47065998c779f" name="a8b2686062953553e48a47065998c779f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b2686062953553e48a47065998c779f">&#9670;&#160;</a></span>eval_one()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::eval_one </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate curve at given coordinates. </p>
+
+</div>
+</div>
+<a id="a30529a8f06a2fee344f327fab09528ce" name="a30529a8f06a2fee344f327fab09528ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30529a8f06a2fee344f327fab09528ce">&#9670;&#160;</a></span>fit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::fit </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>keep_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate/update fitting curve, with optional smoothing. </p>
+
+</div>
+</div>
+<a id="a671f94792caf09152b945b33d7f8225a" name="a671f94792caf09152b945b33d7f8225a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a671f94792caf09152b945b33d7f8225a">&#9670;&#160;</a></span>interpolate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::interpolate </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5572cc869e8b9a88fa67b192839cbb4e" name="a5572cc869e8b9a88fa67b192839cbb4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5572cc869e8b9a88fa67b192839cbb4e">&#9670;&#160;</a></span>least_squares()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::least_squares </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2e1e4bd1215241682768ab974b68390d" name="a2e1e4bd1215241682768ab974b68390d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e1e4bd1215241682768ab974b68390d">&#9670;&#160;</a></span>new_fit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::new_fit </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>order</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate new fit. </p>
+
+</div>
+</div>
+<a id="a3f63dc7bebefb11700aebcab30216170" name="a3f63dc7bebefb11700aebcab30216170"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f63dc7bebefb11700aebcab30216170">&#9670;&#160;</a></span>new_from_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">type(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>) function fitpack_parametric_curves::fitpack_parametric_curve::new_from_points </td>
+          <td>(</td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__parametric__curves_1_1fitpack__parametric__curve_a3f63dc7bebefb11700aebcab30216170_cgraph.png" border="0" usemap="#astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a3f63dc7bebefb11700aebcab30216170_cgraph" alt=""/></div>
+<map name="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a3f63dc7bebefb11700aebcab30216170_cgraph" id="astructfitpack__parametric__curves_1_1fitpack__parametric__curve_a3f63dc7bebefb11700aebcab30216170_cgraph">
+<area shape="rect" title=" " alt="" coords="5,42,208,97"/>
+<area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="256,49,409,89"/>
+<area shape="poly" title=" " alt="" coords="209,67,242,67,242,72,209,72"/>
+<area shape="rect" href="namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="457,5,611,45"/>
+<area shape="poly" title=" " alt="" coords="409,50,443,42,444,48,410,55"/>
+<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="457,93,611,133"/>
+<area shape="poly" title=" " alt="" coords="410,83,444,91,443,96,409,89"/>
+<area shape="poly" title=" " alt="" coords="496,94,494,84,500,75,514,69,534,67,558,70,570,77,568,82,556,75,534,72,515,74,503,79,499,85,501,92"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a2cd28c0a47f734471742469a85fb0bdf" name="a2cd28c0a47f734471742469a85fb0bdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cd28c0a47f734471742469a85fb0bdf">&#9670;&#160;</a></span>new_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::new_points </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#a2f83b91c7177c398a7ec18370c04a50d">x</a>,2)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set new points. </p>
+
+</div>
+</div>
+<a id="ade4dbe07065bc7754892650823630863" name="ade4dbe07065bc7754892650823630863"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade4dbe07065bc7754892650823630863">&#9670;&#160;</a></span>set_default_parameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_parametric_curves::fitpack_parametric_curve::set_default_parameters </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__parametric__curves_1_1fitpack__parametric__curve.html">fitpack_parametric_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="adbb3c81072f15dd247ae4f41ca831b72" name="adbb3c81072f15dd247ae4f41ca831b72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbb3c81072f15dd247ae4f41ca831b72">&#9670;&#160;</a></span>dd</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::dd</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a569f3e04ec00a8340e7a4b1d9b9f9dd5" name="a569f3e04ec00a8340e7a4b1d9b9f9dd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a569f3e04ec00a8340e7a4b1d9b9f9dd5">&#9670;&#160;</a></span>has_params</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">logical fitpack_parametric_curves::fitpack_parametric_curve::has_params = .false.</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parameter values: one for each point. They may be optional, in which case, they will be internally calculated by fitpack. </p>
+
+</div>
+</div>
+<a id="a2f53ab7f2eda5e372cb55570801ab690" name="a2f53ab7f2eda5e372cb55570801ab690"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f53ab7f2eda5e372cb55570801ab690">&#9670;&#160;</a></span>idim</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_parametric_curves::fitpack_parametric_curve::idim = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Number of dimensions. </p>
+
+</div>
+</div>
+<a id="a1b93b39dde60026661148f767deb76b7" name="a1b93b39dde60026661148f767deb76b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b93b39dde60026661148f767deb76b7">&#9670;&#160;</a></span>knots</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_parametric_curves::fitpack_parametric_curve::knots = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa444acf938855d3a30f3f9fdbfbdb1c9" name="aa444acf938855d3a30f3f9fdbfbdb1c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa444acf938855d3a30f3f9fdbfbdb1c9">&#9670;&#160;</a></span>m</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_parametric_curves::fitpack_parametric_curve::m = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Number of points. </p>
+
+</div>
+</div>
+<a id="a0f64bae7285d6215c0cc2eb89245342e" name="a0f64bae7285d6215c0cc2eb89245342e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f64bae7285d6215c0cc2eb89245342e">&#9670;&#160;</a></span>nest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_parametric_curves::fitpack_parametric_curve::nest = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac776021ae76772a0f6308c4e59edab5c" name="ac776021ae76772a0f6308c4e59edab5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac776021ae76772a0f6308c4e59edab5c">&#9670;&#160;</a></span>order</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_parametric_curves::fitpack_parametric_curve::order = 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Spline degree. </p>
+
+</div>
+</div>
+<a id="a597b50e6d19b75854658387c2369e4e5" name="a597b50e6d19b75854658387c2369e4e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a597b50e6d19b75854658387c2369e4e5">&#9670;&#160;</a></span>sp</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::sp</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a671acc4f04dbd187cd60fd86fc89e350" name="a671acc4f04dbd187cd60fd86fc89e350"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a671acc4f04dbd187cd60fd86fc89e350">&#9670;&#160;</a></span>t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac8949d3e6064784681efb615d1963aa2" name="ac8949d3e6064784681efb615d1963aa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8949d3e6064784681efb615d1963aa2">&#9670;&#160;</a></span>u</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::u</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a276e0df7c4b4348d1ef6406fb8e1ed51" name="a276e0df7c4b4348d1ef6406fb8e1ed51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a276e0df7c4b4348d1ef6406fb8e1ed51">&#9670;&#160;</a></span>ubegin</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) fitpack_parametric_curves::fitpack_parametric_curve::ubegin = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Interval boundaries. </p>
+
+</div>
+</div>
+<a id="a442c8456b7146153ddb30ab09de900b4" name="a442c8456b7146153ddb30ab09de900b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a442c8456b7146153ddb30ab09de900b4">&#9670;&#160;</a></span>uend</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) fitpack_parametric_curves::fitpack_parametric_curve::uend = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7c0e2d874c2227b34ccf256d9f98c702" name="a7c0e2d874c2227b34ccf256d9f98c702"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c0e2d874c2227b34ccf256d9f98c702">&#9670;&#160;</a></span>w</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::w</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2f83b91c7177c398a7ec18370c04a50d" name="a2f83b91c7177c398a7ec18370c04a50d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f83b91c7177c398a7ec18370c04a50d">&#9670;&#160;</a></span>x</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable fitpack_parametric_curves::fitpack_parametric_curve::x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The data points. </p>
+
+</div>
+</div>
+<hr/>The documentation for this interface was generated from the following file:<ul>
+<li><a class="el" href="fitpack__parametric_8f90.html">fitpack_parametric.f90</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

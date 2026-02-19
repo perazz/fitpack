@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Scattered Surface Fitting Tutorial</title>
+<title>fitpack: Scattered Surface Fitting Tutorial</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,27 +114,27 @@ $(function(){initNavTree('tutorial_surface.html',''); initResizable(true); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__surface"></a></p>
-<p>This tutorial covers bivariate spline fitting to scattered data with <code>fitpack_surface</code>: constructing a tensor-product B-spline <picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z = s(x, y) $" src="form_9.png"/></picture> from irregularly sampled <picture><source srcset="form_51_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i, z_i) $" src="form_51.png"/></picture> triples, controlling smoothness, and evaluating derived quantities.</p>
+<p>This tutorial covers bivariate spline fitting to scattered data with <code>fitpack_surface</code>: constructing a tensor-product B-spline \( z = s(x, y) \) from irregularly sampled \( (x_i, y_i, z_i) \) triples, controlling smoothness, and evaluating derived quantities.</p>
 <p>Use <code>fitpack_surface</code> whenever your observations are not aligned on a rectangular grid. If the data <b>do</b> lie on a regular grid, prefer <code>fitpack_grid_surface</code> instead (see <a class="el" href="tutorial_grid_surface.html">Grid and Parametric Surface Tutorial</a>).</p>
-<h1><a class="anchor" id="autotoc_md115"></a>
+<h1><a class="anchor" id="autotoc_md127"></a>
 Mathematical Background</h1>
-<p>Given <picture><source srcset="form_36_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m $" src="form_36.png"/></picture> scattered observations <picture><source srcset="form_51_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i, z_i) $" src="form_51.png"/></picture> with positive weights <picture><source srcset="form_61_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ w_i $" src="form_61.png"/></picture>, FITPACK determines a tensor-product B-spline</p>
+<p>Given \( m \) scattered observations \( (x_i, y_i, z_i) \) with positive weights \( w_i \), FITPACK determines a tensor-product B-spline</p>
 <p class="formulaDsp">
-<picture><source srcset="form_310_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s(x, y) = \sum_{i=1}^{n_x - k_x - 1} \sum_{j=1}^{n_y - k_y - 1}
+\[    s(x, y) = \sum_{i=1}^{n_x - k_x - 1} \sum_{j=1}^{n_y - k_y - 1}
               c_{ij} \, B_i^{k_x}(x) \, B_j^{k_y}(y)
-\]" src="form_310.png"/></picture>
+\]
 </p>
 <p>that minimizes the thin-plate smoothing energy subject to a residual constraint:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_311_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \sum_{i=1}^{m} \bigl( w_i \, (z_i - s(x_i, y_i)) \bigr)^2 \leq S
-\]" src="form_311.png"/></picture>
+\[    \sum_{i=1}^{m} \bigl( w_i \, (z_i - s(x_i, y_i)) \bigr)^2 \leq S
+\]
 </p>
-<p>where <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> is the user-supplied smoothing parameter. Knot positions and the number of knots <picture><source srcset="form_312_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n_x, n_y $" src="form_312.png"/></picture> are chosen automatically by the <code>surfit</code> algorithm.</p>
-<p>The default spline degree is bicubic ( <picture><source srcset="form_191_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k_x = k_y = 3 $" src="form_191.png"/></picture>). Degrees 1 through 5 are supported.</p>
+<p>where \( S \) is the user-supplied smoothing parameter. Knot positions and the number of knots \( n_x, n_y \) are chosen automatically by the <code>surfit</code> algorithm.</p>
+<p>The default spline degree is bicubic ( \( k_x = k_y = 3 \)). Degrees 1 through 5 are supported.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.3 (pp. 85&ndash;98)</dd></dl>
-<h1><a class="anchor" id="autotoc_md116"></a>
+<h1><a class="anchor" id="autotoc_md128"></a>
 Basic Example</h1>
-<p>The code below fits a spline to 200 quasi-randomly distributed samples of <picture><source srcset="form_313_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f(x,y) = \sin(\pi x) \cos(\pi y) $" src="form_313.png"/></picture> on <picture><source srcset="form_314_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [0,1]^2 $" src="form_314.png"/></picture>.</p>
+<p>The code below fits a spline to 200 quasi-randomly distributed samples of \( f(x,y) = \sin(\pi x) \cos(\pi y) \) on \( [0,1]^2 \).</p>
 <div class="fragment"><div class="line"><span class="keyword">program</span> surface_demo</div>
 <div class="line">    <span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_surface, fp_real, fp_flag, &amp;</div>
 <div class="line">                       fitpack_success, fitpack_message, zero, one, half, pi</div>
@@ -156,9 +164,9 @@ Basic Example</h1>
 <div class="line"><span class="keyword">end program</span></div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p><code>surf\new_fit(x, y, z, w, smoothing, order)</code> stores the data, allocates workspace, and performs a smoothing fit in a single call. It returns an <code>integer(FP_FLAG)</code> error code.</p>
-<h1><a class="anchor" id="autotoc_md117"></a>
+<h1><a class="anchor" id="autotoc_md129"></a>
 Features</h1>
-<h2><a class="anchor" id="autotoc_md118"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Point evaluation</h2>
 <p>Evaluate the fitted surface at one or many scattered points:</p>
 <div class="fragment"><div class="line"><span class="comment">! Scalar</span></div>
@@ -167,15 +175,15 @@ Point evaluation</h2>
 <div class="line"><span class="comment">! Array of scattered points</span></div>
 <div class="line">z_arr = surf%eval(x_arr, y_arr, ierr)   ! <span class="keyword">size</span>(z_arr) == <span class="keyword">size</span>(x_arr)</div>
 </div><!-- fragment --><p>Both <code>surf\eval</code> variants call the unscattered spline evaluator <code>bispeu</code>, so the input points need not be sorted.</p>
-<h2><a class="anchor" id="autotoc_md119"></a>
+<h2><a class="anchor" id="autotoc_md131"></a>
 Grid evaluation</h2>
 <p>Evaluate on every node of a rectangular output grid:</p>
 <div class="fragment"><div class="line"><span class="comment">! z_grid(j,i) = s(x_grid(i), y_grid(j))</span></div>
 <div class="line">z_grid = surf%eval_ongrid(x_grid, y_grid, ierr)</div>
 </div><!-- fragment --><p>The result has shape <code>(size(y_grid), size(x_grid))</code>.</p>
-<h2><a class="anchor" id="autotoc_md120"></a>
+<h2><a class="anchor" id="autotoc_md132"></a>
 Partial derivatives</h2>
-<p>Compute <picture><source srcset="form_315_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \partial^{n_x+n_y} s / \partial x^{n_x} \partial y^{n_y} $" src="form_315.png"/></picture> at scattered points or on a grid:</p>
+<p>Compute \( \partial^{n_x+n_y} s / \partial x^{n_x} \partial y^{n_y} \) at scattered points or on a grid:</p>
 <div class="fragment"><div class="line"><span class="comment">! ds/dx at a single point</span></div>
 <div class="line">dzdx = surf%dfdx(x0, y0, 1, 0, ierr)</div>
 <div class="line"> </div>
@@ -184,13 +192,13 @@ Partial derivatives</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">! ds/dy on a grid</span></div>
 <div class="line">dz_grid = surf%dfdx_ongrid(x_grid, y_grid, 0, 1, ierr)</div>
-</div><!-- fragment --><p>The derivative order arguments <code>nux</code>, <code>nuy</code> must satisfy <picture><source srcset="form_316_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 \leq n_x &lt; k_x $" src="form_316.png"/></picture> and <picture><source srcset="form_317_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 \leq n_y &lt; k_y $" src="form_317.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md121"></a>
+</div><!-- fragment --><p>The derivative order arguments <code>nux</code>, <code>nuy</code> must satisfy \( 0 \leq n_x &lt; k_x \) and \( 0 \leq n_y &lt; k_y \).</p>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Integration</h2>
-<p>Integrate the surface over a rectangular sub-domain <picture><source srcset="form_318_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [x_1, x_2] \times [y_1, y_2] $" src="form_318.png"/></picture>:</p>
+<p>Integrate the surface over a rectangular sub-domain \( [x_1, x_2] \times [y_1, y_2] \):</p>
 <div class="fragment"><div class="line">vol = surf%integral([x1, y1], [x2, y2])</div>
 </div><!-- fragment --><p>The two arguments are 2-element arrays <code>lower = [x_lo, y_lo]</code> and <code>upper = [x_hi, y_hi]</code>.</p>
-<h2><a class="anchor" id="autotoc_md122"></a>
+<h2><a class="anchor" id="autotoc_md134"></a>
 Cross-sections</h2>
 <p>Extract a one-dimensional profile by fixing one coordinate:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_curve) :: profile</div>
@@ -201,16 +209,16 @@ Cross-sections</h2>
 <div class="line"><span class="comment">! Profile g(x) = s(x, y0)  (along_y = .false.)</span></div>
 <div class="line">profile = surf%cross_section(y0, .false., ierr)</div>
 </div><!-- fragment --><p>The returned <code>fitpack_curve</code> is a full 1D spline that can be evaluated, differentiated, and integrated independently.</p>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 Derivative spline</h2>
 <p>Build a new <code>fitpack_surface</code> whose evaluation gives a partial derivative of the original:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_surface) :: dsdx_surf</div>
 <div class="line"> </div>
 <div class="line">dsdx_surf = surf%derivative_spline(1, 0, ierr)   ! ds/dx</div>
-</div><!-- fragment --><p>The resulting surface has reduced degree <picture><source srcset="form_319_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (k_x - n_x, \; k_y - n_y) $" src="form_319.png"/></picture>.</p>
-<h1><a class="anchor" id="autotoc_md124"></a>
+</div><!-- fragment --><p>The resulting surface has reduced degree \( (k_x - n_x, \; k_y - n_y) \).</p>
+<h1><a class="anchor" id="autotoc_md136"></a>
 Smoothing Sweep</h1>
-<p>The smoothing parameter <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> controls the trade-off between fidelity and smoothness. Smaller <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> forces more knots and a closer fit; larger <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> yields a smoother approximation.</p>
+<p>The smoothing parameter \( S \) controls the trade-off between fidelity and smoothness. Smaller \( S \) forces more knots and a closer fit; larger \( S \) yields a smoother approximation.</p>
 <div class="fragment"><div class="line">print <span class="stringliteral">&#39;(a)&#39;</span>, <span class="stringliteral">&#39;     S       knots_x  knots_y  residual&#39;</span></div>
 <div class="line"><span class="keywordflow">do</span> i = 1, 4</div>
 <div class="line">    ierr = surf%new_fit(x, y, z, smoothing=10.0_fp_real**(3 - i))</div>
@@ -221,12 +229,12 @@ Smoothing Sweep</h1>
 <div class="line"><span class="keyword">end </span>do</div>
 </div><!-- fragment --><p>Special cases:</p>
 <ul>
-<li>** <picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>** &mdash; interpolation (the spline passes through every data point). Use <code>surf\interpolate()</code>.</li>
-<li>**Large <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>** &mdash; very smooth, few knots, possibly large residual.</li>
-<li>** <picture><source srcset="form_159_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = m $" src="form_159.png"/></picture>** (number of data points, unit weights) &mdash; a practical starting value.</li>
+<li>** \( S = 0 \)** &mdash; interpolation (the spline passes through every data point). Use <code>surf\interpolate()</code>.</li>
+<li>**Large \( S \)** &mdash; very smooth, few knots, possibly large residual.</li>
+<li>** \( S = m \)** (number of data points, unit weights) &mdash; a practical starting value.</li>
 </ul>
-<p>After any fit, <code>surf\mse()</code> returns the weighted sum of squared residuals <picture><source srcset="form_273_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p $" src="form_273.png"/></picture>, and <code>surf\knots</code> returns a 2-element integer array <picture><source srcset="form_320_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [n_x, n_y] $" src="form_320.png"/></picture>.</p>
-<h1><a class="anchor" id="autotoc_md125"></a>
+<p>After any fit, <code>surf\mse()</code> returns the weighted sum of squared residuals \( f_p \), and <code>surf\knots</code> returns a 2-element integer array \( [n_x, n_y] \).</p>
+<h1><a class="anchor" id="autotoc_md137"></a>
 Fitting Modes</h1>
 <p>The same three strategies available for curves work for surfaces:</p>
 <table class="markdownTable">
@@ -235,11 +243,11 @@ Fitting Modes</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Automatic knots   </td><td class="markdownTableBodyNone"><code>surf\fit(smoothing=s)</code>   </td><td class="markdownTableBodyNone">Knots chosen to satisfy the smoothing constraint    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>surf\interpolate()</code>   </td><td class="markdownTableBodyNone">Passes through all data points ( <picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>)    </td></tr>
+<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>surf\interpolate()</code>   </td><td class="markdownTableBodyNone">Passes through all data points ( \( S = 0 \))    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Least-squares   </td><td class="markdownTableBodyNone"><code>surf\least_squares()</code>   </td><td class="markdownTableBodyNone">User-supplied knots, no smoothing constraint   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md126"></a>
+<h1><a class="anchor" id="autotoc_md138"></a>
 Error Handling</h1>
 <p>All routines return an <code>integer(FP_FLAG)</code> error code:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_ok, fitpack_success, fitpack_message</div>
@@ -261,7 +269,7 @@ Error Handling</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>FITPACK_INPUT_ERROR</code> (10)   </td><td class="markdownTableBodyNone">Invalid input data   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md127"></a>
+<h1><a class="anchor" id="autotoc_md139"></a>
 Complete Example</h1>
 <p>A self-contained program demonstrating all of the features above is provided in <code>examples/example_surface.f90</code>. Build and run it with:</p>
 <div class="fragment"><div class="line">fpm run --example example_surface</div>

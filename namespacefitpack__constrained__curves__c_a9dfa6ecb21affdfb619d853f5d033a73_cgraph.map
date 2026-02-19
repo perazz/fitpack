@@ -1,0 +1,9 @@
+<map id="fitpack_constrained_curves_c::fitpack_constrained_curve_c_set_constraints" name="fitpack_constrained_curves_c::fitpack_constrained_curve_c_set_constraints">
+<area shape="rect" id="Node000001" title="Set constraints and reset all previous ones: a missing &quot;ddx_end&quot; means: no endpoint constraints Begin..." alt="" coords="5,5,227,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,14,274,10,385,5,496,10,531,13,530,18,496,15,385,11,275,15,227,20"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__constrained__curves__c.html#a7b9392c8bf18d30e70a59fb9f1dbd993" title="Get dimensions." alt="" coords="275,49,496,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,48,262,54,261,59,227,53"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="496,56,530,50,531,56,497,61"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="333,49,333,39,343,30,360,25,385,23,416,26,433,34,431,38,414,31,385,28,361,30,345,35,338,41,338,49"/>
+</map>

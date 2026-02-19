@@ -1,0 +1,9 @@
+<map id="fitpack_core_c::spalde_c" name="fitpack_core_c::spalde_c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,185,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point." alt="" coords="233,42,385,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,52,220,52,220,57,186,57"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="433,5,592,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="385,41,419,36,420,41,386,46"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ab6b368d82e72f0bde7c8a9cc60eb76f2" title=" " alt="" coords="437,70,588,95"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="386,62,424,68,424,73,385,68"/>
+</map>

@@ -1,5 +1,30 @@
 var namespacefitpack__curves =
 [
     [ "fitpack_curve", "structfitpack__curves_1_1fitpack__curve.html", "structfitpack__curves_1_1fitpack__curve" ],
-    [ "fitpack_periodic_curve", "structfitpack__curves_1_1fitpack__periodic__curve.html", null ]
+    [ "fitpack_periodic_curve", "structfitpack__curves_1_1fitpack__periodic__curve.html", null ],
+    [ "curve_all_derivatives", "namespacefitpack__curves.html#a703fa0a7cfc5975d7b3f8f7d94819b7f", null ],
+    [ "curve_all_derivatives_pure", "namespacefitpack__curves.html#aaf4bde3fd7eb67a499710aadb385532e", null ],
+    [ "curve_comm_expand", "namespacefitpack__curves.html#a5151ecb47a2c4b89ea8bc8da729d0c62", null ],
+    [ "curve_comm_pack", "namespacefitpack__curves.html#a8d9fc8f0e678a3b90a2dfe62c922726a", null ],
+    [ "curve_comm_size", "namespacefitpack__curves.html#aacfcd686e441816489df6addf82f65f9", null ],
+    [ "curve_derivative", "namespacefitpack__curves.html#a6b8995b3b8d6a21d541a77388c4e3917", null ],
+    [ "curve_derivatives", "namespacefitpack__curves.html#a92411defec5d2f4a61058fee21581944", null ],
+    [ "curve_eval_many", "namespacefitpack__curves.html#a43a979718c9a1d8b4b2a5c49663b4066", null ],
+    [ "curve_eval_many_pure", "namespacefitpack__curves.html#a191fca4624f0221835ba534903b31e47", null ],
+    [ "curve_eval_one", "namespacefitpack__curves.html#ac9a1d54cba67bb87caf713a5845d5113", null ],
+    [ "curve_eval_one_noerr", "namespacefitpack__curves.html#a86373196ff60d67e15d049beab000d55", null ],
+    [ "curve_fit_automatic_knots", "namespacefitpack__curves.html#a657c16286c605225c58c3226680526bc", null ],
+    [ "curve_fit_least_squares", "namespacefitpack__curves.html#a21c5b5409e2b402cee4be0a039c247bc", null ],
+    [ "curve_insert_knot_many", "namespacefitpack__curves.html#a753de75f8ce3b5561effe892e8e5d07a", null ],
+    [ "curve_insert_knot_one", "namespacefitpack__curves.html#ad697886ef35b0160a31ad6d1b3213797", null ],
+    [ "destroy", "namespacefitpack__curves.html#ab47c223cdfdb094f17fcd8db6cb1350c", null ],
+    [ "fourier_coefficients", "namespacefitpack__curves.html#a8547123979b6f1542dd27c80173c6fd1", null ],
+    [ "grow_knot_storage", "namespacefitpack__curves.html#a0b26792808063c7ee78d2666d04e690b", null ],
+    [ "integral", "namespacefitpack__curves.html#a907da13d1bdf6c330e21ca96c4b1b7b0", null ],
+    [ "interpolating_curve", "namespacefitpack__curves.html#a6aaf1708839635bd3a9d692dd9c3cde4", null ],
+    [ "new_fit", "namespacefitpack__curves.html#ab9238428a925c15fff13da1cbfe3089b", null ],
+    [ "new_from_points", "namespacefitpack__curves.html#a66a6d351e3d9165fdcf83b726947c5e9", null ],
+    [ "new_points", "namespacefitpack__curves.html#a5180b3df72ea1293a7441d4de7dcf598", null ],
+    [ "zeros", "namespacefitpack__curves.html#a775612f44532e86d2844d2c74079f456", null ],
+    [ "max_k", "namespacefitpack__curves.html#abbaa986ed59bf77bf438e8ca1620125a", null ]
 ];

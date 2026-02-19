@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: fitpack_convex_curves Module Reference</title>
+<title>fitpack: fitpack_convex_curves Module Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -103,7 +111,8 @@ $(function(){initNavTree('namespacefitpack__convex__curves.html',''); initResiza
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Types</a>  </div>
+<a href="#nested-classes">Data Types</a> &#124;
+<a href="#func-members">Functions/Subroutines</a>  </div>
   <div class="headertitle"><div class="title">fitpack_convex_curves Module Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -116,12 +125,440 @@ Data Types</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cubic spline fitter with pointwise convexity/concavity constraints.  <a href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions/Subroutines</h2></td></tr>
+<tr class="memitem:ac4ad07a197aa3c1a62af9a9c04c01c17" id="r_ac4ad07a197aa3c1a62af9a9c04c01c17"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4ad07a197aa3c1a62af9a9c04c01c17">convex_new_from_points</a> (x, y, v, w, smoothing, ierr)</td></tr>
+<tr class="separator:ac4ad07a197aa3c1a62af9a9c04c01c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3930f864dcfa9db42f94d93ed5ae90f5" id="r_a3930f864dcfa9db42f94d93ed5ae90f5"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3930f864dcfa9db42f94d93ed5ae90f5">convex_destroy</a> (this)</td></tr>
+<tr class="separator:a3930f864dcfa9db42f94d93ed5ae90f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0d1d5d2b8ea80dc037580398b9d7cee" id="r_ab0d1d5d2b8ea80dc037580398b9d7cee"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0d1d5d2b8ea80dc037580398b9d7cee">convex_new_points</a> (this, x, y, w)</td></tr>
+<tr class="separator:ab0d1d5d2b8ea80dc037580398b9d7cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dc1f070ce1bf54c3e6f62b092a469d8" id="r_a6dc1f070ce1bf54c3e6f62b092a469d8"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dc1f070ce1bf54c3e6f62b092a469d8">set_convexity</a> (this, v)</td></tr>
+<tr class="separator:a6dc1f070ce1bf54c3e6f62b092a469d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33e52e9b015c6f8681654477aae14811" id="r_a33e52e9b015c6f8681654477aae14811"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33e52e9b015c6f8681654477aae14811">remap_concon_error</a> (ier)</td></tr>
+<tr class="separator:a33e52e9b015c6f8681654477aae14811"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1874d19a3cac57957949af137618853" id="r_ad1874d19a3cac57957949af137618853"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1874d19a3cac57957949af137618853">convex_fit_automatic_knots</a> (this, smoothing, order, keep_knots)</td></tr>
+<tr class="separator:ad1874d19a3cac57957949af137618853"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69211dd61f676952fe18f686ea187ad7" id="r_a69211dd61f676952fe18f686ea187ad7"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69211dd61f676952fe18f686ea187ad7">convex_fit_least_squares</a> (this, smoothing, reset_knots)</td></tr>
+<tr class="separator:a69211dd61f676952fe18f686ea187ad7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19a70c815133f911a81332e6465ba81c" id="r_a19a70c815133f911a81332e6465ba81c"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19a70c815133f911a81332e6465ba81c">nearest_constraint</a> (t_knot, x, v, m)</td></tr>
+<tr class="separator:a19a70c815133f911a81332e6465ba81c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ce97ef0a25e9a8cb7abe04371d733e9" id="r_a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ce97ef0a25e9a8cb7abe04371d733e9">convex_comm_size</a> (this)</td></tr>
+<tr class="memdesc:a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return communication buffer size.  <br /></td></tr>
+<tr class="separator:a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f45d38c6206472096f4dd6dd6318a41" id="r_a0f45d38c6206472096f4dd6dd6318a41"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f45d38c6206472096f4dd6dd6318a41">convex_comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a0f45d38c6206472096f4dd6dd6318a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack convex curve data into communication buffer.  <br /></td></tr>
+<tr class="separator:a0f45d38c6206472096f4dd6dd6318a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfd24b47c7517e417d16d080a2146b48" id="r_adfd24b47c7517e417d16d080a2146b48"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfd24b47c7517e417d16d080a2146b48">convex_comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:adfd24b47c7517e417d16d080a2146b48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand convex curve data from communication buffer.  <br /></td></tr>
+<tr class="separator:adfd24b47c7517e417d16d080a2146b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>OOP wrapper for constrained-convexity curve fitting. </p>
-<p>Provides <a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html" title="Cubic spline fitter with pointwise convexity/concavity constraints.">fitpack_convex_curve</a>, an extension of <a class="el" href="structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve .">fitpack_curve</a> that enforces local convexity or concavity constraints during spline fitting. Always uses cubic splines ( <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>). The underlying core routines are concon (automatic knot placement) and cocosp (least-squares with user-supplied knots).</p>
-<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, §8.3–8.4 (pp. 173–196); concon, cocosp </dd></dl>
-</div></div><!-- contents -->
+<p>Provides <a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html" title="Cubic spline fitter with pointwise convexity/concavity constraints.">fitpack_convex_curve</a>, an extension of <a class="el" href="structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve .">fitpack_curve</a> that enforces local convexity or concavity constraints during spline fitting. Always uses cubic splines ( \( k = 3 \)). The underlying core routines are concon (automatic knot placement) and cocosp (least-squares with user-supplied knots).</p>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, §8.3–8.4 (pp. 173–196); <a class="el" href="namespacefitpack__core.html#a4c04e0266b3011454aef7f491c067036" title="Fit a cubic spline with convexity/concavity constraints and automatic knot placement.">concon</a>, <a class="el" href="namespacefitpack__core.html#ae7347e7f9131cca78d72fe38baba4c92" title="Fit a cubic spline with convexity/concavity constraints and user-specified knots.">cocosp</a> </dd></dl>
+</div><h2 class="groupheader">Function/Subroutine Documentation</h2>
+<a id="adfd24b47c7517e417d16d080a2146b48" name="adfd24b47c7517e417d16d080a2146b48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfd24b47c7517e417d16d080a2146b48">&#9670;&#160;</a></span>convex_comm_expand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine fitpack_convex_curves::convex_comm_expand </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Expand convex curve data from communication buffer. </p>
+
+</div>
+</div>
+<a id="a0f45d38c6206472096f4dd6dd6318a41" name="a0f45d38c6206472096f4dd6dd6318a41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f45d38c6206472096f4dd6dd6318a41">&#9670;&#160;</a></span>convex_comm_pack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine fitpack_convex_curves::convex_comm_pack </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Pack convex curve data into communication buffer. </p>
+
+</div>
+</div>
+<a id="a9ce97ef0a25e9a8cb7abe04371d733e9" name="a9ce97ef0a25e9a8cb7abe04371d733e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ce97ef0a25e9a8cb7abe04371d733e9">&#9670;&#160;</a></span>convex_comm_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function fitpack_convex_curves::convex_comm_size </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return communication buffer size. </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph" alt=""/></div>
+<map name="anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph" id="anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph">
+<area shape="rect" title="Return communication buffer size." alt="" coords="5,29,176,69"/>
+<area shape="poly" title=" " alt="" coords="58,30,56,20,61,11,73,5,91,3,111,6,122,13,119,17,109,11,91,8,75,10,65,15,61,21,63,28"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a3930f864dcfa9db42f94d93ed5ae90f5" name="a3930f864dcfa9db42f94d93ed5ae90f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3930f864dcfa9db42f94d93ed5ae90f5">&#9670;&#160;</a></span>convex_destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental subroutine fitpack_convex_curves::convex_destroy </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad1874d19a3cac57957949af137618853" name="ad1874d19a3cac57957949af137618853"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1874d19a3cac57957949af137618853">&#9670;&#160;</a></span>convex_fit_automatic_knots()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function fitpack_convex_curves::convex_fit_automatic_knots </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>order</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>keep_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph" alt=""/></div>
+<map name="anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph" id="anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,219,45"/>
+<area shape="rect" href="namespacefitpack__convex__curves.html#a33e52e9b015c6f8681654477aae14811" title=" " alt="" coords="267,5,437,45"/>
+<area shape="poly" title=" " alt="" coords="219,23,253,23,253,28,219,28"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a69211dd61f676952fe18f686ea187ad7" name="a69211dd61f676952fe18f686ea187ad7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69211dd61f676952fe18f686ea187ad7">&#9670;&#160;</a></span>convex_fit_least_squares()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function fitpack_convex_curves::convex_fit_least_squares </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph" alt=""/></div>
+<map name="anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph" id="anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph">
+<area shape="rect" title=" " alt="" coords="5,37,200,77"/>
+<area shape="rect" href="namespacefitpack__convex__curves.html#a19a70c815133f911a81332e6465ba81c" title=" " alt="" coords="248,5,419,45"/>
+<area shape="poly" title=" " alt="" coords="200,41,234,36,235,42,200,46"/>
+<area shape="rect" href="namespacefitpack__convex__curves.html#a33e52e9b015c6f8681654477aae14811" title=" " alt="" coords="248,69,419,109"/>
+<area shape="poly" title=" " alt="" coords="200,68,235,73,234,78,200,73"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ac4ad07a197aa3c1a62af9a9c04c01c17" name="ac4ad07a197aa3c1a62af9a9c04c01c17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4ad07a197aa3c1a62af9a9c04c01c17">&#9670;&#160;</a></span>convex_new_from_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">type(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>) function fitpack_convex_curves::convex_new_from_points </td>
+          <td>(</td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(x)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(x)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>v</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(x)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0d1d5d2b8ea80dc037580398b9d7cee" name="ab0d1d5d2b8ea80dc037580398b9d7cee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0d1d5d2b8ea80dc037580398b9d7cee">&#9670;&#160;</a></span>convex_new_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">subroutine fitpack_convex_curves::convex_new_points </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(x)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(x)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a19a70c815133f911a81332e6465ba81c" name="a19a70c815133f911a81332e6465ba81c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19a70c815133f911a81332e6465ba81c">&#9670;&#160;</a></span>nearest_constraint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function fitpack_convex_curves::nearest_constraint </td>
+          <td>(</td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t_knot</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>v</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a33e52e9b015c6f8681654477aae14811" name="a33e52e9b015c6f8681654477aae14811"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33e52e9b015c6f8681654477aae14811">&#9670;&#160;</a></span>remap_concon_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function fitpack_convex_curves::remap_concon_error </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6dc1f070ce1bf54c3e6f62b092a469d8" name="a6dc1f070ce1bf54c3e6f62b092a469d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dc1f070ce1bf54c3e6f62b092a469d8">&#9670;&#160;</a></span>set_convexity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function fitpack_convex_curves::set_convexity </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>v</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

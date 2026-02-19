@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Curve Fitting Theory</title>
+<title>fitpack: Curve Fitting Theory</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,219 +114,219 @@ $(function(){initNavTree('theory_curve_fitting.html',''); initResizable(true); }
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2theory__curve__fitting"></a></p>
-<p>This page describes the mathematical foundations of the curve fitting algorithms in FITPACK: given data points <picture><source srcset="form_113_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i) $" src="form_113.png"/></picture> for <picture><source srcset="form_114_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ i = 1, \ldots, m $" src="form_114.png"/></picture>, find a spline <picture><source srcset="form_86_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) $" src="form_86.png"/></picture> in the B-spline space <picture><source srcset="form_115_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S(k, \mathbf{t}) $" src="form_115.png"/></picture> that represents the data well. The library supports several formulations of this problem, from simple least-squares with user-supplied knots to fully automatic smoothing with adaptive knot placement.</p>
-<h1><a class="anchor" id="autotoc_md19"></a>
+<p>This page describes the mathematical foundations of the curve fitting algorithms in FITPACK: given data points \( (x_i, y_i) \) for \( i = 1, \ldots, m \), find a spline \( s(x) \) in the B-spline space \( S(k, \mathbf{t}) \) that represents the data well. The library supports several formulations of this problem, from simple least-squares with user-supplied knots to fully automatic smoothing with adaptive knot placement.</p>
+<h1><a class="anchor" id="autotoc_md31"></a>
 The Approximation Problem</h1>
-<p>Given <picture><source srcset="form_36_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m $" src="form_36.png"/></picture> data points <picture><source srcset="form_113_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i) $" src="form_113.png"/></picture> with strictly increasing abscissae</p>
+<p>Given \( m \) data points \( (x_i, y_i) \) with strictly increasing abscissae</p>
 <p class="formulaDsp">
-<picture><source srcset="form_116_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    x_1 &lt; x_2 &lt; \cdots &lt; x_m
-\]" src="form_116.png"/></picture>
+\[    x_1 &lt; x_2 &lt; \cdots &lt; x_m
+\]
 </p>
-<p>and optional positive weights <picture><source srcset="form_61_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ w_i $" src="form_61.png"/></picture>, the goal is to find a spline <picture><source srcset="form_117_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s \in S(k, \mathbf{t}) $" src="form_117.png"/></picture> of degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> on a knot vector <picture><source srcset="form_66_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{t} $" src="form_66.png"/></picture> that approximates the data. Three common formulations arise:</p>
+<p>and optional positive weights \( w_i \), the goal is to find a spline \( s \in S(k, \mathbf{t}) \) of degree \( k \) on a knot vector \( \mathbf{t} \) that approximates the data. Three common formulations arise:</p>
 <ul>
-<li><b>Interpolation.</b> Require <picture><source srcset="form_118_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x_i) = y_i $" src="form_118.png"/></picture> for every data point. This determines the spline exactly when <picture><source srcset="form_119_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n = m $" src="form_119.png"/></picture> (number of knots minus degree minus one equals number of data points). No smoothing is applied.</li>
-<li><b>Least-squares with fixed knots.</b> Given a prescribed knot vector, find the B-spline coefficients <picture><source srcset="form_120_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ c_j $" src="form_120.png"/></picture> that minimize the weighted residual sum of squares. The number and placement of knots are chosen by the user.</li>
+<li><b>Interpolation.</b> Require \( s(x_i) = y_i \) for every data point. This determines the spline exactly when \( n = m \) (number of knots minus degree minus one equals number of data points). No smoothing is applied.</li>
+<li><b>Least-squares with fixed knots.</b> Given a prescribed knot vector, find the B-spline coefficients \( c_j \) that minimize the weighted residual sum of squares. The number and placement of knots are chosen by the user.</li>
 <li><b>Smoothing.</b> Let the algorithm choose the knot vector automatically, balancing closeness-of-fit against smoothness of the spline. This is FITPACK's primary mode of operation.</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 4&ndash;5 (pp. 49&ndash;103)</dd></dl>
-<h1><a class="anchor" id="autotoc_md20"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Least-Squares with Fixed Knots</h1>
-<p>Suppose a knot vector <picture><source srcset="form_121_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{t} = (t_1, \ldots, t_{n+k+1}) $" src="form_121.png"/></picture> is given. The spline has the B-spline representation</p>
+<p>Suppose a knot vector \( \mathbf{t} = (t_1, \ldots, t_{n+k+1}) \) is given. The spline has the B-spline representation</p>
 <p class="formulaDsp">
-<picture><source srcset="form_122_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s(x) = \sum_{j=1}^{n} c_j \, B_j(x; k, \mathbf{t})
-\]" src="form_122.png"/></picture>
+\[    s(x) = \sum_{j=1}^{n} c_j \, B_j(x; k, \mathbf{t})
+\]
 </p>
-<p>where <picture><source srcset="form_123_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n $" src="form_123.png"/></picture> is the number of B-spline basis functions and <picture><source srcset="form_120_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ c_j $" src="form_120.png"/></picture> are the unknown coefficients. The least-squares problem is to minimize</p>
+<p>where \( n \) is the number of B-spline basis functions and \( c_j \) are the unknown coefficients. The least-squares problem is to minimize</p>
 <p class="formulaDsp">
-<picture><source srcset="form_124_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \sum_{i=1}^{m} w_i^2 \left( y_i - \sum_{j=1}^{n} c_j \, B_j(x_i) \right)^2
-\]" src="form_124.png"/></picture>
+\[    \sum_{i=1}^{m} w_i^2 \left( y_i - \sum_{j=1}^{n} c_j \, B_j(x_i) \right)^2
+\]
 </p>
-<p>over all coefficient vectors <picture><source srcset="form_125_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{c} \in \mathbb{R}^n $" src="form_125.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md21"></a>
+<p>over all coefficient vectors \( \mathbf{c} \in \mathbb{R}^n \).</p>
+<h2><a class="anchor" id="autotoc_md33"></a>
 Normal Equations and Banded Structure</h2>
-<p>Setting the gradient to zero yields the normal equations <picture><source srcset="form_126_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ A^T W^2 A \, \mathbf{c} = A^T W^2 \mathbf{y} $" src="form_126.png"/></picture>, where <picture><source srcset="form_127_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ A_{ij} = B_j(x_i) $" src="form_127.png"/></picture> is the <picture><source srcset="form_128_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m \times n $" src="form_128.png"/></picture> collocation matrix and <picture><source srcset="form_129_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ W = \mathrm{diag}(w_i) $" src="form_129.png"/></picture>. Because each B-spline <picture><source srcset="form_130_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ B_j $" src="form_130.png"/></picture> is nonzero on at most <picture><source srcset="form_131_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k+1 $" src="form_131.png"/></picture> knot spans, the matrix <picture><source srcset="form_132_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ A $" src="form_132.png"/></picture> has at most <picture><source srcset="form_131_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k+1 $" src="form_131.png"/></picture> nonzero entries per row. The resulting normal equations matrix <picture><source srcset="form_133_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ A^T W^2 A $" src="form_133.png"/></picture> is symmetric, positive semi-definite, and banded with bandwidth <picture><source srcset="form_131_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k+1 $" src="form_131.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md22"></a>
+<p>Setting the gradient to zero yields the normal equations \( A^T W^2 A \, \mathbf{c} = A^T W^2 \mathbf{y} \), where \( A_{ij} = B_j(x_i) \) is the \( m \times n \) collocation matrix and \( W = \mathrm{diag}(w_i) \). Because each B-spline \( B_j \) is nonzero on at most \( k+1 \) knot spans, the matrix \( A \) has at most \( k+1 \) nonzero entries per row. The resulting normal equations matrix \( A^T W^2 A \) is symmetric, positive semi-definite, and banded with bandwidth \( k+1 \).</p>
+<h2><a class="anchor" id="autotoc_md34"></a>
 QR Factorization via Givens Rotations</h2>
-<p>Rather than forming and solving the normal equations directly (which squares the condition number), FITPACK solves the least-squares problem by computing a QR factorization of the weighted matrix <picture><source srcset="form_134_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ W A $" src="form_134.png"/></picture> using Givens rotations. Each data point <picture><source srcset="form_113_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i) $" src="form_113.png"/></picture> contributes one row to the system; Givens rotations annihilate entries below the diagonal one at a time, maintaining the banded structure throughout.</p>
+<p>Rather than forming and solving the normal equations directly (which squares the condition number), FITPACK solves the least-squares problem by computing a QR factorization of the weighted matrix \( W A \) using Givens rotations. Each data point \( (x_i, y_i) \) contributes one row to the system; Givens rotations annihilate entries below the diagonal one at a time, maintaining the banded structure throughout.</p>
 <p>This approach has several advantages:</p>
 <ul>
-<li><b>Numerical stability.</b> The condition number of the triangular factor <picture><source srcset="form_135_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ R $" src="form_135.png"/></picture> equals <picture><source srcset="form_136_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \kappa(WA) $" src="form_136.png"/></picture>, not <picture><source srcset="form_137_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \kappa(WA)^2 $" src="form_137.png"/></picture>.</li>
-<li><b>Efficiency.</b> Each rotation touches only <picture><source srcset="form_138_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathcal{O}(k) $" src="form_138.png"/></picture> elements, giving <picture><source srcset="form_139_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathcal{O}(m k^2) $" src="form_139.png"/></picture> total work.</li>
+<li><b>Numerical stability.</b> The condition number of the triangular factor \( R \) equals \( \kappa(WA) \), not \( \kappa(WA)^2 \).</li>
+<li><b>Efficiency.</b> Each rotation touches only \( \mathcal{O}(k) \) elements, giving \( \mathcal{O}(m k^2) \) total work.</li>
 <li><b>Incremental updates.</b> Adding or removing knots requires only local updates to the factorization.</li>
 </ul>
-<p>The back-substitution step solves the upper triangular system <picture><source srcset="form_140_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ R \mathbf{c} = Q^T W \mathbf{y} $" src="form_140.png"/></picture> for the coefficients.</p>
+<p>The back-substitution step solves the upper triangular system \( R \mathbf{c} = Q^T W \mathbf{y} \) for the coefficients.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 4, &sect;4.2 (pp. 53&ndash;62)</dd></dl>
-<h1><a class="anchor" id="autotoc_md23"></a>
+<h1><a class="anchor" id="autotoc_md35"></a>
 The Smoothing Problem</h1>
-<p>Instead of fixing the knot vector a priori, the smoothing formulation treats the number and positions of knots as unknowns. The problem is to find a spline <picture><source srcset="form_117_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s \in S(k, \mathbf{t}) $" src="form_117.png"/></picture> that minimizes a roughness measure subject to a constraint on the residual:</p>
+<p>Instead of fixing the knot vector a priori, the smoothing formulation treats the number and positions of knots as unknowns. The problem is to find a spline \( s \in S(k, \mathbf{t}) \) that minimizes a roughness measure subject to a constraint on the residual:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_141_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \min_{s \in S(k, \mathbf{t})} \int_{x_1}^{x_m} \left[ s''(x) \right]^2 \, dx
+\[    \min_{s \in S(k, \mathbf{t})} \int_{x_1}^{x_m} \left[ s&#39;&#39;(x) \right]^2 \, dx
     \quad \text{subject to} \quad
     \sum_{i=1}^{m} w_i^2 \left( y_i - s(x_i) \right)^2 \leq S
-\]" src="form_141.png"/></picture>
+\]
 </p>
-<p>Here <picture><source srcset="form_142_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S \geq 0 $" src="form_142.png"/></picture> is the <b>smoothing parameter</b> that controls the trade-off:</p>
+<p>Here \( S \geq 0 \) is the <b>smoothing parameter</b> that controls the trade-off:</p>
 <ul>
-<li>** <picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>**: The constraint forces interpolation. The spline passes through every data point, and the roughness integral is minimized among all interpolating splines.</li>
-<li>**Small <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>**: The spline stays close to the data but may oscillate between data points, requiring many knots.</li>
-<li>**Large <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>**: The spline is very smooth (few knots) but may miss important features in the data.</li>
+<li>** \( S = 0 \)**: The constraint forces interpolation. The spline passes through every data point, and the roughness integral is minimized among all interpolating splines.</li>
+<li>**Small \( S \)**: The spline stays close to the data but may oscillate between data points, requiring many knots.</li>
+<li>**Large \( S \)**: The spline is very smooth (few knots) but may miss important features in the data.</li>
 </ul>
-<p>For a given <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>, the theoretical solution is a natural spline of degree <picture><source srcset="form_145_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 2k + 1 $" src="form_145.png"/></picture> with knots at the data sites. FITPACK approximates this solution using a spline of degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> on a much smaller knot set, determined adaptively.</p>
+<p>For a given \( S \), the theoretical solution is a natural spline of degree \( 2k + 1 \) with knots at the data sites. FITPACK approximates this solution using a spline of degree \( k \) on a much smaller knot set, determined adaptively.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2 (pp. 67&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
 Adaptive Knot Placement</h1>
 <p>FITPACK's <code>curfit</code> routine implements an iterative strategy to determine both the number and positions of knots:</p>
 <ol type="1">
-<li><b>Initialize.</b> Start with the minimal knot vector containing <picture><source srcset="form_146_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 2(k+1) $" src="form_146.png"/></picture> knots: <picture><source srcset="form_131_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k+1 $" src="form_131.png"/></picture> knots stacked at each end of the data range.</li>
-<li><b>Solve.</b> Compute the least-squares spline for the current knot vector using Givens rotations. Let <picture><source srcset="form_147_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p = \sum w_i^2 (y_i - s(x_i))^2 $" src="form_147.png"/></picture> be the weighted residual sum of squares.</li>
-<li><b>Test convergence.</b> If <picture><source srcset="form_148_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p \leq S $" src="form_148.png"/></picture>, the smoothing constraint is satisfied and the algorithm terminates.</li>
-<li><b>Add knots.</b> Identify the knot interval <picture><source srcset="form_149_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [t_j, t_{j+1}) $" src="form_149.png"/></picture> with the largest contribution to the residual. Insert a new knot at the data abscissa in that interval where the local residual is greatest.</li>
+<li><b>Initialize.</b> Start with the minimal knot vector containing \( 2(k+1) \) knots: \( k+1 \) knots stacked at each end of the data range.</li>
+<li><b>Solve.</b> Compute the least-squares spline for the current knot vector using Givens rotations. Let \( f_p = \sum w_i^2 (y_i - s(x_i))^2 \) be the weighted residual sum of squares.</li>
+<li><b>Test convergence.</b> If \( f_p \leq S \), the smoothing constraint is satisfied and the algorithm terminates.</li>
+<li><b>Add knots.</b> Identify the knot interval \( [t_j, t_{j+1}) \) with the largest contribution to the residual. Insert a new knot at the data abscissa in that interval where the local residual is greatest.</li>
 <li><b>Iterate.</b> Return to step 2 with the augmented knot vector.</li>
-<li><p class="startli"><b>Smoothing parameter update.</b> Once enough knots are available, the algorithm uses rational interpolation (Dierckx's <code>fprati</code>) to refine the Lagrange multiplier <picture><source srcset="form_150_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ p $" src="form_150.png"/></picture> that connects the unconstrained minimization</p>
+<li><p class="startli"><b>Smoothing parameter update.</b> Once enough knots are available, the algorithm uses rational interpolation (Dierckx's <code>fprati</code>) to refine the Lagrange multiplier \( p \) that connects the unconstrained minimization</p>
 <p class="formulaDsp">
-<picture><source srcset="form_151_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[       \eta(p) = p \sum_{i=1}^{m} w_i^2 (y_i - s_p(x_i))^2
-       + (1 - p) \int [s_p''(x)]^2 \, dx
-\]" src="form_151.png"/></picture>
+\[       \eta(p) = p \sum_{i=1}^{m} w_i^2 (y_i - s_p(x_i))^2
+       + (1 - p) \int [s_p&#39;&#39;(x)]^2 \, dx
+\]
 </p>
 <p class="startli">to the constrained formulation. This avoids solving many full least-squares problems and typically converges in a few iterations.</p>
 </li>
 </ol>
-<p>The procedure is designed to produce a spline with as few knots as possible while satisfying the smoothing constraint <picture><source srcset="form_148_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p \leq S $" src="form_148.png"/></picture>.</p>
+<p>The procedure is designed to produce a spline with as few knots as possible while satisfying the smoothing constraint \( f_p \leq S \).</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2.4 (pp. 78&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md37"></a>
 Choosing the Smoothing Factor</h1>
-<p>Selecting an appropriate value of <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> is the most important practical decision in spline smoothing. The following guidelines apply:</p>
+<p>Selecting an appropriate value of \( S \) is the most important practical decision in spline smoothing. The following guidelines apply:</p>
 <ul>
-<li><p class="startli"><b>Known noise variance.</b> If the data satisfy <picture><source srcset="form_152_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y_i = g(x_i) + \varepsilon_i $" src="form_152.png"/></picture> where <picture><source srcset="form_153_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \varepsilon_i $" src="form_153.png"/></picture> are independent errors with variance <picture><source srcset="form_154_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \sigma^2 $" src="form_154.png"/></picture> and the weights are <picture><source srcset="form_155_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ w_i = 1 $" src="form_155.png"/></picture>, the expected value of the residual sum of squares for the true function is <picture><source srcset="form_156_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m \sigma^2 $" src="form_156.png"/></picture>. A natural choice is</p>
+<li><p class="startli"><b>Known noise variance.</b> If the data satisfy \( y_i = g(x_i) + \varepsilon_i \) where \( \varepsilon_i \) are independent errors with variance \( \sigma^2 \) and the weights are \( w_i = 1 \), the expected value of the residual sum of squares for the true function is \( m \sigma^2 \). A natural choice is</p>
 <p class="formulaDsp">
-<picture><source srcset="form_157_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[      S \approx m \, \sigma^2
-\]" src="form_157.png"/></picture>
+\[      S \approx m \, \sigma^2
+\]
 </p>
-<p class="startli">More generally, for non-uniform weights, <picture><source srcset="form_158_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S \approx \sum w_i^2 \sigma_i^2 $" src="form_158.png"/></picture>.</p>
+<p class="startli">More generally, for non-uniform weights, \( S \approx \sum w_i^2 \sigma_i^2 \).</p>
 </li>
-<li><b>Unit weights, well-scaled data.</b> When <picture><source srcset="form_155_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ w_i = 1 $" src="form_155.png"/></picture> and no noise estimate is available, <picture><source srcset="form_159_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = m $" src="form_159.png"/></picture> is a reasonable starting point.</li>
-<li>**Over-fitting ( <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> too small).** The spline chases noise in the data, introducing spurious oscillations and using too many knots. The number of knots grows until the maximum is reached, and the fit may become numerically ill-conditioned.</li>
-<li>**Under-fitting ( <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> too large).** The spline is too smooth and fails to capture genuine features. The knot count stays near the minimum <picture><source srcset="form_146_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 2(k+1) $" src="form_146.png"/></picture>, and the residuals show systematic patterns.</li>
-<li><b>Diagnostic.</b> After fitting, inspect the mean squared error via <code>curve\mse()</code>. If the residual is much larger than the expected noise level, decrease <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>; if the spline oscillates visibly, increase <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>.</li>
+<li><b>Unit weights, well-scaled data.</b> When \( w_i = 1 \) and no noise estimate is available, \( S = m \) is a reasonable starting point.</li>
+<li>**Over-fitting ( \( S \) too small).** The spline chases noise in the data, introducing spurious oscillations and using too many knots. The number of knots grows until the maximum is reached, and the fit may become numerically ill-conditioned.</li>
+<li>**Under-fitting ( \( S \) too large).** The spline is too smooth and fails to capture genuine features. The knot count stays near the minimum \( 2(k+1) \), and the residuals show systematic patterns.</li>
+<li><b>Diagnostic.</b> After fitting, inspect the mean squared error via <code>curve\mse()</code>. If the residual is much larger than the expected noise level, decrease \( S \); if the spline oscillates visibly, increase \( S \).</li>
 </ul>
-<p>A practical workflow is to try a sequence of <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> values (e.g., on a logarithmic scale) and select the one that gives the best balance between smoothness and fidelity, or use cross-validation techniques.</p>
+<p>A practical workflow is to try a sequence of \( S \) values (e.g., on a logarithmic scale) and select the one that gives the best balance between smoothness and fidelity, or use cross-validation techniques.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2.4 (pp. 78&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md26"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Periodic Splines</h1>
-<p>When the data represent a function that is periodic on <picture><source srcset="form_160_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [x_1, x_m] $" src="form_160.png"/></picture> (for example, angular measurements as a function of time), the fitted spline should satisfy periodicity constraints:</p>
+<p>When the data represent a function that is periodic on \( [x_1, x_m] \) (for example, angular measurements as a function of time), the fitted spline should satisfy periodicity constraints:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_161_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s^{(j)}(x_1) = s^{(j)}(x_m), \quad j = 0, 1, \ldots, k-1
-\]" src="form_161.png"/></picture>
+\[    s^{(j)}(x_1) = s^{(j)}(x_m), \quad j = 0, 1, \ldots, k-1
+\]
 </p>
-<p>These <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> conditions ensure that the spline and its first <picture><source srcset="form_162_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k-1 $" src="form_162.png"/></picture> derivatives match at the endpoints, producing a globally smooth periodic function.</p>
-<p>In terms of the B-spline representation, periodicity is enforced by wrapping the knot vector and tying the first and last <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> coefficients:</p>
+<p>These \( k \) conditions ensure that the spline and its first \( k-1 \) derivatives match at the endpoints, producing a globally smooth periodic function.</p>
+<p>In terms of the B-spline representation, periodicity is enforced by wrapping the knot vector and tying the first and last \( k \) coefficients:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_163_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    c_j = c_{n - k + j}, \quad j = 1, \ldots, k
-\]" src="form_163.png"/></picture>
+\[    c_j = c_{n - k + j}, \quad j = 1, \ldots, k
+\]
 </p>
-<p>This reduces the number of free coefficients from <picture><source srcset="form_123_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n $" src="form_123.png"/></picture> to <picture><source srcset="form_164_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ n - k $" src="form_164.png"/></picture>. The modified least-squares problem is solved with the same Givens rotation approach.</p>
+<p>This reduces the number of free coefficients from \( n \) to \( n - k \). The modified least-squares problem is solved with the same Givens rotation approach.</p>
 <p>FITPACK's <code>percur</code> routine implements automatic-knot periodic curve fitting. The corresponding type is <code>fitpack_periodic_curve</code>.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, &sect;6.1 (pp. 105&ndash;114)</dd></dl>
-<h1><a class="anchor" id="autotoc_md27"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 Parametric Curves</h1>
-<p>A parametric curve in <picture><source srcset="form_30_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbb{R}^d $" src="form_30.png"/></picture> is defined by <picture><source srcset="form_31_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ d $" src="form_31.png"/></picture> coordinate functions of a common parameter <picture><source srcset="form_34_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u $" src="form_34.png"/></picture>:</p>
+<p>A parametric curve in \( \mathbb{R}^d \) is defined by \( d \) coordinate functions of a common parameter \( u \):</p>
 <p class="formulaDsp">
-<picture><source srcset="form_165_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \mathbf{x}(u) = \bigl( s_1(u), \, s_2(u), \, \ldots, \, s_d(u) \bigr)
-\]" src="form_165.png"/></picture>
+\[    \mathbf{x}(u) = \bigl( s_1(u), \, s_2(u), \, \ldots, \, s_d(u) \bigr)
+\]
 </p>
-<p>Given data points <picture><source srcset="form_37_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{x}_i \in \mathbb{R}^d $" src="form_37.png"/></picture> for <picture><source srcset="form_114_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ i = 1, \ldots, m $" src="form_114.png"/></picture>, the first step is to assign parameter values <picture><source srcset="form_20_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u_i $" src="form_20.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<p>Given data points \( \mathbf{x}_i \in \mathbb{R}^d \) for \( i = 1, \ldots, m \), the first step is to assign parameter values \( u_i \).</p>
+<h2><a class="anchor" id="autotoc_md40"></a>
 Chord-Length Parameterization</h2>
 <p>The default choice is cumulative chord length:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_166_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    u_1 = 0, \quad u_{i+1} = u_i + \| \mathbf{x}_{i+1} - \mathbf{x}_i \|,
+\[    u_1 = 0, \quad u_{i+1} = u_i + \| \mathbf{x}_{i+1} - \mathbf{x}_i \|,
     \quad i = 1, \ldots, m-1
-\]" src="form_166.png"/></picture>
+\]
 </p>
 <p>This ensures that parameter increments are proportional to the spacing between successive data points, preventing bunching in regions of high curvature.</p>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md41"></a>
 Shared Knot Vector</h2>
-<p>All <picture><source srcset="form_31_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ d $" src="form_31.png"/></picture> component splines <picture><source srcset="form_33_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s_j(u) $" src="form_33.png"/></picture> share the same knot vector <picture><source srcset="form_66_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \mathbf{t} $" src="form_66.png"/></picture> and degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture>. The smoothing problem becomes: minimize</p>
+<p>All \( d \) component splines \( s_j(u) \) share the same knot vector \( \mathbf{t} \) and degree \( k \). The smoothing problem becomes: minimize</p>
 <p class="formulaDsp">
-<picture><source srcset="form_167_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \sum_{j=1}^{d} \int \left[ s_j''(u) \right]^2 \, du
+\[    \sum_{j=1}^{d} \int \left[ s_j&#39;&#39;(u) \right]^2 \, du
     \quad \text{subject to} \quad
     \sum_{i=1}^{m} \sum_{j=1}^{d} w_i^2 \left( x_{ij} - s_j(u_i) \right)^2 \leq S
-\]" src="form_167.png"/></picture>
+\]
 </p>
-<p>FITPACK's <code>parcur</code> routine handles this by solving <picture><source srcset="form_31_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ d $" src="form_31.png"/></picture> coupled least-squares problems with a common knot vector.</p>
-<h2><a class="anchor" id="autotoc_md30"></a>
+<p>FITPACK's <code>parcur</code> routine handles this by solving \( d \) coupled least-squares problems with a common knot vector.</p>
+<h2><a class="anchor" id="autotoc_md42"></a>
 Closed Curves</h2>
 <p>For closed parametric curves, the spline must satisfy periodic boundary conditions in every component:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_168_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s_j^{(l)}(u_1) = s_j^{(l)}(u_m), \quad l = 0, 1, \ldots, k-1, \quad j = 1, \ldots, d
-\]" src="form_168.png"/></picture>
+\[    s_j^{(l)}(u_1) = s_j^{(l)}(u_m), \quad l = 0, 1, \ldots, k-1, \quad j = 1, \ldots, d
+\]
 </p>
 <p>This is implemented by <code>clocur</code> (type <code>fitpack_closed_curve</code>).</p>
-<h2><a class="anchor" id="autotoc_md31"></a>
+<h2><a class="anchor" id="autotoc_md43"></a>
 Endpoint Constraints</h2>
 <p>In some applications, the tangent vector or higher derivatives at the curve endpoints are prescribed. FITPACK's <code>concur</code> routine supports derivative constraints of the form:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_169_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    s_j^{(l)}(u_1) = \alpha_{jl}, \quad s_j^{(l)}(u_m) = \beta_{jl}
-\]" src="form_169.png"/></picture>
+\[    s_j^{(l)}(u_1) = \alpha_{jl}, \quad s_j^{(l)}(u_m) = \beta_{jl}
+\]
 </p>
-<p>for selected orders <picture><source srcset="form_170_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ l $" src="form_170.png"/></picture> and components <picture><source srcset="form_171_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ j $" src="form_171.png"/></picture>, implemented by <code>fitpack_constrained_curve</code>.</p>
+<p>for selected orders \( l \) and components \( j \), implemented by <code>fitpack_constrained_curve</code>.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9 (pp. 199&ndash;228)</dd></dl>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md44"></a>
 Convexity-Constrained Fitting</h1>
 <p>In many applications the fitted curve must be shape-preserving: convex data should produce a convex spline, concave data a concave spline. FITPACK supports local convexity constraints via the second derivative.</p>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md45"></a>
 B-Spline Coefficient Conditions</h2>
-<p>A spline <picture><source srcset="form_86_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) $" src="form_86.png"/></picture> of degree <picture><source srcset="form_172_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k \geq 2 $" src="form_172.png"/></picture> is convex on an interval if and only if <picture><source srcset="form_173_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x) \geq 0 $" src="form_173.png"/></picture> there. For B-splines, this translates into conditions on the second-order divided differences of the coefficients:</p>
+<p>A spline \( s(x) \) of degree \( k \geq 2 \) is convex on an interval if and only if \( s&#39;&#39;(x) \geq 0 \) there. For B-splines, this translates into conditions on the second-order divided differences of the coefficients:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_174_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \Delta^2 c_j = c_{j+2} - 2 c_{j+1} + c_j \geq 0
-\]" src="form_174.png"/></picture>
+\[    \Delta^2 c_j = c_{j+2} - 2 c_{j+1} + c_j \geq 0
+\]
 </p>
-<p>for all <picture><source srcset="form_171_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ j $" src="form_171.png"/></picture> whose corresponding B-splines overlap the interval. Concavity requires <picture><source srcset="form_175_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \Delta^2 c_j \leq 0 $" src="form_175.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<p>for all \( j \) whose corresponding B-splines overlap the interval. Concavity requires \( \Delta^2 c_j \leq 0 \).</p>
+<h2><a class="anchor" id="autotoc_md46"></a>
 Per-Interval Convexity Flags</h2>
-<p>FITPACK allows the user to specify convexity constraints independently for each data interval via a flag vector <picture><source srcset="form_176_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i $" src="form_176.png"/></picture>:</p>
+<p>FITPACK allows the user to specify convexity constraints independently for each data interval via a flag vector \( v_i \):</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Flag value   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><picture><source srcset="form_177_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ +1 $" src="form_177.png"/></picture>   </td><td class="markdownTableBodyNone">The spline must be concave on <picture><source srcset="form_178_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [x_i, x_{i+1}] $" src="form_178.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">\( +1 \)   </td><td class="markdownTableBodyNone">The spline must be concave on \( [x_i, x_{i+1}] \)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><picture><source srcset="form_179_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ -1 $" src="form_179.png"/></picture>   </td><td class="markdownTableBodyNone">The spline must be convex on <picture><source srcset="form_178_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [x_i, x_{i+1}] $" src="form_178.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">\( -1 \)   </td><td class="markdownTableBodyNone">The spline must be convex on \( [x_i, x_{i+1}] \)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><picture><source srcset="form_180_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 $" src="form_180.png"/></picture>   </td><td class="markdownTableBodyNone">No constraint (the spline is free)   </td></tr>
+<td class="markdownTableBodyNone">\( 0 \)   </td><td class="markdownTableBodyNone">No constraint (the spline is free)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 Quadratic Programming Formulation</h2>
-<p>The constrained fitting problem becomes a quadratic program (QP): minimize the roughness integral (or weighted residual) subject to the linear inequality constraints on <picture><source srcset="form_181_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \Delta^2 c_j $" src="form_181.png"/></picture> and the smoothing constraint <picture><source srcset="form_148_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p \leq S $" src="form_148.png"/></picture>. FITPACK solves this QP iteratively, combining the adaptive knot strategy with active-set management for the convexity constraints.</p>
+<p>The constrained fitting problem becomes a quadratic program (QP): minimize the roughness integral (or weighted residual) subject to the linear inequality constraints on \( \Delta^2 c_j \) and the smoothing constraint \( f_p \leq S \). FITPACK solves this QP iteratively, combining the adaptive knot strategy with active-set management for the convexity constraints.</p>
 <p>Two routines are provided:</p>
 <ul>
 <li><b><code>concon</code></b> (type <code>fitpack_convex_curve</code>): automatic knot placement with convexity constraints. The algorithm adds knots as in <code>curfit</code> but enforces the shape constraints at each step.</li>
 <li><b><code>cocosp</code></b>: fixed knot vector with convexity constraints. The user supplies the knots and the routine solves the constrained least-squares problem.</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, &sect;8.3&ndash;8.4 (pp. 173&ndash;196)</dd></dl>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md48"></a>
 Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Formulation   </th><th class="markdownTableHeadNone">Routine   </th><th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Key parameter    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Automatic smoothing   </td><td class="markdownTableBodyNone"><code>curfit</code>   </td><td class="markdownTableBodyNone"><code>fitpack_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Automatic smoothing   </td><td class="markdownTableBodyNone"><code>curfit</code>   </td><td class="markdownTableBodyNone"><code>fitpack_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor \( S \)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curfit</code>   </td><td class="markdownTableBodyNone"><code>fitpack_curve</code>   </td><td class="markdownTableBodyNone"><picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Interpolation   </td><td class="markdownTableBodyNone"><code>curfit</code>   </td><td class="markdownTableBodyNone"><code>fitpack_curve</code>   </td><td class="markdownTableBodyNone">\( S = 0 \)    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Fixed-knot least-squares   </td><td class="markdownTableBodyNone"><code>curfit</code>   </td><td class="markdownTableBodyNone"><code>fitpack_curve</code>   </td><td class="markdownTableBodyNone">User knot vector    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Periodic smoothing   </td><td class="markdownTableBodyNone"><code>percur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_periodic_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Periodic smoothing   </td><td class="markdownTableBodyNone"><code>percur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_periodic_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor \( S \)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Open parametric   </td><td class="markdownTableBodyNone"><code>parcur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_parametric_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Open parametric   </td><td class="markdownTableBodyNone"><code>parcur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_parametric_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor \( S \)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Closed parametric   </td><td class="markdownTableBodyNone"><code>clocur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_closed_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Closed parametric   </td><td class="markdownTableBodyNone"><code>clocur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_closed_curve</code>   </td><td class="markdownTableBodyNone">Smoothing factor \( S \)    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Endpoint-constrained   </td><td class="markdownTableBodyNone"><code>concur</code>   </td><td class="markdownTableBodyNone"><code>fitpack_constrained_curve</code>   </td><td class="markdownTableBodyNone">Derivative values    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Convex (auto knots)   </td><td class="markdownTableBodyNone"><code>concon</code>   </td><td class="markdownTableBodyNone"><code>fitpack_convex_curve</code>   </td><td class="markdownTableBodyNone">Convexity flags <picture><source srcset="form_176_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i $" src="form_176.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone">Convex (auto knots)   </td><td class="markdownTableBodyNone"><code>concon</code>   </td><td class="markdownTableBodyNone"><code>fitpack_convex_curve</code>   </td><td class="markdownTableBodyNone">Convexity flags \( v_i \)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Convex (fixed knots)   </td><td class="markdownTableBodyNone"><code>cocosp</code>   </td><td class="markdownTableBodyNone">&mdash;   </td><td class="markdownTableBodyNone">Convexity flags <picture><source srcset="form_176_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i $" src="form_176.png"/></picture>   </td></tr>
+<td class="markdownTableBodyNone">Convex (fixed knots)   </td><td class="markdownTableBodyNone"><code>cocosp</code>   </td><td class="markdownTableBodyNone">&mdash;   </td><td class="markdownTableBodyNone">Convexity flags \( v_i \)   </td></tr>
 </table>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="theory_bsplines.html">B-Spline Foundations</a> </dd>
 <dd>

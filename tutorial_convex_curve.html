@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Convexity-Constrained Curve Fitting</title>
+<title>fitpack: Convexity-Constrained Curve Fitting</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -107,32 +115,32 @@ $(function(){initNavTree('tutorial_convex_curve.html',''); initResizable(true); 
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__convex__curve"></a></p>
 <p>This tutorial covers shape-preserving spline fitting with <code>fitpack_convex_curve</code>, which enforces local convexity or concavity constraints on a cubic spline. Use it when the data represents a physical quantity that must be convex or concave — e.g. moisture content vs depth, dose-response curves, or thermodynamic isotherms — and an unconstrained spline would introduce spurious wiggles.</p>
-<h1><a class="anchor" id="autotoc_md105"></a>
+<h1><a class="anchor" id="autotoc_md117"></a>
 Mathematical Background</h1>
-<p>A cubic B-spline <picture><source srcset="form_301_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) = \sum_j c_j B_j(x) $" src="form_301.png"/></picture> is locally convex ( <picture><source srcset="form_173_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x) \geq 0 $" src="form_173.png"/></picture>) when the coefficient second differences satisfy</p>
+<p>A cubic B-spline \( s(x) = \sum_j c_j B_j(x) \) is locally convex ( \( s&#39;&#39;(x) \geq 0 \)) when the coefficient second differences satisfy</p>
 <p class="formulaDsp">
-<picture><source srcset="form_302_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    c_{j-1} - 2\,c_j + c_{j+1} \geq 0
-\]" src="form_302.png"/></picture>
+\[    c_{j-1} - 2\,c_j + c_{j+1} \geq 0
+\]
 </p>
-<p>and locally concave ( <picture><source srcset="form_303_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x) \leq 0 $" src="form_303.png"/></picture>) when</p>
+<p>and locally concave ( \( s&#39;&#39;(x) \leq 0 \)) when</p>
 <p class="formulaDsp">
-<picture><source srcset="form_304_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    c_{j-1} - 2\,c_j + c_{j+1} \leq 0
-\]" src="form_304.png"/></picture>
+\[    c_{j-1} - 2\,c_j + c_{j+1} \leq 0
+\]
 </p>
-<p>FITPACK expresses these requirements through per-data-point flags <picture><source srcset="form_305_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i \in \{-1, 0, +1\} $" src="form_305.png"/></picture> with the constraint <picture><source srcset="form_306_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x_i)\,v_i \leq 0 $" src="form_306.png"/></picture>:</p>
+<p>FITPACK expresses these requirements through per-data-point flags \( v_i \in \{-1, 0, +1\} \) with the constraint \( s&#39;&#39;(x_i)\,v_i \leq 0 \):</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Flag   </th><th class="markdownTableHeadNone">Constraint   </th><th class="markdownTableHeadNone">Shape    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><picture><source srcset="form_307_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i = +1 $" src="form_307.png"/></picture>   </td><td class="markdownTableBodyNone"><picture><source srcset="form_308_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x_i) \leq 0 $" src="form_308.png"/></picture>   </td><td class="markdownTableBodyNone">Concave (curves downward)    </td></tr>
+<td class="markdownTableBodyNone">\( v_i = +1 \)   </td><td class="markdownTableBodyNone">\( s&#39;&#39;(x_i) \leq 0 \)   </td><td class="markdownTableBodyNone">Concave (curves downward)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><picture><source srcset="form_2_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i = -1 $" src="form_2.png"/></picture>   </td><td class="markdownTableBodyNone"><picture><source srcset="form_309_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x_i) \geq 0 $" src="form_309.png"/></picture>   </td><td class="markdownTableBodyNone">Convex (curves upward)    </td></tr>
+<td class="markdownTableBodyNone">\( v_i = -1 \)   </td><td class="markdownTableBodyNone">\( s&#39;&#39;(x_i) \geq 0 \)   </td><td class="markdownTableBodyNone">Convex (curves upward)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><picture><source srcset="form_3_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i = 0 $" src="form_3.png"/></picture>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">Unconstrained   </td></tr>
+<td class="markdownTableBodyNone">\( v_i = 0 \)   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">Unconstrained   </td></tr>
 </table>
-<p>The fitting always uses cubic splines ( <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>). The core solver (<code>concon</code>) places knots automatically to satisfy the smoothing constraint while respecting the requested convexity at every data point.</p>
+<p>The fitting always uses cubic splines ( \( k = 3 \)). The core solver (<code>concon</code>) places knots automatically to satisfy the smoothing constraint while respecting the requested convexity at every data point.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, &sect;8.3&ndash;8.4 (pp. 173&ndash;196)</dd></dl>
-<h1><a class="anchor" id="autotoc_md106"></a>
+<h1><a class="anchor" id="autotoc_md118"></a>
 Basic Example</h1>
 <p>Consider moisture-content measurements as a function of depth. The data rises quickly then levels off — a concave profile.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_convex_curve, fp_real, fp_flag, &amp;</div>
@@ -153,7 +161,7 @@ Basic Example</h1>
 <div class="line">     0.317_fp_real, 0.326_fp_real, 0.323_fp_real, 0.321_fp_real, 0.322_fp_real, &amp;</div>
 <div class="line">     0.328_fp_real]</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md107"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md119"></a>
 Step 1 — Load Data and Set Convexity Flags</h2>
 <div class="fragment"><div class="line"><span class="comment">! Load data points</span></div>
 <div class="line"><span class="keyword">call </span>curve%new_points(x, y)</div>
@@ -162,12 +170,12 @@ Step 1 — Load Data and Set Convexity Flags</h2>
 <div class="line">v = one</div>
 <div class="line">ierr = curve%set_convexity(v)</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md108"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md120"></a>
 Step 2 — Fit with Constraints</h2>
-<p>Call <code>curve\fit</code> with a smoothing parameter. The solver selects knots automatically while enforcing <picture><source srcset="form_308_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x_i) \leq 0 $" src="form_308.png"/></picture> at every data point:</p>
+<p>Call <code>curve\fit</code> with a smoothing parameter. The solver selects knots automatically while enforcing \( s&#39;&#39;(x_i) \leq 0 \) at every data point:</p>
 <div class="fragment"><div class="line">ierr = curve%fit(smoothing=0.04_fp_real)</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md109"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md121"></a>
 Step 3 — Evaluate and Inspect</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: y_eval, d2y</div>
 <div class="line"><span class="keywordtype">integer</span> :: i</div>
@@ -179,7 +187,7 @@ Step 3 — Evaluate and Inspect</h2>
 <div class="line"><span class="keywordflow">end do</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md110"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md122"></a>
 Comparing Constrained vs Unconstrained</h1>
 <p>Without constraints, a standard <code>fitpack_curve</code> may oscillate through noisy data, creating regions where the second derivative changes sign. The constrained fit eliminates these wiggles:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_curve, fitpack_convex_curve, fp_real, fp_flag, one</div>
@@ -202,29 +210,29 @@ Comparing Constrained vs Unconstrained</h1>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>free_curve%destroy()</div>
 <div class="line"><span class="keyword">call </span>constrained%destroy()</div>
-</div><!-- fragment --><p>The constrained spline guarantees <picture><source srcset="form_303_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x) \leq 0 $" src="form_303.png"/></picture> throughout.</p>
-<h1><a class="anchor" id="autotoc_md111"></a>
+</div><!-- fragment --><p>The constrained spline guarantees \( s&#39;&#39;(x) \leq 0 \) throughout.</p>
+<h1><a class="anchor" id="autotoc_md123"></a>
 Mixed Constraints</h1>
 <p>The constraint vector need not be uniform. Assign different flags per point for data that changes curvature sign:</p>
 <div class="fragment"><div class="line">v(1:6)  = -one   <span class="comment">! convex region: s&#39;&#39;(x_i) &gt;= 0</span></div>
 <div class="line">v(7:m)  =  one   <span class="comment">! concave region: s&#39;&#39;(x_i) &lt;= 0</span></div>
 <div class="line">ierr = curve%set_convexity(v)</div>
-</div><!-- fragment --><p>Setting <picture><source srcset="form_3_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ v_i = 0 $" src="form_3.png"/></picture> leaves individual points unconstrained, which is useful at transition regions where the curvature sign is unknown.</p>
-<h1><a class="anchor" id="autotoc_md112"></a>
+</div><!-- fragment --><p>Setting \( v_i = 0 \) leaves individual points unconstrained, which is useful at transition regions where the curvature sign is unknown.</p>
+<h1><a class="anchor" id="autotoc_md124"></a>
 Constructor Shortcut</h1>
 <p>A one-step constructor combines <code>new_points</code>, <code>set_convexity</code>, and <code>fit</code>:</p>
 <div class="fragment"><div class="line">v = one</div>
 <div class="line">curve = fitpack_convex_curve(x, y, v, smoothing=0.04_fp_real, ierr=ierr)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md113"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md125"></a>
 API Summary</h1>
-<p><code>fitpack_convex_curve</code> extends <code>fitpack_curve</code> with convexity constraints. The spline degree is always cubic ( <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>).</p>
+<p><code>fitpack_convex_curve</code> extends <code>fitpack_curve</code> with convexity constraints. The spline degree is always cubic ( \( k = 3 \)).</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Method   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>curve\new_points(x, y, w)</code>   </td><td class="markdownTableBodyNone">Load data points and optional weights    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>curve\set_convexity(v)</code>   </td><td class="markdownTableBodyNone">Set per-point convexity flags ( <picture><source srcset="form_177_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ +1 $" src="form_177.png"/></picture>, <picture><source srcset="form_179_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ -1 $" src="form_179.png"/></picture>, or <picture><source srcset="form_180_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 $" src="form_180.png"/></picture>)    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\set_convexity(v)</code>   </td><td class="markdownTableBodyNone">Set per-point convexity flags ( \( +1 \), \( -1 \), or \( 0 \))    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>curve\fit(smoothing)</code>   </td><td class="markdownTableBodyNone">Fit with automatic knots (calls <code>concon</code>)    </td></tr>
 <tr class="markdownTableRowEven">
@@ -234,11 +242,11 @@ API Summary</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>curve\dfdx(x, order)</code>   </td><td class="markdownTableBodyNone">Evaluate derivatives    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>curve\integral(a, b)</code>   </td><td class="markdownTableBodyNone">Definite integral over <picture><source srcset="form_65_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [a, b] $" src="form_65.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\integral(a, b)</code>   </td><td class="markdownTableBodyNone">Definite integral over \( [a, b] \)    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>curve\destroy()</code>   </td><td class="markdownTableBodyNone">Release allocated memory   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md114"></a>
+<h1><a class="anchor" id="autotoc_md126"></a>
 Complete Example</h1>
 <p>See <code>examples/example_convex_curve.f90</code> (<code>examples/example_convex_curve.f90</code>) for a full working program that loads moisture-content data with endpoint-emphasized weights, fits at multiple smoothing levels, and prints a comparison table of knot count, residual, and maximum second derivative.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__convex__curves.html">fitpack_convex_curves</a>, Dierckx Ch. 8 (pp. 173&ndash;196) </dd></dl>

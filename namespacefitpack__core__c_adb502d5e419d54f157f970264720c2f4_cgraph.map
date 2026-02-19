@@ -1,0 +1,15 @@
+<map id="fitpack_core_c::fourco_c" name="fitpack_core_c::fourco_c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,184,68"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2256640832da2724f9e5058bcebd6ec2" title="Compute Fourier coefficients of a cubic spline." alt="" coords="232,43,383,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,53,218,53,218,58,184,58"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#acc0e64bf7c182c225873ce2bfac77ab1" title="Compute Fourier coefficients of cubic B&#45;splines." alt="" coords="431,43,581,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,53,417,53,417,58,383,58"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a8c6900d3b80033043b2b73b49ce84fc2" title="Compute weighted Fourier integrals of a cubic polynomial." alt="" coords="642,5,790,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="578,40,631,30,631,36,579,45"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="629,79,803,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="581,65,629,74,628,79,580,71"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="682,80,675,70,679,60,693,54,716,52,745,56,756,65,753,69,742,61,716,57,694,59,683,64,680,70,686,77"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="851,79,996,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="803,89,837,89,837,94,803,94"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="890,80,882,70,886,60,900,54,923,52,952,56,963,65,960,69,950,61,923,57,901,59,890,64,888,70,894,77"/>
+</map>

@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Namespace Members</title>
+<title>fitpack: Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -102,100 +110,10 @@ $(function(){initNavTree('namespacemembers_func.html',''); initResizable(true); 
 </div>
 
 <div class="contents">
-<div class="textblock">Here is a list of all documented namespace functions with links to the namespaces they belong to:</div>
+<div class="textblock">Here is a list of all namespace functions with links to the namespace documentation for each function:</div>
 
-<h3><a id="index_f" name="index_f"></a>- f -</h3><ul>
-<li>fitpack_closed_curve_c_allocate()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#af92550e66e5c12dccdb698fd64c45d7e">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_copy()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a0ce9192fe1010886352fca0bb140873b">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_degree()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a10341365387bb49122e9d4908f45b472">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_destroy()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a74353a0327b5c126304a43a805599c32">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_eval_one()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a2a771cc0c0c0928af18784698811160a">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_fit()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a6091425d1d7ef1144a4ae50166c78839">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_get_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a3ff276587e3889b8b353b9280fcae943">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_idim()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a882c57e2ea0380342649aac98b87f90b">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_interpolating()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a993b3ae0339fe727b406a43288e26b04">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_move_alloc()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a1db5bd2d67b5144875cb8bc74c00de7d">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_mse()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a50dab0a1fa3bc7da68b123ccb9c81fea">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_new_fit()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a5b89966000556634324b4cbefa539c6d">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_new_points()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#ac712e18e7d85e00100b5fca62c1dbc5e">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#aac6158ca1112a25d506d9cc3ea7e1d9d">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_smoothing()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a8bf3b580b94974208b4c773b8ec51cd2">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_ubegin()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a2bb1a8ab287cd949c06fef3cd0d3a202">fitpack_closed_curves_c</a></li>
-<li>fitpack_closed_curve_c_uend()&#160;:&#160;<a class="el" href="namespacefitpack__closed__curves__c.html#a6ef02881cac3ef80d2c28962999e2a5d">fitpack_closed_curves_c</a></li>
-<li>fitpack_constrained_curve_c_allocate()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a4896412e15668ca563aebd714581b661">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_copy()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a33718c754080258b16da3094ca0a6d9d">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_degree()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#ab77b09c7d2eef60175ce97a72ca44a4d">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_derivative()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#ace3ce6221ea21318255efc9afeee0694">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_destroy()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#af610d2fbf2fdb56cc4cc97eb5343d5bb">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_eval_one()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a0ffe8ba7fc296003644b3f8837245d23">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_fit()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a28748c09285d852c1b0e7b6663ef8c17">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_get_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_idim()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a7b9392c8bf18d30e70a59fb9f1dbd993">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_interpolating()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#acc29a5dea633192bbd86820347823d21">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_move_alloc()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a7732913081269b8b65695584ee345d13">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_mse()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#aedb18ae1f2fb8b9b8af66947398b4dd0">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_new_fit()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a187147954c0d8ee78a033516a52918df">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_new_points()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a07094b3c2b2931731d974fe2b438b392">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#add888f3454c41a3da62cb08d01dea859">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_smoothing()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a58f1f1fe8d354e20015ee9951e0c819c">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_ubegin()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a7e1ac437434f723144e6ba379c39a829">fitpack_constrained_curves_c</a></li>
-<li>fitpack_constrained_curve_c_uend()&#160;:&#160;<a class="el" href="namespacefitpack__constrained__curves__c.html#a5a4b3ed4bafa93e540e76f6e6f52658e">fitpack_constrained_curves_c</a></li>
-<li>fitpack_curve_c_all_derivatives()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a0db9d1b68093aac9473972a3e5760e6e">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_allocate()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a70b29a74673295f6465a91e44f48628e">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_copy()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a532c03aac50decdaed318ef55c91594b">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_degree()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a92eaa00bc604287ac0af40809313ad6e">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_derivative()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a56f82995a5b8de2a7751d2301e27b39d">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_destroy()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#aa5687c369c8c58f9cd60bfe6f7a6f66e">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_eval_many()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#acf8209f170e11ab77b21df9012752988">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_eval_one()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a289d8f0b0aef1ebee1341b13d797e7ab">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_fit()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#ae6c335e6f63f8933421d0849b46fa688">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_fourier()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a612aa82a87493a03f781dad69f88cd8c">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_get_bc()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a4d6ed045fb917b68b5767a92fa6219d5">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_get_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#adb479e307b50b9939f9e689ffd385082">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_integral()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a514af7c0a684f89e26e62f3fd20cfc9b">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_interpolating()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a7a1b7416dbceebc128a73285bcf5d2fd">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_mse()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a84b4cd4200ebac81de3894b8f69c26d3">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_new_fit()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a56fdb2523db90e9e61d8a0eaee640f51">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_new_points()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a9148b723f7256780431b8d17f8272e41">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#ab8802e418f18b3e0a731857b3716c89f">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_set_bc()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#a1affaba0b81175c243c6ca72e58bb71c">fitpack_curves_c</a></li>
-<li>fitpack_curve_c_smoothing()&#160;:&#160;<a class="el" href="namespacefitpack__curves__c.html#aa883576078b21eb86dce68e8644789da">fitpack_curves_c</a></li>
-<li>fitpack_parametric_curve_c_allocate()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a9ddf68fccfb85f859d4508039fcef3c1">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_copy()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a0fbaa2c936c14d5e93339f903e3fff47">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_degree()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#aac9f31beadfcf3851ed3647bf884920e">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_derivative()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ac2f01d76683156eded712f0df3416534">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_destroy()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ab46a83dd6f39d383504fcd72174c0beb">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_eval_one()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a6ceea5744841d5dfc5d52522356789cd">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_fit()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#afcccf5ee33bf60134d058479ac265542">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_get_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a65a16d18fe94d3cbf67169ed73f8efdc">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_idim()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a2e1efa752deaf8779fc1ac516127d527">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_interpolating()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a20c32183726f1e4ce775d1f01c69a933">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_move_alloc()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a7c6520676f31a6f95ba68be149dcf6a5">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_mse()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ac48bbb1237e2a4c7b6e248a5abb62599">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_new_fit()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a39f5a7e28a71ba0b99c1c87e2fe5a861">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_new_points()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a7d2e600572400386c7229ceb89a10589">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ab81e3f7e63cccbcb2771a257f1032fbb">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_smoothing()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ae5a4a7a7d830ddd210c04a7ea6361159">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_ubegin()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#ab53dd6f7649c877f71ea31b5f0fbe9e8">fitpack_parametric_curves_c</a></li>
-<li>fitpack_parametric_curve_c_uend()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__curves__c.html#a41d9320a2a73bb3e6819bfae8abcb095">fitpack_parametric_curves_c</a></li>
-<li>fitpack_periodic_curve_c_all_derivatives()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a5929d29d5d78198732d66df213050b8b">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_allocate()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a96c1605d9236c12239ba7640c5e65c05">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_copy()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a513585d8920edadd45108f606ccafb7d">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_degree()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#af7cf61003487e0076a40f59b2eaf55dc">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_derivative()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#ad10970b59f312336ff7ee7c2235ba958">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_destroy()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#af13c3719ab1fb2a67fff34abd4e772cf">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_eval_many()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#addc6c242bf87fd4ec44339c94232cd22">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_eval_one()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a43d3989fdc296e40f64230fe1e1a03b0">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_fit()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#adc01e1f0b776d9f27d89be62206b1a92">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_fourier()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a727c21ae80a2cab5fd2a31e3c6f24f13">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_get_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_integral()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#ac19b1d3b2a2b964f9f37d079194faf3e">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_interpolating()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#ad4f3db353be2b6ef6fe6068540442b0d">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_mse()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#ab00fab7e291ebd3a9ff49476a4bd9045">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_new_fit()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a9d131cb9ae4768a26deb40dac089e47f">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_new_points()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a536c0266e869bf5396cab3f4168615cf">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_pointer()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#aeef2651aa247d1b16df2bf49c9db5004">fitpack_periodic_curves_c</a></li>
-<li>fitpack_periodic_curve_c_smoothing()&#160;:&#160;<a class="el" href="namespacefitpack__periodic__curves__c.html#a22035ed64ecd1d30b20922052ee5087d">fitpack_periodic_curves_c</a></li>
+<h3><a id="index_a" name="index_a"></a>- a -</h3><ul>
+<li>allocate_knot_storage()&#160;:&#160;<a class="el" href="namespacefitpack__parametric__surfaces.html#acaa4898491130825fd5a1ed122aefe58">fitpack_parametric_surfaces</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

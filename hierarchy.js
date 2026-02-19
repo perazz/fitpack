@@ -1,5 +1,7 @@
 var hierarchy =
 [
+    [ "fitpack_fitters::comm_expand_if", "interfacefitpack__fitters_1_1comm__expand__if.html", null ],
+    [ "fitpack_fitters::comm_pack_if", "interfacefitpack__fitters_1_1comm__pack__if.html", null ],
     [ "fitpack_fitters::comm_size_if", "interfacefitpack__fitters_1_1comm__size__if.html", null ],
     [ "fitpack_closed_curves_c::fitpack_closed_curve_c", "structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html", null ],
     [ "fitpack_constrained_curves_c::fitpack_constrained_curve_c", "structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html", null ],
@@ -22,5 +24,10 @@ var hierarchy =
       [ "fitpack_surfaces::fitpack_surface", "structfitpack__surfaces_1_1fitpack__surface.html", null ]
     ] ],
     [ "fitpack_parametric_curves_c::fitpack_parametric_curve_c", "structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c.html", null ],
-    [ "fitpack_periodic_curves_c::fitpack_periodic_curve_c", "structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c.html", null ]
+    [ "fitpack_periodic_curves_c::fitpack_periodic_curve_c", "structfitpack__periodic__curves__c_1_1fitpack__periodic__curve__c.html", null ],
+    [ "fitpack_core::fitpack_polar_boundary", "interfacefitpack__core_1_1fitpack__polar__boundary.html", null ],
+    [ "fitpack_core::fitpack_swap", "interfacefitpack__core_1_1fitpack__swap.html", null ],
+    [ "fitpack_core::fp_comm_expand", "interfacefitpack__core_1_1fp__comm__expand.html", null ],
+    [ "fitpack_core::fp_comm_pack", "interfacefitpack__core_1_1fp__comm__pack.html", null ],
+    [ "fitpack_core::fp_comm_size", "interfacefitpack__core_1_1fp__comm__size.html", null ]
 ];

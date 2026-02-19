@@ -1,0 +1,10 @@
+<map id="fitpack_sphere_domains::fitpack_sphere::sphere_new_from_points" name="fitpack_sphere_domains::fitpack_sphere::sphere_new_from_points">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,185,97"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="233,49,387,89"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,67,220,67,220,72,185,72"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="435,5,588,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="386,50,421,42,422,48,388,55"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="435,93,588,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="388,83,422,91,421,96,386,89"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="474,94,471,84,477,75,491,69,511,67,535,70,548,77,545,82,533,75,511,72,492,74,481,79,477,85,479,92"/>
+</map>

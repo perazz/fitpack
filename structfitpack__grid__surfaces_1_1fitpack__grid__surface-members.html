@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Member List</title>
+<title>fitpack: Member List</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -109,10 +117,10 @@ $(function(){initNavTree('structfitpack__grid__surfaces_1_1fitpack__grid__surfac
 <p>This is the complete list of members for <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>, including all inherited members.</p>
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a17057c7a2aa35ac6c0e87329a2e6ec66">c</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>comm_expand</b>(this, buffer) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>comm_expand</b>(this, buffer) (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>comm_pack</b>(this, buffer) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>comm_pack</b>(this, buffer) (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a2d38bdc276bc11e205bcb6203c0e50e7">comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a20a29631c1d4f97f391ebae7335ac524">fitpack_fitters::fitpack_fitter::comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a3c72eaa9269f1ee850c71217cb800146">comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a1060bacf4ad0a9e229784e407087365c">fitpack_fitters::fitpack_fitter::comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ab190b6d0ce917eac8bfbf4c0a577eea7">comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#af3f1bd18f36011f74337f85bf5a160a4">fitpack_fitters::fitpack_fitter::comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a84b552fc80bf0d9e48dab0528518510a">core_comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
@@ -122,7 +130,7 @@ $(function(){initNavTree('structfitpack__grid__surfaces_1_1fitpack__grid__surfac
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a220b3b625a319769a0c481d394d391c1">derivative_spline</a>(this, nux, nuy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a9c882b4538f431da20f578caf441f98a">destroy</a>(this)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a599af639c06dff9d7ab349cb514e54c1">destroy_base</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>dfdx</b>(this, x, y, dx, dy, ierr) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a29891a39807263b81e2d2d00622599a6">dfdx</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a29891a39807263b81e2d2d00622599a6">dfdx</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ac889e742a1045f562aef51862a5d2385">dfdx_ongrid</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a7001585ad14540ac9977b14319118437">eval</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
@@ -131,29 +139,36 @@ $(function(){initNavTree('structfitpack__grid__surfaces_1_1fitpack__grid__surfac
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a4943dddff742db196447dca22b327094">eval_ongrid</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a8c5ae4da5b344962a41c4789a0b32346">fit</a>(this, smoothing, order, keep_knots)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa9428cc7448785fb9a2697225760296e">fp</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a6e5abb70a60c25575c9e5645afe67724">integral</a>(this, lower, upper)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>interpolate</b>(this, reset_knots) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a37789f6e2aef4d11695e20f84a5f0e30">iopt</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>iwrk</b> (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>knots</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>least_squares</b>(this, smoothing, reset_knots) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a77faf70d39841c8c95bacd91ac555ebf">left</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a40e456707e34524cb2b4d80d7b2ac3b7">liwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa5eaddf25a40b1612e978249464a28fb">lwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a90874d58207b3bf3c3b115e192178c94">nest</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#aacc93dc205952d15499af26e44dde9f8">new_fit</a>(this, x, y, z, smoothing, order)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a61aa07b3a85f9571f1ac3cbc322e87b1">new_points</a>(this, x, y, z)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>nmax</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a21d23fbe3b78f6c86a0c24d9739eb928">order</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>right</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>surf_new_from_points</b>(x, y, z, ierr) (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>t</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>wrk</b> (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a4b49d71e135cbd593e0340e7900ece7e">x</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>y</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>z</b> (defined in <a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a>)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ade5a89ea239f0ed647098e9d6ed9af54">gridded_derivatives_gridded</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#aaac58c7201763722a6ab538ef751820a">gridded_derivatives_many</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a85e6783b0f05b415be93ac0ce0638d53">gridded_derivatives_one</a>(this, x, y, dx, dy, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a84b4d9fd7fedda159fdd1b603ec544eb">gridded_eval_many</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a275167f05320a85984fed9d2ac2c7413">gridded_eval_one</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ab5f3abfc8d43812fe745e6731fd84dda">gridsurf_eval_many</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ab8bb1a15b313d28d7b265a0f2ee386ac">gridsurf_eval_one</a>(this, x, y, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a6e5abb70a60c25575c9e5645afe67724">integral</a>(this, lower, upper)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a7ddd32f702a8da0b359fdb47cdbe1bf7">interpolate</a>(this, reset_knots)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a37789f6e2aef4d11695e20f84a5f0e30">iopt</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a79e872bcc881c071816f4a9560b7991a">iwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a86568df46fc2aa92d835eca913d26f79">knots</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a6bb763b82f9240a46b3c12c35a045889">least_squares</a>(this, smoothing, reset_knots)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a77faf70d39841c8c95bacd91ac555ebf">left</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a40e456707e34524cb2b4d80d7b2ac3b7">liwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa5eaddf25a40b1612e978249464a28fb">lwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a90874d58207b3bf3c3b115e192178c94">nest</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#aacc93dc205952d15499af26e44dde9f8">new_fit</a>(this, x, y, z, smoothing, order)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a61aa07b3a85f9571f1ac3cbc322e87b1">new_points</a>(this, x, y, z)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a80fd3fb6a829cedeb7c07415d847f704">nmax</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a21d23fbe3b78f6c86a0c24d9739eb928">order</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a74fb4659d8e4f39ad84016aea36140a1">right</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a50f495f98b3ab90fb34581e7abb7b8e2">surf_new_from_points</a>(x, y, z, ierr)</td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#ab2669908b8eca92eb09f0d8e2cabc43d">t</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#adcb5a0862065efdc9a6a9b7ac3a144e3">wrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a4b49d71e135cbd593e0340e7900ece7e">x</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a402a13194e357e392ede3f40b357ef5f">y</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a23d1b4dea3b29250377c172fdc1430ce">z</a></td><td class="entry"><a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surfaces::fitpack_grid_surface</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

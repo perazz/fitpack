@@ -1,0 +1,13 @@
+<map id="fitpack_core_c::splder_c" name="fitpack_core_c::splder_c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,183,55"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a76d523967d0d2a2011719c12c27b2fe7" title="Evaluate the &#45;th derivative of a spline &#160;at a set of points." alt="" coords="231,29,380,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,39,217,39,217,45,183,45"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="428,29,577,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,39,414,39,414,45,380,45"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="625,29,799,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="577,39,612,39,612,45,577,45"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="678,31,671,21,675,11,689,5,712,3,741,6,752,15,749,20,738,11,712,8,690,10,679,15,676,20,682,28"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="847,29,992,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="799,39,833,39,833,45,799,45"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="886,31,878,21,882,11,896,5,919,3,948,6,959,15,956,20,946,11,919,8,897,10,886,15,884,20,890,28"/>
+</map>

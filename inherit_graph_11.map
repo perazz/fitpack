@@ -1,0 +1,29 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="5,293,168,333"/>
+<area shape="rect" id="Node000001" href="$structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve ." alt="" coords="255,37,423,77"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="95,279,112,235,137,183,171,131,191,108,214,87,253,67,255,72,218,92,195,112,175,135,141,186,117,237,100,281"/>
+<area shape="rect" id="Node000004" href="$structfitpack__grid__surfaces_1_1fitpack__grid__surface.html" title="Bivariate surface fitter &#160;for gridded data." alt="" coords="258,101,419,141"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="103,280,148,214,179,180,215,151,257,132,259,137,217,156,182,184,152,218,107,283"/>
+<area shape="rect" id="Node000005" href="$structfitpack__gridded__polar_1_1fitpack__grid__polar.html" title="Bicubic spline fitter for data on a gridded polar disc." alt="" coords="257,165,420,205"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="118,282,162,247,215,215,256,199,258,204,217,220,165,251,121,286"/>
+<area shape="rect" id="Node000006" href="$structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html" title="Bicubic spline fitter for data on a latitude&#45;longitude grid." alt="" coords="252,229,425,269"/>
+<area shape="poly" id="edge6_Node000000_Node000006" title=" " alt="" coords="179,287,259,267,260,272,180,292"/>
+<area shape="rect" id="Node000007" href="$structfitpack__parametric__curves_1_1fitpack__parametric__curve.html" title="Open parametric curve fitter in ." alt="" coords="216,293,461,333"/>
+<area shape="poly" id="edge7_Node000000_Node000007" title=" " alt="" coords="182,311,216,311,216,316,182,316"/>
+<area shape="rect" id="Node000010" href="$structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html" title="Bicubic parametric surface fitter in ." alt="" coords="231,358,446,413"/>
+<area shape="poly" id="edge10_Node000000_Node000010" title=" " alt="" coords="171,335,243,355,242,361,170,340"/>
+<area shape="rect" id="Node000011" href="$structfitpack__polar__domains_1_1fitpack__polar.html" title="Bicubic spline fitter for data scattered over a general polar domain." alt="" coords="254,437,423,477"/>
+<area shape="poly" id="edge11_Node000000_Node000011" title=" " alt="" coords="116,341,161,384,188,405,217,423,255,438,253,443,215,428,185,409,158,388,113,345"/>
+<area shape="rect" id="Node000012" href="$structfitpack__sphere__domains_1_1fitpack__sphere.html" title="Bicubic spline fitter for data scattered on the sphere." alt="" coords="249,501,429,541"/>
+<area shape="poly" id="edge12_Node000000_Node000012" title=" " alt="" coords="105,345,124,379,149,417,181,455,217,487,249,503,247,508,215,492,177,459,145,421,119,382,101,347"/>
+<area shape="rect" id="Node000013" href="$structfitpack__surfaces_1_1fitpack__surface.html" title="Bivariate surface fitter &#160;for scattered data." alt="" coords="249,565,429,605"/>
+<area shape="poly" id="edge13_Node000000_Node000013" title=" " alt="" coords="99,346,114,392,139,448,173,504,194,529,218,551,250,569,247,573,214,555,190,533,169,507,134,451,109,394,94,348"/>
+<area shape="rect" id="Node000002" href="$structfitpack__convex__curves_1_1fitpack__convex__curve.html" title="Cubic spline fitter with pointwise convexity/concavity constraints." alt="" coords="549,5,720,45"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="436,44,549,32,549,37,437,49"/>
+<area shape="rect" id="Node000003" href="$structfitpack__curves_1_1fitpack__periodic__curve.html" title="Derived type describing a periodic curve. No changes are made to the storage, but the appropriate pac..." alt="" coords="551,69,719,109"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="437,65,551,78,550,83,436,70"/>
+<area shape="rect" id="Node000008" href="$structfitpack__parametric__curves_1_1fitpack__closed__curve.html" title="Closed (periodic) parametric curve fitter." alt="" coords="527,261,743,301"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="475,296,526,290,527,296,475,301"/>
+<area shape="rect" id="Node000009" href="$structfitpack__parametric__curves_1_1fitpack__constrained__curve.html" title="Parametric curve fitter with derivative constraints at the endpoints." alt="" coords="509,325,760,365"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="475,325,509,329,509,334,475,331"/>
+</map>

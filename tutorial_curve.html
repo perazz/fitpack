@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Univariate Curve Fitting with fitpack_curve</title>
+<title>fitpack: Univariate Curve Fitting with fitpack_curve</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,32 +114,32 @@ $(function(){initNavTree('tutorial_curve.html',''); initResizable(true); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__curve"></a></p>
-<p>This tutorial explains how to use the <code>fitpack_curve</code> type for univariate spline smoothing and interpolation of the form <picture><source srcset="form_4_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y = s(x) $" src="form_4.png"/></picture>. It covers the mathematical background, basic and advanced usage, and practical guidance on choosing a smoothing parameter.</p>
-<p>Use <code>fitpack_curve</code> when you have a single-valued relationship between an independent variable <picture><source srcset="form_77_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x $" src="form_77.png"/></picture> and a dependent variable <picture><source srcset="form_112_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y $" src="form_112.png"/></picture> &mdash; that is, each <picture><source srcset="form_11_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x_i $" src="form_11.png"/></picture> maps to exactly one <picture><source srcset="form_262_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y_i $" src="form_262.png"/></picture>. The data must be sorted in strictly increasing order of <picture><source srcset="form_77_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ x $" src="form_77.png"/></picture>.</p>
-<h1><a class="anchor" id="autotoc_md71"></a>
+<p>This tutorial explains how to use the <code>fitpack_curve</code> type for univariate spline smoothing and interpolation of the form \( y = s(x) \). It covers the mathematical background, basic and advanced usage, and practical guidance on choosing a smoothing parameter.</p>
+<p>Use <code>fitpack_curve</code> when you have a single-valued relationship between an independent variable \( x \) and a dependent variable \( y \) &mdash; that is, each \( x_i \) maps to exactly one \( y_i \). The data must be sorted in strictly increasing order of \( x \).</p>
+<h1><a class="anchor" id="autotoc_md83"></a>
 Mathematical Background</h1>
-<p>Given <picture><source srcset="form_36_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m $" src="form_36.png"/></picture> data points <picture><source srcset="form_113_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i) $" src="form_113.png"/></picture> with positive weights <picture><source srcset="form_61_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ w_i $" src="form_61.png"/></picture>, FITPACK constructs a B-spline <picture><source srcset="form_86_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) $" src="form_86.png"/></picture> of degree <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> (default <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>, cubic) by solving the constrained optimization problem</p>
+<p>Given \( m \) data points \( (x_i, y_i) \) with positive weights \( w_i \), FITPACK constructs a B-spline \( s(x) \) of degree \( k \) (default \( k = 3 \), cubic) by solving the constrained optimization problem</p>
 <p class="formulaDsp">
-<picture><source srcset="form_263_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    \min \int_{x_1}^{x_m} \left[ s''(x) \right]^2 dx
+\[    \min \int_{x_1}^{x_m} \left[ s&#39;&#39;(x) \right]^2 dx
     \quad \text{subject to} \quad
     \sum_{i=1}^{m} w_i^2 \left( y_i - s(x_i) \right)^2 \leq S
-\]" src="form_263.png"/></picture>
+\]
 </p>
-<p>The <b>smoothing parameter</b> <picture><source srcset="form_142_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S \geq 0 $" src="form_142.png"/></picture> controls the trade-off between roughness and fidelity to the data:</p>
+<p>The <b>smoothing parameter</b> \( S \geq 0 \) controls the trade-off between roughness and fidelity to the data:</p>
 <ul>
-<li>** <picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>** &mdash; Interpolation. The spline passes through every data point exactly.</li>
-<li>**Small <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>** &mdash; Close to the data but may oscillate between points.</li>
-<li>**Large <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>** &mdash; Very smooth, but may miss genuine features.</li>
+<li>** \( S = 0 \)** &mdash; Interpolation. The spline passes through every data point exactly.</li>
+<li>**Small \( S \)** &mdash; Close to the data but may oscillate between points.</li>
+<li>**Large \( S \)** &mdash; Very smooth, but may miss genuine features.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md72"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Choosing S</h2>
-<p>When the data satisfy <picture><source srcset="form_152_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ y_i = g(x_i) + \varepsilon_i $" src="form_152.png"/></picture> with independent errors of variance <picture><source srcset="form_154_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \sigma^2 $" src="form_154.png"/></picture> and unit weights, the expected residual sum of squares for the true function is <picture><source srcset="form_156_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ m \sigma^2 $" src="form_156.png"/></picture>. A natural starting point is therefore</p>
+<p>When the data satisfy \( y_i = g(x_i) + \varepsilon_i \) with independent errors of variance \( \sigma^2 \) and unit weights, the expected residual sum of squares for the true function is \( m \sigma^2 \). A natural starting point is therefore</p>
 <p class="formulaDsp">
-<picture><source srcset="form_264_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    S \approx m \, \sigma^2
-\]" src="form_264.png"/></picture>
+\[    S \approx m \, \sigma^2
+\]
 </p>
-<p>If no noise estimate is available, <picture><source srcset="form_159_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = m $" src="form_159.png"/></picture> (assuming unit weights) is a reasonable first guess. The algorithm selects knots automatically: fewer knots for larger <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>, more knots for smaller <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>. After fitting, inspect <code>curve\mse()</code> and <code>curve\knots</code> to judge the result.</p>
-<h1><a class="anchor" id="autotoc_md73"></a>
+<p>If no noise estimate is available, \( S = m \) (assuming unit weights) is a reasonable first guess. The algorithm selects knots automatically: fewer knots for larger \( S \), more knots for smaller \( S \). After fitting, inspect <code>curve\mse()</code> and <code>curve\knots</code> to judge the result.</p>
+<h1><a class="anchor" id="autotoc_md85"></a>
 Basic Example</h1>
 <p>The following program fits a smoothing spline to noisy sine data, evaluates it, and prints the result.</p>
 <div class="fragment"><div class="line"><span class="keyword">program</span> basic_curve</div>
@@ -172,7 +180,7 @@ Basic Example</h1>
 <div class="line">    <span class="keyword">call </span>curve%destroy()</div>
 <div class="line"><span class="keyword">end program </span>basic_curve</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md74"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md86"></a>
 Step-by-step</h2>
 <ol type="1">
 <li><b>Import</b> &sect; The <code>use fitpack</code> statement exposes the curve type, kind parameters (<code>FP_REAL</code>, <code>FP_FLAG</code>), error-handling helpers (<code>FITPACK_SUCCESS</code>, <code>FITPACK_MESSAGE</code>), and named constants (<code>zero</code>, <code>one</code>, <code>half</code>, <code>pi</code>). Note that <code>two</code> is not a public export &mdash; define it locally when needed.</li>
@@ -181,9 +189,9 @@ Step-by-step</h2>
 <li><b>Evaluate</b> &sect; <code>curve\eval(x, ierr)</code> accepts a scalar or an array and returns the spline value(s).</li>
 <li><b>Clean up</b> &sect; <code>curve\destroy()</code> releases all internal allocations.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md75"></a>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Advanced Features</h1>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Weights</h2>
 <p>Supply per-point weights via the <code>w</code> argument to emphasize or de-emphasize individual observations. Points with larger weights are fitted more closely.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: w(m)</div>
@@ -191,40 +199,40 @@ Weights</h2>
 <div class="line"><span class="comment">! Inverse-variance weighting</span></div>
 <div class="line">w = one / sigma</div>
 <div class="line">ierr = curve%new_fit(x, y, w=w, smoothing=real(m, fp_real))</div>
-</div><!-- fragment --><p>When weights are proportional to <picture><source srcset="form_265_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 1 / \sigma_i $" src="form_265.png"/></picture>, the smoothing constraint becomes <picture><source srcset="form_266_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \sum (y_i - s(x_i))^2 / \sigma_i^2 \leq S $" src="form_266.png"/></picture>, and <picture><source srcset="form_225_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S \approx m $" src="form_225.png"/></picture> remains a natural choice.</p>
-<h2><a class="anchor" id="autotoc_md77"></a>
+</div><!-- fragment --><p>When weights are proportional to \( 1 / \sigma_i \), the smoothing constraint becomes \( \sum (y_i - s(x_i))^2 / \sigma_i^2 \leq S \), and \( S \approx m \) remains a natural choice.</p>
+<h2><a class="anchor" id="autotoc_md89"></a>
 Derivatives</h2>
-<p>Evaluate derivatives of the fitted spline up to order <picture><source srcset="form_5_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k $" src="form_5.png"/></picture> (the spline degree, default 3):</p>
+<p>Evaluate derivatives of the fitted spline up to order \( k \) (the spline degree, default 3):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: dydx, d2ydx2</div>
 <div class="line"> </div>
 <div class="line">dydx   = curve%dfdx(pi / 4, order=1, ierr=ierr)   <span class="comment">! first derivative</span></div>
 <div class="line">d2ydx2 = curve%dfdx(pi / 4, order=2, ierr=ierr)   ! second derivative</div>
-</div><!-- fragment --><p>The <code>order</code> parameter selects which derivative: 1 for <picture><source srcset="form_267_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s'(x) $" src="form_267.png"/></picture>, 2 for <picture><source srcset="form_268_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s''(x) $" src="form_268.png"/></picture>, 3 for <picture><source srcset="form_269_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s'''(x) $" src="form_269.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md78"></a>
+</div><!-- fragment --><p>The <code>order</code> parameter selects which derivative: 1 for \( s&#39;(x) \), 2 for \( s&#39;&#39;(x) \), 3 for \( s&#39;&#39;&#39;(x) \).</p>
+<h2><a class="anchor" id="autotoc_md90"></a>
 Integration</h2>
-<p>Compute the definite integral of the spline over an arbitrary sub-interval <picture><source srcset="form_65_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ [a, b] $" src="form_65.png"/></picture>:</p>
+<p>Compute the definite integral of the spline over an arbitrary sub-interval \( [a, b] \):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: area</div>
 <div class="line"> </div>
 <div class="line">area = curve%integral(zero, pi)</div>
-</div><!-- fragment --><p>This evaluates <picture><source srcset="form_270_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \int_a^b s(x) \, dx $" src="form_270.png"/></picture> analytically from the B-spline coefficients, so the result is exact for the fitted spline (no numerical quadrature error).</p>
-<h2><a class="anchor" id="autotoc_md79"></a>
+</div><!-- fragment --><p>This evaluates \( \int_a^b s(x) \, dx \) analytically from the B-spline coefficients, so the result is exact for the fitted spline (no numerical quadrature error).</p>
+<h2><a class="anchor" id="autotoc_md91"></a>
 Zero Finding</h2>
 <p>Find all zeros (roots) of a cubic spline within the data range:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL), <span class="keywordtype">allocatable</span> :: roots(:)</div>
 <div class="line"> </div>
 <div class="line">roots = curve%zeros(ierr)</div>
 <div class="line">print <span class="stringliteral">&#39;(a,i0)&#39;</span>, <span class="stringliteral">&#39;Number of zeros: &#39;</span>, <span class="keyword">size</span>(roots)</div>
-</div><!-- fragment --><p>The <code>curve\zeros(ierr)</code> function returns an allocatable array containing every root of <picture><source srcset="form_271_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) = 0 $" src="form_271.png"/></picture>. This operation requires a cubic spline ( <picture><source srcset="form_0_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ k = 3 $" src="form_0.png"/></picture>).</p>
-<h2><a class="anchor" id="autotoc_md80"></a>
+</div><!-- fragment --><p>The <code>curve\zeros(ierr)</code> function returns an allocatable array containing every root of \( s(x) = 0 \). This operation requires a cubic spline ( \( k = 3 \)).</p>
+<h2><a class="anchor" id="autotoc_md92"></a>
 Interpolation</h2>
 <p>For exact interpolation &mdash; a spline that passes through every data point &mdash; set <code>smoothing=zero</code>:</p>
 <div class="fragment"><div class="line">ierr = curve%new_fit(x, y, smoothing=zero)</div>
 </div><!-- fragment --><p>Alternatively, call the dedicated interpolation method:</p>
 <div class="fragment"><div class="line">ierr = curve%interpolate()</div>
-</div><!-- fragment --><p>Both produce the smoothest spline (minimum roughness integral) that satisfies <picture><source srcset="form_118_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x_i) = y_i $" src="form_118.png"/></picture> for all <picture><source srcset="form_272_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ i $" src="form_272.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md81"></a>
+</div><!-- fragment --><p>Both produce the smoothest spline (minimum roughness integral) that satisfies \( s(x_i) = y_i \) for all \( i \).</p>
+<h2><a class="anchor" id="autotoc_md93"></a>
 Smoothing Sweep</h2>
-<p>When the appropriate smoothing level is unknown, try a sequence of <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> values on a logarithmic scale and inspect the resulting number of knots and residual:</p>
+<p>When the appropriate smoothing level is unknown, try a sequence of \( S \) values on a logarithmic scale and inspect the resulting number of knots and residual:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span> :: j</div>
 <div class="line"> </div>
 <div class="line">print <span class="stringliteral">&#39;(a)&#39;</span>, <span class="stringliteral">&#39;     S       knots   residual&#39;</span></div>
@@ -235,8 +243,8 @@ Smoothing Sweep</h2>
 <div class="line">            curve%smoothing, curve%knots, curve%mse()</div>
 <div class="line"><span class="keywordflow">    end if</span></div>
 <div class="line"><span class="keyword">end </span>do</div>
-</div><!-- fragment --><p>A good fit typically shows a "knee" where adding more knots (decreasing <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>) yields diminishing improvement in the residual. Choose the <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture> value at or just past this transition point.</p>
-<h1><a class="anchor" id="autotoc_md82"></a>
+</div><!-- fragment --><p>A good fit typically shows a "knee" where adding more knots (decreasing \( S \)) yields diminishing improvement in the residual. Choose the \( S \) value at or just past this transition point.</p>
+<h1><a class="anchor" id="autotoc_md94"></a>
 API Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -244,29 +252,29 @@ API Summary</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>curve\new_fit(x, y, w, smoothing, order)</code>   </td><td class="markdownTableBodyNone">Fit a smoothing spline; returns <code>integer(FP_FLAG)</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>curve\eval(x, ierr)</code>   </td><td class="markdownTableBodyNone">Evaluate <picture><source srcset="form_86_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) $" src="form_86.png"/></picture> at a scalar or array of points    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\eval(x, ierr)</code>   </td><td class="markdownTableBodyNone">Evaluate \( s(x) \) at a scalar or array of points    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>curve\dfdx(x, order, ierr)</code>   </td><td class="markdownTableBodyNone">Evaluate derivative of order 1, 2, or 3    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>curve\integral(from, to)</code>   </td><td class="markdownTableBodyNone">Definite integral <picture><source srcset="form_270_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \int_a^b s(x) \, dx $" src="form_270.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\integral(from, to)</code>   </td><td class="markdownTableBodyNone">Definite integral \( \int_a^b s(x) \, dx \)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>curve\zeros(ierr)</code>   </td><td class="markdownTableBodyNone">All zeros of <picture><source srcset="form_86_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s(x) $" src="form_86.png"/></picture> (cubic splines only)    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\zeros(ierr)</code>   </td><td class="markdownTableBodyNone">All zeros of \( s(x) \) (cubic splines only)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>curve\interpolate()</code>   </td><td class="markdownTableBodyNone">Exact interpolation ( <picture><source srcset="form_143_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S = 0 $" src="form_143.png"/></picture>)    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\interpolate()</code>   </td><td class="markdownTableBodyNone">Exact interpolation ( \( S = 0 \))    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>curve\knots</code>   </td><td class="markdownTableBodyNone">Number of knots in the current fit    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>curve\mse()</code>   </td><td class="markdownTableBodyNone">Weighted residual sum of squares <picture><source srcset="form_273_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ f_p $" src="form_273.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\mse()</code>   </td><td class="markdownTableBodyNone">Weighted residual sum of squares \( f_p \)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>curve\smoothing</code>   </td><td class="markdownTableBodyNone">Current smoothing parameter <picture><source srcset="form_144_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ S $" src="form_144.png"/></picture>    </td></tr>
+<td class="markdownTableBodyNone"><code>curve\smoothing</code>   </td><td class="markdownTableBodyNone">Current smoothing parameter \( S \)    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>curve\destroy()</code>   </td><td class="markdownTableBodyNone">Release all allocated memory   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md83"></a>
+<h1><a class="anchor" id="autotoc_md95"></a>
 Complete Example</h1>
 <p>A fully compilable program demonstrating smoothing, interpolation, derivatives, integration, root finding, and a smoothing sweep is provided in <code>examples/example_curve.f90</code>. Build and run it with:</p>
 <div class="fragment"><div class="line">fpm run --example example_curve</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md84"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md96"></a>
 Error Handling</h1>
 <p>All fitting and evaluation routines return an <code>integer(FP_FLAG)</code> error code. Use <code>FITPACK_SUCCESS(ierr)</code> to test for success and <code>FITPACK_MESSAGE(ierr)</code> to obtain a human-readable description:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) <span class="keywordflow">then</span></div>
@@ -279,7 +287,7 @@ Error Handling</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>FITPACK_OK</code> (0)   </td><td class="markdownTableBodyNone">Success    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>FITPACK_INTERPOLATING_OK</code> ( <picture><source srcset="form_274_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$-1$" src="form_274.png"/></picture>)   </td><td class="markdownTableBodyNone">Interpolating spline returned    </td></tr>
+<td class="markdownTableBodyNone"><code>FITPACK_INTERPOLATING_OK</code> ( \(-1\))   </td><td class="markdownTableBodyNone">Interpolating spline returned    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>FITPACK_S_TOO_SMALL</code> (1)   </td><td class="markdownTableBodyNone">Smoothing parameter too small for the knot budget    </td></tr>
 <tr class="markdownTableRowEven">

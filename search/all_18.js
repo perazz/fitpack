@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['u_0',['u',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#afeb81f765e51e40fdea291c0f80b8a3b',1,'fitpack_gridded_polar::fitpack_grid_polar::u'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#adae138f45ccb5c7e8502dd0299e89e2f',1,'fitpack_gridded_sphere::fitpack_grid_sphere::u'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#a555b191ecb7cefbab0a94c305f50edf2',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::u'],['../structfitpack__polar__domains_1_1fitpack__polar.html#afd6a3755c76e72298c09ef7c044666dc',1,'fitpack_polar_domains::fitpack_polar::u']]],
+  ['u_0',['u',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#afeb81f765e51e40fdea291c0f80b8a3b',1,'fitpack_gridded_polar::fitpack_grid_polar::u'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#adae138f45ccb5c7e8502dd0299e89e2f',1,'fitpack_gridded_sphere::fitpack_grid_sphere::u'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#ac8949d3e6064784681efb615d1963aa2',1,'fitpack_parametric_curves::fitpack_parametric_curve::u'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#a555b191ecb7cefbab0a94c305f50edf2',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::u'],['../structfitpack__polar__domains_1_1fitpack__polar.html#afd6a3755c76e72298c09ef7c044666dc',1,'fitpack_polar_domains::fitpack_polar::u']]],
   ['ubegin_1',['ubegin',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a276e0df7c4b4348d1ef6406fb8e1ed51',1,'fitpack_parametric_curves::fitpack_parametric_curve']]],
-  ['unconstrained_2',['Comparing Constrained vs Unconstrained',['../tutorial_convex_curve.html#autotoc_md110',1,'']]],
-  ['unit_20disc_3',['Example: smooth function on a unit disc',['../tutorial_polar.html#autotoc_md147',1,'']]],
-  ['univariate_20curve_20fitting_20with_20fitpack_5fcurve_4',['Univariate Curve Fitting with fitpack_curve',['../tutorial_curve.html',1,'']]]
+  ['uend_2',['uend',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a442c8456b7146153ddb30ab09de900b4',1,'fitpack_parametric_curves::fitpack_parametric_curve']]],
+  ['unconstrained_3',['Comparing Constrained vs Unconstrained',['../tutorial_convex_curve.html#autotoc_md122',1,'']]],
+  ['unit_20disc_4',['Example: smooth function on a unit disc',['../tutorial_polar.html#autotoc_md159',1,'']]],
+  ['univariate_20curve_20fitting_20with_20fitpack_5fcurve_5',['Univariate Curve Fitting with fitpack_curve',['../tutorial_curve.html',1,'']]]
 ];

@@ -1,0 +1,11 @@
+<map id="fitpack_core::splev" name="fitpack_core::splev">
+<area shape="rect" id="Node000001" title="Evaluate a spline &#160;of degree &#160;at a set of points." alt="" coords="5,29,149,55"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="197,29,347,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,39,183,39,183,45,150,45"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="395,29,568,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="347,39,381,39,381,45,347,45"/>
+<area shape="poly" id="edge5_Node000003_Node000003" title=" " alt="" coords="448,31,440,21,444,11,458,5,481,3,510,6,521,15,518,20,508,11,481,8,459,10,448,15,446,20,452,28"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="616,29,761,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="568,39,602,39,602,45,568,45"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="655,31,648,21,651,11,665,5,689,3,717,6,729,15,725,20,715,11,689,8,667,10,655,15,653,20,659,28"/>
+</map>

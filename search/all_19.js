@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['v_0',['v',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#a9e77575cfb3d428b084e55339a03a503',1,'fitpack_convex_curves::fitpack_convex_curve']]],
-  ['vector_1',['Shared Knot Vector',['../theory_curve_fitting.html#autotoc_md29',1,'']]],
-  ['vectors_2',['Piecewise Polynomials and Knot Vectors',['../theory_bsplines.html#autotoc_md7',1,'']]],
-  ['verification_3',['Periodicity Verification',['../tutorial_periodic_curve.html#autotoc_md88',1,'']]],
-  ['via_20givens_20rotations_4',['QR Factorization via Givens Rotations',['../theory_curve_fitting.html#autotoc_md22',1,'']]],
-  ['vs_20scattered_20fitting_5',['Grid vs Scattered Fitting',['../tutorial_grid_surface.html#autotoc_md140',1,'']]],
-  ['vs_20unconstrained_6',['Comparing Constrained vs Unconstrained',['../tutorial_convex_curve.html#autotoc_md110',1,'']]]
+  ['v_0',['v',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#a9e77575cfb3d428b084e55339a03a503',1,'fitpack_convex_curves::fitpack_convex_curve::v'],['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58',1,'fitpack_gridded_polar::fitpack_grid_polar::v'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a4fe393cc86c03b57f34c9293381b15e3',1,'fitpack_gridded_sphere::fitpack_grid_sphere::v'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#ae5262257079d70de879caaa77b0c9c0c',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::v'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ae32ec17690b07ae050038749ad932638',1,'fitpack_polar_domains::fitpack_polar::v']]],
+  ['vector_1',['Shared Knot Vector',['../theory_curve_fitting.html#autotoc_md41',1,'']]],
+  ['vectors_2',['Piecewise Polynomials and Knot Vectors',['../theory_bsplines.html#autotoc_md19',1,'']]],
+  ['verification_3',['Periodicity Verification',['../tutorial_periodic_curve.html#autotoc_md100',1,'']]],
+  ['via_20givens_20rotations_4',['QR Factorization via Givens Rotations',['../theory_curve_fitting.html#autotoc_md34',1,'']]],
+  ['vs_20scattered_20fitting_5',['Grid vs Scattered Fitting',['../tutorial_grid_surface.html#autotoc_md152',1,'']]],
+  ['vs_20unconstrained_6',['Comparing Constrained vs Unconstrained',['../tutorial_convex_curve.html#autotoc_md122',1,'']]]
 ];

@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: fitpack_polar_domains::fitpack_polar Interface Reference</title>
+<title>fitpack: fitpack_polar_domains::fitpack_polar Interface Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,6 +114,7 @@ $(function(){initNavTree('structfitpack__polar__domains_1_1fitpack__polar.html',
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="structfitpack__polar__domains_1_1fitpack__polar-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">fitpack_polar_domains::fitpack_polar Interface Reference</div></div>
 </div><!--header-->
@@ -116,184 +125,885 @@ $(function(){initNavTree('structfitpack__polar__domains_1_1fitpack__polar.html',
 <div class="dynheader">
 Inheritance diagram for fitpack_polar_domains::fitpack_polar:</div>
 <div class="dyncontent">
- <div class="center">
-  <img src="structfitpack__polar__domains_1_1fitpack__polar.png" usemap="#fitpack_5Fpolar_5Fdomains::fitpack_5Fpolar_map" alt=""/>
-  <map id="fitpack_5Fpolar_5Fdomains::fitpack_5Fpolar_map" name="fitpack_5Fpolar_5Fdomains::fitpack_5Fpolar_map">
-<area href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="fitpack_fitters::fitpack_fitter" shape="rect" coords="0,0,217,24"/>
-  </map>
-</div></div>
+<div class="center"><img src="structfitpack__polar__domains_1_1fitpack__polar__inherit__graph.png" border="0" usemap="#afitpack__polar__domains_1_1fitpack__polar_inherit__map" alt="Inheritance graph"/></div>
+<map name="afitpack__polar__domains_1_1fitpack__polar_inherit__map" id="afitpack__polar__domains_1_1fitpack__polar_inherit__map">
+<area shape="rect" title="Bicubic spline fitter for data scattered over a general polar domain." alt="" coords="5,93,175,133"/>
+<area shape="rect" href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="9,5,171,45"/>
+<area shape="poly" title=" " alt="" coords="93,59,93,93,87,93,87,59"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for fitpack_polar_domains::fitpack_polar:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__polar__domains_1_1fitpack__polar__coll__graph.png" border="0" usemap="#afitpack__polar__domains_1_1fitpack__polar_coll__map" alt="Collaboration graph"/></div>
+<map name="afitpack__polar__domains_1_1fitpack__polar_coll__map" id="afitpack__polar__domains_1_1fitpack__polar_coll__map">
+<area shape="rect" title="Bicubic spline fitter for data scattered over a general polar domain." alt="" coords="5,93,175,133"/>
+<area shape="rect" href="structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="9,5,171,45"/>
+<area shape="poly" title=" " alt="" coords="93,59,93,93,87,93,87,59"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acf92c07749717d22d0ba4447c161818f" id="r_acf92c07749717d22d0ba4447c161818f"><td class="memItemLeft" align="right" valign="top"><a id="acf92c07749717d22d0ba4447c161818f" name="acf92c07749717d22d0ba4447c161818f"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>destroy</b> (this)</td></tr>
-<tr class="memdesc:acf92c07749717d22d0ba4447c161818f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean memory. <br /></td></tr>
+<tr class="memitem:acf92c07749717d22d0ba4447c161818f" id="r_acf92c07749717d22d0ba4447c161818f"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf92c07749717d22d0ba4447c161818f">destroy</a> (this)</td></tr>
+<tr class="memdesc:acf92c07749717d22d0ba4447c161818f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean memory.  <br /></td></tr>
 <tr class="separator:acf92c07749717d22d0ba4447c161818f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b70da2c8ed886ee3853b083816ce0ca" id="r_a0b70da2c8ed886ee3853b083816ce0ca"><td class="memItemLeft" align="right" valign="top"><a id="a0b70da2c8ed886ee3853b083816ce0ca" name="a0b70da2c8ed886ee3853b083816ce0ca"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>new_points</b> (this, x, y, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, w, boundary_bc)</td></tr>
-<tr class="memdesc:a0b70da2c8ed886ee3853b083816ce0ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set new points. <br /></td></tr>
+<tr class="memitem:a0b70da2c8ed886ee3853b083816ce0ca" id="r_a0b70da2c8ed886ee3853b083816ce0ca"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b70da2c8ed886ee3853b083816ce0ca">new_points</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, <a class="el" href="#a12932ccab6589e1807900aa915ed74f9">w</a>, boundary_bc)</td></tr>
+<tr class="memdesc:a0b70da2c8ed886ee3853b083816ce0ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set new points.  <br /></td></tr>
 <tr class="separator:a0b70da2c8ed886ee3853b083816ce0ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11bc52134a2e7776abe9ac420981d7ca" id="r_a11bc52134a2e7776abe9ac420981d7ca"><td class="memItemLeft" align="right" valign="top"><a id="a11bc52134a2e7776abe9ac420981d7ca" name="a11bc52134a2e7776abe9ac420981d7ca"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>new_fit</b> (this, x, y, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, w, boundary_bc, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>)</td></tr>
-<tr class="memdesc:a11bc52134a2e7776abe9ac420981d7ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate new fit. <br /></td></tr>
+<tr class="memitem:a11bc52134a2e7776abe9ac420981d7ca" id="r_a11bc52134a2e7776abe9ac420981d7ca"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a11bc52134a2e7776abe9ac420981d7ca">new_fit</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, <a class="el" href="#a12932ccab6589e1807900aa915ed74f9">w</a>, boundary_bc, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>)</td></tr>
+<tr class="memdesc:a11bc52134a2e7776abe9ac420981d7ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate new fit.  <br /></td></tr>
 <tr class="separator:a11bc52134a2e7776abe9ac420981d7ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1bb2a2dca57b08df4d1541024a58bd1" id="r_ad1bb2a2dca57b08df4d1541024a58bd1"><td class="memItemLeft" align="right" valign="top"><a id="ad1bb2a2dca57b08df4d1541024a58bd1" name="ad1bb2a2dca57b08df4d1541024a58bd1"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>fit</b> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, keep_knots)</td></tr>
-<tr class="memdesc:ad1bb2a2dca57b08df4d1541024a58bd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional smoothing. <br /></td></tr>
+<tr class="memitem:ad1bb2a2dca57b08df4d1541024a58bd1" id="r_ad1bb2a2dca57b08df4d1541024a58bd1"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1bb2a2dca57b08df4d1541024a58bd1">fit</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, keep_knots)</td></tr>
+<tr class="memdesc:ad1bb2a2dca57b08df4d1541024a58bd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional smoothing.  <br /></td></tr>
 <tr class="separator:ad1bb2a2dca57b08df4d1541024a58bd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae361ed84fd9ec25e05ce81221f4203d4" id="r_ae361ed84fd9ec25e05ce81221f4203d4"><td class="memItemLeft" align="right" valign="top"><a id="ae361ed84fd9ec25e05ce81221f4203d4" name="ae361ed84fd9ec25e05ce81221f4203d4"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>least_squares</b> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
+<tr class="memitem:ae361ed84fd9ec25e05ce81221f4203d4" id="r_ae361ed84fd9ec25e05ce81221f4203d4"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae361ed84fd9ec25e05ce81221f4203d4">least_squares</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
 <tr class="separator:ae361ed84fd9ec25e05ce81221f4203d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afee5dca05ebc7f5f1df5d8f1a93cab22" id="r_afee5dca05ebc7f5f1df5d8f1a93cab22"><td class="memItemLeft" align="right" valign="top"><a id="afee5dca05ebc7f5f1df5d8f1a93cab22" name="afee5dca05ebc7f5f1df5d8f1a93cab22"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>interpolate</b> (this, reset_knots)</td></tr>
+<tr class="memitem:afee5dca05ebc7f5f1df5d8f1a93cab22" id="r_afee5dca05ebc7f5f1df5d8f1a93cab22"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afee5dca05ebc7f5f1df5d8f1a93cab22">interpolate</a> (this, reset_knots)</td></tr>
 <tr class="separator:afee5dca05ebc7f5f1df5d8f1a93cab22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42303aec4c608ad95ed4bedf0d00881c" id="r_a42303aec4c608ad95ed4bedf0d00881c"><td class="memItemLeft" align="right" valign="top"><a id="a42303aec4c608ad95ed4bedf0d00881c" name="a42303aec4c608ad95ed4bedf0d00881c"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (this, x, y, ierr)</td></tr>
-<tr class="memdesc:a42303aec4c608ad95ed4bedf0d00881c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate polar domain at given x,y coordinates. <br /></td></tr>
+<tr class="memitem:a42303aec4c608ad95ed4bedf0d00881c" id="r_a42303aec4c608ad95ed4bedf0d00881c"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42303aec4c608ad95ed4bedf0d00881c">eval</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, ierr)</td></tr>
+<tr class="memdesc:a42303aec4c608ad95ed4bedf0d00881c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate polar domain at given x,y coordinates.  <br /></td></tr>
 <tr class="separator:a42303aec4c608ad95ed4bedf0d00881c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42303aec4c608ad95ed4bedf0d00881c" id="r_a42303aec4c608ad95ed4bedf0d00881c"><td class="memItemLeft" align="right" valign="top"><a id="a42303aec4c608ad95ed4bedf0d00881c" name="a42303aec4c608ad95ed4bedf0d00881c"></a>
-generic&#160;</td><td class="memItemRight" valign="bottom"><b>eval</b> (this, x, y, ierr)</td></tr>
+<tr class="memitem:a42303aec4c608ad95ed4bedf0d00881c" id="r_a42303aec4c608ad95ed4bedf0d00881c"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42303aec4c608ad95ed4bedf0d00881c">eval</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, ierr)</td></tr>
 <tr class="separator:a42303aec4c608ad95ed4bedf0d00881c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8da154a4145144c0a846bcdf7e44313" id="r_ab8da154a4145144c0a846bcdf7e44313"><td class="memItemLeft" align="right" valign="top"><a id="ab8da154a4145144c0a846bcdf7e44313" name="ab8da154a4145144c0a846bcdf7e44313"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_size</b> (this)</td></tr>
-<tr class="memdesc:ab8da154a4145144c0a846bcdf7e44313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Communication interface. <br /></td></tr>
+<tr class="memitem:ab8da154a4145144c0a846bcdf7e44313" id="r_ab8da154a4145144c0a846bcdf7e44313"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8da154a4145144c0a846bcdf7e44313">comm_size</a> (this)</td></tr>
+<tr class="memdesc:ab8da154a4145144c0a846bcdf7e44313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Communication interface.  <br /></td></tr>
 <tr class="separator:ab8da154a4145144c0a846bcdf7e44313"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef830c4a9f23017303c711cd2b861ae1" id="r_aef830c4a9f23017303c711cd2b861ae1"><td class="memItemLeft" align="right" valign="top"><a id="aef830c4a9f23017303c711cd2b861ae1" name="aef830c4a9f23017303c711cd2b861ae1"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_pack</b> (this, buffer)</td></tr>
+<tr class="memitem:aef830c4a9f23017303c711cd2b861ae1" id="r_aef830c4a9f23017303c711cd2b861ae1"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef830c4a9f23017303c711cd2b861ae1">comm_pack</a> (this, buffer)</td></tr>
 <tr class="separator:aef830c4a9f23017303c711cd2b861ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1a5136ec39300e197d6a4754abb272" id="r_a3b1a5136ec39300e197d6a4754abb272"><td class="memItemLeft" align="right" valign="top"><a id="a3b1a5136ec39300e197d6a4754abb272" name="a3b1a5136ec39300e197d6a4754abb272"></a>
-procedure&#160;</td><td class="memItemRight" valign="bottom"><b>comm_expand</b> (this, buffer)</td></tr>
+<tr class="memitem:a3b1a5136ec39300e197d6a4754abb272" id="r_a3b1a5136ec39300e197d6a4754abb272"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b1a5136ec39300e197d6a4754abb272">comm_expand</a> (this, buffer)</td></tr>
 <tr class="separator:a3b1a5136ec39300e197d6a4754abb272"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad7ae0d07ba7850c35ab5d605c02a694" id="r_aad7ae0d07ba7850c35ab5d605c02a694"><td class="memItemLeft" align="right" valign="top"><a id="aad7ae0d07ba7850c35ab5d605c02a694" name="aad7ae0d07ba7850c35ab5d605c02a694"></a>
-type(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>) function&#160;</td><td class="memItemRight" valign="bottom"><b>polr_new_from_points</b> (x, y, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, w, boundary_bc, ierr)</td></tr>
+<tr class="memitem:aad7ae0d07ba7850c35ab5d605c02a694" id="r_aad7ae0d07ba7850c35ab5d605c02a694"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad7ae0d07ba7850c35ab5d605c02a694">polr_new_from_points</a> (<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, <a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a>, boundary, <a class="el" href="#a12932ccab6589e1807900aa915ed74f9">w</a>, boundary_bc, ierr)</td></tr>
 <tr class="separator:aad7ae0d07ba7850c35ab5d605c02a694"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
-<tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>mse</b> (this)</td></tr>
-<tr class="memdesc:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">MSE accessor (shared by all types) <br /></td></tr>
+<tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a> (this)</td></tr>
+<tr class="memdesc:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">MSE accessor (shared by all types)  <br /></td></tr>
 <tr class="separator:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_ac96427338601093ec28b0462966cc138"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_size</b> (this)</td></tr>
-<tr class="memdesc:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field helpers for comm (non-overridable, called by subtypes) <br /></td></tr>
+<tr class="memitem:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_ac96427338601093ec28b0462966cc138"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#ac96427338601093ec28b0462966cc138">core_comm_size</a> (this)</td></tr>
+<tr class="memdesc:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field helpers for comm (non-overridable, called by subtypes)  <br /></td></tr>
 <tr class="separator:ac96427338601093ec28b0462966cc138 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a71f8f7fd77934f74258803c4518a4c56"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_pack</b> (this, buffer)</td></tr>
-<tr class="memdesc:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack base fields into communication buffer. <br /></td></tr>
+<tr class="memitem:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a71f8f7fd77934f74258803c4518a4c56"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a71f8f7fd77934f74258803c4518a4c56">core_comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack base fields into communication buffer.  <br /></td></tr>
 <tr class="separator:a71f8f7fd77934f74258803c4518a4c56 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a84b552fc80bf0d9e48dab0528518510a"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>core_comm_expand</b> (this, buffer)</td></tr>
-<tr class="memdesc:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand base fields from communication buffer. <br /></td></tr>
+<tr class="memitem:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a84b552fc80bf0d9e48dab0528518510a"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a84b552fc80bf0d9e48dab0528518510a">core_comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand base fields from communication buffer.  <br /></td></tr>
 <tr class="separator:a84b552fc80bf0d9e48dab0528518510a inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a599af639c06dff9d7ab349cb514e54c1"><td class="memItemLeft" align="right" valign="top">
-procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><b>destroy_base</b> (this)</td></tr>
-<tr class="memdesc:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field reset (called by subtype destroy methods) <br /></td></tr>
+<tr class="memitem:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a599af639c06dff9d7ab349cb514e54c1"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a599af639c06dff9d7ab349cb514e54c1">destroy_base</a> (this)</td></tr>
+<tr class="memdesc:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base field reset (called by subtype destroy methods)  <br /></td></tr>
 <tr class="separator:a599af639c06dff9d7ab349cb514e54c1 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_af3f1bd18f36011f74337f85bf5a160a4"><td class="memItemLeft" align="right" valign="top">
-procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__size__if.html">comm_size_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_size</b> (this)</td></tr>
-<tr class="memdesc:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deferred communication interface. <br /></td></tr>
+<tr class="memitem:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_af3f1bd18f36011f74337f85bf5a160a4"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__size__if.html">comm_size_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#af3f1bd18f36011f74337f85bf5a160a4">comm_size</a> (this)</td></tr>
+<tr class="memdesc:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deferred communication interface.  <br /></td></tr>
 <tr class="separator:af3f1bd18f36011f74337f85bf5a160a4 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a1060bacf4ad0a9e229784e407087365c"><td class="memItemLeft" align="right" valign="top">
-procedure(comm_pack_if), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_pack</b> (this, buffer)</td></tr>
+<tr class="memitem:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a1060bacf4ad0a9e229784e407087365c"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__pack__if.html">comm_pack_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a1060bacf4ad0a9e229784e407087365c">comm_pack</a> (this, buffer)</td></tr>
 <tr class="separator:a1060bacf4ad0a9e229784e407087365c inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a20a29631c1d4f97f391ebae7335ac524"><td class="memItemLeft" align="right" valign="top">
-procedure(comm_expand_if), deferred&#160;</td><td class="memItemRight" valign="bottom"><b>comm_expand</b> (this, buffer)</td></tr>
+<tr class="memitem:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a20a29631c1d4f97f391ebae7335ac524"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__fitters_1_1comm__expand__if.html">comm_expand_if</a>), deferred&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a20a29631c1d4f97f391ebae7335ac524">comm_expand</a> (this, buffer)</td></tr>
 <tr class="separator:a20a29631c1d4f97f391ebae7335ac524 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ab3fc7226342d3c6fa08f0c64dbf1ce4e" id="r_ab3fc7226342d3c6fa08f0c64dbf1ce4e"><td class="memItemLeft" align="right" valign="top"><a id="ab3fc7226342d3c6fa08f0c64dbf1ce4e" name="ab3fc7226342d3c6fa08f0c64dbf1ce4e"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>m</b> = 0</td></tr>
-<tr class="memdesc:ab3fc7226342d3c6fa08f0c64dbf1ce4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scattered data points. <br /></td></tr>
+<tr class="memitem:ab3fc7226342d3c6fa08f0c64dbf1ce4e" id="r_ab3fc7226342d3c6fa08f0c64dbf1ce4e"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3fc7226342d3c6fa08f0c64dbf1ce4e">m</a> = 0</td></tr>
+<tr class="memdesc:ab3fc7226342d3c6fa08f0c64dbf1ce4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scattered data points.  <br /></td></tr>
 <tr class="separator:ab3fc7226342d3c6fa08f0c64dbf1ce4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac03f55d3331607e4fc82b3d258b7c267" id="r_ac03f55d3331607e4fc82b3d258b7c267"><td class="memItemLeft" align="right" valign="top"><a id="ac03f55d3331607e4fc82b3d258b7c267" name="ac03f55d3331607e4fc82b3d258b7c267"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>x</b></td></tr>
+<tr class="memitem:ac03f55d3331607e4fc82b3d258b7c267" id="r_ac03f55d3331607e4fc82b3d258b7c267"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a></td></tr>
 <tr class="separator:ac03f55d3331607e4fc82b3d258b7c267"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1324c2d3552dfc3d36d7e145a0c4d688" id="r_a1324c2d3552dfc3d36d7e145a0c4d688"><td class="memItemLeft" align="right" valign="top"><a id="a1324c2d3552dfc3d36d7e145a0c4d688" name="a1324c2d3552dfc3d36d7e145a0c4d688"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>y</b></td></tr>
+<tr class="memitem:a1324c2d3552dfc3d36d7e145a0c4d688" id="r_a1324c2d3552dfc3d36d7e145a0c4d688"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a></td></tr>
 <tr class="separator:a1324c2d3552dfc3d36d7e145a0c4d688"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dc72d2f5165e0dd69a2d732124f6685" id="r_a8dc72d2f5165e0dd69a2d732124f6685"><td class="memItemLeft" align="right" valign="top"><a id="a8dc72d2f5165e0dd69a2d732124f6685" name="a8dc72d2f5165e0dd69a2d732124f6685"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>z</b></td></tr>
-<tr class="memdesc:a8dc72d2f5165e0dd69a2d732124f6685"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function values at the points. <br /></td></tr>
+<tr class="memitem:a8dc72d2f5165e0dd69a2d732124f6685" id="r_a8dc72d2f5165e0dd69a2d732124f6685"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8dc72d2f5165e0dd69a2d732124f6685">z</a></td></tr>
+<tr class="memdesc:a8dc72d2f5165e0dd69a2d732124f6685"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function values at the points.  <br /></td></tr>
 <tr class="separator:a8dc72d2f5165e0dd69a2d732124f6685"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd6a3755c76e72298c09ef7c044666dc" id="r_afd6a3755c76e72298c09ef7c044666dc"><td class="memItemLeft" align="right" valign="top"><a id="afd6a3755c76e72298c09ef7c044666dc" name="afd6a3755c76e72298c09ef7c044666dc"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>u</b></td></tr>
-<tr class="memdesc:afd6a3755c76e72298c09ef7c044666dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates of the data points in rectangular coordinates (u,v) <br /></td></tr>
+<tr class="memitem:afd6a3755c76e72298c09ef7c044666dc" id="r_afd6a3755c76e72298c09ef7c044666dc"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd6a3755c76e72298c09ef7c044666dc">u</a></td></tr>
+<tr class="memdesc:afd6a3755c76e72298c09ef7c044666dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates of the data points in rectangular coordinates (u,v)  <br /></td></tr>
 <tr class="separator:afd6a3755c76e72298c09ef7c044666dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae32ec17690b07ae050038749ad932638" id="r_ae32ec17690b07ae050038749ad932638"><td class="memItemLeft" align="right" valign="top"><a id="ae32ec17690b07ae050038749ad932638" name="ae32ec17690b07ae050038749ad932638"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>v</b></td></tr>
+<tr class="memitem:ae32ec17690b07ae050038749ad932638" id="r_ae32ec17690b07ae050038749ad932638"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae32ec17690b07ae050038749ad932638">v</a></td></tr>
 <tr class="separator:ae32ec17690b07ae050038749ad932638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12932ccab6589e1807900aa915ed74f9" id="r_a12932ccab6589e1807900aa915ed74f9"><td class="memItemLeft" align="right" valign="top"><a id="a12932ccab6589e1807900aa915ed74f9" name="a12932ccab6589e1807900aa915ed74f9"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>w</b></td></tr>
+<tr class="memitem:a12932ccab6589e1807900aa915ed74f9" id="r_a12932ccab6589e1807900aa915ed74f9"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12932ccab6589e1807900aa915ed74f9">w</a></td></tr>
 <tr class="separator:a12932ccab6589e1807900aa915ed74f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa012d6df26fa45155935ebf5b596d616" id="r_aa012d6df26fa45155935ebf5b596d616"><td class="memItemLeft" align="right" valign="top"><a id="aa012d6df26fa45155935ebf5b596d616" name="aa012d6df26fa45155935ebf5b596d616"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>lwrk2</b> = 0</td></tr>
+<tr class="memitem:aa012d6df26fa45155935ebf5b596d616" id="r_aa012d6df26fa45155935ebf5b596d616"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa012d6df26fa45155935ebf5b596d616">lwrk2</a> = 0</td></tr>
 <tr class="separator:aa012d6df26fa45155935ebf5b596d616"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa3357646ae5f56b7495f1efa0dc941e" id="r_aaa3357646ae5f56b7495f1efa0dc941e"><td class="memItemLeft" align="right" valign="top"><a id="aaa3357646ae5f56b7495f1efa0dc941e" name="aaa3357646ae5f56b7495f1efa0dc941e"></a>
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>wrk2</b></td></tr>
+<tr class="memitem:aaa3357646ae5f56b7495f1efa0dc941e" id="r_aaa3357646ae5f56b7495f1efa0dc941e"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa3357646ae5f56b7495f1efa0dc941e">wrk2</a></td></tr>
 <tr class="separator:aaa3357646ae5f56b7495f1efa0dc941e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab30e03d98385349cd38f54f84728a0ad" id="r_ab30e03d98385349cd38f54f84728a0ad"><td class="memItemLeft" align="right" valign="top"><a id="ab30e03d98385349cd38f54f84728a0ad" name="ab30e03d98385349cd38f54f84728a0ad"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>bc_continuity_origin</b> = 2</td></tr>
+<tr class="memitem:ab30e03d98385349cd38f54f84728a0ad" id="r_ab30e03d98385349cd38f54f84728a0ad"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab30e03d98385349cd38f54f84728a0ad">bc_continuity_origin</a> = 2</td></tr>
 <tr class="separator:ab30e03d98385349cd38f54f84728a0ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d2d0ca4b5c64e3081d540223a6c05f6" id="r_a3d2d0ca4b5c64e3081d540223a6c05f6"><td class="memItemLeft" align="right" valign="top"><a id="a3d2d0ca4b5c64e3081d540223a6c05f6" name="a3d2d0ca4b5c64e3081d540223a6c05f6"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>bc_boundary</b> = OUTSIDE_EXTRAPOLATE</td></tr>
+<tr class="memitem:a3d2d0ca4b5c64e3081d540223a6c05f6" id="r_a3d2d0ca4b5c64e3081d540223a6c05f6"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3d2d0ca4b5c64e3081d540223a6c05f6">bc_boundary</a> = OUTSIDE_EXTRAPOLATE</td></tr>
 <tr class="separator:a3d2d0ca4b5c64e3081d540223a6c05f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca303c817dfaaffd97e9330e396cc0be" id="r_aca303c817dfaaffd97e9330e396cc0be"><td class="memItemLeft" align="right" valign="top"><a id="aca303c817dfaaffd97e9330e396cc0be" name="aca303c817dfaaffd97e9330e396cc0be"></a>
-integer, dimension(2)&#160;</td><td class="memItemRight" valign="bottom"><b>nest</b> = 0</td></tr>
+<tr class="memitem:aca303c817dfaaffd97e9330e396cc0be" id="r_aca303c817dfaaffd97e9330e396cc0be"><td class="memItemLeft" align="right" valign="top">integer, dimension(2)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca303c817dfaaffd97e9330e396cc0be">nest</a> = 0</td></tr>
 <tr class="separator:aca303c817dfaaffd97e9330e396cc0be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2e224577bc522695c74452efa5ceb06" id="r_ab2e224577bc522695c74452efa5ceb06"><td class="memItemLeft" align="right" valign="top"><a id="ab2e224577bc522695c74452efa5ceb06" name="ab2e224577bc522695c74452efa5ceb06"></a>
-integer&#160;</td><td class="memItemRight" valign="bottom"><b>nmax</b> = 0</td></tr>
+<tr class="memitem:ab2e224577bc522695c74452efa5ceb06" id="r_ab2e224577bc522695c74452efa5ceb06"><td class="memItemLeft" align="right" valign="top">integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2e224577bc522695c74452efa5ceb06">nmax</a> = 0</td></tr>
 <tr class="separator:ab2e224577bc522695c74452efa5ceb06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac876ab6c952eec505cf9da3d658ea765" id="r_ac876ab6c952eec505cf9da3d658ea765"><td class="memItemLeft" align="right" valign="top"><a id="ac876ab6c952eec505cf9da3d658ea765" name="ac876ab6c952eec505cf9da3d658ea765"></a>
-integer, dimension(2)&#160;</td><td class="memItemRight" valign="bottom"><b>knots</b> = 0</td></tr>
+<tr class="memitem:ac876ab6c952eec505cf9da3d658ea765" id="r_ac876ab6c952eec505cf9da3d658ea765"><td class="memItemLeft" align="right" valign="top">integer, dimension(2)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac876ab6c952eec505cf9da3d658ea765">knots</a> = 0</td></tr>
 <tr class="separator:ac876ab6c952eec505cf9da3d658ea765"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b24fca3eff8d98451e0c461f13d5584" id="r_a4b24fca3eff8d98451e0c461f13d5584"><td class="memItemLeft" align="right" valign="top"><a id="a4b24fca3eff8d98451e0c461f13d5584" name="a4b24fca3eff8d98451e0c461f13d5584"></a>
-real(fp_real), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>t</b></td></tr>
+<tr class="memitem:a4b24fca3eff8d98451e0c461f13d5584" id="r_a4b24fca3eff8d98451e0c461f13d5584"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b24fca3eff8d98451e0c461f13d5584">t</a></td></tr>
 <tr class="separator:a4b24fca3eff8d98451e0c461f13d5584"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_attribs_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
-<tr class="memitem:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a37789f6e2aef4d11695e20f84a5f0e30"><td class="memItemLeft" align="right" valign="top">
-integer(fp_flag)&#160;</td><td class="memItemRight" valign="bottom"><b>iopt</b> = IOPT_NEW_SMOOTHING</td></tr>
-<tr class="memdesc:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitting state flag. <br /></td></tr>
+<tr class="memitem:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a37789f6e2aef4d11695e20f84a5f0e30"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a37789f6e2aef4d11695e20f84a5f0e30">iopt</a> = IOPT_NEW_SMOOTHING</td></tr>
+<tr class="memdesc:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitting state flag.  <br /></td></tr>
 <tr class="separator:a37789f6e2aef4d11695e20f84a5f0e30 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a2ef622360564515e14a40a24a1896163"><td class="memItemLeft" align="right" valign="top">
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>smoothing</b> = 1000.0_FP_REAL</td></tr>
-<tr class="memdesc:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smoothing parameter. <br /></td></tr>
+<tr class="memitem:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a2ef622360564515e14a40a24a1896163"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a> = 1000.0_FP_REAL</td></tr>
+<tr class="memdesc:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smoothing parameter.  <br /></td></tr>
 <tr class="separator:a2ef622360564515e14a40a24a1896163 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa9428cc7448785fb9a2697225760296e"><td class="memItemLeft" align="right" valign="top">
-real(fp_real)&#160;</td><td class="memItemRight" valign="bottom"><b>fp</b> = zero</td></tr>
-<tr class="memdesc:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted sum of squared residuals. <br /></td></tr>
+<tr class="memitem:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa9428cc7448785fb9a2697225760296e"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa9428cc7448785fb9a2697225760296e">fp</a> = <a class="el" href="namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b">zero</a></td></tr>
+<tr class="memdesc:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted sum of squared residuals.  <br /></td></tr>
 <tr class="separator:aa9428cc7448785fb9a2697225760296e inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a17057c7a2aa35ac6c0e87329a2e6ec66"><td class="memItemLeft" align="right" valign="top">
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>c</b></td></tr>
-<tr class="memdesc:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">B-spline coefficients. <br /></td></tr>
+<tr class="memitem:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a17057c7a2aa35ac6c0e87329a2e6ec66"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a17057c7a2aa35ac6c0e87329a2e6ec66">c</a></td></tr>
+<tr class="memdesc:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">B-spline coefficients.  <br /></td></tr>
 <tr class="separator:a17057c7a2aa35ac6c0e87329a2e6ec66 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa5eaddf25a40b1612e978249464a28fb"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size)&#160;</td><td class="memItemRight" valign="bottom"><b>lwrk</b> = 0</td></tr>
-<tr class="memdesc:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real workspace and its size. <br /></td></tr>
+<tr class="memitem:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_aa5eaddf25a40b1612e978249464a28fb"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#aa5eaddf25a40b1612e978249464a28fb">lwrk</a> = 0</td></tr>
+<tr class="memdesc:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real workspace and its size.  <br /></td></tr>
 <tr class="separator:aa5eaddf25a40b1612e978249464a28fb inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_adcb5a0862065efdc9a6a9b7ac3a144e3"><td class="memItemLeft" align="right" valign="top">
-real(fp_real), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>wrk</b></td></tr>
+<tr class="memitem:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_adcb5a0862065efdc9a6a9b7ac3a144e3"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#adcb5a0862065efdc9a6a9b7ac3a144e3">wrk</a></td></tr>
 <tr class="separator:adcb5a0862065efdc9a6a9b7ac3a144e3 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a40e456707e34524cb2b4d80d7b2ac3b7"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size)&#160;</td><td class="memItemRight" valign="bottom"><b>liwrk</b> = 0</td></tr>
-<tr class="memdesc:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer workspace and its size. <br /></td></tr>
+<tr class="memitem:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a40e456707e34524cb2b4d80d7b2ac3b7"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a40e456707e34524cb2b4d80d7b2ac3b7">liwrk</a> = 0</td></tr>
+<tr class="memdesc:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer workspace and its size.  <br /></td></tr>
 <tr class="separator:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a79e872bcc881c071816f4a9560b7991a"><td class="memItemLeft" align="right" valign="top">
-integer(fp_size), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><b>iwrk</b></td></tr>
+<tr class="memitem:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a79e872bcc881c071816f4a9560b7991a"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a79e872bcc881c071816f4a9560b7991a">iwrk</a></td></tr>
 <tr class="separator:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a9c98f35e9b1437cae3f8a313fc172f4c" id="r_a9c98f35e9b1437cae3f8a313fc172f4c"><td class="memItemLeft" align="right" valign="top"><a id="a9c98f35e9b1437cae3f8a313fc172f4c" name="a9c98f35e9b1437cae3f8a313fc172f4c"></a>
-procedure(fitpack_polar_boundary), pointer, nopass&#160;</td><td class="memItemRight" valign="bottom"><b>rad</b> =&gt; null()</td></tr>
-<tr class="memdesc:a9c98f35e9b1437cae3f8a313fc172f4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that describes shape of the polar boundary: radius as a function of angle theta: x = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*cos(v) , y = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*sin(v), -pi &lt;= v &lt;= pi. <br /></td></tr>
+<tr class="memitem:a9c98f35e9b1437cae3f8a313fc172f4c" id="r_a9c98f35e9b1437cae3f8a313fc172f4c"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacefitpack__core_1_1fitpack__polar__boundary.html">fitpack_polar_boundary</a>), pointer, nopass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c">rad</a> =&gt; null()</td></tr>
+<tr class="memdesc:a9c98f35e9b1437cae3f8a313fc172f4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that describes shape of the polar boundary: radius as a function of angle theta: x = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*cos(v) , y = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*sin(v), -pi &lt;= v &lt;= pi.  <br /></td></tr>
 <tr class="separator:a9c98f35e9b1437cae3f8a313fc172f4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:ab55c494100062d1a71212b93cf0ed3f7" id="r_ab55c494100062d1a71212b93cf0ed3f7"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab55c494100062d1a71212b93cf0ed3f7">polr_eval_one</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, ierr)</td></tr>
+<tr class="memdesc:ab55c494100062d1a71212b93cf0ed3f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate polar domain at given x,y coordinates.  <br /></td></tr>
+<tr class="separator:ab55c494100062d1a71212b93cf0ed3f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c5e1eb380aedf9fd6d53989097e893" id="r_a36c5e1eb380aedf9fd6d53989097e893"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36c5e1eb380aedf9fd6d53989097e893">polr_eval_many</a> (this, <a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>, <a class="el" href="#a1324c2d3552dfc3d36d7e145a0c4d688">y</a>, ierr)</td></tr>
+<tr class="separator:a36c5e1eb380aedf9fd6d53989097e893"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Bicubic spline fitter for data scattered over a general polar domain. </p>
-<p>Stores the scattered Cartesian data <picture><source srcset="form_51_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (x_i, y_i, z_i) $" src="form_51.png"/></picture>, the user-supplied boundary function <picture><source srcset="form_48_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r(\theta) $" src="form_48.png"/></picture>, optional weights, and the fitted B-spline representation. The smoothing parameter controls the trade-off between closeness of fit and smoothness, while continuity at the origin ( <picture><source srcset="form_28_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ u = 0 $" src="form_28.png"/></picture>) is enforced up to order <picture><source srcset="form_52_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^0 $" src="form_52.png"/></picture>, <picture><source srcset="form_53_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^1 $" src="form_53.png"/></picture>, or <picture><source srcset="form_54_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^2 $" src="form_54.png"/></picture>.</p>
+<p>Stores the scattered Cartesian data \( (x_i, y_i, z_i) \), the user-supplied boundary function \( r(\theta) \), optional weights, and the fitted B-spline representation. The smoothing parameter controls the trade-off between closeness of fit and smoothness, while continuity at the origin ( \( u = 0 \)) is enforced up to order \( C^0 \), \( C^1 \), or \( C^2 \).</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 11, §11.1 (pp. 255–263) </dd></dl>
-</div><hr/>The documentation for this interface was generated from the following file:<ul>
-<li>/home/runner/work/fitpack/fitpack/src/<b>fitpack_polar.f90</b></li>
+</div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
+<a id="a3b1a5136ec39300e197d6a4754abb272" name="a3b1a5136ec39300e197d6a4754abb272"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b1a5136ec39300e197d6a4754abb272">&#9670;&#160;</a></span>comm_expand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::comm_expand </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__polar__domains_1_1fitpack__polar_a3b1a5136ec39300e197d6a4754abb272_cgraph.png" border="0" usemap="#astructfitpack__polar__domains_1_1fitpack__polar_a3b1a5136ec39300e197d6a4754abb272_cgraph" alt=""/></div>
+<map name="astructfitpack__polar__domains_1_1fitpack__polar_a3b1a5136ec39300e197d6a4754abb272_cgraph" id="astructfitpack__polar__domains_1_1fitpack__polar_a3b1a5136ec39300e197d6a4754abb272_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,175,60"/>
+<area shape="rect" href="namespacefitpack__polar__domains.html#ab87954e5439cd167ce02409ecdf31c90" title=" " alt="" coords="223,13,397,53"/>
+<area shape="poly" title=" " alt="" coords="175,30,209,30,209,35,175,35"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="aef830c4a9f23017303c711cd2b861ae1" name="aef830c4a9f23017303c711cd2b861ae1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef830c4a9f23017303c711cd2b861ae1">&#9670;&#160;</a></span>comm_pack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::comm_pack </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab8da154a4145144c0a846bcdf7e44313" name="ab8da154a4145144c0a846bcdf7e44313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8da154a4145144c0a846bcdf7e44313">&#9670;&#160;</a></span>comm_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::comm_size </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Communication interface. </p>
+
+</div>
+</div>
+<a id="acf92c07749717d22d0ba4447c161818f" name="acf92c07749717d22d0ba4447c161818f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf92c07749717d22d0ba4447c161818f">&#9670;&#160;</a></span>destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::destroy </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clean memory. </p>
+
+</div>
+</div>
+<a id="a42303aec4c608ad95ed4bedf0d00881c" name="a42303aec4c608ad95ed4bedf0d00881c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42303aec4c608ad95ed4bedf0d00881c">&#9670;&#160;</a></span>eval() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_polar_domains::fitpack_polar::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate polar domain at given x,y coordinates. </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__polar__domains_1_1fitpack__polar_a42303aec4c608ad95ed4bedf0d00881c_cgraph.png" border="0" usemap="#astructfitpack__polar__domains_1_1fitpack__polar_a42303aec4c608ad95ed4bedf0d00881c_cgraph" alt=""/></div>
+<map name="astructfitpack__polar__domains_1_1fitpack__polar_a42303aec4c608ad95ed4bedf0d00881c_cgraph" id="astructfitpack__polar__domains_1_1fitpack__polar_a42303aec4c608ad95ed4bedf0d00881c_cgraph">
+<area shape="rect" title="Evaluate polar domain at given x,y coordinates." alt="" coords="5,35,175,75"/>
+<area shape="rect" href="namespacefitpack__polar__domains.html#a46c936c7df627f5d6fcab07789d9d825" title=" " alt="" coords="223,5,392,45"/>
+<area shape="poly" title=" " alt="" coords="175,41,209,36,210,41,175,46"/>
+<area shape="rect" href="namespacefitpack__polar__domains.html#a42072a02901a25adb57d01fbe7d70dce" title=" " alt="" coords="440,35,609,75"/>
+<area shape="poly" title=" " alt="" coords="175,54,223,55,392,55,426,54,426,60,392,60,223,60,175,59"/>
+<area shape="poly" title=" " alt="" coords="393,34,427,39,426,44,392,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a42303aec4c608ad95ed4bedf0d00881c" name="a42303aec4c608ad95ed4bedf0d00881c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42303aec4c608ad95ed4bedf0d00881c">&#9670;&#160;</a></span>eval() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_polar_domains::fitpack_polar::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad1bb2a2dca57b08df4d1541024a58bd1" name="ad1bb2a2dca57b08df4d1541024a58bd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1bb2a2dca57b08df4d1541024a58bd1">&#9670;&#160;</a></span>fit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::fit </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>keep_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate/update fitting curve, with optional smoothing. </p>
+
+</div>
+</div>
+<a id="afee5dca05ebc7f5f1df5d8f1a93cab22" name="afee5dca05ebc7f5f1df5d8f1a93cab22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afee5dca05ebc7f5f1df5d8f1a93cab22">&#9670;&#160;</a></span>interpolate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::interpolate </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae361ed84fd9ec25e05ce81221f4203d4" name="ae361ed84fd9ec25e05ce81221f4203d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae361ed84fd9ec25e05ce81221f4203d4">&#9670;&#160;</a></span>least_squares()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::least_squares </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>reset_knots</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a11bc52134a2e7776abe9ac420981d7ca" name="a11bc52134a2e7776abe9ac420981d7ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11bc52134a2e7776abe9ac420981d7ca">&#9670;&#160;</a></span>new_fit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::new_fit </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">procedure(<a class="el" href="interfacefitpack__core_1_1fitpack__polar__boundary.html">fitpack_polar_boundary</a>)</td>          <td class="paramname"><span class="paramname"><em>boundary</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>boundary_bc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>smoothing</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate new fit. </p>
+
+</div>
+</div>
+<a id="a0b70da2c8ed886ee3853b083816ce0ca" name="a0b70da2c8ed886ee3853b083816ce0ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b70da2c8ed886ee3853b083816ce0ca">&#9670;&#160;</a></span>new_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_polar_domains::fitpack_polar::new_points </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">procedure(<a class="el" href="interfacefitpack__core_1_1fitpack__polar__boundary.html">fitpack_polar_boundary</a>)</td>          <td class="paramname"><span class="paramname"><em>boundary</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>boundary_bc</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set new points. </p>
+
+</div>
+</div>
+<a id="a36c5e1eb380aedf9fd6d53989097e893" name="a36c5e1eb380aedf9fd6d53989097e893"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36c5e1eb380aedf9fd6d53989097e893">&#9670;&#160;</a></span>polr_eval_many()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_polar_domains::fitpack_polar::polr_eval_many </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab55c494100062d1a71212b93cf0ed3f7" name="ab55c494100062d1a71212b93cf0ed3f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab55c494100062d1a71212b93cf0ed3f7">&#9670;&#160;</a></span>polr_eval_one()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_polar_domains::fitpack_polar::polr_eval_one </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate polar domain at given x,y coordinates. </p>
+
+</div>
+</div>
+<a id="aad7ae0d07ba7850c35ab5d605c02a694" name="aad7ae0d07ba7850c35ab5d605c02a694"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad7ae0d07ba7850c35ab5d605c02a694">&#9670;&#160;</a></span>polr_new_from_points()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">type(<a class="el" href="structfitpack__polar__domains_1_1fitpack__polar.html">fitpack_polar</a>) function fitpack_polar_domains::fitpack_polar::polr_new_from_points </td>
+          <td>(</td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">procedure(<a class="el" href="interfacefitpack__core_1_1fitpack__polar__boundary.html">fitpack_polar_boundary</a>)</td>          <td class="paramname"><span class="paramname"><em>boundary</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(size(<a class="el" href="#ac03f55d3331607e4fc82b3d258b7c267">x</a>)), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>boundary_bc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__polar__domains_1_1fitpack__polar_aad7ae0d07ba7850c35ab5d605c02a694_cgraph.png" border="0" usemap="#astructfitpack__polar__domains_1_1fitpack__polar_aad7ae0d07ba7850c35ab5d605c02a694_cgraph" alt=""/></div>
+<map name="astructfitpack__polar__domains_1_1fitpack__polar_aad7ae0d07ba7850c35ab5d605c02a694_cgraph" id="astructfitpack__polar__domains_1_1fitpack__polar_aad7ae0d07ba7850c35ab5d605c02a694_cgraph">
+<area shape="rect" title=" " alt="" coords="5,42,175,97"/>
+<area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="223,49,376,89"/>
+<area shape="poly" title=" " alt="" coords="175,67,209,67,209,72,175,72"/>
+<area shape="rect" href="namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="424,5,577,45"/>
+<area shape="poly" title=" " alt="" coords="376,50,410,42,411,48,377,55"/>
+<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="424,93,577,133"/>
+<area shape="poly" title=" " alt="" coords="377,83,411,91,410,96,376,89"/>
+<area shape="poly" title=" " alt="" coords="463,94,461,84,467,75,480,69,501,67,524,70,537,77,534,82,522,75,501,72,482,74,470,79,466,85,468,92"/>
+</map>
+</div>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a3d2d0ca4b5c64e3081d540223a6c05f6" name="a3d2d0ca4b5c64e3081d540223a6c05f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d2d0ca4b5c64e3081d540223a6c05f6">&#9670;&#160;</a></span>bc_boundary</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_polar_domains::fitpack_polar::bc_boundary = OUTSIDE_EXTRAPOLATE</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab30e03d98385349cd38f54f84728a0ad" name="ab30e03d98385349cd38f54f84728a0ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab30e03d98385349cd38f54f84728a0ad">&#9670;&#160;</a></span>bc_continuity_origin</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_polar_domains::fitpack_polar::bc_continuity_origin = 2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac876ab6c952eec505cf9da3d658ea765" name="ac876ab6c952eec505cf9da3d658ea765"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac876ab6c952eec505cf9da3d658ea765">&#9670;&#160;</a></span>knots</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer, dimension(2) fitpack_polar_domains::fitpack_polar::knots = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa012d6df26fa45155935ebf5b596d616" name="aa012d6df26fa45155935ebf5b596d616"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa012d6df26fa45155935ebf5b596d616">&#9670;&#160;</a></span>lwrk2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_polar_domains::fitpack_polar::lwrk2 = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab3fc7226342d3c6fa08f0c64dbf1ce4e" name="ab3fc7226342d3c6fa08f0c64dbf1ce4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3fc7226342d3c6fa08f0c64dbf1ce4e">&#9670;&#160;</a></span>m</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_polar_domains::fitpack_polar::m = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Scattered data points. </p>
+
+</div>
+</div>
+<a id="aca303c817dfaaffd97e9330e396cc0be" name="aca303c817dfaaffd97e9330e396cc0be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca303c817dfaaffd97e9330e396cc0be">&#9670;&#160;</a></span>nest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer, dimension(2) fitpack_polar_domains::fitpack_polar::nest = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab2e224577bc522695c74452efa5ceb06" name="ab2e224577bc522695c74452efa5ceb06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2e224577bc522695c74452efa5ceb06">&#9670;&#160;</a></span>nmax</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer fitpack_polar_domains::fitpack_polar::nmax = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9c98f35e9b1437cae3f8a313fc172f4c" name="a9c98f35e9b1437cae3f8a313fc172f4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c98f35e9b1437cae3f8a313fc172f4c">&#9670;&#160;</a></span>rad</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure(<a class="el" href="interfacefitpack__core_1_1fitpack__polar__boundary.html">fitpack_polar_boundary</a>), pointer, nopass fitpack_polar_domains::fitpack_polar::rad =&gt; null()</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Function that describes shape of the polar boundary: radius as a function of angle theta: x = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*cos(v) , y = <a class="el" href="#a9c98f35e9b1437cae3f8a313fc172f4c" title="Function that describes shape of the polar boundary: radius as a function of angle theta: x = rad(v)*...">rad(v)</a>*sin(v), -pi &lt;= v &lt;= pi. </p>
+
+</div>
+</div>
+<a id="a4b24fca3eff8d98451e0c461f13d5584" name="a4b24fca3eff8d98451e0c461f13d5584"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b24fca3eff8d98451e0c461f13d5584">&#9670;&#160;</a></span>t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), allocatable fitpack_polar_domains::fitpack_polar::t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afd6a3755c76e72298c09ef7c044666dc" name="afd6a3755c76e72298c09ef7c044666dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd6a3755c76e72298c09ef7c044666dc">&#9670;&#160;</a></span>u</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::u</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Coordinates of the data points in rectangular coordinates (u,v) </p>
+
+</div>
+</div>
+<a id="ae32ec17690b07ae050038749ad932638" name="ae32ec17690b07ae050038749ad932638"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae32ec17690b07ae050038749ad932638">&#9670;&#160;</a></span>v</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::v</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a12932ccab6589e1807900aa915ed74f9" name="a12932ccab6589e1807900aa915ed74f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12932ccab6589e1807900aa915ed74f9">&#9670;&#160;</a></span>w</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::w</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaa3357646ae5f56b7495f1efa0dc941e" name="aaa3357646ae5f56b7495f1efa0dc941e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa3357646ae5f56b7495f1efa0dc941e">&#9670;&#160;</a></span>wrk2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::wrk2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac03f55d3331607e4fc82b3d258b7c267" name="ac03f55d3331607e4fc82b3d258b7c267"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac03f55d3331607e4fc82b3d258b7c267">&#9670;&#160;</a></span>x</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1324c2d3552dfc3d36d7e145a0c4d688" name="a1324c2d3552dfc3d36d7e145a0c4d688"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1324c2d3552dfc3d36d7e145a0c4d688">&#9670;&#160;</a></span>y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8dc72d2f5165e0dd69a2d732124f6685" name="a8dc72d2f5165e0dd69a2d732124f6685"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8dc72d2f5165e0dd69a2d732124f6685">&#9670;&#160;</a></span>z</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), allocatable fitpack_polar_domains::fitpack_polar::z</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function values at the points. </p>
+
+</div>
+</div>
+<hr/>The documentation for this interface was generated from the following file:<ul>
+<li><a class="el" href="fitpack__polar_8f90.html">fitpack_polar.f90</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

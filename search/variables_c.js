@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['u_0',['u',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#afeb81f765e51e40fdea291c0f80b8a3b',1,'fitpack_gridded_polar::fitpack_grid_polar::u'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#adae138f45ccb5c7e8502dd0299e89e2f',1,'fitpack_gridded_sphere::fitpack_grid_sphere::u'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#a555b191ecb7cefbab0a94c305f50edf2',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::u'],['../structfitpack__polar__domains_1_1fitpack__polar.html#afd6a3755c76e72298c09ef7c044666dc',1,'fitpack_polar_domains::fitpack_polar::u']]],
-  ['ubegin_1',['ubegin',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a276e0df7c4b4348d1ef6406fb8e1ed51',1,'fitpack_parametric_curves::fitpack_parametric_curve']]]
+  ['r_0',['r',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa279b6a9811f82d7bf574af8fe5e3fce',1,'fitpack_gridded_polar::fitpack_grid_polar::r'],['../structfitpack__sphere__domains_1_1fitpack__sphere.html#a0a81b797c165dc2c28bc3005f225f906',1,'fitpack_sphere_domains::fitpack_sphere::r']]],
+  ['rad_1',['rad',['../structfitpack__polar__domains_1_1fitpack__polar.html#a9c98f35e9b1437cae3f8a313fc172f4c',1,'fitpack_polar_domains::fitpack_polar']]],
+  ['right_2',['right',['../structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a74fb4659d8e4f39ad84016aea36140a1',1,'fitpack_grid_surfaces::fitpack_grid_surface::right'],['../structfitpack__surfaces_1_1fitpack__surface.html#ac41687499583166271abe33c2b540bb7',1,'fitpack_surfaces::fitpack_surface::right']]]
 ];

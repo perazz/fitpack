@@ -1,10 +1,14 @@
 var searchData=
 [
-  ['key_20properties_0',['Key properties',['../theory_bsplines.html#autotoc_md11',1,'']]],
-  ['knot_20insertion_20oslo_20algorithm_1',['Knot Insertion (Oslo Algorithm)',['../theory_bsplines.html#autotoc_md16',1,'']]],
-  ['knot_20placement_2',['Knot Placement',['../theory_curve_fitting.html#autotoc_md24',1,'Adaptive Knot Placement'],['../theory_surface_fitting.html#autotoc_md43',1,'Adaptive Knot Placement']]],
-  ['knot_20vector_3',['Shared Knot Vector',['../theory_curve_fitting.html#autotoc_md29',1,'']]],
-  ['knot_20vectors_4',['Piecewise Polynomials and Knot Vectors',['../theory_bsplines.html#autotoc_md7',1,'']]],
-  ['knots_5',['Least-Squares with Fixed Knots',['../theory_curve_fitting.html#autotoc_md20',1,'']]],
-  ['kronecker_20product_20structure_6',['Kronecker Product Structure',['../theory_surface_fitting.html#autotoc_md45',1,'']]]
+  ['key_20properties_0',['Key properties',['../theory_bsplines.html#autotoc_md23',1,'']]],
+  ['knot_20insertion_20oslo_20algorithm_1',['Knot Insertion (Oslo Algorithm)',['../theory_bsplines.html#autotoc_md28',1,'']]],
+  ['knot_20placement_2',['Knot Placement',['../theory_curve_fitting.html#autotoc_md36',1,'Adaptive Knot Placement'],['../theory_surface_fitting.html#autotoc_md55',1,'Adaptive Knot Placement']]],
+  ['knot_20vector_3',['Shared Knot Vector',['../theory_curve_fitting.html#autotoc_md41',1,'']]],
+  ['knot_20vectors_4',['Piecewise Polynomials and Knot Vectors',['../theory_bsplines.html#autotoc_md19',1,'']]],
+  ['knot_5fdim_5f1_5',['knot_dim_1',['../namespacefitpack__core.html#a1d8475ed3cb1c0bfccef4ca66ef6bf59',1,'fitpack_core']]],
+  ['knot_5fdim_5f2_6',['knot_dim_2',['../namespacefitpack__core.html#a7d99472224f26deec2560fedeab07794',1,'fitpack_core']]],
+  ['knot_5fdim_5fnone_7',['knot_dim_none',['../namespacefitpack__core.html#ae335f58a7994bbafd5ff9cfb81d1e7fb',1,'fitpack_core']]],
+  ['knots_8',['Least-Squares with Fixed Knots',['../theory_curve_fitting.html#autotoc_md32',1,'']]],
+  ['knots_9',['knots',['../structfitpack__curves_1_1fitpack__curve.html#afb0a4fbe45029a425195e8a93dd0bb1c',1,'fitpack_curves::fitpack_curve::knots'],['../structfitpack__grid__surfaces_1_1fitpack__grid__surface.html#a86568df46fc2aa92d835eca913d26f79',1,'fitpack_grid_surfaces::fitpack_grid_surface::knots'],['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a5521be15182952d79ac3e696ba9e5d64',1,'fitpack_gridded_polar::fitpack_grid_polar::knots'],['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a605782ce0f8bfcfb0d1be5eea1365c15',1,'fitpack_gridded_sphere::fitpack_grid_sphere::knots'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a1b93b39dde60026661148f767deb76b7',1,'fitpack_parametric_curves::fitpack_parametric_curve::knots'],['../structfitpack__parametric__surfaces_1_1fitpack__parametric__surface.html#a41251dfbd61c54fc1a0cfa872f6cadc3',1,'fitpack_parametric_surfaces::fitpack_parametric_surface::knots'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ac876ab6c952eec505cf9da3d658ea765',1,'fitpack_polar_domains::fitpack_polar::knots'],['../structfitpack__sphere__domains_1_1fitpack__sphere.html#a4d90d6677a804b50854e12069cc1a595',1,'fitpack_sphere_domains::fitpack_sphere::knots'],['../structfitpack__surfaces_1_1fitpack__surface.html#a9d0140d478f95536880f6d5e4c42f158',1,'fitpack_surfaces::fitpack_surface::knots']]],
+  ['kronecker_20product_20structure_10',['Kronecker Product Structure',['../theory_surface_fitting.html#autotoc_md57',1,'']]]
 ];

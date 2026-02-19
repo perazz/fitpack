@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Spherical Spline Fitting Tutorial</title>
+<title>fitpack: Spherical Spline Fitting Tutorial</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,45 +114,45 @@ $(function(){initNavTree('tutorial_sphere.html',''); initResizable(true); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__sphere"></a></p>
-<p>This tutorial covers bivariate spline fitting on the unit sphere with FITPACK: constructing a bicubic spline <picture><source srcset="form_57_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ r = s(\theta, \phi) $" src="form_57.png"/></picture> from data in spherical coordinates, handling pole singularities, and evaluating the fitted surface.</p>
-<h1><a class="anchor" id="autotoc_md154"></a>
+<p>This tutorial covers bivariate spline fitting on the unit sphere with FITPACK: constructing a bicubic spline \( r = s(\theta, \phi) \) from data in spherical coordinates, handling pole singularities, and evaluating the fitted surface.</p>
+<h1><a class="anchor" id="autotoc_md166"></a>
 Overview</h1>
 <p>Many physical problems produce data on the surface of a sphere — geophysical fields, satellite measurements, radiation patterns, or angular distributions. FITPACK provides two sphere-specific types, selected by input data structure:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Input   </th><th class="markdownTableHeadNone">Core routine   </th><th class="markdownTableHeadNone">Use case    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>fitpack_sphere</code>   </td><td class="markdownTableBodyNone">Scattered <picture><source srcset="form_60_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (\theta_i, \phi_i, r_i) $" src="form_60.png"/></picture>   </td><td class="markdownTableBodyNone"><code>sphere</code>   </td><td class="markdownTableBodyNone">Irregularly sampled observations    </td></tr>
+<td class="markdownTableBodyNone"><code>fitpack_sphere</code>   </td><td class="markdownTableBodyNone">Scattered \( (\theta_i, \phi_i, r_i) \)   </td><td class="markdownTableBodyNone"><code>sphere</code>   </td><td class="markdownTableBodyNone">Irregularly sampled observations    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>fitpack_grid_sphere</code>   </td><td class="markdownTableBodyNone">Grid <picture><source srcset="form_330_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ z(v_j, u_i) $" src="form_330.png"/></picture>   </td><td class="markdownTableBodyNone"><code>spgrid</code>   </td><td class="markdownTableBodyNone">Latitude-longitude grids   </td></tr>
+<td class="markdownTableBodyNone"><code>fitpack_grid_sphere</code>   </td><td class="markdownTableBodyNone">Grid \( z(v_j, u_i) \)   </td><td class="markdownTableBodyNone"><code>spgrid</code>   </td><td class="markdownTableBodyNone">Latitude-longitude grids   </td></tr>
 </table>
 <p><b>Always prefer <code>fitpack_grid_sphere</code> when data lies on a regular latitude-longitude grid</b> — the <code>spgrid</code> algorithm exploits the grid structure and is significantly more efficient.</p>
-<h1><a class="anchor" id="autotoc_md155"></a>
+<h1><a class="anchor" id="autotoc_md167"></a>
 Mathematical Background</h1>
-<p>Points on the unit sphere are parameterized by colatitude <picture><source srcset="form_55_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta \in [0, \pi] $" src="form_55.png"/></picture> (measured from the north pole) and longitude <picture><source srcset="form_341_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \phi \in [0, 2\pi) $" src="form_341.png"/></picture>. The Cartesian embedding is:</p>
+<p>Points on the unit sphere are parameterized by colatitude \( \theta \in [0, \pi] \) (measured from the north pole) and longitude \( \phi \in [0, 2\pi) \). The Cartesian embedding is:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_342_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    x = \sin\theta \cos\phi, \quad
+\[    x = \sin\theta \cos\phi, \quad
     y = \sin\theta \sin\phi, \quad
     z = \cos\theta
-\]" src="form_342.png"/></picture>
+\]
 </p>
-<h2><a class="anchor" id="autotoc_md156"></a>
+<h2><a class="anchor" id="autotoc_md168"></a>
 The Pole Problem</h2>
-<p>At the north pole ( <picture><source srcset="form_58_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta = 0 $" src="form_58.png"/></picture>) and south pole ( <picture><source srcset="form_59_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \theta = \pi $" src="form_59.png"/></picture>), all values of <picture><source srcset="form_254_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \phi $" src="form_254.png"/></picture> correspond to the same geometric point. A naive tensor-product spline in <picture><source srcset="form_343_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ (\theta, \phi) $" src="form_343.png"/></picture> would not enforce this single-valuedness. FITPACK's sphere routines automatically impose pole constraints so that the fitted spline is smooth and well-defined at both poles.</p>
-<h2><a class="anchor" id="autotoc_md157"></a>
+<p>At the north pole ( \( \theta = 0 \)) and south pole ( \( \theta = \pi \)), all values of \( \phi \) correspond to the same geometric point. A naive tensor-product spline in \( (\theta, \phi) \) would not enforce this single-valuedness. FITPACK's sphere routines automatically impose pole constraints so that the fitted spline is smooth and well-defined at both poles.</p>
+<h2><a class="anchor" id="autotoc_md169"></a>
 Spherical Harmonics Connection</h2>
-<p>The real spherical harmonics <picture><source srcset="form_344_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ Y_l^m(\theta, \phi) $" src="form_344.png"/></picture> form a natural basis for functions on the sphere. The first few are:</p>
+<p>The real spherical harmonics \( Y_l^m(\theta, \phi) \) form a natural basis for functions on the sphere. The first few are:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_345_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    Y_0^0 = 1, \quad
+\[    Y_0^0 = 1, \quad
     Y_1^0 = \cos\theta, \quad
     Y_2^2 = \sin^2\!\theta \cos 2\phi
-\]" src="form_345.png"/></picture>
+\]
 </p>
 <p>A smooth test function built from these harmonics provides a useful validation target, since the spline should reproduce low-order harmonics to high accuracy with only a moderate number of knots.</p>
-<h1><a class="anchor" id="autotoc_md158"></a>
+<h1><a class="anchor" id="autotoc_md170"></a>
 Scattered Sphere Data — <code>fitpack_sphere</code></h1>
 <p>Use <code>fitpack_sphere</code> when data points are irregularly distributed over the sphere.</p>
-<h2><a class="anchor" id="autotoc_md159"></a>
+<h2><a class="anchor" id="autotoc_md171"></a>
 Construction and Fitting</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_sphere, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, one, half, pi</div>
@@ -156,8 +164,8 @@ Construction and Fitting</h2>
 <div class="line">ierr = sph%new_fit(theta, phi, r, smoothing=real(m, fp_real))</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><p>The <code>new_fit</code> method stores the data, allocates workspace, and performs a smoothing fit in one call. The smoothing parameter <picture><source srcset="form_62_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s $" src="form_62.png"/></picture> controls the trade-off between fidelity and smoothness. A practical starting value is <picture><source srcset="form_346_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ s = m $" src="form_346.png"/></picture> (the number of data points).</p>
-<h2><a class="anchor" id="autotoc_md160"></a>
+</div><!-- fragment --><p>The <code>new_fit</code> method stores the data, allocates workspace, and performs a smoothing fit in one call. The smoothing parameter \( s \) controls the trade-off between fidelity and smoothness. A practical starting value is \( s = m \) (the number of data points).</p>
+<h2><a class="anchor" id="autotoc_md172"></a>
 Evaluation</h2>
 <p>The <code>eval</code> method returns values on a tensor-product grid:</p>
 <div class="fragment"><div class="line">f = sph%eval(t_eval, p_eval, ierr)</div>
@@ -168,13 +176,13 @@ Evaluation</h2>
 </div><!-- fragment --><p>After fitting, the knot counts are available from <code>sph\knots</code>:</p>
 <div class="fragment"><div class="line">print *, <span class="stringliteral">&#39;Theta knots:&#39;</span>, sph%knots(1), <span class="stringliteral">&#39;  Phi knots:&#39;</span>, sph%knots(2)</div>
 </div><!-- fragment --><p>The residual (weighted sum of squared errors) is returned by <code>sph\mse()</code>.</p>
-<h2><a class="anchor" id="autotoc_md161"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 Example: Spherical Harmonic Test Function</h2>
 <p>The following test function combines three harmonics:</p>
 <p class="formulaDsp">
-<picture><source srcset="form_347_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[    f(\theta, \phi) = Y_0^0 + Y_1^0 + \tfrac{1}{2}\, Y_2^2
-                    = 1 + \cos\theta + \tfrac{1}{2}\sin^2\!\theta\,\cos 2\phi
-\]" src="form_347.png"/></picture>
+\[    f(\theta, \phi) = Y_0^0 + Y_1^0 + \frac{1}{2}\, Y_2^2
+                    = 1 + \cos\theta + \frac{1}{2}\sin^2\!\theta\,\cos 2\phi
+\]
 </p>
 <div class="fragment"><div class="line"><span class="keywordtype">elemental</span> <span class="keyword">real(FP_REAL) </span><span class="keyword">function </span>test_sphere(theta, phi) <span class="keyword">result</span>(f)</div>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">intent(in)</span> :: theta, phi</div>
@@ -192,10 +200,10 @@ Example: Spherical Harmonic Test Function</h2>
 <div class="line">ierr = sph%new_fit(theta, phi, r, smoothing=real(m, fp_real))</div>
 <div class="line">ierr = sph%fit(smoothing=10.0_fp_real)</div>
 </div><!-- fragment --><p>Tightening the smoothing parameter increases the number of knots and reduces the residual, allowing the spline to capture finer angular structure.</p>
-<h1><a class="anchor" id="autotoc_md162"></a>
+<h1><a class="anchor" id="autotoc_md174"></a>
 Gridded Sphere Data — <code>fitpack_grid_sphere</code></h1>
 <p>Use <code>fitpack_grid_sphere</code> when data is sampled on a regular colatitude-longitude grid — the typical case for reanalysis products, climate model output, or any field stored on a lat-lon mesh.</p>
-<h2><a class="anchor" id="autotoc_md163"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 Construction and Fitting</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_sphere, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, one, pi</div>
@@ -207,8 +215,8 @@ Construction and Fitting</h2>
 <div class="line"><span class="comment">! v (longitude) in [0, 2*pi)</span></div>
 <div class="line"><span class="comment">! zg(j, i) = f(u(i), v(j))</span></div>
 <div class="line">ierr = gsph%new_fit(u, v, zg, smoothing=zero)</div>
-</div><!-- fragment --><p>Note the array layout: <code>zg</code> has shape <code>(size(v), size(u))</code>, with the longitude index first. The colatitude grid must satisfy <picture><source srcset="form_348_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 &lt; u_1 &lt; \cdots &lt; u_{n_u} &lt; \pi $" src="form_348.png"/></picture> (strictly interior — the poles are not grid points). The longitude grid must satisfy <picture><source srcset="form_349_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ 0 \leq v_1 &lt; v_2 &lt; \cdots &lt; v_{n_v} &lt; 2\pi $" src="form_349.png"/></picture>.</p>
-<h2><a class="anchor" id="autotoc_md164"></a>
+</div><!-- fragment --><p>Note the array layout: <code>zg</code> has shape <code>(size(v), size(u))</code>, with the longitude index first. The colatitude grid must satisfy \( 0 &lt; u_1 &lt; \cdots &lt; u_{n_u} &lt; \pi \) (strictly interior — the poles are not grid points). The longitude grid must satisfy \( 0 \leq v_1 &lt; v_2 &lt; \cdots &lt; v_{n_v} &lt; 2\pi \).</p>
+<h2><a class="anchor" id="autotoc_md176"></a>
 Pole Boundary Conditions</h2>
 <p>Because the grid excludes the poles, FITPACK allows you to supply pole values and control the smoothness there:</p>
 <div class="fragment"><div class="line"><span class="keyword">call </span>gsph%BC_north_pole(z0=z_north, exact=.true., differentiable=.true.)</div>
@@ -222,12 +230,12 @@ Pole Boundary Conditions</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>exact</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: spline passes exactly through <code>z0</code>; <code>.false.</code>: treated as data    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>differentiable</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce <picture><source srcset="form_53_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ C^1 $" src="form_53.png"/></picture> continuity at the pole    </td></tr>
+<td class="markdownTableBodyNone"><code>differentiable</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce \( C^1 \) continuity at the pole    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>zero_grad</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce <picture><source srcset="form_350_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \nabla s = 0 $" src="form_350.png"/></picture> at the pole   </td></tr>
+<td class="markdownTableBodyNone"><code>zero_grad</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce \( \nabla s = 0 \) at the pole   </td></tr>
 </table>
 <p>When <code>z0</code> is omitted, no function-value constraint is imposed at that pole.</p>
-<h2><a class="anchor" id="autotoc_md165"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 Example: Function on a Lat-Lon Grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: nu = 15, nv = 30</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: u(nu), v(nv), zg(nv, nu), du, dv</div>
@@ -258,7 +266,7 @@ Example: Function on a Lat-Lon Grid</h2>
 <div class="line"><span class="comment">! Evaluate on a new grid</span></div>
 <div class="line">f = gsph%eval(u_eval, v_eval, ierr)</div>
 <div class="line">! f(j, i) = s(u_eval(i), v_eval(j))</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md166"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md178"></a>
 Complete Example</h1>
 <p>A full working program demonstrating both scattered fitting with progressive refinement and gridded fitting with pole boundary conditions is provided in <code>examples/example_sphere.f90</code>. Build and run it with:</p>
 <div class="fragment"><div class="line">fpm run --example example_sphere</div>

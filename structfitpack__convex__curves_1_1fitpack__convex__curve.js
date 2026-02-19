@@ -3,6 +3,7 @@ var structfitpack__convex__curves_1_1fitpack__convex__curve =
     [ "comm_expand", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#a6d227de45d4a7299160718ed4c01e4bf", null ],
     [ "comm_pack", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#a3ff3ad5e397c0b4ee81e51766cc0853f", null ],
     [ "comm_size", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#a10b067bc8d577fb567bab91013e0147a", null ],
+    [ "convex_new_from_points", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#ac5c5ed540c6059720fb73836c40a56f0", null ],
     [ "destroy", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#a8ab906f465674f1b9c1bd9f380f7eb33", null ],
     [ "fit", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#a4ccb21d964085a1f499c1b4c65e1e0d1", null ],
     [ "least_squares", "structfitpack__convex__curves_1_1fitpack__convex__curve.html#afb804ce1a42fbc30b8afcedf17ccd23e", null ],

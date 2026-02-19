@@ -1,0 +1,49 @@
+<map id="fitpack_core::sphere" name="fitpack_core::sphere">
+<area shape="rect" id="Node000001" title="Fit a smooth bicubic spherical spline to scattered data on a sphere." alt="" coords="5,316,159,341"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a6b16cd0ae09d295a9bdf3723c10db8e7" title="Core algorithm for spline fitting on the sphere." alt="" coords="207,316,360,341"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,326,193,326,193,331,159,331"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="876,208,1021,233"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="324,339,365,350,408,358,528,375,624,383,669,380,716,371,768,355,827,330,858,312,886,289,928,242,932,246,889,293,861,316,829,335,770,360,718,377,670,385,624,388,528,380,408,363,363,355,323,344"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ab4ec4c90b00749bb021a6ec2f3433781" title="Rotate an observation row into the upper triangular band matrix." alt="" coords="408,208,607,233"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="301,314,348,283,407,250,446,235,448,240,409,255,350,287,304,318"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="667,157,816,183"/>
+<area shape="poly" id="edge18_Node000002_Node000005" title=" " alt="" coords="290,314,307,288,333,254,367,220,407,193,468,171,533,159,596,156,653,157,653,162,596,161,533,165,470,176,409,198,370,224,337,257,311,291,294,317"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="667,259,815,284"/>
+<area shape="poly" id="edge26_Node000002_Node000006" title=" " alt="" coords="325,313,408,294,536,278,653,271,654,276,537,284,408,299,327,319"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aa452051613d61831a99b2f9ef8e21bc8" title="Rotate a smoothing&#45;matrix row into a band matrix using shifted pivots." alt="" coords="423,309,591,349"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="360,326,409,326,409,331,360,331"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="431,424,584,449"/>
+<area shape="poly" id="edge12_Node000002_Node000008" title=" " alt="" coords="304,339,350,370,409,402,448,417,446,422,407,407,348,375,301,344"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="433,5,582,31"/>
+<area shape="poly" id="edge13_Node000002_Node000009" title=" " alt="" coords="284,315,294,266,316,194,332,155,352,116,377,80,406,48,427,34,430,39,410,52,381,83,357,119,337,157,321,196,299,267,289,317"/>
+<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="655,56,828,81"/>
+<area shape="poly" id="edge28_Node000002_Node000010" title=" " alt="" coords="284,315,295,270,317,209,334,176,354,144,378,115,407,92,436,75,468,63,534,50,600,47,660,52,659,57,600,53,535,55,469,69,438,80,409,96,381,119,358,147,338,178,322,211,300,272,290,316"/>
+<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="433,473,581,499"/>
+<area shape="poly" id="edge17_Node000002_Node000011" title=" " alt="" coords="295,340,339,397,372,430,409,458,425,466,422,471,407,463,368,434,335,401,291,343"/>
+<area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a000e6860b30d66fcc8bf487d934c0f28" title="Sort scattered data points into rectangular panels." alt="" coords="432,523,583,548"/>
+<area shape="poly" id="edge19_Node000002_Node000012" title=" " alt="" coords="292,340,307,374,332,420,366,468,387,489,410,508,421,515,418,519,406,512,383,493,362,471,328,423,302,377,287,343"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="432,107,583,132"/>
+<area shape="poly" id="edge21_Node000002_Node000014" title=" " alt="" coords="288,315,303,282,329,237,364,190,406,149,432,135,435,139,410,153,368,194,333,240,308,284,292,317"/>
+<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="432,572,583,597"/>
+<area shape="poly" id="edge27_Node000002_Node000015" title=" " alt="" coords="290,341,302,383,326,442,361,504,383,533,410,557,421,565,418,569,406,561,380,536,356,507,321,444,297,385,285,342"/>
+<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="440,622,575,662"/>
+<area shape="poly" id="edge29_Node000002_Node000016" title=" " alt="" coords="289,341,299,390,320,462,336,502,356,540,381,576,410,608,429,621,426,625,406,612,376,580,352,543,331,504,315,464,294,392,284,342"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="915,210,908,200,911,190,925,184,949,181,977,185,989,194,985,198,975,190,949,187,927,189,915,193,913,199,919,206"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="607,218,862,218,862,223,607,223"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="566,205,668,183,669,188,568,210"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="568,231,669,253,668,258,566,236"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="591,328,705,320,767,309,827,293,878,268,920,240,923,244,880,273,829,298,768,314,706,325,592,333"/>
+<area shape="poly" id="edge10_Node000007_Node000005" title=" " alt="" coords="536,306,708,189,711,193,539,311"/>
+<area shape="poly" id="edge11_Node000007_Node000006" title=" " alt="" coords="589,306,675,285,676,290,590,311"/>
+<area shape="poly" id="edge14_Node000009_Node000010" title=" " alt="" coords="568,28,669,50,668,56,566,33"/>
+<area shape="poly" id="edge15_Node000010_Node000003" title=" " alt="" coords="789,79,829,98,860,121,888,147,931,195,927,199,884,151,856,125,827,103,786,84"/>
+<area shape="poly" id="edge16_Node000010_Node000010" title=" " alt="" coords="708,58,700,48,704,38,718,32,741,29,770,33,781,42,778,46,768,38,741,35,719,37,708,41,706,47,712,54"/>
+<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="662,515,821,555"/>
+<area shape="poly" id="edge20_Node000012_Node000013" title=" " alt="" coords="583,533,648,533,648,538,583,538"/>
+<area shape="poly" id="edge22_Node000014_Node000003" title=" " alt="" coords="583,113,700,117,765,126,829,142,881,167,924,197,920,201,878,172,827,147,764,131,700,122,583,118"/>
+<area shape="poly" id="edge23_Node000014_Node000005" title=" " alt="" coords="568,130,669,152,668,157,566,135"/>
+<area shape="poly" id="edge24_Node000014_Node000006" title=" " alt="" coords="529,130,710,249,707,253,527,134"/>
+<area shape="poly" id="edge25_Node000014_Node000010" title=" " alt="" coords="566,104,668,82,669,87,568,109"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="669,629,813,655"/>
+<area shape="poly" id="edge30_Node000016_Node000017" title=" " alt="" coords="575,639,656,639,656,645,575,645"/>
+</map>

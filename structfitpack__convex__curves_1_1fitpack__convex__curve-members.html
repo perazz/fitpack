@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.13.2-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 <head>
@@ -5,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Member List</title>
+<title>fitpack: Member List</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,12 +19,19 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-  $(function() { init_search(); });
-/* @license-end */
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
 </script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+        <script type="text/javascript">
+            DoxygenAwesomeDarkModeToggle.init()
+        </script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -32,21 +40,10 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">fitpack
    </div>
+   <div id="projectbrief">Modern Fortran library for curve and surface fitting with splines</div>
   </td>
-    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
-          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -63,6 +60,17 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 $(function() { codefold.init(0); });
 /* @license-end */
 </script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Search',true);
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -108,22 +116,32 @@ $(function(){initNavTree('structfitpack__convex__curves_1_1fitpack__convex__curv
 
 <p>This is the complete list of members for <a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a>, including all inherited members.</p>
 <table class="directory">
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>bc</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ada14732734497aadb5627b515226c40e">bc</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a8f25225db33b66c65a6058e5145fa366">bind</a></td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a17057c7a2aa35ac6c0e87329a2e6ec66">c</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a6d227de45d4a7299160718ed4c01e4bf">comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2">fitpack_curves::fitpack_curve::comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>comm_expand</b>(this, buffer) (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a20a29631c1d4f97f391ebae7335ac524">fitpack_fitters::fitpack_fitter::comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a3ff3ad5e397c0b4ee81e51766cc0853f">comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a8c84ac425d10251ec6e7602ebf74e235">fitpack_curves::fitpack_curve::comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>comm_pack</b>(this, buffer) (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a1060bacf4ad0a9e229784e407087365c">fitpack_fitters::fitpack_fitter::comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a10b067bc8d577fb567bab91013e0147a">comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a9bffb5bd168bc305326812a86463eb56">fitpack_curves::fitpack_curve::comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#af3f1bd18f36011f74337f85bf5a160a4">fitpack_fitters::fitpack_fitter::comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>convex_new_from_points</b>(x, y, v, w, smoothing, ierr) (defined in <a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#ac5c5ed540c6059720fb73836c40a56f0">convex_new_from_points</a>(x, y, v, w, smoothing, ierr)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a84b552fc80bf0d9e48dab0528518510a">core_comm_expand</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a71f8f7fd77934f74258803c4518a4c56">core_comm_pack</a>(this, buffer)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#ac96427338601093ec28b0462966cc138">core_comm_size</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#add6e578e84c31f82ddf61b679681ba4d">curve_all_derivatives</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a75ee7e9900ef24bbcf778a859dda41d6">curve_all_derivatives_pure</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a4abae06c4018c773b11140486c972011">curve_derivative</a>(this, x, order, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#af76782f54a7f7a77b7536f0509f00350">curve_derivatives</a>(this, x, order, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a735cb8a89868a8e9fa9286591634f852">curve_eval_many</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aa2033866a10430114f30467d774705ef">curve_eval_many_pure</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#acdb865e3105ab66700ad8b8c3a834f17">curve_eval_one</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ab3d9a7d4e36ebcd70b83b1552c055b34">curve_eval_one_noerr</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ab0ba695bc04fec510052524bf5d7d4f9">curve_insert_knot_many</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aa748cb9cbaea2c5b6cad566168996188">curve_insert_knot_one</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"><span class="mlabel">private</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a8ab906f465674f1b9c1bd9f380f7eb33">destroy</a>(this)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#abde0ace26fb81c6baaee6af49863f4b6">fitpack_curves::fitpack_curve::destroy</a>(this)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a599af639c06dff9d7ab349cb514e54c1">destroy_base</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
@@ -132,7 +150,7 @@ $(function(){initNavTree('structfitpack__convex__curves_1_1fitpack__convex__curv
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aea96e10b0976d10e67c38e23b5e17743">dfdx_all</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a0f65a9090eeba61fbcb684c2777ea55a">dfdx_all</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aff31aa74d607af245d6a61d015f30ebd">eval</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>eval</b>(this, x) (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#acf6236eba73aefcb76c35e7d2a6ac089">eval</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aff31aa74d607af245d6a61d015f30ebd">eval</a>(this, x, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#acf6236eba73aefcb76c35e7d2a6ac089">eval</a>(this, x)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a4ccb21d964085a1f499c1b4c65e1e0d1">fit</a>(this, smoothing, order, keep_knots)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
@@ -144,8 +162,8 @@ $(function(){initNavTree('structfitpack__convex__curves_1_1fitpack__convex__curv
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a8c1ac9d541bce3498510b43fd6dba6ac">integral</a>(this, from, to)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a1d554a2d443d5fa50669b549eb8873a6">interpolate</a>(this, order, reset_knots)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a37789f6e2aef4d11695e20f84a5f0e30">iopt</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>iwrk</b> (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>knots</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a79e872bcc881c071816f4a9560b7991a">iwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#afb0a4fbe45029a425195e8a93dd0bb1c">knots</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#afb804ce1a42fbc30b8afcedf17ccd23e">least_squares</a>(this, smoothing, reset_knots)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a70130ea325c5433afb81b230111a2e59">fitpack_curves::fitpack_curve::least_squares</a>(this, smoothing, reset_knots)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a40e456707e34524cb2b4d80d7b2ac3b7">liwrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
@@ -154,7 +172,7 @@ $(function(){initNavTree('structfitpack__convex__curves_1_1fitpack__convex__curv
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#aaf16c0217bf4248a2e1520c5c9edf21c">maxbin</a></td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00">maxtr</a></td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a>(this)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>nest</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ad9ac14b59190ba7695e6ad7e131193c4">nest</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a4abb623b94b599e30c29cf576d5e6cec">new_fit</a>(this, x, y, w, smoothing, order)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a78e13992ec8ec1195b7fbdbf3b90d065">new_from_points</a>(x, y, w, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a57d41fac3a641def82f07509ba4ce9d4">new_points</a>(this, x, y, w)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
@@ -162,17 +180,17 @@ $(function(){initNavTree('structfitpack__convex__curves_1_1fitpack__convex__curv
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a03d0f2b1596577c156de28b8a34b6339">order</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a7ed6d5f5b48c41fad2a8bfc16e9e6e6c">set_convexity</a>(this, v)</td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>sp</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a4472f3ee4ab69575965ea8b10ff9fa6b">sp</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#ae36b2d943b41432d5388d2e3aed70cf6">sx</a></td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>t</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#ac0d07388dd8ecf66645fa07e524f9a60">t</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html#a9e77575cfb3d428b084e55339a03a503">v</a></td><td class="entry"><a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curves::fitpack_convex_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>w</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>wrk</b> (defined in <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a>)</td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>wrk_fou</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>x</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a5809325b79660af9954f72dad3e8d672">w</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#adcb5a0862065efdc9a6a9b7ac3a144e3">wrk</a></td><td class="entry"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a36f9715a3a17c4b05b35080f64fcd7ef">wrk_fou</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#aacb3fe59724e43456e25eafdea9eaa20">x</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a42fef4f389c9a8475414a5e1d98373d7">xleft</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="odd"><td class="entry"><b>xright</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>y</b> (defined in <a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a>)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a0aeb31255bd721c2333fba4565f8c9e9">xright</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a1b6be2873aefcd9aa17a26a2c4da6d08">y</a></td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html#a2abcd592a21323f4da5a5ccb8faef7d2">zeros</a>(this, ierr)</td><td class="entry"><a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curves::fitpack_curve</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->

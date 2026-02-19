@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_polar::fitpack_grid_polar" name="fitpack_gridded_polar::fitpack_grid_polar">
+<area shape="rect" id="Node000001" title="Bicubic spline fitter for data on a gridded polar disc." alt="" coords="5,93,168,133"/>
+<area shape="rect" id="Node000002" href="$structfitpack__fitters_1_1fitpack__fitter.html" title="Abstract base type for all FITPACK OOP fitters." alt="" coords="5,5,168,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,59,89,93,84,93,84,59"/>
+</map>

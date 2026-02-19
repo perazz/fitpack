@@ -1,0 +1,6 @@
+<map id="fitpack_core::fp_comm_expand::fp_real_comm_expand_3d" name="fitpack_core::fp_comm_expand::fp_real_comm_expand_3d">
+<area shape="rect" id="Node000001" title="Expand communication buffer into 3D real(FP_REAL) allocatable array." alt="" coords="5,22,184,77"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a7d6e951acad3110eb2c3dfb6e5215d8b" title="Number of FP_COMM elements required to store nbits of data." alt="" coords="232,29,415,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,47,219,47,219,52,184,52"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="281,30,278,20,285,10,300,5,323,3,350,6,364,13,362,18,348,11,323,8,302,10,288,15,284,21,286,28"/>
+</map>

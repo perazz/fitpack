@@ -1,0 +1,21 @@
+<map id="fitpack_core::fpcosp" name="fitpack_core::fpcosp">
+<area shape="rect" id="Node000001" title="Core algorithm for convexity&#45;constrained cubic spline fitting." alt="" coords="5,119,157,145"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="205,5,364,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,117,147,87,204,55,218,48,220,53,207,60,149,92,103,121"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a9bcbf8cf99bfb2ac2f3834891c731be7" title="Add a branch to the constraint&#45;set binary tree." alt="" coords="207,70,362,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,117,218,96,219,101,135,122"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="210,119,359,145"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="157,129,196,129,196,135,157,135"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ad5d82ac791ec6ae19e9b4671ffb734e0" title="Prune short branches from the constraint&#45;set binary tree." alt="" coords="207,169,362,194"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="135,142,219,163,218,168,134,147"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#a535f9e04981c794c70a60f728e918472" title="Fetch and advance to the next branch in the constraint&#45;set tree." alt="" coords="208,218,361,243"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="102,143,148,173,206,204,223,211,221,216,204,209,146,178,99,147"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a8006d449287383c5f5c4151086e9a376" title="Collect free nodes from the constraint&#45;set binary tree." alt="" coords="425,58,573,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="362,76,411,73,411,78,362,81"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="412,131,585,157"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="360,134,399,136,398,141,360,139"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="465,133,458,123,461,113,475,107,499,105,527,108,539,117,535,122,525,113,499,110,477,112,465,117,463,122,469,130"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="633,131,779,157"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="586,141,620,141,620,147,586,147"/>
+<area shape="poly" id="edge7_Node000007_Node000007" title=" " alt="" coords="672,133,665,123,669,113,683,107,706,105,735,108,746,117,743,122,732,113,706,110,684,112,673,117,670,122,676,130"/>
+</map>

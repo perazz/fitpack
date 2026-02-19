@@ -1,0 +1,11 @@
+<map id="fitpack_periodic_curves_c::fitpack_periodic_curve_c_copy" name="fitpack_periodic_curves_c::fitpack_periodic_curve_c_copy">
+<area shape="rect" id="Node000001" title="Copy contents from another object." alt="" coords="5,71,196,125"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__periodic__curves__c.html#af13c3719ab1fb2a67fff34abd4e772cf" title="Deallocate Fortran object." alt="" coords="244,5,435,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,69,230,60,232,65,197,74"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7" title="Get pointer to embedded Fortran object." alt="" coords="483,71,673,125"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="196,95,469,95,469,101,196,101"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__periodic__curves__c.html#aeef2651aa247d1b16df2bf49c9db5004" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="244,136,435,191"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="197,122,232,131,230,136,196,127"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="436,56,470,66,469,71,434,61"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="434,135,469,125,470,130,436,140"/>
+</map>

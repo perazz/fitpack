@@ -1,0 +1,7 @@
+<map id="fitpack_curves::fitpack_curve::dfdx_all" name="fitpack_curves::fitpack_curve::dfdx_all">
+<area shape="rect" id="Node000001" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="5,37,173,77"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__curves.html#a703fa0a7cfc5975d7b3f8f7d94819b7f" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="222,5,382,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,42,208,37,209,42,174,47"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__curves.html#aaf4bde3fd7eb67a499710aadb385532e" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="221,69,383,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,67,208,73,207,78,173,73"/>
+</map>
