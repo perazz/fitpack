@@ -103,8 +103,8 @@ The residual (weighted sum of squared errors) is returned by `sph\%mse()`.
 The following test function combines three harmonics:
 
 \f[
-    f(\theta, \phi) = Y_0^0 + Y_1^0 + \tfrac{1}{2}\, Y_2^2
-                    = 1 + \cos\theta + \tfrac{1}{2}\sin^2\!\theta\,\cos 2\phi
+    f(\theta, \phi) = Y_0^0 + Y_1^0 + \frac{1}{2}\, Y_2^2
+                    = 1 + \cos\theta + \frac{1}{2}\sin^2\!\theta\,\cos 2\phi
 \f]
 
 ```fortran
