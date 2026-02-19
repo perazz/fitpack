@@ -148,8 +148,8 @@ For the test function \f$ f(x) = \cos(x) + \sin(2x) \f$ the exact integral is
 
 \f[
     \int_{\pi/2}^{3\pi} \bigl[\cos(x) + \sin(2x)\bigr] \, dx
-    = \Bigl[\sin(x) - \tfrac{1}{2}\cos(2x)\Bigr]_{\pi/2}^{3\pi}
-    = -\tfrac{3}{2}
+    = \Bigl[\sin(x) - \frac{1}{2}\cos(2x)\Bigr]_{\pi/2}^{3\pi}
+    = -\frac{3}{2}
 \f]
 
 ## Smoothing and Interpolation
