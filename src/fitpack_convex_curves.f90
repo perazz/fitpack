@@ -92,7 +92,17 @@ module fitpack_convex_curves
 
     contains
 
-    ! A default constructor
+    !> @brief Construct a convex curve from data points with convexity constraints and fit it.
+    !!
+    !! @param[in]  x          Independent variable values.
+    !! @param[in]  y          Dependent variable values, same size as `x`.
+    !! @param[in]  v          Convexity constraints: 1=concave, -1=convex, 0=unconstrained.
+    !! @param[in]  w          Optional weights (positive), same size as `x`.
+    !! @param[in]  smoothing  Optional smoothing factor.
+    !! @param[out] ierr       Optional error flag.
+    !! @return Fitted convex curve object.
+    !!
+    !! @see concon
     type(fitpack_convex_curve) function convex_new_from_points(x,y,v,w,smoothing,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(size(x))
         real(FP_REAL), intent(in) :: v(size(x))
@@ -110,7 +120,7 @@ module fitpack_convex_curves
 
     end function convex_new_from_points
 
-    ! Destroy all data
+    !> @brief Destroy the convex curve object and release all allocated memory.
     elemental subroutine convex_destroy(this)
        class(fitpack_convex_curve), intent(inout) :: this
        integer :: ierr
@@ -127,7 +137,14 @@ module fitpack_convex_curves
 
     end subroutine convex_destroy
 
-    ! Set new data points and allocate workspace for concon
+    !> @brief Load new data points and allocate workspace for convex fitting.
+    !!
+    !! @param[in,out] this  The convex curve object (destroyed and reinitialized).
+    !! @param[in]     x     Independent variable values.
+    !! @param[in]     y     Dependent variable values, same size as `x`.
+    !! @param[in]     w     Optional positive weights, same size as `x`.
+    !!
+    !! @see concon, cocosp
     subroutine convex_new_points(this,x,y,w)
         class(fitpack_convex_curve), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x))
@@ -184,7 +201,11 @@ module fitpack_convex_curves
 
     end subroutine convex_new_points
 
-    ! Set convexity constraint values
+    !> @brief Set pointwise convexity constraints.
+    !!
+    !! @param[in,out] this  The convex curve object.
+    !! @param[in]     v     Constraint values: 1=concave, -1=convex, 0=unconstrained. Must have size `m`.
+    !! @return Error flag (FITPACK_INPUT_ERROR if size mismatch).
     integer(FP_FLAG) function set_convexity(this, v) result(ierr)
         class(fitpack_convex_curve), intent(inout) :: this
         real(FP_REAL), intent(in) :: v(:)
@@ -212,7 +233,18 @@ module fitpack_convex_curves
 
     end function remap_concon_error
 
-    ! Fit with automatic knots using concon
+    !> @brief Fit a smoothing spline with convexity constraints and automatic knot placement.
+    !!
+    !! Uses the concon core routine which solves a constrained quadratic programming problem
+    !! to place knots while respecting local convexity/concavity constraints.
+    !!
+    !! @param[in,out] this       The convex curve object.
+    !! @param[in]     smoothing  Optional smoothing factor.
+    !! @param[in]     order      Ignored (always cubic).
+    !! @param[in]     keep_knots If `.true.`, continue from current knot set.
+    !! @return Error flag.
+    !!
+    !! @see concon
     integer(FP_FLAG) function convex_fit_automatic_knots(this,smoothing,order,keep_knots) result(ierr)
         class(fitpack_convex_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -243,7 +275,17 @@ module fitpack_convex_curves
 
     end function convex_fit_automatic_knots
 
-    ! Least-squares fit with given knots using cocosp
+    !> @brief Fit a least-squares spline with convexity constraints on the current knots.
+    !!
+    !! Uses the cocosp core routine. Constraint values at interior knots are derived from
+    !! the nearest data-point convexity flags.
+    !!
+    !! @param[in,out] this        The convex curve object.
+    !! @param[in]     smoothing   Optional smoothing for initial knot placement (if `reset_knots`).
+    !! @param[in]     reset_knots If `.true.`, recompute knots via concon first.
+    !! @return Error flag.
+    !!
+    !! @see cocosp
     integer(FP_FLAG) function convex_fit_least_squares(this,smoothing,reset_knots) result(ierr)
         class(fitpack_convex_curve), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -309,7 +351,7 @@ module fitpack_convex_curves
     ! PARALLEL COMMUNICATION (size/pack/expand)
     ! =================================================================================================
 
-    !> Return communication buffer size
+    !> @brief Return the communication buffer size for the convex curve.
     elemental integer(FP_SIZE) function convex_comm_size(this)
         class(fitpack_convex_curve), intent(in) :: this
 
@@ -323,7 +365,7 @@ module fitpack_convex_curves
 
     end function convex_comm_size
 
-    !> Pack convex curve data into communication buffer
+    !> @brief Pack convex curve data into a communication buffer.
     pure subroutine convex_comm_pack(this, buffer)
         class(fitpack_convex_curve), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -345,7 +387,7 @@ module fitpack_convex_curves
 
     end subroutine convex_comm_pack
 
-    !> Expand convex curve data from communication buffer
+    !> @brief Expand convex curve data from a communication buffer.
     pure subroutine convex_comm_expand(this, buffer)
         class(fitpack_convex_curve), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)

@@ -125,7 +125,9 @@ module fitpack_grid_surfaces
 
     contains
 
-    ! Fit a surface to least squares of the current knots
+    !> @brief Fit a least-squares gridded surface with fixed knots.
+    !!
+    !! @see regrid
     integer function surface_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_grid_surface), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: smoothing
@@ -146,7 +148,9 @@ module fitpack_grid_surfaces
 
     end function surface_fit_least_squares
 
-    ! Find interpolating surface
+    !> @brief Fit an interpolating gridded surface (\f$ s = 0 \f$).
+    !!
+    !! @see regrid
     integer function surface_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_grid_surface), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -160,7 +164,12 @@ module fitpack_grid_surfaces
     end function surface_fit_interpolating
 
 
-    ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
+    !> @brief Fit a smoothing gridded surface with automatic knot placement.
+    !!
+    !! Uses the regrid core routine, which exploits the rectangular grid structure for
+    !! efficiency.
+    !!
+    !! @see regrid
     integer(FP_FLAG) function surface_fit_automatic_knots(this,smoothing,order,keep_knots) result(ierr)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -209,6 +218,7 @@ module fitpack_grid_surfaces
     end function surface_fit_automatic_knots
 
 
+    !> @brief Destroy a grid surface object and release all allocated memory.
     elemental subroutine surf_destroy(this)
        class(fitpack_grid_surface), intent(inout) :: this
        integer :: ierr
@@ -229,6 +239,14 @@ module fitpack_grid_surfaces
 
     end subroutine surf_destroy
 
+    !> @brief Load new gridded data and allocate workspace.
+    !!
+    !! @param[in,out] this  The grid surface (destroyed and reinitialized).
+    !! @param[in]     x     Grid coordinates in the x direction.
+    !! @param[in]     y     Grid coordinates in the y direction.
+    !! @param[in]     z     Function values `z(j,i)` = \f$ f(x_i, y_j) \f$.
+    !!
+    !! @see regrid
     subroutine surf_new_points(this,x,y,z)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
@@ -284,7 +302,9 @@ module fitpack_grid_surfaces
 
     end subroutine surf_new_points
 
-    ! A default constructor
+    !> @brief Construct a grid surface from gridded data and perform a default fit.
+    !!
+    !! @see regrid
     type(fitpack_grid_surface) function surf_new_from_points(x,y,z,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
         integer(FP_FLAG), optional, intent(out) :: ierr
@@ -298,7 +318,9 @@ module fitpack_grid_surfaces
 
     end function surf_new_from_points
 
-    ! Fit a new curve
+    !> @brief Load new gridded data and perform a fresh fit.
+    !!
+    !! @see regrid
     integer function surf_new_fit(this,x,y,z,smoothing,order)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
@@ -311,7 +333,9 @@ module fitpack_grid_surfaces
 
     end function surf_new_fit
 
-    !> Evaluate surface at a list of scattered (x(i),y(i)) points using bispeu
+    !> @brief Evaluate the grid surface at scattered \f$ (x_i, y_i) \f$ points.
+    !!
+    !! @see bispeu
     function gridsurf_eval_many(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x))
@@ -338,7 +362,9 @@ module fitpack_grid_surfaces
 
     end function gridsurf_eval_many
 
-    !> Evaluate surface at a single (x,y) point using bispeu
+    !> @brief Evaluate the grid surface at a single \f$ (x, y) \f$ point.
+    !!
+    !! @see bispeu
     real(FP_REAL) function gridsurf_eval_one(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x,y
@@ -351,7 +377,11 @@ module fitpack_grid_surfaces
 
     end function gridsurf_eval_one
 
-    !> Evaluate surface on a grid of x(:) x y(:) points using bispev
+    !> @brief Evaluate the grid surface on a rectangular evaluation grid.
+    !!
+    !! Returns `f(j,i)` = \f$ s(x_i, y_j) \f$.
+    !!
+    !! @see bispev
     function gridded_eval_many(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         real(FP_REAL), intent(in) :: x(:),y(:)  ! Evaluation points
@@ -379,7 +409,7 @@ module fitpack_grid_surfaces
 
     end function gridded_eval_many
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the grid surface at a single grid point via bispev.
     real(FP_REAL) function gridded_eval_one(this,x,y,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         real(FP_REAL),               intent(in)      :: x,y ! Evaluation point
@@ -391,7 +421,9 @@ module fitpack_grid_surfaces
 
     end function gridded_eval_one
 
-    !> Evaluate derivatives on a grid domain
+    !> @brief Evaluate partial derivatives on a rectangular grid.
+    !!
+    !! @see parder
     function gridded_derivatives_gridded(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         
@@ -449,7 +481,9 @@ module fitpack_grid_surfaces
 
     end function gridded_derivatives_gridded
 
-    !> Evaluate derivatives on a list of (x(i),y(i)) points
+    !> @brief Evaluate partial derivatives at scattered \f$ (x_i, y_i) \f$ points.
+    !!
+    !! @see pardeu
     function gridded_derivatives_many(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_grid_surface), intent(inout)  :: this
         
@@ -515,6 +549,9 @@ module fitpack_grid_surfaces
 
     end function gridded_derivatives_many
 
+    !> @brief Evaluate a partial derivative at a single \f$ (x, y) \f$ point.
+    !!
+    !! @see pardeu
     real(FP_REAL) function gridded_derivatives_one(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_grid_surface), intent(inout) :: this
         
@@ -537,7 +574,9 @@ module fitpack_grid_surfaces
 
     end function gridded_derivatives_one
 
-    !> Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)]
+    !> @brief Compute the double integral of the grid surface over a rectangular domain.
+    !!
+    !! @see dblint
     real(FP_REAL) function gridsurf_integral(this, lower, upper)
         class(fitpack_grid_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(2), upper(2)
@@ -552,8 +591,11 @@ module fitpack_grid_surfaces
 
     end function gridsurf_integral
 
-    !> Extract a 1D cross-section from the surface.
-    !> If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u).
+    !> @brief Extract a 1D cross-section curve from the grid surface.
+    !!
+    !! If `along_y=.true.`, returns \f$ f(y) = s(u, y) \f$; otherwise \f$ g(x) = s(x, u) \f$.
+    !!
+    !! @see profil
     function gridsurf_cross_section(this, u, along_y, ierr) result(curve)
         class(fitpack_grid_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: u
@@ -602,8 +644,11 @@ module fitpack_grid_surfaces
 
     end function gridsurf_cross_section
 
-    !> Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy.
-    !> Returns a new grid surface with reduced order and trimmed knots.
+    !> @brief Compute the B-spline representation of a partial derivative surface.
+    !!
+    !! Returns a new grid surface with reduced degrees and trimmed knots.
+    !!
+    !! @see pardtc
     function gridsurf_derivative_spline(this, nux, nuy, ierr) result(dsurf)
         class(fitpack_grid_surface), intent(in) :: this
         integer(FP_SIZE), intent(in) :: nux, nuy
@@ -661,6 +706,7 @@ module fitpack_grid_surfaces
     ! PARALLEL COMMUNICATION
     ! =================================================================================================
 
+    !> @brief Return the communication buffer size for the grid surface.
     elemental integer(FP_SIZE) function gridsurf_comm_size(this)
         class(fitpack_grid_surface), intent(in) :: this
         ! Base fields + grid-surface-specific scalars:
@@ -673,6 +719,7 @@ module fitpack_grid_surfaces
                            + FP_COMM_SIZE(this%t)
     end function gridsurf_comm_size
 
+    !> @brief Pack grid surface data into a communication buffer.
     pure subroutine gridsurf_comm_pack(this, buffer)
         class(fitpack_grid_surface), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -699,6 +746,7 @@ module fitpack_grid_surfaces
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine gridsurf_comm_pack
 
+    !> @brief Expand grid surface data from a communication buffer.
     pure subroutine gridsurf_comm_expand(this, buffer)
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)

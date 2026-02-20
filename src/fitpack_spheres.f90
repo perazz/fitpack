@@ -98,7 +98,9 @@ module fitpack_sphere_domains
 
     contains
 
-    ! Fit a surface to least squares of the current knots
+    !> @brief Fit a least-squares spherical surface with fixed knots.
+    !!
+    !! @see sphere
     integer function surface_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_sphere), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: smoothing
@@ -119,7 +121,12 @@ module fitpack_sphere_domains
 
     end function surface_fit_least_squares
 
-    ! Find interpolating surface
+    !> @brief Fit an interpolating spherical surface (\f$ s = 0 \f$).
+    !!
+    !! @param[in] reset_knots  If `.true.` (default), start with fresh knot placement.
+    !! @return Error flag.
+    !!
+    !! @see sphere
     integer function surface_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_sphere), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -132,7 +139,16 @@ module fitpack_sphere_domains
 
     end function surface_fit_interpolating
 
-    ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
+    !> @brief Fit a smoothing spherical surface with automatic knot placement.
+    !!
+    !! Iterates over the smoothing schedule, calling the sphere core routine to fit a
+    !! bicubic spline \f$ r = s(\theta, \phi) \f$ to scattered data on the unit sphere.
+    !!
+    !! @param[in] smoothing   Smoothing factor (\f$ s \ge 0 \f$); default uses stored value.
+    !! @param[in] keep_knots  If `.true.`, reuse the current knot set.
+    !! @return Error flag.
+    !!
+    !! @see sphere
     integer function surface_fit_automatic_knots(this,smoothing,keep_knots) result(ierr)
         class(fitpack_sphere), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -177,6 +193,7 @@ module fitpack_sphere_domains
     end function surface_fit_automatic_knots
 
 
+    !> @brief Release all allocated memory and reset the sphere fitter to its default state.
     elemental subroutine sphere_destroy(this)
        class(fitpack_sphere), intent(inout) :: this
        integer :: ierr
@@ -195,6 +212,15 @@ module fitpack_sphere_domains
 
     end subroutine sphere_destroy
 
+    !> @brief Load new scattered spherical data and allocate working storage.
+    !!
+    !! Replaces any previous data with the given colatitude \f$ \theta_i \in [0, \pi] \f$,
+    !! longitude \f$ \phi_i \in [0, 2\pi] \f$, and radial values \f$ r_i \f$.
+    !!
+    !! @param[in] theta  Colatitude coordinates.
+    !! @param[in] phi    Longitude coordinates (same size as theta).
+    !! @param[in] r      Function values at each point.
+    !! @param[in] w      Optional weights (default: uniform).
     subroutine sphere_new_points(this,theta,phi,r,w)
         class(fitpack_sphere), intent(inout) :: this
         real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
@@ -254,7 +280,15 @@ module fitpack_sphere_domains
 
     end subroutine sphere_new_points
 
-    ! A default constructor
+    !> @brief Construct a fitpack_sphere from scattered data and perform an initial fit.
+    !!
+    !! @param[in]  theta  Colatitude coordinates \f$ \theta_i \in [0, \pi] \f$.
+    !! @param[in]  phi    Longitude coordinates \f$ \phi_i \in [0, 2\pi] \f$.
+    !! @param[in]  r      Function values at each point.
+    !! @param[in]  w      Optional weights.
+    !! @param[out] ierr   Optional error flag; if absent, halts on error.
+    !!
+    !! @see sphere
     type(fitpack_sphere) function sphere_new_from_points(theta,phi,r,w,ierr) result(this)
         real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
         real(FP_REAL), optional, intent(in) :: w(size(theta)) ! node weights
@@ -269,6 +303,17 @@ module fitpack_sphere_domains
 
     end function sphere_new_from_points
 
+    !> @brief Evaluate the spherical spline on a grid of colatitude and longitude values.
+    !!
+    !! Returns \f$ r(j,i) = s(\theta_i, \phi_j) \f$ for all combinations of the input
+    !! theta and phi vectors (tensor-product evaluation).
+    !!
+    !! @param[in]  theta  Colatitude evaluation points.
+    !! @param[in]  phi    Longitude evaluation points.
+    !! @param[out] ierr   Optional error flag.
+    !! @return Grid of spline values, dimensioned `(size(phi), size(theta))`.
+    !!
+    !! @see bispev
     function sphere_eval_many(this,theta,phi,ierr) result(r)
         class(fitpack_sphere), intent(inout)  :: this
         real(FP_REAL), intent(in) :: theta(:),phi(:)  ! Evaluation points
@@ -296,7 +341,14 @@ module fitpack_sphere_domains
 
     end function sphere_eval_many
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the spherical spline at a single point.
+    !!
+    !! @param[in]  theta  Colatitude \f$ \theta \in [0, \pi] \f$.
+    !! @param[in]  phi    Longitude \f$ \phi \in [0, 2\pi] \f$.
+    !! @param[out] ierr   Optional error flag.
+    !! @return Spline value \f$ s(\theta, \phi) \f$.
+    !!
+    !! @see bispev
     real(FP_REAL) function sphere_eval_one(this,theta,phi,ierr) result(r)
         class(fitpack_sphere), intent(inout)  :: this
         real(FP_REAL),          intent(in)     :: theta,phi ! Evaluation point
@@ -308,7 +360,16 @@ module fitpack_sphere_domains
 
     end function sphere_eval_one
 
-    ! Fit a new curve
+    !> @brief Load new scattered data and fit a smoothing spherical spline in one call.
+    !!
+    !! @param[in] theta      Colatitude coordinates.
+    !! @param[in] phi        Longitude coordinates.
+    !! @param[in] r          Function values.
+    !! @param[in] w          Optional weights.
+    !! @param[in] smoothing  Optional smoothing factor.
+    !! @return Error flag.
+    !!
+    !! @see sphere
     integer function sphere_new_fit(this,theta,phi,r,w,smoothing)
         class(fitpack_sphere), intent(inout) :: this
         real(FP_REAL), intent(in) :: theta(:),phi(size(theta)),r(size(theta))
@@ -325,6 +386,7 @@ module fitpack_sphere_domains
     ! PARALLEL COMMUNICATION
     ! =================================================================================================
 
+    !> @brief Return the communication buffer size for parallel pack/expand.
     elemental integer(FP_SIZE) function sphere_comm_size(this)
         class(fitpack_sphere), intent(in) :: this
         ! Base fields + sphere-specific scalars:
@@ -339,6 +401,7 @@ module fitpack_sphere_domains
                          + FP_COMM_SIZE(this%t)
     end function sphere_comm_size
 
+    !> @brief Pack the sphere fitter state into a communication buffer.
     pure subroutine sphere_comm_pack(this, buffer)
         class(fitpack_sphere), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -363,6 +426,7 @@ module fitpack_sphere_domains
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine sphere_comm_pack
 
+    !> @brief Restore the sphere fitter state from a communication buffer.
     pure subroutine sphere_comm_expand(this, buffer)
         class(fitpack_sphere), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)

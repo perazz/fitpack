@@ -116,7 +116,9 @@ module fitpack_polar_domains
 
     contains
 
-    ! Fit a surface to least squares of the current knots
+    !> @brief Fit a least-squares polar surface with fixed knots.
+    !!
+    !! @see polar
     integer function surface_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_polar), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: smoothing
@@ -137,7 +139,9 @@ module fitpack_polar_domains
 
     end function surface_fit_least_squares
 
-    ! Find interpolating surface
+    !> @brief Fit an interpolating polar surface (\f$ s = 0 \f$).
+    !!
+    !! @see polar
     integer function surface_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_polar), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -150,7 +154,13 @@ module fitpack_polar_domains
 
     end function surface_fit_interpolating
 
-    ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
+    !> @brief Fit a smoothing polar surface with automatic knot placement.
+    !!
+    !! The fitting uses normalized polar coordinates \f$ (u, v) \f$ with a user-supplied
+    !! boundary function \f$ r(\theta) \f$. Continuity at the origin is controlled by
+    !! `bc_continuity_origin`.
+    !!
+    !! @see polar
     integer function surface_fit_automatic_knots(this,smoothing,keep_knots) result(ierr)
         class(fitpack_polar), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -199,6 +209,7 @@ module fitpack_polar_domains
     end function surface_fit_automatic_knots
 
 
+    !> @brief Destroy a polar surface object and release all allocated memory.
     elemental subroutine polar_destroy(this)
        class(fitpack_polar), intent(inout) :: this
        integer :: ierr
@@ -222,6 +233,17 @@ module fitpack_polar_domains
 
     end subroutine polar_destroy
 
+    !> @brief Load new scattered data and a boundary function for polar fitting.
+    !!
+    !! @param[in,out] this         The polar surface (destroyed and reinitialized).
+    !! @param[in]     x            Cartesian x coordinates.
+    !! @param[in]     y            Cartesian y coordinates, same size as `x`.
+    !! @param[in]     z            Function values, same size as `x`.
+    !! @param[in]     boundary     Boundary function \f$ r(\theta) \f$ defining the polar domain.
+    !! @param[in]     w            Optional positive weights.
+    !! @param[in]     boundary_bc  Optional boundary extrapolation flag.
+    !!
+    !! @see polar
     subroutine polar_new_points(this,x,y,z,boundary,w,boundary_bc)
         class(fitpack_polar), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
@@ -298,7 +320,9 @@ module fitpack_polar_domains
 
     end subroutine polar_new_points
 
-    ! A default constructor
+    !> @brief Construct a polar surface from scattered data and perform a default fit.
+    !!
+    !! @see polar
     type(fitpack_polar) function polr_new_from_points(x,y,z,boundary,w,boundary_bc,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         procedure(fitpack_polar_boundary) :: boundary
@@ -315,6 +339,11 @@ module fitpack_polar_domains
 
     end function polr_new_from_points
 
+    !> @brief Evaluate the polar surface at a single Cartesian \f$ (x, y) \f$ point.
+    !!
+    !! Internally transforms to normalized polar coordinates before evaluation.
+    !!
+    !! @see evapol
     real(FP_REAL) function polr_eval_one(this,x,y,ierr) result(z)
         class(fitpack_polar), intent(inout)  :: this
         real(FP_REAL),          intent(in)     :: x,y    ! Evaluation point
@@ -330,7 +359,9 @@ module fitpack_polar_domains
 
     end function polr_eval_one
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the polar surface at multiple Cartesian points.
+    !!
+    !! @see evapol
     function polr_eval_many(this,x,y,ierr) result(z)
         class(fitpack_polar), intent(inout)  :: this
         real(FP_REAL),          intent(in)     :: x(:),y(size(x)) ! Evaluation points
@@ -345,7 +376,9 @@ module fitpack_polar_domains
 
     end function polr_eval_many
 
-    ! Fit a new curve
+    !> @brief Load new data and perform a fresh polar surface fit.
+    !!
+    !! @see polar
     integer function polr_new_fit(this,x,y,z,boundary,w,boundary_bc,smoothing)
         class(fitpack_polar), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
@@ -360,7 +393,7 @@ module fitpack_polar_domains
 
     end function polr_new_fit
 
-    ! Communication: buffer size
+    !> @brief Return the communication buffer size for the polar surface.
     elemental integer(FP_SIZE) function polar_comm_size(this)
         class(fitpack_polar), intent(in) :: this
         polar_comm_size = this%core_comm_size() &
@@ -375,7 +408,7 @@ module fitpack_polar_domains
                         + FP_COMM_SIZE(this%t)
     end function polar_comm_size
 
-    ! Communication: pack into buffer
+    !> @brief Pack polar surface data into a communication buffer.
     pure subroutine polar_comm_pack(this, buffer)
         class(fitpack_polar), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -404,7 +437,7 @@ module fitpack_polar_domains
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine polar_comm_pack
 
-    ! Communication: expand from buffer
+    !> @brief Expand polar surface data from a communication buffer.
     pure subroutine polar_comm_expand(this, buffer)
         class(fitpack_polar), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)
