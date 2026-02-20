@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_sphere::gridded_to_disk" name="fitpack_gridded_sphere::gridded_to_disk">
-<area shape="rect" id="Node000001" title="Print gridded polar data to disk." alt="" coords="5,59,179,99"/>
+<area shape="rect" id="Node000001" title="Write gridded spherical data to a formatted text file." alt="" coords="5,59,179,99"/>
 <area shape="rect" id="Node000002" href="$fitpack__gridded__polar_8f90.html#ac2ef12b839fb73f1a202e9e46776fd88" title=" " alt="" coords="237,29,304,55"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,59,223,49,225,54,179,64"/>
 <area shape="rect" id="Node000003" href="$fitpack__gridded__polar_8f90.html#ac2f23e8fe57b80bae14c0affe5fc3112" title=" " alt="" coords="227,103,315,128"/>

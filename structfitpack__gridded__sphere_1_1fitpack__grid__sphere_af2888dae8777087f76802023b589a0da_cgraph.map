@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_sphere::fitpack_grid_sphere::spgrid_new_from_points" name="fitpack_gridded_sphere::fitpack_grid_sphere::spgrid_new_from_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,195,97"/>
+<area shape="rect" id="Node000001" title="Construct a fitpack_grid_sphere from gridded data and perform an initial fit." alt="" coords="5,42,195,97"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="243,49,396,89"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,67,229,67,229,72,195,72"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="444,5,597,45"/>

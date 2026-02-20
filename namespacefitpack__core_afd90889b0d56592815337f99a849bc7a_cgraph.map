@@ -1,5 +1,5 @@
 <map id="fitpack_core::root_finding_iterate" name="fitpack_core::root_finding_iterate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,140,45"/>
+<area shape="rect" id="Node000001" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="5,5,140,45"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="188,13,332,38"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,23,175,23,175,28,140,28"/>
 </map>

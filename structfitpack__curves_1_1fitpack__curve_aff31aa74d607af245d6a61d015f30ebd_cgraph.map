@@ -4,9 +4,9 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,54,167,30,221,12,270,5,321,3,416,10,416,16,321,8,271,10,222,17,170,35,124,58"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__curves.html#a191fca4624f0221835ba534903b31e47" title="Evaluate the spline at multiple points (pure, returns NaN on error)." alt="" coords="429,100,589,140"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,82,416,108,415,113,173,87"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__curves.html#ac9a1d54cba67bb87caf713a5845d5113" title=" " alt="" coords="221,27,381,67"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__curves.html#ac9a1d54cba67bb87caf713a5845d5113" title="Evaluate the spline at a single point (with error flag)." alt="" coords="221,27,381,67"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,62,208,57,208,62,174,67"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__curves.html#a86373196ff60d67e15d049beab000d55" title=" " alt="" coords="221,141,381,181"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__curves.html#a86373196ff60d67e15d049beab000d55" title="Evaluate the spline at a single point (pure, returns NaN on error)." alt="" coords="221,141,381,181"/>
 <area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="141,94,239,134,237,139,139,99"/>
 <area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="381,38,416,35,416,41,382,43"/>
 <area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="381,143,415,136,416,141,382,148"/>

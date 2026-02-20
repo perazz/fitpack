@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_polar::fitpack_grid_polar::surf_new_from_points" name="fitpack_gridded_polar::fitpack_grid_polar::surf_new_from_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,180,97"/>
+<area shape="rect" id="Node000001" title="Construct a gridded polar surface from data and perform a default fit." alt="" coords="5,42,180,97"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="228,49,381,89"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,67,214,67,214,72,180,72"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="429,5,583,45"/>

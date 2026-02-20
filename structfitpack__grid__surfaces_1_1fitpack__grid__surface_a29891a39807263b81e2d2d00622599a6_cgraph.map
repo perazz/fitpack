@@ -1,8 +1,8 @@
 <map id="fitpack_grid_surfaces::fitpack_grid_surface::dfdx" name="fitpack_grid_surfaces::fitpack_grid_surface::dfdx">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,204,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#a5c242327847cac6c6b0e4c5990f5af5e" title="Evaluate derivatives on a list of (x(i),y(i)) points." alt="" coords="491,5,693,45"/>
+<area shape="rect" id="Node000001" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="5,5,204,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#a5c242327847cac6c6b0e4c5990f5af5e" title="Evaluate partial derivatives at scattered &#160;points." alt="" coords="491,5,693,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,20,252,19,443,19,477,19,477,25,443,24,252,24,204,25"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__grid__surfaces.html#a4d4674972e1a07efa04babb20e7b0c7e" title=" " alt="" coords="252,33,443,73"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__grid__surfaces.html#a4d4674972e1a07efa04babb20e7b0c7e" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="252,33,443,73"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,34,239,38,238,43,204,39"/>
 <area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="443,40,477,36,477,41,443,45"/>
 </map>

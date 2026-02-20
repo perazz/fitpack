@@ -1,5 +1,5 @@
 <map id="fitpack_surfaces::surface_derivatives_one" name="fitpack_surfaces::surface_derivatives_one">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,189,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__surfaces.html#a1a235356ec006d630c7f77035096a5e6" title="Evaluate derivatives on a list of (x(i),y(i)) points." alt="" coords="237,5,421,45"/>
+<area shape="rect" id="Node000001" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="5,5,189,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__surfaces.html#a1a235356ec006d630c7f77035096a5e6" title="Evaluate partial derivatives at scattered &#160;points." alt="" coords="237,5,421,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,23,223,23,223,28,190,28"/>
 </map>

@@ -1,6 +1,6 @@
 <map id="fitpack_surfaces::surface_fit_interpolating" name="fitpack_surfaces::surface_fit_interpolating">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,231,189,271"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__surfaces.html#a8b4af77eda1ccb1a175c0020f03032de" title=" " alt="" coords="237,231,421,271"/>
+<area shape="rect" id="Node000001" title="Fit an interpolating surface ( ) through the data points." alt="" coords="5,231,189,271"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__surfaces.html#a8b4af77eda1ccb1a175c0020f03032de" title="Fit a smoothing surface with automatic knot placement." alt="" coords="237,231,421,271"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,249,223,249,223,254,190,254"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="496,174,649,214"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="414,229,482,213,483,218,415,234"/>
@@ -25,7 +25,7 @@
 <area shape="poly" id="edge22_Node000006_Node000016" title=" " alt="" coords="817,311,862,342,920,373,940,380,938,385,918,378,859,347,814,316"/>
 <area shape="rect" id="Node000018" href="$namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="943,124,1093,149"/>
 <area shape="poly" id="edge24_Node000006_Node000018" title=" " alt="" coords="804,286,846,225,879,190,917,160,932,152,934,157,920,164,883,194,851,229,808,289"/>
-<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="951,437,1085,477"/>
+<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="951,437,1085,477"/>
 <area shape="poly" id="edge29_Node000006_Node000019" title=" " alt="" coords="810,312,853,365,885,396,920,422,939,432,936,437,917,427,881,400,850,369,806,315"/>
 <area shape="rect" id="Node000021" href="$fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="983,501,1053,527"/>
 <area shape="poly" id="edge31_Node000006_Node000021" title=" " alt="" coords="806,313,820,348,843,395,877,445,897,467,920,486,944,499,970,506,968,512,942,504,917,491,894,471,873,448,839,398,815,350,801,315"/>

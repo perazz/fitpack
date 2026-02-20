@@ -4,7 +4,7 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,623,218,623,218,629,184,629"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1100,431,1245,456"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,634,515,644,598,646,687,643,780,634,873,617,965,591,1051,554,1081,535,1109,511,1152,465,1156,469,1113,515,1084,539,1053,559,966,596,874,622,780,639,687,648,598,651,515,650,383,639"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="431,664,584,689"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="431,664,584,689"/>
 <area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="359,636,444,658,443,663,358,641"/>
 <area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a408ada754639be78ba19d10d4e92d560" title="Core algorithm for univariate periodic spline fitting." alt="" coords="434,315,581,340"/>
 <area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="315,612,488,350,492,353,319,615"/>
@@ -27,9 +27,9 @@
 <area shape="poly" id="edge20_Node000005_Node000014" title=" " alt="" coords="516,339,532,372,557,416,591,461,634,500,646,507,643,511,630,504,587,465,552,419,527,375,511,341"/>
 <area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="656,5,807,31"/>
 <area shape="poly" id="edge22_Node000005_Node000015" title=" " alt="" coords="508,314,517,263,538,189,554,149,574,110,600,73,630,41,642,33,645,37,634,45,604,76,579,113,559,151,543,191,522,264,513,315"/>
-<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="658,119,805,159"/>
+<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title="Set up the initial knot configuration for periodic spline interpolation." alt="" coords="658,119,805,159"/>
 <area shape="poly" id="edge23_Node000005_Node000016" title=" " alt="" coords="514,313,558,249,592,210,630,176,651,163,654,168,634,180,595,214,562,252,518,316"/>
-<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="664,55,799,95"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="664,55,799,95"/>
 <area shape="poly" id="edge25_Node000005_Node000017" title=" " alt="" coords="510,313,523,273,547,217,583,157,605,130,630,105,650,93,653,97,634,109,609,133,587,160,552,220,528,275,515,315"/>
 <area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="831,242,884,246,942,256,999,271,1053,296,1089,322,1119,355,1161,417,1157,420,1115,358,1085,326,1051,300,998,276,941,261,884,252,831,248"/>
 <area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="830,234,877,229,877,234,831,239"/>

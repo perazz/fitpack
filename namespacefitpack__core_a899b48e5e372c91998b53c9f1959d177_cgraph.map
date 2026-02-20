@@ -14,13 +14,13 @@
 <area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="127,315,227,344,225,349,125,321"/>
 <area shape="rect" id="Node000009" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="211,70,360,95"/>
 <area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="83,291,98,256,123,209,157,158,200,113,222,99,225,103,203,117,161,161,127,211,103,258,88,293"/>
-<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title=" " alt="" coords="211,400,359,440"/>
+<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title="Set up the initial knot configuration for closed&#45;curve interpolation." alt="" coords="211,400,359,440"/>
 <area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="98,316,144,350,203,386,215,392,213,397,200,390,141,354,95,320"/>
 <area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="211,465,359,490"/>
 <area shape="poly" id="edge17_Node000001_Node000012" title=" " alt="" coords="90,317,132,380,165,418,203,450,216,457,213,462,200,454,161,421,128,384,85,320"/>
 <area shape="rect" id="Node000013" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="210,514,361,539"/>
 <area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="87,317,101,354,125,403,159,456,180,480,203,501,210,506,207,510,200,505,176,483,155,459,120,406,96,356,82,319"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="218,564,353,604"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="218,564,353,604"/>
 <area shape="poly" id="edge21_Node000001_Node000014" title=" " alt="" coords="86,317,98,361,120,423,155,491,177,522,203,550,208,554,205,559,199,554,173,526,150,494,115,425,93,363,81,319"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="639,131,784,157"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="370,309,421,308,478,302,535,290,589,270,622,248,651,221,693,167,697,170,655,225,626,252,592,274,537,295,479,308,422,313,370,314"/>

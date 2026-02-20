@@ -1,9 +1,9 @@
 <map id="fitpack_parametric_curves::new_points" name="fitpack_parametric_curves::new_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,41,160,81"/>
+<area shape="rect" id="Node000001" title="Load new data points into the parametric curve and allocate workspace." alt="" coords="5,41,160,81"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves.html#ac9a5e29dce2f913726aaa75f57a59437" title="Set or reset endpoint derivative constraints for a constrained parametric curve." alt="" coords="208,5,387,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,46,194,40,195,45,161,51"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__parametric__curves.html#a708931ae747e8e370bf2f65c8f86b137" title=" " alt="" coords="221,70,374,125"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__parametric__curves.html#a708931ae747e8e370bf2f65c8f86b137" title="Compute default parameter values from cumulative chord lengths." alt="" coords="221,70,374,125"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,72,208,80,207,85,160,77"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves.html#aa9245c048b87007480ea7ccbc649db12" title=" " alt="" coords="435,5,629,45"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves.html#aa9245c048b87007480ea7ccbc649db12" title="Remove all endpoint derivative constraints." alt="" coords="435,5,629,45"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,23,421,23,421,28,387,28"/>
 </map>

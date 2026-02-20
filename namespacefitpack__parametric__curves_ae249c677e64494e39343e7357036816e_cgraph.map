@@ -1,8 +1,8 @@
 <map id="fitpack_parametric_curves::concur_comm_pack" name="fitpack_parametric_curves::concur_comm_pack">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,49,215,89"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves.html#a0301e07e54f825f003a95a895fd4e703" title=" " alt="" coords="263,5,469,45"/>
+<area shape="rect" id="Node000001" title="Pack constrained curve data into a communication buffer." alt="" coords="5,49,215,89"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves.html#a0301e07e54f825f003a95a895fd4e703" title="Pack parametric curve data into a communication buffer." alt="" coords="263,5,469,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,49,249,43,250,48,215,54"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves.html#a27cc5949043793919847bec44b813caf" title=" " alt="" coords="265,93,467,133"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves.html#a27cc5949043793919847bec44b813caf" title="Return the communication buffer size for the parametric curve." alt="" coords="265,93,467,133"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="215,85,251,91,250,96,214,90"/>
 <area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="318,94,316,84,323,74,340,69,366,67,396,70,412,77,410,82,394,75,366,72,341,74,326,79,321,85,324,92"/>
 </map>

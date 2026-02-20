@@ -1,6 +1,6 @@
 <map id="fitpack_grid_surfaces::surface_fit_interpolating" name="fitpack_grid_surfaces::surface_fit_interpolating">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,284,193,324"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#af133b6bc9f226909115b9dcfb438b116" title=" " alt="" coords="241,284,456,324"/>
+<area shape="rect" id="Node000001" title="Fit an interpolating gridded surface ( )." alt="" coords="5,284,193,324"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#af133b6bc9f226909115b9dcfb438b116" title="Fit a smoothing gridded surface with automatic knot placement." alt="" coords="241,284,456,324"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,301,228,301,228,307,194,307"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="531,227,684,267"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="439,281,517,264,518,269,440,287"/>
@@ -20,9 +20,9 @@
 <area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="883,150,985,178,984,184,881,155"/>
 <area shape="rect" id="Node000018" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="969,70,1120,95"/>
 <area shape="poly" id="edge25_Node000008_Node000018" title=" " alt="" coords="881,125,984,96,985,102,883,130"/>
-<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="959,120,1131,160"/>
+<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="959,120,1131,160"/>
 <area shape="poly" id="edge26_Node000008_Node000019" title=" " alt="" coords="909,137,945,137,945,143,909,143"/>
-<area shape="rect" id="Node000020" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="977,5,1112,45"/>
+<area shape="rect" id="Node000020" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="977,5,1112,45"/>
 <area shape="poly" id="edge27_Node000008_Node000020" title=" " alt="" coords="851,125,897,91,957,55,971,48,973,53,960,60,900,96,854,129"/>
 <area shape="rect" id="Node000010" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="1179,176,1347,216"/>
 <area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="1119,194,1165,194,1165,199,1119,200"/>

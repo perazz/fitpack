@@ -170,6 +170,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aff31aa74d607af245d6a61d015f30ebd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates.  <br /></td></tr>
 <tr class="separator:aff31aa74d607af245d6a61d015f30ebd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf6236eba73aefcb76c35e7d2a6ac089" id="r_acf6236eba73aefcb76c35e7d2a6ac089"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf6236eba73aefcb76c35e7d2a6ac089">eval</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>)</td></tr>
+<tr class="memdesc:acf6236eba73aefcb76c35e7d2a6ac089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the spline at a single point (pure, returns NaN on error).  <br /></td></tr>
 <tr class="separator:acf6236eba73aefcb76c35e7d2a6ac089"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff31aa74d607af245d6a61d015f30ebd" id="r_aff31aa74d607af245d6a61d015f30ebd"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff31aa74d607af245d6a61d015f30ebd">eval</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
 <tr class="memdesc:aff31aa74d607af245d6a61d015f30ebd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the spline at multiple points (with error flag).  <br /></td></tr>
@@ -190,28 +191,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6fb1f3284d1718bb94d4da99f65992d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivative at given coordinates.  <br /></td></tr>
 <tr class="separator:a6fb1f3284d1718bb94d4da99f65992d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fb1f3284d1718bb94d4da99f65992d9" id="r_a6fb1f3284d1718bb94d4da99f65992d9"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fb1f3284d1718bb94d4da99f65992d9">dfdx</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, <a class="el" href="#a03d0f2b1596577c156de28b8a34b6339">order</a>, ierr)</td></tr>
-<tr class="memdesc:a6fb1f3284d1718bb94d4da99f65992d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present.  <br /></td></tr>
+<tr class="memdesc:a6fb1f3284d1718bb94d4da99f65992d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the k-th derivative at multiple points (with error flag).  <br /></td></tr>
 <tr class="separator:a6fb1f3284d1718bb94d4da99f65992d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea96e10b0976d10e67c38e23b5e17743" id="r_aea96e10b0976d10e67c38e23b5e17743"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea96e10b0976d10e67c38e23b5e17743">dfdx_all</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
-<tr class="memdesc:aea96e10b0976d10e67c38e23b5e17743"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.  <br /></td></tr>
+<tr class="memdesc:aea96e10b0976d10e67c38e23b5e17743"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (with error flag).  <br /></td></tr>
 <tr class="separator:aea96e10b0976d10e67c38e23b5e17743"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f65a9090eeba61fbcb684c2777ea55a" id="r_a0f65a9090eeba61fbcb684c2777ea55a"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f65a9090eeba61fbcb684c2777ea55a">dfdx_all</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>)</td></tr>
-<tr class="memdesc:a0f65a9090eeba61fbcb684c2777ea55a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.  <br /></td></tr>
+<tr class="memdesc:a0f65a9090eeba61fbcb684c2777ea55a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (pure, NaN on error).  <br /></td></tr>
 <tr class="separator:a0f65a9090eeba61fbcb684c2777ea55a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf4fdd3063be4a628762a14a59141d73" id="r_abf4fdd3063be4a628762a14a59141d73"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf4fdd3063be4a628762a14a59141d73">insert_knot</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
 <tr class="memdesc:abf4fdd3063be4a628762a14a59141d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert knot(s) into the spline representation.  <br /></td></tr>
 <tr class="separator:abf4fdd3063be4a628762a14a59141d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf4fdd3063be4a628762a14a59141d73" id="r_abf4fdd3063be4a628762a14a59141d73"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf4fdd3063be4a628762a14a59141d73">insert_knot</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
-<tr class="memdesc:abf4fdd3063be4a628762a14a59141d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert multiple knots into the spline representation.  <br /></td></tr>
+<tr class="memdesc:abf4fdd3063be4a628762a14a59141d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert multiple knots into the B-spline representation.  <br /></td></tr>
 <tr class="separator:abf4fdd3063be4a628762a14a59141d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bffb5bd168bc305326812a86463eb56" id="r_a9bffb5bd168bc305326812a86463eb56"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bffb5bd168bc305326812a86463eb56">comm_size</a> (this)</td></tr>
 <tr class="memdesc:a9bffb5bd168bc305326812a86463eb56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication interface (size/pack/expand)  <br /></td></tr>
 <tr class="separator:a9bffb5bd168bc305326812a86463eb56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c84ac425d10251ec6e7602ebf74e235" id="r_a8c84ac425d10251ec6e7602ebf74e235"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c84ac425d10251ec6e7602ebf74e235">comm_pack</a> (this, buffer)</td></tr>
-<tr class="memdesc:a8c84ac425d10251ec6e7602ebf74e235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack curve data into communication buffer.  <br /></td></tr>
+<tr class="memdesc:a8c84ac425d10251ec6e7602ebf74e235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack curve data into a communication buffer for parallel transfer.  <br /></td></tr>
 <tr class="separator:a8c84ac425d10251ec6e7602ebf74e235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2" id="r_ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2">comm_expand</a> (this, buffer)</td></tr>
-<tr class="memdesc:ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand curve data from communication buffer.  <br /></td></tr>
+<tr class="memdesc:ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand curve data from a communication buffer.  <br /></td></tr>
 <tr class="separator:ab4e3f6fc0b0d6f12faa8d8aed0a5a3c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78e13992ec8ec1195b7fbdbf3b90d065" id="r_a78e13992ec8ec1195b7fbdbf3b90d065"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78e13992ec8ec1195b7fbdbf3b90d065">new_from_points</a> (<a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, <a class="el" href="#a1b6be2873aefcd9aa17a26a2c4da6d08">y</a>, <a class="el" href="#a5809325b79660af9954f72dad3e8d672">w</a>, ierr)</td></tr>
 <tr class="memdesc:a78e13992ec8ec1195b7fbdbf3b90d065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve .">fitpack_curve</a> from data points and perform a default fit.  <br /></td></tr>
@@ -301,6 +302,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:acdb865e3105ab66700ad8b8c3a834f17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate curve at given coordinates.  <br /></td></tr>
 <tr class="separator:acdb865e3105ab66700ad8b8c3a834f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d9a7d4e36ebcd70b83b1552c055b34" id="r_ab3d9a7d4e36ebcd70b83b1552c055b34"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3d9a7d4e36ebcd70b83b1552c055b34">curve_eval_one_noerr</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>)</td></tr>
+<tr class="memdesc:ab3d9a7d4e36ebcd70b83b1552c055b34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the spline at a single point (pure, returns NaN on error).  <br /></td></tr>
 <tr class="separator:ab3d9a7d4e36ebcd70b83b1552c055b34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a735cb8a89868a8e9fa9286591634f852" id="r_a735cb8a89868a8e9fa9286591634f852"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a735cb8a89868a8e9fa9286591634f852">curve_eval_many</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
 <tr class="memdesc:a735cb8a89868a8e9fa9286591634f852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the spline at multiple points (with error flag).  <br /></td></tr>
@@ -312,19 +314,19 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a4abae06c4018c773b11140486c972011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivative at given coordinates.  <br /></td></tr>
 <tr class="separator:a4abae06c4018c773b11140486c972011"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af76782f54a7f7a77b7536f0509f00350" id="r_af76782f54a7f7a77b7536f0509f00350"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af76782f54a7f7a77b7536f0509f00350">curve_derivatives</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, <a class="el" href="#a03d0f2b1596577c156de28b8a34b6339">order</a>, ierr)</td></tr>
-<tr class="memdesc:af76782f54a7f7a77b7536f0509f00350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present.  <br /></td></tr>
+<tr class="memdesc:af76782f54a7f7a77b7536f0509f00350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the k-th derivative at multiple points (with error flag).  <br /></td></tr>
 <tr class="separator:af76782f54a7f7a77b7536f0509f00350"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add6e578e84c31f82ddf61b679681ba4d" id="r_add6e578e84c31f82ddf61b679681ba4d"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add6e578e84c31f82ddf61b679681ba4d">curve_all_derivatives</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
-<tr class="memdesc:add6e578e84c31f82ddf61b679681ba4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.  <br /></td></tr>
+<tr class="memdesc:add6e578e84c31f82ddf61b679681ba4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (with error flag).  <br /></td></tr>
 <tr class="separator:add6e578e84c31f82ddf61b679681ba4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75ee7e9900ef24bbcf778a859dda41d6" id="r_a75ee7e9900ef24bbcf778a859dda41d6"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75ee7e9900ef24bbcf778a859dda41d6">curve_all_derivatives_pure</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>)</td></tr>
-<tr class="memdesc:a75ee7e9900ef24bbcf778a859dda41d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation.  <br /></td></tr>
+<tr class="memdesc:a75ee7e9900ef24bbcf778a859dda41d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (pure, NaN on error).  <br /></td></tr>
 <tr class="separator:a75ee7e9900ef24bbcf778a859dda41d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa748cb9cbaea2c5b6cad566168996188" id="r_aa748cb9cbaea2c5b6cad566168996188"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa748cb9cbaea2c5b6cad566168996188">curve_insert_knot_one</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
 <tr class="memdesc:aa748cb9cbaea2c5b6cad566168996188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert knot(s) into the spline representation.  <br /></td></tr>
 <tr class="separator:aa748cb9cbaea2c5b6cad566168996188"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0ba695bc04fec510052524bf5d7d4f9" id="r_ab0ba695bc04fec510052524bf5d7d4f9"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0ba695bc04fec510052524bf5d7d4f9">curve_insert_knot_many</a> (this, <a class="el" href="#aacb3fe59724e43456e25eafdea9eaa20">x</a>, ierr)</td></tr>
-<tr class="memdesc:ab0ba695bc04fec510052524bf5d7d4f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert multiple knots into the spline representation.  <br /></td></tr>
+<tr class="memdesc:ab0ba695bc04fec510052524bf5d7d4f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert multiple knots into the B-spline representation.  <br /></td></tr>
 <tr class="separator:ab0ba695bc04fec510052524bf5d7d4f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -356,7 +358,7 @@ Private Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Expand curve data from communication buffer. </p>
+<p>Expand curve data from a communication buffer. </p>
 
 </div>
 </div>
@@ -379,7 +381,7 @@ Private Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Pack curve data into communication buffer. </p>
+<p>Pack curve data into a communication buffer for parallel transfer. </p>
 
 </div>
 </div>
@@ -434,7 +436,17 @@ Private Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation. </p>
+<p>Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (with error flag). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of size \( k+1 \) containing \( s(x), s&#39;(x), \ldots, s^{(k)}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> </dd></dl>
 
 </div>
 </div>
@@ -465,7 +477,16 @@ Private Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation. </p>
+<p>Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (pure, NaN on error). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of size \( k+1 \) containing \( s(x), s&#39;(x), \ldots, s^{(k)}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> </dd></dl>
 
 </div>
 </div>
@@ -507,6 +528,17 @@ Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Evaluate derivative at given coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Derivative order ( \( 0 \leq \text{order} \leq k \)). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Scalar derivative value \( s^{(\text{order})}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a76d523967d0d2a2011719c12c27b2fe7" title="Evaluate the -th derivative of a spline  at a set of points.">splder</a> </dd></dl>
 
 </div>
 </div>
@@ -547,7 +579,18 @@ Private Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present. </p>
+<p>Evaluate the k-th derivative at multiple points (with error flag). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Array of evaluation points. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Derivative order ( \( 0 \leq \text{order} \leq k \)). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of derivative values \( s^{(\text{order})}(x_i) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a76d523967d0d2a2011719c12c27b2fe7" title="Evaluate the -th derivative of a spline  at a set of points.">splder</a> </dd></dl>
 
 </div>
 </div>
@@ -651,6 +694,16 @@ Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Evaluate curve at given coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Evaluation point. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a633394bd969a94a285ac5eeda32e48a7" title="Evaluate a spline  of degree  at a set of points.">splev</a> </dd></dl>
 
 </div>
 </div>
@@ -680,6 +733,17 @@ Private Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Evaluate the spline at a single point (pure, returns NaN on error). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Evaluation point. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(x) \), or NaN on error.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a633394bd969a94a285ac5eeda32e48a7" title="Evaluate a spline  of degree  at a set of points.">splev</a> </dd></dl>
 
 </div>
 </div>
@@ -715,7 +779,16 @@ Private Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Insert multiple knots into the spline representation. </p>
+<p>Insert multiple knots into the B-spline representation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Array of knot positions to insert. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a5408515a66457ab26ce615842e24a526" title="Insert a single knot into a spline in place (avoiding aliasing issues).">insert_inplace</a> </dd></dl>
 
 </div>
 </div>
@@ -752,6 +825,16 @@ Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Insert knot(s) into the spline representation. </p>
+<p>The spline value is unchanged; only the knot vector and coefficients are updated. Workspace state is reset after insertion.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Knot position to insert. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a5408515a66457ab26ce615842e24a526" title="Insert a single knot into a spline in place (avoiding aliasing issues).">insert_inplace</a> </dd></dl>
 
 </div>
 </div>
@@ -804,15 +887,26 @@ Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Evaluate derivative at given coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Derivative order ( \( 0 \leq \text{order} \leq k \)). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Scalar derivative value \( s^{(\text{order})}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a76d523967d0d2a2011719c12c27b2fe7" title="Evaluate the -th derivative of a spline  at a set of points.">splder</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__curves_1_1fitpack__curve_a6fb1f3284d1718bb94d4da99f65992d9_cgraph.png" border="0" usemap="#astructfitpack__curves_1_1fitpack__curve_a6fb1f3284d1718bb94d4da99f65992d9_cgraph" alt=""/></div>
 <map name="astructfitpack__curves_1_1fitpack__curve_a6fb1f3284d1718bb94d4da99f65992d9_cgraph" id="astructfitpack__curves_1_1fitpack__curve_a6fb1f3284d1718bb94d4da99f65992d9_cgraph">
 <area shape="rect" title="Evaluate derivative at given coordinates." alt="" coords="5,35,173,75"/>
-<area shape="rect" href="namespacefitpack__curves.html#a6b8995b3b8d6a21d541a77388c4e3917" title="Evaluate k&#45;th derivative of the curve at points x Use 1st derivative if order not present." alt="" coords="221,5,381,45"/>
+<area shape="rect" href="namespacefitpack__curves.html#a6b8995b3b8d6a21d541a77388c4e3917" title="Evaluate the k&#45;th derivative at a single point (with optional error flag)." alt="" coords="221,5,381,45"/>
 <area shape="poly" title=" " alt="" coords="173,40,208,36,208,41,174,46"/>
-<area shape="rect" href="namespacefitpack__curves.html#a92411defec5d2f4a61058fee21581944" title="Evaluate k&#45;th derivative of the curve at points x Use 1st derivative if order not present." alt="" coords="429,35,589,75"/>
+<area shape="rect" href="namespacefitpack__curves.html#a92411defec5d2f4a61058fee21581944" title="Evaluate the k&#45;th derivative at multiple points (with error flag)." alt="" coords="429,35,589,75"/>
 <area shape="poly" title=" " alt="" coords="174,54,221,55,381,55,416,54,416,60,381,60,221,60,174,59"/>
 <area shape="poly" title=" " alt="" coords="382,34,416,39,415,44,381,39"/>
 </map>
@@ -849,7 +943,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate k-th derivative of the curve at points x Use 1st derivative if order not present. </p>
+<p>Evaluate the k-th derivative at multiple points (with error flag). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Array of evaluation points. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Derivative order ( \( 0 \leq \text{order} \leq k \)). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of derivative values \( s^{(\text{order})}(x_i) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a76d523967d0d2a2011719c12c27b2fe7" title="Evaluate the -th derivative of a spline  at a set of points.">splder</a> </dd></dl>
 
 </div>
 </div>
@@ -872,7 +977,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation. </p>
+<p>Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (pure, NaN on error). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of size \( k+1 \) containing \( s(x), s&#39;(x), \ldots, s^{(k)}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> </dd></dl>
 
 </div>
 </div>
@@ -900,16 +1014,26 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate ALL derivatives of the curve at points x (j-1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) of order k1 (degree k=k1-1), given in its b-spline representation. </p>
+<p>Evaluate all derivatives \( s^{(j)}(x) \) for \( j = 0, \ldots, k \) (with error flag). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Scalar evaluation point. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Array of size \( k+1 \) containing \( s(x), s&#39;(x), \ldots, s^{(k)}(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__curves_1_1fitpack__curve_aea96e10b0976d10e67c38e23b5e17743_cgraph.png" border="0" usemap="#astructfitpack__curves_1_1fitpack__curve_aea96e10b0976d10e67c38e23b5e17743_cgraph" alt=""/></div>
 <map name="astructfitpack__curves_1_1fitpack__curve_aea96e10b0976d10e67c38e23b5e17743_cgraph" id="astructfitpack__curves_1_1fitpack__curve_aea96e10b0976d10e67c38e23b5e17743_cgraph">
-<area shape="rect" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="5,37,173,77"/>
-<area shape="rect" href="namespacefitpack__curves.html#a703fa0a7cfc5975d7b3f8f7d94819b7f" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="222,5,382,45"/>
+<area shape="rect" title="Evaluate all derivatives &#160;for &#160;(with error flag)." alt="" coords="5,37,173,77"/>
+<area shape="rect" href="namespacefitpack__curves.html#a703fa0a7cfc5975d7b3f8f7d94819b7f" title="Evaluate all derivatives &#160;for &#160;(with error flag)." alt="" coords="222,5,382,45"/>
 <area shape="poly" title=" " alt="" coords="173,42,208,37,209,42,174,47"/>
-<area shape="rect" href="namespacefitpack__curves.html#aaf4bde3fd7eb67a499710aadb385532e" title="Evaluate ALL derivatives of the curve at points x (j&#45;1) d(j) = s (x) , j=1,2,...,k1 of a spline s(x) ..." alt="" coords="221,69,383,109"/>
+<area shape="rect" href="namespacefitpack__curves.html#aaf4bde3fd7eb67a499710aadb385532e" title="Evaluate all derivatives &#160;for &#160;(pure, NaN on error)." alt="" coords="221,69,383,109"/>
 <area shape="poly" title=" " alt="" coords="174,67,208,73,207,78,173,73"/>
 </map>
 </div>
@@ -934,6 +1058,17 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Evaluate the spline at a single point (pure, returns NaN on error). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Evaluation point. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(x) \), or NaN on error.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a633394bd969a94a285ac5eeda32e48a7" title="Evaluate a spline  of degree  at a set of points.">splev</a> </dd></dl>
 
 </div>
 </div>
@@ -985,6 +1120,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate curve at given coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Evaluation point. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(x) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a633394bd969a94a285ac5eeda32e48a7" title="Evaluate a spline  of degree  at a set of points.">splev</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -995,9 +1140,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="122,54,167,30,221,12,270,5,321,3,416,10,416,16,321,8,271,10,222,17,170,35,124,58"/>
 <area shape="rect" href="namespacefitpack__curves.html#a191fca4624f0221835ba534903b31e47" title="Evaluate the spline at multiple points (pure, returns NaN on error)." alt="" coords="429,100,589,140"/>
 <area shape="poly" title=" " alt="" coords="174,82,416,108,415,113,173,87"/>
-<area shape="rect" href="namespacefitpack__curves.html#ac9a1d54cba67bb87caf713a5845d5113" title=" " alt="" coords="221,27,381,67"/>
+<area shape="rect" href="namespacefitpack__curves.html#ac9a1d54cba67bb87caf713a5845d5113" title="Evaluate the spline at a single point (with error flag)." alt="" coords="221,27,381,67"/>
 <area shape="poly" title=" " alt="" coords="173,62,208,57,208,62,174,67"/>
-<area shape="rect" href="namespacefitpack__curves.html#a86373196ff60d67e15d049beab000d55" title=" " alt="" coords="221,141,381,181"/>
+<area shape="rect" href="namespacefitpack__curves.html#a86373196ff60d67e15d049beab000d55" title="Evaluate the spline at a single point (pure, returns NaN on error)." alt="" coords="221,141,381,181"/>
 <area shape="poly" title=" " alt="" coords="141,94,239,134,237,139,139,99"/>
 <area shape="poly" title=" " alt="" coords="381,38,416,35,416,41,382,43"/>
 <area shape="poly" title=" " alt="" coords="381,143,415,136,416,141,382,148"/>
@@ -1102,6 +1247,23 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Fourier coefficients. </p>
+<p>Computes integrals over the interior knot range \( [t_4, t_{n-3}] \):    </p><p class="formulaDsp">
+\[            A_i = \int_{t_4}^{t_{n-3}} s(x) \sin(\alpha_i x) \, dx, \quad
+            B_i = \int_{t_4}^{t_{n-3}} s(x) \cos(\alpha_i x) \, dx
+\]
+</p>
+<p> Requires at least 10 knots.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve (must have \( \geq 10 \) knots). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Array of frequency values \( \alpha_i \). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">A</td><td>Sine coefficients, same size as <code>alpha</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">B</td><td>Cosine coefficients, same size as <code>alpha</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a2256640832da2724f9e5058bcebd6ec2" title="Compute Fourier coefficients of a cubic spline.">fourco</a> </dd></dl>
 
 </div>
 </div>
@@ -1130,17 +1292,27 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Insert knot(s) into the spline representation. </p>
+<p>The spline value is unchanged; only the knot vector and coefficients are updated. Workspace state is reset after insertion.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Knot position to insert. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a5408515a66457ab26ce615842e24a526" title="Insert a single knot into a spline in place (avoiding aliasing issues).">insert_inplace</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__curves_1_1fitpack__curve_abf4fdd3063be4a628762a14a59141d73_cgraph.png" border="0" usemap="#astructfitpack__curves_1_1fitpack__curve_abf4fdd3063be4a628762a14a59141d73_cgraph" alt=""/></div>
 <map name="astructfitpack__curves_1_1fitpack__curve_abf4fdd3063be4a628762a14a59141d73_cgraph" id="astructfitpack__curves_1_1fitpack__curve_abf4fdd3063be4a628762a14a59141d73_cgraph">
 <area shape="rect" title="Insert knot(s) into the spline representation." alt="" coords="5,37,173,77"/>
-<area shape="rect" href="namespacefitpack__curves.html#a753de75f8ce3b5561effe892e8e5d07a" title="Insert multiple knots into the spline representation." alt="" coords="221,5,381,45"/>
+<area shape="rect" href="namespacefitpack__curves.html#a753de75f8ce3b5561effe892e8e5d07a" title="Insert multiple knots into the B&#45;spline representation." alt="" coords="221,5,381,45"/>
 <area shape="poly" title=" " alt="" coords="173,42,208,37,208,42,174,47"/>
-<area shape="rect" href="namespacefitpack__curves.html#ad697886ef35b0160a31ad6d1b3213797" title="Insert a single knot into the spline representation (in&#45;place)" alt="" coords="221,69,381,109"/>
+<area shape="rect" href="namespacefitpack__curves.html#ad697886ef35b0160a31ad6d1b3213797" title="Insert a single knot into the B&#45;spline representation." alt="" coords="221,69,381,109"/>
 <area shape="poly" title=" " alt="" coords="174,67,208,73,208,78,173,73"/>
-<area shape="rect" href="namespacefitpack__curves.html#a0b26792808063c7ee78d2666d04e690b" title="Grow t(:) and c(:) arrays when nest is too small." alt="" coords="429,69,585,109"/>
+<area shape="rect" href="namespacefitpack__curves.html#a0b26792808063c7ee78d2666d04e690b" title="Grow the knot and coefficient arrays when storage is insufficient." alt="" coords="429,69,585,109"/>
 <area shape="poly" title=" " alt="" coords="382,87,415,87,415,92,382,92"/>
 </map>
 </div>
@@ -1171,7 +1343,16 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Insert multiple knots into the spline representation. </p>
+<p>Insert multiple knots into the B-spline representation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The fitted curve. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Array of knot positions to insert. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a5408515a66457ab26ce615842e24a526" title="Insert a single knot into a spline in place (avoiding aliasing issues).">insert_inplace</a> </dd></dl>
 
 </div>
 </div>
@@ -1390,6 +1571,17 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Set new points. </p>
+<p>Sorts data by <code>x</code>, allocates knot/coefficient storage, and prepares workspaces. A subsequent call to <code>fit</code>, <code>interpolate</code>, or <code>least_squares</code> is required to compute the spline representation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The curve object (destroyed and reinitialized). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Independent variable values (unsorted OK; will be sorted internally). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Dependent variable values, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Optional positive weights, same size as <code>x</code>. Default: uniform.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac65af4d46ed853e0bfe2274ea2660b0f" title="Determine a smooth spline approximation of degree  to a set of data points.">curfit</a>, <a class="el" href="namespacefitpack__core.html#ad0afe8a4afa89245ec1ec1447ef7b556" title="Determine a smooth periodic spline approximation to data.">percur</a> </dd></dl>
 
 </div>
 </div>
@@ -1413,6 +1605,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Find the zeros of a spline s(x), only if it is cubic. </p>
+<p>Only valid for cubic splines ( \( k = 3 \)). Iteratively grows storage until all zeros are found.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted cubic curve. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Allocatable array of zero locations (empty if none found).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ab82db7c6b3d5abc2ace2c6e76ec168d7" title="Find the zeros of a cubic spline  given in B-spline representation.">sproot</a> </dd></dl>
 
 </div>
 </div>

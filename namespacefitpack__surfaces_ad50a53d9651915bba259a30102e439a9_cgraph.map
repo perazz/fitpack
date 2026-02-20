@@ -1,5 +1,5 @@
 <map id="fitpack_surfaces::surface_fit_least_squares" name="fitpack_surfaces::surface_fit_least_squares">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,189,69"/>
+<area shape="rect" id="Node000001" title="Fit a least&#45;squares surface with fixed knots." alt="" coords="5,29,189,69"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="237,29,391,69"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,47,224,47,224,52,189,52"/>
 <area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="273,30,271,20,278,10,292,5,314,3,339,6,353,13,351,18,338,11,314,8,293,10,281,15,276,21,279,28"/>

@@ -14,7 +14,7 @@
 <area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="106,232,201,273,226,280,224,286,199,278,104,237"/>
 <area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="224,336,375,361"/>
 <area shape="poly" id="edge17_Node000001_Node000012" title=" " alt="" coords="93,233,138,277,168,302,201,322,217,329,215,334,199,327,165,306,134,281,89,237"/>
-<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,386,367,426"/>
+<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,386,367,426"/>
 <area shape="poly" id="edge18_Node000001_Node000013" title=" " alt="" coords="89,233,131,299,163,338,202,372,221,383,218,387,198,376,159,342,126,302,84,236"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="668,80,813,105"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="398,121,446,115,654,97,654,102,447,121,399,126"/>

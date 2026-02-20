@@ -4,7 +4,7 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,613,215,613,215,619,181,619"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1064,525,1209,550"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,626,489,645,567,652,652,657,743,657,835,651,927,637,1015,614,1067,588,1109,557,1112,562,1070,593,1017,618,928,642,836,656,743,662,652,662,566,658,488,650,366,631"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="425,578,579,603"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="425,578,579,603"/>
 <area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="377,604,411,600,412,605,378,609"/>
 <area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a899b48e5e372c91998b53c9f1959d177" title="Core algorithm for closed (periodic) parametric curve fitting." alt="" coords="428,335,576,361"/>
 <area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="312,601,481,370,485,373,316,605"/>
@@ -25,13 +25,13 @@
 <area shape="poly" id="edge15_Node000005_Node000011" title=" " alt="" coords="512,359,555,429,589,471,628,507,652,521,649,526,625,511,585,474,551,432,508,362"/>
 <area shape="rect" id="Node000012" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="636,578,785,603"/>
 <area shape="poly" id="edge16_Node000005_Node000012" title=" " alt="" coords="509,360,523,400,546,456,581,514,603,541,628,565,635,569,632,574,625,569,599,545,577,517,542,458,518,402,504,362"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title=" " alt="" coords="637,5,785,45"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title="Set up the initial knot configuration for closed&#45;curve interpolation." alt="" coords="637,5,785,45"/>
 <area shape="poly" id="edge20_Node000005_Node000014" title=" " alt="" coords="503,334,513,284,534,209,550,168,570,128,595,89,625,55,630,51,633,55,629,59,599,93,575,130,555,171,539,211,518,285,508,335"/>
 <area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="637,70,785,95"/>
 <area shape="poly" id="edge21_Node000005_Node000015" title=" " alt="" coords="504,334,516,290,539,229,575,163,598,133,625,106,634,100,637,104,628,110,602,136,579,166,544,231,521,292,509,336"/>
 <area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="635,185,786,210"/>
 <area shape="poly" id="edge23_Node000005_Node000016" title=" " alt="" coords="510,334,555,279,588,248,625,220,640,213,642,218,628,225,592,252,559,283,514,337"/>
-<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="643,120,778,160"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="643,120,778,160"/>
 <area shape="poly" id="edge25_Node000005_Node000017" title=" " alt="" coords="507,334,549,258,583,211,625,170,633,165,636,169,628,174,587,214,553,260,511,336"/>
 <area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="796,262,849,274,907,291,965,316,1018,349,1057,387,1088,431,1112,474,1128,511,1123,513,1107,477,1084,434,1053,390,1014,353,962,320,905,296,847,279,794,268"/>
 <area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="770,272,796,284,854,319,902,353,899,357,851,323,793,289,768,277"/>

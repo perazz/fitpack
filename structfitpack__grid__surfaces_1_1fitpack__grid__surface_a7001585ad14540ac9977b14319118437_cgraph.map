@@ -1,8 +1,8 @@
 <map id="fitpack_grid_surfaces::fitpack_grid_surface::eval" name="fitpack_grid_surfaces::fitpack_grid_surface::eval">
 <area shape="rect" id="Node000001" title="Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid." alt="" coords="5,5,203,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#acbed01eda6106b0a621c4496037a7d6e" title="Evaluate surface at a list of scattered (x(i),y(i)) points using bispeu." alt="" coords="459,5,619,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__grid__surfaces.html#acbed01eda6106b0a621c4496037a7d6e" title="Evaluate the grid surface at scattered &#160;points." alt="" coords="459,5,619,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,20,251,19,411,19,445,19,445,25,411,24,251,24,203,25"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__grid__surfaces.html#a213165480a43b379762e5941a39ee675" title="Evaluate surface at a single (x,y) point using bispeu." alt="" coords="251,33,411,73"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__grid__surfaces.html#a213165480a43b379762e5941a39ee675" title="Evaluate the grid surface at a single &#160;point." alt="" coords="251,33,411,73"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,35,237,39,237,44,203,40"/>
 <area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="410,40,445,35,445,41,411,45"/>
 </map>

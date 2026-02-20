@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_polar::gridded_eval_one" name="fitpack_gridded_polar::gridded_eval_one">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,168,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__polar.html#a0b3efbcee850e53d8eaab9a2a6e00790" title=" " alt="" coords="216,5,379,45"/>
+<area shape="rect" id="Node000001" title="Evaluate the gridded polar surface at a single &#160;point." alt="" coords="5,5,168,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__polar.html#a0b3efbcee850e53d8eaab9a2a6e00790" title="Evaluate the gridded polar surface on a rectangular &#160;grid." alt="" coords="216,5,379,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,23,202,23,202,28,168,28"/>
 </map>

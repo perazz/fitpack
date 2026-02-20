@@ -129,29 +129,35 @@ Data Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
 <tr class="memitem:ac4ad07a197aa3c1a62af9a9c04c01c17" id="r_ac4ad07a197aa3c1a62af9a9c04c01c17"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__convex__curves_1_1fitpack__convex__curve.html">fitpack_convex_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4ad07a197aa3c1a62af9a9c04c01c17">convex_new_from_points</a> (x, y, v, w, smoothing, ierr)</td></tr>
+<tr class="memdesc:ac4ad07a197aa3c1a62af9a9c04c01c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a convex curve from data points with convexity constraints and fit it.  <br /></td></tr>
 <tr class="separator:ac4ad07a197aa3c1a62af9a9c04c01c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3930f864dcfa9db42f94d93ed5ae90f5" id="r_a3930f864dcfa9db42f94d93ed5ae90f5"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3930f864dcfa9db42f94d93ed5ae90f5">convex_destroy</a> (this)</td></tr>
+<tr class="memdesc:a3930f864dcfa9db42f94d93ed5ae90f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the convex curve object and release all allocated memory.  <br /></td></tr>
 <tr class="separator:a3930f864dcfa9db42f94d93ed5ae90f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0d1d5d2b8ea80dc037580398b9d7cee" id="r_ab0d1d5d2b8ea80dc037580398b9d7cee"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0d1d5d2b8ea80dc037580398b9d7cee">convex_new_points</a> (this, x, y, w)</td></tr>
+<tr class="memdesc:ab0d1d5d2b8ea80dc037580398b9d7cee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load new data points and allocate workspace for convex fitting.  <br /></td></tr>
 <tr class="separator:ab0d1d5d2b8ea80dc037580398b9d7cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dc1f070ce1bf54c3e6f62b092a469d8" id="r_a6dc1f070ce1bf54c3e6f62b092a469d8"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dc1f070ce1bf54c3e6f62b092a469d8">set_convexity</a> (this, v)</td></tr>
+<tr class="memdesc:a6dc1f070ce1bf54c3e6f62b092a469d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointwise convexity constraints.  <br /></td></tr>
 <tr class="separator:a6dc1f070ce1bf54c3e6f62b092a469d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33e52e9b015c6f8681654477aae14811" id="r_a33e52e9b015c6f8681654477aae14811"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33e52e9b015c6f8681654477aae14811">remap_concon_error</a> (ier)</td></tr>
 <tr class="separator:a33e52e9b015c6f8681654477aae14811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1874d19a3cac57957949af137618853" id="r_ad1874d19a3cac57957949af137618853"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1874d19a3cac57957949af137618853">convex_fit_automatic_knots</a> (this, smoothing, order, keep_knots)</td></tr>
+<tr class="memdesc:ad1874d19a3cac57957949af137618853"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a smoothing spline with convexity constraints and automatic knot placement.  <br /></td></tr>
 <tr class="separator:ad1874d19a3cac57957949af137618853"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69211dd61f676952fe18f686ea187ad7" id="r_a69211dd61f676952fe18f686ea187ad7"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69211dd61f676952fe18f686ea187ad7">convex_fit_least_squares</a> (this, smoothing, reset_knots)</td></tr>
+<tr class="memdesc:a69211dd61f676952fe18f686ea187ad7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a least-squares spline with convexity constraints on the current knots.  <br /></td></tr>
 <tr class="separator:a69211dd61f676952fe18f686ea187ad7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19a70c815133f911a81332e6465ba81c" id="r_a19a70c815133f911a81332e6465ba81c"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19a70c815133f911a81332e6465ba81c">nearest_constraint</a> (t_knot, x, v, m)</td></tr>
 <tr class="separator:a19a70c815133f911a81332e6465ba81c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ce97ef0a25e9a8cb7abe04371d733e9" id="r_a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ce97ef0a25e9a8cb7abe04371d733e9">convex_comm_size</a> (this)</td></tr>
-<tr class="memdesc:a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return communication buffer size.  <br /></td></tr>
+<tr class="memdesc:a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the communication buffer size for the convex curve.  <br /></td></tr>
 <tr class="separator:a9ce97ef0a25e9a8cb7abe04371d733e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f45d38c6206472096f4dd6dd6318a41" id="r_a0f45d38c6206472096f4dd6dd6318a41"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f45d38c6206472096f4dd6dd6318a41">convex_comm_pack</a> (this, buffer)</td></tr>
-<tr class="memdesc:a0f45d38c6206472096f4dd6dd6318a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack convex curve data into communication buffer.  <br /></td></tr>
+<tr class="memdesc:a0f45d38c6206472096f4dd6dd6318a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack convex curve data into a communication buffer.  <br /></td></tr>
 <tr class="separator:a0f45d38c6206472096f4dd6dd6318a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfd24b47c7517e417d16d080a2146b48" id="r_adfd24b47c7517e417d16d080a2146b48"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfd24b47c7517e417d16d080a2146b48">convex_comm_expand</a> (this, buffer)</td></tr>
-<tr class="memdesc:adfd24b47c7517e417d16d080a2146b48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand convex curve data from communication buffer.  <br /></td></tr>
+<tr class="memdesc:adfd24b47c7517e417d16d080a2146b48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand convex curve data from a communication buffer.  <br /></td></tr>
 <tr class="separator:adfd24b47c7517e417d16d080a2146b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -186,7 +192,7 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Expand convex curve data from communication buffer. </p>
+<p>Expand convex curve data from a communication buffer. </p>
 
 </div>
 </div>
@@ -217,7 +223,7 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Pack convex curve data into communication buffer. </p>
+<p>Pack convex curve data into a communication buffer. </p>
 
 </div>
 </div>
@@ -244,13 +250,13 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return communication buffer size. </p>
+<p>Return the communication buffer size for the convex curve. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph" alt=""/></div>
 <map name="anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph" id="anamespacefitpack__convex__curves_a9ce97ef0a25e9a8cb7abe04371d733e9_cgraph">
-<area shape="rect" title="Return communication buffer size." alt="" coords="5,29,176,69"/>
+<area shape="rect" title="Return the communication buffer size for the convex curve." alt="" coords="5,29,176,69"/>
 <area shape="poly" title=" " alt="" coords="58,30,56,20,61,11,73,5,91,3,111,6,122,13,119,17,109,11,91,8,75,10,65,15,61,21,63,28"/>
 </map>
 </div>
@@ -279,6 +285,8 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroy the convex curve object and release all allocated memory. </p>
 
 </div>
 </div>
@@ -318,12 +326,26 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Fit a smoothing spline with convexity constraints and automatic knot placement. </p>
+<p>Uses the concon core routine which solves a constrained quadratic programming problem to place knots while respecting local convexity/concavity constraints.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The convex curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing factor. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Ignored (always cubic). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keep_knots</td><td>If <code>.true.</code>, continue from current knot set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a4c04e0266b3011454aef7f491c067036" title="Fit a cubic spline with convexity/concavity constraints and automatic knot placement.">concon</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph" alt=""/></div>
 <map name="anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph" id="anamespacefitpack__convex__curves_ad1874d19a3cac57957949af137618853_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,219,45"/>
+<area shape="rect" title="Fit a smoothing spline with convexity constraints and automatic knot placement." alt="" coords="5,5,219,45"/>
 <area shape="rect" href="namespacefitpack__convex__curves.html#a33e52e9b015c6f8681654477aae14811" title=" " alt="" coords="267,5,437,45"/>
 <area shape="poly" title=" " alt="" coords="219,23,253,23,253,28,219,28"/>
 </map>
@@ -362,12 +384,25 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Fit a least-squares spline with convexity constraints on the current knots. </p>
+<p>Uses the cocosp core routine. Constraint values at interior knots are derived from the nearest data-point convexity flags.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The convex curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing for initial knot placement (if <code>reset_knots</code>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reset_knots</td><td>If <code>.true.</code>, recompute knots via concon first. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ae7347e7f9131cca78d72fe38baba4c92" title="Fit a cubic spline with convexity/concavity constraints and user-specified knots.">cocosp</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph.png" border="0" usemap="#anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph" alt=""/></div>
 <map name="anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph" id="anamespacefitpack__convex__curves_a69211dd61f676952fe18f686ea187ad7_cgraph">
-<area shape="rect" title=" " alt="" coords="5,37,200,77"/>
+<area shape="rect" title="Fit a least&#45;squares spline with convexity constraints on the current knots." alt="" coords="5,37,200,77"/>
 <area shape="rect" href="namespacefitpack__convex__curves.html#a19a70c815133f911a81332e6465ba81c" title=" " alt="" coords="248,5,419,45"/>
 <area shape="poly" title=" " alt="" coords="200,41,234,36,235,42,200,46"/>
 <area shape="rect" href="namespacefitpack__convex__curves.html#a33e52e9b015c6f8681654477aae14811" title=" " alt="" coords="248,69,419,109"/>
@@ -424,6 +459,21 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Construct a convex curve from data points with convexity constraints and fit it. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Independent variable values. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Dependent variable values, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Convexity constraints: 1=concave, -1=convex, 0=unconstrained. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Optional weights (positive), same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing factor. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Fitted convex curve object.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a4c04e0266b3011454aef7f491c067036" title="Fit a cubic spline with convexity/concavity constraints and automatic knot placement.">concon</a> </dd></dl>
+
 </div>
 </div>
 <a id="ab0d1d5d2b8ea80dc037580398b9d7cee" name="ab0d1d5d2b8ea80dc037580398b9d7cee"></a>
@@ -462,6 +512,18 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Load new data points and allocate workspace for convex fitting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The convex curve object (destroyed and reinitialized). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Independent variable values. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Dependent variable values, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Optional positive weights, same size as <code>x</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a4c04e0266b3011454aef7f491c067036" title="Fit a cubic spline with convexity/concavity constraints and automatic knot placement.">concon</a>, <a class="el" href="namespacefitpack__core.html#ae7347e7f9131cca78d72fe38baba4c92" title="Fit a cubic spline with convexity/concavity constraints and user-specified knots.">cocosp</a> </dd></dl>
 
 </div>
 </div>
@@ -555,6 +617,16 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Set pointwise convexity constraints. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The convex curve object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Constraint values: 1=concave, -1=convex, 0=unconstrained. Must have size <code>m</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag (FITPACK_INPUT_ERROR if size mismatch). </dd></dl>
 
 </div>
 </div>

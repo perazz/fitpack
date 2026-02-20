@@ -6,7 +6,7 @@
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,385,537,374,717,367,1139,367,1199,363,1258,349,1316,330,1371,306,1466,254,1533,210,1536,214,1469,259,1374,311,1318,335,1260,355,1200,368,1139,373,717,373,537,379,383,391"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="431,408,583,433"/>
 <area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="383,402,418,407,417,412,382,407"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="431,457,584,483"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="431,457,584,483"/>
 <area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="338,406,432,444,452,451,450,456,430,448,336,411"/>
 <area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a19127c353493bb69ea3a6c3c382895d7" title="Core algorithm for parametric surface fitting on a grid." alt="" coords="431,127,584,152"/>
 <area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="316,381,486,161,490,164,321,384"/>
@@ -15,9 +15,9 @@
 <area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="556,149,658,178,657,183,554,155"/>
 <area shape="rect" id="Node000019" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="643,5,793,31"/>
 <area shape="poly" id="edge27_Node000006_Node000019" title=" " alt="" coords="520,125,566,84,597,61,631,41,649,33,651,38,633,46,600,65,570,88,523,129"/>
-<area shape="rect" id="Node000020" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="632,119,804,159"/>
+<area shape="rect" id="Node000020" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="632,119,804,159"/>
 <area shape="poly" id="edge28_Node000006_Node000020" title=" " alt="" coords="584,137,618,137,618,142,584,142"/>
-<area shape="rect" id="Node000021" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="651,55,785,95"/>
+<area shape="rect" id="Node000021" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="651,55,785,95"/>
 <area shape="poly" id="edge29_Node000006_Node000021" title=" " alt="" coords="549,124,638,97,639,102,551,129"/>
 <area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="852,208,1005,233"/>
 <area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="794,203,839,208,838,213,794,208"/>

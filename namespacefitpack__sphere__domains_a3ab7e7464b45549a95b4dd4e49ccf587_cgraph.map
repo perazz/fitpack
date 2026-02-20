@@ -1,5 +1,5 @@
 <map id="fitpack_sphere_domains::surface_fit_automatic_knots" name="fitpack_sphere_domains::surface_fit_automatic_knots">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,259,220,299"/>
+<area shape="rect" id="Node000001" title="Fit a smoothing spherical surface with automatic knot placement." alt="" coords="5,259,220,299"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="295,202,448,242"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,257,281,239,282,244,204,262"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="268,267,475,292"/>
@@ -33,7 +33,7 @@
 <area shape="poly" id="edge25_Node000005_Node000017" title=" " alt="" coords="604,315,619,282,645,237,680,190,722,149,748,135,751,139,726,153,684,194,649,240,624,284,608,317"/>
 <area shape="rect" id="Node000018" href="$namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="748,572,899,597"/>
 <area shape="poly" id="edge31_Node000005_Node000018" title=" " alt="" coords="606,341,618,383,642,442,677,504,699,533,726,557,737,565,734,569,722,561,696,536,672,507,637,444,613,385,601,342"/>
-<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="756,622,891,662"/>
+<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="756,622,891,662"/>
 <area shape="poly" id="edge33_Node000005_Node000019" title=" " alt="" coords="605,341,615,390,636,462,652,502,672,540,697,576,726,608,745,621,742,625,722,612,692,580,668,543,647,504,631,464,610,392,600,342"/>
 <area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="1231,210,1224,200,1227,190,1241,184,1265,181,1293,185,1305,194,1301,198,1291,190,1265,187,1243,189,1231,193,1229,199,1235,206"/>
 <area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="923,218,1178,218,1178,223,923,223"/>

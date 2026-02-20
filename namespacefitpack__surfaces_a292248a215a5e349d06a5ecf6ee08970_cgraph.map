@@ -1,5 +1,5 @@
 <map id="fitpack_surfaces::surface_eval_many" name="fitpack_surfaces::surface_eval_many">
-<area shape="rect" id="Node000001" title="Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu." alt="" coords="5,63,189,103"/>
+<area shape="rect" id="Node000001" title="Evaluate the surface at a list of scattered &#160;points." alt="" coords="5,63,189,103"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points ." alt="" coords="238,41,390,66"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,68,224,63,225,68,190,73"/>
 <area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="237,91,391,131"/>

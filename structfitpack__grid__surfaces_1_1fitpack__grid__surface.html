@@ -157,25 +157,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8c5ae4da5b344962a41c4789a0b32346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional /Users/federico/code/fitpack/test/fitpack_curve_tests.f90smoothing.  <br /></td></tr>
 <tr class="separator:a8c5ae4da5b344962a41c4789a0b32346"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bb763b82f9240a46b3c12c35a045889" id="r_a6bb763b82f9240a46b3c12c35a045889"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6bb763b82f9240a46b3c12c35a045889">least_squares</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
+<tr class="memdesc:a6bb763b82f9240a46b3c12c35a045889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a least-squares gridded surface with fixed knots.  <br /></td></tr>
 <tr class="separator:a6bb763b82f9240a46b3c12c35a045889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ddd32f702a8da0b359fdb47cdbe1bf7" id="r_a7ddd32f702a8da0b359fdb47cdbe1bf7"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ddd32f702a8da0b359fdb47cdbe1bf7">interpolate</a> (this, reset_knots)</td></tr>
+<tr class="memdesc:a7ddd32f702a8da0b359fdb47cdbe1bf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit an interpolating gridded surface ( \( s = 0 \)).  <br /></td></tr>
 <tr class="separator:a7ddd32f702a8da0b359fdb47cdbe1bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7001585ad14540ac9977b14319118437" id="r_a7001585ad14540ac9977b14319118437"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7001585ad14540ac9977b14319118437">eval</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
 <tr class="memdesc:a7001585ad14540ac9977b14319118437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid.  <br /></td></tr>
 <tr class="separator:a7001585ad14540ac9977b14319118437"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7001585ad14540ac9977b14319118437" id="r_a7001585ad14540ac9977b14319118437"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7001585ad14540ac9977b14319118437">eval</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
-<tr class="memdesc:a7001585ad14540ac9977b14319118437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface at a list of scattered (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points using bispeu.  <br /></td></tr>
+<tr class="memdesc:a7001585ad14540ac9977b14319118437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the grid surface at scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:a7001585ad14540ac9977b14319118437"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4943dddff742db196447dca22b327094" id="r_a4943dddff742db196447dca22b327094"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4943dddff742db196447dca22b327094">eval_ongrid</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
 <tr class="memdesc:a4943dddff742db196447dca22b327094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate on a rectangular grid <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> (bispev). Returns f(ny,nx).  <br /></td></tr>
 <tr class="separator:a4943dddff742db196447dca22b327094"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4943dddff742db196447dca22b327094" id="r_a4943dddff742db196447dca22b327094"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4943dddff742db196447dca22b327094">eval_ongrid</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
-<tr class="memdesc:a4943dddff742db196447dca22b327094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface on a grid of <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> points using bispev.  <br /></td></tr>
+<tr class="memdesc:a4943dddff742db196447dca22b327094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the grid surface on a rectangular evaluation grid.  <br /></td></tr>
 <tr class="separator:a4943dddff742db196447dca22b327094"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29891a39807263b81e2d2d00622599a6" id="r_a29891a39807263b81e2d2d00622599a6"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29891a39807263b81e2d2d00622599a6">dfdx</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
+<tr class="memdesc:a29891a39807263b81e2d2d00622599a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative at a single \( (x, y) \) point.  <br /></td></tr>
 <tr class="separator:a29891a39807263b81e2d2d00622599a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29891a39807263b81e2d2d00622599a6" id="r_a29891a39807263b81e2d2d00622599a6"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29891a39807263b81e2d2d00622599a6">dfdx</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
-<tr class="memdesc:a29891a39807263b81e2d2d00622599a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives on a list of (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points.  <br /></td></tr>
+<tr class="memdesc:a29891a39807263b81e2d2d00622599a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives at scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:a29891a39807263b81e2d2d00622599a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac889e742a1045f562aef51862a5d2385" id="r_ac889e742a1045f562aef51862a5d2385"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac889e742a1045f562aef51862a5d2385">dfdx_ongrid</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
 <tr class="memdesc:ac889e742a1045f562aef51862a5d2385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives at given coordinates.  <br /></td></tr>
@@ -193,10 +196,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab190b6d0ce917eac8bfbf4c0a577eea7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication.  <br /></td></tr>
 <tr class="separator:ab190b6d0ce917eac8bfbf4c0a577eea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c72eaa9269f1ee850c71217cb800146" id="r_a3c72eaa9269f1ee850c71217cb800146"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c72eaa9269f1ee850c71217cb800146">comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a3c72eaa9269f1ee850c71217cb800146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack grid surface data into a communication buffer.  <br /></td></tr>
 <tr class="separator:a3c72eaa9269f1ee850c71217cb800146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d38bdc276bc11e205bcb6203c0e50e7" id="r_a2d38bdc276bc11e205bcb6203c0e50e7"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d38bdc276bc11e205bcb6203c0e50e7">comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:a2d38bdc276bc11e205bcb6203c0e50e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand grid surface data from a communication buffer.  <br /></td></tr>
 <tr class="separator:a2d38bdc276bc11e205bcb6203c0e50e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50f495f98b3ab90fb34581e7abb7b8e2" id="r_a50f495f98b3ab90fb34581e7abb7b8e2"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__grid__surfaces_1_1fitpack__grid__surface.html">fitpack_grid_surface</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a50f495f98b3ab90fb34581e7abb7b8e2">surf_new_from_points</a> (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, <a class="el" href="#a23d1b4dea3b29250377c172fdc1430ce">z</a>, ierr)</td></tr>
+<tr class="memdesc:a50f495f98b3ab90fb34581e7abb7b8e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a grid surface from gridded data and perform a default fit.  <br /></td></tr>
 <tr class="separator:a50f495f98b3ab90fb34581e7abb7b8e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
 <tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a> (this)</td></tr>
@@ -278,21 +284,22 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:ab8bb1a15b313d28d7b265a0f2ee386ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid.  <br /></td></tr>
 <tr class="separator:ab8bb1a15b313d28d7b265a0f2ee386ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5f3abfc8d43812fe745e6731fd84dda" id="r_ab5f3abfc8d43812fe745e6731fd84dda"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5f3abfc8d43812fe745e6731fd84dda">gridsurf_eval_many</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
-<tr class="memdesc:ab5f3abfc8d43812fe745e6731fd84dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface at a list of scattered (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points using bispeu.  <br /></td></tr>
+<tr class="memdesc:ab5f3abfc8d43812fe745e6731fd84dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the grid surface at scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:ab5f3abfc8d43812fe745e6731fd84dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a275167f05320a85984fed9d2ac2c7413" id="r_a275167f05320a85984fed9d2ac2c7413"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a275167f05320a85984fed9d2ac2c7413">gridded_eval_one</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
 <tr class="memdesc:a275167f05320a85984fed9d2ac2c7413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate on a rectangular grid <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> (bispev). Returns f(ny,nx).  <br /></td></tr>
 <tr class="separator:a275167f05320a85984fed9d2ac2c7413"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84b4d9fd7fedda159fdd1b603ec544eb" id="r_a84b4d9fd7fedda159fdd1b603ec544eb"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84b4d9fd7fedda159fdd1b603ec544eb">gridded_eval_many</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, ierr)</td></tr>
-<tr class="memdesc:a84b4d9fd7fedda159fdd1b603ec544eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface on a grid of <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> points using bispev.  <br /></td></tr>
+<tr class="memdesc:a84b4d9fd7fedda159fdd1b603ec544eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the grid surface on a rectangular evaluation grid.  <br /></td></tr>
 <tr class="separator:a84b4d9fd7fedda159fdd1b603ec544eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade5a89ea239f0ed647098e9d6ed9af54" id="r_ade5a89ea239f0ed647098e9d6ed9af54"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade5a89ea239f0ed647098e9d6ed9af54">gridded_derivatives_gridded</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
 <tr class="memdesc:ade5a89ea239f0ed647098e9d6ed9af54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives at given coordinates.  <br /></td></tr>
 <tr class="separator:ade5a89ea239f0ed647098e9d6ed9af54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaac58c7201763722a6ab538ef751820a" id="r_aaac58c7201763722a6ab538ef751820a"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaac58c7201763722a6ab538ef751820a">gridded_derivatives_many</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
-<tr class="memdesc:aaac58c7201763722a6ab538ef751820a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives on a list of (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points.  <br /></td></tr>
+<tr class="memdesc:aaac58c7201763722a6ab538ef751820a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives at scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:aaac58c7201763722a6ab538ef751820a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85e6783b0f05b415be93ac0ce0638d53" id="r_a85e6783b0f05b415be93ac0ce0638d53"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85e6783b0f05b415be93ac0ce0638d53">gridded_derivatives_one</a> (this, <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e">x</a>, <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y</a>, dx, dy, ierr)</td></tr>
+<tr class="memdesc:a85e6783b0f05b415be93ac0ce0638d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative at a single \( (x, y) \) point.  <br /></td></tr>
 <tr class="separator:a85e6783b0f05b415be93ac0ce0638d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -318,13 +325,15 @@ Private Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Expand grid surface data from a communication buffer. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_a2d38bdc276bc11e205bcb6203c0e50e7_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a2d38bdc276bc11e205bcb6203c0e50e7_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a2d38bdc276bc11e205bcb6203c0e50e7_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a2d38bdc276bc11e205bcb6203c0e50e7_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,167,60"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a055123b778d317194d0806e0736fd5d9" title=" " alt="" coords="215,13,389,53"/>
+<area shape="rect" title="Expand grid surface data from a communication buffer." alt="" coords="5,5,167,60"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a055123b778d317194d0806e0736fd5d9" title="Construct a grid surface from gridded data and perform a default fit." alt="" coords="215,13,389,53"/>
 <area shape="poly" title=" " alt="" coords="167,30,201,30,201,35,167,35"/>
 </map>
 </div>
@@ -349,6 +358,8 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Pack grid surface data into a communication buffer. </p>
 
 </div>
 </div>
@@ -401,6 +412,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Extract a 1D cross-section curve from the surface. </p>
+<p>If <code>along_y=.true.</code>, returns \( f(y) = s(u, y) \); otherwise \( g(x) = s(x, u) \).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7ea4ba8b0cda533eb078e95b28d782db" title="Extract a cross-section (profile) of a bivariate spline.">profil</a> </dd></dl>
 
 </div>
 </div>
@@ -434,6 +447,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Compute the derivative spline coefficients. </p>
+<p>Returns a new grid surface with reduced degrees and trimmed knots.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ae277d8a029f43ac5702946468c8bd54f" title="Transform B-spline coefficients to obtain the partial derivative spline.">pardtc</a> </dd></dl>
 
 </div>
 </div>
@@ -494,15 +509,18 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Evaluate a partial derivative at a single \( (x, y) \) point. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_a29891a39807263b81e2d2d00622599a6_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a29891a39807263b81e2d2d00622599a6_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a29891a39807263b81e2d2d00622599a6_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a29891a39807263b81e2d2d00622599a6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,204,45"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a5c242327847cac6c6b0e4c5990f5af5e" title="Evaluate derivatives on a list of (x(i),y(i)) points." alt="" coords="491,5,693,45"/>
+<area shape="rect" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="5,5,204,45"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a5c242327847cac6c6b0e4c5990f5af5e" title="Evaluate partial derivatives at scattered &#160;points." alt="" coords="491,5,693,45"/>
 <area shape="poly" title=" " alt="" coords="204,20,252,19,443,19,477,19,477,25,443,24,252,24,204,25"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a4d4674972e1a07efa04babb20e7b0c7e" title=" " alt="" coords="252,33,443,73"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a4d4674972e1a07efa04babb20e7b0c7e" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="252,33,443,73"/>
 <area shape="poly" title=" " alt="" coords="205,34,239,38,238,43,204,39"/>
 <area shape="poly" title=" " alt="" coords="443,40,477,36,477,41,443,45"/>
 </map>
@@ -549,7 +567,8 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate derivatives on a list of (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points. </p>
+<p>Evaluate partial derivatives at scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
 
 </div>
 </div>
@@ -593,13 +612,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate derivatives at given coordinates. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a01477d82a007d0853de3bc8247ef8c27" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid.">parder</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_ac889e742a1045f562aef51862a5d2385_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_ac889e742a1045f562aef51862a5d2385_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_ac889e742a1045f562aef51862a5d2385_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_ac889e742a1045f562aef51862a5d2385_cgraph">
 <area shape="rect" title="Evaluate derivatives at given coordinates." alt="" coords="5,5,167,60"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a96eedbd4558d5134f21bcb4641d4b7b8" title="Evaluate derivatives on a grid domain." alt="" coords="215,5,375,60"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a96eedbd4558d5134f21bcb4641d4b7b8" title="Evaluate partial derivatives on a rectangular grid." alt="" coords="215,5,375,60"/>
 <area shape="poly" title=" " alt="" coords="167,30,201,30,201,35,167,35"/>
 </map>
 </div>
@@ -636,15 +656,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_a7001585ad14540ac9977b14319118437_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a7001585ad14540ac9977b14319118437_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a7001585ad14540ac9977b14319118437_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a7001585ad14540ac9977b14319118437_cgraph">
 <area shape="rect" title="Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid." alt="" coords="5,5,203,45"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#acbed01eda6106b0a621c4496037a7d6e" title="Evaluate surface at a list of scattered (x(i),y(i)) points using bispeu." alt="" coords="459,5,619,45"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#acbed01eda6106b0a621c4496037a7d6e" title="Evaluate the grid surface at scattered &#160;points." alt="" coords="459,5,619,45"/>
 <area shape="poly" title=" " alt="" coords="203,20,251,19,411,19,445,19,445,25,411,24,251,24,203,25"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a213165480a43b379762e5941a39ee675" title="Evaluate surface at a single (x,y) point using bispeu." alt="" coords="251,33,411,73"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a213165480a43b379762e5941a39ee675" title="Evaluate the grid surface at a single &#160;point." alt="" coords="251,33,411,73"/>
 <area shape="poly" title=" " alt="" coords="203,35,237,39,237,44,203,40"/>
 <area shape="poly" title=" " alt="" coords="410,40,445,35,445,41,411,45"/>
 </map>
@@ -681,7 +702,8 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface at a list of scattered (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points using bispeu. </p>
+<p>Evaluate the grid surface at scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 
 </div>
 </div>
@@ -721,9 +743,9 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_a4943dddff742db196447dca22b327094_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a4943dddff742db196447dca22b327094_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a4943dddff742db196447dca22b327094_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a4943dddff742db196447dca22b327094_cgraph">
 <area shape="rect" title="Evaluate on a rectangular grid x(:) x y(:) (bispev). Returns f(ny,nx)." alt="" coords="5,5,167,60"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#a166f4ac98d72e74871a668c771ffc88f" title="Evaluate surface on a grid of x(:) x y(:) points using bispev." alt="" coords="423,13,583,53"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#a166f4ac98d72e74871a668c771ffc88f" title="Evaluate the grid surface on a rectangular evaluation grid." alt="" coords="423,13,583,53"/>
 <area shape="poly" title=" " alt="" coords="167,27,215,26,375,26,409,27,409,32,375,31,215,31,167,32"/>
-<area shape="rect" href="namespacefitpack__grid__surfaces.html#af55dfa9789f53103dda2f79ba4c3f886" title=" " alt="" coords="215,41,375,81"/>
+<area shape="rect" href="namespacefitpack__grid__surfaces.html#af55dfa9789f53103dda2f79ba4c3f886" title="Evaluate the grid surface at a single grid point via bispev." alt="" coords="215,41,375,81"/>
 <area shape="poly" title=" " alt="" coords="167,41,202,46,201,51,167,46"/>
 <area shape="poly" title=" " alt="" coords="374,47,409,43,409,48,375,53"/>
 </map>
@@ -760,7 +782,9 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface on a grid of <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> points using bispev. </p>
+<p>Evaluate the grid surface on a rectangular evaluation grid. </p>
+<p>Returns <code>f(j,i)</code> = \( s(x_i, y_j) \).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 
 </div>
 </div>
@@ -794,6 +818,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Generate/update fitting curve, with optional /Users/federico/code/fitpack/test/fitpack_curve_tests.f90smoothing. </p>
+<p>Uses the regrid core routine, which exploits the rectangular grid structure for efficiency.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 
 </div>
 </div>
@@ -845,6 +871,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate derivatives at given coordinates. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a01477d82a007d0853de3bc8247ef8c27" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid.">parder</a> </dd></dl>
 
 </div>
 </div>
@@ -895,7 +922,8 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate derivatives on a list of (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points. </p>
+<p>Evaluate partial derivatives at scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
 
 </div>
 </div>
@@ -946,6 +974,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Evaluate a partial derivative at a single \( (x, y) \) point. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
+
 </div>
 </div>
 <a id="a84b4d9fd7fedda159fdd1b603ec544eb" name="a84b4d9fd7fedda159fdd1b603ec544eb"></a>
@@ -985,7 +1016,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface on a grid of <a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(:)</a> x <a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(:)</a> points using bispev. </p>
+<p>Evaluate the grid surface on a rectangular evaluation grid. </p>
+<p>Returns <code>f(j,i)</code> = \( s(x_i, y_j) \).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 
 </div>
 </div>
@@ -1067,7 +1100,8 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface at a list of scattered (<a class="el" href="#a4b49d71e135cbd593e0340e7900ece7e" title="The data points.">x(i)</a>,<a class="el" href="#a402a13194e357e392ede3f40b357ef5f">y(i)</a>) points using bispeu. </p>
+<p>Evaluate the grid surface at scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 
 </div>
 </div>
@@ -1109,6 +1143,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate at scattered (x,y) points (bispeu). For gridded output, use eval_ongrid. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 
 </div>
 </div>
@@ -1137,6 +1172,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Double integration over a rectangular domain. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aad87800d8674963f83316e6a9a6c9cce" title="Compute the double integral of a bivariate spline over a rectangle.">dblint</a> </dd></dl>
 
 </div>
 </div>
@@ -1158,6 +1194,9 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Fit an interpolating gridded surface ( \( s = 0 \)). </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 
 </div>
 </div>
@@ -1184,6 +1223,9 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Fit a least-squares gridded surface with fixed knots. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 
 </div>
 </div>
@@ -1227,6 +1269,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Generate new fit. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 
 </div>
 </div>
@@ -1260,6 +1303,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Set new points. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The grid surface (destroyed and reinitialized). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Grid coordinates in the x direction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Grid coordinates in the y direction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Function values <code><a class="el" href="#a23d1b4dea3b29250377c172fdc1430ce">z(j,i)</a></code> = \( f(x_i, y_j) \).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 
 </div>
 </div>
@@ -1291,12 +1344,15 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Construct a grid surface from gridded data and perform a default fit. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__grid__surfaces_1_1fitpack__grid__surface_a50f495f98b3ab90fb34581e7abb7b8e2_cgraph.png" border="0" usemap="#astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a50f495f98b3ab90fb34581e7abb7b8e2_cgraph" alt=""/></div>
 <map name="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a50f495f98b3ab90fb34581e7abb7b8e2_cgraph" id="astructfitpack__grid__surfaces_1_1fitpack__grid__surface_a50f495f98b3ab90fb34581e7abb7b8e2_cgraph">
-<area shape="rect" title=" " alt="" coords="5,42,180,97"/>
+<area shape="rect" title="Construct a grid surface from gridded data and perform a default fit." alt="" coords="5,42,180,97"/>
 <area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="228,49,381,89"/>
 <area shape="poly" title=" " alt="" coords="180,67,214,67,214,72,180,72"/>
 <area shape="rect" href="namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="429,5,583,45"/>

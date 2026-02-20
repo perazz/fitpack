@@ -18,9 +18,9 @@
 <area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="98,309,143,340,201,371,221,378,219,383,199,376,140,345,95,314"/>
 <area shape="rect" id="Node000012" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="224,434,375,459"/>
 <area shape="poly" id="edge18_Node000001_Node000012" title=" " alt="" coords="91,310,134,364,165,395,201,420,214,427,212,431,199,425,162,399,130,367,86,313"/>
-<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="226,484,373,524"/>
+<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title="Set up the initial knot configuration for periodic spline interpolation." alt="" coords="226,484,373,524"/>
 <area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="88,311,103,343,128,386,161,431,202,470,215,478,212,483,198,474,157,434,123,389,98,345,83,313"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,548,367,588"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,548,367,588"/>
 <area shape="poly" id="edge21_Node000001_Node000014" title=" " alt="" coords="85,311,97,354,119,414,154,478,176,508,202,534,220,546,217,551,198,538,172,511,149,481,115,416,92,355,80,312"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="668,131,813,157"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="399,306,451,306,508,301,565,289,619,270,652,248,681,221,723,167,727,170,685,225,655,252,621,274,566,295,509,306,451,311,399,311"/>

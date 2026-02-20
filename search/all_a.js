@@ -221,7 +221,7 @@ var searchData=
   ['fixed_20knots_218',['Least-Squares with Fixed Knots',['../theory_curve_fitting.html#autotoc_md32',1,'']]],
   ['flags_219',['Flags',['../theory_curve_fitting.html#autotoc_md46',1,'Per-Interval Convexity Flags'],['../tutorial_convex_curve.html#autotoc_md119',1,'Step 1 — Load Data and Set Convexity Flags']]],
   ['for_20bivariate_20splines_220',['Tensor Products for Bivariate Splines',['../theory_bsplines.html#autotoc_md29',1,'']]],
-  ['for_20degree_20_5fform_20528_221',['Recurrence for degree  \_form#528',['../theory_bsplines.html#autotoc_md22',1,'']]],
+  ['for_20degree_20_5fform_20588_221',['Recurrence for degree  \_form#588',['../theory_bsplines.html#autotoc_md22',1,'']]],
   ['for_20gridded_20spheres_222',['Pole boundary conditions for gridded spheres',['../theory_special_domains.html#autotoc_md81',1,'']]],
   ['formulation_223',['Formulation',['../theory_surface_fitting.html#autotoc_md52',1,'Least-Squares Formulation'],['../theory_curve_fitting.html#autotoc_md47',1,'Quadratic Programming Formulation'],['../theory_surface_fitting.html#autotoc_md53',1,'Smoothing Formulation']]],
   ['fortran_20spline_20fitting_224',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]],

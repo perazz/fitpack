@@ -129,53 +129,64 @@ Data Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a8b4af77eda1ccb1a175c0020f03032de" id="r_a8b4af77eda1ccb1a175c0020f03032de"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b4af77eda1ccb1a175c0020f03032de">surface_fit_automatic_knots</a> (this, smoothing, order, keep_knots)</td></tr>
+<tr class="memdesc:a8b4af77eda1ccb1a175c0020f03032de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a smoothing surface with automatic knot placement.  <br /></td></tr>
 <tr class="separator:a8b4af77eda1ccb1a175c0020f03032de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31d2f193797c29e504566771727407c" id="r_ae31d2f193797c29e504566771727407c"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae31d2f193797c29e504566771727407c">surface_fit_interpolating</a> (this, reset_knots)</td></tr>
+<tr class="memdesc:ae31d2f193797c29e504566771727407c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit an interpolating surface ( \( s = 0 \)) through the data points.  <br /></td></tr>
 <tr class="separator:ae31d2f193797c29e504566771727407c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad50a53d9651915bba259a30102e439a9" id="r_ad50a53d9651915bba259a30102e439a9"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad50a53d9651915bba259a30102e439a9">surface_fit_least_squares</a> (this, smoothing, reset_knots)</td></tr>
+<tr class="memdesc:ad50a53d9651915bba259a30102e439a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a least-squares surface with fixed knots.  <br /></td></tr>
 <tr class="separator:ad50a53d9651915bba259a30102e439a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a292248a215a5e349d06a5ecf6ee08970" id="r_a292248a215a5e349d06a5ecf6ee08970"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(x))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a292248a215a5e349d06a5ecf6ee08970">surface_eval_many</a> (this, x, y, ierr)</td></tr>
-<tr class="memdesc:a292248a215a5e349d06a5ecf6ee08970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu.  <br /></td></tr>
+<tr class="memdesc:a292248a215a5e349d06a5ecf6ee08970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the surface at a list of scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:a292248a215a5e349d06a5ecf6ee08970"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e02d699c029211601368bb335788801" id="r_a4e02d699c029211601368bb335788801"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e02d699c029211601368bb335788801">surface_eval_one</a> (this, x, y, ierr)</td></tr>
-<tr class="memdesc:a4e02d699c029211601368bb335788801"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface at a single (x,y) point.  <br /></td></tr>
+<tr class="memdesc:a4e02d699c029211601368bb335788801"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the surface at a single \( (x, y) \) point.  <br /></td></tr>
 <tr class="separator:a4e02d699c029211601368bb335788801"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf6d9644cb0ed1c05f95407ab124ba06" id="r_aaf6d9644cb0ed1c05f95407ab124ba06"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(y), size(x))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf6d9644cb0ed1c05f95407ab124ba06">surface_eval_gridded</a> (this, x, y, ierr)</td></tr>
-<tr class="memdesc:aaf6d9644cb0ed1c05f95407ab124ba06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate surface on a grid domain using bispev.  <br /></td></tr>
+<tr class="memdesc:aaf6d9644cb0ed1c05f95407ab124ba06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the surface on a rectangular grid \( x_i \times y_j \).  <br /></td></tr>
 <tr class="separator:aaf6d9644cb0ed1c05f95407ab124ba06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2811c3f44b375db327924c8a74dc489f" id="r_a2811c3f44b375db327924c8a74dc489f"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2811c3f44b375db327924c8a74dc489f">surf_destroy</a> (this)</td></tr>
+<tr class="memdesc:a2811c3f44b375db327924c8a74dc489f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy a surface object and release all allocated memory.  <br /></td></tr>
 <tr class="separator:a2811c3f44b375db327924c8a74dc489f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefb4b49387e0b34029b949ebad65f73e" id="r_aefb4b49387e0b34029b949ebad65f73e"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefb4b49387e0b34029b949ebad65f73e">surf_new_points</a> (this, x, y, z, w)</td></tr>
+<tr class="memdesc:aefb4b49387e0b34029b949ebad65f73e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load new scattered data points and allocate workspace for surface fitting.  <br /></td></tr>
 <tr class="separator:aefb4b49387e0b34029b949ebad65f73e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68e537d2244f15fa1b691d05b41167e2" id="r_a68e537d2244f15fa1b691d05b41167e2"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__surfaces_1_1fitpack__surface.html">fitpack_surface</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68e537d2244f15fa1b691d05b41167e2">surf_new_from_points</a> (x, y, z, w, ierr)</td></tr>
+<tr class="memdesc:a68e537d2244f15fa1b691d05b41167e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a surface from scattered data points and perform a default fit.  <br /></td></tr>
 <tr class="separator:a68e537d2244f15fa1b691d05b41167e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64a290c3c00df44894d815e7e4431fbc" id="r_a64a290c3c00df44894d815e7e4431fbc"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64a290c3c00df44894d815e7e4431fbc">surf_new_fit</a> (this, x, y, z, w, smoothing, order)</td></tr>
+<tr class="memdesc:a64a290c3c00df44894d815e7e4431fbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load new data points and perform a fresh surface fit.  <br /></td></tr>
 <tr class="separator:a64a290c3c00df44894d815e7e4431fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5969fa834c6edb4cdcfa5c089f642c7c" id="r_a5969fa834c6edb4cdcfa5c089f642c7c"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(y), size(x))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5969fa834c6edb4cdcfa5c089f642c7c">surface_derivatives_gridded</a> (this, x, y, dx, dy, ierr)</td></tr>
-<tr class="memdesc:a5969fa834c6edb4cdcfa5c089f642c7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives on a grid domain.  <br /></td></tr>
+<tr class="memdesc:a5969fa834c6edb4cdcfa5c089f642c7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives on a rectangular grid.  <br /></td></tr>
 <tr class="separator:a5969fa834c6edb4cdcfa5c089f642c7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a235356ec006d630c7f77035096a5e6" id="r_a1a235356ec006d630c7f77035096a5e6"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(size(x))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a235356ec006d630c7f77035096a5e6">surface_derivatives_many</a> (this, x, y, dx, dy, ierr)</td></tr>
-<tr class="memdesc:a1a235356ec006d630c7f77035096a5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate derivatives on a list of (x(i),y(i)) points.  <br /></td></tr>
+<tr class="memdesc:a1a235356ec006d630c7f77035096a5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives at scattered \( (x_i, y_i) \) points.  <br /></td></tr>
 <tr class="separator:a1a235356ec006d630c7f77035096a5e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a7489a5b32b589f9137ed9aef0523e3" id="r_a9a7489a5b32b589f9137ed9aef0523e3"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a7489a5b32b589f9137ed9aef0523e3">surface_derivatives_one</a> (this, x, y, dx, dy, ierr)</td></tr>
+<tr class="memdesc:a9a7489a5b32b589f9137ed9aef0523e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative at a single \( (x, y) \) point.  <br /></td></tr>
 <tr class="separator:a9a7489a5b32b589f9137ed9aef0523e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a200cba54312706021d024a3bd8df3e4d" id="r_a200cba54312706021d024a3bd8df3e4d"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a200cba54312706021d024a3bd8df3e4d">surface_integral</a> (this, lower, upper)</td></tr>
-<tr class="memdesc:a200cba54312706021d024a3bd8df3e4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)].  <br /></td></tr>
+<tr class="memdesc:a200cba54312706021d024a3bd8df3e4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the double integral of the surface over a rectangular domain.  <br /></td></tr>
 <tr class="separator:a200cba54312706021d024a3bd8df3e4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c1f585661df044630553f5391c0f793" id="r_a1c1f585661df044630553f5391c0f793"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__curves_1_1fitpack__curve.html">fitpack_curve</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1c1f585661df044630553f5391c0f793">surface_cross_section</a> (this, u, along_y, ierr)</td></tr>
-<tr class="memdesc:a1c1f585661df044630553f5391c0f793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract a 1D cross-section from the surface. If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u).  <br /></td></tr>
+<tr class="memdesc:a1c1f585661df044630553f5391c0f793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract a 1D cross-section curve from the surface.  <br /></td></tr>
 <tr class="separator:a1c1f585661df044630553f5391c0f793"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84ae66a5ac32fff4e3684bbabefa4973" id="r_a84ae66a5ac32fff4e3684bbabefa4973"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__surfaces_1_1fitpack__surface.html">fitpack_surface</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84ae66a5ac32fff4e3684bbabefa4973">surface_derivative_spline</a> (this, nux, nuy, ierr)</td></tr>
-<tr class="memdesc:a84ae66a5ac32fff4e3684bbabefa4973"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy. Returns a new surface with reduced order [kx-nux, ky-nuy] and trimmed knots.  <br /></td></tr>
+<tr class="memdesc:a84ae66a5ac32fff4e3684bbabefa4973"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the B-spline representation of a partial derivative surface.  <br /></td></tr>
 <tr class="separator:a84ae66a5ac32fff4e3684bbabefa4973"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d7f13ca2d46ab67f1cc3d7b1bb664d8" id="r_a0d7f13ca2d46ab67f1cc3d7b1bb664d8"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(n)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d7f13ca2d46ab67f1cc3d7b1bb664d8">merge_knots</a> (along_y, tx, ty, n)</td></tr>
-<tr class="memdesc:a0d7f13ca2d46ab67f1cc3d7b1bb664d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper: select knots from the appropriate direction for cross_section.  <br /></td></tr>
+<tr class="memdesc:a0d7f13ca2d46ab67f1cc3d7b1bb664d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Select knots from the appropriate direction for cross-section extraction.  <br /></td></tr>
 <tr class="separator:a0d7f13ca2d46ab67f1cc3d7b1bb664d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac81403b47e5cea96982ca2001556ff08" id="r_ac81403b47e5cea96982ca2001556ff08"><td class="memItemLeft" align="right" valign="top">elemental integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac81403b47e5cea96982ca2001556ff08">surf_comm_size</a> (this)</td></tr>
+<tr class="memdesc:ac81403b47e5cea96982ca2001556ff08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the communication buffer size for the surface.  <br /></td></tr>
 <tr class="separator:ac81403b47e5cea96982ca2001556ff08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fe0dc00fac689499bc194456d26ecd3" id="r_a8fe0dc00fac689499bc194456d26ecd3"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fe0dc00fac689499bc194456d26ecd3">surf_comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a8fe0dc00fac689499bc194456d26ecd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack surface data into a communication buffer.  <br /></td></tr>
 <tr class="separator:a8fe0dc00fac689499bc194456d26ecd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49ce81feab8e8dfe360525d10a46278f" id="r_a49ce81feab8e8dfe360525d10a46278f"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a49ce81feab8e8dfe360525d10a46278f">surf_comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:a49ce81feab8e8dfe360525d10a46278f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand surface data from a communication buffer.  <br /></td></tr>
 <tr class="separator:a49ce81feab8e8dfe360525d10a46278f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -220,7 +231,7 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Helper: select knots from the appropriate direction for cross_section. </p>
+<p>Select knots from the appropriate direction for cross-section extraction. </p>
 
 </div>
 </div>
@@ -251,6 +262,8 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Expand surface data from a communication buffer. </p>
+
 </div>
 </div>
 <a id="a8fe0dc00fac689499bc194456d26ecd3" name="a8fe0dc00fac689499bc194456d26ecd3"></a>
@@ -280,6 +293,8 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Pack surface data into a communication buffer. </p>
+
 </div>
 </div>
 <a id="ac81403b47e5cea96982ca2001556ff08" name="ac81403b47e5cea96982ca2001556ff08"></a>
@@ -304,12 +319,14 @@ Functions/Subroutines</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Return the communication buffer size for the surface. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_ac81403b47e5cea96982ca2001556ff08_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_ac81403b47e5cea96982ca2001556ff08_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_ac81403b47e5cea96982ca2001556ff08_cgraph" id="anamespacefitpack__surfaces_ac81403b47e5cea96982ca2001556ff08_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,167,69"/>
+<area shape="rect" title="Return the communication buffer size for the surface." alt="" coords="5,29,167,69"/>
 <area shape="poly" title=" " alt="" coords="55,29,53,20,58,11,69,5,86,3,105,6,116,13,112,17,103,11,86,8,71,10,62,14,59,21,60,28"/>
 </map>
 </div>
@@ -338,6 +355,8 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroy a surface object and release all allocated memory. </p>
 
 </div>
 </div>
@@ -392,12 +411,15 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Load new data points and perform a fresh surface fit. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a64a290c3c00df44894d815e7e4431fbc_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a64a290c3c00df44894d815e7e4431fbc_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a64a290c3c00df44894d815e7e4431fbc_cgraph" id="anamespacefitpack__surfaces_a64a290c3c00df44894d815e7e4431fbc_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,167,69"/>
+<area shape="rect" title="Load new data points and perform a fresh surface fit." alt="" coords="5,29,167,69"/>
 <area shape="poly" title=" " alt="" coords="55,29,53,20,58,11,69,5,86,3,105,6,116,13,112,17,103,11,86,8,71,10,62,14,59,21,60,28"/>
 </map>
 </div>
@@ -446,6 +468,20 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Construct a surface from scattered data points and perform a default fit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>X coordinates. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Y coordinates, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Function values, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Optional weights. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Fitted surface object.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
+
 </div>
 </div>
 <a id="aefb4b49387e0b34029b949ebad65f73e" name="aefb4b49387e0b34029b949ebad65f73e"></a>
@@ -490,6 +526,19 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Load new scattered data points and allocate workspace for surface fitting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The surface object (destroyed and reinitialized). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>X coordinates of scattered data points. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Y coordinates, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Function values, same size as <code>x</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Optional positive weights, same size as <code>x</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
+
 </div>
 </div>
 <a id="a1c1f585661df044630553f5391c0f793" name="a1c1f585661df044630553f5391c0f793"></a>
@@ -529,14 +578,16 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Extract a 1D cross-section from the surface. If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u). </p>
+<p>Extract a 1D cross-section curve from the surface. </p>
+<p>If <code>along_y=.true.</code>, returns \( f(y) = s(u, y) \); otherwise \( g(x) = s(x, u) \). The result is a <a class="el" href="structfitpack__curves_1_1fitpack__curve.html" title="Univariate spline curve .">fitpack_curve</a> with the appropriate knots and coefficients.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7ea4ba8b0cda533eb078e95b28d782db" title="Extract a cross-section (profile) of a bivariate spline.">profil</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a1c1f585661df044630553f5391c0f793_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a1c1f585661df044630553f5391c0f793_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a1c1f585661df044630553f5391c0f793_cgraph" id="anamespacefitpack__surfaces_a1c1f585661df044630553f5391c0f793_cgraph">
-<area shape="rect" title="Extract a 1D cross&#45;section from the surface. If along_y=.true., returns f(y) = s(u,..." alt="" coords="5,5,189,45"/>
-<area shape="rect" href="namespacefitpack__surfaces.html#a0d7f13ca2d46ab67f1cc3d7b1bb664d8" title="Helper: select knots from the appropriate direction for cross_section." alt="" coords="237,5,416,45"/>
+<area shape="rect" title="Extract a 1D cross&#45;section curve from the surface." alt="" coords="5,5,189,45"/>
+<area shape="rect" href="namespacefitpack__surfaces.html#a0d7f13ca2d46ab67f1cc3d7b1bb664d8" title="Select knots from the appropriate direction for cross&#45;section extraction." alt="" coords="237,5,416,45"/>
 <area shape="poly" title=" " alt="" coords="190,23,223,23,223,28,190,28"/>
 </map>
 </div>
@@ -580,7 +631,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy. Returns a new surface with reduced order [kx-nux, ky-nuy] and trimmed knots. </p>
+<p>Compute the B-spline representation of a partial derivative surface. </p>
+<p>Returns a new surface representing \( \partial^{n_x+n_y} s / \partial x^{n_x} \partial y^{n_y} \), with reduced degrees \( (k_x - n_x, k_y - n_y) \) and trimmed knots.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ae277d8a029f43ac5702946468c8bd54f" title="Transform B-spline coefficients to obtain the partial derivative spline.">pardtc</a> </dd></dl>
 
 </div>
 </div>
@@ -631,7 +684,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate derivatives on a grid domain. </p>
+<p>Evaluate partial derivatives on a rectangular grid. </p>
+<p>Returns <code>f(j,i)</code> = \( \partial^{dx+dy} s / \partial x^{dx} \partial y^{dy} \) at \( (x_i, y_j) \).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a01477d82a007d0853de3bc8247ef8c27" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid.">parder</a> </dd></dl>
 
 </div>
 </div>
@@ -682,7 +737,8 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate derivatives on a list of (x(i),y(i)) points. </p>
+<p>Evaluate partial derivatives at scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
 
 </div>
 </div>
@@ -732,13 +788,16 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Evaluate a partial derivative at a single \( (x, y) \) point. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a9a7489a5b32b589f9137ed9aef0523e3_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a9a7489a5b32b589f9137ed9aef0523e3_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a9a7489a5b32b589f9137ed9aef0523e3_cgraph" id="anamespacefitpack__surfaces_a9a7489a5b32b589f9137ed9aef0523e3_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,189,45"/>
-<area shape="rect" href="namespacefitpack__surfaces.html#a1a235356ec006d630c7f77035096a5e6" title="Evaluate derivatives on a list of (x(i),y(i)) points." alt="" coords="237,5,421,45"/>
+<area shape="rect" title="Evaluate a partial derivative at a single &#160;point." alt="" coords="5,5,189,45"/>
+<area shape="rect" href="namespacefitpack__surfaces.html#a1a235356ec006d630c7f77035096a5e6" title="Evaluate partial derivatives at scattered &#160;points." alt="" coords="237,5,421,45"/>
 <area shape="poly" title=" " alt="" coords="190,23,223,23,223,28,190,28"/>
 </map>
 </div>
@@ -782,7 +841,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface on a grid domain using bispev. </p>
+<p>Evaluate the surface on a rectangular grid \( x_i \times y_j \). </p>
+<p>Returns <code>f(j,i)</code> = \( s(x_i, y_j) \).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 
 </div>
 </div>
@@ -823,13 +884,14 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu. </p>
+<p>Evaluate the surface at a list of scattered \( (x_i, y_i) \) points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a292248a215a5e349d06a5ecf6ee08970_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a292248a215a5e349d06a5ecf6ee08970_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a292248a215a5e349d06a5ecf6ee08970_cgraph" id="anamespacefitpack__surfaces_a292248a215a5e349d06a5ecf6ee08970_cgraph">
-<area shape="rect" title="Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu." alt="" coords="5,63,189,103"/>
+<area shape="rect" title="Evaluate the surface at a list of scattered &#160;points." alt="" coords="5,63,189,103"/>
 <area shape="rect" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points ." alt="" coords="238,41,390,66"/>
 <area shape="poly" title=" " alt="" coords="189,68,224,63,225,68,190,73"/>
 <area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="237,91,391,131"/>
@@ -893,14 +955,15 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate surface at a single (x,y) point. </p>
+<p>Evaluate the surface at a single \( (x, y) \) point. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points .">bispeu</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a4e02d699c029211601368bb335788801_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a4e02d699c029211601368bb335788801_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a4e02d699c029211601368bb335788801_cgraph" id="anamespacefitpack__surfaces_a4e02d699c029211601368bb335788801_cgraph">
-<area shape="rect" title="Evaluate surface at a single (x,y) point." alt="" coords="5,63,189,103"/>
-<area shape="rect" href="namespacefitpack__surfaces.html#a292248a215a5e349d06a5ecf6ee08970" title="Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu." alt="" coords="237,63,421,103"/>
+<area shape="rect" title="Evaluate the surface at a single &#160;point." alt="" coords="5,63,189,103"/>
+<area shape="rect" href="namespacefitpack__surfaces.html#a292248a215a5e349d06a5ecf6ee08970" title="Evaluate the surface at a list of scattered &#160;points." alt="" coords="237,63,421,103"/>
 <area shape="poly" title=" " alt="" coords="190,80,223,80,223,85,190,85"/>
 <area shape="rect" href="namespacefitpack__core.html#a7fc6de0b9389c7699809c138e0cb8604" title="Evaluate a bivariate spline at scattered points ." alt="" coords="470,41,622,66"/>
 <area shape="poly" title=" " alt="" coords="421,68,456,63,457,68,422,73"/>
@@ -964,13 +1027,27 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Fit a smoothing surface with automatic knot placement. </p>
+<p>Uses the surfit core routine. The smoothing parameter controls the trade-off between closeness of fit and smoothness.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">this</td><td>The surface object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing factor. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>Optional spline degree (applied to both directions). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keep_knots</td><td>If <code>.true.</code>, continue from current knot set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
 <p>Ensure we start with new knots (unless caller wants to keep them)</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a8b4af77eda1ccb1a175c0020f03032de_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a8b4af77eda1ccb1a175c0020f03032de_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a8b4af77eda1ccb1a175c0020f03032de_cgraph" id="anamespacefitpack__surfaces_a8b4af77eda1ccb1a175c0020f03032de_cgraph">
-<area shape="rect" title=" " alt="" coords="5,231,189,271"/>
+<area shape="rect" title="Fit a smoothing surface with automatic knot placement." alt="" coords="5,231,189,271"/>
 <area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="264,174,417,214"/>
 <area shape="poly" title=" " alt="" coords="182,229,250,213,251,218,183,234"/>
 <area shape="rect" href="namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="237,239,444,264"/>
@@ -994,7 +1071,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="585,311,630,342,688,373,708,380,706,385,686,378,627,347,582,316"/>
 <area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="711,124,861,149"/>
 <area shape="poly" title=" " alt="" coords="572,286,614,225,647,190,685,160,700,152,702,157,688,164,651,194,619,229,576,289"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="719,437,853,477"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="719,437,853,477"/>
 <area shape="poly" title=" " alt="" coords="578,312,621,365,653,396,688,422,707,432,704,437,685,427,649,400,618,369,574,315"/>
 <area shape="rect" href="fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="751,501,821,527"/>
 <area shape="poly" title=" " alt="" coords="574,313,588,348,611,395,645,445,665,467,688,486,712,499,738,506,736,512,710,504,685,491,662,471,641,448,607,398,583,350,569,315"/>
@@ -1051,13 +1128,16 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Fit an interpolating surface ( \( s = 0 \)) through the data points. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_ae31d2f193797c29e504566771727407c_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_ae31d2f193797c29e504566771727407c_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_ae31d2f193797c29e504566771727407c_cgraph" id="anamespacefitpack__surfaces_ae31d2f193797c29e504566771727407c_cgraph">
-<area shape="rect" title=" " alt="" coords="5,231,189,271"/>
-<area shape="rect" href="namespacefitpack__surfaces.html#a8b4af77eda1ccb1a175c0020f03032de" title=" " alt="" coords="237,231,421,271"/>
+<area shape="rect" title="Fit an interpolating surface ( ) through the data points." alt="" coords="5,231,189,271"/>
+<area shape="rect" href="namespacefitpack__surfaces.html#a8b4af77eda1ccb1a175c0020f03032de" title="Fit a smoothing surface with automatic knot placement." alt="" coords="237,231,421,271"/>
 <area shape="poly" title=" " alt="" coords="190,249,223,249,223,254,190,254"/>
 <area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="496,174,649,214"/>
 <area shape="poly" title=" " alt="" coords="414,229,482,213,483,218,415,234"/>
@@ -1082,7 +1162,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="817,311,862,342,920,373,940,380,938,385,918,378,859,347,814,316"/>
 <area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="943,124,1093,149"/>
 <area shape="poly" title=" " alt="" coords="804,286,846,225,879,190,917,160,932,152,934,157,920,164,883,194,851,229,808,289"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="951,437,1085,477"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="951,437,1085,477"/>
 <area shape="poly" title=" " alt="" coords="810,312,853,365,885,396,920,422,939,432,936,437,917,427,881,400,850,369,806,315"/>
 <area shape="rect" href="fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="983,501,1053,527"/>
 <area shape="poly" title=" " alt="" coords="806,313,820,348,843,395,877,445,897,467,920,486,944,499,970,506,968,512,942,504,917,491,894,471,873,448,839,398,815,350,801,315"/>
@@ -1144,12 +1224,15 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Fit a least-squares surface with fixed knots. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#ac3ec431477bdf8868e8aff1cc3f5ab51" title="Fit a smoothing bivariate spline to scattered data.">surfit</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_ad50a53d9651915bba259a30102e439a9_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_ad50a53d9651915bba259a30102e439a9_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_ad50a53d9651915bba259a30102e439a9_cgraph" id="anamespacefitpack__surfaces_ad50a53d9651915bba259a30102e439a9_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,189,69"/>
+<area shape="rect" title="Fit a least&#45;squares surface with fixed knots." alt="" coords="5,29,189,69"/>
 <area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="237,29,391,69"/>
 <area shape="poly" title=" " alt="" coords="189,47,224,47,224,52,189,52"/>
 <area shape="poly" title=" " alt="" coords="273,30,271,20,278,10,292,5,314,3,339,6,353,13,351,18,338,11,314,8,293,10,281,15,276,21,279,28"/>
@@ -1190,13 +1273,24 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)]. </p>
+<p>Compute the double integral of the surface over a rectangular domain. </p>
+<p>Computes \( \int_{x_a}^{x_b} \int_{y_a}^{y_b} s(x,y)\,dy\,dx \).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">this</td><td>The fitted surface. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower</td><td>Lower bounds \( (x_a, y_a) \). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper</td><td>Upper bounds \( (x_b, y_b) \). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The integral value.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aad87800d8674963f83316e6a9a6c9cce" title="Compute the double integral of a bivariate spline over a rectangle.">dblint</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__surfaces_a200cba54312706021d024a3bd8df3e4d_cgraph.png" border="0" usemap="#anamespacefitpack__surfaces_a200cba54312706021d024a3bd8df3e4d_cgraph" alt=""/></div>
 <map name="anamespacefitpack__surfaces_a200cba54312706021d024a3bd8df3e4d_cgraph" id="anamespacefitpack__surfaces_a200cba54312706021d024a3bd8df3e4d_cgraph">
-<area shape="rect" title="Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),..." alt="" coords="5,29,189,69"/>
+<area shape="rect" title="Compute the double integral of the surface over a rectangular domain." alt="" coords="5,29,189,69"/>
 <area shape="poly" title=" " alt="" coords="62,30,60,20,66,11,78,5,97,3,119,6,131,13,128,17,117,11,97,8,80,10,69,15,66,21,68,28"/>
 </map>
 </div>

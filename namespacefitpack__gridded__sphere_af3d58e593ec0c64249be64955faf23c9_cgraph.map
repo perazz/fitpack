@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_sphere::spgrid_fit_least_squares" name="fitpack_gridded_sphere::spgrid_fit_least_squares">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,192,69"/>
+<area shape="rect" id="Node000001" title="Fit a least&#45;squares gridded spherical surface with fixed knots." alt="" coords="5,29,192,69"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="240,29,393,69"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,47,226,47,226,52,193,52"/>
 <area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="276,30,274,20,280,10,295,5,317,3,342,6,356,13,353,18,340,11,317,8,296,10,283,15,279,21,281,28"/>

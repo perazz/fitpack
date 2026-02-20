@@ -13,7 +13,7 @@ var searchData=
   ['de_20boor_20algorithm_10',['Evaluation: the de Boor Algorithm',['../theory_bsplines.html#autotoc_md25',1,'']]],
   ['deficiency_11',['Rank Deficiency',['../theory_surface_fitting.html#autotoc_md54',1,'']]],
   ['deg2rad_12',['deg2rad',['../namespacefitpack__core.html#af3c998a4a06cbcdfc95f2f901573016b',1,'fitpack_core']]],
-  ['degree_20_5fform_20528_13',['Recurrence for degree  \_form#528',['../theory_bsplines.html#autotoc_md22',1,'']]],
+  ['degree_20_5fform_20588_13',['Recurrence for degree  \_form#588',['../theory_bsplines.html#autotoc_md22',1,'']]],
   ['degree_20zero_14',['Degree zero',['../theory_bsplines.html#autotoc_md21',1,'']]],
   ['degree_5f3_15',['degree_3',['../namespacefitpack__core.html#a668bd0af72972ca4b389eb70672f246b',1,'fitpack_core']]],
   ['degree_5f4_16',['degree_4',['../namespacefitpack__core.html#a3d07187113a320a4bf1fa751018181d2',1,'fitpack_core']]],

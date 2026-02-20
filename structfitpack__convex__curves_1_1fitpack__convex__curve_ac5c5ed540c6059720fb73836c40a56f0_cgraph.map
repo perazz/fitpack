@@ -1,5 +1,5 @@
 <map id="fitpack_convex_curves::fitpack_convex_curve::convex_new_from_points" name="fitpack_convex_curves::fitpack_convex_curve::convex_new_from_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,58,201,113"/>
+<area shape="rect" id="Node000001" title="Construct a convex curve from data points with convexity constraints and fit it." alt="" coords="5,58,201,113"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="249,36,403,76"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,70,235,65,236,70,202,75"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="451,93,604,133"/>

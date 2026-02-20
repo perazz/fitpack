@@ -1,8 +1,8 @@
 <map id="fitpack_polar_domains::fitpack_polar::eval" name="fitpack_polar_domains::fitpack_polar::eval">
 <area shape="rect" id="Node000001" title="Evaluate polar domain at given x,y coordinates." alt="" coords="5,35,175,75"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__polar__domains.html#a46c936c7df627f5d6fcab07789d9d825" title=" " alt="" coords="223,5,392,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__polar__domains.html#a46c936c7df627f5d6fcab07789d9d825" title="Evaluate the polar surface at multiple Cartesian points." alt="" coords="223,5,392,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,41,209,36,210,41,175,46"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__polar__domains.html#a42072a02901a25adb57d01fbe7d70dce" title=" " alt="" coords="440,35,609,75"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__polar__domains.html#a42072a02901a25adb57d01fbe7d70dce" title="Evaluate the polar surface at a single Cartesian &#160;point." alt="" coords="440,35,609,75"/>
 <area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="175,54,223,55,392,55,426,54,426,60,392,60,223,60,175,59"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="393,34,427,39,426,44,392,39"/>
 </map>

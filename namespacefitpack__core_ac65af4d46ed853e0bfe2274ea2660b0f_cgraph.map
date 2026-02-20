@@ -21,7 +21,7 @@
 <area shape="poly" id="edge19_Node000004_Node000013" title=" " alt="" coords="283,271,325,335,358,372,397,404,410,410,407,415,395,408,355,376,321,338,278,274"/>
 <area shape="rect" id="Node000014" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="420,140,571,165"/>
 <area shape="poly" id="edge20_Node000004_Node000014" title=" " alt="" coords="287,244,333,209,395,174,414,167,416,172,397,179,336,214,290,249"/>
-<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="428,75,563,115"/>
+<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="428,75,563,115"/>
 <area shape="poly" id="edge21_Node000004_Node000015" title=" " alt="" coords="280,245,324,188,357,154,395,125,414,115,416,120,397,130,361,158,328,191,284,248"/>
 <area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="553,187,608,177,675,171,746,170,817,178,862,192,902,210,900,215,860,197,815,183,746,175,675,176,609,183,554,192"/>
 <area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="655,243,804,268"/>

@@ -1,5 +1,5 @@
 <map id="fitpack_sphere_domains::fitpack_sphere::sphere_new_from_points" name="fitpack_sphere_domains::fitpack_sphere::sphere_new_from_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,42,185,97"/>
+<area shape="rect" id="Node000001" title="Construct a fitpack_sphere from scattered data and perform an initial fit." alt="" coords="5,42,185,97"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="233,49,387,89"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,67,220,67,220,72,185,72"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="435,5,588,45"/>

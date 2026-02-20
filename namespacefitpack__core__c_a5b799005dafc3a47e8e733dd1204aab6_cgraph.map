@@ -13,9 +13,9 @@
 <area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="547,150,649,178,648,184,545,155"/>
 <area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="633,70,784,95"/>
 <area shape="poly" id="edge21_Node000005_Node000015" title=" " alt="" coords="545,125,648,96,649,102,547,130"/>
-<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="623,120,795,160"/>
+<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="623,120,795,160"/>
 <area shape="poly" id="edge22_Node000005_Node000016" title=" " alt="" coords="573,137,609,137,609,143,573,143"/>
-<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="641,5,776,45"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="641,5,776,45"/>
 <area shape="poly" id="edge23_Node000005_Node000017" title=" " alt="" coords="515,125,561,91,621,55,635,48,637,53,624,60,564,96,518,129"/>
 <area shape="rect" id="Node000007" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="843,176,1011,216"/>
 <area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="783,194,829,194,829,199,783,200"/>

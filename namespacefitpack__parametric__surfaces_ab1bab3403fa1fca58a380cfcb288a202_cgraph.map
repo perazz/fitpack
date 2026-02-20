@@ -1,5 +1,5 @@
 <map id="fitpack_parametric_surfaces::new_points" name="fitpack_parametric_surfaces::new_points">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,172,53"/>
+<area shape="rect" id="Node000001" title="Load new gridded data and allocate workspace for parametric surface fitting." alt="" coords="5,13,172,53"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__parametric__surfaces.html#acaa4898491130825fd5a1ed122aefe58" title=" " alt="" coords="220,5,364,60"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,30,206,30,206,35,172,35"/>
 </map>

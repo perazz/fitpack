@@ -157,31 +157,37 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a224c65f20c7d199f5aafda56f0340119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pole BCs.  <br /></td></tr>
 <tr class="separator:a224c65f20c7d199f5aafda56f0340119"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b381a3a48ed966d06feb54f70ee1850" id="r_a8b381a3a48ed966d06feb54f70ee1850"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b381a3a48ed966d06feb54f70ee1850">bc_south_pole</a> (this, z0, exact, differentiable, zero_grad)</td></tr>
-<tr class="memdesc:a8b381a3a48ed966d06feb54f70ee1850"><td class="mdescLeft">&#160;</td><td class="mdescRight">South pole BC.  <br /></td></tr>
+<tr class="memdesc:a8b381a3a48ed966d06feb54f70ee1850"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set boundary conditions at the south pole ( \( u = \pi \)).  <br /></td></tr>
 <tr class="separator:a8b381a3a48ed966d06feb54f70ee1850"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d5a897f7d0eda20c96cc6742ec2db53" id="r_a8d5a897f7d0eda20c96cc6742ec2db53"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8d5a897f7d0eda20c96cc6742ec2db53">fit</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, keep_knots)</td></tr>
 <tr class="memdesc:a8d5a897f7d0eda20c96cc6742ec2db53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate/update fitting curve, with optional smoothing.  <br /></td></tr>
 <tr class="separator:a8d5a897f7d0eda20c96cc6742ec2db53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55114790683bdaf58e8693b244226b65" id="r_a55114790683bdaf58e8693b244226b65"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55114790683bdaf58e8693b244226b65">least_squares</a> (this, <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a2ef622360564515e14a40a24a1896163">smoothing</a>, reset_knots)</td></tr>
+<tr class="memdesc:a55114790683bdaf58e8693b244226b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a least-squares gridded spherical surface with fixed knots.  <br /></td></tr>
 <tr class="separator:a55114790683bdaf58e8693b244226b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a442d748eace30c8c4e4da9777c85cb12" id="r_a442d748eace30c8c4e4da9777c85cb12"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a442d748eace30c8c4e4da9777c85cb12">interpolate</a> (this, reset_knots)</td></tr>
+<tr class="memdesc:a442d748eace30c8c4e4da9777c85cb12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit an interpolating gridded spherical surface ( \( s = 0 \)).  <br /></td></tr>
 <tr class="separator:a442d748eace30c8c4e4da9777c85cb12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ec28c12c1cc0c09029260c069d93c74" id="r_a7ec28c12c1cc0c09029260c069d93c74"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ec28c12c1cc0c09029260c069d93c74">eval</a> (this, <a class="el" href="#adae138f45ccb5c7e8502dd0299e89e2f">u</a>, <a class="el" href="#a4fe393cc86c03b57f34c9293381b15e3">v</a>, ierr)</td></tr>
 <tr class="memdesc:a7ec28c12c1cc0c09029260c069d93c74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate gridded domain at given x,y coordinates.  <br /></td></tr>
 <tr class="separator:a7ec28c12c1cc0c09029260c069d93c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ec28c12c1cc0c09029260c069d93c74" id="r_a7ec28c12c1cc0c09029260c069d93c74"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ec28c12c1cc0c09029260c069d93c74">eval</a> (this, <a class="el" href="#adae138f45ccb5c7e8502dd0299e89e2f">u</a>, <a class="el" href="#a4fe393cc86c03b57f34c9293381b15e3">v</a>, ierr)</td></tr>
+<tr class="memdesc:a7ec28c12c1cc0c09029260c069d93c74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the gridded spherical spline on a grid of colatitude and longitude values.  <br /></td></tr>
 <tr class="separator:a7ec28c12c1cc0c09029260c069d93c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a923cfd29002690de3af45a58316d0389" id="r_a923cfd29002690de3af45a58316d0389"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a923cfd29002690de3af45a58316d0389">comm_size</a> (this)</td></tr>
 <tr class="memdesc:a923cfd29002690de3af45a58316d0389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication interface.  <br /></td></tr>
 <tr class="separator:a923cfd29002690de3af45a58316d0389"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9537f758800ecbe904b52a6956ad81d6" id="r_a9537f758800ecbe904b52a6956ad81d6"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9537f758800ecbe904b52a6956ad81d6">comm_pack</a> (this, buffer)</td></tr>
+<tr class="memdesc:a9537f758800ecbe904b52a6956ad81d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack the gridded sphere fitter state into a communication buffer.  <br /></td></tr>
 <tr class="separator:a9537f758800ecbe904b52a6956ad81d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaed9c4373c13b313a8c27c145ef81c06" id="r_aaed9c4373c13b313a8c27c145ef81c06"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaed9c4373c13b313a8c27c145ef81c06">comm_expand</a> (this, buffer)</td></tr>
+<tr class="memdesc:aaed9c4373c13b313a8c27c145ef81c06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restore the gridded sphere fitter state from a communication buffer.  <br /></td></tr>
 <tr class="separator:aaed9c4373c13b313a8c27c145ef81c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f304962c018881f0fd2de6eef998090" id="r_a3f304962c018881f0fd2de6eef998090"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f304962c018881f0fd2de6eef998090">write</a> (this, filename)</td></tr>
 <tr class="memdesc:a3f304962c018881f0fd2de6eef998090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to disk.  <br /></td></tr>
 <tr class="separator:a3f304962c018881f0fd2de6eef998090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2888dae8777087f76802023b589a0da" id="r_af2888dae8777087f76802023b589a0da"><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html">fitpack_grid_sphere</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2888dae8777087f76802023b589a0da">spgrid_new_from_points</a> (<a class="el" href="#adae138f45ccb5c7e8502dd0299e89e2f">u</a>, <a class="el" href="#a4fe393cc86c03b57f34c9293381b15e3">v</a>, <a class="el" href="#a7f0750428c0898f18ca9a33d973bb1eb">z</a>, ierr)</td></tr>
+<tr class="memdesc:af2888dae8777087f76802023b589a0da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html" title="Bicubic spline fitter for data on a latitude-longitude grid.">fitpack_grid_sphere</a> from gridded data and perform an initial fit.  <br /></td></tr>
 <tr class="separator:af2888dae8777087f76802023b589a0da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfitpack__fitters_1_1fitpack__fitter"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structfitpack__fitters_1_1fitpack__fitter')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html">fitpack_fitters::fitpack_fitter</a></td></tr>
 <tr class="memitem:a76262da39321e6f256f82296c37bd973 inherit pub_methods_structfitpack__fitters_1_1fitpack__fitter" id="r_a76262da39321e6f256f82296c37bd973"><td class="memItemLeft" align="right" valign="top">procedure, non_overridable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973">mse</a> (this)</td></tr>
@@ -267,6 +273,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:ad762a23e9c59712744e510d0dc436b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate gridded domain at given x,y coordinates.  <br /></td></tr>
 <tr class="separator:ad762a23e9c59712744e510d0dc436b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4142d90db4c3122d3ad44287868d64e" id="r_af4142d90db4c3122d3ad44287868d64e"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4142d90db4c3122d3ad44287868d64e">gridded_eval_many</a> (this, <a class="el" href="#adae138f45ccb5c7e8502dd0299e89e2f">u</a>, <a class="el" href="#a4fe393cc86c03b57f34c9293381b15e3">v</a>, ierr)</td></tr>
+<tr class="memdesc:af4142d90db4c3122d3ad44287868d64e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the gridded spherical spline on a grid of colatitude and longitude values.  <br /></td></tr>
 <tr class="separator:af4142d90db4c3122d3ad44287868d64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -346,7 +353,7 @@ Private Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>South pole BC. </p>
+<p>Set boundary conditions at the south pole ( \( u = \pi \)). </p>
 
 </div>
 </div>
@@ -369,6 +376,8 @@ Private Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Restore the gridded sphere fitter state from a communication buffer. </p>
+
 </div>
 </div>
 <a id="a9537f758800ecbe904b52a6956ad81d6" name="a9537f758800ecbe904b52a6956ad81d6"></a>
@@ -389,6 +398,8 @@ Private Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Pack the gridded sphere fitter state into a communication buffer. </p>
 
 </div>
 </div>
@@ -460,15 +471,25 @@ Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Evaluate gridded domain at given x,y coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude \( u \in [0, \pi] \). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude \( v \). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(u, v) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__gridded__sphere_1_1fitpack__grid__sphere_a7ec28c12c1cc0c09029260c069d93c74_cgraph.png" border="0" usemap="#astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a7ec28c12c1cc0c09029260c069d93c74_cgraph" alt=""/></div>
 <map name="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a7ec28c12c1cc0c09029260c069d93c74_cgraph" id="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a7ec28c12c1cc0c09029260c069d93c74_cgraph">
 <area shape="rect" title="Evaluate gridded domain at given x,y coordinates." alt="" coords="5,5,199,45"/>
-<area shape="rect" href="namespacefitpack__gridded__sphere.html#a242b4327b2f86b3e3637f0aac5293c3b" title=" " alt="" coords="468,5,641,45"/>
+<area shape="rect" href="namespacefitpack__gridded__sphere.html#a242b4327b2f86b3e3637f0aac5293c3b" title="Evaluate the gridded spherical spline on a grid of colatitude and longitude values." alt="" coords="468,5,641,45"/>
 <area shape="poly" title=" " alt="" coords="199,20,247,19,420,19,454,19,454,25,420,24,247,24,199,25"/>
-<area shape="rect" href="namespacefitpack__gridded__sphere.html#aeb38d7634c5e68e0f781eb60e5ff77b5" title=" " alt="" coords="247,33,420,73"/>
+<area shape="rect" href="namespacefitpack__gridded__sphere.html#aeb38d7634c5e68e0f781eb60e5ff77b5" title="Evaluate the gridded spherical spline at a single point." alt="" coords="247,33,420,73"/>
 <area shape="poly" title=" " alt="" coords="199,34,234,39,233,44,199,40"/>
 <area shape="poly" title=" " alt="" coords="420,40,454,35,455,41,421,45"/>
 </map>
@@ -505,6 +526,19 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Evaluate the gridded spherical spline on a grid of colatitude and longitude values. </p>
+<p>Returns \( f(j,i) = s(u_i, v_j) \) for all combinations of the input vectors (tensor-product evaluation).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude evaluation points. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude evaluation points. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Grid of spline values, dimensioned <code>(size(v), size(u))</code>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
+
 </div>
 </div>
 <a id="a8d5a897f7d0eda20c96cc6742ec2db53" name="a8d5a897f7d0eda20c96cc6742ec2db53"></a>
@@ -532,6 +566,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Generate/update fitting curve, with optional smoothing. </p>
+<p>Iterates over the smoothing schedule, calling the spgrid core routine to fit a bicubic spline on the sphere grid. Pole boundary conditions (continuity order, gradient vanishing, exact data) are applied as configured.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Smoothing factor ( \( s \ge 0 \)); default uses stored value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keep_knots</td><td>If <code>.true.</code>, reuse the current knot set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a30c8a4cf89f70ba6c63596bfdcdc3d4e" title="Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).">spgrid</a> </dd></dl>
 
 </div>
 </div>
@@ -571,6 +615,19 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Evaluate the gridded spherical spline on a grid of colatitude and longitude values. </p>
+<p>Returns \( f(j,i) = s(u_i, v_j) \) for all combinations of the input vectors (tensor-product evaluation).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude evaluation points. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude evaluation points. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Grid of spline values, dimensioned <code>(size(v), size(u))</code>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 
 </div>
 </div>
@@ -612,6 +669,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Evaluate gridded domain at given x,y coordinates. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude \( u \in [0, \pi] \). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude \( v \). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Spline value \( s(u, v) \).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> </dd></dl>
 
 </div>
 </div>
@@ -633,6 +700,16 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Fit an interpolating gridded spherical surface ( \( s = 0 \)). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">reset_knots</td><td>If <code>.true.</code> (default), start with fresh knot placement. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a30c8a4cf89f70ba6c63596bfdcdc3d4e" title="Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).">spgrid</a> </dd></dl>
 
 </div>
 </div>
@@ -659,6 +736,17 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Fit a least-squares gridded spherical surface with fixed knots. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing factor for the reset pass. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reset_knots</td><td>If <code>.true.</code>, recompute knots via a smoothing fit first. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a30c8a4cf89f70ba6c63596bfdcdc3d4e" title="Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).">spgrid</a> </dd></dl>
 
 </div>
 </div>
@@ -697,6 +785,17 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Generate new fit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude grid. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude grid. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Gridded function values. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">smoothing</td><td>Optional smoothing factor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Error flag.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a30c8a4cf89f70ba6c63596bfdcdc3d4e" title="Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).">spgrid</a> </dd></dl>
 
 </div>
 </div>
@@ -730,6 +829,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Set new points. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude grid \( u_i \in [0, \pi] \). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude grid \( v_j \) ( \( 2\pi \)-periodic). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Function values \( z(j, i) \), dimensioned <code>(size(v), size(u))</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -761,12 +868,24 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Construct a <a class="el" href="structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html" title="Bicubic spline fitter for data on a latitude-longitude grid.">fitpack_grid_sphere</a> from gridded data and perform an initial fit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Colatitude grid \( u_i \in [0, \pi] \). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Longitude grid \( v_j \) ( \( 2\pi \)-periodic). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Function values \( z(j, i) \), dimensioned <code>(size(v), size(u))</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag; if absent, halts on error.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__core.html#a30c8a4cf89f70ba6c63596bfdcdc3d4e" title="Fit a smooth bivariate spline to gridded data on a sphere (latitude-longitude grid).">spgrid</a> </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__gridded__sphere_1_1fitpack__grid__sphere_af2888dae8777087f76802023b589a0da_cgraph.png" border="0" usemap="#astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_af2888dae8777087f76802023b589a0da_cgraph" alt=""/></div>
 <map name="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_af2888dae8777087f76802023b589a0da_cgraph" id="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_af2888dae8777087f76802023b589a0da_cgraph">
-<area shape="rect" title=" " alt="" coords="5,42,195,97"/>
+<area shape="rect" title="Construct a fitpack_grid_sphere from gridded data and perform an initial fit." alt="" coords="5,42,195,97"/>
 <area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="243,49,396,89"/>
 <area shape="poly" title=" " alt="" coords="195,67,229,67,229,72,195,72"/>
 <area shape="rect" href="namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="444,5,597,45"/>
@@ -799,13 +918,20 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Write to disk. </p>
+<p>Outputs a table with colatitude grid values in rows and longitude grid values in columns, suitable for external plotting or inspection.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fileName</td><td>Output file path. </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structfitpack__gridded__sphere_1_1fitpack__grid__sphere_a3f304962c018881f0fd2de6eef998090_cgraph.png" border="0" usemap="#astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a3f304962c018881f0fd2de6eef998090_cgraph" alt=""/></div>
 <map name="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a3f304962c018881f0fd2de6eef998090_cgraph" id="astructfitpack__gridded__sphere_1_1fitpack__grid__sphere_a3f304962c018881f0fd2de6eef998090_cgraph">
 <area shape="rect" title="Write to disk." alt="" coords="5,5,179,60"/>
-<area shape="rect" href="namespacefitpack__gridded__sphere.html#ad79d9ef6305beda94055823dbbd752fd" title=" " alt="" coords="227,13,416,53"/>
+<area shape="rect" href="namespacefitpack__gridded__sphere.html#ad79d9ef6305beda94055823dbbd752fd" title="Construct a fitpack_grid_sphere from gridded data and perform an initial fit." alt="" coords="227,13,416,53"/>
 <area shape="poly" title=" " alt="" coords="179,30,213,30,213,35,179,35"/>
 </map>
 </div>

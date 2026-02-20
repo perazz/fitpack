@@ -188,6 +188,7 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:a2256640832da2724f9e5058bcebd6ec2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute Fourier coefficients of a cubic spline.  <br /></td></tr>
 <tr class="separator:a2256640832da2724f9e5058bcebd6ec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6b368d82e72f0bde7c8a9cc60eb76f2" id="r_ab6b368d82e72f0bde7c8a9cc60eb76f2"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab6b368d82e72f0bde7c8a9cc60eb76f2">fpader</a> (t, n, c, k1, x, l, d)</td></tr>
+<tr class="memdesc:ab6b368d82e72f0bde7c8a9cc60eb76f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives of a spline at a single point.  <br /></td></tr>
 <tr class="separator:ab6b368d82e72f0bde7c8a9cc60eb76f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bcbf8cf99bfb2ac2f3834891c731be7" id="r_a9bcbf8cf99bfb2ac2f3834891c731be7"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bcbf8cf99bfb2ac2f3834891c731be7">fpadno</a> (maxtr, up, left, right, info, count, merk, jbind, n1, ier)</td></tr>
 <tr class="memdesc:a9bcbf8cf99bfb2ac2f3834891c731be7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a branch to the constraint-set binary tree.  <br /></td></tr>
@@ -217,13 +218,16 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:a3e1011bf7749aa62d3c05bd1a20e36d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify knot positions against data points (Schoenberg-Whitney check).  <br /></td></tr>
 <tr class="separator:a3e1011bf7749aa62d3c05bd1a20e36d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fa29b4729274b28092dd2e3a338f21c" id="r_a7fa29b4729274b28092dd2e3a338f21c"><td class="memItemLeft" align="right" valign="top">pure integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fa29b4729274b28092dd2e3a338f21c">fpched</a> (x, m, t, n, k, ib, ie)</td></tr>
+<tr class="memdesc:a7fa29b4729274b28092dd2e3a338f21c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify knot positions for a constrained spline (Schoenberg-Whitney check).  <br /></td></tr>
 <tr class="separator:a7fa29b4729274b28092dd2e3a338f21c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accaa1729715efbe04726699613597c32" id="r_accaa1729715efbe04726699613597c32"><td class="memItemLeft" align="right" valign="top">pure integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#accaa1729715efbe04726699613597c32">fpchep</a> (x, m, t, n, k)</td></tr>
+<tr class="memdesc:accaa1729715efbe04726699613597c32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify knot positions for a periodic spline (Schoenberg-Whitney check).  <br /></td></tr>
 <tr class="separator:accaa1729715efbe04726699613597c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a899b48e5e372c91998b53c9f1959d177" id="r_a899b48e5e372c91998b53c9f1959d177"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a899b48e5e372c91998b53c9f1959d177">fpclos</a> (iopt, idim, m, u, mx, x, w, k, s, nest, tol, maxit, k1, k2, n, t, nc, c, fp, fpint, z, a1, a2, b, g1, g2, q, nrdata, ier)</td></tr>
 <tr class="memdesc:a899b48e5e372c91998b53c9f1959d177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core algorithm for closed (periodic) parametric curve fitting.  <br /></td></tr>
 <tr class="separator:a899b48e5e372c91998b53c9f1959d177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae099a69d7fc431841d2de41c38e4fcab" id="r_ae099a69d7fc431841d2de41c38e4fcab"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae099a69d7fc431841d2de41c38e4fcab">fpclos_reset_interp</a> (idim, k, m, mx, n, nc, nest, kk, kk1, u, x, t, c, fp, per, fp0, s, fpint, nrdata, done)</td></tr>
+<tr class="memdesc:ae099a69d7fc431841d2de41c38e4fcab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the initial knot configuration for closed-curve interpolation.  <br /></td></tr>
 <tr class="separator:ae099a69d7fc431841d2de41c38e4fcab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4003dce07901ef7e9b8db9bb2a45b97c" id="r_a4003dce07901ef7e9b8db9bb2a45b97c"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4003dce07901ef7e9b8db9bb2a45b97c">fpcoco</a> (iopt, m, x, y, w, v, s, nest, maxtr, maxbin, n, t, c, sq, sx, bind, e, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:a4003dce07901ef7e9b8db9bb2a45b97c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a convexity-constrained cubic smoothing spline.  <br /></td></tr>
@@ -328,6 +332,7 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:a408ada754639be78ba19d10d4e92d560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core algorithm for univariate periodic spline fitting.  <br /></td></tr>
 <tr class="separator:a408ada754639be78ba19d10d4e92d560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58bbdfcdf11801b4bacf532b022a2815" id="r_a58bbdfcdf11801b4bacf532b022a2815"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a58bbdfcdf11801b4bacf532b022a2815">fpperi_reset_interp</a> (k, m, n, nest, kk, kk1, x, y, t, c, fp, per, fp0, s, fpint, nrdata, done)</td></tr>
+<tr class="memdesc:a58bbdfcdf11801b4bacf532b022a2815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the initial knot configuration for periodic spline interpolation.  <br /></td></tr>
 <tr class="separator:a58bbdfcdf11801b4bacf532b022a2815"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c1c9269f27beeddee5d8b680aaa7140" id="r_a1c1c9269f27beeddee5d8b680aaa7140"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1c1c9269f27beeddee5d8b680aaa7140">fppocu</a> (idim, k, a, b, ib, db, nb, ie, de, ne, cp, np)</td></tr>
 <tr class="memdesc:a1c1c9269f27beeddee5d8b680aaa7140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a polynomial curve satisfying endpoint derivative constraints.  <br /></td></tr>
@@ -339,6 +344,7 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:ac854d9583be2e3e162a00fd43dc20314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core algorithm for spline fitting on a polar domain.  <br /></td></tr>
 <tr class="separator:ac854d9583be2e3e162a00fd43dc20314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd90889b0d56592815337f99a849bc7a" id="r_afd90889b0d56592815337f99a849bc7a"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd90889b0d56592815337f99a849bc7a">root_finding_iterate</a> (p1, f1, p2, f2, p3, f3, p, fpms, acc, check1, check3, success)</td></tr>
+<tr class="memdesc:afd90889b0d56592815337f99a849bc7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the smoothing parameter \( p \) during iterative knot selection.  <br /></td></tr>
 <tr class="separator:afd90889b0d56592815337f99a849bc7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab08555e9bd2f44d1461e09ba35a7bb22" id="r_ab08555e9bd2f44d1461e09ba35a7bb22"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab08555e9bd2f44d1461e09ba35a7bb22">fprank</a> (a, f, n, m, na, tol, c, sq, rank, aa, ff, h)</td></tr>
 <tr class="memdesc:ab08555e9bd2f44d1461e09ba35a7bb22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the minimum-norm least-squares solution under rank deficiency.  <br /></td></tr>
@@ -350,6 +356,7 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:a26879f854f0e23671e8fd07f9f144410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver for rectangular grid smoothing surface with knot selection.  <br /></td></tr>
 <tr class="separator:a26879f854f0e23671e8fd07f9f144410"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c4fa92fbc6556a21d112fbdfbd0f80f" id="r_a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="memItemLeft" align="right" valign="top">elemental integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c4fa92fbc6556a21d112fbdfbd0f80f">new_knot_dimension</a> (n1, n1add, n1max, n2, n2add, n2max, last)</td></tr>
+<tr class="memdesc:a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Choose which dimension receives the next knot during bivariate fitting.  <br /></td></tr>
 <tr class="separator:a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3804afa034c5c78f99a71f867d53de7c" id="r_a3804afa034c5c78f99a71f867d53de7c"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3804afa034c5c78f99a71f867d53de7c">fprota</a> (cos, sin, a, b)</td></tr>
 <tr class="memdesc:a3804afa034c5c78f99a71f867d53de7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a Givens plane rotation to two scalars.  <br /></td></tr>
@@ -370,6 +377,7 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:a6b16cd0ae09d295a9bdf3723c10db8e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core algorithm for spline fitting on the sphere.  <br /></td></tr>
 <tr class="separator:a6b16cd0ae09d295a9bdf3723c10db8e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93f9263090199970a23f6dfca11227cf" id="r_a93f9263090199970a23f6dfca11227cf"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93f9263090199970a23f6dfca11227cf">fpsuev</a> (idim, tu, nu, tv, nv, c, u, mu, v, mv, f, wu, wv, lu, lv)</td></tr>
+<tr class="memdesc:a93f9263090199970a23f6dfca11227cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a parametric bicubic tensor-product spline surface.  <br /></td></tr>
 <tr class="separator:a93f9263090199970a23f6dfca11227cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a999c5b98cb9e681f3045c39c6dea7151" id="r_a999c5b98cb9e681f3045c39c6dea7151"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a999c5b98cb9e681f3045c39c6dea7151">fpsurf</a> (iopt, m, x, y, z, w, xb, xe, yb, ye, kxx, kyy, s, nxest, nyest, eta, tol, maxit, nmax, km1, km2, ib1, ib3, nc, intest, nrest, nx0, tx, ny0, ty, c, fp, fp0, fpint, coord, f, ff, a, q, bx, by, spx, spy, h, index, nummer, wrk, lwrk, ier)</td></tr>
 <tr class="memdesc:a999c5b98cb9e681f3045c39c6dea7151"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core algorithm for bivariate tensor-product spline surface fitting.  <br /></td></tr>
@@ -1056,7 +1064,7 @@ Here is the call graph for this function:</div>
 <area shape="rect" title="Determine a smooth closed parametric spline curve approximation." alt="" coords="5,603,153,629"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="840,525,985,550"/>
 <area shape="poly" title=" " alt="" coords="143,626,265,645,343,652,428,657,519,657,611,651,703,637,791,614,843,588,885,557,888,562,846,593,793,618,704,642,612,656,519,662,428,662,342,658,264,650,142,631"/>
-<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="201,578,355,603"/>
+<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="201,578,355,603"/>
 <area shape="poly" title=" " alt="" coords="153,604,187,600,188,605,154,609"/>
 <area shape="rect" href="namespacefitpack__core.html#a899b48e5e372c91998b53c9f1959d177" title="Core algorithm for closed (periodic) parametric curve fitting." alt="" coords="204,335,352,361"/>
 <area shape="poly" title=" " alt="" coords="88,601,257,370,261,373,92,605"/>
@@ -1077,13 +1085,13 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="288,359,331,429,365,471,404,507,428,521,425,526,401,511,361,474,327,432,284,362"/>
 <area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="412,578,561,603"/>
 <area shape="poly" title=" " alt="" coords="285,360,299,400,322,456,357,514,379,541,404,565,411,569,408,574,401,569,375,545,353,517,318,458,294,402,280,362"/>
-<area shape="rect" href="namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title=" " alt="" coords="413,5,561,45"/>
+<area shape="rect" href="namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title="Set up the initial knot configuration for closed&#45;curve interpolation." alt="" coords="413,5,561,45"/>
 <area shape="poly" title=" " alt="" coords="279,334,289,284,310,209,326,168,346,128,371,89,401,55,406,51,409,55,405,59,375,93,351,130,331,171,315,211,294,285,284,335"/>
 <area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="413,70,561,95"/>
 <area shape="poly" title=" " alt="" coords="280,334,292,290,315,229,351,163,374,133,401,106,410,100,413,104,404,110,378,136,355,166,320,231,297,292,285,336"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="411,185,562,210"/>
 <area shape="poly" title=" " alt="" coords="286,334,331,279,364,248,401,220,416,213,418,218,404,225,368,252,335,283,290,337"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="419,120,554,160"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="419,120,554,160"/>
 <area shape="poly" title=" " alt="" coords="283,334,325,258,359,211,401,170,409,165,412,169,404,174,363,214,329,260,287,336"/>
 <area shape="poly" title=" " alt="" coords="572,262,625,274,683,291,741,316,794,349,833,387,864,431,888,474,904,511,899,513,883,477,860,434,829,390,790,353,738,320,681,296,623,279,570,268"/>
 <area shape="poly" title=" " alt="" coords="546,272,572,284,630,319,678,353,675,357,627,323,569,289,544,277"/>
@@ -1660,7 +1668,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="86,247,102,214,127,171,162,126,204,87,255,55,300,39,347,30,408,22,517,7,604,3,690,11,798,33,842,46,882,64,880,68,840,51,797,38,689,17,603,9,517,13,408,27,348,36,301,44,257,60,207,91,166,129,132,174,107,217,91,249"/>
 <area shape="rect" href="namespacefitpack__core.html#a8b4b656d4556778559ffea0d15d20e55" title="Add a polynomial curve to a spline curve in B&#45;spline representation." alt="" coords="205,272,360,297"/>
 <area shape="poly" title=" " alt="" coords="158,267,192,271,191,276,157,272"/>
-<area shape="rect" href="namespacefitpack__core.html#a7fa29b4729274b28092dd2e3a338f21c" title=" " alt="" coords="206,321,359,347"/>
+<area shape="rect" href="namespacefitpack__core.html#a7fa29b4729274b28092dd2e3a338f21c" title="Verify knot positions for a constrained spline (Schoenberg&#45;Whitney check)." alt="" coords="206,321,359,347"/>
 <area shape="poly" title=" " alt="" coords="115,271,206,306,230,314,228,319,204,311,113,276"/>
 <area shape="rect" href="namespacefitpack__core.html#a17a3995cbff15ef64c241c059a40e682" title="Core algorithm for constrained parametric curve fitting." alt="" coords="207,223,359,248"/>
 <area shape="poly" title=" " alt="" coords="157,248,192,244,193,249,158,254"/>
@@ -1689,7 +1697,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="339,246,362,257,377,272,386,287,395,301,410,315,422,322,420,326,406,319,391,304,382,289,373,275,358,262,336,250"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="417,379,567,404"/>
 <area shape="poly" title=" " alt="" coords="344,246,362,257,374,271,381,285,387,312,392,339,399,351,410,364,418,370,415,374,406,368,394,354,387,341,381,313,376,287,369,274,358,261,341,250"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="425,429,559,469"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="425,429,559,469"/>
 <area shape="poly" title=" " alt="" coords="346,246,362,257,377,277,385,297,387,336,390,375,396,394,410,414,415,418,411,422,406,417,392,397,384,376,382,337,380,299,372,280,358,261,343,250"/>
 <area shape="poly" title=" " alt="" coords="576,152,840,98,841,103,577,157"/>
 <area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="636,173,785,199"/>
@@ -1782,7 +1790,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>At a knot, right derivatives are computed (left derivatives at the right boundary).</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> — scalar variant; <a class="el" href="#ab6b368d82e72f0bde7c8a9cc60eb76f2">fpader</a> — derivative computation kernel </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a0c64b88d2d403641e200a68c9604f425" title="Evaluate all derivatives of a spline at a single point.">spalde</a> — scalar variant; <a class="el" href="#ab6b368d82e72f0bde7c8a9cc60eb76f2" title="Evaluate all derivatives of a spline at a single point.">fpader</a> — derivative computation kernel </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1791,7 +1799,7 @@ Here is the call graph for this function:</div>
 <area shape="rect" title="Evaluate all derivatives of a parametric spline curve at a single point." alt="" coords="5,42,157,67"/>
 <area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="205,5,364,45"/>
 <area shape="poly" title=" " alt="" coords="157,41,191,36,192,41,158,46"/>
-<area shape="rect" href="namespacefitpack__core.html#ab6b368d82e72f0bde7c8a9cc60eb76f2" title=" " alt="" coords="209,70,360,95"/>
+<area shape="rect" href="namespacefitpack__core.html#ab6b368d82e72f0bde7c8a9cc60eb76f2" title="Evaluate all derivatives of a spline at a single point." alt="" coords="209,70,360,95"/>
 <area shape="poly" title=" " alt="" coords="158,62,196,68,196,73,157,68"/>
 </map>
 </div>
@@ -2040,7 +2048,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="283,271,325,335,358,372,397,404,410,410,407,415,395,408,355,376,321,338,278,274"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="420,140,571,165"/>
 <area shape="poly" title=" " alt="" coords="287,244,333,209,395,174,414,167,416,172,397,179,336,214,290,249"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="428,75,563,115"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="428,75,563,115"/>
 <area shape="poly" title=" " alt="" coords="280,245,324,188,357,154,395,125,414,115,416,120,397,130,361,158,328,191,284,248"/>
 <area shape="poly" title=" " alt="" coords="553,187,608,177,675,171,746,170,817,178,862,192,902,210,900,215,860,197,815,183,746,175,675,176,609,183,554,192"/>
 <area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="655,243,804,268"/>
@@ -4141,6 +4149,29 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Evaluate all derivatives of a spline at a single point. </p>
+<p>Computes all \( k+1 \) derivatives of a spline of order \( k_1 = k+1 \) at a point \( x \) in the knot interval \( [\lambda_l, \lambda_{l+1}) \):</p>
+<p class="formulaDsp">
+\[              d(j) = s^{(j-1)}(x), \quad j = 1, \ldots, k_1
+\]
+</p>
+<p>Uses the stable recurrence scheme of de Boor, which first forms divided differences of the B-spline coefficients, then evaluates each derivative level by the standard B-spline recursion.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Knot vector \( \lambda_1, \ldots, \lambda_n \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Length of the knot vector </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( n \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k1</td><td>Spline order \( k+1 \) (= degree + 1) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Evaluation point, \( \lambda_l \leq x &lt; \lambda_{l+1} \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>Knot interval index </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">d</td><td>Array of derivatives: <code>d(j)</code> = \( s^{(j-1)}(x) \), \( j = 1, \ldots, k_1 \)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, §1.4 (pp. 11-14): de Boor recurrence for derivatives </dd>
+<dd>
+de Boor, C. (1978). <em>A Practical Guide to Splines</em>. Springer. </dd></dl>
+
 </div>
 </div>
 <a id="a9bcbf8cf99bfb2ac2f3834891c731be7" name="a9bcbf8cf99bfb2ac2f3834891c731be7"></a>
@@ -4941,6 +4972,32 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Verify knot positions for a constrained spline (Schoenberg-Whitney check). </p>
+<p>Checks that the knots \( \lambda_j \), \( j = 1, \ldots, n \), of a spline of degree \( k \) with \( i_b \) derivative constraints at \( x_1 \) and \( i_e \) constraints at \( x_m \), satisfy all conditions required for a well-posed least-squares problem:</p>
+<ol type="1">
+<li>\( k+1 \leq n-k-1 \leq m + \max(0, i_b - 1) + \max(0, i_e - 1) \)</li>
+<li>Boundary knot monotonicity</li>
+<li>Interior knots strictly increasing</li>
+<li>\( \lambda_{k+1} \leq x_1 \) and \( x_m \leq \lambda_{n-k} \)</li>
+<li>Schoenberg-Whitney conditions (Eq. 4.5) for the subset of unconstrained equations</li>
+</ol>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Data abscissae, strictly increasing </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of data points </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Knot vector \( \lambda_1, \ldots, \lambda_n \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ib</td><td>Number of derivative constraints at \( x_1 \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ie</td><td>Number of derivative constraints at \( x_m \)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>FITPACK_OK</code> if all conditions hold, <code>FITPACK_INPUT_ERROR</code> otherwise.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, §8.2 (pp. 141-146): constrained curve fitting </dd>
+<dd>
+Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5 </dd></dl>
+
 </div>
 </div>
 <a id="accaa1729715efbe04726699613597c32" name="accaa1729715efbe04726699613597c32"></a>
@@ -4984,6 +5041,30 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Verify knot positions for a periodic spline (Schoenberg-Whitney check). </p>
+<p>Checks that the knots \( \lambda_j \), \( j = 1, \ldots, n \), of a periodic spline of degree \( k \) satisfy all conditions required for a well-posed least-squares problem with data points \( x_i \):</p>
+<ol type="1">
+<li>\( k+1 \leq n-k-1 \leq m+k-1 \)</li>
+<li>Boundary knot monotonicity</li>
+<li>Interior knots strictly increasing</li>
+<li>\( \lambda_{k+1} \leq x_1 \) and \( x_m \leq \lambda_{n-k} \)</li>
+<li>Schoenberg-Whitney conditions for the periodic basis: a subset \( y_j \) satisfying \( \lambda_j &lt; y_j &lt; \lambda_{j+k+1} \) must exist, where values may wrap around with period \( T = \lambda_{n-k} - \lambda_{k+1} \)</li>
+</ol>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Data abscissae, strictly increasing </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of data points </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Knot vector \( \lambda_1, \ldots, \lambda_n \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>FITPACK_OK</code> if all conditions hold, <code>FITPACK_INPUT_ERROR</code> otherwise.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, §6.1 (pp. 95-100): periodic spline fitting </dd>
+<dd>
+Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5 </dd></dl>
 
 </div>
 </div>
@@ -5214,13 +5295,13 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="127,315,227,344,225,349,125,321"/>
 <area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="211,70,360,95"/>
 <area shape="poly" title=" " alt="" coords="83,291,98,256,123,209,157,158,200,113,222,99,225,103,203,117,161,161,127,211,103,258,88,293"/>
-<area shape="rect" href="namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title=" " alt="" coords="211,400,359,440"/>
+<area shape="rect" href="namespacefitpack__core.html#ae099a69d7fc431841d2de41c38e4fcab" title="Set up the initial knot configuration for closed&#45;curve interpolation." alt="" coords="211,400,359,440"/>
 <area shape="poly" title=" " alt="" coords="98,316,144,350,203,386,215,392,213,397,200,390,141,354,95,320"/>
 <area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="211,465,359,490"/>
 <area shape="poly" title=" " alt="" coords="90,317,132,380,165,418,203,450,216,457,213,462,200,454,161,421,128,384,85,320"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="210,514,361,539"/>
 <area shape="poly" title=" " alt="" coords="87,317,101,354,125,403,159,456,180,480,203,501,210,506,207,510,200,505,176,483,155,459,120,406,96,356,82,319"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="218,564,353,604"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="218,564,353,604"/>
 <area shape="poly" title=" " alt="" coords="86,317,98,361,120,423,155,491,177,522,203,550,208,554,205,559,199,554,173,526,150,494,115,425,93,363,81,319"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="639,131,784,157"/>
 <area shape="poly" title=" " alt="" coords="370,309,421,308,478,302,535,290,589,270,622,248,651,221,693,167,697,170,655,225,626,252,592,274,537,295,479,308,422,313,370,314"/>
@@ -5357,6 +5438,35 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Set up the initial knot configuration for closed-curve interpolation. </p>
+<p>When \( s = 0 \) (interpolation) and \( k \) is odd, places interior knots at the data parameter values. For \( k = 1 \) (linear), directly sets the B-spline coefficients from the data and returns the exact interpolant. When \( k \) is even, knots are placed at midpoints of consecutive parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">idim</td><td>Number of dimensions </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of data points </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mx</td><td>Length of data array <code>x</code> (= <code>m * idim</code>) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nc</td><td>Length of coefficient array <code>c</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nest</td><td>Maximum knots allowed </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">kk</td><td>Adjusted degree for iteration </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">kk1</td><td>Adjusted order for iteration </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Parameter values, length <code>m</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Data coordinates, length <code>mx</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">t</td><td>Knot vector, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">c</td><td>B-spline coefficients, length <code>nc</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fp</td><td>Weighted sum of squared residuals </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">per</td><td>Period \( = u_m - u_1 \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fp0</td><td>Upper bound for the smoothing factor </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>Smoothing factor </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fpint</td><td>Knot interval contributions, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nrdata</td><td>Data point counts per interval, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">done</td><td><code>.true.</code> if the interpolant was fully determined</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112): closed periodic spline fitting </dd></dl>
 
 </div>
 </div>
@@ -5792,7 +5902,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="112,244,206,283,231,291,230,296,204,288,110,249"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="214,347,365,373"/>
 <area shape="poly" title=" " alt="" coords="96,244,142,288,173,312,207,334,220,340,218,345,204,338,170,317,138,292,92,248"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="222,397,357,437"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="222,397,357,437"/>
 <area shape="poly" title=" " alt="" coords="92,245,135,310,168,349,207,383,215,389,212,393,204,387,165,353,131,313,88,248"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="643,81,788,106"/>
 <area shape="poly" title=" " alt="" coords="374,128,629,100,629,105,374,133"/>
@@ -6347,7 +6457,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="106,232,201,273,226,280,224,286,199,278,104,237"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="224,336,375,361"/>
 <area shape="poly" title=" " alt="" coords="93,233,138,277,168,302,201,322,217,329,215,334,199,327,165,306,134,281,89,237"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,386,367,426"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,386,367,426"/>
 <area shape="poly" title=" " alt="" coords="89,233,131,299,163,338,202,372,221,383,218,387,198,376,159,342,126,302,84,236"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="668,80,813,105"/>
 <area shape="poly" title=" " alt="" coords="398,121,446,115,654,97,654,102,447,121,399,126"/>
@@ -9283,7 +9393,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="111,244,205,283,230,291,228,296,203,288,109,249"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="213,347,363,373"/>
 <area shape="poly" title=" " alt="" coords="95,244,141,288,172,312,205,334,219,340,217,345,203,338,169,317,137,292,92,248"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="221,397,355,437"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="221,397,355,437"/>
 <area shape="poly" title=" " alt="" coords="91,245,134,310,167,349,206,383,213,388,210,393,202,387,163,353,130,313,87,248"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="641,81,787,106"/>
 <area shape="poly" title=" " alt="" coords="372,128,628,100,628,105,373,133"/>
@@ -9570,9 +9680,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="109,221,206,180,231,172,233,177,208,185,111,226"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="217,194,368,219"/>
 <area shape="poly" title=" " alt="" coords="159,223,203,216,204,222,159,228"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="207,244,379,284"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="207,244,379,284"/>
 <area shape="poly" title=" " alt="" coords="159,244,194,248,193,253,159,249"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="225,308,360,348"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="225,308,360,348"/>
 <area shape="poly" title=" " alt="" coords="109,246,208,294,224,301,222,305,206,298,107,251"/>
 <area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="427,155,580,181"/>
 <area shape="poly" title=" " alt="" coords="369,158,413,161,413,166,368,164"/>
@@ -9821,9 +9931,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="98,309,143,340,201,371,221,378,219,383,199,376,140,345,95,314"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="224,434,375,459"/>
 <area shape="poly" title=" " alt="" coords="91,310,134,364,165,395,201,420,214,427,212,431,199,425,162,399,130,367,86,313"/>
-<area shape="rect" href="namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="226,484,373,524"/>
+<area shape="rect" href="namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title="Set up the initial knot configuration for periodic spline interpolation." alt="" coords="226,484,373,524"/>
 <area shape="poly" title=" " alt="" coords="88,311,103,343,128,386,161,431,202,470,215,478,212,483,198,474,157,434,123,389,98,345,83,313"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,548,367,588"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,548,367,588"/>
 <area shape="poly" title=" " alt="" coords="85,311,97,354,119,414,154,478,176,508,202,534,220,546,217,551,198,538,172,511,149,481,115,416,92,355,80,312"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="668,131,813,157"/>
 <area shape="poly" title=" " alt="" coords="399,306,451,306,508,301,565,289,619,270,652,248,681,221,723,167,727,170,685,225,655,252,621,274,566,295,509,306,451,311,399,311"/>
@@ -9945,6 +10055,32 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Set up the initial knot configuration for periodic spline interpolation. </p>
+<p>When \( s = 0 \) (interpolation) and \( k \) is odd, places interior knots at the data abscissae. For \( k = 1 \) (linear), directly sets the B-spline coefficients from the data and returns the exact interpolant. When \( k \) is even, knots are placed at midpoints of consecutive abscissae.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of data points </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nest</td><td>Maximum knots allowed </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">kk</td><td>Adjusted degree for iteration </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">kk1</td><td>Adjusted order for iteration </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Data abscissae, length <code>m</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Data ordinates, length <code>m</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">t</td><td>Knot vector, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">c</td><td>B-spline coefficients, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fp</td><td>Weighted sum of squared residuals </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">per</td><td>Period \( = x_m - x_1 \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fp0</td><td>Upper bound for the smoothing factor </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>Smoothing factor </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fpint</td><td>Knot interval contributions, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nrdata</td><td>Data point counts per interval, length <code>nest</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">done</td><td><code>.true.</code> if the interpolant was fully determined</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112): periodic spline fitting </dd></dl>
 
 </div>
 </div>
@@ -10340,9 +10476,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="107,289,203,247,225,240,227,245,205,252,109,294"/>
 <area shape="rect" href="namespacefitpack__core.html#a07a9d1d759c2a6d39e91039f904c923b" title="Compute smoothing spline on a polar grid with origin constraints." alt="" coords="215,262,365,287"/>
 <area shape="poly" title=" " alt="" coords="156,291,201,284,201,290,156,296"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="204,312,376,352"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="204,312,376,352"/>
 <area shape="poly" title=" " alt="" coords="156,311,191,316,190,321,156,317"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="223,376,357,416"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="223,376,357,416"/>
 <area shape="poly" title=" " alt="" coords="108,314,205,362,222,369,220,373,203,366,105,319"/>
 <area shape="rect" href="namespacefitpack__core.html#a03d606165767f7703429cb55181efe11" title="Compute spline coefficients on a polar/spherical grid via Kronecker product." alt="" coords="427,287,573,313"/>
 <area shape="poly" title=" " alt="" coords="366,281,413,287,413,292,365,286"/>
@@ -10738,7 +10874,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="85,315,100,282,126,237,160,190,202,149,228,135,231,139,206,153,164,194,130,240,105,284,90,317"/>
 <area shape="rect" href="namespacefitpack__core.html#a85e2e23efd601e9e1e28c0195664dd16" title="Convert constrained polar spline coefficients to standard form." alt="" coords="228,572,379,597"/>
 <area shape="poly" title=" " alt="" coords="87,341,99,383,122,442,157,504,180,533,206,557,217,565,214,569,202,561,176,536,153,507,117,444,94,385,82,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="236,622,371,662"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="236,622,371,662"/>
 <area shape="poly" title=" " alt="" coords="86,341,96,390,117,462,133,502,153,540,177,576,206,608,225,621,222,626,202,612,173,580,148,543,128,504,112,464,91,392,81,342"/>
 <area shape="poly" title=" " alt="" coords="711,210,704,200,707,190,721,184,745,181,773,185,785,194,781,198,771,190,745,187,723,189,711,193,709,199,715,206"/>
 <area shape="poly" title=" " alt="" coords="403,218,658,218,658,223,403,223"/>
@@ -11232,9 +11368,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="105,195,200,154,222,146,224,151,202,158,107,200"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="212,169,363,194"/>
 <area shape="poly" title=" " alt="" coords="153,198,198,191,199,196,154,203"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="201,219,373,259"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="201,219,373,259"/>
 <area shape="poly" title=" " alt="" coords="154,218,188,223,187,228,153,223"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="220,283,355,323"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="220,283,355,323"/>
 <area shape="poly" title=" " alt="" coords="106,221,202,268,219,275,217,280,200,273,103,226"/>
 <area shape="rect" href="namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="421,169,589,209"/>
 <area shape="poly" title=" " alt="" coords="337,142,416,163,415,168,336,147"/>
@@ -11850,9 +11986,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="107,289,203,247,225,240,227,245,205,252,109,294"/>
 <area shape="rect" href="namespacefitpack__core.html#a383ad79ef10f0ff29a9122c3f736178e" title="Compute smoothing spline on a spherical grid with pole constraints." alt="" coords="213,262,367,287"/>
 <area shape="poly" title=" " alt="" coords="156,291,199,285,200,290,156,296"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="204,312,376,352"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="204,312,376,352"/>
 <area shape="poly" title=" " alt="" coords="156,311,191,316,190,321,156,317"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="223,376,357,416"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="223,376,357,416"/>
 <area shape="poly" title=" " alt="" coords="108,314,205,362,222,369,220,373,203,366,105,319"/>
 <area shape="rect" href="namespacefitpack__core.html#a74a11f85ace5b032c95c53307fa47913" title="Compute spherical grid spline coefficients via Kronecker product." alt="" coords="425,287,575,313"/>
 <area shape="poly" title=" " alt="" coords="367,281,411,287,411,292,366,287"/>
@@ -12231,7 +12367,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="86,315,102,282,128,237,162,190,205,149,231,135,234,139,208,153,166,194,132,240,107,284,91,317"/>
 <area shape="rect" href="namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="231,572,381,597"/>
 <area shape="poly" title=" " alt="" coords="89,341,101,383,124,442,160,504,182,533,208,557,219,565,216,569,205,561,178,536,155,507,119,444,96,385,84,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="239,622,373,662"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="239,622,373,662"/>
 <area shape="poly" title=" " alt="" coords="88,341,98,390,119,462,135,502,155,540,179,576,208,608,228,621,225,625,205,612,175,580,150,543,130,504,114,464,93,392,83,342"/>
 <area shape="poly" title=" " alt="" coords="714,210,706,200,710,190,724,184,747,181,776,185,787,194,784,198,774,190,747,187,725,189,714,193,712,199,718,206"/>
 <area shape="poly" title=" " alt="" coords="406,218,661,218,661,223,406,223"/>
@@ -12347,12 +12483,42 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Evaluate a parametric bicubic tensor-product spline surface. </p>
+<p>Computes the values of a \( d \)-dimensional bicubic spline surface \( (s_1(u,v), \ldots, s_d(u,v)) \) at the grid points \( (u_i, v_j) \), \( i = 1, \ldots, m_u \), \( j = 1, \ldots, m_v \).</p>
+<p>For each dimension, the evaluation uses the tensor-product decomposition:</p>
+<p class="formulaDsp">
+\[              s(u, v) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j,4}(v) \right) N_{i,4}(u)
+\]
+</p>
+<p>This is the computational core called by <code>surev</code> after input validation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">idim</td><td>Number of coordinate dimensions </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tu</td><td>Knot vector in \( u \), length <code>nu</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Number of knots in \( u \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tv</td><td>Knot vector in \( v \), length <code>nv</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nv</td><td>Number of knots in \( v \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length <code>(nu-4)*(nv-4)*idim</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Evaluation points in \( u \), length <code>mu</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mu</td><td>Number of evaluation points in \( u \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>Evaluation points in \( v \), length <code>mv</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mv</td><td>Number of evaluation points in \( v \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">f</td><td>Surface values, length <code>mu * mv * idim</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">wu</td><td>B-spline basis values in \( u \), <code>wu(mu, 4)</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">wv</td><td>B-spline basis values in \( v \), <code>wv(mv, 4)</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lu</td><td>Knot interval indices in \( u \), length <code>mu</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lv</td><td>Knot interval indices in \( v \), length <code>mv</code></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17 </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__core_a93f9263090199970a23f6dfca11227cf_cgraph.png" border="0" usemap="#anamespacefitpack__core_a93f9263090199970a23f6dfca11227cf_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_a93f9263090199970a23f6dfca11227cf_cgraph" id="anamespacefitpack__core_a93f9263090199970a23f6dfca11227cf_cgraph">
-<area shape="rect" title=" " alt="" coords="5,42,159,67"/>
+<area shape="rect" title="Evaluate a parametric bicubic tensor&#45;product spline surface." alt="" coords="5,42,159,67"/>
 <area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="207,5,365,45"/>
 <area shape="poly" title=" " alt="" coords="158,41,193,36,193,41,159,46"/>
 <area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="211,70,361,95"/>
@@ -12722,7 +12888,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="98,311,143,342,201,373,221,380,219,385,199,378,140,347,95,316"/>
 <area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="224,124,375,149"/>
 <area shape="poly" title=" " alt="" coords="85,286,128,225,160,190,199,160,213,152,216,157,201,164,164,194,132,229,90,289"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,437,367,477"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,437,367,477"/>
 <area shape="poly" title=" " alt="" coords="91,312,135,365,166,396,201,422,220,432,218,437,199,427,163,400,131,369,87,315"/>
 <area shape="rect" href="fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="264,501,335,527"/>
 <area shape="poly" title=" " alt="" coords="87,313,101,348,125,395,158,445,179,467,201,486,225,499,251,506,250,512,223,504,199,491,175,471,154,448,120,398,96,350,82,315"/>
@@ -13514,6 +13680,22 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Choose which dimension receives the next knot during bivariate fitting. </p>
+<p>Selects whether to add a knot in dimension 1 or 2, balancing knot insertion across dimensions. Prefers dimension 2 when it has fewer added knots, unless dimension 1 is at its maximum or no knot has been added yet.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n1</td><td>Current number of knots in dimension 1 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n1add</td><td>Number of knots added to dimension 1 this iteration </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n1max</td><td>Maximum allowed knots in dimension 1 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n2</td><td>Current number of knots in dimension 2 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n2add</td><td>Number of knots added to dimension 2 this iteration </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n2max</td><td>Maximum allowed knots in dimension 2 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">last</td><td>Last dimension a knot was added to (<code>KNOT_DIM_1</code>, <code>KNOT_DIM_2</code>, or <code>KNOT_DIM_NONE</code>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>KNOT_DIM_1</code> or <code>KNOT_DIM_2</code> </dd></dl>
+
 </div>
 </div>
 <a id="a2509dd629f972935555488cd2db1bff2" name="a2509dd629f972935555488cd2db1bff2"></a>
@@ -13737,7 +13919,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="287,201,331,140,364,104,403,73,414,67,416,72,405,78,367,108,335,143,291,204"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="413,88,563,113"/>
 <area shape="poly" title=" " alt="" coords="294,201,340,163,403,124,422,115,424,120,405,128,343,167,297,205"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="421,138,555,178"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="421,138,555,178"/>
 <area shape="poly" title=" " alt="" coords="326,200,407,178,408,183,328,205"/>
 <area shape="poly" title=" " alt="" coords="572,258,793,222,838,213,839,219,794,227,572,263"/>
 <area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="632,339,781,364"/>
@@ -14257,7 +14439,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="156,385,310,374,490,367,912,367,972,363,1032,349,1090,330,1145,306,1240,254,1306,210,1309,214,1242,259,1147,311,1092,335,1033,355,973,368,912,373,490,373,310,379,157,391"/>
 <area shape="rect" href="namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="205,408,357,433"/>
 <area shape="poly" title=" " alt="" coords="156,402,191,407,190,412,156,407"/>
-<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="204,457,357,483"/>
+<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="204,457,357,483"/>
 <area shape="poly" title=" " alt="" coords="112,406,205,444,225,451,223,456,203,448,110,411"/>
 <area shape="rect" href="namespacefitpack__core.html#a19127c353493bb69ea3a6c3c382895d7" title="Core algorithm for parametric surface fitting on a grid." alt="" coords="204,127,357,152"/>
 <area shape="poly" title=" " alt="" coords="90,381,259,161,263,164,94,384"/>
@@ -14266,9 +14448,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="329,149,432,178,430,183,327,155"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="416,5,567,31"/>
 <area shape="poly" title=" " alt="" coords="293,125,340,84,371,61,404,41,422,33,425,38,407,46,374,65,343,88,297,129"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="405,119,577,159"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="405,119,577,159"/>
 <area shape="poly" title=" " alt="" coords="358,137,392,137,392,142,358,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="424,55,559,95"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="424,55,559,95"/>
 <area shape="poly" title=" " alt="" coords="323,124,411,97,412,102,324,129"/>
 <area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="625,208,779,233"/>
 <area shape="poly" title=" " alt="" coords="567,203,612,208,611,213,567,208"/>
@@ -14432,7 +14614,7 @@ Here is the call graph for this function:</div>
 <area shape="rect" title="Determine a smooth periodic spline approximation to data." alt="" coords="5,613,156,639"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="873,431,1019,456"/>
 <area shape="poly" title=" " alt="" coords="156,634,289,644,371,646,460,643,553,634,646,617,738,591,824,554,855,535,882,511,925,465,929,469,886,515,858,539,827,559,740,596,648,622,554,639,460,648,371,651,288,650,156,639"/>
-<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="204,664,357,689"/>
+<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="204,664,357,689"/>
 <area shape="poly" title=" " alt="" coords="132,636,217,658,216,663,131,641"/>
 <area shape="rect" href="namespacefitpack__core.html#a408ada754639be78ba19d10d4e92d560" title="Core algorithm for univariate periodic spline fitting." alt="" coords="207,315,354,340"/>
 <area shape="poly" title=" " alt="" coords="88,612,261,350,266,353,93,615"/>
@@ -14455,9 +14637,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="290,339,305,372,330,416,364,461,407,500,419,507,416,511,404,504,360,465,326,419,300,375,285,341"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="429,5,580,31"/>
 <area shape="poly" title=" " alt="" coords="281,314,290,263,311,189,327,149,348,110,373,73,404,41,415,33,418,37,407,45,377,76,352,113,332,151,316,191,295,264,286,315"/>
-<area shape="rect" href="namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title=" " alt="" coords="431,119,578,159"/>
+<area shape="rect" href="namespacefitpack__core.html#a58bbdfcdf11801b4bacf532b022a2815" title="Set up the initial knot configuration for periodic spline interpolation." alt="" coords="431,119,578,159"/>
 <area shape="poly" title=" " alt="" coords="287,313,331,249,365,210,404,176,425,163,428,168,407,180,369,214,336,252,292,316"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="437,55,572,95"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="437,55,572,95"/>
 <area shape="poly" title=" " alt="" coords="283,313,297,273,321,217,356,157,378,130,404,105,423,93,426,97,407,109,382,133,360,160,325,220,302,275,288,315"/>
 <area shape="poly" title=" " alt="" coords="604,242,658,246,715,256,773,271,827,296,862,322,893,355,934,417,930,420,888,358,859,326,824,300,771,276,714,261,657,252,604,248"/>
 <area shape="poly" title=" " alt="" coords="604,234,650,229,651,234,604,239"/>
@@ -14613,7 +14795,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="103,124,167,91,261,51,315,32,373,17,431,6,490,3,911,3,975,12,1060,36,1147,70,1185,90,1216,110,1252,143,1282,181,1324,249,1320,252,1278,184,1248,147,1213,114,1182,94,1145,75,1058,41,974,17,910,8,490,8,432,12,374,22,317,37,263,56,169,95,105,128"/>
 <area shape="rect" href="namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="205,150,357,175"/>
 <area shape="poly" title=" " alt="" coords="156,145,191,149,190,155,156,150"/>
-<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="204,199,357,225"/>
+<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="204,199,357,225"/>
 <area shape="poly" title=" " alt="" coords="114,149,205,184,228,192,226,197,203,189,112,154"/>
 <area shape="rect" href="namespacefitpack__core.html#a3a3d9c76b5b016414056f18b807aa39f" title="Driver for polar grid smoothing spline with knot selection." alt="" coords="205,101,356,126"/>
 <area shape="poly" title=" " alt="" coords="156,127,191,122,192,127,156,132"/>
@@ -14622,9 +14804,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="327,98,430,70,432,75,329,103"/>
 <area shape="rect" href="namespacefitpack__core.html#a07a9d1d759c2a6d39e91039f904c923b" title="Compute smoothing spline on a polar grid with origin constraints." alt="" coords="416,222,567,247"/>
 <area shape="poly" title=" " alt="" coords="339,124,359,135,376,154,384,172,391,190,407,207,418,214,415,219,404,211,387,193,379,174,371,157,356,139,336,128"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="405,93,577,133"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="405,93,577,133"/>
 <area shape="poly" title=" " alt="" coords="357,111,391,111,391,116,357,116"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="424,157,559,197"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="424,157,559,197"/>
 <area shape="poly" title=" " alt="" coords="324,124,412,151,411,156,323,129"/>
 <area shape="rect" href="namespacefitpack__core.html#a03d606165767f7703429cb55181efe11" title="Compute spline coefficients on a polar/spherical grid via Kronecker product." alt="" coords="628,267,775,293"/>
 <area shape="poly" title=" " alt="" coords="552,245,629,262,628,267,550,250"/>
@@ -14847,7 +15029,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="276,315,291,282,316,237,351,190,393,149,419,135,421,139,396,153,355,194,321,240,296,284,280,317"/>
 <area shape="rect" href="namespacefitpack__core.html#a85e2e23efd601e9e1e28c0195664dd16" title="Convert constrained polar spline coefficients to standard form." alt="" coords="419,572,569,597"/>
 <area shape="poly" title=" " alt="" coords="278,341,290,383,313,442,348,504,370,533,396,557,407,565,404,569,393,561,366,536,343,507,308,444,285,385,273,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="427,622,561,662"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="427,622,561,662"/>
 <area shape="poly" title=" " alt="" coords="277,341,287,390,308,462,323,502,343,540,367,576,396,608,416,621,413,626,393,612,363,580,339,543,319,504,303,464,282,392,272,342"/>
 <area shape="poly" title=" " alt="" coords="902,210,894,200,898,190,912,184,935,181,964,185,975,194,972,198,962,190,935,187,913,189,902,193,900,199,906,206"/>
 <area shape="poly" title=" " alt="" coords="594,218,849,218,849,223,594,223"/>
@@ -15183,9 +15365,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="324,150,427,178,425,184,323,155"/>
 <area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="411,70,561,95"/>
 <area shape="poly" title=" " alt="" coords="323,125,425,96,427,102,324,130"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="400,120,572,160"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="400,120,572,160"/>
 <area shape="poly" title=" " alt="" coords="350,137,386,137,386,143,350,143"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="419,5,553,45"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="419,5,553,45"/>
 <area shape="poly" title=" " alt="" coords="292,125,339,91,399,55,412,48,415,53,401,60,342,96,295,129"/>
 <area shape="rect" href="namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="620,176,788,216"/>
 <area shape="poly" title=" " alt="" coords="560,194,606,194,606,199,560,200"/>
@@ -15292,12 +15474,34 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Update the smoothing parameter \( p \) during iterative knot selection. </p>
+<p>Given the current iterate \( (p, F(p) - S) \) and the bracketing triple \( (p_1, F_1), (p_2, F_2), (p_3, F_3) \) with \( F_1 &gt; 0 \) and \( F_3 &lt; 0 \), updates the bracket and computes the next estimate via rational interpolation (fprati, Eq. 5.30).</p>
+<p>During the initial phase (before the bracket is established), the routine adjusts \( p \) by multiplicative factors to find \( p \) values that bracket the root \( F(p) = 0 \).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">p1</td><td>Left bracket; satisfies \( F_1 &gt; 0 \) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">f1</td><td>\( F(p_1) - S \); updated with \( p_1 \) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">p2</td><td>Most recent iterate; set to <code>p</code> on entry </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">f2</td><td>\( F(p_2) - S \); set to <code>fpms</code> on entry </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">p3</td><td>Right bracket; satisfies \( F_3 &lt; 0 \) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">f3</td><td>\( F(p_3) - S \); updated with \( p_3 \) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">p</td><td>Current smoothing parameter; updated to next estimate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpms</td><td>Current residual \( F(p) - S \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">acc</td><td>Convergence tolerance </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">check1</td><td><code>.true.</code> once lower bracket is established </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">check3</td><td><code>.true.</code> once upper bracket is established </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">success</td><td><code>.false.</code> if iteration stalls (non-monotone \( F \))</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, §5.2.4 (pp. 83-86), Eq. 5.30-5.32 </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__core_afd90889b0d56592815337f99a849bc7a_cgraph.png" border="0" usemap="#anamespacefitpack__core_afd90889b0d56592815337f99a849bc7a_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_afd90889b0d56592815337f99a849bc7a_cgraph" id="anamespacefitpack__core_afd90889b0d56592815337f99a849bc7a_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,140,45"/>
+<area shape="rect" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="5,5,140,45"/>
 <area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="188,13,332,38"/>
 <area shape="poly" title=" " alt="" coords="140,23,175,23,175,28,140,28"/>
 </map>
@@ -15364,7 +15568,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>At a knot, right derivatives are computed (left derivatives at the right boundary).</dd></dl>
-<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, §1.3; <a class="el" href="#ab6b368d82e72f0bde7c8a9cc60eb76f2">fpader</a> — derivative computation kernel </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, §1.3; <a class="el" href="#ab6b368d82e72f0bde7c8a9cc60eb76f2" title="Evaluate all derivatives of a spline at a single point.">fpader</a> — derivative computation kernel </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -15373,7 +15577,7 @@ Here is the call graph for this function:</div>
 <area shape="rect" title="Evaluate all derivatives of a spline at a single point." alt="" coords="5,42,157,67"/>
 <area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="205,5,364,45"/>
 <area shape="poly" title=" " alt="" coords="157,41,191,36,192,41,158,46"/>
-<area shape="rect" href="namespacefitpack__core.html#ab6b368d82e72f0bde7c8a9cc60eb76f2" title=" " alt="" coords="209,70,360,95"/>
+<area shape="rect" href="namespacefitpack__core.html#ab6b368d82e72f0bde7c8a9cc60eb76f2" title="Evaluate all derivatives of a spline at a single point." alt="" coords="209,70,360,95"/>
 <area shape="poly" title=" " alt="" coords="158,62,196,68,196,73,157,68"/>
 </map>
 </div>
@@ -15531,7 +15735,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="102,124,166,91,260,51,314,32,371,17,430,6,489,3,910,3,974,12,1059,36,1145,70,1184,90,1215,110,1251,143,1281,181,1323,249,1318,252,1277,184,1247,147,1212,114,1181,94,1143,75,1057,41,973,17,909,8,489,8,431,12,372,22,316,37,262,56,168,95,105,128"/>
 <area shape="rect" href="namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="203,150,355,175"/>
 <area shape="poly" title=" " alt="" coords="155,145,190,149,189,155,155,150"/>
-<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="203,199,356,225"/>
+<area shape="rect" href="namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="203,199,356,225"/>
 <area shape="poly" title=" " alt="" coords="113,149,204,184,227,192,225,197,202,189,111,154"/>
 <area shape="rect" href="namespacefitpack__core.html#ae2fd0d6545f3ff0cc2019428c3d5ad38" title="Driver for spherical grid smoothing spline with knot selection." alt="" coords="204,101,355,126"/>
 <area shape="poly" title=" " alt="" coords="155,127,190,122,191,127,155,132"/>
@@ -15540,9 +15744,9 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="326,98,429,70,430,75,328,103"/>
 <area shape="rect" href="namespacefitpack__core.html#a383ad79ef10f0ff29a9122c3f736178e" title="Compute smoothing spline on a spherical grid with pole constraints." alt="" coords="413,222,567,247"/>
 <area shape="poly" title=" " alt="" coords="337,124,358,135,374,154,382,172,390,190,406,207,417,214,414,219,402,211,386,193,377,174,370,157,354,139,335,128"/>
-<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="404,93,576,133"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="404,93,576,133"/>
 <area shape="poly" title=" " alt="" coords="355,111,390,111,390,116,355,116"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="423,157,557,197"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="423,157,557,197"/>
 <area shape="poly" title=" " alt="" coords="323,124,411,151,410,156,321,129"/>
 <area shape="rect" href="namespacefitpack__core.html#a74a11f85ace5b032c95c53307fa47913" title="Compute spherical grid spline coefficients via Kronecker product." alt="" coords="625,267,775,293"/>
 <area shape="poly" title=" " alt="" coords="550,245,628,262,627,267,549,250"/>
@@ -15787,7 +15991,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="288,315,303,282,329,237,364,190,406,149,432,135,435,139,410,153,368,194,333,240,308,284,292,317"/>
 <area shape="rect" href="namespacefitpack__core.html#a4bd769a20c06ac85da1866ea8ac3e98c" title="Convert constrained spherical spline coefficients to standard form." alt="" coords="432,572,583,597"/>
 <area shape="poly" title=" " alt="" coords="290,341,302,383,326,442,361,504,383,533,410,557,421,565,418,569,406,561,380,536,356,507,321,444,297,385,285,342"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="440,622,575,662"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="440,622,575,662"/>
 <area shape="poly" title=" " alt="" coords="289,341,299,390,320,462,336,502,356,540,381,576,410,608,429,621,426,625,406,612,376,580,352,543,331,504,315,464,294,392,284,342"/>
 <area shape="poly" title=" " alt="" coords="915,210,908,200,911,190,925,184,949,181,977,185,989,194,985,198,975,190,949,187,927,189,915,193,913,199,919,206"/>
 <area shape="poly" title=" " alt="" coords="607,218,862,218,862,223,607,223"/>
@@ -16291,7 +16495,7 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="namespacefitpack__core_a827820ea1a71f5e6fad5e75bd3016578_cgraph.png" border="0" usemap="#anamespacefitpack__core_a827820ea1a71f5e6fad5e75bd3016578_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_a827820ea1a71f5e6fad5e75bd3016578_cgraph" id="anamespacefitpack__core_a827820ea1a71f5e6fad5e75bd3016578_cgraph">
 <area shape="rect" title="Evaluate a parametric bicubic spline surface on a grid." alt="" coords="5,42,151,67"/>
-<area shape="rect" href="namespacefitpack__core.html#a93f9263090199970a23f6dfca11227cf" title=" " alt="" coords="199,42,352,67"/>
+<area shape="rect" href="namespacefitpack__core.html#a93f9263090199970a23f6dfca11227cf" title="Evaluate a parametric bicubic tensor&#45;product spline surface." alt="" coords="199,42,352,67"/>
 <area shape="poly" title=" " alt="" coords="151,52,184,52,184,57,151,57"/>
 <area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="400,5,559,45"/>
 <area shape="poly" title=" " alt="" coords="352,41,386,36,387,41,353,46"/>
@@ -16533,7 +16737,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="289,311,334,342,392,373,412,380,410,385,390,378,331,347,286,316"/>
 <area shape="rect" href="namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="415,124,565,149"/>
 <area shape="poly" title=" " alt="" coords="276,286,318,225,351,190,389,160,404,152,406,157,392,164,355,194,323,229,280,289"/>
-<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="423,437,557,477"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="423,437,557,477"/>
 <area shape="poly" title=" " alt="" coords="282,312,325,365,357,396,392,422,411,432,408,437,389,427,353,400,322,369,278,315"/>
 <area shape="rect" href="fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="455,501,525,527"/>
 <area shape="poly" title=" " alt="" coords="278,313,292,348,315,395,349,445,369,467,392,486,416,499,442,506,440,512,414,504,389,491,366,471,345,448,311,398,287,350,273,315"/>

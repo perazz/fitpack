@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_sphere::spgrid_fit_automatic_knots" name="fitpack_gridded_sphere::spgrid_fit_automatic_knots">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,87,212,127"/>
+<area shape="rect" id="Node000001" title="Fit a smoothing spherical surface on a lat&#45;lon grid with automatic knot placement." alt="" coords="5,87,212,127"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="287,29,440,69"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,84,273,67,274,72,199,89"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="260,94,467,119"/>
@@ -11,7 +11,7 @@
 <area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="426,141,466,128,489,116,514,103,653,43,717,26,801,20,1222,20,1286,29,1371,53,1457,87,1496,107,1527,127,1563,160,1593,198,1635,267,1630,270,1589,201,1559,164,1524,131,1493,112,1455,92,1369,58,1285,34,1221,25,801,25,718,31,655,48,516,108,492,121,468,133,427,146"/>
 <area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="515,167,667,193"/>
 <area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="439,161,502,168,501,173,438,167"/>
-<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="515,217,668,242"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="515,217,668,242"/>
 <area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="405,166,539,210,537,215,403,171"/>
 <area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ae2fd0d6545f3ff0cc2019428c3d5ad38" title="Driver for spherical grid smoothing spline with knot selection." alt="" coords="516,118,667,143"/>
 <area shape="poly" id="edge9_Node000004_Node000008" title=" " alt="" coords="438,145,502,138,502,143,439,150"/>
@@ -20,9 +20,9 @@
 <area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="638,115,741,87,742,92,640,121"/>
 <area shape="rect" id="Node000010" href="$namespacefitpack__core.html#a383ad79ef10f0ff29a9122c3f736178e" title="Compute smoothing spline on a spherical grid with pole constraints." alt="" coords="725,239,879,265"/>
 <area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="649,141,670,153,686,171,694,190,702,208,718,225,729,231,726,236,714,229,698,210,689,192,682,174,666,157,647,146"/>
-<area shape="rect" id="Node000026" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="716,111,888,151"/>
+<area shape="rect" id="Node000026" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="716,111,888,151"/>
 <area shape="poly" id="edge37_Node000008_Node000026" title=" " alt="" coords="667,128,702,128,702,133,667,133"/>
-<area shape="rect" id="Node000027" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="735,175,869,215"/>
+<area shape="rect" id="Node000027" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="735,175,869,215"/>
 <area shape="poly" id="edge38_Node000008_Node000027" title=" " alt="" coords="635,141,723,168,722,173,633,146"/>
 <area shape="rect" id="Node000011" href="$namespacefitpack__core.html#a74a11f85ace5b032c95c53307fa47913" title="Compute spherical grid spline coefficients via Kronecker product." alt="" coords="937,285,1087,310"/>
 <area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="862,262,940,279,939,284,861,267"/>

@@ -14,7 +14,7 @@
 <area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="98,311,143,342,201,373,221,380,219,385,199,378,140,347,95,316"/>
 <area shape="rect" id="Node000013" href="$namespacefitpack__core.html#ab08555e9bd2f44d1461e09ba35a7bb22" title="Compute the minimum&#45;norm least&#45;squares solution under rank deficiency." alt="" coords="224,124,375,149"/>
 <area shape="poly" id="edge18_Node000001_Node000013" title=" " alt="" coords="85,286,128,225,160,190,199,160,213,152,216,157,201,164,164,194,132,229,90,289"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="232,437,367,477"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="232,437,367,477"/>
 <area shape="poly" id="edge23_Node000001_Node000014" title=" " alt="" coords="91,312,135,365,166,396,201,422,220,432,218,437,199,427,163,400,131,369,87,315"/>
 <area shape="rect" id="Node000016" href="$fitpack__core_8_f90.html#aa91d9195d5c1268da8985c5f63cde0aa" title="Restore original x/y ordering if axes were interchanged." alt="" coords="264,501,335,527"/>
 <area shape="poly" id="edge25_Node000001_Node000016" title=" " alt="" coords="87,313,101,348,125,395,158,445,179,467,201,486,225,499,251,506,250,512,223,504,199,491,175,471,154,448,120,398,96,350,82,315"/>

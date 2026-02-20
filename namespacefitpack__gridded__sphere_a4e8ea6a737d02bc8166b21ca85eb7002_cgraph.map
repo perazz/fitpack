@@ -1,5 +1,5 @@
 <map id="fitpack_gridded_sphere::bc_south_pole" name="fitpack_gridded_sphere::bc_south_pole">
-<area shape="rect" id="Node000001" title="South pole BC." alt="" coords="5,5,179,45"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__sphere.html#a03cf37e053502a1f1e18eca1404347df" title="Set pole BC." alt="" coords="227,5,400,45"/>
+<area shape="rect" id="Node000001" title="Set boundary conditions at the south pole ( )." alt="" coords="5,5,179,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__sphere.html#a03cf37e053502a1f1e18eca1404347df" title="Set boundary conditions at one pole of the sphere." alt="" coords="227,5,400,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,23,213,23,213,28,179,28"/>
 </map>

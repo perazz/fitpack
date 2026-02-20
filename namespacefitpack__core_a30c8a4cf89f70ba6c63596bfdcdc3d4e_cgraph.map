@@ -4,7 +4,7 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,124,166,91,260,51,314,32,371,17,430,6,489,3,910,3,974,12,1059,36,1145,70,1184,90,1215,110,1251,143,1281,181,1323,249,1318,252,1277,184,1247,147,1212,114,1181,94,1143,75,1057,41,973,17,909,8,489,8,431,12,372,22,316,37,262,56,168,95,105,128"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="203,150,355,175"/>
 <area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="155,145,190,149,189,155,155,150"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title=" " alt="" coords="203,199,356,225"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#accaa1729715efbe04726699613597c32" title="Verify knot positions for a periodic spline (Schoenberg&#45;Whitney check)." alt="" coords="203,199,356,225"/>
 <area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="113,149,204,184,227,192,225,197,202,189,111,154"/>
 <area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ae2fd0d6545f3ff0cc2019428c3d5ad38" title="Driver for spherical grid smoothing spline with knot selection." alt="" coords="204,101,355,126"/>
 <area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="155,127,190,122,191,127,155,132"/>
@@ -13,9 +13,9 @@
 <area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="326,98,429,70,430,75,328,103"/>
 <area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a383ad79ef10f0ff29a9122c3f736178e" title="Compute smoothing spline on a spherical grid with pole constraints." alt="" coords="413,222,567,247"/>
 <area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="337,124,358,135,374,154,382,172,390,190,406,207,417,214,414,219,402,211,386,193,377,174,370,157,354,139,335,128"/>
-<area shape="rect" id="Node000023" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="404,93,576,133"/>
+<area shape="rect" id="Node000023" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="404,93,576,133"/>
 <area shape="poly" id="edge33_Node000005_Node000023" title=" " alt="" coords="355,111,390,111,390,116,355,116"/>
-<area shape="rect" id="Node000024" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="423,157,557,197"/>
+<area shape="rect" id="Node000024" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="423,157,557,197"/>
 <area shape="poly" id="edge34_Node000005_Node000024" title=" " alt="" coords="323,124,411,151,410,156,321,129"/>
 <area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a74a11f85ace5b032c95c53307fa47913" title="Compute spherical grid spline coefficients via Kronecker product." alt="" coords="625,267,775,293"/>
 <area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="550,245,628,262,627,267,549,250"/>

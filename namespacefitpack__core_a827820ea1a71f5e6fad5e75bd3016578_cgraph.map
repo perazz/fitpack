@@ -1,6 +1,6 @@
 <map id="fitpack_core::surev" name="fitpack_core::surev">
 <area shape="rect" id="Node000001" title="Evaluate a parametric bicubic spline surface on a grid." alt="" coords="5,42,151,67"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a93f9263090199970a23f6dfca11227cf" title=" " alt="" coords="199,42,352,67"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a93f9263090199970a23f6dfca11227cf" title="Evaluate a parametric bicubic tensor&#45;product spline surface." alt="" coords="199,42,352,67"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,52,184,52,184,57,151,57"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="400,5,559,45"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,41,386,36,387,41,353,46"/>

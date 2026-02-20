@@ -1,5 +1,5 @@
 <map id="fitpack_grid_surfaces::surface_fit_automatic_knots" name="fitpack_grid_surfaces::surface_fit_automatic_knots">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,284,220,324"/>
+<area shape="rect" id="Node000001" title="Fit a smoothing gridded surface with automatic knot placement." alt="" coords="5,284,220,324"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="295,227,448,267"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,281,281,264,282,269,204,287"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="268,291,475,317"/>
@@ -18,9 +18,9 @@
 <area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="647,150,749,178,748,184,645,155"/>
 <area shape="rect" id="Node000017" href="$namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="733,70,884,95"/>
 <area shape="poly" id="edge24_Node000007_Node000017" title=" " alt="" coords="645,125,748,96,749,102,647,130"/>
-<area shape="rect" id="Node000018" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title=" " alt="" coords="723,120,895,160"/>
+<area shape="rect" id="Node000018" href="$namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="723,120,895,160"/>
 <area shape="poly" id="edge25_Node000007_Node000018" title=" " alt="" coords="673,137,709,137,709,143,673,143"/>
-<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title=" " alt="" coords="741,5,876,45"/>
+<area shape="rect" id="Node000019" href="$namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="741,5,876,45"/>
 <area shape="poly" id="edge26_Node000007_Node000019" title=" " alt="" coords="615,125,661,91,721,55,735,48,737,53,724,60,664,96,618,129"/>
 <area shape="rect" id="Node000009" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="943,176,1111,216"/>
 <area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="883,194,929,194,929,199,883,200"/>
