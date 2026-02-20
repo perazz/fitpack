@@ -124,7 +124,18 @@ module fitpack_surfaces
 
     contains
 
-    ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
+    !> @brief Fit a smoothing surface with automatic knot placement.
+    !!
+    !! Uses the surfit core routine. The smoothing parameter controls the trade-off between
+    !! closeness of fit and smoothness.
+    !!
+    !! @param[in,out] this       The surface object.
+    !! @param[in]     smoothing  Optional smoothing factor.
+    !! @param[in]     order      Optional spline degree (applied to both directions).
+    !! @param[in]     keep_knots If `.true.`, continue from current knot set.
+    !! @return Error flag.
+    !!
+    !! @see surfit
     integer(FP_FLAG) function surface_fit_automatic_knots(this,smoothing,order,keep_knots) result(ierr)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -176,7 +187,9 @@ module fitpack_surfaces
     end function surface_fit_automatic_knots
 
 
-    ! Find interpolating surface
+    !> @brief Fit an interpolating surface (\f$ s = 0 \f$) through the data points.
+    !!
+    !! @see surfit
     integer(FP_FLAG) function surface_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_surface), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -188,7 +201,9 @@ module fitpack_surfaces
         ierr = surface_fit_automatic_knots(this,smoothing=zero,keep_knots=.not.do_reset)
     end function surface_fit_interpolating
 
-    ! Fit a surface to least squares of the current knots
+    !> @brief Fit a least-squares surface with fixed knots.
+    !!
+    !! @see surfit
     integer(FP_FLAG) function surface_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_surface), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: smoothing
@@ -208,7 +223,9 @@ module fitpack_surfaces
        ierr = this%fit()
     end function surface_fit_least_squares
 
-    !> Evaluate surface on a list of (x(i),y(i)) scattered points using bispeu
+    !> @brief Evaluate the surface at a list of scattered \f$ (x_i, y_i) \f$ points.
+    !!
+    !! @see bispeu
     function surface_eval_many(this,x,y,ierr) result(f)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x))
@@ -235,7 +252,9 @@ module fitpack_surfaces
 
     end function surface_eval_many
 
-    !> Evaluate surface at a single (x,y) point
+    !> @brief Evaluate the surface at a single \f$ (x, y) \f$ point.
+    !!
+    !! @see bispeu
     real(FP_REAL) function surface_eval_one(this,x,y,ierr) result(f)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x,y
@@ -248,7 +267,11 @@ module fitpack_surfaces
 
     end function surface_eval_one
 
-    !> Evaluate surface on a grid domain using bispev
+    !> @brief Evaluate the surface on a rectangular grid \f$ x_i \times y_j \f$.
+    !!
+    !! Returns `f(j,i)` = \f$ s(x_i, y_j) \f$.
+    !!
+    !! @see bispev
     function surface_eval_gridded(this,x,y,ierr) result(f)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(:)
@@ -293,6 +316,7 @@ module fitpack_surfaces
 
     end function surface_eval_gridded
 
+    !> @brief Destroy a surface object and release all allocated memory.
     elemental subroutine surf_destroy(this)
        class(fitpack_surface), intent(inout) :: this
        integer :: ierr
@@ -316,6 +340,15 @@ module fitpack_surfaces
 
     end subroutine surf_destroy
 
+    !> @brief Load new scattered data points and allocate workspace for surface fitting.
+    !!
+    !! @param[in,out] this  The surface object (destroyed and reinitialized).
+    !! @param[in]     x     X coordinates of scattered data points.
+    !! @param[in]     y     Y coordinates, same size as `x`.
+    !! @param[in]     z     Function values, same size as `x`.
+    !! @param[in]     w     Optional positive weights, same size as `x`.
+    !!
+    !! @see surfit
     subroutine surf_new_points(this,x,y,z,w)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
@@ -390,7 +423,16 @@ module fitpack_surfaces
 
     end subroutine surf_new_points
 
-    ! A default constructor
+    !> @brief Construct a surface from scattered data points and perform a default fit.
+    !!
+    !! @param[in]  x     X coordinates.
+    !! @param[in]  y     Y coordinates, same size as `x`.
+    !! @param[in]  z     Function values, same size as `x`.
+    !! @param[in]  w     Optional weights.
+    !! @param[out] ierr  Optional error flag.
+    !! @return Fitted surface object.
+    !!
+    !! @see surfit
     type(fitpack_surface) function surf_new_from_points(x,y,z,w,ierr) result(this)
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
         real(FP_REAL), optional, intent(in) :: w(size(x)) ! node weights
@@ -405,7 +447,9 @@ module fitpack_surfaces
 
     end function surf_new_from_points
 
-    ! Fit a new curve
+    !> @brief Load new data points and perform a fresh surface fit.
+    !!
+    !! @see surfit
     integer(FP_FLAG) function surf_new_fit(this,x,y,z,w,smoothing,order)
         class(fitpack_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(size(x)),z(size(x))
@@ -419,7 +463,11 @@ module fitpack_surfaces
 
     end function surf_new_fit
 
-    !> Evaluate derivatives on a grid domain
+    !> @brief Evaluate partial derivatives on a rectangular grid.
+    !!
+    !! Returns `f(j,i)` = \f$ \partial^{dx+dy} s / \partial x^{dx} \partial y^{dy} \f$ at \f$ (x_i, y_j) \f$.
+    !!
+    !! @see parder
     function surface_derivatives_gridded(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_surface), intent(inout)  :: this
         
@@ -477,7 +525,9 @@ module fitpack_surfaces
 
     end function surface_derivatives_gridded
 
-    !> Evaluate derivatives on a list of (x(i),y(i)) points
+    !> @brief Evaluate partial derivatives at scattered \f$ (x_i, y_i) \f$ points.
+    !!
+    !! @see pardeu
     function surface_derivatives_many(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_surface), intent(inout)  :: this
         
@@ -543,6 +593,9 @@ module fitpack_surfaces
 
     end function surface_derivatives_many
 
+    !> @brief Evaluate a partial derivative at a single \f$ (x, y) \f$ point.
+    !!
+    !! @see pardeu
     real(FP_REAL) function surface_derivatives_one(this,x,y,dx,dy,ierr) result(f)
         class(fitpack_surface), intent(inout) :: this
         
@@ -566,7 +619,16 @@ module fitpack_surfaces
     end function surface_derivatives_one
 
 
-    !> Double integration of the surface over a rectangular domain [lower(1),upper(1)] x [lower(2),upper(2)]
+    !> @brief Compute the double integral of the surface over a rectangular domain.
+    !!
+    !! Computes \f$ \int_{x_a}^{x_b} \int_{y_a}^{y_b} s(x,y)\,dy\,dx \f$.
+    !!
+    !! @param[in] this   The fitted surface.
+    !! @param[in] lower  Lower bounds \f$ (x_a, y_a) \f$.
+    !! @param[in] upper  Upper bounds \f$ (x_b, y_b) \f$.
+    !! @return The integral value.
+    !!
+    !! @see dblint
     real(FP_REAL) function surface_integral(this, lower, upper)
         class(fitpack_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(2), upper(2)
@@ -581,8 +643,12 @@ module fitpack_surfaces
 
     end function surface_integral
 
-    !> Extract a 1D cross-section from the surface.
-    !> If along_y=.true., returns f(y) = s(u,y); if along_y=.false., returns g(x) = s(x,u).
+    !> @brief Extract a 1D cross-section curve from the surface.
+    !!
+    !! If `along_y=.true.`, returns \f$ f(y) = s(u, y) \f$; otherwise \f$ g(x) = s(x, u) \f$.
+    !! The result is a fitpack_curve with the appropriate knots and coefficients.
+    !!
+    !! @see profil
     function surface_cross_section(this, u, along_y, ierr) result(curve)
         class(fitpack_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: u
@@ -630,8 +696,12 @@ module fitpack_surfaces
 
     end function surface_cross_section
 
-    !> Compute the derivative spline d^(nux+nuy)s / dx^nux dy^nuy.
-    !> Returns a new surface with reduced order [kx-nux, ky-nuy] and trimmed knots.
+    !> @brief Compute the B-spline representation of a partial derivative surface.
+    !!
+    !! Returns a new surface representing \f$ \partial^{n_x+n_y} s / \partial x^{n_x} \partial y^{n_y} \f$,
+    !! with reduced degrees \f$ (k_x - n_x, k_y - n_y) \f$ and trimmed knots.
+    !!
+    !! @see pardtc
     function surface_derivative_spline(this, nux, nuy, ierr) result(dsurf)
         class(fitpack_surface), intent(in) :: this
         integer(FP_SIZE), intent(in) :: nux, nuy
@@ -678,7 +748,7 @@ module fitpack_surfaces
 
     end function surface_derivative_spline
 
-    !> Helper: select knots from the appropriate direction for cross_section
+    !> @brief Select knots from the appropriate direction for cross-section extraction.
     pure function merge_knots(along_y, tx, ty, n) result(knots)
         logical, intent(in) :: along_y
         real(FP_REAL), intent(in) :: tx(:), ty(:)
@@ -696,6 +766,7 @@ module fitpack_surfaces
     ! PARALLEL COMMUNICATION
     ! =================================================================================================
 
+    !> @brief Return the communication buffer size for the surface.
     elemental integer(FP_SIZE) function surf_comm_size(this)
         class(fitpack_surface), intent(in) :: this
         ! Base fields + surface-specific scalars:
@@ -710,6 +781,7 @@ module fitpack_surfaces
                        + FP_COMM_SIZE(this%wrk2)
     end function surf_comm_size
 
+    !> @brief Pack surface data into a communication buffer.
     pure subroutine surf_comm_pack(this, buffer)
         class(fitpack_surface), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -741,6 +813,7 @@ module fitpack_surfaces
         call FP_COMM_PACK(this%wrk2, buffer(pos:))
     end subroutine surf_comm_pack
 
+    !> @brief Expand surface data from a communication buffer.
     pure subroutine surf_comm_expand(this, buffer)
         class(fitpack_surface), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)

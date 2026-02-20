@@ -104,7 +104,16 @@ module fitpack_parametric_surfaces
 
     contains
 
-    ! A default constructor
+    !> @brief Construct a parametric surface from gridded data and perform a default fit.
+    !!
+    !! @param[in]  u            Parameter grid in the u direction.
+    !! @param[in]  v            Parameter grid in the v direction.
+    !! @param[in]  z            Data values `z(j,i,l)` for component `l` at `(u(i),v(j))`.
+    !! @param[in]  periodic_BC  Optional periodicity flags `[u_periodic, v_periodic]`.
+    !! @param[out] ierr         Optional error flag.
+    !! @return Fitted parametric surface object.
+    !!
+    !! @see parsur
     type(fitpack_parametric_surface) function new_from_points(u,v,z,periodic_BC,ierr) result(this)
         real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
         logical    , optional, intent(in) :: periodic_BC(2)
@@ -119,7 +128,9 @@ module fitpack_parametric_surfaces
 
     end function new_from_points
 
-    ! Fit a new curve
+    !> @brief Load new data and perform a fresh parametric surface fit.
+    !!
+    !! @see parsur
     integer function new_fit(this,u,v,z,smoothing,periodic_BC)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
@@ -132,6 +143,7 @@ module fitpack_parametric_surfaces
 
     end function new_fit
 
+    !> @brief Destroy a parametric surface object and release all allocated memory.
     elemental subroutine destroy(this)
        class(fitpack_parametric_surface), intent(inout) :: this
        integer :: ierr
@@ -148,6 +160,9 @@ module fitpack_parametric_surfaces
 
     end subroutine destroy
 
+    !> @brief Load new gridded data and allocate workspace for parametric surface fitting.
+    !!
+    !! @see parsur
     subroutine new_points(this,u,v,z,periodic_BC)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: u(:),v(:),z(:,:,:)
@@ -227,6 +242,11 @@ module fitpack_parametric_surfaces
 
     end subroutine allocate_knot_storage
 
+    !> @brief Evaluate the parametric surface at a single \f$ (u, v) \f$ point.
+    !!
+    !! @return Point \f$ \mathbf{s}(u, v) \in \mathbb{R}^d \f$.
+    !!
+    !! @see surev
     function surf_eval_one(this,u,v,ierr) result(y)
         class(fitpack_parametric_surface), intent(inout)  :: this
         real(FP_REAL),          intent(in)     :: u,v      ! Evaluation point
@@ -249,6 +269,11 @@ module fitpack_parametric_surfaces
     ! f(1:mv,1:mu,1:idim)
 
 
+    !> @brief Evaluate the parametric surface on a rectangular parameter grid.
+    !!
+    !! Returns `f(j,i,l)` = \f$ s_l(u_i, v_j) \f$.
+    !!
+    !! @see surev
     function surf_eval_grid(this,u,v,ierr) result(f)
         class(fitpack_parametric_surface), intent(inout)  :: this
         real(FP_REAL),          intent(in)     :: u(:),v(:) ! Evaluation grid (parameter range)
@@ -272,7 +297,9 @@ module fitpack_parametric_surfaces
 
     end function surf_eval_grid
 
-    ! Interpolating curve
+    !> @brief Fit an interpolating parametric surface (\f$ s = 0 \f$).
+    !!
+    !! @see parsur
     integer function interpolating_curve(this,reset_knots) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -285,7 +312,12 @@ module fitpack_parametric_surfaces
 
     end function interpolating_curve
 
-    ! Least-squares surface on current or given knots
+    !> @brief Fit a least-squares parametric surface with current or user-supplied knots.
+    !!
+    !! Optional `u_knots` and `v_knots` set interior knots directly. If omitted, the
+    !! current knot vectors are used.
+    !!
+    !! @see parsur
     integer function surface_fit_least_squares(this,u_knots,v_knots,smoothing,reset_knots) result(ierr)
        class(fitpack_parametric_surface), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: u_knots(:)
@@ -337,7 +369,9 @@ module fitpack_parametric_surfaces
 
     end function surface_fit_least_squares
 
-    ! Curve fitting driver: automatic number of knots
+    !> @brief Fit a smoothing parametric surface with automatic knot placement.
+    !!
+    !! @see parsur
     integer function surf_fit_automatic_knots(this,smoothing,periodic,keep_knots) result(ierr)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -397,6 +431,7 @@ module fitpack_parametric_surfaces
     ! PARALLEL COMMUNICATION
     ! =================================================================================================
 
+    !> @brief Return the communication buffer size for the parametric surface.
     elemental integer(FP_SIZE) function parsurf_comm_size(this)
         class(fitpack_parametric_surface), intent(in) :: this
         ! Base fields + parametric-surface-specific scalars:
@@ -409,6 +444,7 @@ module fitpack_parametric_surfaces
                           + FP_COMM_SIZE(this%t)
     end function parsurf_comm_size
 
+    !> @brief Pack parametric surface data into a communication buffer.
     pure subroutine parsurf_comm_pack(this, buffer)
         class(fitpack_parametric_surface), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -432,6 +468,7 @@ module fitpack_parametric_surfaces
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine parsurf_comm_pack
 
+    !> @brief Expand parametric surface data from a communication buffer.
     pure subroutine parsurf_comm_expand(this, buffer)
         class(fitpack_parametric_surface), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)

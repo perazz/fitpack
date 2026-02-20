@@ -120,7 +120,9 @@ module fitpack_gridded_polar
 
     contains
 
-    ! Fit a surface to least squares of the current knots
+    !> @brief Fit a least-squares gridded polar surface with fixed knots.
+    !!
+    !! @see pogrid
     integer function polr_fit_least_squares(this,smoothing,reset_knots) result(ierr)
        class(fitpack_grid_polar), intent(inout) :: this
        real(FP_REAL), optional, intent(in) :: smoothing
@@ -141,7 +143,9 @@ module fitpack_gridded_polar
 
     end function polr_fit_least_squares
 
-    ! Find interpolating surface
+    !> @brief Fit an interpolating gridded polar surface (\f$ s = 0 \f$).
+    !!
+    !! @see pogrid
     integer function polr_fit_interpolating(this,reset_knots) result(ierr)
         class(fitpack_grid_polar), intent(inout) :: this
         logical, optional, intent(in) :: reset_knots
@@ -155,7 +159,12 @@ module fitpack_gridded_polar
     end function polr_fit_interpolating
 
 
-    ! Fit a surface z = s(x,y) defined on a meshgrid: x[1:n], y[1:m]
+    !> @brief Fit a smoothing gridded polar surface with automatic knot placement.
+    !!
+    !! Uses the pogrid core routine. Origin continuity constraints and optional function
+    !! value at the origin are configured via `set_origin_BC`.
+    !!
+    !! @see pogrid
     integer function polr_fit_automatic_knots(this,smoothing,keep_knots) result(ierr)
         class(fitpack_grid_polar), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: smoothing
@@ -206,6 +215,7 @@ module fitpack_gridded_polar
     end function polr_fit_automatic_knots
 
 
+    !> @brief Destroy a gridded polar surface object and release all allocated memory.
     elemental subroutine surf_destroy(this)
        class(fitpack_grid_polar), intent(inout) :: this
        integer :: ierr
@@ -228,6 +238,16 @@ module fitpack_gridded_polar
 
     end subroutine surf_destroy
 
+    !> @brief Load new gridded polar data and allocate workspace.
+    !!
+    !! @param[in,out] this  The grid polar surface (destroyed and reinitialized).
+    !! @param[in]     u     Radial grid values \f$ u_i \in [0, 1] \f$.
+    !! @param[in]     v     Angular grid values \f$ v_j \in [-\pi, \pi] \f$.
+    !! @param[in]     r     Constant boundary radius.
+    !! @param[in]     z     Gridded function values `z(j,i)`.
+    !! @param[in]     z0    Optional function value at the origin.
+    !!
+    !! @see pogrid
     subroutine surf_new_points(this,u,v,r,z,z0)
         class(fitpack_grid_polar), intent(inout) :: this
         real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
@@ -281,7 +301,9 @@ module fitpack_gridded_polar
 
     end subroutine surf_new_points
 
-    ! A default constructor
+    !> @brief Construct a gridded polar surface from data and perform a default fit.
+    !!
+    !! @see pogrid
     type(fitpack_grid_polar) function surf_new_from_points(u,v,r,z,z0,ierr) result(this)
         real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
         real(FP_REAL), intent(in) :: z(size(v),size(u)) ! Gridded values
@@ -297,7 +319,9 @@ module fitpack_gridded_polar
 
     end function surf_new_from_points
 
-    ! Fit a new curve
+    !> @brief Load new data and perform a fresh gridded polar fit.
+    !!
+    !! @see pogrid
     integer function surf_new_fit(this,u,v,r,z,z0,smoothing)
         class(fitpack_grid_polar), intent(inout) :: this
         real(FP_REAL), intent(in) :: u(:),v(:),r ! polar domain
@@ -311,6 +335,11 @@ module fitpack_gridded_polar
 
     end function surf_new_fit
 
+    !> @brief Evaluate the gridded polar surface on a rectangular \f$ u \times v \f$ grid.
+    !!
+    !! Returns `f(j,i)` = \f$ s(u_i, v_j) \f$ in normalized polar coordinates.
+    !!
+    !! @see bispev
     function gridded_eval_many(this,u,v,ierr) result(f)
         class(fitpack_grid_polar), intent(inout)  :: this
         real(FP_REAL), intent(in) :: u(:),v(:)  ! Evaluation grid points (polar coordinates)
@@ -338,7 +367,9 @@ module fitpack_gridded_polar
 
     end function gridded_eval_many
 
-    ! Curve evaluation driver
+    !> @brief Evaluate the gridded polar surface at a single \f$ (u, v) \f$ point.
+    !!
+    !! @see bispev
     real(FP_REAL) function gridded_eval_one(this,u,v,ierr) result(f)
         class(fitpack_grid_polar), intent(inout)  :: this
         real(FP_REAL),          intent(in)      :: u,v ! Evaluation point (grid polar coordinates)
@@ -350,6 +381,12 @@ module fitpack_gridded_polar
 
     end function gridded_eval_one
 
+    !> @brief Configure origin boundary conditions for the gridded polar surface.
+    !!
+    !! @param[in,out] this            The grid polar surface.
+    !! @param[in]     z0              Optional function value at the origin.
+    !! @param[in]     exact           If `.true.`, fit the origin value exactly.
+    !! @param[in]     differentiable  If `.true.`, enforce \f$ C^1 \f$ continuity at the origin.
     subroutine set_origin_BC(this,z0,exact,differentiable)
         class(fitpack_grid_polar), intent(inout) :: this
         real(FP_REAL), optional, intent(in) :: z0 ! Function value at origin
@@ -370,7 +407,7 @@ module fitpack_gridded_polar
 
     end subroutine set_origin_BC
 
-    !> Print gridded polar data to disk
+    !> @brief Write gridded polar data to a text file.
     subroutine gridded_to_disk(this,fileName)
         class(fitpack_grid_polar), intent(inout) :: this
         character(*), intent(in) :: fileName
@@ -412,6 +449,7 @@ module fitpack_gridded_polar
     ! PARALLEL COMMUNICATION
     ! =================================================================================================
 
+    !> @brief Return the communication buffer size for the gridded polar surface.
     elemental integer(FP_SIZE) function gridpolar_comm_size(this)
         class(fitpack_grid_polar), intent(in) :: this
         ! Base fields + grid-polar-specific scalars:
@@ -425,6 +463,7 @@ module fitpack_gridded_polar
                             + FP_COMM_SIZE(this%t)
     end function gridpolar_comm_size
 
+    !> @brief Pack gridded polar data into a communication buffer.
     pure subroutine gridpolar_comm_pack(this, buffer)
         class(fitpack_grid_polar), intent(in) :: this
         real(FP_COMM), intent(out) :: buffer(:)
@@ -452,6 +491,7 @@ module fitpack_gridded_polar
         call FP_COMM_PACK(this%t, buffer(pos:))
     end subroutine gridpolar_comm_pack
 
+    !> @brief Expand gridded polar data from a communication buffer.
     pure subroutine gridpolar_comm_expand(this, buffer)
         class(fitpack_grid_polar), intent(inout) :: this
         real(FP_COMM), intent(in) :: buffer(:)
