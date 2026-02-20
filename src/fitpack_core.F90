@@ -1475,12 +1475,29 @@ module fitpack_core
       end subroutine fourco
 
 
-      !  subroutine fpader calculates the derivatives
-      !             (j-1)
-      !     d(j) = s     (x) , j=1,2,...,k1
-      !  of a spline of order k1 at the point t(l)<=x<t(l+1), using the
-      !  stable recurrence scheme of de boor
-      !  ..
+      !> @brief Evaluate all derivatives of a spline at a single point.
+      !!
+      !! Computes all \f$ k+1 \f$ derivatives of a spline of order \f$ k_1 = k+1 \f$
+      !! at a point \f$ x \f$ in the knot interval \f$ [\lambda_l, \lambda_{l+1}) \f$:
+      !!
+      !! \f[
+      !!     d(j) = s^{(j-1)}(x), \quad j = 1, \ldots, k_1
+      !! \f]
+      !!
+      !! Uses the stable recurrence scheme of de Boor, which first forms divided
+      !! differences of the B-spline coefficients, then evaluates each derivative
+      !! level by the standard B-spline recursion.
+      !!
+      !! @param[in]  t   Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in]  n   Length of the knot vector
+      !! @param[in]  c   B-spline coefficients, length \f$ n \f$
+      !! @param[in]  k1  Spline order \f$ k+1 \f$ (= degree + 1)
+      !! @param[in]  x   Evaluation point, \f$ \lambda_l \leq x < \lambda_{l+1} \f$
+      !! @param[in]  l   Knot interval index
+      !! @param[out] d   Array of derivatives: `d(j)` = \f$ s^{(j-1)}(x) \f$, \f$ j = 1, \ldots, k_1 \f$
+      !!
+      !! @see Dierckx, Ch. 1, §1.4 (pp. 11-14): de Boor recurrence for derivatives
+      !! @see de Boor, C. (1978). *A Practical Guide to Splines*. Springer.
       pure subroutine fpader(t,n,c,k1,x,l,d)
       !  ..scalar arguments..
       real(FP_REAL),    intent(in)  :: x
@@ -2385,14 +2402,33 @@ module fitpack_core
       end function fpchec
 
 
+      !> @brief Verify knot positions for a constrained spline (Schoenberg-Whitney check).
+      !!
+      !! Checks that the knots \f$ \lambda_j \f$, \f$ j = 1, \ldots, n \f$, of a
+      !! spline of degree \f$ k \f$ with \f$ i_b \f$ derivative constraints at
+      !! \f$ x_1 \f$ and \f$ i_e \f$ constraints at \f$ x_m \f$, satisfy all conditions
+      !! required for a well-posed least-squares problem:
+      !!
+      !! 1. \f$ k+1 \leq n-k-1 \leq m + \max(0, i_b - 1) + \max(0, i_e - 1) \f$
+      !! 2. Boundary knot monotonicity
+      !! 3. Interior knots strictly increasing
+      !! 4. \f$ \lambda_{k+1} \leq x_1 \f$ and \f$ x_m \leq \lambda_{n-k} \f$
+      !! 5. Schoenberg-Whitney conditions (Eq. 4.5) for the subset of
+      !!    unconstrained equations
+      !!
+      !! @param[in] x   Data abscissae, strictly increasing
+      !! @param[in] m   Number of data points
+      !! @param[in] t   Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n   Number of knots
+      !! @param[in] k   Spline degree
+      !! @param[in] ib  Number of derivative constraints at \f$ x_1 \f$
+      !! @param[in] ie  Number of derivative constraints at \f$ x_m \f$
+      !!
+      !! @return `FITPACK_OK` if all conditions hold, `FITPACK_INPUT_ERROR` otherwise.
+      !!
+      !! @see Dierckx, Ch. 8, §8.2 (pp. 141-146): constrained curve fitting
+      !! @see Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5
       pure integer function fpched(x,m,t,n,k,ib,ie) result(ier)
-
-      !  subroutine fpched verifies the number and the position of the knots t(j),j=1,2,...,n of a spline
-      !  of degree k,with ib derative constraints at x(1) and ie constraints at x(m), in relation to the
-      !  number and the position of the data points x(i),i=1,2,...,m. if all of the following conditions
-      !  are fulfilled, the error parameter ier is set to zero. if one of the conditions is violated ier
-      !  is set to ten.
-      !  ..
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in) :: m,n,k,ib,ie
       !  ..array arguments..
@@ -2457,11 +2493,31 @@ module fitpack_core
       return
       end function fpched
 
-      ! subroutine fpchep verifies the number and the position of the knots t(j),j=1,2,...,n of a
-      ! periodic spline of degree k, in relation to the number and the position of the data points
-      ! x(i),i=1,2,...,m.
-      ! if all of the following conditions are fulfilled, ier is set to zero.
-      ! if one of the conditions is violated ier is set to ten.
+      !> @brief Verify knot positions for a periodic spline (Schoenberg-Whitney check).
+      !!
+      !! Checks that the knots \f$ \lambda_j \f$, \f$ j = 1, \ldots, n \f$, of a
+      !! periodic spline of degree \f$ k \f$ satisfy all conditions required for a
+      !! well-posed least-squares problem with data points \f$ x_i \f$:
+      !!
+      !! 1. \f$ k+1 \leq n-k-1 \leq m+k-1 \f$
+      !! 2. Boundary knot monotonicity
+      !! 3. Interior knots strictly increasing
+      !! 4. \f$ \lambda_{k+1} \leq x_1 \f$ and \f$ x_m \leq \lambda_{n-k} \f$
+      !! 5. Schoenberg-Whitney conditions for the periodic basis: a subset
+      !!    \f$ y_j \f$ satisfying \f$ \lambda_j < y_j < \lambda_{j+k+1} \f$ must
+      !!    exist, where values may wrap around with period
+      !!    \f$ T = \lambda_{n-k} - \lambda_{k+1} \f$
+      !!
+      !! @param[in] x  Data abscissae, strictly increasing
+      !! @param[in] m  Number of data points
+      !! @param[in] t  Knot vector \f$ \lambda_1, \ldots, \lambda_n \f$
+      !! @param[in] n  Number of knots
+      !! @param[in] k  Spline degree
+      !!
+      !! @return `FITPACK_OK` if all conditions hold, `FITPACK_INPUT_ERROR` otherwise.
+      !!
+      !! @see Dierckx, Ch. 6, §6.1 (pp. 95-100): periodic spline fitting
+      !! @see Dierckx, Ch. 4, §4.1.1 (pp. 53-55), Eq. 4.5
       pure integer(FP_FLAG) function fpchep(x,m,t,n,k) result(ier)
           !  ..scalar arguments..
           integer(FP_SIZE), intent(in) :: m,n,k
@@ -3177,6 +3233,35 @@ module fitpack_core
 
       end subroutine fpclos
 
+      !> @brief Set up the initial knot configuration for closed-curve interpolation.
+      !!
+      !! When \f$ s = 0 \f$ (interpolation) and \f$ k \f$ is odd, places interior knots
+      !! at the data parameter values. For \f$ k = 1 \f$ (linear), directly sets the
+      !! B-spline coefficients from the data and returns the exact interpolant.
+      !! When \f$ k \f$ is even, knots are placed at midpoints of consecutive parameters.
+      !!
+      !! @param[in]     idim    Number of dimensions
+      !! @param[in]     k       Spline degree
+      !! @param[in]     m       Number of data points
+      !! @param[in]     mx      Length of data array `x` (= `m * idim`)
+      !! @param[in]     n       Number of knots
+      !! @param[in]     nc      Length of coefficient array `c`
+      !! @param[in]     nest    Maximum knots allowed
+      !! @param[in,out] kk      Adjusted degree for iteration
+      !! @param[in,out] kk1     Adjusted order for iteration
+      !! @param[in]     u       Parameter values, length `m`
+      !! @param[in]     x       Data coordinates, length `mx`
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in]     per     Period \f$ = u_m - u_1 \f$
+      !! @param[in]     fp0     Upper bound for the smoothing factor
+      !! @param[in]     s       Smoothing factor
+      !! @param[in,out] fpint   Knot interval contributions, length `nest`
+      !! @param[in,out] nrdata  Data point counts per interval, length `nest`
+      !! @param[out]    done    `.true.` if the interpolant was fully determined
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112): closed periodic spline fitting
       pure subroutine fpclos_reset_interp(idim,k,m,mx,n,nc,nest,kk,kk1,u,x,t,c,fp,per,fp0,s,fpint,nrdata,done)
          integer(FP_SIZE), intent(in)    :: idim,k,m,mx,n,nc,nest
          integer(FP_SIZE), intent(inout) :: kk,kk1
@@ -9935,6 +10020,32 @@ module fitpack_core
 
       end subroutine fpperi
 
+      !> @brief Set up the initial knot configuration for periodic spline interpolation.
+      !!
+      !! When \f$ s = 0 \f$ (interpolation) and \f$ k \f$ is odd, places interior knots
+      !! at the data abscissae. For \f$ k = 1 \f$ (linear), directly sets the
+      !! B-spline coefficients from the data and returns the exact interpolant.
+      !! When \f$ k \f$ is even, knots are placed at midpoints of consecutive abscissae.
+      !!
+      !! @param[in]     k       Spline degree
+      !! @param[in]     m       Number of data points
+      !! @param[in]     n       Number of knots
+      !! @param[in]     nest    Maximum knots allowed
+      !! @param[in,out] kk      Adjusted degree for iteration
+      !! @param[in,out] kk1     Adjusted order for iteration
+      !! @param[in]     x       Data abscissae, length `m`
+      !! @param[in]     y       Data ordinates, length `m`
+      !! @param[in,out] t       Knot vector, length `nest`
+      !! @param[in,out] c       B-spline coefficients, length `nest`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in]     per     Period \f$ = x_m - x_1 \f$
+      !! @param[in]     fp0     Upper bound for the smoothing factor
+      !! @param[in]     s       Smoothing factor
+      !! @param[in,out] fpint   Knot interval contributions, length `nest`
+      !! @param[in,out] nrdata  Data point counts per interval, length `nest`
+      !! @param[out]    done    `.true.` if the interpolant was fully determined
+      !!
+      !! @see Dierckx, Ch. 6, §6.1-6.2 (pp. 95-112): periodic spline fitting
       pure subroutine fpperi_reset_interp(k,m,n,nest,kk,kk1,x,y,t,c,fp,per,fp0,s,fpint,nrdata,done)
          integer(FP_SIZE), intent(in) :: k,m,n,nest
          integer(FP_SIZE), intent(inout) :: kk,kk1
@@ -11329,9 +11440,31 @@ module fitpack_core
 
       end subroutine fppola
 
-      ! three values of p (p1,p2,p3) with corresponding values of
-      ! f(p) (f1=f(p1)-s,f2=f(p2)-s,f3=f(p3)-s) are used to calculate the new value of p
-      ! such that r(p)=s. convergence is guaranteed by taking f1>0,f3<zero
+      !> @brief Update the smoothing parameter \f$ p \f$ during iterative knot selection.
+      !!
+      !! Given the current iterate \f$ (p, F(p) - S) \f$ and the bracketing triple
+      !! \f$ (p_1, F_1), (p_2, F_2), (p_3, F_3) \f$ with \f$ F_1 > 0 \f$ and
+      !! \f$ F_3 < 0 \f$, updates the bracket and computes the next estimate
+      !! via rational interpolation (fprati, Eq. 5.30).
+      !!
+      !! During the initial phase (before the bracket is established), the routine
+      !! adjusts \f$ p \f$ by multiplicative factors to find \f$ p \f$ values that
+      !! bracket the root \f$ F(p) = 0 \f$.
+      !!
+      !! @param[in,out] p1       Left bracket; satisfies \f$ F_1 > 0 \f$
+      !! @param[in,out] f1       \f$ F(p_1) - S \f$; updated with \f$ p_1 \f$
+      !! @param[in,out] p2       Most recent iterate; set to `p` on entry
+      !! @param[in,out] f2       \f$ F(p_2) - S \f$; set to `fpms` on entry
+      !! @param[in,out] p3       Right bracket; satisfies \f$ F_3 < 0 \f$
+      !! @param[in,out] f3       \f$ F(p_3) - S \f$; updated with \f$ p_3 \f$
+      !! @param[in,out] p        Current smoothing parameter; updated to next estimate
+      !! @param[in]     fpms     Current residual \f$ F(p) - S \f$
+      !! @param[in]     acc      Convergence tolerance
+      !! @param[in,out] check1   `.true.` once lower bracket is established
+      !! @param[in,out] check3   `.true.` once upper bracket is established
+      !! @param[out]    success  `.false.` if iteration stalls (non-monotone \f$ F \f$)
+      !!
+      !! @see Dierckx, Ch. 5, §5.2.4 (pp. 83-86), Eq. 5.30-5.32
       elemental subroutine root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
           real(FP_REAL), intent(inout) :: p1,f1,p2,f2,p3,f3,p
           real(FP_REAL), intent(in)    :: fpms,acc
@@ -12152,7 +12285,23 @@ module fitpack_core
 
       end subroutine fpregr
 
-      ! Choose the dimension the next knot should be added on
+      !> @brief Choose which dimension receives the next knot during bivariate fitting.
+      !!
+      !! Selects whether to add a knot in dimension 1 or 2, balancing knot
+      !! insertion across dimensions. Prefers dimension 2 when it has fewer
+      !! added knots, unless dimension 1 is at its maximum or no knot has
+      !! been added yet.
+      !!
+      !! @param[in] n1     Current number of knots in dimension 1
+      !! @param[in] n1add  Number of knots added to dimension 1 this iteration
+      !! @param[in] n1max  Maximum allowed knots in dimension 1
+      !! @param[in] n2     Current number of knots in dimension 2
+      !! @param[in] n2add  Number of knots added to dimension 2 this iteration
+      !! @param[in] n2max  Maximum allowed knots in dimension 2
+      !! @param[in] last   Last dimension a knot was added to (`KNOT_DIM_1`, `KNOT_DIM_2`,
+      !!                   or `KNOT_DIM_NONE`)
+      !!
+      !! @return `KNOT_DIM_1` or `KNOT_DIM_2`
       elemental integer function new_knot_dimension(n1,n1add,n1max,n2,n2add,n2max,last) result(dir)
          integer(FP_SIZE), intent(in) :: n1,n2       ! Number of knots in both dimensions
          integer(FP_SIZE), intent(in) :: n1add,n2add ! Number of knots ADDED in either dimension
@@ -13696,7 +13845,37 @@ module fitpack_core
       end subroutine fpsphe
 
 
-      ! Once all inputs checked, do the actual b-spline surface evaluation
+      !> @brief Evaluate a parametric bicubic tensor-product spline surface.
+      !!
+      !! Computes the values of a \f$ d \f$-dimensional bicubic spline surface
+      !! \f$ (s_1(u,v), \ldots, s_d(u,v)) \f$ at the grid points
+      !! \f$ (u_i, v_j) \f$, \f$ i = 1, \ldots, m_u \f$, \f$ j = 1, \ldots, m_v \f$.
+      !!
+      !! For each dimension, the evaluation uses the tensor-product decomposition:
+      !!
+      !! \f[
+      !!     s(u, v) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j,4}(v) \right) N_{i,4}(u)
+      !! \f]
+      !!
+      !! This is the computational core called by `surev` after input validation.
+      !!
+      !! @param[in]  idim  Number of coordinate dimensions
+      !! @param[in]  tu    Knot vector in \f$ u \f$, length `nu`
+      !! @param[in]  nu    Number of knots in \f$ u \f$
+      !! @param[in]  tv    Knot vector in \f$ v \f$, length `nv`
+      !! @param[in]  nv    Number of knots in \f$ v \f$
+      !! @param[in]  c     B-spline coefficients, length `(nu-4)*(nv-4)*idim`
+      !! @param[in]  u     Evaluation points in \f$ u \f$, length `mu`
+      !! @param[in]  mu    Number of evaluation points in \f$ u \f$
+      !! @param[in]  v     Evaluation points in \f$ v \f$, length `mv`
+      !! @param[in]  mv    Number of evaluation points in \f$ v \f$
+      !! @param[out] f     Surface values, length `mu * mv * idim`
+      !! @param[out] wu    B-spline basis values in \f$ u \f$, `wu(mu, 4)`
+      !! @param[out] wv    B-spline basis values in \f$ v \f$, `wv(mv, 4)`
+      !! @param[out] lu    Knot interval indices in \f$ u \f$, length `mu`
+      !! @param[out] lv    Knot interval indices in \f$ v \f$, length `mv`
+      !!
+      !! @see Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
       pure subroutine fpsuev(idim,tu,nu,tv,nv,c,u,mu,v,mv,f,wu,wv,lu,lv)
 
       !  ..scalar arguments..
