@@ -14,3 +14,4 @@ loop_3
 polar_grid.dat
 project/fitpack.dylib
 project/doxygen/html/
+project/libfitpack.a
