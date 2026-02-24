@@ -22,6 +22,7 @@
 			<Target title="Debug_Apple">
 				<Option platforms="Mac;" />
 				<Option output="../build/debug/fitpack" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="../build/debug/fitpack/" />
 				<Option type="2" />
 				<Option compiler="gcc" />
@@ -97,79 +98,76 @@
 		<Unit filename="../include/fpParametricCurve.hpp" />
 		<Unit filename="../include/fpPeriodicCurve.hpp" />
 		<Unit filename="../src/fitpack.f90">
-			<Option weight="0" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="../src/fitpack_closed_c.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_constrained_c.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_convex_curves.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_core.F90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="../src/fitpack_core.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="../src/fitpack_core_c.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_curves.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_curves_c.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_fitters.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_grid_surfaces.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_polar.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_sphere.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric_c.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric_surfaces.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_periodic_curves_c.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../src/fitpack_polar.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_spheres.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_surfaces.f90">
-			<Option weight="0" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="../test/fitpack_cpp_tests.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="../test/fitpack_curve_tests.f90">
-			<Option weight="0" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="../test/fitpack_test_data.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="../test/fitpack_tests.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="../test/test.f90">
-			<Option weight="0" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="../test/test_curve.cpp" />
 		<Extensions />
