@@ -4,6 +4,7 @@ program test
     use fitpack_test_data
     use fitpack_curve_tests
     use fitpack_cpp_tests
+    use fitpack_grid_nd_tests
     use iso_fortran_env, only: output_unit
     implicit none
 
@@ -68,6 +69,7 @@ program test
         call add_test(test_cross_section())
         call add_test(test_derivative_spline())
         call add_test(test_grid_surface_scattered_eval())
+        call add_test(test_nd_grid_equivalence())
 
     end subroutine run_interface_tests
 
