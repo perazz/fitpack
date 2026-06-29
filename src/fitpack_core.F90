@@ -108,11 +108,13 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: IOPT_NEW_SMOOTHING    =  0 ! Request a new smoothing fit
     integer(FP_FLAG), parameter,  public :: IOPT_OLD_FIT          =  1 ! Update an old fit
 
-    ! Dimensions of last knot addition
+    ! Dimension index of the last knot addition. KNOT_DIM_NONE = none added yet; otherwise the
+    ! 1-based axis ID (1 = first dim x/u, 2 = second dim y/v, ... up to MAX_IDIM), so the value can
+    ! be used directly as an array/axis index. This generalizes to N dimensions.
     integer(FP_SIZE), parameter,  public :: MAX_IDIM      = 10  ! Max number of dimensions
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
-    integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  1  ! Last knot added on 2nd dim (y or v)
-    integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    = -1  ! Last knot added on 1st dim (x or u)
+    integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
+    integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)
 
     ! Spline degrees
     integer(FP_SIZE), parameter, public :: MAX_ORDER = 19    ! Max spline order (for array allocation)
@@ -7345,6 +7347,10 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),n(dims)
       integer(FP_SIZE), intent(inout) :: ifs(dims),ifb(dims)
       !  ..array arguments..
+      !  z(mz): gridded data tensor, flat. Row-major with axis 1 (x) SLOWEST and the last axis
+      !  FASTEST -- at dims=2 this is z(m(2),m(1)) = (ny_data,nx_data), NOT (nx,ny). Element
+      !  (i1,i2,...) lives at fp_grid_index([i1,i2,...],fp_grid_strides(m))+1; at dims=2 that is
+      !  (i-1)*my+j, which is exactly how the frozen kernels below read it (x-outer, y-inner).
       real(FP_REAL),    intent(in)              :: z(mz)
       real(FP_REAL),    intent(in),  contiguous :: xg(:,:),t(:,:)
       real(FP_REAL),    intent(inout)           :: c(nc),right(mm),q(mynx)
@@ -9721,9 +9727,8 @@ module fitpack_core
          endif
 
          ! test whether we are going to add knots in the u- or v-direction.
-         ! lastdi = last knot direction: lastdi==0  = not yet set
-         !                               lastdi==1  = v direction
-         !                               lastdi==-1 = u direction
+         ! lastdi = dimension index of last knot addition: KNOT_DIM_NONE = not yet set;
+         !          KNOT_DIM_1 = u direction; KNOT_DIM_2 = v direction
          lastdi = new_knot_dimension(nu,nplu,nue,nv,nplv,nve,lastdi)
 
          choose_dir: if (lastdi==KNOT_DIM_2) then
@@ -12684,6 +12689,8 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: n(dims),nplus(dims)
       real(FP_REAL),    intent(inout) :: reduc(dims)
       !  ..array arguments (data + caller-supplied workspace views)..
+      !  z(mz): gridded data, flat and (ny,nx)-ordered (y-fast); passed straight to fpgrre_nd, which
+      !  documents and indexes the storage convention. fpregr_nd never dereferences z itself.
       real(FP_REAL),    intent(in)               :: z(mz)
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:),fpint(:,:),sp(:,:,:),right(:),q(:),a(:,:,:),b(:,:,:)
@@ -12764,9 +12771,7 @@ module fitpack_core
 
                   !  iopt=0, or iopt=1 and s>=fp0: start from the least-squares polynomial.
                   n = nmin
-                  do d=1,dims
-                     nrdat(1,d) = m(d)-2
-                  end do
+                  nrdat(1,:dims) = m-2
                   lastdi = KNOT_DIM_NONE
                   nplus  = 0
                   fp0    = zero
@@ -12779,11 +12784,8 @@ module fitpack_core
 
       endif bootstrap
 
-      ! mpm = sum(m) is a safe upper bound on the number of trials (avoid sum() per house style).
-      mpm = 0
-      do d=1,dims
-         mpm = mpm+m(d)
-      end do
+      ! mpm = sum(m) is a safe upper bound on the number of trials.
+      mpm = sum(m)
       ifs = 0
       ifb = 0
       p   = -one
@@ -12800,10 +12802,10 @@ module fitpack_core
           nrint = n-nmin+1
           nk1   = n-k1
           ncof  = product(nk1)
-          do d=1,dims
+          forall (d=1:dims)
              t(1:k1(d),d)        = lo(d)
              t(n(d)-k(d):n(d),d) = hi(d)
-          end do
+          end forall
 
           ! least-squares spline + per-interval residuals fpint(:,d) and total fp.
           call fpgrre_nd(dims,ifs,ifb,xg,m,z,mz,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
@@ -12832,11 +12834,8 @@ module fitpack_core
 
           ier = FITPACK_OK
 
-          ! adjust reduc for the direction of the last knot addition (binary; literal-2).
-          select case (lastdi)
-             case (KNOT_DIM_1); reduc(1) = fpold-fp
-             case (KNOT_DIM_2); reduc(2) = fpold-fp
-          end select
+          ! adjust reduc for the axis of the last knot addition (lastdi is the dimension index).
+          if (lastdi/=KNOT_DIM_NONE) reduc(lastdi) = fpold-fp
 
           fpold = fp
 
@@ -12851,32 +12850,21 @@ module fitpack_core
              endif
           end do
 
-         ! choose the direction for the next knots (binary arbiter; literal-2).
+         ! choose the axis for the next knots. new_knot_dimension returns the dimension index
+         ! (KNOT_DIM_1 or KNOT_DIM_2 at dims=2); lastdi then drives the refinement directly, so the
+         ! binary branch collapses to a single dimension-indexed block. The arbiter itself stays
+         ! binary until the dims>2 step replaces it with an argmax over the axes.
          lastdi = new_knot_dimension(n(1),npl(1),ne(1),n(2),npl(2),ne(2),lastdi)
 
-         choose_dim: if (lastdi==KNOT_DIM_2) then
-
-            ! addition in the y-direction (axis 2).
-            nplus(2) = npl(2)
-            ifs(2)   = 0
-            add_y_knots: do l=1,nplus(2)
-               call fpknot(xg(1:m(2),2),m(2),t(1:nest(2),2),n(2),fpint(1:nest(2),2), &
-                           nrdat(1:nest(2),2),nrint(2),nest(2),IONE)
-               if (n(2)==ne(2)) exit add_y_knots
-            end do add_y_knots
-
-        else choose_dim
-
-            ! addition in the x-direction (axis 1).
-            nplus(1) = npl(1)
-            ifs(1)   = 0
-            add_x_knots: do l=1,nplus(1)
-               call fpknot(xg(1:m(1),1),m(1),t(1:nest(1),1),n(1),fpint(1:nest(1),1), &
-                           nrdat(1:nest(1),1),nrint(1),nest(1),IONE)
-               if (n(1)==ne(1)) exit add_x_knots
-            end do add_x_knots
-
-        endif choose_dim
+         ! add knots along the chosen axis (lastdi in 1..dims).
+         d        = lastdi
+         nplus(d) = npl(d)
+         ifs(d)   = 0
+         add_knots: do l=1,nplus(d)
+            call fpknot(xg(1:m(d),d),m(d),t(1:nest(d),d),n(d),fpint(1:nest(d),d), &
+                        nrdat(1:nest(d),d),nrint(d),nest(d),IONE)
+            if (n(d)==ne(d)) exit add_knots
+         end do add_knots
 
       end do main_loop
 

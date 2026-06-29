@@ -9,6 +9,8 @@
 !     A. fpbisp_nd  vs bispev  (gridded evaluation)
 !     D. regrid_nd  vs regrid  (gridded fit; transitively covers fpregr_nd and fpgrre_nd, whose
 !                               outputs tx,ty,c,fp,nx,ny are exactly what regrid_nd returns)
+!     D'. regrid_nd vs regrid on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
+!                               convention so an x<->y axis/size swap cannot hide behind mx==my
 !
 !   See todo/fitpack_nd_grids.md (slice 1) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
 ! **************************************************************************************************
@@ -46,6 +48,9 @@ module fitpack_grid_nd_tests
 
         ! Gate D: regrid_nd vs regrid (backbone; transitively covers fpregr_nd + fpgrre_nd)
         if (success) success = gate_regrid_nd(useUnit)
+
+        ! Gate D': same, on a NON-SQUARE grid (mx /= my) so an x<->y data/size swap cannot hide
+        if (success) success = gate_regrid_nd_nonsquare(useUnit)
 
         ! Gate A: fpbisp_nd vs bispev
         if (success) success = gate_fpbisp_nd(useUnit)
@@ -240,6 +245,73 @@ module fitpack_grid_nd_tests
 
         write(useUnit,'(a)') '[gate D] regrid_nd == regrid (bit-for-bit; iopt=-1,0,1; cubic+quintic)'
     end function gate_regrid_nd
+
+    !> @brief Gate D' — regrid_nd vs regrid on a NON-SQUARE grid (mx /= my).
+    !!
+    !! The square 11x11 daregr battery cannot expose an x<->y swap in the data tensor or in the
+    !! per-axis sizing: with mx==my both indexings address the same elements. A non-square grid
+    !! makes any such swap a hard bit-for-bit failure, so this directly guards the z = (ny,nx)
+    !! (y-fast) storage convention as the *_nd path heads toward dims>2. The synthetic data is
+    !! deliberately NON-symmetric under x<->y (different centres/weights) so even a pure transpose
+    !! on a hypothetical square grid would be caught.
+    logical function gate_regrid_nd_nonsquare(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: MX = 9, MY = 13
+        real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY)
+        ! reference (regrid)
+        integer(FP_SIZE) :: nxr,nyr
+        real(FP_REAL)    :: txr(NXEST),tyr(NYEST),cr(NCMAX),fpr,wrkr(LWRK)
+        integer(FP_SIZE) :: iwrkr(KWRK)
+        integer(FP_FLAG) :: ier_r
+        ! test (regrid_nd)
+        integer(FP_SIZE) :: ntst(2),kk(2),m2(2),nest2(2)
+        real(FP_REAL)    :: ttst(NXEST,2),ctst(NCMAX),fptst,wrkt(LWRK),xgt(MY,2)
+        integer(FP_SIZE) :: iwrkt(KWRK)
+        integer(FP_FLAG) :: ier_t
+        ! shared
+        real(FP_REAL)    :: xb,xe,yb,ye,s,lo(2),hi(2)
+        integer(FP_SIZE) :: i,j,iopt,icase
+        character(len=40):: lbl
+
+        ok = .true.
+
+        ! strictly increasing grids on [0,1]; distinct sizes mx=9, my=13
+        do i=1,MX; xg1(i) = real(i-1,FP_REAL)/real(MX-1,FP_REAL); end do
+        do j=1,MY; yg1(j) = real(j-1,FP_REAL)/real(MY-1,FP_REAL); end do
+
+        ! smooth, NON-symmetric data, stored y-fast: zin((i-1)*MY+j) = f(x_i,y_j)
+        do i=1,MX
+           do j=1,MY
+              zin((i-1)*MY+j) = (xg1(i)-0.5_FP_REAL)**2 + 2.0_FP_REAL*(yg1(j)-0.3_FP_REAL)**2 &
+                              + xg1(i)*yg1(j)
+           end do
+        end do
+
+        xb = xg1(1); xe = xg1(MX); yb = yg1(1); ye = yg1(MY)
+        m2 = [MX,MY]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
+        xgt = zero; xgt(1:MX,1) = xg1; xgt(1:MY,2) = yg1
+        wrkr = zero; iwrkr = 0; wrkt = zero; iwrkt = 0
+        kk = [3_FP_SIZE,3_FP_SIZE]
+
+        do icase=1,2
+            select case (icase)
+               case (1); iopt = 0; s = 0.05_FP_REAL   ! smoothing
+               case (2); iopt = 0; s = 0.0_FP_REAL    ! interpolation
+            end select
+            call regrid(iopt,MX,xg1,MY,yg1,zin,xb,xe,yb,ye,kk(1),kk(2),s,NXEST,NYEST, &
+                        nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
+            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+                           ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
+            write(lbl,'(a,i0)') 'non-square 9x13 #',icase
+            if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
+                             ntst,ttst,ctst,fptst,ier_t)) then
+                ok = .false.; return
+            end if
+        end do
+
+        write(useUnit,'(a)') '[gate D''] regrid_nd == regrid (bit-for-bit; non-square 9x13)'
+    end function gate_regrid_nd_nonsquare
 
     !> @brief Compare a regrid vs regrid_nd result pair bit-for-bit; report on mismatch.
     logical function pair_ok(useUnit,label,k,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
