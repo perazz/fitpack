@@ -11,6 +11,17 @@
 #include <iostream>
 using std::vector;
 
+// Math constants used only by these tests (kept out of the public C header so
+// they don't collide with a host project's own one/zero/pi/... definitions).
+static const FP_REAL one        = 1.0;
+static const FP_REAL half       = 0.5;
+static const FP_REAL third      = one/3.0;
+static const FP_REAL pi         = 3.1415926535897932384626433832795028842;
+static const FP_REAL pi2        = 2*pi;
+static const FP_REAL smallnum03 = 1.0e-03;
+static const FP_REAL smallnum06 = 1.0e-06;
+static const FP_REAL smallnum08 = 1.0e-08;
+
 extern "C" {
 
 // Test curve
