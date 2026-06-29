@@ -127,7 +127,8 @@ module fitpack_core_c
       end subroutine cocosp_c
 
       ! concon interface
-      pure subroutine concon_c(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_concon_c')
+      pure subroutine concon_c(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) &
+                                bind(C,name='fp_concon_c')
           real   (FP_REAL), intent(in), value :: s
           real   (FP_REAL), intent(out)       :: sq
           integer(FP_SIZE), intent(in), value :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
