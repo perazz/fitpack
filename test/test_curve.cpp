@@ -42,7 +42,7 @@ FP_BOOL test_cpp_sine_fit()
    // Create interpolating curve (smoothing=0)
    fpCurve sine;
    ierr = sine.new_fit(x,y,0.0);
-   if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+   if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
    // Create 200 points halfway between the range
    vector<FP_REAL> xrand; xrand.reserve(N-1);
@@ -56,7 +56,7 @@ FP_BOOL test_cpp_sine_fit()
    for (int i=0; i<N-1; i++)
    {
        // Evaluate function
-       if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+       if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
        // Get exact function and derivatives here
        dfdx[0] = sin(xrand[i]);
@@ -68,7 +68,7 @@ FP_BOOL test_cpp_sine_fit()
        for (FP_SIZE order = 0; order<4; order++)
        {
           FP_REAL yprime = sine.ddx(xrand[i],order,&ierr);
-          if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+          if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
           // Check error
           if (abs(yprime-dfdx[order])>smallnum03*fmax(0.01,abs(dfdx[order]))) return FP_FALSE;
@@ -127,7 +127,7 @@ FP_BOOL test_cpp_periodic_fit()
     ierr = curve.new_fit(x,y,0.0);
 
     // Failed to create
-    if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+    if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
     // Create 200 points halfway between the range
     vector<FP_REAL> xrand(N,0.0);
@@ -143,7 +143,7 @@ FP_BOOL test_cpp_periodic_fit()
     {
 
         FP_REAL yeval = curve.eval(xrand[i],&ierr);
-        if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+        if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
 
         // Get analytical function and derivatives
@@ -164,7 +164,7 @@ FP_BOOL test_cpp_periodic_fit()
         for (FP_SIZE order = 0; order<4; order++)
         {
           FP_REAL yprime = curve.ddx(xrand[i],order,&ierr);
-          if (!fp_FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
+          if (!FITPACK_SUCCESS_c(ierr)) return FP_FALSE;
 
           // Check error
           if (abs(yprime-dfdx[order])*rewt(RTOL,ATOL,dfdx[order])>one) return FP_FALSE;
@@ -275,8 +275,8 @@ FP_BOOL test_cpp_parametric_fit()
             break;
          }
 
-         if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_parametric_fit] test " << loop << " failed: " << msg << std::endl;
             break;
          }
@@ -284,8 +284,8 @@ FP_BOOL test_cpp_parametric_fit()
           // Evaluate the spline at all nodes
           vector<fpPoint> y = curve.eval(uv,&ierr);
 
-          if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_parametric_fit] point evaluation " << loop << " failed: " << msg << std::endl;
             break;
           }
@@ -294,8 +294,8 @@ FP_BOOL test_cpp_parametric_fit()
           if (loop<6) {
               vector<fpPoint> dy = curve.ddu_all(uv[12], &ierr);
 
-              if (!fp_FITPACK_SUCCESS_c(ierr)) {
-                fp_fitpack_message_c(ierr,msg);
+              if (!FITPACK_SUCCESS_c(ierr)) {
+                fitpack_message_c(ierr,msg);
                 std::cout << "[test_parametric_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
                 break;
               }
@@ -304,7 +304,7 @@ FP_BOOL test_cpp_parametric_fit()
      }
 
     // All checks passed: success!
-    return fp_FITPACK_SUCCESS_c(ierr);
+    return FITPACK_SUCCESS_c(ierr);
 
 }
 
@@ -389,8 +389,8 @@ FP_BOOL test_cpp_closed_fit()
             break;
          }
 
-         if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_closed_fit] test " << loop << " failed: " << msg << std::endl;
             break;
          }
@@ -398,8 +398,8 @@ FP_BOOL test_cpp_closed_fit()
           // Evaluate the spline at all nodes
           vector<fpPoint> y = curve.eval(u,&ierr);
 
-          if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_closed_fit] point evaluation " << loop << " failed: " << msg << std::endl;
             break;
           }
@@ -408,8 +408,8 @@ FP_BOOL test_cpp_closed_fit()
           if (loop<6) {
               vector<fpPoint> dy = curve.ddu_all(u[12], &ierr);
 
-              if (!fp_FITPACK_SUCCESS_c(ierr)) {
-                fp_fitpack_message_c(ierr,msg);
+              if (!FITPACK_SUCCESS_c(ierr)) {
+                fitpack_message_c(ierr,msg);
                 std::cout << "[test_closed_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
                 break;
               }
@@ -418,7 +418,7 @@ FP_BOOL test_cpp_closed_fit()
      }
 
     // All checks passed: success!
-    return fp_FITPACK_SUCCESS_c(ierr);
+    return FITPACK_SUCCESS_c(ierr);
 
 }
 
@@ -474,7 +474,7 @@ FP_BOOL test_cpp_constrained_fit() {
             {
                 ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+1),
                                             vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
-                if (!fp_FITPACK_SUCCESS_c(ierr)) break;
+                if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
             }
@@ -482,7 +482,7 @@ FP_BOOL test_cpp_constrained_fit() {
             {
                 ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
                                             vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
-                if (!fp_FITPACK_SUCCESS_c(ierr)) break;
+                if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
             }
@@ -490,14 +490,14 @@ FP_BOOL test_cpp_constrained_fit() {
             {
                 ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
                                             vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+2));
-                if (!fp_FITPACK_SUCCESS_c(ierr)) break;
+                if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
             }
          case 5: // quintic spline, 2st derivative constraints (both)
             {
                 ierr = curve.constrain_both(ddx_beginv,ddx_endv);
-                if (!fp_FITPACK_SUCCESS_c(ierr)) break;
+                if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m, 5);
                 break;
             }
@@ -510,32 +510,32 @@ FP_BOOL test_cpp_constrained_fit() {
             break;
          }
 
-         if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] test " << loop << " failed: " << msg << std::endl;
             break;
          }
 
           // Evaluate the spline at all nodes
           vector<fpPoint> y = curve.eval(u,&ierr);
-          if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] point evaluation " << loop << " failed: " << msg << std::endl;
             break;
           }
 
          // Calculate derivatives at the begin point.
          vector<fpPoint> ybegin = curve.ddu_all(curve.ubegin(), &ierr);
-         if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] begin point derivatives " << loop << " failed: " << msg << std::endl;
             break;
          }
 
          // Calculate derivatives at the end point
          vector<fpPoint> yend = curve.ddu_all(curve.uend(), &ierr);
-         if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+         if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] end point derivatives " << loop << " failed: " << msg << std::endl;
             break;
          }
@@ -591,15 +591,15 @@ FP_BOOL test_cpp_constrained_fit() {
          }
 
           // Evaluate derivatives at a random point from the initial set
-          if (!fp_FITPACK_SUCCESS_c(ierr)) {
-            fp_fitpack_message_c(ierr,msg);
+          if (!FITPACK_SUCCESS_c(ierr)) {
+            fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] derivative evaluation " << loop << " failed: " << msg << std::endl;
             break;
           }
 
      }
 
-   return fp_FITPACK_SUCCESS_c(ierr);
+   return FITPACK_SUCCESS_c(ierr);
 
 }
 

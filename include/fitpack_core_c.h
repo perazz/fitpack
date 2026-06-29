@@ -66,7 +66,7 @@ static const FP_SIZE DEGREE_5  =  5;
 typedef FP_REAL (*FP_POLAR_BC)(FP_REAL); 
 
 // Error codes
-             FP_BOOL fp_FITPACK_SUCCESS_c(FP_FLAG ierr);
+             FP_BOOL FITPACK_SUCCESS_c(FP_FLAG ierr);
 static const FP_FLAG FITPACK_OK                   = 0 ; // ok for spline, abs(fp-s)/s <= tol=0.001
 static const FP_FLAG FITPACK_INTERPOLATING_OK     = -1; // ok for interpolating spline, fp=0
 static const FP_FLAG FITPACK_LEASTSQUARES_OK      = -2; // ok for weighted least-squares polynomial of degree k.
@@ -81,7 +81,7 @@ static const FP_FLAG FITPACK_TEST_ERROR           = 11;
 static const FP_FLAG FITPACK_INVALID_CONSTRAINT   = 12;
 static const FP_FLAG FITPACK_INSUFFICIENT_KNOTS   = 13;
 
-void fp_fitpack_message_c(FP_FLAG ierr, char* msg);
+void fitpack_message_c(FP_FLAG ierr, char* msg);
 
 //Internal Parameters
 static const FP_BOOL FP_TRUE  = true;

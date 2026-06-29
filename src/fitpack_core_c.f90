@@ -41,13 +41,13 @@ module fitpack_core_c
     contains
 
       ! Error test wrapper
-      logical(FP_BOOL) function FITPACK_SUCCESS_c(ierr) result(success) bind(C,name="fp_FITPACK_SUCCESS_c")
+      logical(FP_BOOL) function FITPACK_SUCCESS_c(ierr) result(success) bind(C,name="FITPACK_SUCCESS_c")
          integer(FP_FLAG), intent(in), value :: ierr
          success = FITPACK_SUCCESS(ierr)
       end function FITPACK_SUCCESS_c
 
       ! Flow control: on output flag present, return it; otherwise, halt on error
-      pure subroutine fitpack_message_c(ierr,msg) bind(C,name='fp_fitpack_message_c')
+      pure subroutine fitpack_message_c(ierr,msg) bind(C,name='fitpack_message_c')
           integer(FP_FLAG), intent(in), value :: ierr
           character(len=1,kind=c_char), intent(inout) :: msg(*)
           character(:), allocatable :: str
