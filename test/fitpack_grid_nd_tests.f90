@@ -184,6 +184,7 @@ module fitpack_grid_nd_tests
         integer(FP_FLAG) :: ier_t
         ! shared
         real(FP_REAL)    :: zin(size(daregr_x)*size(daregr_y)),xb,xe,yb,ye,s,lo(2),hi(2)
+        real(FP_REAL)    :: zin2(size(daregr_y),size(daregr_x))   ! rank-2 (my,mx) data for regrid_nd
         integer(FP_SIZE) :: kx,ky,iopt,icase,i
         character(len=40):: lbl
 
@@ -191,6 +192,7 @@ module fitpack_grid_nd_tests
         mx = size(daregr_x,kind=FP_SIZE); my = size(daregr_y,kind=FP_SIZE)
         xb = daregr_x(1); xe = daregr_x(mx); yb = daregr_y(1); ye = daregr_y(my)
         zin = reshape(daregr_z,[mx*my])
+        zin2 = reshape(zin,[my,mx])        ! same bytes as zin, shaped (my,mx) = (ny,nx)
 
         ! regrid_nd marshalling that is constant across calls
         m2 = [mx,my]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
@@ -208,7 +210,7 @@ module fitpack_grid_nd_tests
             end select
             call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                         nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'cubic iopt-chain #',icase
             if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
@@ -221,7 +223,7 @@ module fitpack_grid_nd_tests
         kx = 5; ky = 5; kk = [kx,ky]; iopt = 0; s = 0.2_FP_REAL
         call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                     nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-        call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+        call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.pair_ok(useUnit,'quintic fresh iopt=0',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
                          ntst,ttst,ctst,fptst,ier_t)) then
@@ -236,7 +238,7 @@ module fitpack_grid_nd_tests
         ttst(kx+2:kx+4,1) = txr(kx+2:kx+4); ttst(ky+2:ky+4,2) = tyr(ky+2:ky+4)
         call regrid(-1_FP_FLAG,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                     nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-        call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+        call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.pair_ok(useUnit,'lsq given knots iopt=-1',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
                          ntst,ttst,ctst,fptst,ier_t)) then
@@ -258,7 +260,7 @@ module fitpack_grid_nd_tests
         integer, intent(in) :: useUnit
 
         integer(FP_SIZE), parameter :: MX = 9, MY = 13
-        real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY)
+        real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY),zin2(MY,MX)
         ! reference (regrid)
         integer(FP_SIZE) :: nxr,nyr
         real(FP_REAL)    :: txr(NXEST),tyr(NYEST),cr(NCMAX),fpr,wrkr(LWRK)
@@ -287,6 +289,7 @@ module fitpack_grid_nd_tests
                               + xg1(i)*yg1(j)
            end do
         end do
+        zin2 = reshape(zin,[MY,MX])        ! same bytes as zin, shaped (my,mx) = (ny,nx)
 
         xb = xg1(1); xe = xg1(MX); yb = yg1(1); ye = yg1(MY)
         m2 = [MX,MY]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
@@ -301,7 +304,7 @@ module fitpack_grid_nd_tests
             end select
             call regrid(iopt,MX,xg1,MY,yg1,zin,xb,xe,yb,ye,kk(1),kk(2),s,NXEST,NYEST, &
                         nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'non-square 9x13 #',icase
             if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &

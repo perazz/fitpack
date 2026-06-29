@@ -7336,22 +7336,22 @@ module fitpack_core
       !! separately-sized ax(nx,kx2)/ay(ny,ky2)/bx/by — no copies, no value change.
       !!
       !! @see fpgrre, Dierckx Ch. 5 §5.4; todo/fitpack_nd_grids.md (slice 1, §2/§9)
-      pure subroutine fpgrre_nd(dims,ifs,ifb,xg,m,z,mz,k,t,n,p,c,nc,fp,fpint, &
+      pure subroutine fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint, &
                                 mm,mynx,sp,right,q,a,b,nr)
 
       !  ..scalar arguments..
       integer(FP_DIM),  intent(in)    :: dims
       real(FP_REAL),    intent(in)    :: p
       real(FP_REAL),    intent(inout) :: fp
-      integer(FP_SIZE), intent(in)    :: mz,nc,mm,mynx
+      integer(FP_SIZE), intent(in)    :: nc,mm,mynx
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),n(dims)
       integer(FP_SIZE), intent(inout) :: ifs(dims),ifb(dims)
       !  ..array arguments..
-      !  z(mz): gridded data tensor, flat. Row-major with axis 1 (x) SLOWEST and the last axis
-      !  FASTEST -- at dims=2 this is z(m(2),m(1)) = (ny_data,nx_data), NOT (nx,ny). Element
-      !  (i1,i2,...) lives at fp_grid_index([i1,i2,...],fp_grid_strides(m))+1; at dims=2 that is
-      !  (i-1)*my+j, which is exactly how the frozen kernels below read it (x-outer, y-inner).
-      real(FP_REAL),    intent(in)              :: z(mz)
+      !  z(m(2),m(1)): gridded data tensor as a genuine 2-D array -- leading dim m(2) (= my, the y/
+      !  axis-2 data count) FASTEST, trailing dim m(1) (= mx, axis-1) SLOWEST, i.e. (ny,nx) and NOT
+      !  (nx,ny). Element z(i2,i1) is the datum at (x_i1,y_i2); this is bit-for-bit the legacy flat
+      !  layout z((i1-1)*my+i2). Generalizes to z(m(dims),...,m(1)) at the dims>2 step.
+      real(FP_REAL),    intent(in)              :: z(m(2),m(1))
       real(FP_REAL),    intent(in),  contiguous :: xg(:,:),t(:,:)
       real(FP_REAL),    intent(inout)           :: c(nc),right(mm),q(mynx)
       real(FP_REAL),    intent(inout), contiguous :: fpint(:,:),sp(:,:,:),a(:,:,:),b(:,:,:)
@@ -7359,7 +7359,7 @@ module fitpack_core
       !  ..local scalars..
       real(FP_REAL) :: arg,fac,pinv,term
       integer(FP_DIM)  :: d
-      integer(FP_SIZE) :: i,ibandx,ibandy,irot,it,iz,i1,i2,j,kk,kc,l,l1,ncof,nrold,nroldx,nroldy,&
+      integer(FP_SIZE) :: i,ibandx,ibandy,irot,it,i1,i2,j,kk,kc,l,l1,ncof,nrold,nroldx,nroldy,&
                           number,numx,numx1,numy,numy1,n1,lda,ldb
       !  ..per-axis sizes..
       integer(FP_SIZE) :: k1(dims),k2(dims),nk1(dims)
@@ -7434,10 +7434,7 @@ module fitpack_core
            if(nrold==number) then
               h(ibandx) = zero
               h(1:kx1) = sp(it,1:kx1,1)
-              do j=1,my
-                 l = l+1
-                 right(j) = z(l)
-              end do
+              right(1:my) = z(1:my,it)      ! column it of the (my,mx) data tensor
               irot = number
            elseif (p<=zero) then
               nrold = nrold+1
@@ -7527,7 +7524,6 @@ module fitpack_core
       fpint(:,1) = zero
       fpint(:,2) = zero
       nk1y   = nk1(2)
-      iz     = 0
       nroldx = 0
 
       !  main loop for the different grid points.
@@ -7538,7 +7534,6 @@ module fitpack_core
          grid_y: do i2=1,my
             numy = nr(i2,2)
             numy1 = numy+1
-            iz = iz+1
             term = zero
             kc = numx*nk1y+numy
             do l1=1,kx1
@@ -7546,7 +7541,7 @@ module fitpack_core
                kc = kc+nk1y
             end do
 
-            term = (z(iz)-term)**2
+            term = (z(i2,i1)-term)**2      ! datum at (x_i1,y_i2); rank-2 (my,mx) access
             fp = fp+term
             fpint(numx1,1) = fpint(numx1,1)+term
             fpint(numy1,2) = fpint(numy1,2)+term
@@ -12671,7 +12666,7 @@ module fitpack_core
       !! (fp0, fpold, reduc, lastdi, nplus) is passed explicitly rather than hidden in wrk offsets.
       !!
       !! @see fpregr, fpgrre_nd, Dierckx Ch. 5 §5.4; todo/fitpack_nd_grids.md (slice 1, §8 part C)
-      pure subroutine fpregr_nd(iopt,dims,xg,m,z,mz,lo,hi,k,s,nest,tol,maxit,nc, &
+      pure subroutine fpregr_nd(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
                                 n,t,c,fp,fp0,fpold,reduc,lastdi,nplus, &
                                 fpint,nr,nrdat,sp,right,q,a,b,ier)
 
@@ -12679,7 +12674,7 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: iopt
       integer(FP_DIM),  intent(in)    :: dims
       real(FP_REAL),    intent(in)    :: s,tol
-      integer(FP_SIZE), intent(in)    :: mz,nc,maxit
+      integer(FP_SIZE), intent(in)    :: nc,maxit
       real(FP_REAL),    intent(inout) :: c(nc),fp,fp0,fpold
       integer(FP_SIZE), intent(inout) :: lastdi
       integer(FP_FLAG), intent(inout) :: ier
@@ -12689,9 +12684,9 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: n(dims),nplus(dims)
       real(FP_REAL),    intent(inout) :: reduc(dims)
       !  ..array arguments (data + caller-supplied workspace views)..
-      !  z(mz): gridded data, flat and (ny,nx)-ordered (y-fast); passed straight to fpgrre_nd, which
-      !  documents and indexes the storage convention. fpregr_nd never dereferences z itself.
-      real(FP_REAL),    intent(in)               :: z(mz)
+      !  z(m(2),m(1)): gridded data as a 2-D array, (ny,nx)-ordered (y/axis-2 fastest); passed
+      !  straight to fpgrre_nd, which documents and indexes the convention. fpregr_nd never reads z.
+      real(FP_REAL),    intent(in)               :: z(m(2),m(1))
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:),fpint(:,:),sp(:,:,:),right(:),q(:),a(:,:,:),b(:,:,:)
       integer(FP_SIZE), intent(inout), contiguous :: nr(:,:),nrdat(:,:)
@@ -12808,7 +12803,7 @@ module fitpack_core
           end forall
 
           ! least-squares spline + per-interval residuals fpint(:,d) and total fp.
-          call fpgrre_nd(dims,ifs,ifb,xg,m,z,mz,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
+          call fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
 
           if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
 
@@ -12882,7 +12877,7 @@ module fitpack_core
 
       root_iterations: do iter = 1,maxit
 
-          call fpgrre_nd(dims,ifs,ifb,xg,m,z,mz,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
+          call fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
 
           fpms = fp-s; if (abs(fpms)<acc) return
 
@@ -17800,7 +17795,7 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),nest(dims)
       real(FP_REAL),    intent(in)    :: lo(dims),hi(dims)
       integer(FP_SIZE), intent(inout) :: n(dims)
-      real(FP_REAL),    intent(in)              :: z(*)
+      real(FP_REAL),    intent(in)              :: z(m(2),m(1))  ! gridded data, (ny,nx)/y-fast (dims=2)
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:)
       real(FP_REAL),    intent(inout)             :: c(*)
@@ -17812,7 +17807,7 @@ module fitpack_core
       real(FP_REAL),    parameter :: tol = smallnum03
       !  ..local scalars..
       integer(FP_DIM)  :: d
-      integer(FP_SIZE) :: mz,nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi
+      integer(FP_SIZE) :: nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi
       !  ..per-axis arrays..
       integer(FP_SIZE) :: k1(dims),k2(dims),nmin(dims)
       !  ..workspace views (carved from wrk/iwrk; contiguous by construction)..
@@ -17825,7 +17820,6 @@ module fitpack_core
       k1   = k+1
       k2   = k+2
       nmin = 2*k1
-      mz   = product(m)
       nc   = product(nest-k1)
 
       if (any(k<=0) .or. any(k>5))    return
@@ -17883,7 +17877,7 @@ module fitpack_core
       pnr(1:maxm,1:dims)             => iwrk(offi+1:offi+maxm*dims);            offi = offi+maxm*dims
       pnrdat(1:maxnest,1:dims)       => iwrk(offi+1:offi+maxnest*dims)
 
-      call fpregr_nd(iopt,dims,xg,m,z,mz,lo,hi,k,s,nest,tol,maxit,nc, &
+      call fpregr_nd(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
                      n,t,c,fp,wrk(1),wrk(2),wrk(3:2+dims),iwrk(1),iwrk(2:1+dims), &
                      pfpint,pnr,pnrdat,psp,pright,pq,pa,pb,ier)
       return
