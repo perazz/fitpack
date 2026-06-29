@@ -114,7 +114,7 @@ class fpParametricCurve
             for (FP_SIZE i=0; i<static_cast<FP_SIZE>(u.size()); i++)
             {
                 y[i] = eval(u[i],&ierr0);
-                if (!FITPACK_SUCCESS_c(ierr0)) break;
+                if (!fp_FITPACK_SUCCESS_c(ierr0)) break;
             }
 
             // Return error flag
@@ -154,7 +154,7 @@ class fpParametricCurve
            FP_FLAG ierr0 = FITPACK_OK;
            for (FP_SIZE order = 0; order<degree()+1; order++) {
                 deriv[order] = ddu(u,order,&ierr0);
-                if (!FITPACK_SUCCESS_c(ierr0)) break;
+                if (!fp_FITPACK_SUCCESS_c(ierr0)) break;
            }
            if (ierr) (*ierr)=ierr0;
            return deriv;

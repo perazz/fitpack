@@ -41,13 +41,13 @@ module fitpack_core_c
     contains
 
       ! Error test wrapper
-      logical(FP_BOOL) function FITPACK_SUCCESS_c(ierr) result(success) bind(C,name="FITPACK_SUCCESS_c")
+      logical(FP_BOOL) function FITPACK_SUCCESS_c(ierr) result(success) bind(C,name="fp_FITPACK_SUCCESS_c")
          integer(FP_FLAG), intent(in), value :: ierr
          success = FITPACK_SUCCESS(ierr)
       end function FITPACK_SUCCESS_c
 
       ! Flow control: on output flag present, return it; otherwise, halt on error
-      pure subroutine fitpack_message_c(ierr,msg) bind(C,name='fitpack_message_c')
+      pure subroutine fitpack_message_c(ierr,msg) bind(C,name='fp_fitpack_message_c')
           integer(FP_FLAG), intent(in), value :: ierr
           character(len=1,kind=c_char), intent(inout) :: msg(*)
           character(:), allocatable :: str
@@ -61,7 +61,7 @@ module fitpack_core_c
       end subroutine fitpack_message_c
 
       ! curfit interface
-      pure subroutine curfit_c(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="curfit_c")
+      pure subroutine curfit_c(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="fp_curfit_c")
          real   (FP_REAL), intent(in),    value  :: xb,xe,s
          real   (FP_REAL), intent(inout)         :: fp
          integer(FP_SIZE), intent(in),    value  :: iopt,m,k,nest,lwrk
@@ -74,7 +74,7 @@ module fitpack_core_c
       end subroutine curfit_c
 
       ! percur interface
-      pure subroutine percur_c(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="percur_c")
+      pure subroutine percur_c(iopt,m,x,y,w,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="fp_percur_c")
          real   (FP_REAL), intent(in),    value :: s
          real   (FP_REAL), intent(inout)        :: fp
          integer(FP_SIZE), intent(inout)        :: n
@@ -87,7 +87,7 @@ module fitpack_core_c
       end subroutine percur_c
 
       ! parcur interface
-      pure subroutine parcur_c(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="parcur_c")
+      pure subroutine parcur_c(iopt,ipar,idim,m,u,mx,x,w,ub,ue,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name="fp_parcur_c")
           real   (FP_REAL), intent(inout)       :: ub,ue,s
           real   (FP_REAL), intent(out)         :: fp
           integer(FP_SIZE), intent(in),   value :: iopt,ipar,idim,m,mx,k,nest,lwrk,nc
@@ -100,7 +100,7 @@ module fitpack_core_c
       end subroutine parcur_c
 
       ! clocur interface
-      pure subroutine clocur_c(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name='clocur_c')
+      pure subroutine clocur_c(iopt,ipar,idim,m,u,mx,x,w,k,s,nest,n,t,nc,c,fp,wrk,lwrk,iwrk,ier) bind(C,name='fp_clocur_c')
           real   (FP_REAL), intent(in),    value :: s
           real   (FP_REAL), intent(inout)        :: fp
           integer(FP_SIZE), intent(in),    value :: iopt,ipar,idim,m,mx,k,nest,nc,lwrk
@@ -113,7 +113,7 @@ module fitpack_core_c
       end subroutine clocur_c
 
       ! cocosp interface
-      pure subroutine cocosp_c(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='cocosp_c')
+      pure subroutine cocosp_c(m,x,y,w,n,t,e,maxtr,maxbin,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_cocosp_c')
           real   (FP_REAL), intent(out)       :: sq
           integer(FP_SIZE), intent(in), value :: m,n,maxtr,maxbin,lwrk,kwrk
           integer(FP_FLAG), intent(out)       :: ier
@@ -127,7 +127,7 @@ module fitpack_core_c
       end subroutine cocosp_c
 
       ! concon interface
-      pure subroutine concon_c(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='concon_c')
+      pure subroutine concon_c(iopt,m,x,y,w,v,s,nest,maxtr,maxbin,n,t,c,sq,sx,bind,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_concon_c')
           real   (FP_REAL), intent(in), value :: s
           real   (FP_REAL), intent(out)       :: sq
           integer(FP_SIZE), intent(in), value :: iopt,m,nest,maxtr,maxbin,lwrk,kwrk
@@ -141,7 +141,7 @@ module fitpack_core_c
       end subroutine concon_c
 
       ! splev interface
-      pure subroutine splev_c(t,n,c,k,x,y,m,e,ier) bind(C,name='splev_c')
+      pure subroutine splev_c(t,n,c,k,x,y,m,e,ier) bind(C,name='fp_splev_c')
           integer(FP_SIZE), intent(in), value :: n, k, m
           real(FP_REAL),    intent(in)         :: t(n)
           real(FP_REAL),    intent(in)         :: c(n)
@@ -153,7 +153,7 @@ module fitpack_core_c
       end subroutine splev_c
       
       ! splder interface
-      pure subroutine splder_c(t,n,c,k,nu,x,y,m,e,wrk,ier) bind(C,name='splder_c')
+      pure subroutine splder_c(t,n,c,k,nu,x,y,m,e,wrk,ier) bind(C,name='fp_splder_c')
           integer(FP_SIZE), intent(in), value  :: n,k,nu,m
           integer(FP_FLAG), intent(in), value  :: e
           integer(FP_FLAG), intent(out)        :: ier
@@ -164,7 +164,7 @@ module fitpack_core_c
       end subroutine splder_c
       
       ! spalde interface
-      pure subroutine spalde_c(t,n,c,k1,x,d,ier) bind(C,name='spalde_c')
+      pure subroutine spalde_c(t,n,c,k1,x,d,ier) bind(C,name='fp_spalde_c')
           integer(FP_SIZE), intent(in), value  :: n,k1
           integer(FP_FLAG), intent(out)        :: ier
           real(FP_REAL),    intent(in), value  :: x
@@ -174,7 +174,7 @@ module fitpack_core_c
       end subroutine spalde_c
 
       ! curev interface
-      pure subroutine curev_c(idim,t,n,c,nc,k,u,m,x,mx,ier) bind(C,name='curev_c')
+      pure subroutine curev_c(idim,t,n,c,nc,k,u,m,x,mx,ier) bind(C,name='fp_curev_c')
           integer(FP_SIZE), intent(in), value :: idim,n,nc,k,m,mx
           integer(FP_FLAG), intent(out)       :: ier
           real(FP_REAL),    intent(in)        :: t(n),c(nc),u(m)
@@ -183,7 +183,7 @@ module fitpack_core_c
       end subroutine curev_c
       
       ! cualde interface
-      pure subroutine cualde_c(idim,t,n,c,nc,k1,u,d,nd,ier) bind(C,name='cualde_c')
+      pure subroutine cualde_c(idim,t,n,c,nc,k1,u,d,nd,ier) bind(C,name='fp_cualde_c')
           integer(FP_SIZE), intent(in), value  :: idim,n,nc,k1,nd
           integer(FP_FLAG), intent(out)        :: ier
           real(FP_REAL),    intent(in), value  :: u
@@ -193,7 +193,7 @@ module fitpack_core_c
       end subroutine cualde_c
       
       ! insert interface
-      pure subroutine insert_c(iopt,t,n,c,k,x,nest,ier) bind(C,name='insert_c')
+      pure subroutine insert_c(iopt,t,n,c,k,x,nest,ier) bind(C,name='fp_insert_c')
           integer(FP_SIZE), intent(in), value  :: iopt,k,nest
           real(FP_REAL),    intent(inout)      :: t(nest),c(nest)          
           real(FP_REAL),    intent(in), value  :: x
@@ -203,7 +203,7 @@ module fitpack_core_c
       end subroutine insert_c
       
       ! splint interface
-      real(FP_REAL) function splint_c(t,n,c,k,a,b,wrk) bind(C,name='splint_c')
+      real(FP_REAL) function splint_c(t,n,c,k,a,b,wrk) bind(C,name='fp_splint_c')
           real(FP_REAL),    intent(in), value :: a,b
           integer(FP_SIZE), intent(in), value :: n,k
           real(FP_REAL),    intent(in)        :: t(n),c(n)
@@ -212,7 +212,7 @@ module fitpack_core_c
       end function splint_c
       
       ! fourier coefficients
-      pure subroutine fourco_c(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier) bind(C,name='fourco_c')
+      pure subroutine fourco_c(t,n,c,alfa,m,ress,resc,wrk1,wrk2,ier) bind(C,name='fp_fourco_c')
           integer(FP_SIZE), intent(in), value :: n,m
           integer(FP_FLAG), intent(out)       :: ier
           real(FP_REAL),    intent(in)        :: t(n),c(n),alfa(m)
@@ -222,7 +222,7 @@ module fitpack_core_c
       end subroutine fourco_c
 
       ! spline roots
-      pure subroutine sproot_c(t,n,c,zeros,mest,m,ier) bind(C,name='sproot_c')
+      pure subroutine sproot_c(t,n,c,zeros,mest,m,ier) bind(C,name='fp_sproot_c')
           integer(FP_SIZE), intent(in), value  :: n,mest
           integer(FP_SIZE), intent(out)        :: m
           integer(FP_FLAG), intent(out)        :: ier
@@ -233,7 +233,7 @@ module fitpack_core_c
 
       ! surface fit
       pure subroutine surfit_c(iopt,m,x,y,z,w,xb,xe,yb,ye,kx,ky,s,nxest,nyest,nmax,eps,nx, &
-                               tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='surfit_c')
+                               tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='fp_surfit_c')
           real(FP_REAL),    intent(in), value  :: xb,xe,yb,ye,s,eps
           real(FP_REAL),    intent(inout)      :: fp
           integer(FP_SIZE), intent(in), value  :: iopt,m,kx,ky,nxest,nyest,nmax,lwrk1,lwrk2,kwrk
@@ -250,7 +250,7 @@ module fitpack_core_c
 
       ! regular grid fit
       pure subroutine regrid_c(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
-                               nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='regrid_c')
+                               nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_regrid_c')
           real(FP_REAL),    intent(in), value :: xb,xe,yb,ye,s
           real(FP_REAL),    intent(out)       :: fp
           integer(FP_SIZE), intent(in), value :: iopt,mx,my,kx,ky,nxest,nyest,lwrk,kwrk
@@ -264,7 +264,7 @@ module fitpack_core_c
       end subroutine regrid_c
 
       subroutine polar_c(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu,nv,tv,u,v,c,&
-                         fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='polar_c')
+                         fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='fp_polar_c')
           real(FP_REAL),    intent(in), value :: s,eps
           real(FP_REAL),    intent(inout)     :: fp
           integer(FP_SIZE), intent(in), value :: m,nuest,nvest,lwrk1,lwrk2,kwrk
@@ -292,7 +292,7 @@ module fitpack_core_c
       end subroutine polar_c
 
       subroutine pogrid_c(iopt,ider,mu,u,mv,v,z,z0,r,s,nuest,nvest,nu,tu,nv,tv, &
-                          c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='pogrid_c')
+                          c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_pogrid_c')
           integer(FP_SIZE), intent(in)        :: iopt(3),ider(2)
           real(FP_REAL),    intent(in), value :: z0,r,s
           real(FP_REAL),    intent(inout)     :: fp
@@ -309,7 +309,7 @@ module fitpack_core_c
       end subroutine pogrid_c
 
       pure subroutine sphere_c(iopt,m,teta,phi,r,w,s,ntest,npest,eps,nt,tt,np,tp,c, &
-                               fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='sphere_c')
+                               fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier) bind(C,name='fp_sphere_c')
           integer(FP_SIZE), intent(in), value :: iopt,m,ntest,npest,lwrk1,lwrk2,kwrk
           real(FP_REAL),    intent(in), value :: s,eps
           real(FP_REAL),    intent(inout)     :: fp
@@ -324,7 +324,7 @@ module fitpack_core_c
       end subroutine sphere_c
 
       integer(FP_FLAG) function spgrid_c(iopt,ider,mu,u,mv,v,r,r0,r1,s,nuest,nvest,nu,tu,nv,tv, &
-                             c,fp,wrk,lwrk,iwrk,kwrk) bind(C,name='spgrid_c') result(ier)
+                             c,fp,wrk,lwrk,iwrk,kwrk) bind(C,name='fp_spgrid_c') result(ier)
 
           real(FP_REAL),    intent(in), value :: r0,r1,s
           real(FP_REAL),    intent(inout)     :: fp
@@ -341,7 +341,7 @@ module fitpack_core_c
       end function spgrid_c
 
       integer(FP_FLAG) function parsur_c(iopt,ipar,idim,mu,u,mv,v,f,s,nuest,nvest,nu,tu,nv,tv, &
-                             c,fp,wrk,lwrk,iwrk,kwrk) result(ier) bind(C,name='parsur_c')
+                             c,fp,wrk,lwrk,iwrk,kwrk) result(ier) bind(C,name='fp_parsur_c')
 
           real(FP_REAL),    intent(in), value  :: s
           real(FP_REAL),    intent(inout)      :: fp
@@ -358,7 +358,7 @@ module fitpack_core_c
       end function parsur_c
 
       integer(FP_FLAG) function bispeu_c(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk) &
-                       result(ier) bind(C,name='bispeu_c')
+                       result(ier) bind(C,name='fp_bispeu_c')
 
           integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,m,lwrk
           real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
@@ -370,7 +370,7 @@ module fitpack_core_c
       end function bispeu_c
 
       integer(FP_FLAG) function bispev_c(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk) &
-                       result(ier) bind(C,name='bispev_c')
+                       result(ier) bind(C,name='fp_bispev_c')
 
           integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,mx,my,lwrk,kwrk
           integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
@@ -383,7 +383,7 @@ module fitpack_core_c
       end function bispev_c
 
       integer(FP_FLAG) function parder_c(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk) &
-                       result(ier) bind(C,name='parder_c')
+                       result(ier) bind(C,name='fp_parder_c')
 
           integer(FP_SIZE), intent(in), value  :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
           integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
