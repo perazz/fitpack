@@ -263,21 +263,23 @@ module fitpack_core
       !> @brief Multi-index of a flat 0-based offset into a row-major tensor (inverse of fp_grid_index).
       !!
       !! Given a 0-based linear offset and the per-axis extents `sizes(1:d)`, returns the 1-based
-      !! multi-index `idx(1:d)` such that `fp_grid_index(idx, fp_grid_strides(sizes)) == offset`.
+      !! multi-index `idx(1:d)` such that `fp_grid_index(d, idx, fp_grid_strides(d, sizes)) == offset`.
       !! Row-major: the last axis varies fastest (stride 1), the first axis slowest. Used to drive a
       !! dimension-generic loop over a tensor's grid points with a single linear counter. Integer
       !! arithmetic is exact, so it is bit-for-bit consistent with the hand-written 2-D index walks.
       !!
+      !! @param[in] d       Number of axes (length of sizes and idx).
       !! @param[in] offset  0-based flat offset (0 <= offset < product(sizes)).
-      !! @param[in] sizes   Per-axis extents (length d).
-      !! @return    idx     1-based multi-index (length d).
-      pure function fp_grid_unravel(offset,sizes) result(idx)
-          integer(FP_SIZE), intent(in) :: offset,sizes(:)
-          integer(FP_SIZE) :: idx(size(sizes))
+      !! @param[in] sizes   Per-axis extents, sizes(d).
+      !! @return    idx     1-based multi-index, idx(d).
+      pure function fp_grid_unravel(d,offset,sizes) result(idx)
+          integer(FP_DIM),  intent(in) :: d
+          integer(FP_SIZE), intent(in) :: offset,sizes(d)
+          integer(FP_SIZE) :: idx(d)
           integer(FP_DIM)  :: i
           integer(FP_SIZE) :: rem
           rem = offset
-          do i=size(sizes,kind=FP_DIM),1,-1
+          do i=d,1,-1
              idx(i) = mod(rem,sizes(i)) + 1_FP_SIZE
              rem    = rem/sizes(i)
           end do
@@ -2301,9 +2303,10 @@ module fitpack_core
 
           !  ..local variables..
           integer(FP_DIM)  :: d,a
-          integer(FP_SIZE) :: k1(dims),nk1(dims),cstride(dims),gidx(dims),cidx(dims),lbase(dims)
-          integer(FP_SIZE) :: l,mout,i,nkd,q,coff0,coff
-          real(FP_REAL)    :: arg,sp,tb,te,wprod,h(MAX_ORDER+1)
+          integer(FP_SIZE) :: k1(dims),nk1(dims),cstride(dims),gidx(dims),lbase(dims),cidx(dims)
+          integer(FP_SIZE) :: l,mout,i,nkd,q,nsupp,coff0,coff
+          !  support odometer over axes 1..dims-1: multi-index cidx, basis partial products pw (O(dims))
+          real(FP_REAL)    :: arg,sp,tb,te,h(MAX_ORDER+1),pw(0:dims-1)
 
           !  per-axis order and coefficient extents
           k1  = k+1
@@ -2330,20 +2333,44 @@ module fitpack_core
           !  c is the coefficient tensor (row-major, axis-1 slowest); z is the output value grid (row-
           !  major, axis-1 slowest). For each output point the value is the tensor contraction of the
           !  k1(1)x...x k1(dims) coefficient support against the per-axis basis tables w. The innermost
-          !  dot_product runs over the FASTEST axis (axis dims, contiguous stride 1); the remaining
-          !  coefficient axes 1..dims-1 are swept by a single linear counter q. At dims=2 the terms and
-          !  their accumulation order are identical to the original 2-D walk (bit-for-bit).
+          !  dot_product runs over the FASTEST axis (axis dims, contiguous stride 1). The support on the
+          !  remaining axes 1..dims-1 is swept by a mixed-radix odometer (radix k1): the support index
+          !  cidx, the coefficient offset coff and the basis partial products pw(0:dims-1) are carried
+          !  incrementally -- O(dims) state, no integer div/mod and no recomputed offsets in the loop.
+          !  At dims=2 the terms and their accumulation order are identical to the original 2-D walk.
           cstride = fp_grid_strides(dims,nk1)
+          nsupp   = product(k1(1:dims-1))
           do mout=1,product(m)
-             gidx  = fp_grid_unravel(mout-1,m)                       ! output grid multi-index
-             lbase = [(lidx(gidx(a),a)+1, a=1,dims)]                 ! first coefficient of the support
+             gidx  = fp_grid_unravel(dims,mout-1,m)                     ! output grid multi-index
+             lbase = [(lidx(gidx(a),a)+1, a=1,dims)]                    ! first coefficient of the support
              coff0 = fp_grid_index(dims,lbase,cstride)
-             sp    = zero
-             do q=0,product(k1(1:dims-1))-1
-                cidx(1:dims-1) = fp_grid_unravel(q,k1(1:dims-1))     ! support index on axes 1..dims-1
-                wprod = product([(w(gidx(a),cidx(a),a), a=1,dims-1)])
-                coff  = coff0 + dot_product(cidx(1:dims-1)-1,cstride(1:dims-1))
-                sp    = sp + wprod*dot_product(c(coff+1:coff+k1(dims)),w(gidx(dims),1:k1(dims),dims))
+
+             !  seed the odometer at the support root (cidx = 1 on every contracted axis)
+             cidx(1:dims-1) = 1
+             coff  = coff0
+             pw(0) = one
+             do a=1,dims-1
+                pw(a) = pw(a-1)*w(gidx(a),cidx(a),a)
+             end do
+
+             sp = zero
+             do q=1,nsupp
+                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(gidx(dims),1:k1(dims),dims))
+                if (q==nsupp) exit
+                !  advance: bump the fastest axis; on overflow reset it and carry to the next-slower axis
+                do a=dims-1,1,-1
+                   if (cidx(a)<k1(a)) then
+                      cidx(a) = cidx(a)+1
+                      coff    = coff + cstride(a)
+                      do d=a,dims-1               ! refresh partial products from the changed axis upward
+                         pw(d) = pw(d-1)*w(gidx(d),cidx(d),d)
+                      end do
+                      exit
+                   else
+                      cidx(a) = 1                 ! axis wrapped: rewind its offset, carry to a-1
+                      coff    = coff - (k1(a)-1)*cstride(a)
+                   end if
+                end do
              end do
              z(mout) = sp
           end do
