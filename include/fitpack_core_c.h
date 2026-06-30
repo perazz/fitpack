@@ -49,11 +49,11 @@ static const FP_FLAG IOPT_NEW_LEASTSQUARES = -1; // Request a new lsq fit
 static const FP_FLAG IOPT_NEW_SMOOTHING    =  0; // Request a new smoothing fit
 static const FP_FLAG IOPT_OLD_FIT          =  1; // Update an old fit
 
-//Dimensions of last knot addition
+//Dimension index of the last knot addition (0 = none yet; otherwise the 1-based axis ID)
 static const FP_SIZE MAX_IDIM      = 10; //Max number of dimensions
 static const FP_FLAG KNOT_DIM_NONE =  0; // No knots added yet
-static const FP_FLAG KNOT_DIM_2    =  1; // Last knot added on 2nd dim (y or v)
-static const FP_FLAG KNOT_DIM_1    = -1; // Last knot added on 1st dim (x or u)
+static const FP_FLAG KNOT_DIM_1    =  1; // Last knot added on 1st dim (x or u)
+static const FP_FLAG KNOT_DIM_2    =  2; // Last knot added on 2nd dim (y or v)
 
 //Spline degrees
 static const FP_SIZE MAX_ORDER = 19; // Max spline order (for array allocation)
