@@ -227,13 +227,14 @@ module fitpack_core
       !! (sizes `[nk1x,nk1y]` -> strides `[nk1y,1]`) used by the 2-D gridded core. Each tensor
       !! must be passed its own size vector; the two differ only in the leading stride.
       !!
-      !! @param[in] sizes  Per-axis extents.
-      !! @return    str    Row-major strides; `str(size(sizes)) = 1`.
-      pure function fp_grid_strides(sizes) result(str)
-          integer(FP_SIZE), intent(in) :: sizes(:)
-          integer(FP_SIZE) :: str(size(sizes))
-          integer(FP_DIM) :: i,d
-          d = size(sizes,kind=FP_DIM)
+      !! @param[in] d      Number of axes.
+      !! @param[in] sizes  Per-axis extents, sizes(d).
+      !! @return    str    Row-major strides; `str(d) = 1`.
+      pure function fp_grid_strides(d,sizes) result(str)
+          integer(FP_DIM),  intent(in) :: d
+          integer(FP_SIZE), intent(in) :: sizes(d)
+          integer(FP_SIZE) :: str(d)
+          integer(FP_DIM)  :: i
           if (d<=0) return
           str(d) = 1_FP_SIZE
           do i=d-1,1,-1
@@ -248,17 +249,15 @@ module fitpack_core
       !! `c(fp_grid_index(idx,str)+1)`. Integer arithmetic is exact, so routing tensor addresses
       !! through this helper is bit-for-bit identical to the hand-written 2-D index expressions.
       !!
+      !! @param[in] d        Number of axes (length of idx and strides).
       !! @param[in] idx      1-based multi-index (length d).
       !! @param[in] strides  Row-major strides (length d), from fp_grid_strides.
       !! @return    offset   0-based flat offset.
-      pure function fp_grid_index(idx,strides) result(offset)
-          integer(FP_SIZE), intent(in) :: idx(:),strides(:)
+      pure function fp_grid_index(d,idx,strides) result(offset)
+          integer(FP_DIM),  intent(in) :: d
+          integer(FP_SIZE), intent(in) :: idx(d),strides(d)
           integer(FP_SIZE) :: offset
-          integer(FP_DIM) :: i
-          offset = 0_FP_SIZE
-          do i=1,size(idx,kind=FP_DIM)
-             offset = offset + (idx(i)-1_FP_SIZE)*strides(i)
-          end do
+          offset = sum((idx-1_FP_SIZE)*strides)
       end function fp_grid_index
 
       !> @brief Dispatch an error code: return it to caller or halt with a message.
@@ -2238,16 +2237,37 @@ module fitpack_core
 
       !> @brief N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.
       !!
-      !! Dimensionalized duplicate of fpbisp (the bivariate gridded evaluator). At `dims=2` it is
-      !! bit-for-bit identical to fpbisp: the per-axis basis-table build is a runtime do-loop over
-      !! the `dims` axes (each axis is independent), while the evaluation contraction is deliberately
-      !! kept in literal 2-D form (x-outer / `dot_product`-over-axis-2-inner) until the dims>2 step.
-      !! Each axis `d` supplies its own knots `t(1:n(d),d)`, order `k(d)`, and grid `xg(1:m(d),d)` of
-      !! `m(d)` points; the flat coefficient tensor `c` and output `z` are row-major (first axis
-      !! varies slowest), matching fpbisp's storage. `w`/`lidx` are per-axis basis-value and
-      !! knot-interval workspaces (one column per axis), mirroring fpbisp's `wx,wy`/`lx,ly`.
+      !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
+      !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
+      !! \f$ (x_i, y_j) \f$, \f$ i = 1, \ldots, m_x \f$, \f$ j = 1, \ldots, m_y \f$.
       !!
-      !! @see fpbisp, Dierckx Ch. 5 (pp. 98-103); todo/fitpack_nd_grids.md (slice 1)
+      !! The evaluation uses the two-step algorithm: first compute the B-spline
+      !! basis values in each direction, then assemble:
+      !!
+      !! \f[
+      !!     s(x, y) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j, k_y+1}(y) \right)
+      !!               N_{i, k_x+1}(x)
+      !!     \tag{2.14-2.15}
+      !! \f]
+      !!
+      !! At `dims=2` this is bit-for-bit identical to fpbisp: the per-axis basis-table
+      !! build is a runtime do-loop over the `dims` axes, while the evaluation
+      !! contraction is kept in literal 2-D form until the dims>2 step. The B-spline
+      !! values and knot interval indices are stored per axis in workspace arrays `w`
+      !! and `lidx` (one column per axis) for reuse.
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]  m     Number of evaluation points per axis, `m(dims)`
+      !! @param[out] z     Spline values at grid points, flat row-major (first axis varies slowest)
+      !! @param[out] w     Per-axis B-spline basis values, `w(m(d),k(d)+1,d)` (mirrors fpbisp `wx,wy`)
+      !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (mirrors fpbisp `lx,ly`)
+      !!
+      !! @see fpbisp, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
       pure subroutine fpbisp_nd(dims,t,n,c,k,xg,m,z,w,lidx)
           integer(FP_DIM),  intent(in)  :: dims
           integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m(dims)
@@ -2284,12 +2304,12 @@ module fitpack_core
 
           !  ---- frozen literal-2 evaluation contraction (kept until the dims>2 step) ----
           !  c is row-major with leading stride nk1(2); z is row-major, first axis slowest.
-          cstride = fp_grid_strides(nk1)    ! [nk1(2),1] at dims=2
+          cstride = fp_grid_strides(dims,nk1)    ! [nk1(2),1] at dims=2
           mout = 0
           do i=1,m(1)
              h(1:k1(1)) = w(i,1:k1(1),1)
              do j=1,m(2)
-                l1 = fp_grid_index([lidx(i,1)+1,lidx(j,2)+1],cstride)
+                l1 = fp_grid_index(dims,[lidx(i,1)+1,lidx(j,2)+1],cstride)
                 sp = zero
                 do i1=1,k1(1)
                    sp = sp+h(i1)*dot_product(c(l1+1:l1+k1(2)),w(j,1:k1(2),2))
@@ -7316,26 +7336,61 @@ module fitpack_core
 
       !> @brief N-D generalization of fpgrre: tensor-product least-squares gridded solver.
       !!
-      !! Dimensionalized duplicate of fpgrre. At `dims=2` it is bit-for-bit identical to fpgrre.
-      !! The per-axis housekeeping (observation matrices `sp(:,:,d)`, discontinuity matrices
-      !! `b(:,:,d)`, and the caching flags `ifs(d)`/`ifb(d)`) is a runtime do-loop over the `dims`
-      !! axes — each axis is independent, so iterating d=1 then d=2 reproduces the original's
-      !! "x before y" build order exactly. The three genuinely d-dimensional kernels are kept in
-      !! literal 2-D form until the dims>2 step:
-      !!   1. the alternating-direction reductions (axis-1 reduces z->q via fp_rotate_row_block,
-      !!      axis-2 reduces q->c via fp_rotate_row_stride),
-      !!   2. the two-pass back-substitution solving (ry) c (rx)' = h,
-      !!   3. the residual contraction (x-outer / dot_product-over-y-inner) with the fac=term*half
-      !!      boundary attribution carried by the nroldx/nroldy state machine.
+      !! For data on a rectangular grid \f$ \{x_i\} \times \{y_j\} \f$, solves
+      !! the smoothing least-squares system using the Kronecker product structure
+      !! (Eq. 10.4-10.8):
       !!
-      !! KEY to bit-for-bit equivalence: the per-axis band/observation/discontinuity arrays are
-      !! merged into rank-3 arrays whose leading dimension `lda`/`ldb` is uniform (>= max over axes
-      !! of n(d)) rather than the per-axis nx/ny. Because fp_rotate_*, fpback and fpdisc all take
-      !! the leading dimension as an explicit `na`/`nest` argument, passing the TRUE (uniform)
-      !! leading dim makes every addressed element coincide logically with the original's
-      !! separately-sized ax(nx,kx2)/ay(ny,ky2)/bx/by — no copies, no value change.
+      !! \f[
+      !!     A_y \, C \, A_x^T = Q
+      !!     \tag{10.4}
+      !! \f]
       !!
-      !! @see fpgrre, Dierckx Ch. 5 §5.4; todo/fitpack_nd_grids.md (slice 1, §2/§9)
+      !! where the augmented observation matrices are:
+      !!
+      !! \f[
+      !!     A_x = \begin{pmatrix} S_{px} \\ \frac{1}{\sqrt{p}} B_x \end{pmatrix}, \quad
+      !!     A_y = \begin{pmatrix} S_{py} \\ \frac{1}{\sqrt{p}} B_y \end{pmatrix}
+      !!     \tag{10.5}
+      !! \f]
+      !!
+      !! The per-axis QR factorizations are performed independently using
+      !! fp_rotate_row_stride (row-access RHS for \f$ A_y \f$) and fp_rotate_row_block
+      !! (column-access RHS for \f$ A_x \f$), followed by back-substitution; residual
+      !! sums `fpint` per knot interval are also computed for knot-placement decisions.
+      !! At `dims=2` this is bit-for-bit identical to fpgrre: the per-axis housekeeping
+      !! is a runtime do-loop over the axes, while the alternating-direction reductions,
+      !! the two-pass back-substitution and the residual contraction are kept literal-2
+      !! until the dims>2 step. The per-axis band/observation/discontinuity arrays are
+      !! merged into rank-3 arrays with a uniform leading dimension (`lda`/`ldb`), passed
+      !! as the explicit leading-dim argument to fp_rotate_*, fpback and fpdisc so every
+      !! addressed element coincides with the original's separately-sized matrices — no
+      !! copies, no value change.
+      !!
+      !! @param[in]     dims    Number of axes (domain dimension)
+      !! @param[in,out] ifs     Per-axis flag: 0 = recompute observation matrix \f$ S_p \f$ (orig ifsx,ifsy)
+      !! @param[in,out] ifb     Per-axis flag: 0 = recompute discontinuity matrix \f$ B \f$ (orig ifbx,ifby)
+      !! @param[in]     xg      Per-axis grid values; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]     m       Number of grid points per axis, `m(dims)`
+      !! @param[in]     z       Data on the grid, `z(m(2),m(1))`, (ny,nx)-ordered (axis-2 fastest)
+      !! @param[in]     k       Degree per axis, `k(dims)`
+      !! @param[in]     t       Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]     n       Number of knots per axis, `n(dims)`
+      !! @param[in]     p       Smoothing parameter
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in]     nc      Length of `c`
+      !! @param[in,out] fp      Total weighted sum of squared residuals
+      !! @param[in,out] fpint   Residual sums per knot interval, per axis (orig fpx,fpy)
+      !! @param[in]     mm      Work dimension
+      !! @param[in]     mynx    Work dimension (\f$ my \cdot (nx - kx - 1) \f$)
+      !! @param[in,out] sp      Per-axis B-spline observation matrices (orig spx,spy)
+      !! @param[in,out] right   Work: RHS vector for row rotations, length `mm`
+      !! @param[in,out] q       Work: RHS matrix, length `mynx`
+      !! @param[in,out] a       Per-axis band matrices, uniform leading dim (orig ax,ay)
+      !! @param[in,out] b       Per-axis discontinuity-jump matrices, uniform leading dim (orig bx,by)
+      !! @param[in,out] nr      Per-axis knot interval indices (orig nrx,nry)
+      !!
+      !! @see fpgrre, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; fp_rotate_row_block,
+      !!      fp_rotate_row_stride — grid Givens rotations; todo/fitpack_nd_grids.md (slice 1, §2/§9)
       pure subroutine fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint, &
                                 mm,mynx,sp,right,q,a,b,nr)
 
@@ -12652,20 +12707,55 @@ module fitpack_core
 
       !> @brief N-D generalization of fpregr: knot determination + p-iteration for gridded fits.
       !!
-      !! Dimensionalized duplicate of fpregr. At `dims=2` it is bit-for-bit identical to fpregr.
-      !! The paired state (nx/ny, kx/ky, fpintx/fpinty, reducx/reducy, nplusx/nplusy, the per-axis
-      !! knot/data counts) becomes `dims`-length arrays, and the knot-init / knot-placement passes
-      !! become runtime do-loops over the axes — each axis independent, so d=1 then d=2 reproduces
-      !! the original's x-then-y order exactly. Kept literal-2 until the dims>2 step: the binary
-      !! knot-direction arbiter (`new_knot_dimension`, the reduc/lastdi select-case and the
-      !! choose-dim branch) and the scalar p-iteration root find for f(p)=s.
+      !! Outer iteration loop for fitting a smoothing spline surface on a
+      !! rectangular grid \f$ \{x_i\} \times \{y_j\} \f$. Manages the knot
+      !! selection strategy (alternating between axis directions based on residuals)
+      !! and the smoothing-parameter search, delegating the grid computation to
+      !! fpgrre_nd at each step. At `dims=2` this is bit-for-bit identical to fpregr:
+      !! the paired per-axis state becomes `dims`-length arrays and the knot-init /
+      !! knot-placement passes become runtime do-loops over the axes, while the binary
+      !! knot-direction arbiter and the scalar p-iteration root find for f(p)=s are
+      !! kept literal-2 until the dims>2 step.
       !!
-      !! WORKSPACE: per the no-allocation rule, all scratch (sp, a, b, right, q, fpint, nr, nrdat)
-      !! is supplied by the caller (regrid_nd carves it from the user wrk/iwrk via pointer bounds
-      !! remapping) and received here as assumed-shape inout views. The persistent fit-state
-      !! (fp0, fpold, reduc, lastdi, nplus) is passed explicitly rather than hidden in wrk offsets.
+      !! WORKSPACE: per the no-allocation rule, all scratch (`sp,a,b,right,q,fpint,nr,
+      !! nrdat`) is supplied by the caller (regrid_nd carves it from the user wrk/iwrk)
+      !! and received here as assumed-shape inout views; the persistent fit-state
+      !! (`fp0,fpold,reduc,lastdi,nplus`) is passed explicitly rather than hidden in
+      !! wrk offsets.
       !!
-      !! @see fpregr, fpgrre_nd, Dierckx Ch. 5 §5.4; todo/fitpack_nd_grids.md (slice 1, §8 part C)
+      !! @param[in]     iopt    0 = new fit, 1 = continue
+      !! @param[in]     dims    Number of axes (domain dimension)
+      !! @param[in]     xg      Per-axis grid values; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]     m       Number of grid points per axis, `m(dims)`
+      !! @param[in]     z       Data values, `z(m(2),m(1))`, (ny,nx)-ordered (passed through to fpgrre_nd)
+      !! @param[in]     lo      Per-axis lower boundary (orig xb,yb)
+      !! @param[in]     hi      Per-axis upper boundary (orig xe,ye)
+      !! @param[in]     k       Degree per axis, `k(dims)`
+      !! @param[in]     s       Smoothing factor \f$ S \geq 0 \f$
+      !! @param[in]     nest    Max knots per axis (orig nxest,nyest)
+      !! @param[in]     tol     Smoothing condition tolerance
+      !! @param[in]     maxit   Maximum smoothing-parameter iterations
+      !! @param[in]     nc      Length of coefficient array
+      !! @param[in,out] n       Number of knots per axis (orig nx,ny)
+      !! @param[in,out] t       Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)` (orig tx,ty)
+      !! @param[in,out] c       B-spline coefficients, length `nc`
+      !! @param[in,out] fp      Weighted sum of squared residuals
+      !! @param[in,out] fp0     Initial residual
+      !! @param[in,out] fpold   Previous residual
+      !! @param[in,out] reduc   Per-axis residual reduction (orig reducx,reducy)
+      !! @param[in,out] lastdi  Last direction of knot addition
+      !! @param[in,out] nplus   Per-axis number of knots to add (orig nplusx,nplusy)
+      !! @param[in,out] fpint   Residual sums per knot interval, per axis (orig fpintx,fpinty)
+      !! @param[in,out] nr      Per-axis knot interval indices (orig nrx,nry)
+      !! @param[in,out] nrdat   Per-axis interior data counts per interval (orig nrdatx,nrdaty)
+      !! @param[in,out] sp      Work: per-axis observation matrices
+      !! @param[in,out] right   Work: RHS vector
+      !! @param[in,out] q       Work: RHS matrix
+      !! @param[in,out] a       Work: per-axis band matrices
+      !! @param[in,out] b       Work: per-axis discontinuity matrices
+      !! @param[in,out] ier     Error flag
+      !!
+      !! @see fpregr, fpgrre_nd, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; todo/fitpack_nd_grids.md (slice 1, §8 part C)
       pure subroutine fpregr_nd(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
                                 n,t,c,fp,fp0,fpold,reduc,lastdi,nplus, &
                                 fpint,nr,nrdat,sp,right,q,a,b,ier)
