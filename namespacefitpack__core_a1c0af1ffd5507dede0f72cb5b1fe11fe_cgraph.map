@@ -1,0 +1,27 @@
+<map id="fitpack_core::fpgrre_nd" name="fitpack_core::fpgrre_nd">
+<area shape="rect" id="Node000001" title="N&#45;D generalization of fpgrre: tensor&#45;product least&#45;squares gridded solver." alt="" coords="5,158,176,184"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="224,30,392,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,156,157,119,223,79,236,73,239,78,225,84,160,124,110,160"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="224,94,392,134"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="139,156,218,135,219,140,140,161"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="231,208,385,233"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="148,181,239,202,237,207,147,186"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="233,158,383,184"/>
+<area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="176,168,220,168,220,174,176,174"/>
+<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="234,257,382,282"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="113,182,163,212,225,243,244,250,242,255,223,248,160,217,110,186"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="661,137,807,162"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,27,419,13,483,4,550,5,583,11,614,22,649,42,678,69,720,124,716,127,675,73,646,47,612,27,581,17,549,11,483,10,420,19,366,32"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="452,86,601,112"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="393,66,457,81,456,86,392,71"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="453,37,601,62"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="392,47,439,47,439,52,392,52"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="700,139,693,129,697,119,711,113,734,110,763,114,774,123,771,127,760,119,734,116,712,118,701,123,698,128,704,135"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="393,118,648,140,648,145,392,123"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="392,105,438,102,438,108,392,111"/>
+<area shape="poly" id="edge9_Node000006_Node000005" title=" " alt="" coords="373,91,439,71,465,64,467,69,441,76,374,96"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="440,212,613,237"/>
+<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="362,181,461,206,460,211,360,186"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="562,209,684,165,686,170,564,214"/>
+<area shape="poly" id="edge14_Node000009_Node000009" title=" " alt="" coords="493,213,486,203,489,194,503,187,527,185,555,189,567,198,563,202,553,194,527,190,505,192,493,197,491,203,497,210"/>
+</map>

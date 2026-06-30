@@ -136,6 +136,12 @@ Data Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
+<tr class="memitem:afd6db1accafe304359cbc35ca52cf072" id="r_afd6db1accafe304359cbc35ca52cf072"><td class="memItemLeft" align="right" valign="top">pure integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function, dimension(d)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd6db1accafe304359cbc35ca52cf072">fp_grid_strides</a> (d, sizes)</td></tr>
+<tr class="memdesc:afd6db1accafe304359cbc35ca52cf072"><td class="mdescLeft">&#160;</td><td class="mdescRight">Row-major strides for a flat tensor of the given per-axis sizes.  <br /></td></tr>
+<tr class="separator:afd6db1accafe304359cbc35ca52cf072"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a654429d58a12e13f845e27dc8d4396ab" id="r_a654429d58a12e13f845e27dc8d4396ab"><td class="memItemLeft" align="right" valign="top">pure integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a654429d58a12e13f845e27dc8d4396ab">fp_grid_index</a> (d, idx, strides)</td></tr>
+<tr class="memdesc:a654429d58a12e13f845e27dc8d4396ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flat 0-based offset of a multi-index into a row-major tensor.  <br /></td></tr>
+<tr class="separator:a654429d58a12e13f845e27dc8d4396ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2df24a0ee6fecec68ea6b06ee1f28e08" id="r_a2df24a0ee6fecec68ea6b06ee1f28e08"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2df24a0ee6fecec68ea6b06ee1f28e08">fitpack_error_handling</a> (ierr, ierr_out, whereat)</td></tr>
 <tr class="memdesc:a2df24a0ee6fecec68ea6b06ee1f28e08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dispatch an error code: return it to caller or halt with a message.  <br /></td></tr>
 <tr class="separator:a2df24a0ee6fecec68ea6b06ee1f28e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -208,6 +214,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a72432bc4ebc7c5ff0425d188147d7dbb" id="r_a72432bc4ebc7c5ff0425d188147d7dbb"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a72432bc4ebc7c5ff0425d188147d7dbb">fpbisp</a> (tx, nx, ty, ny, c, kx, ky, x, mx, y, my, z, wx, wy, lx, ly)</td></tr>
 <tr class="memdesc:a72432bc4ebc7c5ff0425d188147d7dbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a tensor product spline on a grid.  <br /></td></tr>
 <tr class="separator:a72432bc4ebc7c5ff0425d188147d7dbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b734cdd622810708ff09ef2ca5ad41f" id="r_a0b734cdd622810708ff09ef2ca5ad41f"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b734cdd622810708ff09ef2ca5ad41f">fpbisp_nd</a> (dims, t, n, c, k, xg, m, z, w, lidx)</td></tr>
+<tr class="memdesc:a0b734cdd622810708ff09ef2ca5ad41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.  <br /></td></tr>
+<tr class="separator:a0b734cdd622810708ff09ef2ca5ad41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5fb8acceffae7a31a838c1d7ff97d31" id="r_ac5fb8acceffae7a31a838c1d7ff97d31"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(<a class="el" href="#a6c5b21fc23625ebfc7f555075c13eb07">max_order</a>+1)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5fb8acceffae7a31a838c1d7ff97d31">fpbspl</a> (t, n, k, x, l)</td></tr>
 <tr class="memdesc:ac5fb8acceffae7a31a838c1d7ff97d31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the non-zero B-splines at a given point.  <br /></td></tr>
 <tr class="separator:ac5fb8acceffae7a31a838c1d7ff97d31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,6 +310,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a78b0d9c28e76eff73dcf956f4811c257" id="r_a78b0d9c28e76eff73dcf956f4811c257"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78b0d9c28e76eff73dcf956f4811c257">fpgrre</a> (ifsx, ifsy, ifbx, ifby, x, mx, y, my, z, mz, kx, ky, tx, nx, ty, ny, p, c, nc, fp, fpx, fpy, mm, mynx, kx1, kx2, ky1, ky2, spx, spy, right, q, ax, ay, bx, by, nrx, nry)</td></tr>
 <tr class="memdesc:a78b0d9c28e76eff73dcf956f4811c257"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute grid-based spline coefficients via Kronecker product decomposition.  <br /></td></tr>
 <tr class="separator:a78b0d9c28e76eff73dcf956f4811c257"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c0af1ffd5507dede0f72cb5b1fe11fe" id="r_a1c0af1ffd5507dede0f72cb5b1fe11fe"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1c0af1ffd5507dede0f72cb5b1fe11fe">fpgrre_nd</a> (dims, ifs, ifb, xg, m, z, k, t, n, p, c, nc, fp, fpint, mm, mynx, sp, right, q, a, b, nr)</td></tr>
+<tr class="memdesc:a1c0af1ffd5507dede0f72cb5b1fe11fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of fpgrre: tensor-product least-squares gridded solver.  <br /></td></tr>
+<tr class="separator:a1c0af1ffd5507dede0f72cb5b1fe11fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74a11f85ace5b032c95c53307fa47913" id="r_a74a11f85ace5b032c95c53307fa47913"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74a11f85ace5b032c95c53307fa47913">fpgrsp</a> (ifsu, ifsv, ifbu, ifbv, lback, u, mu, v, mv, r, mr, dr, iop0, iop1, tu, nu, tv, nv, p, c, nc, sq, fp, fpu, fpv, mm, mvnu, spu, spv, right, q, au, av1, av2, bu, bv, a0, a1, b0, b1, c0, c1, cosi, nru, nrv)</td></tr>
 <tr class="memdesc:a74a11f85ace5b032c95c53307fa47913"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute spherical grid spline coefficients via Kronecker product.  <br /></td></tr>
 <tr class="separator:a74a11f85ace5b032c95c53307fa47913"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -355,6 +367,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a26879f854f0e23671e8fd07f9f144410" id="r_a26879f854f0e23671e8fd07f9f144410"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26879f854f0e23671e8fd07f9f144410">fpregr</a> (iopt, x, mx, y, my, z, mz, xb, xe, yb, ye, kx, ky, s, nxest, nyest, tol, maxit, nc, nx, tx, ny, ty, c, fp, fp0, fpold, reducx, reducy, fpintx, fpinty, lastdi, nplusx, nplusy, nrx, nry, nrdatx, nrdaty, wrk, lwrk, ier)</td></tr>
 <tr class="memdesc:a26879f854f0e23671e8fd07f9f144410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Driver for rectangular grid smoothing surface with knot selection.  <br /></td></tr>
 <tr class="separator:a26879f854f0e23671e8fd07f9f144410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa47f6788ffd10e1ea9d7ae06c406822a" id="r_aa47f6788ffd10e1ea9d7ae06c406822a"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa47f6788ffd10e1ea9d7ae06c406822a">fpregr_nd</a> (iopt, dims, xg, m, z, lo, hi, k, s, nest, tol, maxit, nc, n, t, c, fp, fp0, fpold, reduc, lastdi, nplus, fpint, nr, nrdat, sp, right, q, a, b, ier)</td></tr>
+<tr class="memdesc:aa47f6788ffd10e1ea9d7ae06c406822a"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of fpregr: knot determination + p-iteration for gridded fits.  <br /></td></tr>
+<tr class="separator:aa47f6788ffd10e1ea9d7ae06c406822a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c4fa92fbc6556a21d112fbdfbd0f80f" id="r_a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="memItemLeft" align="right" valign="top">elemental integer function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c4fa92fbc6556a21d112fbdfbd0f80f">new_knot_dimension</a> (n1, n1add, n1max, n2, n2add, n2max, last)</td></tr>
 <tr class="memdesc:a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Choose which dimension receives the next knot during bivariate fitting.  <br /></td></tr>
 <tr class="separator:a8c4fa92fbc6556a21d112fbdfbd0f80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -427,6 +442,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:adba4c1c277c572cad2725b326b896ef8" id="r_adba4c1c277c572cad2725b326b896ef8"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adba4c1c277c572cad2725b326b896ef8">regrid</a> (iopt, mx, x, my, y, z, xb, xe, yb, ye, kx, ky, s, nxest, nyest, nx, tx, ny, ty, c, fp, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:adba4c1c277c572cad2725b326b896ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a smoothing bivariate spline to data on a rectangular grid.  <br /></td></tr>
 <tr class="separator:adba4c1c277c572cad2725b326b896ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5b7adeaa56a18fec0f71de67bfaabb2" id="r_aa5b7adeaa56a18fec0f71de67bfaabb2"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5b7adeaa56a18fec0f71de67bfaabb2">regrid_nd</a> (iopt, dims, m, xg, z, lo, hi, k, s, nest, n, t, c, fp, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
+<tr class="memdesc:aa5b7adeaa56a18fec0f71de67bfaabb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of regrid: tensor-product gridded smoothing-spline driver.  <br /></td></tr>
+<tr class="separator:aa5b7adeaa56a18fec0f71de67bfaabb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c64b88d2d403641e200a68c9604f425" id="r_a0c64b88d2d403641e200a68c9604f425"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0c64b88d2d403641e200a68c9604f425">spalde</a> (t, n, c, k1, x, d, ier)</td></tr>
 <tr class="memdesc:a0c64b88d2d403641e200a68c9604f425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives of a spline at a single point.  <br /></td></tr>
 <tr class="separator:a0c64b88d2d403641e200a68c9604f425"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -545,6 +563,8 @@ Variables</h2></td></tr>
 <tr class="separator:a650e5831ebea638e634b52942aae265c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9aa06356d8fbf8f4b108db917e429a4" id="r_ac9aa06356d8fbf8f4b108db917e429a4"><td class="memItemLeft" align="right" valign="top">integer, parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9aa06356d8fbf8f4b108db917e429a4">fp_comm</a> = c_double</td></tr>
 <tr class="separator:ac9aa06356d8fbf8f4b108db917e429a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a995ea8d768c880ccfab37dbf3eafb3a2" id="r_a995ea8d768c880ccfab37dbf3eafb3a2"><td class="memItemLeft" align="right" valign="top">integer, parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a> = c_int32_t</td></tr>
+<tr class="separator:a995ea8d768c880ccfab37dbf3eafb3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ef1ddc6e8416540eac14148753788d" id="r_a16ef1ddc6e8416540eac14148753788d"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a16ef1ddc6e8416540eac14148753788d">fp_not_alloc</a> = -99999999_FP_SIZE</td></tr>
 <tr class="memdesc:a16ef1ddc6e8416540eac14148753788d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marker for unallocated arrays in communication buffers.  <br /></td></tr>
 <tr class="separator:a16ef1ddc6e8416540eac14148753788d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -566,10 +586,10 @@ Variables</h2></td></tr>
 <tr class="separator:acea3d2d817763c46755c944d4ea72a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae335f58a7994bbafd5ff9cfb81d1e7fb" id="r_ae335f58a7994bbafd5ff9cfb81d1e7fb"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae335f58a7994bbafd5ff9cfb81d1e7fb">knot_dim_none</a> = 0</td></tr>
 <tr class="separator:ae335f58a7994bbafd5ff9cfb81d1e7fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d99472224f26deec2560fedeab07794" id="r_a7d99472224f26deec2560fedeab07794"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d99472224f26deec2560fedeab07794">knot_dim_2</a> = 1</td></tr>
-<tr class="separator:a7d99472224f26deec2560fedeab07794"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d8475ed3cb1c0bfccef4ca66ef6bf59" id="r_a1d8475ed3cb1c0bfccef4ca66ef6bf59"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d8475ed3cb1c0bfccef4ca66ef6bf59">knot_dim_1</a> = -1</td></tr>
+<tr class="memitem:a1d8475ed3cb1c0bfccef4ca66ef6bf59" id="r_a1d8475ed3cb1c0bfccef4ca66ef6bf59"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d8475ed3cb1c0bfccef4ca66ef6bf59">knot_dim_1</a> = 1</td></tr>
 <tr class="separator:a1d8475ed3cb1c0bfccef4ca66ef6bf59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d99472224f26deec2560fedeab07794" id="r_a7d99472224f26deec2560fedeab07794"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d99472224f26deec2560fedeab07794">knot_dim_2</a> = 2</td></tr>
+<tr class="separator:a7d99472224f26deec2560fedeab07794"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c5b21fc23625ebfc7f555075c13eb07" id="r_a6c5b21fc23625ebfc7f555075c13eb07"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c5b21fc23625ebfc7f555075c13eb07">max_order</a> = 19</td></tr>
 <tr class="separator:a6c5b21fc23625ebfc7f555075c13eb07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a668bd0af72972ca4b389eb70672f246b" id="r_a668bd0af72972ca4b389eb70672f246b"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a668bd0af72972ca4b389eb70672f246b">degree_3</a> = 3</td></tr>
@@ -2726,6 +2746,92 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="a654429d58a12e13f845e27dc8d4396ab" name="a654429d58a12e13f845e27dc8d4396ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a654429d58a12e13f845e27dc8d4396ab">&#9670;&#160;</a></span>fp_grid_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function fitpack_core::fp_grid_index </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>d</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(d), intent(in)</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(d), intent(in)</td>          <td class="paramname"><span class="paramname"><em>strides</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flat 0-based offset of a multi-index into a row-major tensor. </p>
+<p>Given a 1-based multi-index <code>idx(1:d)</code> and the strides from fp_grid_strides, returns the 0-based linear offset <code>sum((idx-1)*strides)</code>. Add 1 for Fortran 1-based access, e.g. <code>c(fp_grid_index(idx,str)+1)</code>. Integer arithmetic is exact, so routing tensor addresses through this helper is bit-for-bit identical to the hand-written 2-D index expressions.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">d</td><td>Number of axes (length of idx and strides). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">idx</td><td>1-based multi-index (length d). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strides</td><td>Row-major strides (length d), from fp_grid_strides. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>offset 0-based flat offset. </dd></dl>
+
+</div>
+</div>
+<a id="afd6db1accafe304359cbc35ca52cf072" name="afd6db1accafe304359cbc35ca52cf072"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd6db1accafe304359cbc35ca52cf072">&#9670;&#160;</a></span>fp_grid_strides()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>) function, dimension(d) fitpack_core::fp_grid_strides </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>d</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(d), intent(in)</td>          <td class="paramname"><span class="paramname"><em>sizes</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Row-major strides for a flat tensor of the given per-axis sizes. </p>
+<p>Returns the multipliers <code>str(d)</code> such that a 1-based multi-index <code>idx(1:d)</code> maps to the flat 0-based offset <code>sum((idx-1)*str)</code>. The first axis varies slowest (leading stride = product of the trailing sizes), matching the storage of the gridded data tensor <code>z</code> (sizes <code>[mx,my]</code> -&gt; strides <code>[my,1]</code>) and the coefficient tensor <code>c</code> (sizes <code>[nk1x,nk1y]</code> -&gt; strides <code>[nk1y,1]</code>) used by the 2-D gridded core. Each tensor must be passed its own size vector; the two differ only in the leading stride.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">d</td><td>Number of axes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sizes</td><td>Per-axis extents, sizes(d). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>str Row-major strides; <code>str(d) = 1</code>. </dd></dl>
+
+</div>
+</div>
 <a id="ab8705afed0d461ae20bf35a10b0579f5" name="ab8705afed0d461ae20bf35a10b0579f5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab8705afed0d461ae20bf35a10b0579f5">&#9670;&#160;</a></span>fp_knot_interval()</h2>
 
@@ -4757,6 +4863,116 @@ Here is the call graph for this function:</div>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="631,70,776,95"/>
 <area shape="poly" title=" " alt="" coords="583,80,617,80,617,85,583,85"/>
 <area shape="poly" title=" " alt="" coords="670,72,662,62,666,52,680,46,703,43,732,47,743,56,740,60,730,52,703,49,681,51,670,55,668,61,674,68"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a0b734cdd622810708ff09ef2ca5ad41f" name="a0b734cdd622810708ff09ef2ca5ad41f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b734cdd622810708ff09ef2ca5ad41f">&#9670;&#160;</a></span>fpbisp_nd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine, public fitpack_core::fpbisp_nd </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>w</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:,:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>lidx</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>N-D generalization of fpbisp: evaluate a tensor-product spline on a grid. </p>
+<p>Computes the values of a bivariate spline \( s(x, y) \) of degrees \( k_x \) and \( k_y \) at the grid points \( (x_i, y_j) \), \( i = 1, \ldots, m_x \), \( j = 1, \ldots, m_y \).</p>
+<p>The evaluation uses the two-step algorithm: first compute the B-spline basis values in each direction, then assemble:</p>
+<p class="formulaDsp">
+\[              s(x, y) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j, k_y+1}(y) \right)
+                        N_{i, k_x+1}(x)
+              \tag{2.14-2.15}
+\]
+</p>
+<p>At <code>dims=2</code> this is bit-for-bit identical to fpbisp: the per-axis basis-table build is a runtime do-loop over the <code>dims</code> axes, while the evaluation contraction is kept in literal 2-D form until the dims&gt;2 step. The B-spline values and knot interval indices are stored per axis in workspace arrays <code>w</code> and <code>lidx</code> (one column per axis) for reuse.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis varies slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis evaluation grids; column \( d \) is <code>xg(1:m(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points per axis, <code>m(dims)</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Spline values at grid points, flat row-major (first axis varies slowest) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>Per-axis B-spline basis values, <code>w(m(d),k(d)+1,d)</code> (mirrors fpbisp <code>wx,wy</code>) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lidx</td><td>Per-axis knot interval indices, <code>lidx(m(d),d)</code> (mirrors fpbisp <code>lx,ly</code>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a72432bc4ebc7c5ff0425d188147d7dbb" title="Evaluate a tensor product spline on a grid.">fpbisp</a>, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1) </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_a0b734cdd622810708ff09ef2ca5ad41f_cgraph.png" border="0" usemap="#anamespacefitpack__core_a0b734cdd622810708ff09ef2ca5ad41f_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a0b734cdd622810708ff09ef2ca5ad41f_cgraph" id="anamespacefitpack__core_a0b734cdd622810708ff09ef2ca5ad41f_cgraph">
+<area shape="rect" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="5,109,177,134"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="227,5,382,45"/>
+<area shape="poly" title=" " alt="" coords="117,106,224,55,240,48,242,53,226,60,119,111"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="227,69,382,109"/>
+<area shape="poly" title=" " alt="" coords="176,106,214,100,214,106,177,111"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="225,133,384,173"/>
+<area shape="poly" title=" " alt="" coords="177,131,212,137,212,142,176,137"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="230,198,379,223"/>
+<area shape="poly" title=" " alt="" coords="118,132,226,183,249,191,247,196,224,188,116,137"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="432,198,605,223"/>
+<area shape="poly" title=" " alt="" coords="380,208,418,208,418,213,380,213"/>
+<area shape="poly" title=" " alt="" coords="485,200,478,190,481,180,495,174,519,171,547,175,559,184,555,188,545,180,519,177,497,179,485,183,483,189,489,196"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="653,198,799,223"/>
+<area shape="poly" title=" " alt="" coords="606,208,640,208,640,213,606,213"/>
+<area shape="poly" title=" " alt="" coords="692,200,685,190,689,180,703,174,726,171,755,175,766,184,763,188,752,180,726,177,704,179,693,183,690,189,696,196"/>
 </map>
 </div>
 
@@ -7864,6 +8080,211 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="339,181,439,206,437,211,338,186"/>
 <area shape="poly" title=" " alt="" coords="540,209,662,165,664,170,541,214"/>
 <area shape="poly" title=" " alt="" coords="470,213,463,203,467,194,481,187,504,185,533,189,544,198,541,202,530,194,504,190,482,192,471,197,468,203,474,210"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a1c0af1ffd5507dede0f72cb5b1fe11fe" name="a1c0af1ffd5507dede0f72cb5b1fe11fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c0af1ffd5507dede0f72cb5b1fe11fe">&#9670;&#160;</a></span>fpgrre_nd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine fitpack_core::fpgrre_nd </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>ifs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>ifb</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m(2),m(1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>p</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nc), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>fp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>fpint</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>mm</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>mynx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>sp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mm), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>right</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mynx), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>q</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>b</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>nr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>N-D generalization of fpgrre: tensor-product least-squares gridded solver. </p>
+<p>For data on a rectangular grid \( \{x_i\} \times \{y_j\} \), solves the smoothing least-squares system using the Kronecker product structure (Eq. 10.4-10.8):</p>
+<p class="formulaDsp">
+\[              A_y \, C \, A_x^T = Q
+              \tag{10.4}
+\]
+</p>
+<p>where the augmented observation matrices are:</p>
+<p class="formulaDsp">
+\[              A_x = \begin{pmatrix} S_{px} \\ \frac{1}{\sqrt{p}} B_x \end{pmatrix}, \quad
+              A_y = \begin{pmatrix} S_{py} \\ \frac{1}{\sqrt{p}} B_y \end{pmatrix}
+              \tag{10.5}
+\]
+</p>
+<p>The per-axis QR factorizations are performed independently using fp_rotate_row_stride (row-access RHS for \( A_y \)) and fp_rotate_row_block (column-access RHS for \( A_x \)), followed by back-substitution; residual sums <code>fpint</code> per knot interval are also computed for knot-placement decisions. At <code>dims=2</code> this is bit-for-bit identical to fpgrre: the per-axis housekeeping is a runtime do-loop over the axes, while the alternating-direction reductions, the two-pass back-substitution and the residual contraction are kept literal-2 until the dims&gt;2 step. The per-axis band/observation/discontinuity arrays are merged into rank-3 arrays with a uniform leading dimension (<code>lda</code>/<code>ldb</code>), passed as the explicit leading-dim argument to fp_rotate_*, fpback and fpdisc so every addressed element coincides with the original's separately-sized matrices — no copies, no value change.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ifs</td><td>Per-axis flag: 0 = recompute observation matrix \( S_p \) (orig ifsx,ifsy) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ifb</td><td>Per-axis flag: 0 = recompute discontinuity matrix \( B \) (orig ifbx,ifby) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis grid values; column \( d \) is <code>xg(1:m(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of grid points per axis, <code>m(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Data on the grid, <code>z(m(2),m(1))</code>, (ny,nx)-ordered (axis-2 fastest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>Smoothing parameter </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">c</td><td>B-spline coefficients, length <code>nc</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nc</td><td>Length of <code>c</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fp</td><td>Total weighted sum of squared residuals </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fpint</td><td>Residual sums per knot interval, per axis (orig fpx,fpy) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mm</td><td>Work dimension </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mynx</td><td>Work dimension ( \( my \cdot (nx - kx - 1) \)) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sp</td><td>Per-axis B-spline observation matrices (orig spx,spy) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">right</td><td>Work: RHS vector for row rotations, length <code>mm</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">q</td><td>Work: RHS matrix, length <code>mynx</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">a</td><td>Per-axis band matrices, uniform leading dim (orig ax,ay) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">b</td><td>Per-axis discontinuity-jump matrices, uniform leading dim (orig bx,by) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nr</td><td>Per-axis knot interval indices (orig nrx,nry)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a78b0d9c28e76eff73dcf956f4811c257" title="Compute grid-based spline coefficients via Kronecker product decomposition.">fpgrre</a>, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; <a class="el" href="#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous-block RHS.">fp_rotate_row_block</a>, <a class="el" href="#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row-access) RHS.">fp_rotate_row_stride</a> — grid Givens rotations; todo/fitpack_nd_grids.md (slice 1, §2/§9) </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_a1c0af1ffd5507dede0f72cb5b1fe11fe_cgraph.png" border="0" usemap="#anamespacefitpack__core_a1c0af1ffd5507dede0f72cb5b1fe11fe_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a1c0af1ffd5507dede0f72cb5b1fe11fe_cgraph" id="anamespacefitpack__core_a1c0af1ffd5507dede0f72cb5b1fe11fe_cgraph">
+<area shape="rect" title="N&#45;D generalization of fpgrre: tensor&#45;product least&#45;squares gridded solver." alt="" coords="5,158,176,184"/>
+<area shape="rect" href="namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="224,30,392,70"/>
+<area shape="poly" title=" " alt="" coords="107,156,157,119,223,79,236,73,239,78,225,84,160,124,110,160"/>
+<area shape="rect" href="namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="224,94,392,134"/>
+<area shape="poly" title=" " alt="" coords="139,156,218,135,219,140,140,161"/>
+<area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="231,208,385,233"/>
+<area shape="poly" title=" " alt="" coords="148,181,239,202,237,207,147,186"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="233,158,383,184"/>
+<area shape="poly" title=" " alt="" coords="176,168,220,168,220,174,176,174"/>
+<area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="234,257,382,282"/>
+<area shape="poly" title=" " alt="" coords="113,182,163,212,225,243,244,250,242,255,223,248,160,217,110,186"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="661,137,807,162"/>
+<area shape="poly" title=" " alt="" coords="365,27,419,13,483,4,550,5,583,11,614,22,649,42,678,69,720,124,716,127,675,73,646,47,612,27,581,17,549,11,483,10,420,19,366,32"/>
+<area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="452,86,601,112"/>
+<area shape="poly" title=" " alt="" coords="393,66,457,81,456,86,392,71"/>
+<area shape="rect" href="namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="453,37,601,62"/>
+<area shape="poly" title=" " alt="" coords="392,47,439,47,439,52,392,52"/>
+<area shape="poly" title=" " alt="" coords="700,139,693,129,697,119,711,113,734,110,763,114,774,123,771,127,760,119,734,116,712,118,701,123,698,128,704,135"/>
+<area shape="poly" title=" " alt="" coords="393,118,648,140,648,145,392,123"/>
+<area shape="poly" title=" " alt="" coords="392,105,438,102,438,108,392,111"/>
+<area shape="poly" title=" " alt="" coords="373,91,439,71,465,64,467,69,441,76,374,96"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="440,212,613,237"/>
+<area shape="poly" title=" " alt="" coords="362,181,461,206,460,211,360,186"/>
+<area shape="poly" title=" " alt="" coords="562,209,684,165,686,170,564,214"/>
+<area shape="poly" title=" " alt="" coords="493,213,486,203,489,194,503,187,527,185,555,189,567,198,563,202,553,194,527,190,505,192,493,197,491,203,497,210"/>
 </map>
 </div>
 
@@ -11398,6 +11819,263 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="690,240,683,230,687,220,701,214,724,211,753,215,764,224,761,228,750,220,724,217,702,219,691,223,688,229,694,236"/>
 <area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="433,290,577,315"/>
 <area shape="poly" title=" " alt="" coords="355,300,419,300,419,305,355,305"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="aa47f6788ffd10e1ea9d7ae06c406822a" name="aa47f6788ffd10e1ea9d7ae06c406822a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa47f6788ffd10e1ea9d7ae06c406822a">&#9670;&#160;</a></span>fpregr_nd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine fitpack_core::fpregr_nd </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>iopt</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m(2),m(1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>lo</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>hi</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nest</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tol</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>maxit</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nc), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>fp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>fp0</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>fpold</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>reduc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>lastdi</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>nplus</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>fpint</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>nr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>nrdat</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>sp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>right</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>q</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>b</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>N-D generalization of fpregr: knot determination + p-iteration for gridded fits. </p>
+<p>Outer iteration loop for fitting a smoothing spline surface on a rectangular grid \( \{x_i\} \times \{y_j\} \). Manages the knot selection strategy (alternating between axis directions based on residuals) and the smoothing-parameter search, delegating the grid computation to fpgrre_nd at each step. At <code>dims=2</code> this is bit-for-bit identical to fpregr: the paired per-axis state becomes <code>dims</code>-length arrays and the knot-init / knot-placement passes become runtime do-loops over the axes, while the binary knot-direction arbiter and the scalar p-iteration root find for f(p)=s are kept literal-2 until the dims&gt;2 step.</p>
+<p>WORKSPACE: per the no-allocation rule, all scratch (<code>sp,a,b,right,q,fpint,nr, nrdat</code>) is supplied by the caller (regrid_nd carves it from the user wrk/iwrk) and received here as assumed-shape inout views; the persistent fit-state (<code>fp0,fpold,reduc,lastdi,nplus</code>) is passed explicitly rather than hidden in wrk offsets.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">iopt</td><td>0 = new fit, 1 = continue </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis grid values; column \( d \) is <code>xg(1:m(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of grid points per axis, <code>m(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">z</td><td>Data values, <code>z(m(2),m(1))</code>, (ny,nx)-ordered (passed through to fpgrre_nd) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lo</td><td>Per-axis lower boundary (orig xb,yb) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hi</td><td>Per-axis upper boundary (orig xe,ye) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>Smoothing factor \( S \geq 0 \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nest</td><td>Max knots per axis (orig nxest,nyest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tol</td><td>Smoothing condition tolerance </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maxit</td><td>Maximum smoothing-parameter iterations </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nc</td><td>Length of coefficient array </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">n</td><td>Number of knots per axis (orig nx,ny) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> (orig tx,ty) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">c</td><td>B-spline coefficients, length <code>nc</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fp</td><td>Weighted sum of squared residuals </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fp0</td><td>Initial residual </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fpold</td><td>Previous residual </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">reduc</td><td>Per-axis residual reduction (orig reducx,reducy) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">lastdi</td><td>Last direction of knot addition </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nplus</td><td>Per-axis number of knots to add (orig nplusx,nplusy) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">fpint</td><td>Residual sums per knot interval, per axis (orig fpintx,fpinty) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nr</td><td>Per-axis knot interval indices (orig nrx,nry) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">nrdat</td><td>Per-axis interior data counts per interval (orig nrdatx,nrdaty) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sp</td><td>Work: per-axis observation matrices </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">right</td><td>Work: RHS vector </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">q</td><td>Work: RHS matrix </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">a</td><td>Work: per-axis band matrices </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">b</td><td>Work: per-axis discontinuity matrices </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ier</td><td>Error flag</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a26879f854f0e23671e8fd07f9f144410" title="Driver for rectangular grid smoothing surface with knot selection.">fpregr</a>, <a class="el" href="#a1c0af1ffd5507dede0f72cb5b1fe11fe" title="N-D generalization of fpgrre: tensor-product least-squares gridded solver.">fpgrre_nd</a>, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; todo/fitpack_nd_grids.md (slice 1, §8 part C) </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_aa47f6788ffd10e1ea9d7ae06c406822a_cgraph.png" border="0" usemap="#anamespacefitpack__core_aa47f6788ffd10e1ea9d7ae06c406822a_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_aa47f6788ffd10e1ea9d7ae06c406822a_cgraph" id="anamespacefitpack__core_aa47f6788ffd10e1ea9d7ae06c406822a_cgraph">
+<area shape="rect" title="N&#45;D generalization of fpregr: knot determination + p&#45;iteration for gridded fits." alt="" coords="5,198,176,223"/>
+<area shape="rect" href="namespacefitpack__core.html#a1c0af1ffd5507dede0f72cb5b1fe11fe" title="N&#45;D generalization of fpgrre: tensor&#45;product least&#45;squares gridded solver." alt="" coords="225,119,395,145"/>
+<area shape="poly" title=" " alt="" coords="119,195,223,153,246,146,248,151,225,159,121,200"/>
+<area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="235,169,385,194"/>
+<area shape="poly" title=" " alt="" coords="176,197,221,191,221,196,177,202"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="224,219,396,259"/>
+<area shape="poly" title=" " alt="" coords="177,219,211,223,210,229,176,224"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="243,283,377,323"/>
+<area shape="poly" title=" " alt="" coords="120,221,225,268,242,275,240,280,223,273,117,226"/>
+<area shape="rect" href="namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="444,169,612,209"/>
+<area shape="poly" title=" " alt="" coords="360,142,439,163,438,168,358,147"/>
+<area shape="rect" href="namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="444,5,612,45"/>
+<area shape="poly" title=" " alt="" coords="331,117,381,87,443,55,458,48,460,53,445,60,384,92,333,121"/>
+<area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="451,70,605,95"/>
+<area shape="poly" title=" " alt="" coords="366,117,457,96,458,101,367,122"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="453,235,603,261"/>
+<area shape="poly" title=" " alt="" coords="376,142,398,154,414,170,423,187,431,204,446,219,459,227,457,232,442,223,426,207,418,190,410,173,394,158,373,147"/>
+<area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="454,119,602,145"/>
+<area shape="poly" title=" " alt="" coords="396,129,441,129,441,135,396,135"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="881,163,1027,189"/>
+<area shape="poly" title=" " alt="" coords="612,184,868,176,868,181,613,189"/>
+<area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="672,63,821,89"/>
+<area shape="poly" title=" " alt="" coords="588,167,610,154,625,140,633,126,643,112,658,98,670,92,672,96,662,102,647,115,638,129,629,143,614,158,591,171"/>
+<area shape="rect" href="namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="673,113,821,138"/>
+<area shape="poly" title=" " alt="" coords="596,167,689,139,690,144,598,172"/>
+<area shape="poly" title=" " alt="" coords="920,165,913,155,917,145,931,139,954,137,983,140,994,149,991,154,980,145,954,142,932,144,921,149,918,154,924,162"/>
+<area shape="poly" title=" " alt="" coords="612,14,664,13,721,18,779,28,835,48,868,70,898,97,940,150,936,153,894,100,865,74,832,53,778,34,720,23,664,19,612,19"/>
+<area shape="poly" title=" " alt="" coords="613,42,678,58,677,63,612,47"/>
+<area shape="poly" title=" " alt="" coords="590,43,613,55,628,66,638,77,647,88,661,98,678,105,675,110,659,102,644,92,634,81,624,70,611,60,588,48"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="660,238,833,263"/>
+<area shape="poly" title=" " alt="" coords="603,246,646,247,646,252,603,252"/>
+<area shape="poly" title=" " alt="" coords="782,235,904,191,906,196,784,240"/>
+<area shape="poly" title=" " alt="" coords="713,240,706,230,709,220,723,214,747,211,775,215,787,224,783,228,773,220,747,217,725,219,713,223,711,229,717,236"/>
+<area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="456,290,600,315"/>
+<area shape="poly" title=" " alt="" coords="378,300,442,300,442,305,378,305"/>
 </map>
 </div>
 
@@ -15398,6 +16076,165 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="aa5b7adeaa56a18fec0f71de67bfaabb2" name="aa5b7adeaa56a18fec0f71de67bfaabb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5b7adeaa56a18fec0f71de67bfaabb2">&#9670;&#160;</a></span>regrid_nd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine, public fitpack_core::regrid_nd </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>iopt</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m(2),m(1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>lo</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>hi</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nest</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(inout), contiguous</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(*), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>fp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(lwrk), intent(inout), target</td>          <td class="paramname"><span class="paramname"><em>wrk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>lwrk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(kwrk), intent(inout), target</td>          <td class="paramname"><span class="paramname"><em>iwrk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kwrk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>N-D generalization of regrid: tensor-product gridded smoothing-spline driver. </p>
+<p>Dimensionalized duplicate of regrid. At <code>dims=2</code> it produces results bit-for-bit identical to regrid (verified by the regrid_nd-vs-regrid equivalence gate over all iopt modes and spline orders). Validation, boundary-knot clamping and Schoenberg-Whitney (<code>fpchec</code>) checks become runtime do-loops over the <code>dims</code> axes; the binary knot-direction logic stays literal-2 inside fpregr_nd until the dims&gt;2 step.</p>
+<p>WORKSPACE (no allocation): the caller supplies a flat real <code>wrk(lwrk)</code> and integer <code>iwrk(kwrk)</code>, both <code>target</code>. regrid_nd carves them into the rank-N work views needed by fpregr_nd/fpgrre_nd via pointer bounds remapping (the N-D analogue of regrid's flat-offset partition). The persistent fit-state lives at fixed offsets: wrk(1)=fp0, wrk(2)=fpold, wrk(3:2+dims)=reduc; iwrk(1)=lastdi, iwrk(2:1+dims)=nplus &ndash; so preserving wrk/iwrk between calls (with iopt=1) continues from the previous knot set, exactly as regrid does.</p>
+<p>Minimum sizes: lwrk &gt;= 2 + dims + nestmax*dims + mmax*(kmax+1)*dims + 2*nestmax*(kmax+2)*dims + mm + mq kwrk &gt;= 1 + dims + mmax*dims + nestmax*dims with mmax=maxval(m), nestmax=maxval(nest), kmax=maxval(k), mm=max(nestmax,mmax), mq=mmax*nestmax.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#adba4c1c277c572cad2725b326b896ef8" title="Fit a smoothing bivariate spline to data on a rectangular grid.">regrid</a>, <a class="el" href="#aa47f6788ffd10e1ea9d7ae06c406822a" title="N-D generalization of fpregr: knot determination + p-iteration for gridded fits.">fpregr_nd</a>; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4. </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_aa5b7adeaa56a18fec0f71de67bfaabb2_cgraph.png" border="0" usemap="#anamespacefitpack__core_aa5b7adeaa56a18fec0f71de67bfaabb2_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_aa5b7adeaa56a18fec0f71de67bfaabb2_cgraph" id="anamespacefitpack__core_aa5b7adeaa56a18fec0f71de67bfaabb2_cgraph">
+<area shape="rect" title="N&#45;D generalization of regrid: tensor&#45;product gridded smoothing&#45;spline driver." alt="" coords="5,341,176,366"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1100,174,1245,199"/>
+<area shape="poly" title=" " alt="" coords="176,351,527,351,748,351,807,346,866,334,924,316,978,294,1073,246,1141,205,1144,209,1076,251,980,299,925,321,868,339,808,352,748,356,527,356,176,356"/>
+<area shape="rect" href="namespacefitpack__core.html#a3e1011bf7749aa62d3c05bd1a20e36d1" title="Verify knot positions against data points (Schoenberg&#45;Whitney check)." alt="" coords="233,391,385,417"/>
+<area shape="poly" title=" " alt="" coords="147,364,241,386,240,391,146,369"/>
+<area shape="rect" href="namespacefitpack__core.html#aa47f6788ffd10e1ea9d7ae06c406822a" title="N&#45;D generalization of fpregr: knot determination + p&#45;iteration for gridded fits." alt="" coords="224,127,395,153"/>
+<area shape="poly" title=" " alt="" coords="103,339,283,161,287,164,107,343"/>
+<area shape="poly" title=" " alt="" coords="1139,176,1132,166,1135,156,1149,150,1173,147,1201,151,1213,160,1209,164,1199,156,1173,153,1151,155,1139,159,1137,165,1143,172"/>
+<area shape="rect" href="namespacefitpack__core.html#a1c0af1ffd5507dede0f72cb5b1fe11fe" title="N&#45;D generalization of fpgrre: tensor&#45;product least&#45;squares gridded solver." alt="" coords="443,185,614,210"/>
+<area shape="poly" title=" " alt="" coords="359,150,467,179,466,184,358,155"/>
+<area shape="rect" href="namespacefitpack__core.html#a8357b7623d6629bc3663f8023fcd6666" title="Select and insert a new knot at the location of maximum residual." alt="" coords="453,70,604,95"/>
+<area shape="poly" title=" " alt="" coords="358,125,466,96,467,101,359,130"/>
+<area shape="rect" href="namespacefitpack__core.html#a8c4fa92fbc6556a21d112fbdfbd0f80f" title="Choose which dimension receives the next knot during bivariate fitting." alt="" coords="443,120,615,160"/>
+<area shape="poly" title=" " alt="" coords="395,137,429,137,429,143,395,143"/>
+<area shape="rect" href="namespacefitpack__core.html#afd90889b0d56592815337f99a849bc7a" title="Update the smoothing parameter &#160;during iterative knot selection." alt="" coords="461,5,596,45"/>
+<area shape="poly" title=" " alt="" coords="327,125,377,92,441,55,456,48,458,53,444,60,380,96,330,130"/>
+<area shape="rect" href="namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="663,176,831,216"/>
+<area shape="poly" title=" " alt="" coords="614,194,649,194,649,199,615,199"/>
+<area shape="rect" href="namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="663,112,831,152"/>
+<area shape="poly" title=" " alt="" coords="572,182,614,169,666,153,668,159,615,175,573,187"/>
+<area shape="rect" href="namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="670,241,823,266"/>
+<area shape="poly" title=" " alt="" coords="580,207,684,235,682,240,578,213"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="672,62,821,87"/>
+<area shape="poly" title=" " alt="" coords="590,182,613,170,629,153,636,135,644,116,661,98,672,91,675,95,664,102,649,119,641,137,633,156,616,174,592,187"/>
+<area shape="rect" href="namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="673,290,821,315"/>
+<area shape="poly" title=" " alt="" coords="549,208,599,242,664,276,682,283,680,288,662,281,597,246,546,212"/>
+<area shape="poly" title=" " alt="" coords="802,214,840,225,879,233,966,243,1003,241,1051,233,1095,220,1135,203,1137,208,1097,225,1053,239,1004,247,965,249,878,239,838,230,800,219"/>
+<area shape="rect" href="namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="891,149,1040,174"/>
+<area shape="poly" title=" " alt="" coords="830,180,877,173,878,178,831,185"/>
+<area shape="rect" href="namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="891,198,1039,223"/>
+<area shape="poly" title=" " alt="" coords="831,199,878,202,878,207,831,204"/>
+<area shape="poly" title=" " alt="" coords="831,122,937,120,995,125,1053,133,1098,147,1138,165,1136,170,1096,152,1051,139,995,130,937,126,831,127"/>
+<area shape="poly" title=" " alt="" coords="831,141,878,147,877,152,831,146"/>
+<area shape="poly" title=" " alt="" coords="802,150,832,162,880,183,905,191,903,196,878,188,830,166,800,155"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="879,47,1052,73"/>
+<area shape="poly" title=" " alt="" coords="822,67,864,64,865,69,822,72"/>
+<area shape="poly" title=" " alt="" coords="1010,70,1053,90,1107,126,1150,162,1146,166,1103,130,1051,94,1008,75"/>
+<area shape="poly" title=" " alt="" coords="932,49,924,39,928,29,942,23,965,21,994,24,1005,33,1002,38,992,29,965,26,943,28,932,33,930,38,936,46"/>
+<area shape="rect" href="namespacefitpack__core.html#aefb269f6c2a494ba69c10e93334def66" title="Rational interpolation for the smoothing parameter search." alt="" coords="675,13,819,38"/>
+<area shape="poly" title=" " alt="" coords="596,23,661,23,661,28,596,28"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="afd90889b0d56592815337f99a849bc7a" name="afd90889b0d56592815337f99a849bc7a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afd90889b0d56592815337f99a849bc7a">&#9670;&#160;</a></span>root_finding_iterate()</h2>
 
@@ -17181,6 +18018,20 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="a995ea8d768c880ccfab37dbf3eafb3a2" name="a995ea8d768c880ccfab37dbf3eafb3a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a995ea8d768c880ccfab37dbf3eafb3a2">&#9670;&#160;</a></span>fp_dim</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer, parameter, public fitpack_core::fp_dim = c_int32_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a015fac22c02c6a271cc91e07f8d068ef" name="a015fac22c02c6a271cc91e07f8d068ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a015fac22c02c6a271cc91e07f8d068ef">&#9670;&#160;</a></span>fp_false</h2>
 
@@ -17470,7 +18321,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public fitpack_core::knot_dim_1 = -1</td>
+          <td class="memname">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public fitpack_core::knot_dim_1 = 1</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -17484,7 +18335,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public fitpack_core::knot_dim_2 = 1</td>
+          <td class="memname">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public fitpack_core::knot_dim_2 = 2</td>
         </tr>
       </table>
 </div><div class="memdoc">

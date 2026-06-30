@@ -1,5 +1,12 @@
 var NAVTREEINDEX5 =
 {
+"structfitpack__polar__domains_1_1fitpack__polar.html#a11bc52134a2e7776abe9ac420981d7ca":[15,0,14,0,9],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a12932ccab6589e1807900aa915ed74f9":[14,0,16,0,25],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a12932ccab6589e1807900aa915ed74f9":[15,0,14,0,25],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a1324c2d3552dfc3d36d7e145a0c4d688":[14,0,16,0,28],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a1324c2d3552dfc3d36d7e145a0c4d688":[15,0,14,0,28],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a36c5e1eb380aedf9fd6d53989097e893":[14,0,16,0,11],
+"structfitpack__polar__domains_1_1fitpack__polar.html#a36c5e1eb380aedf9fd6d53989097e893":[15,0,14,0,11],
 "structfitpack__polar__domains_1_1fitpack__polar.html#a3b1a5136ec39300e197d6a4754abb272":[14,0,16,0,0],
 "structfitpack__polar__domains_1_1fitpack__polar.html#a3b1a5136ec39300e197d6a4754abb272":[15,0,14,0,0],
 "structfitpack__polar__domains_1_1fitpack__polar.html#a3d2d0ca4b5c64e3081d540223a6c05f6":[14,0,16,0,14],
@@ -242,12 +249,5 @@ var NAVTREEINDEX5 =
 "theory_surface_fitting.html#autotoc_md52":[4,1,1],
 "theory_surface_fitting.html#autotoc_md53":[4,1,2],
 "theory_surface_fitting.html#autotoc_md54":[4,1,3],
-"theory_surface_fitting.html#autotoc_md55":[4,1,4],
-"theory_surface_fitting.html#autotoc_md56":[4,2],
-"theory_surface_fitting.html#autotoc_md57":[4,2,0],
-"theory_surface_fitting.html#autotoc_md58":[4,2,1],
-"theory_surface_fitting.html#autotoc_md59":[4,3],
-"theory_surface_fitting.html#autotoc_md60":[4,4],
-"theory_surface_fitting.html#autotoc_md61":[4,4,0],
-"theory_surface_fitting.html#autotoc_md62":[4,5]
+"theory_surface_fitting.html#autotoc_md55":[4,1,4]
 };

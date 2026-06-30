@@ -1,5 +1,12 @@
 var NAVTREEINDEX6 =
 {
+"theory_surface_fitting.html#autotoc_md56":[4,2],
+"theory_surface_fitting.html#autotoc_md57":[4,2,0],
+"theory_surface_fitting.html#autotoc_md58":[4,2,1],
+"theory_surface_fitting.html#autotoc_md59":[4,3],
+"theory_surface_fitting.html#autotoc_md60":[4,4],
+"theory_surface_fitting.html#autotoc_md61":[4,4,0],
+"theory_surface_fitting.html#autotoc_md62":[4,5],
 "theory_surface_fitting.html#autotoc_md63":[4,5,0],
 "theory_surface_fitting.html#autotoc_md64":[4,6],
 "tutorial_convex_curve.html":[9],

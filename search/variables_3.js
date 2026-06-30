@@ -24,10 +24,11 @@ var searchData=
   ['fp_21',['fp',['../structfitpack__fitters_1_1fitpack__fitter.html#aa9428cc7448785fb9a2697225760296e',1,'fitpack_fitters::fitpack_fitter']]],
   ['fp_5fbool_22',['fp_bool',['../namespacefitpack__core.html#a650e5831ebea638e634b52942aae265c',1,'fitpack_core']]],
   ['fp_5fcomm_23',['fp_comm',['../namespacefitpack__core.html#ac9aa06356d8fbf8f4b108db917e429a4',1,'fitpack_core']]],
-  ['fp_5ffalse_24',['fp_false',['../namespacefitpack__core.html#a015fac22c02c6a271cc91e07f8d068ef',1,'fitpack_core']]],
-  ['fp_5fflag_25',['fp_flag',['../namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54',1,'fitpack_core']]],
-  ['fp_5fnot_5falloc_26',['fp_not_alloc',['../namespacefitpack__core.html#a16ef1ddc6e8416540eac14148753788d',1,'fitpack_core']]],
-  ['fp_5freal_27',['fp_real',['../namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065',1,'fitpack_core']]],
-  ['fp_5fsize_28',['fp_size',['../namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7',1,'fitpack_core']]],
-  ['fp_5ftrue_29',['fp_true',['../namespacefitpack__core.html#aeb077d251aa5a83467c1db3413457d9b',1,'fitpack_core']]]
+  ['fp_5fdim_24',['fp_dim',['../namespacefitpack__core.html#a995ea8d768c880ccfab37dbf3eafb3a2',1,'fitpack_core']]],
+  ['fp_5ffalse_25',['fp_false',['../namespacefitpack__core.html#a015fac22c02c6a271cc91e07f8d068ef',1,'fitpack_core']]],
+  ['fp_5fflag_26',['fp_flag',['../namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54',1,'fitpack_core']]],
+  ['fp_5fnot_5falloc_27',['fp_not_alloc',['../namespacefitpack__core.html#a16ef1ddc6e8416540eac14148753788d',1,'fitpack_core']]],
+  ['fp_5freal_28',['fp_real',['../namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065',1,'fitpack_core']]],
+  ['fp_5fsize_29',['fp_size',['../namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7',1,'fitpack_core']]],
+  ['fp_5ftrue_30',['fp_true',['../namespacefitpack__core.html#aeb077d251aa5a83467c1db3413457d9b',1,'fitpack_core']]]
 ];

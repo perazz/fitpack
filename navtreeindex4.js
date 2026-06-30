@@ -1,5 +1,12 @@
 var NAVTREEINDEX4 =
 {
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58":[15,0,8,0,24],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9ba01dcae245b6536a7ee7de548e4739":[14,0,10,0,20],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9ba01dcae245b6536a7ee7de548e4739":[15,0,8,0,20],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9f0abab7931bb757e3f63aec05665702":[14,0,10,0,11],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9f0abab7931bb757e3f63aec05665702":[15,0,8,0,11],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa279b6a9811f82d7bf574af8fe5e3fce":[14,0,10,0,21],
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa279b6a9811f82d7bf574af8fe5e3fce":[15,0,8,0,21],
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa2f6bbacbdb715ef170e2dd74236e3c4":[14,0,10,0,12],
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa2f6bbacbdb715ef170e2dd74236e3c4":[15,0,8,0,12],
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa9f5639bd696ca35c9c936775b50ca5b":[14,0,10,0,16],
@@ -242,12 +249,5 @@ var NAVTREEINDEX4 =
 "structfitpack__polar__domains_1_1fitpack__polar.html":[15,0,14,0],
 "structfitpack__polar__domains_1_1fitpack__polar.html#a0b70da2c8ed886ee3853b083816ce0ca":[14,0,16,0,10],
 "structfitpack__polar__domains_1_1fitpack__polar.html#a0b70da2c8ed886ee3853b083816ce0ca":[15,0,14,0,10],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a11bc52134a2e7776abe9ac420981d7ca":[14,0,16,0,9],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a11bc52134a2e7776abe9ac420981d7ca":[15,0,14,0,9],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a12932ccab6589e1807900aa915ed74f9":[14,0,16,0,25],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a12932ccab6589e1807900aa915ed74f9":[15,0,14,0,25],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a1324c2d3552dfc3d36d7e145a0c4d688":[14,0,16,0,28],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a1324c2d3552dfc3d36d7e145a0c4d688":[15,0,14,0,28],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a36c5e1eb380aedf9fd6d53989097e893":[14,0,16,0,11],
-"structfitpack__polar__domains_1_1fitpack__polar.html#a36c5e1eb380aedf9fd6d53989097e893":[15,0,14,0,11]
+"structfitpack__polar__domains_1_1fitpack__polar.html#a11bc52134a2e7776abe9ac420981d7ca":[14,0,16,0,9]
 };

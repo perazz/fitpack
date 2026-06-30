@@ -1,5 +1,12 @@
 var NAVTREEINDEX3 =
 {
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#ac5c5ed540c6059720fb73836c40a56f0":[15,0,2,0,3],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#ae36b2d943b41432d5388d2e3aed70cf6":[14,0,3,0,12],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#ae36b2d943b41432d5388d2e3aed70cf6":[15,0,2,0,12],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00":[14,0,3,0,11],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00":[15,0,2,0,11],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#afb804ce1a42fbc30b8afcedf17ccd23e":[14,0,3,0,6],
+"structfitpack__convex__curves_1_1fitpack__convex__curve.html#afb804ce1a42fbc30b8afcedf17ccd23e":[15,0,2,0,6],
 "structfitpack__curves_1_1fitpack__curve.html":[14,0,6,0],
 "structfitpack__curves_1_1fitpack__curve.html":[15,0,4,0],
 "structfitpack__curves_1_1fitpack__curve.html#a03d0f2b1596577c156de28b8a34b6339":[14,0,6,0,37],
@@ -242,12 +249,5 @@ var NAVTREEINDEX3 =
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a8a79758335bc0a0397a4f0074f77f224":[15,0,8,0,9],
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9238ff4df81ae52c29ee76230427a9e5":[14,0,10,0,27],
 "structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9238ff4df81ae52c29ee76230427a9e5":[15,0,8,0,27],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58":[14,0,10,0,24],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58":[15,0,8,0,24],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9ba01dcae245b6536a7ee7de548e4739":[14,0,10,0,20],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9ba01dcae245b6536a7ee7de548e4739":[15,0,8,0,20],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9f0abab7931bb757e3f63aec05665702":[14,0,10,0,11],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9f0abab7931bb757e3f63aec05665702":[15,0,8,0,11],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa279b6a9811f82d7bf574af8fe5e3fce":[14,0,10,0,21],
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#aa279b6a9811f82d7bf574af8fe5e3fce":[15,0,8,0,21]
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a958fb8f59ede580c16a0748c700bde58":[14,0,10,0,24]
 };
