@@ -1,18 +1,21 @@
 ! **************************************************************************************************
-!   FITPACK N-D gridded core — bit-for-bit equivalence gate (slice 1)
+!   FITPACK N-D gridded core — equivalence gate (slice 1) + first dims>2 path (slice 2)
 !
-!   Asserts that the dimensionalized *_nd gridded routines reproduce their 2-D originals EXACTLY
-!   (bit-for-bit) when run at dims=2, over the standard 11x11 `daregr` battery across all iopt
-!   modes and spline orders. This is the oracle that licenses extending the *_nd path to dims>2.
+!   Gates A/D/D' assert that the dimensionalized *_nd gridded routines reproduce their 2-D originals
+!   EXACTLY (bit-for-bit) when run at dims=2, over the standard 11x11 `daregr` battery across all iopt
+!   modes and spline orders — the oracle that licenses extending the *_nd path to dims>2. Gate E then
+!   exercises the first genuine dims>2 path (the eval contraction at dims=3) against independent refs.
 !
 !   Gates:
-!     A. fpbisp_nd  vs bispev  (gridded evaluation)
+!     A. fpbisp_nd  vs bispev  (gridded evaluation, dims=2 bit-for-bit)
 !     D. regrid_nd  vs regrid  (gridded fit; transitively covers fpregr_nd and fpgrre_nd, whose
 !                               outputs tx,ty,c,fp,nx,ny are exactly what regrid_nd returns)
 !     D'. regrid_nd vs regrid on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
 !                               convention so an x<->y axis/size swap cannot hide behind mx==my
+!     E. fpbisp_nd(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
+!                               splev, and non-separable coeffs vs the dims=2 path combined along z
 !
-!   See todo/fitpack_nd_grids.md (slice 1) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
+!   See todo/fitpack_nd_grids.md (slices 1–2) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
 ! **************************************************************************************************
 module fitpack_grid_nd_tests
     use fitpack_core
@@ -55,7 +58,10 @@ module fitpack_grid_nd_tests
         ! Gate A: fpbisp_nd vs bispev
         if (success) success = gate_fpbisp_nd(useUnit)
 
-        if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all dims=2 gates bit-for-bit OK'
+        ! Gate E: fpbisp_nd at dims=3 vs two independent references (the first genuine dims>2 path)
+        if (success) success = gate_fpbisp_nd_3d(useUnit)
+
+        if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all N-D gridded gates OK'
 
     end function test_nd_grid_equivalence
 
@@ -354,5 +360,151 @@ module fitpack_grid_nd_tests
         2200 format('[gate D] ',a,' NOT bit-for-bit: max|dtx|=',1pe10.2,' max|dty|=',e10.2, &
                     ' max|dc|=',e10.2,' |dfp|=',e10.2)
     end function pair_ok
+
+    !> @brief Build a clamped knot vector on [0,1] for order k with nk1 coefficients (uniform interior).
+    subroutine clamped_unit_knots(k,nk1,t,n)
+        integer(FP_SIZE), intent(in)  :: k,nk1
+        real(FP_REAL),    intent(out) :: t(:)
+        integer(FP_SIZE), intent(out) :: n
+        integer(FP_SIZE) :: k1,nint,i
+        k1   = k+1
+        n    = nk1+k1
+        nint = n-2*k1                  ! number of interior knots
+        t(1:k1) = zero
+        do i=1,nint
+           t(k1+i) = real(i,FP_REAL)/real(nint+1,FP_REAL)
+        end do
+        t(n-k:n) = one
+    end subroutine clamped_unit_knots
+
+    !> @brief Gate E — fpbisp_nd at dims=3 vs two independent references (the first genuine dims>2 path).
+    !!
+    !! Reference 1 (separable): coefficients c(i,j,l)=a(i)*b(j)*d(l) make the 3-D tensor spline
+    !! factorize to sx(x)*sy(y)*sz(z); the reference grid is the outer product of three verified 1-D
+    !! splev evaluations.  Reference 2 (non-separable): each z-coefficient slab is evaluated over the
+    !! (x,y) plane with the gate-A-verified fpbisp_nd(dims=2), then combined along z with an explicit
+    !! B-spline basis (fpbspl) — catching axis-ordering / separation bugs the symmetric case can hide.
+    !! Distinct per-axis orders and grid sizes, so an axis swap cannot pass unnoticed.
+    logical function gate_fpbisp_nd_3d(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        ! distinct per-axis orders, coefficient counts and eval-grid sizes (never equal: no axis hides)
+        integer(FP_SIZE), parameter :: kx=3,   ky=2,   kz=4
+        integer(FP_SIZE), parameter :: nk1x=6, nk1y=5, nk1z=7
+        integer(FP_SIZE), parameter :: mx=7,   my=5,   mz=9
+        integer(FP_SIZE), parameter :: maxn=nk1z+kz+1, maxm=mz, maxk1=kz+1
+        integer(FP_SIZE), parameter :: nc3=nk1x*nk1y*nk1z, mout3=mx*my*mz, mxy=mx*my
+        real(FP_REAL),    parameter :: tol=1.0e-12_FP_REAL
+
+        real(FP_REAL)    :: t3(maxn,3),xg3(maxm,3),c3(nc3),z3(mout3),w3(maxm,maxk1,3)
+        integer(FP_SIZE) :: lidx3(maxm,3),n3(3),k3(3),m3(3)
+        ! separable reference (outer product of three 1-D splev evaluations)
+        real(FP_REAL)    :: av(maxn),bv(maxn),dv(maxn),sx(mx),sy(my),sz(mz),ref
+        ! non-separable reference (verified dims=2 plane evals, combined along z by splev)
+        real(FP_REAL)    :: v2(mxy,nk1z),z2(mxy),c2(nk1x*nk1y),w2(mx,kx+1,2),vz(mz),cz(maxn)
+        real(FP_REAL)    :: t2(maxn,2),xg2(mx,2),maxdiff
+        integer(FP_SIZE) :: lidx2(mx,2),n2(2),k2(2),m2(2)
+        integer(FP_SIZE) :: ix,iy,iz,i,nx,ny,nz,l,ic,iout
+        integer(FP_FLAG) :: ier
+
+        ok = .true.
+        t3 = zero; xg3 = zero; xg2 = zero
+        k3 = [kx,ky,kz]; m3 = [mx,my,mz]
+
+        ! clamped knot vectors on [0,1]; n_a = nk1_a+k_a+1 (10,8,12)
+        call clamped_unit_knots(kx,nk1x,t3(:,1),nx)
+        call clamped_unit_knots(ky,nk1y,t3(:,2),ny)
+        call clamped_unit_knots(kz,nk1z,t3(:,3),nz)
+        n3 = [nx,ny,nz]
+
+        ! eval grids: strictly interior, distinct sizes
+        do i=1,mx; xg3(i,1) = (real(i,FP_REAL)-half)/real(mx,FP_REAL); end do
+        do i=1,my; xg3(i,2) = (real(i,FP_REAL)-half)/real(my,FP_REAL); end do
+        do i=1,mz; xg3(i,3) = (real(i,FP_REAL)-half)/real(mz,FP_REAL); end do
+
+        ! 1-D coefficient vectors (moderate, deterministic, non-trivial)
+        av = zero; bv = zero; dv = zero
+        do i=1,nk1x; av(i) = sin(0.7_FP_REAL*i)+1.5_FP_REAL; end do
+        do i=1,nk1y; bv(i) = cos(0.4_FP_REAL*i)+1.3_FP_REAL; end do
+        do i=1,nk1z; dv(i) = 0.5_FP_REAL+0.13_FP_REAL*i;     end do
+
+        ! coefficient/output flat indices are row-major: x slowest, z fastest
+        ! c3((ix-1)*nk1y*nk1z+(iy-1)*nk1z+iz),  z3((ix-1)*my*mz+(iy-1)*mz+iz)
+
+        ! ===== Reference 1: separable coefficients c(i,j,l)=a(i)*b(j)*d(l) =====
+        do ix=1,nk1x
+           do iy=1,nk1y
+              do iz=1,nk1z
+                 c3((ix-1)*nk1y*nk1z+(iy-1)*nk1z+iz) = av(ix)*bv(iy)*dv(iz)
+              end do
+           end do
+        end do
+
+        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
+
+        call splev(t3(1:nx,1),nx,av(1:nx),kx,xg3(1:mx,1),sx,mx,OUTSIDE_EXTRAPOLATE,ier)
+        call splev(t3(1:ny,2),ny,bv(1:ny),ky,xg3(1:my,2),sy,my,OUTSIDE_EXTRAPOLATE,ier)
+        call splev(t3(1:nz,3),nz,dv(1:nz),kz,xg3(1:mz,3),sz,mz,OUTSIDE_EXTRAPOLATE,ier)
+
+        maxdiff = zero
+        do ix=1,mx
+           do iy=1,my
+              do iz=1,mz
+                 ref  = sx(ix)*sy(iy)*sz(iz)
+                 iout = (ix-1)*my*mz+(iy-1)*mz+iz
+                 maxdiff = max(maxdiff, abs(z3(iout)-ref))
+              end do
+           end do
+        end do
+        if (maxdiff>=tol) then
+           ok = .false.; write(useUnit,3000) 'separable',maxdiff; return
+        end if
+
+        ! ===== Reference 2: non-separable coefficients =====
+        do ix=1,nk1x
+           do iy=1,nk1y
+              do iz=1,nk1z
+                 c3((ix-1)*nk1y*nk1z+(iy-1)*nk1z+iz) = sin(1.1_FP_REAL*ix+0.7_FP_REAL*iy+0.5_FP_REAL*iz)
+              end do
+           end do
+        end do
+
+        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
+
+        ! evaluate the (x,y) plane of each z-coefficient slab with the gate-A-verified dims=2 path
+        n2 = [nx,ny]; k2 = [kx,ky]; m2 = [mx,my]
+        t2(:,1) = t3(:,1); t2(:,2) = t3(:,2)
+        xg2(1:mx,1) = xg3(1:mx,1); xg2(1:my,2) = xg3(1:my,2)
+        do l=1,nk1z
+           do ix=1,nk1x
+              do iy=1,nk1y
+                 c2((ix-1)*nk1y+iy) = c3((ix-1)*nk1y*nk1z+(iy-1)*nk1z+l)
+              end do
+           end do
+           call fpbisp_nd(2_FP_DIM,t2,n2,c2,k2,xg2,m2,z2,w2,lidx2)
+           v2(:,l) = z2
+        end do
+
+        ! combine along z: for each (x,y) the nk1z slab values ARE the z-spline coefficients -> splev
+        maxdiff = zero
+        do ix=1,mx
+           do iy=1,my
+              ic = (ix-1)*my+iy
+              cz = zero; cz(1:nk1z) = v2(ic,1:nk1z)
+              call splev(t3(1:nz,3),nz,cz(1:nz),kz,xg3(1:mz,3),vz,mz,OUTSIDE_EXTRAPOLATE,ier)
+              do iz=1,mz
+                 iout = (ix-1)*my*mz+(iy-1)*mz+iz
+                 maxdiff = max(maxdiff, abs(z3(iout)-vz(iz)))
+              end do
+           end do
+        end do
+        if (maxdiff>=tol) then
+           ok = .false.; write(useUnit,3000) 'non-separable',maxdiff; return
+        end if
+
+        write(useUnit,'(a)') '[gate E] fpbisp_nd(dims=3) == separable & nested-2D references'
+
+        3000 format('[gate E] fpbisp_nd(dims=3) /= ',a,' reference  (max |diff| = ',1pe12.3,')')
+    end function gate_fpbisp_nd_3d
 
 end module fitpack_grid_nd_tests

@@ -260,6 +260,31 @@ module fitpack_core
           offset = sum((idx-1_FP_SIZE)*strides)
       end function fp_grid_index
 
+      !> @brief Multi-index of a flat 0-based offset into a row-major tensor (inverse of fp_grid_index).
+      !!
+      !! Given a 0-based linear offset and the per-axis extents `sizes(1:d)`, returns the 1-based
+      !! multi-index `idx(1:d)` such that `fp_grid_index(d, idx, fp_grid_strides(d, sizes)) == offset`.
+      !! Row-major: the last axis varies fastest (stride 1), the first axis slowest. Used to drive a
+      !! dimension-generic loop over a tensor's grid points with a single linear counter. Integer
+      !! arithmetic is exact, so it is bit-for-bit consistent with the hand-written 2-D index walks.
+      !!
+      !! @param[in] d       Number of axes (length of sizes and idx).
+      !! @param[in] offset  0-based flat offset (0 <= offset < product(sizes)).
+      !! @param[in] sizes   Per-axis extents, sizes(d).
+      !! @return    idx     1-based multi-index, idx(d).
+      pure function fp_grid_unravel(d,offset,sizes) result(idx)
+          integer(FP_DIM),  intent(in) :: d
+          integer(FP_SIZE), intent(in) :: offset,sizes(d)
+          integer(FP_SIZE) :: idx(d)
+          integer(FP_DIM)  :: i
+          integer(FP_SIZE) :: rem
+          rem = offset
+          do i=d,1,-1
+             idx(i) = mod(rem,sizes(i)) + 1_FP_SIZE
+             rem    = rem/sizes(i)
+          end do
+      end function fp_grid_unravel
+
       !> @brief Dispatch an error code: return it to caller or halt with a message.
       !!
       !! If `ierr_out` is present, the error code is returned through it. Otherwise, if `ierr`
@@ -2250,11 +2275,12 @@ module fitpack_core
       !!     \tag{2.14-2.15}
       !! \f]
       !!
-      !! At `dims=2` this is bit-for-bit identical to fpbisp: the per-axis basis-table
-      !! build is a runtime do-loop over the `dims` axes, while the evaluation
-      !! contraction is kept in literal 2-D form until the dims>2 step. The B-spline
-      !! values and knot interval indices are stored per axis in workspace arrays `w`
-      !! and `lidx` (one column per axis) for reuse.
+      !! At `dims=2` this is bit-for-bit identical to fpbisp: both the per-axis basis-
+      !! table build and the evaluation contraction are dimension-generic runtime loops
+      !! over the `dims` axes, with the innermost `dot_product` on the fastest (axis
+      !! `dims`, contiguous) coefficient axis as the FP-reassociation anchor. The
+      !! B-spline values and knot interval indices are stored per axis in workspace
+      !! arrays `w` and `lidx` (one column per axis) for reuse.
       !!
       !! @param[in]  dims  Number of axes (domain dimension)
       !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
@@ -2276,10 +2302,11 @@ module fitpack_core
           integer(FP_SIZE), intent(out) :: lidx(:,:)
 
           !  ..local variables..
-          integer(FP_DIM)  :: d
-          integer(FP_SIZE) :: k1(dims),nk1(dims),cstride(dims)
-          integer(FP_SIZE) :: l,l1,mout,i,i1,j,nkd
-          real(FP_REAL)    :: arg,sp,tb,te,h(MAX_ORDER+1)
+          integer(FP_DIM)  :: d,a
+          integer(FP_SIZE) :: k1(dims),nk1(dims),cstride(dims),gidx(dims),lbase(dims),cidx(dims)
+          integer(FP_SIZE) :: l,mout,i,nkd,q,nsupp,coff0,coff
+          !  support odometer over axes 1..dims-1: multi-index cidx, basis partial products pw (O(dims))
+          real(FP_REAL)    :: arg,sp,tb,te,h(MAX_ORDER+1),pw(0:dims-1)
 
           !  per-axis order and coefficient extents
           k1  = k+1
@@ -2302,22 +2329,50 @@ module fitpack_core
              end do
           end do
 
-          !  ---- frozen literal-2 evaluation contraction (kept until the dims>2 step) ----
-          !  c is row-major with leading stride nk1(2); z is row-major, first axis slowest.
-          cstride = fp_grid_strides(dims,nk1)    ! [nk1(2),1] at dims=2
-          mout = 0
-          do i=1,m(1)
-             h(1:k1(1)) = w(i,1:k1(1),1)
-             do j=1,m(2)
-                l1 = fp_grid_index(dims,[lidx(i,1)+1,lidx(j,2)+1],cstride)
-                sp = zero
-                do i1=1,k1(1)
-                   sp = sp+h(i1)*dot_product(c(l1+1:l1+k1(2)),w(j,1:k1(2),2))
-                   l1 = l1+nk1(2)
-                end do
-                mout = mout+1
-                z(mout) = sp
+          !  ---- dimension-generic evaluation contraction ----
+          !  c is the coefficient tensor (row-major, axis-1 slowest); z is the output value grid (row-
+          !  major, axis-1 slowest). For each output point the value is the tensor contraction of the
+          !  k1(1)x...x k1(dims) coefficient support against the per-axis basis tables w. The innermost
+          !  dot_product runs over the FASTEST axis (axis dims, contiguous stride 1). The support on the
+          !  remaining axes 1..dims-1 is swept by a mixed-radix odometer (radix k1): the support index
+          !  cidx, the coefficient offset coff and the basis partial products pw(0:dims-1) are carried
+          !  incrementally -- O(dims) state, no integer div/mod and no recomputed offsets in the loop.
+          !  At dims=2 the terms and their accumulation order are identical to the original 2-D walk.
+          cstride = fp_grid_strides(dims,nk1)
+          nsupp   = product(k1(1:dims-1))
+          do mout=1,product(m)
+             gidx  = fp_grid_unravel(dims,mout-1,m)                     ! output grid multi-index
+             lbase = [(lidx(gidx(a),a)+1, a=1,dims)]                    ! first coefficient of the support
+             coff0 = fp_grid_index(dims,lbase,cstride)
+
+             !  seed the odometer at the support root (cidx = 1 on every contracted axis)
+             cidx(1:dims-1) = 1
+             coff  = coff0
+             pw(0) = one
+             do a=1,dims-1
+                pw(a) = pw(a-1)*w(gidx(a),cidx(a),a)
              end do
+
+             sp = zero
+             do q=1,nsupp
+                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(gidx(dims),1:k1(dims),dims))
+                if (q==nsupp) exit
+                !  advance: bump the fastest axis; on overflow reset it and carry to the next-slower axis
+                do a=dims-1,1,-1
+                   if (cidx(a)<k1(a)) then
+                      cidx(a) = cidx(a)+1
+                      coff    = coff + cstride(a)
+                      do d=a,dims-1               ! refresh partial products from the changed axis upward
+                         pw(d) = pw(d-1)*w(gidx(d),cidx(d),d)
+                      end do
+                      exit
+                   else
+                      cidx(a) = 1                 ! axis wrapped: rewind its offset, carry to a-1
+                      coff    = coff - (k1(a)-1)*cstride(a)
+                   end if
+                end do
+             end do
+             z(mout) = sp
           end do
           return
       end subroutine fpbisp_nd
