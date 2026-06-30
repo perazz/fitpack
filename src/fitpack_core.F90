@@ -13020,11 +13020,9 @@ module fitpack_core
              endif
           end do
 
-         ! choose the axis for the next knots. new_knot_dimension returns the dimension index
-         ! (KNOT_DIM_1 or KNOT_DIM_2 at dims=2); lastdi then drives the refinement directly, so the
-         ! binary branch collapses to a single dimension-indexed block. The arbiter itself stays
-         ! binary until the dims>2 step replaces it with an argmax over the axes.
-         lastdi = new_knot_dimension(n(1),npl(1),ne(1),n(2),npl(2),ne(2),lastdi)
+         ! choose the axis for the next knots: the uncapped axis with the smallest pending count
+         ! npl(d) (ties to the highest index). lastdi then drives the placement below.
+         lastdi = new_knot_dimension_nd(dims,n,npl,ne)
 
          ! add knots along the chosen axis (lastdi in 1..dims).
          d        = lastdi
@@ -13100,6 +13098,34 @@ module fitpack_core
          end if
 
       end function new_knot_dimension
+
+      !> @brief Choose which axis gets the next knots (N-D form of new_knot_dimension).
+      !!
+      !! Among the uncapped axes (n(d)<ne(d)) picks the one with the smallest pending knot count
+      !! npl(d); ties resolve to the highest axis index. At dims=2 this is bit-for-bit identical to
+      !! new_knot_dimension. The caller guarantees at least one uncapped axis, so dir ends in 1..dims.
+      !!
+      !! @param[in] dims  Number of axes
+      !! @param[in] n     Current knot count per axis
+      !! @param[in] npl   Pending knots to add per axis this iteration
+      !! @param[in] ne    Knot cap per axis (min(nmax,nest))
+      !! @return Dimension index (1..dims) of the axis to refine
+      pure integer(FP_SIZE) function new_knot_dimension_nd(dims,n,npl,ne) result(dir)
+         integer(FP_DIM),  intent(in) :: dims
+         integer(FP_SIZE), intent(in) :: n(dims),npl(dims),ne(dims)
+         integer(FP_DIM) :: d
+
+         dir = KNOT_DIM_NONE
+         do d=1,dims
+            if (n(d)>=ne(d)) cycle              ! axis d is at its cap: skip
+            if (dir==KNOT_DIM_NONE) then
+               dir = d                          ! first uncapped axis
+            elseif (npl(d)<=npl(dir)) then      ! '<=' makes ties favor the higher index
+               dir = d
+            end if
+         end do
+
+      end function new_knot_dimension_nd
 
       !> @brief Apply a Givens plane rotation to two scalars.
       !!

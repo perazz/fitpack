@@ -66,6 +66,9 @@ module fitpack_grid_nd_tests
         ! Gate F: regrid_nd at dims=3 — the first genuine dims>2 FIT (generalized fpgrre_nd solve)
         if (success) success = gate_regrid_nd_3d(useUnit)
 
+        ! Gate G: regrid_nd at dims=3 SMOOTHING (s>0) — the generalized knot-direction arbiter
+        if (success) success = gate_regrid_nd_3d_smoothing(useUnit)
+
         if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all N-D gridded gates OK'
 
     end function test_nd_grid_equivalence
@@ -627,5 +630,105 @@ module fitpack_grid_nd_tests
         end function poly_w
 
     end function gate_regrid_nd_3d
+
+    !> @brief Gate G — regrid_nd at dims=3 SMOOTHING (s>0): the generalized knot-direction arbiter.
+    !!
+    !! The first dims>2 smoothing fit, so the first runtime exercise of the N-D argmax arbiter
+    !! (new_knot_dimension_nd) AND of the p>0 discontinuity branch at dims>2. No legacy dims=3
+    !! reference exists, so the oracle is independent: data is a separable Runge product (NOT in the
+    !! spline space, so smoothing genuinely adds knots). After fitting: (1) success, (2) the smoothing
+    !! identity |fp-s|<=tol*s, (3) knots distributed -- in particular axis 3 received knots, which the
+    !! old literal-2 arbiter could never do, and (4) fp equals the unit-weight SSR recomputed through
+    !! the gate-A/E/F-verified fpbisp_nd.
+    logical function gate_regrid_nd_3d_smoothing(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: kx=3, ky=3, kw=3
+        integer(FP_SIZE), parameter :: mx=9, my=8, mw=7, mz=mx*my*mw
+        integer(FP_SIZE), parameter :: nest=17, maxm=mx, maxk1=kx+1
+        integer(FP_SIZE), parameter :: maxc=(nest-kx-1)**3, lwrk3=4000, kwrk3=200
+
+        real(FP_REAL)    :: t3(nest,3),xg3(maxm,3),c3(maxc),z3(mz),zfit(mz),w3(maxm,maxk1,3)
+        real(FP_REAL)    :: fp0cal,fp,s,lo(3),hi(3),ssr,wrk(lwrk3)
+        integer(FP_SIZE) :: iwrk(kwrk3),n3(3),k3(3),m3(3),nest3(3),nmin3(3),lidx3(maxm,3)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: ix,iy,iw,i,iout
+
+        ok = .true.
+        t3 = zero; xg3 = zero
+        k3 = [kx,ky,kw]; m3 = [mx,my,mw]; nest3 = nest; nmin3 = 2*(k3+1); n3 = nmin3
+        lo = zero; hi = one
+
+        ! strictly-increasing data grids on [0,1] (endpoints included)
+        do i=1,mx; xg3(i,1) = real(i-1,FP_REAL)/real(mx-1,FP_REAL); end do
+        do i=1,my; xg3(i,2) = real(i-1,FP_REAL)/real(my-1,FP_REAL); end do
+        do i=1,mw; xg3(i,3) = real(i-1,FP_REAL)/real(mw-1,FP_REAL); end do
+
+        ! data: separable Runge product (not in the spline space), row-major (x slowest, w fastest)
+        do ix=1,mx
+           do iy=1,my
+              do iw=1,mw
+                 iout = (ix-1)*my*mw + (iy-1)*mw + iw
+                 z3(iout) = runge(xg3(ix,1))*runge(xg3(iy,2))*runge(xg3(iw,3))
+              end do
+           end do
+        end do
+
+        ! calibrate: a huge s returns the least-squares polynomial residual fp0
+        wrk = zero; iwrk = 0
+        call regrid_nd(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,1.0e30_FP_REAL,nest3, &
+                       n3,t3,c3,fp0cal,wrk,lwrk3,iwrk,kwrk3,ier)
+        if (.not.FITPACK_SUCCESS(ier) .or. fp0cal<=zero) then
+           ok = .false.; write(useUnit,3000) 'calibration failed (ier/fp0)', fp0cal; return
+        end if
+
+        ! smoothing fit at s = 1% of the polynomial residual: forces knot addition on every axis
+        s = 1.0e-2_FP_REAL*fp0cal
+        t3 = zero; wrk = zero; iwrk = 0
+        call regrid_nd(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
+                       n3,t3,c3,fp,wrk,lwrk3,iwrk,kwrk3,ier)
+        if (.not.FITPACK_SUCCESS(ier)) then
+           ok = .false.; write(useUnit,'(a,i0)') '[gate G] regrid_nd(dims=3) smoothing failed, ier=',ier; return
+        end if
+
+        ! check 1: smoothing identity -- the solver converges to |fp-s| < tol*s (tol = 1e-3)
+        if (abs(fp-s) > 1.0e-3_FP_REAL*s) then
+           ok = .false.; write(useUnit,3000) '|fp-s| exceeds tol*s', abs(fp-s); return
+        end if
+
+        ! check 2: the new arbiter distributed knots -- axis 3 was refined (impossible for the old
+        ! literal-2 arbiter), and at least two axes received interior knots
+        if (n3(3)<=nmin3(3) .or. count(n3>nmin3)<2) then
+           ok = .false.; write(useUnit,3100) n3(1),n3(2),n3(3); return
+        end if
+
+        ! check 3: fp equals the unit-weight SSR recomputed through the independent fpbisp_nd
+        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,zfit,w3,lidx3)
+        ssr = zero
+        do ix=1,mx
+           do iy=1,my
+              do iw=1,mw
+                 iout = (ix-1)*my*mw + (iy-1)*mw + iw
+                 ssr  = ssr + (z3(iout)-zfit(iout))**2
+              end do
+           end do
+        end do
+        if (abs(ssr-fp) > 1.0e-9_FP_REAL*max(fp,one)) then
+           ok = .false.; write(useUnit,3000) 'fp /= SSR via fpbisp_nd', abs(ssr-fp); return
+        end if
+
+        write(useUnit,'(a)') '[gate G] regrid_nd(dims=3) smoothing converges, distributes knots, fp==SSR'
+
+        3000 format('[gate G] regrid_nd(dims=3) smoothing ',a,' = ',1pe12.3)
+        3100 format('[gate G] regrid_nd(dims=3) knots not distributed: n = ',i0,1x,i0,1x,i0)
+
+    contains
+
+        pure real(FP_REAL) function runge(t)
+            real(FP_REAL), intent(in) :: t
+            runge = one/(one + 20.0_FP_REAL*(t-half)**2)
+        end function runge
+
+    end function gate_regrid_nd_3d_smoothing
 
 end module fitpack_grid_nd_tests
