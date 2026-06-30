@@ -14,8 +14,10 @@
 !                               convention so an x<->y axis/size swap cannot hide behind mx==my
 !     E. fpbisp_nd(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
 !                               splev, and non-separable coeffs vs the dims=2 path combined along z
+!     F. regrid_nd(dims=3) least-squares FIT on given knots (slice 3) — the generalized fpgrre_nd solve
+!                               recovers an in-space polynomial; checked vs the closed-form (fpbisp_nd)
 !
-!   See todo/fitpack_nd_grids.md (slices 1–2) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
+!   See todo/fitpack_nd_grids.md (slices 1–3) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
 ! **************************************************************************************************
 module fitpack_grid_nd_tests
     use fitpack_core
@@ -60,6 +62,9 @@ module fitpack_grid_nd_tests
 
         ! Gate E: fpbisp_nd at dims=3 vs two independent references (the first genuine dims>2 path)
         if (success) success = gate_fpbisp_nd_3d(useUnit)
+
+        ! Gate F: regrid_nd at dims=3 — the first genuine dims>2 FIT (generalized fpgrre_nd solve)
+        if (success) success = gate_regrid_nd_3d(useUnit)
 
         if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all N-D gridded gates OK'
 
@@ -190,15 +195,13 @@ module fitpack_grid_nd_tests
         integer(FP_FLAG) :: ier_t
         ! shared
         real(FP_REAL)    :: zin(size(daregr_x)*size(daregr_y)),xb,xe,yb,ye,s,lo(2),hi(2)
-        real(FP_REAL)    :: zin2(size(daregr_y),size(daregr_x))   ! rank-2 (my,mx) data for regrid_nd
         integer(FP_SIZE) :: kx,ky,iopt,icase,i
         character(len=40):: lbl
 
         ok = .true.
         mx = size(daregr_x,kind=FP_SIZE); my = size(daregr_y,kind=FP_SIZE)
         xb = daregr_x(1); xe = daregr_x(mx); yb = daregr_y(1); ye = daregr_y(my)
-        zin = reshape(daregr_z,[mx*my])
-        zin2 = reshape(zin,[my,mx])        ! same bytes as zin, shaped (my,mx) = (ny,nx)
+        zin = reshape(daregr_z,[mx*my])    ! flat row-major (x slowest, y fastest) = regrid_nd's z contract
 
         ! regrid_nd marshalling that is constant across calls
         m2 = [mx,my]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
@@ -216,7 +219,7 @@ module fitpack_grid_nd_tests
             end select
             call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                         nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
+            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'cubic iopt-chain #',icase
             if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
@@ -229,7 +232,7 @@ module fitpack_grid_nd_tests
         kx = 5; ky = 5; kk = [kx,ky]; iopt = 0; s = 0.2_FP_REAL
         call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                     nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-        call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
+        call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.pair_ok(useUnit,'quintic fresh iopt=0',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
                          ntst,ttst,ctst,fptst,ier_t)) then
@@ -244,7 +247,7 @@ module fitpack_grid_nd_tests
         ttst(kx+2:kx+4,1) = txr(kx+2:kx+4); ttst(ky+2:ky+4,2) = tyr(ky+2:ky+4)
         call regrid(-1_FP_FLAG,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
                     nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-        call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
+        call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.pair_ok(useUnit,'lsq given knots iopt=-1',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
                          ntst,ttst,ctst,fptst,ier_t)) then
@@ -266,7 +269,7 @@ module fitpack_grid_nd_tests
         integer, intent(in) :: useUnit
 
         integer(FP_SIZE), parameter :: MX = 9, MY = 13
-        real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY),zin2(MY,MX)
+        real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY)
         ! reference (regrid)
         integer(FP_SIZE) :: nxr,nyr
         real(FP_REAL)    :: txr(NXEST),tyr(NYEST),cr(NCMAX),fpr,wrkr(LWRK)
@@ -295,7 +298,6 @@ module fitpack_grid_nd_tests
                               + xg1(i)*yg1(j)
            end do
         end do
-        zin2 = reshape(zin,[MY,MX])        ! same bytes as zin, shaped (my,mx) = (ny,nx)
 
         xb = xg1(1); xe = xg1(MX); yb = yg1(1); ye = yg1(MY)
         m2 = [MX,MY]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
@@ -310,7 +312,7 @@ module fitpack_grid_nd_tests
             end select
             call regrid(iopt,MX,xg1,MY,yg1,zin,xb,xe,yb,ye,kk(1),kk(2),s,NXEST,NYEST, &
                         nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin2,lo,hi,kk,s,nest2, &
+            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'non-square 9x13 #',icase
             if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
@@ -506,5 +508,124 @@ module fitpack_grid_nd_tests
 
         3000 format('[gate E] fpbisp_nd(dims=3) /= ',a,' reference  (max |diff| = ',1pe12.3,')')
     end function gate_fpbisp_nd_3d
+
+    !> @brief Gate F — regrid_nd at dims=3 (least-squares fit on given knots) vs a closed-form oracle.
+    !!
+    !! The first genuine dims>2 FIT path: the generalized fpgrre_nd solve (alternating-direction
+    !! reduction + ping-pong buffer + back-substitution + residual contraction). Data is a separable
+    !! in-space polynomial f(x,y,w)=Px(x)*Py(y)*Pw(w) with deg Px/Py/Pw = kx/ky/kw, which lies EXACTLY
+    !! in the tensor B-spline space for any clamped knots. Fit via regrid_nd(dims=3, iopt=-1) on
+    !! hand-built clamped knots with nk1(d)<m(d) (genuinely over-determined, so the residual path runs);
+    !! the binary knot-direction arbiter is provably untouched on the iopt<0 path. Two independent
+    !! checks: the residual fp must vanish, and the fitted spline -- evaluated by the gate-A/E-verified
+    !! fpbisp_nd(dims=3) at strictly-interior probe points off the data grid -- must reproduce the
+    !! closed-form f. Distinct per-axis orders and grid sizes, so an axis swap cannot pass unnoticed.
+    logical function gate_regrid_nd_3d(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: kx=3, ky=2, kw=4
+        integer(FP_SIZE), parameter :: nk1x=6, nk1y=5, nk1w=7
+        integer(FP_SIZE), parameter :: mx=8, my=6, mw=10
+        integer(FP_SIZE), parameter :: nxk=nk1x+kx+1, nyk=nk1y+ky+1, nwk=nk1w+kw+1   ! 10,8,12
+        integer(FP_SIZE), parameter :: maxn=nwk, maxk1=kw+1, nc3=nk1x*nk1y*nk1w, mz3=mx*my*mw
+        integer(FP_SIZE), parameter :: mpx=5, mpy=4, mpw=6, maxmp=mpw   ! interior probe grid
+        real(FP_REAL),    parameter :: tol=1.0e-10_FP_REAL
+
+        real(FP_REAL)    :: t3(maxn,3),xg3(mw,3),c3(nc3),z3(mz3),fpf,lo(3),hi(3),s
+        real(FP_REAL)    :: wrk(LWRK)
+        integer(FP_SIZE) :: iwrk(KWRK),n3(3),k3(3),m3(3),nest3(3)
+        integer(FP_FLAG) :: ier
+        ! probe / closed-form oracle
+        real(FP_REAL)    :: xgp(maxmp,3),zp(mpx*mpy*mpw),wp(maxmp,maxk1,3)
+        integer(FP_SIZE) :: lidxp(maxmp,3),mp3(3)
+        real(FP_REAL)    :: x,y,w,maxdiff
+        integer(FP_SIZE) :: ix,iy,iw,i,iout
+
+        ok = .true.
+        t3 = zero; xg3 = zero; xgp = zero
+        k3 = [kx,ky,kw]; m3 = [mx,my,mw]; lo = zero; hi = one
+
+        ! clamped knot vectors on [0,1]; nest = exact knot counts (least-squares on given knots)
+        call clamped_unit_knots(kx,nk1x,t3(:,1),n3(1))
+        call clamped_unit_knots(ky,nk1y,t3(:,2),n3(2))
+        call clamped_unit_knots(kw,nk1w,t3(:,3),n3(3))
+        nest3 = n3
+
+        ! strictly-increasing data grids on [0,1] (endpoints included)
+        do i=1,mx; xg3(i,1) = real(i-1,FP_REAL)/real(mx-1,FP_REAL); end do
+        do i=1,my; xg3(i,2) = real(i-1,FP_REAL)/real(my-1,FP_REAL); end do
+        do i=1,mw; xg3(i,3) = real(i-1,FP_REAL)/real(mw-1,FP_REAL); end do
+
+        ! data: separable in-space polynomial, row-major (x slowest, w fastest)
+        do ix=1,mx
+           x = xg3(ix,1)
+           do iy=1,my
+              y = xg3(iy,2)
+              do iw=1,mw
+                 w = xg3(iw,3)
+                 iout = (ix-1)*my*mw + (iy-1)*mw + iw
+                 z3(iout) = poly_x(x)*poly_y(y)*poly_w(w)
+              end do
+           end do
+        end do
+
+        ! least-squares fit on the given clamped knots (iopt=-1): the arbiter-free dims=3 solve
+        s = zero; wrk = zero; iwrk = 0
+        call regrid_nd(-1_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
+                       n3,t3,c3,fpf,wrk,LWRK,iwrk,KWRK,ier)
+        if (ier/=FITPACK_OK) then
+           ok = .false.; write(useUnit,'(a,i0)') '[gate F] regrid_nd(dims=3) fit failed, ier=',ier; return
+        end if
+
+        ! check 1: data exactly in space -> least-squares residual must vanish
+        if (fpf>=1.0e-9_FP_REAL) then
+           ok = .false.; write(useUnit,3000) 'nonzero residual fp', fpf; return
+        end if
+
+        ! check 2: reconstruction at strictly-interior probe points off the data grid vs closed-form f
+        mp3 = [mpx,mpy,mpw]
+        do i=1,mpx; xgp(i,1) = (real(i,FP_REAL)-half)/real(mpx,FP_REAL); end do
+        do i=1,mpy; xgp(i,2) = (real(i,FP_REAL)-half)/real(mpy,FP_REAL); end do
+        do i=1,mpw; xgp(i,3) = (real(i,FP_REAL)-half)/real(mpw,FP_REAL); end do
+
+        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xgp,mp3,zp,wp,lidxp)
+
+        maxdiff = zero
+        do ix=1,mpx
+           x = xgp(ix,1)
+           do iy=1,mpy
+              y = xgp(iy,2)
+              do iw=1,mpw
+                 w = xgp(iw,3)
+                 iout = (ix-1)*mpy*mpw + (iy-1)*mpw + iw
+                 maxdiff = max(maxdiff, abs(zp(iout)-poly_x(x)*poly_y(y)*poly_w(w)))
+              end do
+           end do
+        end do
+        if (maxdiff>=tol) then
+           ok = .false.; write(useUnit,3100) maxdiff; return
+        end if
+
+        write(useUnit,'(a)') '[gate F] regrid_nd(dims=3) least-squares fit reproduces in-space polynomial'
+
+        3000 format('[gate F] regrid_nd(dims=3) ',a,' = ',1pe12.3)
+        3100 format('[gate F] regrid_nd(dims=3) fit /= closed-form f  (max |diff| = ',1pe12.3,')')
+
+    contains
+
+        pure real(FP_REAL) function poly_x(x)
+            real(FP_REAL), intent(in) :: x
+            poly_x = 1.0_FP_REAL + 0.5_FP_REAL*x - 0.3_FP_REAL*x**2 + 0.2_FP_REAL*x**3
+        end function poly_x
+        pure real(FP_REAL) function poly_y(y)
+            real(FP_REAL), intent(in) :: y
+            poly_y = 0.8_FP_REAL - 0.4_FP_REAL*y + 0.6_FP_REAL*y**2
+        end function poly_y
+        pure real(FP_REAL) function poly_w(w)
+            real(FP_REAL), intent(in) :: w
+            poly_w = 1.2_FP_REAL + 0.3_FP_REAL*w - 0.5_FP_REAL*w**2 + 0.1_FP_REAL*w**3 + 0.15_FP_REAL*w**4
+        end function poly_w
+
+    end function gate_regrid_nd_3d
 
 end module fitpack_grid_nd_tests

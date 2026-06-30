@@ -7409,24 +7409,29 @@ module fitpack_core
       !! \f]
       !!
       !! The per-axis QR factorizations are performed independently using
-      !! fp_rotate_row_stride (row-access RHS for \f$ A_y \f$) and fp_rotate_row_block
-      !! (column-access RHS for \f$ A_x \f$), followed by back-substitution; residual
-      !! sums `fpint` per knot interval are also computed for knot-placement decisions.
-      !! At `dims=2` this is bit-for-bit identical to fpgrre: the per-axis housekeeping
-      !! is a runtime do-loop over the axes, while the alternating-direction reductions,
-      !! the two-pass back-substitution and the residual contraction are kept literal-2
-      !! until the dims>2 step. The per-axis band/observation/discontinuity arrays are
-      !! merged into rank-3 arrays with a uniform leading dimension (`lda`/`ldb`), passed
-      !! as the explicit leading-dim argument to fp_rotate_*, fpback and fpdisc so every
-      !! addressed element coincides with the original's separately-sized matrices — no
-      !! copies, no value change.
+      !! fp_rotate_row_block (column-access RHS) for the leading axes `1..dims-1` and
+      !! fp_rotate_row_stride (row-access RHS) for the final axis, followed by per-axis
+      !! back-substitution; residual sums `fpint` per knot interval are also computed for
+      !! knot-placement decisions. This is the dimension-generic form: each pass reduces
+      !! one axis, with the partially-reduced right-hand side held in a row-major
+      !! "ping-pong" buffer that, after pass `i`, stores (coefficients along axes `1..i`)
+      !! x (data along axes `i+1..dims`). At `dims=2` it is bit-for-bit identical to
+      !! fpgrre: the leading pass is the single `A_x` block reduction (RHS width `my`),
+      !! the final pass the `A_y` stride reduction, the back-substitution solves `R_dims`
+      !! then descends to `R_1`, and the residual contraction is the same per-cell walk
+      !! (the support sweep is a mixed-radix odometer whose innermost `dot_product` runs
+      !! over the fastest axis — the floating-point reassociation anchor). The per-axis
+      !! band/observation/discontinuity arrays are merged into rank-3 arrays with a
+      !! uniform leading dimension (`lda`/`ldb`), passed as the explicit leading-dim
+      !! argument to fp_rotate_*, fpback and fpdisc so every addressed element coincides
+      !! with the original's separately-sized matrices — no copies, no value change.
       !!
       !! @param[in]     dims    Number of axes (domain dimension)
       !! @param[in,out] ifs     Per-axis flag: 0 = recompute observation matrix \f$ S_p \f$ (orig ifsx,ifsy)
       !! @param[in,out] ifb     Per-axis flag: 0 = recompute discontinuity matrix \f$ B \f$ (orig ifbx,ifby)
       !! @param[in]     xg      Per-axis grid values; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]     m       Number of grid points per axis, `m(dims)`
-      !! @param[in]     z       Data on the grid, `z(m(2),m(1))`, (ny,nx)-ordered (axis-2 fastest)
+      !! @param[in]     z       Data on the grid, flat `z(product(m))`, row-major (axis 1 slowest)
       !! @param[in]     k       Degree per axis, `k(dims)`
       !! @param[in]     t       Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
       !! @param[in]     n       Number of knots per axis, `n(dims)`
@@ -7435,11 +7440,11 @@ module fitpack_core
       !! @param[in]     nc      Length of `c`
       !! @param[in,out] fp      Total weighted sum of squared residuals
       !! @param[in,out] fpint   Residual sums per knot interval, per axis (orig fpx,fpy)
-      !! @param[in]     mm      Work dimension
-      !! @param[in]     mynx    Work dimension (\f$ my \cdot (nx - kx - 1) \f$)
+      !! @param[in]     mm      Work dimension: widest gathered RHS fiber
+      !! @param[in]     mynx    Work dimension: two ping-pong buffers (\f$ my \cdot (nx-kx-1) \f$ at dims=2)
       !! @param[in,out] sp      Per-axis B-spline observation matrices (orig spx,spy)
       !! @param[in,out] right   Work: RHS vector for row rotations, length `mm`
-      !! @param[in,out] q       Work: RHS matrix, length `mynx`
+      !! @param[in,out] q       Work: ping-pong RHS buffer (two halves at dims>2), length `mynx`
       !! @param[in,out] a       Per-axis band matrices, uniform leading dim (orig ax,ay)
       !! @param[in,out] b       Per-axis discontinuity-jump matrices, uniform leading dim (orig bx,by)
       !! @param[in,out] nr      Per-axis knot interval indices (orig nrx,nry)
@@ -7457,26 +7462,30 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),n(dims)
       integer(FP_SIZE), intent(inout) :: ifs(dims),ifb(dims)
       !  ..array arguments..
-      !  z(m(2),m(1)): gridded data tensor as a genuine 2-D array -- leading dim m(2) (= my, the y/
-      !  axis-2 data count) FASTEST, trailing dim m(1) (= mx, axis-1) SLOWEST, i.e. (ny,nx) and NOT
-      !  (nx,ny). Element z(i2,i1) is the datum at (x_i1,y_i2); this is bit-for-bit the legacy flat
-      !  layout z((i1-1)*my+i2). Generalizes to z(m(dims),...,m(1)) at the dims>2 step.
-      real(FP_REAL),    intent(in)              :: z(m(2),m(1))
+      !  z(product(m)): gridded data tensor, flat row-major over the dims axes -- axis 1 SLOWEST,
+      !  axis dims FASTEST (stride 1). The datum at multi-index (i1,...,id) is z(fp_grid_index+1).
+      !  At dims=2 element z((i1-1)*my+i2) is the datum at (x_i1,y_i2) -- bit-for-bit the legacy
+      !  layout (the old rank-2 z(m(2),m(1)) had identical bytes: y/axis-2 fastest).
+      real(FP_REAL),    intent(in)              :: z(product(m))
       real(FP_REAL),    intent(in),  contiguous :: xg(:,:),t(:,:)
       real(FP_REAL),    intent(inout)           :: c(nc),right(mm),q(mynx)
       real(FP_REAL),    intent(inout), contiguous :: fpint(:,:),sp(:,:,:),a(:,:,:),b(:,:,:)
       integer(FP_SIZE), intent(inout), contiguous :: nr(:,:)
       !  ..local scalars..
-      real(FP_REAL) :: arg,fac,pinv,term
-      integer(FP_DIM)  :: d
-      integer(FP_SIZE) :: i,ibandx,ibandy,irot,it,i1,i2,j,kk,kc,l,l1,ncof,nrold,nroldx,nroldy,&
-                          number,numx,numx1,numy,numy1,n1,lda,ldb
-      !  ..per-axis sizes..
-      integer(FP_SIZE) :: k1(dims),k2(dims),nk1(dims)
-      !  ..literal-2 aliases for the frozen kernels (axis 1 = x, axis 2 = y)..
-      integer(FP_SIZE) :: kx1,ky1,kx2,ky2,mx,my,nk1x,nk1y
+      real(FP_REAL) :: arg,fac,pinv,term,sp_val
+      integer(FP_DIM)  :: d,a_ax,dd
+      integer(FP_SIZE) :: i,j,l,l1,irot,it,ncof,nrold,number,n1,lda,ldb
+      !  forward-solve / ping-pong bookkeeping
+      integer(FP_SIZE) :: pp,ibase,obase,ibuf,obuf,hhalf,td_trail,pd_lead
+      !  back-substitution bookkeeping
+      integer(FP_SIZE) :: nlead,ntrail,pl,tl,base
+      !  residual-contraction odometer
+      integer(FP_SIZE) :: coff0,coff,nsupp,mout,qq,num,nrold_d
+      !  ..per-axis sizes / state..
+      integer(FP_SIZE) :: k1(dims),k2(dims),nk1(dims),iband(dims),cstr(dims)
+      integer(FP_SIZE) :: gidx(dims),cidx(dims),lbase(dims)
       !  ..local arrays..
-      real(FP_REAL) :: h(MAX_ORDER+1)
+      real(FP_REAL) :: h(MAX_ORDER+1),pw(0:dims-1)
 
       !  per-axis order and coefficient extents
       k1  = k+1
@@ -7520,154 +7529,191 @@ module fitpack_core
       end if
 
       !  ======================================================================================
-      !  Frozen literal-2 kernels below (kept until the dims>2 step). Axis 1 = x, axis 2 = y.
-      !  Only mechanical renames vs fpgrre: paired arrays -> rank-3 page (:,:,d), paired counts
-      !  -> aliases, the leading-dim arguments nx/ny -> the uniform lda, and the coefficient-index
-      !  scalar k1 -> kc (to free the name k1 for the per-axis array).
+      !  Dimension-generic alternating-direction solve. Every coefficient/data buffer is canonical
+      !  row-major over the dims axes (axis 1 slowest, axis dims fastest, stride 1). Pass d reduces
+      !  axis d; the partially-reduced RHS lives in a ping-pong buffer that, after pass i, stores
+      !  (coefficients along axes 1..i) x (data along axes i+1..dims). The leading passes 1..dims-1
+      !  use the column-access block rotation; the final pass dims uses the row-access stride
+      !  rotation, writing the coefficient tensor c. At dims=2 this is the literal A_x then A_y
+      !  reduction, bit-for-bit.
       !  ======================================================================================
-      kx1 = k1(1); ky1 = k1(2)
-      kx2 = k2(1); ky2 = k2(2)
-      mx  = m(1) ; my  = m(2)
-      nk1x = nk1(1); nk1y = nk1(2)
+      cstr  = fp_grid_strides(dims,nk1)            ! cstr(d) = product(nk1(d+1:dims)); cstr(dims)=1
+      hhalf = mynx/2                               ! ping-pong half size (only dims>2 uses both halves)
 
-      !  reduce the matrix (ax) to upper triangular form (rx) using givens rotations. apply the
-      !  same transformations to the rows of matrix q to obtain the my x (nx-kx-1) matrix g.
-      l = my*nk1x
-      q(1:l) = zero
-      a(1:nk1x,1:kx2,1) = zero
-      l = 0
-      nrold = 0
-      ibandx = kx1
-      givens_ax: do it=1,mx
-         number = nr(it,1)
-         inner_ax: do
-           if(nrold==number) then
-              h(ibandx) = zero
-              h(1:kx1) = sp(it,1:kx1,1)
-              right(1:my) = z(1:my,it)      ! column it of the (my,mx) data tensor
-              irot = number
-           elseif (p<=zero) then
-              nrold = nrold+1
-              cycle inner_ax
-           else
-              ibandx = kx2
-              n1 = nrold+1
-              h(1:kx2) = b(n1,1:kx2,1)*pinv
-              right(1:my) = zero
-              irot = nrold
-           endif
+      forward: do d=1,dims
+         td_trail = product(m(d+1:dims))           ! trailing (not-yet-reduced) data axes; =1 at d=dims
+         pd_lead  = product(nk1(1:d-1))            ! leading (already-reduced) coeff axes; =1 at d=1
+         iband(d) = k1(d)
 
-           call fp_rotate_row_block(h, ibandx, a(:,:,1), lda, right, q, my, irot)
+         if (d<dims) then
 
-           if (nrold==number) exit inner_ax
-
-           nrold = nrold+1
-         end do inner_ax
-      end do givens_ax
-
-      !  reduce the matrix (ay) to upper triangular form (ry) using givens rotations. apply the same
-      !  transformations to the columns of matrix g to obtain the (ny-ky-1) x (nx-kx-1) matrix h.
-      ncof = nk1x*nk1y
-
-      c(1:ncof) = zero
-      a(1:nk1y,1:ky2,2) = zero
-      nrold = 0
-
-      ibandy = ky1
-      givens_ay: do it=1,my
-         number = nr(it,2)
-         inner_ay: do
-            if (nrold==number) then
-                h(ibandy) = zero
-                h(1:ky1) = sp(it,1:ky1,2)
-                l = it
-                do j=1,nk1x
-                   right(j) = q(l)
-                   l = l+my
-                end do
-                irot = number
-            elseif (p<=zero) then
-                nrold = nrold+1
-                cycle inner_ay
-            else
-                ibandy = ky2
-                n1 = nrold+1
-                h(1:ky2) = b(n1,1:ky2,2)*pinv
-                right(1:nk1x) = zero
-                irot = nrold
-            endif
-
-            call fp_rotate_row_stride(h, ibandy, a(:,:,2), lda, right, c, nk1y, nk1x, irot)
-            if (nrold==number) exit inner_ay
-            nrold = nrold+1
-         end do inner_ay
-      end do givens_ay
-
-      !  backward substitution to obtain the b-spline coefficients as the
-      !  solution of the linear system    (ry) c (rx)' = h.
-      !  first step: solve the system  (ry) (c1) = h.
-      kk = 1
-      do i=1,nk1x
-        c(kk:kk+nk1y-1) = fpback(a(:,:,2),c(kk),nk1y,ibandy,lda)
-        kk = kk+nk1y
-      end do
-
-      !  second step: solve the system  c (rx)' = (c1).
-      kk = 0
-      do j=1,nk1y
-         kk = kk+1
-         l = kk
-         do i=1,nk1x
-            right(i) = c(l)
-            l = l+nk1y
-         end do
-         right(:nk1x) = fpback(a(:,:,1),right,nk1x,ibandx,lda)
-         l = kk
-         do i=1,nk1x
-            c(l) = right(i)
-            l = l+nk1y
-         end do
-      end do
-
-      !  calculate the quantities res(i,j), fp, fpx(.) and fpy(.) (-> fpint(:,1) and fpint(:,2)).
-      fp     = zero
-      fpint(:,1) = zero
-      fpint(:,2) = zero
-      nk1y   = nk1(2)
-      nroldx = 0
-
-      !  main loop for the different grid points.
-      grid_x: do i1=1,mx
-         numx = nr(i1,1)
-         numx1 = numx+1
-         nroldy = 0
-         grid_y: do i2=1,my
-            numy = nr(i2,2)
-            numy1 = numy+1
-            term = zero
-            kc = numx*nk1y+numy
-            do l1=1,kx1
-               term = term+sp(i1,l1,1)*dot_product(sp(i2,1:ky1,2),c(kc+1:kc+ky1))
-               kc = kc+nk1y
+            !  ---- block reduction of axis d: RHS = the td_trail contiguous trailing entries ----
+            !  reduce a(:,:,d) to upper triangular form, applying the same rotations to the trailing
+            !  data block to obtain the next ping-pong buffer. b_{d-1} (= z at d=1) -> b_d.
+            obuf = merge(0_FP_SIZE, hhalf, mod(d,2)==1)
+            q(obuf+1:obuf+pd_lead*nk1(d)*td_trail) = zero
+            do pp=1,pd_lead                        ! one independent reduction per leading slab
+               a(1:nk1(d),1:k2(d),d) = zero
+               nrold    = 0
+               iband(d) = k1(d)
+               obase = obuf + (pp-1)*nk1(d)*td_trail
+               do it=1,m(d)
+                  number = nr(it,d)
+                  inner_block: do
+                     if (nrold==number) then
+                        h(iband(d)) = zero
+                        h(1:k1(d))  = sp(it,1:k1(d),d)
+                        if (d==1) then
+                           ibase = (it-1)*td_trail
+                           right(1:td_trail) = z(ibase+1:ibase+td_trail)
+                        else
+                           ibuf  = merge(0_FP_SIZE, hhalf, mod(d-1,2)==1)
+                           ibase = ibuf + (pp-1)*m(d)*td_trail + (it-1)*td_trail
+                           right(1:td_trail) = q(ibase+1:ibase+td_trail)
+                        end if
+                        irot = number
+                     elseif (p<=zero) then
+                        nrold = nrold+1
+                        cycle inner_block
+                     else
+                        iband(d)   = k2(d)
+                        n1         = nrold+1
+                        h(1:k2(d)) = b(n1,1:k2(d),d)*pinv
+                        right(1:td_trail) = zero
+                        irot = nrold
+                     end if
+                     call fp_rotate_row_block(h, iband(d), a(:,:,d), lda, right, q(obase+1), td_trail, irot)
+                     if (nrold==number) exit inner_block
+                     nrold = nrold+1
+                  end do inner_block
+               end do
             end do
 
-            term = (z(i2,i1)-term)**2      ! datum at (x_i1,y_i2); rank-2 (my,mx) access
-            fp = fp+term
-            fpint(numx1,1) = fpint(numx1,1)+term
-            fpint(numy1,2) = fpint(numy1,2)+term
-            fac = term*half
-            if (numy/=nroldy) then
-               fpint(numy1,2) = fpint(numy1,2)-fac
-               fpint(numy,2)  = fpint(numy,2) +fac
-            endif
-            nroldy = numy
-            if (numx/=nroldx) then
-               fpint(numx1,1) = fpint(numx1,1)-fac
-               fpint(numx,1)  = fpint(numx,1) +fac
-            endif
-         end do grid_y
-         nroldx = numx
-      end do grid_x
+         else
+
+            !  ---- stride reduction of the final axis: RHS = the pd_lead leading coeff combos ----
+            !  reduce a(:,:,dims), applying the rotations to the columns of the last buffer to obtain
+            !  the (nk1(dims)) x (pd_lead) coefficient tensor c.
+            ncof = product(nk1)
+            c(1:ncof) = zero
+            a(1:nk1(dims),1:k2(dims),dims) = zero
+            nrold    = 0
+            iband(dims) = k1(dims)
+            ibuf = merge(0_FP_SIZE, hhalf, mod(dims-1,2)==1)
+            do it=1,m(dims)
+               number = nr(it,dims)
+               inner_stride: do
+                  if (nrold==number) then
+                     h(iband(dims)) = zero
+                     h(1:k1(dims))  = sp(it,1:k1(dims),dims)
+                     do j=1,pd_lead
+                        right(j) = q(ibuf + (j-1)*m(dims) + it)
+                     end do
+                     irot = number
+                  elseif (p<=zero) then
+                     nrold = nrold+1
+                     cycle inner_stride
+                  else
+                     iband(dims)   = k2(dims)
+                     n1            = nrold+1
+                     h(1:k2(dims)) = b(n1,1:k2(dims),dims)*pinv
+                     right(1:pd_lead) = zero
+                     irot = nrold
+                  end if
+                  call fp_rotate_row_stride(h, iband(dims), a(:,:,dims), lda, right, c, nk1(dims), pd_lead, irot)
+                  if (nrold==number) exit inner_stride
+                  nrold = nrold+1
+               end do inner_stride
+            end do
+
+         end if
+      end do forward
+
+      !  ---- back-substitution: solve the per-axis triangular systems, axis dims down to axis 1 ----
+      !  (the R_d^{-1} operators do not commute in floating point, so the order is the reverse of the
+      !  forward reduction). For each axis d, solve every line along axis d through the coeff tensor:
+      !  contiguous (stride 1) in place, strided via gather/solve/scatter. At dims=2 this is the
+      !  literal (R_y) then (R_x) two-step solve.
+      do d=dims,1,-1
+         nlead  = product(nk1(1:d-1))
+         ntrail = cstr(d)
+         do pl=1,nlead
+            do tl=1,ntrail
+               base = (pl-1)*nk1(d)*ntrail + (tl-1)
+               if (ntrail==1) then
+                  c(base+1:base+nk1(d)) = fpback(a(:,:,d),c(base+1),nk1(d),iband(d),lda)
+               else
+                  do i=1,nk1(d)
+                     right(i) = c(base+(i-1)*ntrail+1)
+                  end do
+                  right(1:nk1(d)) = fpback(a(:,:,d),right,nk1(d),iband(d),lda)
+                  do i=1,nk1(d)
+                     c(base+(i-1)*ntrail+1) = right(i)
+                  end do
+               end if
+            end do
+         end do
+      end do
+
+      !  ---- residual: fp and the per-axis interval residual sums fpint(:,d) (orig fpx,fpy) ----
+      !  walk the output grid row-major; for each cell contract the k1(1)x...x k1(dims) coefficient
+      !  support against the per-axis basis tables sp via a mixed-radix odometer (innermost
+      !  dot_product over the fastest axis = reassociation anchor), then accumulate fp and split each
+      !  axis's boundary residual half-and-half on its interval transitions. At dims=2 the terms,
+      !  their accumulation order and the half-splits are identical to the original grid_x/grid_y walk.
+      fp = zero
+      fpint(:,1:dims) = zero
+      nsupp = product(k1(1:dims-1))
+      grid_points: do mout=1,product(m)
+         gidx  = fp_grid_unravel(dims,mout-1,m)                ! output grid multi-index
+         lbase = [(nr(gidx(a_ax),a_ax)+1, a_ax=1,dims)]        ! first coefficient of the support
+         coff0 = fp_grid_index(dims,lbase,cstr)                ! = numx*nk1y+numy at dims=2
+
+         cidx(1:dims-1) = 1
+         coff  = coff0
+         pw(0) = one
+         do a_ax=1,dims-1
+            pw(a_ax) = pw(a_ax-1)*sp(gidx(a_ax),cidx(a_ax),a_ax)
+         end do
+
+         sp_val = zero
+         do qq=1,nsupp
+            sp_val = sp_val + pw(dims-1)*dot_product(sp(gidx(dims),1:k1(dims),dims),c(coff+1:coff+k1(dims)))
+            if (qq==nsupp) exit
+            do a_ax=dims-1,1,-1
+               if (cidx(a_ax)<k1(a_ax)) then
+                  cidx(a_ax) = cidx(a_ax)+1
+                  coff       = coff + cstr(a_ax)
+                  do dd=a_ax,dims-1
+                     pw(dd) = pw(dd-1)*sp(gidx(dd),cidx(dd),dd)
+                  end do
+                  exit
+               else
+                  cidx(a_ax) = 1
+                  coff       = coff - (k1(a_ax)-1)*cstr(a_ax)
+               end if
+            end do
+         end do
+
+         term = (z(mout)-sp_val)**2
+         fp   = fp + term
+         fac  = term*half
+         do d=1,dims
+            num = nr(gidx(d),d)
+            fpint(num+1,d) = fpint(num+1,d) + term
+            !  "did axis d's knot interval change vs the previous cell along axis d?" -- a pure
+            !  function of gidx(d) (avoid evaluating nr(0,d) at the axis origin).
+            if (gidx(d)>=2) then
+               nrold_d = nr(gidx(d)-1,d)
+            else
+               nrold_d = 0_FP_SIZE
+            end if
+            if (num/=nrold_d) then
+               fpint(num+1,d) = fpint(num+1,d) - fac
+               fpint(num,  d) = fpint(num,  d) + fac
+            end if
+         end do
+      end do grid_points
       return
       end subroutine fpgrre_nd
 
@@ -12782,7 +12828,7 @@ module fitpack_core
       !! @param[in]     dims    Number of axes (domain dimension)
       !! @param[in]     xg      Per-axis grid values; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]     m       Number of grid points per axis, `m(dims)`
-      !! @param[in]     z       Data values, `z(m(2),m(1))`, (ny,nx)-ordered (passed through to fpgrre_nd)
+      !! @param[in]     z       Data values, flat `z(product(m))`, row-major (passed through to fpgrre_nd)
       !! @param[in]     lo      Per-axis lower boundary (orig xb,yb)
       !! @param[in]     hi      Per-axis upper boundary (orig xe,ye)
       !! @param[in]     k       Degree per axis, `k(dims)`
@@ -12829,9 +12875,9 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: n(dims),nplus(dims)
       real(FP_REAL),    intent(inout) :: reduc(dims)
       !  ..array arguments (data + caller-supplied workspace views)..
-      !  z(m(2),m(1)): gridded data as a 2-D array, (ny,nx)-ordered (y/axis-2 fastest); passed
-      !  straight to fpgrre_nd, which documents and indexes the convention. fpregr_nd never reads z.
-      real(FP_REAL),    intent(in)               :: z(m(2),m(1))
+      !  z(product(m)): flat row-major gridded data (axis 1 slowest); passed straight to fpgrre_nd,
+      !  which documents and indexes the convention. fpregr_nd never reads z.
+      real(FP_REAL),    intent(in)               :: z(product(m))
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:),fpint(:,:),sp(:,:,:),right(:),q(:),a(:,:,:),b(:,:,:)
       integer(FP_SIZE), intent(inout), contiguous :: nr(:,:),nrdat(:,:)
@@ -17923,8 +17969,10 @@ module fitpack_core
       !! Minimum sizes:
       !!   lwrk >= 2 + dims + nestmax*dims + mmax*(kmax+1)*dims + 2*nestmax*(kmax+2)*dims + mm + mq
       !!   kwrk >= 1 + dims + mmax*dims + nestmax*dims
-      !! with mmax=maxval(m), nestmax=maxval(nest), kmax=maxval(k), mm=max(nestmax,mmax),
-      !! mq=mmax*nestmax.
+      !! with mmax=maxval(m), nestmax=maxval(nest), kmax=maxval(k). At dims=2, mm=max(nestmax,mmax)
+      !! and mq=mmax*nestmax. At dims>2 the two ping-pong buffers grow: with nk1max=nest-(k+1),
+      !! mq = 2*max_{i=1..dims-1} [ product(nk1max(1:i)) * product(m(i+1:dims)) ] and
+      !! mm = max(nestmax, mmax, product(m(2:dims)), product(nk1max(1:dims-1))).
       !!
       !! @see regrid, fpregr_nd; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4.
       pure subroutine regrid_nd(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier)
@@ -17940,7 +17988,7 @@ module fitpack_core
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),nest(dims)
       real(FP_REAL),    intent(in)    :: lo(dims),hi(dims)
       integer(FP_SIZE), intent(inout) :: n(dims)
-      real(FP_REAL),    intent(in)              :: z(m(2),m(1))  ! gridded data, (ny,nx)/y-fast (dims=2)
+      real(FP_REAL),    intent(in)              :: z(product(m))  ! flat row-major gridded data (axis 1 slowest)
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:)
       real(FP_REAL),    intent(inout)             :: c(*)
@@ -17978,6 +18026,23 @@ module fitpack_core
       maxk2   = maxval(k)+2
       mm      = max(maxnest,maxm)
       mynx    = maxm*maxnest
+
+      !  dims>2: grow the two literal-2 buffers to the N-D requirement. right (mm) holds the widest
+      !  gathered RHS fiber; q (mynx) holds the two ping-pong buffers, each big enough for the largest
+      !  intermediate tensor max_i [ product(nk1max(1:i)) * product(m(i+1:dims)) ]. dims=2 is untouched
+      !  (the formula reduces to the single buffer maxm*maxnest), so the dims=2 gate path never moves.
+      if (dims>2) then
+         block
+            integer(FP_SIZE) :: nk1max(dims),bufmax,i
+            nk1max = nest-k1
+            bufmax = 0
+            do i=1,dims-1
+               bufmax = max(bufmax, product(nk1max(1:i))*product(m(i+1:dims)))
+            end do
+            mm   = max(mm, product(m(2:dims)), product(nk1max(1:dims-1)), maxval(nk1max))
+            mynx = 2*bufmax
+         end block
+      end if
 
       lwest = (2+dims) + maxnest*dims + maxm*maxk1*dims + 2*maxnest*maxk2*dims + mm + mynx
       kwest = (1+dims) + maxm*dims + maxnest*dims
