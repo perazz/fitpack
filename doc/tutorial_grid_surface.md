@@ -273,5 +273,5 @@ Build and run it with:
 fpm run --example example_grid_surface
 ```
 
-@see @ref fitpack_grid_surfaces, @ref fitpack_parametric_surfaces,
+@see @ref fitpack_gridded_surfaces, @ref fitpack_parametric_surfaces,
      Dierckx Ch. 5 &sect;5.4 (pp. 98&ndash;103), Ch. 10 &sect;10.2 (pp. 241&ndash;254)

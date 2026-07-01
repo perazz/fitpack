@@ -65,19 +65,19 @@ module fitpack_core
     ! N-D gridded core (dimensionalized behind a bit-for-bit gate at dims=2; see
     ! todo/fitpack_nd_grids.md). fpregr/fpgrre stay private and are covered transitively
     ! by the regrid backbone gate. fpndsp is the N-D evaluation kernel; ndspev its public
-    ! flat-workspace wrapper (the N-D analogue of fpbisp/bispev).
+    ! flat-workspace wrapper (the N-D analogue of bispev).
     public :: regrid ! tensor-product gridded smoothing-spline fit (any domain dimension)
-    public :: fpndsp    ! N-D generalization of fpbisp (gridded evaluation kernel)
-    public :: ndspev    ! N-D generalization of bispev (gridded evaluation, flat workspace)
+    public :: fpndsp ! N-D gridded evaluation kernel (the engine behind bispev)
+    public :: ndspev ! N-D generalization of bispev (gridded evaluation, flat workspace)
 
     ! Surface application routines
-    public :: bispeu ! * Evaluation of a bivariate spline function
-    public :: bispev ! * Evaluation of a bivariate spline function
-    public :: parder ! Partial derivatives of a bivariate spline
-    public :: pardeu ! Partial derivatives of a bivariate spline
-    public :: pardtc ! Create partial derivative splane of a bivariate spline
-    public :: dblint ! Integration of a bivariate spline
-    public :: profil ! Cross-section of a bivariate spline
+    public :: ndspeu ! * Evaluation of a tensor-product spline at scattered points (any dimension)
+    public :: bispev ! * Evaluation of a bivariate spline function (2-D grid)
+    public :: parder ! Partial derivatives of a tensor-product spline on a grid (any dimension)
+    public :: pardeu ! Partial derivatives of a tensor-product spline at scattered points (any dimension)
+    public :: pardtc ! B-spline coefficients of a partial-derivative spline (any dimension)
+    public :: dblint ! Box/domain integral of a tensor-product spline (any dimension)
+    public :: profil ! Cross-section of a tensor-product spline: fix one axis (any dimension)
     public :: evapol ! * Evaluation of a polar spline
     public :: surev  ! * Evaluation of a parametric spline surface
 
@@ -113,6 +113,7 @@ module fitpack_core
     ! 1-based axis ID (1 = first dim x/u, 2 = second dim y/v, ... up to MAX_IDIM), so the value can
     ! be used directly as an array/axis index. This generalizes to N dimensions.
     integer(FP_SIZE), parameter,  public :: MAX_IDIM      = 10  ! Max number of dimensions
+    integer(FP_DIM),  parameter,  public :: IDIMS(MAX_IDIM) = [1,2,3,4,5,6,7,8,9,10]
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)
@@ -394,60 +395,6 @@ module fitpack_core
          FITPACK_SUCCESS = ierr<=FITPACK_OK
       end function FITPACK_SUCCESS
 
-      !> @brief Evaluate a bivariate spline at scattered points \f$ (x_i, y_i) \f$.
-      !!
-      !! Given a bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x \f$ and \f$ k_y \f$ in
-      !! tensor-product B-spline representation, evaluates \f$ s(x_i, y_i) \f$ for
-      !! \f$ i = 1,\ldots,m \f$ at arbitrary (scattered) points.
-      !!
-      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
-      !! @param[in]     nx    Total number of knots in \f$ x \f$.
-      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
-      !! @param[in]     ny    Total number of knots in \f$ y \f$.
-      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     kx    Degree in \f$ x \f$.
-      !! @param[in]     ky    Degree in \f$ y \f$.
-      !! @param[in]     x     \f$ x \f$-coordinates of evaluation points (length \f$ m \f$).
-      !! @param[in]     y     \f$ y \f$-coordinates of evaluation points (length \f$ m \f$).
-      !! @param[out]    z     Spline values \f$ s(x_i, y_i) \f$ (length \f$ m \f$).
-      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$.
-      !! @param[in,out] wrk   Real workspace, length \f$ \ge k_x + k_y + 2 \f$.
-      !! @param[in]     lwrk  Declared dimension of `wrk`.
-      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
-      !!
-      !! @see bispev — grid evaluation variant; fpbisp — tensor-product evaluation kernel
-      pure subroutine bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
-
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,m,lwrk
-      integer(FP_FLAG), intent(out) :: ier
-
-      !  ..array arguments..
-      real(FP_REAL), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
-      real(FP_REAL), intent(inout) :: wrk(lwrk)
-      real(FP_REAL), intent(out)   :: z(m)
-
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,lwest
-
-      !  Check inputs (wrk/lwrk retained for ABI; fpbisp self-manages its basis tables)
-      lwest = kx+ky+2
-
-      if (lwrk<lwest .or. m<1) then
-
-         ier = FITPACK_INPUT_ERROR
-         return
-
-      else
-
-         ier = FITPACK_OK
-         do i=1,m
-            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),IONE,y(i),IONE,z(i))
-         end do
-
-      end if
-
-      end subroutine bispeu
 
       !> @brief Evaluate a bivariate spline on a rectangular grid.
       !!
@@ -473,7 +420,7 @@ module fitpack_core
       !! @param[in]     kwrk  Declared dimension of `iwrk`.
       !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
       !!
-      !! @see bispeu — scattered-point variant; fpbisp — tensor-product evaluation kernel
+      !! @see ndspeu — scattered-point variant; fpndsp — tensor-product evaluation kernel
       pure subroutine bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
@@ -486,10 +433,13 @@ module fitpack_core
       real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
       integer(FP_SIZE) :: lwest
+      !  ..N-D column-layout marshalling scratch (fpndsp fills its basis tables into w2/lidx2)..
+      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(kx,ky)+1,max(mx,my),2)
+      integer(FP_SIZE) :: lidx2(max(mx,my),2)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      !  (wrk/iwrk retained for ABI; fpbisp self-manages its basis tables since slice 6.)
+      !  (wrk/iwrk retained for ABI; the marshalling scratch below is local, fpndsp self-manages.)
       ier   = FITPACK_INPUT_ERROR
       lwest = (kx+1)*mx+(ky+1)*my
 
@@ -497,9 +447,13 @@ module fitpack_core
       if (mx>1 .and. any(x(2:mx)<x(1:mx-1))) return
       if (my>1 .and. any(y(2:my)<y(1:my-1))) return
 
-      ! Evaluate spline
+      ! Evaluate spline: marshal the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D
+      ! column layout and defer the basis build + tensor contraction to fpndsp, the single
+      ! evaluation kernel (bit-for-bit identical to the classic 2-D contraction, locked by gate A).
       ier = FITPACK_OK
-      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
+      t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
+      xg2(1:mx,1) = x;    xg2(1:my,2) = y
+      call fpndsp(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg2,[mx,my],z,w2,lidx2)
 
       end subroutine bispev
 
@@ -1345,65 +1299,79 @@ module fitpack_core
       end subroutine curfit
 
 
-      !> @brief Compute the double integral of a bivariate spline over a rectangle.
+
+      !> @brief Integral of a tensor-product spline over an axis-aligned box (any dimension).
       !!
-      !! Calculates \f$ \int_{x_b}^{x_e} \int_{y_b}^{y_e} s(x,y)\,dx\,dy \f$ for a bivariate
-      !! spline of degrees \f$ k_x \f$ and \f$ k_y \f$ in tensor-product B-spline representation.
-      !! The spline is considered identically zero outside its support rectangle
-      !! \f$ (t^x_{k_x+1}, t^x_{n_x-k_x}) \times (t^y_{k_y+1}, t^y_{n_y-k_y}) \f$.
+      !! Computes \f$ \int_{xb_1}^{xe_1}\!\cdots\!\int_{xb_d}^{xe_d} s(x_1,\ldots,x_d)\,dx_1\cdots dx_d \f$.
+      !! The box integral is separable: with \f$ s=\sum_{\mathbf i} c_{\mathbf i}\prod_d N^{(d)}_{i_d} \f$
+      !! it factors into a product of 1-D B-spline integrals per axis contracted against the coefficient
+      !! tensor. Each per-axis integral vector is produced by `fpintb`; the contraction reuses the fpndsp
+      !! odometer. At `dims=2` the terms and their accumulation order reduce to the classic bivariate box integral.
       !!
-      !! @param[in]  tx   Knot positions in \f$ x \f$ (length \f$ n_x \f$).
-      !! @param[in]  nx   Total number of knots in \f$ x \f$.
-      !! @param[in]  ty   Knot positions in \f$ y \f$ (length \f$ n_y \f$).
-      !! @param[in]  ny   Total number of knots in \f$ y \f$.
-      !! @param[in]  c    B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]  kx   Degree in \f$ x \f$.
-      !! @param[in]  ky   Degree in \f$ y \f$.
-      !! @param[in]  xb   Left boundary of integration in \f$ x \f$.
-      !! @param[in]  xe   Right boundary of integration in \f$ x \f$.
-      !! @param[in]  yb   Lower boundary of integration in \f$ y \f$.
-      !! @param[in]  ye   Upper boundary of integration in \f$ y \f$.
-      !! @param[out] wrk  Workspace (length \f$ \ge n_x + n_y - k_x - k_y - 2 \f$). On exit,
-      !!   contains integrals of normalized B-splines in each direction.
-      !! @return The double integral \f$ \iint s(x,y)\,dx\,dy \f$.
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xb    Per-axis lower integration limits, `xb(dims)`
+      !! @param[in]  xe    Per-axis upper integration limits, `xe(dims)`
+      !! @return     res   Value of the box integral
       !!
-      !! @see splint — univariate integral; fpintb — B-spline integration
-      real(FP_REAL) function dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk) result(dblint_res)
+      !! @see dblint, fpintb; todo/fitpack_nd_grids.md
+      pure real(FP_REAL) function dblint(dims,t,n,c,k,xb,xe) result(res)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xb(dims),xe(dims)
 
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky
-      real(FP_REAL), intent(in) :: xb,xe,yb,ye
-      !  ..array arguments..
-      real(FP_REAL), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(FP_REAL), intent(out) :: wrk(nx+ny-kx-ky-2)
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,j,l,m,nkx1,nky1
-      real(FP_REAL) :: res
+          integer(FP_DIM)  :: d,a
+          integer(FP_SIZE) :: nk1(dims),cstride(dims),cidx(dims)
+          integer(FP_SIZE) :: j,q,nsupp,coff
+          real(FP_REAL)    :: pw(0:dims-1)
+          real(FP_REAL)    :: iax(maxval(n-k-1),dims)   ! per-axis B-spline integral vectors
 
-      !  ..
-      nkx1 = nx-kx-1
-      nky1 = ny-ky-1
+          nk1 = n-k-1
 
-      !  we calculate the integrals of the normalized b-splines ni,kx+1(x)
-      call fpintb(tx,nx,wrk,nkx1,xb,xe)
+          !  per-axis integrals of the normalized B-splines
+          iax = zero
+          do d=1,dims
+             call fpintb(t(1:n(d),d), n(d), iax(1:nk1(d),d), nk1(d), xb(d), xe(d))
+          end do
 
-      !  we calculate the integrals of the normalized b-splines nj,ky+1(y)
-      call fpintb(ty,ny,wrk(nkx1+1),nky1,yb,ye)
+          cstride = fp_grid_strides(dims,nk1)
+          nsupp   = product(nk1(1:dims-1))
 
-      !  calculate the integral of s(x,y)
-      dblint_res = zero
-      x_dim: do i=1,nkx1
-        res = wrk(i)
-        if (equal(res,zero)) cycle x_dim
-        m = (i-1)*nky1
-        l = nkx1
-        y_dim: do j=1,nky1
-          m = m+1
-          l = l+1
-          dblint_res = dblint_res + res*wrk(l)*c(m)
-        end do y_dim
-      end do x_dim
-      return
+          !  contract the coefficient tensor against the per-axis integral vectors (fpndsp odometer);
+          !  carry the partial product pw over axes 1..dims-1 and skip a slice whose weight vanishes,
+          !  exactly as dblint skips Ix(i)==0. At dims=2: res += (Ix(i)*Iy(j))*c(m), bit-for-bit.
+          res   = zero
+          cidx(1:dims-1) = 1
+          coff  = 0
+          pw(0) = one
+          do a=1,dims-1
+             pw(a) = pw(a-1)*iax(cidx(a),a)
+          end do
+          do q=1,nsupp
+             if (.not.equal(pw(dims-1),zero)) then
+                do j=1,nk1(dims)
+                   res = res + (pw(dims-1)*iax(j,dims))*c(coff+j)
+                end do
+             end if
+             if (q==nsupp) exit
+             do a=dims-1,1,-1
+                if (cidx(a)<nk1(a)) then
+                   cidx(a) = cidx(a)+1
+                   coff    = coff + cstride(a)
+                   do d=a,dims-1
+                      pw(d) = pw(d-1)*iax(cidx(d),d)
+                   end do
+                   exit
+                else
+                   cidx(a) = 1
+                   coff    = coff - (nk1(a)-1)*cstride(a)
+                end if
+             end do
+          end do
+          return
       end function dblint
 
       !> @brief Evaluate a polar spline \f$ f(x,y) = s(u,v) \f$ at a Cartesian point.
@@ -2155,44 +2123,7 @@ module fitpack_core
       end subroutine fpbfou
 
 
-      !> @brief Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).
-      !!
-      !! Computes \f$ s(x_i, y_j) \f$ on the grid \f$ i=1,\ldots,m_x;\, j=1,\ldots,m_y \f$ for a
-      !! bivariate spline of degrees \f$ k_x, k_y \f$. Since slice 6 this is a thin adapter: it
-      !! marshals the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D column layout and defers
-      !! the basis build + tensor contraction to fpndsp, the single evaluation kernel. At dims=2
-      !! fpndsp reproduces the former in-line 2-D contraction bit-for-bit (locked by gate A). The
-      !! per-axis basis tables are automatic locals here, so no caller scratch is needed.
-      !!
-      !! @param[in]  tx,ty  Per-axis knot vectors, lengths `nx`, `ny`
-      !! @param[in]  nx,ny  Number of knots per axis
-      !! @param[in]  c      B-spline coefficients, length \f$ (n_x-k_x-1)(n_y-k_y-1) \f$
-      !! @param[in]  kx,ky  Spline degree per axis
-      !! @param[in]  x,y    Per-axis evaluation points, lengths `mx`, `my`
-      !! @param[in]  mx,my  Number of evaluation points per axis
-      !! @param[out] z      Spline values, row-major: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
-      !!
-      !! @see fpndsp, bispev; Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
-      pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
-
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,mx,my
-      !  ..array arguments..
-      real(FP_REAL),    intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      real(FP_REAL),    intent(out) :: z(mx*my)
-
-      !  ..N-D column-layout marshalling; fpndsp builds its own basis tables (automatic locals)..
-      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(mx,my),max(kx,ky)+1,2)
-      integer(FP_SIZE) :: lidx2(max(mx,my),2)
-
-      t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
-      xg2(1:mx,1) = x;    xg2(1:my,2) = y
-      call fpndsp(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg2,[mx,my],z,w2,lidx2)
-      return
-      end subroutine fpbisp
-
-
-      !> @brief N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.
+      !> @brief Evaluate a tensor-product spline on a grid (any dimension; bispev's kernel).
       !!
       !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
       !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
@@ -2207,8 +2138,8 @@ module fitpack_core
       !!     \tag{2.14-2.15}
       !! \f]
       !!
-      !! At `dims=2` this is bit-for-bit identical to fpbisp: both the per-axis basis-
-      !! table build and the evaluation contraction are dimension-generic runtime loops
+      !! At `dims=2` this reproduces the classic bivariate contraction bit-for-bit: both the
+      !! per-axis basis-table build and the evaluation contraction are dimension-generic runtime loops
       !! over the `dims` axes, with the innermost `dot_product` on the fastest (axis
       !! `dims`, contiguous) coefficient axis as the FP-reassociation anchor. The
       !! B-spline values and knot interval indices are stored per axis in workspace
@@ -2222,10 +2153,10 @@ module fitpack_core
       !! @param[in]  xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]  m     Number of evaluation points per axis, `m(dims)`
       !! @param[out] z     Spline values at grid points, flat row-major (first axis varies slowest)
-      !! @param[out] w     Per-axis B-spline basis values, `w(m(d),k(d)+1,d)` (mirrors fpbisp `wx,wy`)
-      !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (mirrors fpbisp `lx,ly`)
+      !! @param[out] w     Per-axis B-spline basis values, `w(k(d)+1,m(d),d)` (basis-major, one page per axis)
+      !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (one column per axis)
       !!
-      !! @see fpbisp, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
+      !! @see bispev, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
       pure subroutine fpndsp(dims,t,n,c,k,xg,m,z,w,lidx)
           integer(FP_DIM),  intent(in)  :: dims
           integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m(dims)
@@ -2257,7 +2188,7 @@ module fitpack_core
                 l = fp_knot_interval(t(1:n(d),d), arg, l, nkd)
                 h = fpbspl(t(1:n(d),d), n(d), k(d), arg, l)
                 lidx(i,d) = l-k1(d)
-                w(i,1:k1(d),d) = h(1:k1(d))
+                w(1:k1(d),i,d) = h(1:k1(d))
              end do
           end do
 
@@ -2282,12 +2213,12 @@ module fitpack_core
              coff  = coff0
              pw(0) = one
              do a=1,dims-1
-                pw(a) = pw(a-1)*w(gidx(a),cidx(a),a)
+                pw(a) = pw(a-1)*w(cidx(a),gidx(a),a)
              end do
 
              sp = zero
              do q=1,nsupp
-                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(gidx(dims),1:k1(dims),dims))
+                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(1:k1(dims),gidx(dims),dims))
                 if (q==nsupp) exit
                 !  advance: bump the fastest axis; on overflow reset it and carry to the next-slower axis
                 do a=dims-1,1,-1
@@ -2295,7 +2226,7 @@ module fitpack_core
                       cidx(a) = cidx(a)+1
                       coff    = coff + cstride(a)
                       do d=a,dims-1               ! refresh partial products from the changed axis upward
-                         pw(d) = pw(d-1)*w(gidx(d),cidx(d),d)
+                         pw(d) = pw(d-1)*w(cidx(d),gidx(d),d)
                       end do
                       exit
                    else
@@ -2313,7 +2244,7 @@ module fitpack_core
       !!
       !! Public flat-workspace front-end to fpndsp (the evaluation kernel). Mirrors bispev: the
       !! caller supplies flat real `wrk(lwrk)` / integer `iwrk(kwrk)` scratch, which are carved by
-      !! pointer bounds remapping into the padded per-axis basis table `w(maxm,maxk1,dims)` and the
+      !! pointer bounds remapping into the padded per-axis basis table `w(maxk1,maxm,dims)` and the
       !! interval-index matrix `lidx(maxm,dims)` that fpndsp expects (`maxm=maxval(m)`,
       !! `maxk1=maxval(k)+1`). At `dims=2` this is bit-for-bit identical to bispev.
       !!
@@ -2366,12 +2297,59 @@ module fitpack_core
           end do
 
           ier = FITPACK_OK
-          pw(1:maxm,1:maxk1,1:dims) => wrk(1:lwest)
+          pw(1:maxk1,1:maxm,1:dims) => wrk(1:lwest)
           plidx(1:maxm,1:dims)      => iwrk(1:kwest)
           call fpndsp(dims,t,n,c,k,xg,m,z,pw,plidx)
           return
 
       end subroutine ndspev
+
+      !> @brief Evaluate a tensor-product spline at scattered points (any dimension).
+      !!
+      !! Scattered-point counterpart of ndspev (which evaluates on a rectangular grid). A scattered
+      !! point is just a degenerate 1x...x1 grid, so each point is handed to the fpndsp kernel with a
+      !! singleton per-axis grid (one call per point). This keeps a single source of truth for the
+      !! tensor contraction (fpndsp); at `dims=2` it reduces to the classic bivariate scattered
+      !! evaluation. Self-manages its (singleton) basis scratch, so no work arrays are required.
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xg    Point coordinates, `xg(d,i)` = axis-\f$ d \f$ coordinate of point \f$ i \f$, passed
+      !!                   column-major (point \f$ i \f$ = contiguous column, matching curev/parcur). Declared
+      !!                   with a leading singleton node, `xg(1,dims,*)`, so the slice `xg(:,:,i)` is already
+      !!                   the `(1,dims)` grid fpndsp reads; callers pass a plain contiguous `(dims,m)` array.
+      !! @param[in]  m     Number of evaluation points, \f$ m \ge 1 \f$
+      !! @param[out] z     Spline values at the points, `z(m)`
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
+      !!
+      !! @see ndspev — gridded variant; fpndsp — tensor-product evaluation kernel
+      pure subroutine ndspeu(dims,t,n,c,k,xg,m,z,ier)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xg(1,dims,*)
+          real(FP_REAL),    intent(out) :: z(m)
+          integer(FP_FLAG), intent(out) :: ier
+
+          integer(FP_SIZE) :: i,mone(dims)
+          !  singleton-grid basis scratch fpndsp fills (one node per point)
+          real(FP_REAL)    :: w(MAX_ORDER+1,1,dims)
+          integer(FP_SIZE) :: lidx(1,dims)
+
+          ier = FITPACK_INPUT_ERROR
+          if (m<1) return
+          ier = FITPACK_OK
+
+          !  a scattered point is a 1x...x1 grid; xg(:,:,i) is already the (1,dims) singleton grid row
+          !  fpndsp reads (xg(node,axis)), so hand each point's slice straight to the kernel -- no copy.
+          mone = 1
+          do i=1,m
+             call fpndsp(dims,t,n,c,k,xg(:,:,i),mone,z(i:i),w,lidx)
+          end do
+          return
+      end subroutine ndspeu
 
 
       !> @brief Evaluate the non-zero B-splines at a given point.
@@ -7188,7 +7166,7 @@ module fitpack_core
                   number = number+1
                end do
                h = fpbspl(t(1:n(d),d),n(d),k(d),arg,l)
-               sp(it,1:k1(d),d) = h(1:k1(d))
+               sp(1:k1(d),it,d) = h(1:k1(d))
                nr(it,d) = number
             end do
             ifs(d) = 1
@@ -7235,7 +7213,7 @@ module fitpack_core
                   inner_block: do
                      if (nrold==number) then
                         h(iband(d)) = zero
-                        h(1:k1(d))  = sp(it,1:k1(d),d)
+                        h(1:k1(d))  = sp(1:k1(d),it,d)
                         if (d==1) then
                            ibase = (it-1)*td_trail
                            right(1:td_trail) = z(ibase+1:ibase+td_trail)
@@ -7277,7 +7255,7 @@ module fitpack_core
                inner_stride: do
                   if (nrold==number) then
                      h(iband(dims)) = zero
-                     h(1:k1(dims))  = sp(it,1:k1(dims),dims)
+                     h(1:k1(dims))  = sp(1:k1(dims),it,dims)
                      do j=1,pd_lead
                         right(j) = q(ibuf + (j-1)*m(dims) + it)
                      end do
@@ -7338,19 +7316,19 @@ module fitpack_core
          coff  = coff0
          pw(0) = one
          do a_ax=1,dims-1
-            pw(a_ax) = pw(a_ax-1)*sp(gidx(a_ax),cidx(a_ax),a_ax)
+            pw(a_ax) = pw(a_ax-1)*sp(cidx(a_ax),gidx(a_ax),a_ax)
          end do
 
          sp_val = zero
          do qq=1,nsupp
-            sp_val = sp_val + pw(dims-1)*dot_product(sp(gidx(dims),1:k1(dims),dims),c(coff+1:coff+k1(dims)))
+            sp_val = sp_val + pw(dims-1)*dot_product(sp(1:k1(dims),gidx(dims),dims),c(coff+1:coff+k1(dims)))
             if (qq==nsupp) exit
             do a_ax=dims-1,1,-1
                if (cidx(a_ax)<k1(a_ax)) then
                   cidx(a_ax) = cidx(a_ax)+1
                   coff       = coff + cstr(a_ax)
                   do dd=a_ax,dims-1
-                     pw(dd) = pw(dd-1)*sp(gidx(dd),cidx(dd),dd)
+                     pw(dd) = pw(dd-1)*sp(cidx(dd),gidx(dd),dd)
                   end do
                   exit
                else
@@ -15307,406 +15285,201 @@ module fitpack_core
       end subroutine parcur
 
 
-      !> @brief Evaluate a partial derivative of a bivariate spline on a rectangular grid.
+
+      !> @brief B-spline coefficients of a partial-derivative spline (any dimension).
       !!
-      !! Computes the partial derivative \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial
-      !! y^{\nu_y}} s(x,y) \f$ of a bivariate spline of degrees \f$ k_x \f$ and \f$ k_y \f$ on the grid
-      !! \f$ (x_i, y_j) \f$, \f$ i=1,\ldots,m_x;\; j=1,\ldots,m_y \f$.
+      !! The partial derivative \f$ \partial^{\nu_1+\cdots+\nu_d} s / \partial x_1^{\nu_1}\cdots
+      !! \partial x_d^{\nu_d} \f$ of a tensor-product spline is itself a tensor-product spline of
+      !! per-axis degrees \f$ k_d-\nu_d \f$ over the trimmed knot vectors \f$ t(\nu_d{+}1:n_d{-}\nu_d,d) \f$.
+      !! This routine returns that spline's coefficients. The 1-D B-spline derivative recurrence is applied
+      !! `nu(d)` times along each axis `d`; after each axis the tensor is repacked contiguously (the N-D
+      !! replacement for the 2-D "gaps + compaction" trick). Every output coefficient is a single
+      !! independent expression (no summation), so at dims=2 the result reduces to the classic bivariate
+      !! coefficient transform regardless of the fiber-iteration order.
       !!
-      !! The derivative spline of degrees \f$ k_x - \nu_x \f$ and \f$ k_y - \nu_y \f$ is first computed
-      !! by differencing the B-spline coefficients, then evaluated via fpbisp.
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     Input B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[out] newc  Derivative coefficients, packed contiguously at the front (row-major over the
+      !!                   reduced tensor of size \f$ \prod_d (n(d)-k(d)-1-\nu_d) \f$); must be sized
+      !!                   \f$ \ge \prod_d (n(d)-k(d)-1) \f$
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
       !!
-      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
-      !! @param[in]     nx    Total number of knots in \f$ x \f$.
-      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
-      !! @param[in]     ny    Total number of knots in \f$ y \f$.
-      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     kx    Degree in \f$ x \f$.
-      !! @param[in]     ky    Degree in \f$ y \f$.
-      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
-      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
-      !! @param[in]     x     Grid \f$ x \f$-coordinates (length \f$ m_x \f$), non-decreasing in
-      !!                      \f$ [t_{k_x+1}, t_{n_x-k_x}] \f$.
-      !! @param[in]     mx    Number of grid points along \f$ x \f$, \f$ m_x \ge 1 \f$.
-      !! @param[in]     y     Grid \f$ y \f$-coordinates (length \f$ m_y \f$), non-decreasing in
-      !!                      \f$ [t_{k_y+1}, t_{n_y-k_y}] \f$.
-      !! @param[in]     my    Number of grid points along \f$ y \f$, \f$ m_y \ge 1 \f$.
-      !! @param[out]    z     Derivative values, length \f$ m_x \cdot m_y \f$. On exit,
-      !!                      `z(my*(i-1)+j)` = \f$ \partial^{\nu_x+\nu_y} s / \partial x^{\nu_x}\partial
-      !!                      y^{\nu_y} \f$ at \f$ (x_i, y_j) \f$.
-      !! @param[in,out] wrk   Real workspace, length \f$ \ge m_x(k_x{+}1{-}\nu_x) + m_y(k_y{+}1{-}\nu_y)
-      !!                      + (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     lwrk  Declared dimension of `wrk`.
-      !! @param[in,out] iwrk  Integer workspace (length \f$ \ge m_x + m_y \f$).
-      !! @param[in]     kwrk  Declared dimension of `iwrk`.
-      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !! @see pardtc, parder, pardeu; todo/fitpack_nd_grids.md
+      pure subroutine pardtc(dims,t,n,c,k,nu,newc,ier)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims),nu(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:)
+          real(FP_REAL),    intent(out) :: newc(:)
+          integer(FP_FLAG), intent(out) :: ier
+
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),cur(dims),curn(dims),str(dims),strn(dims),idx(dims)
+          integer(FP_SIZE) :: nc,ncn,p,o,i,l1,l2,src_lo,src_hi
+          real(FP_REAL)    :: ak,fac,tmp(size(newc))
+
+          ier = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          ier = FITPACK_OK
+
+          nk1        = n-k-1
+          nc         = product(nk1)
+          newc(1:nc) = c(1:nc)
+          cur        = nk1
+
+          !  differentiate one axis at a time; after each pass repack into a fresh contiguous tensor
+          axes: do d=1,dims
+             if (nu(d)==0) cycle axes
+             passes: do p=1,nu(d)
+                ak   = real(k(d)-p+1, FP_REAL)       ! running degree before this pass (= 2-D "ak")
+                str  = fp_grid_strides(dims,cur)     ! current (old) layout
+                curn = cur; curn(d) = cur(d)-1       ! one fewer coefficient along axis d
+                strn = fp_grid_strides(dims,curn)    ! new layout
+                ncn  = product(curn)
+                do o=0,ncn-1
+                   idx = fp_grid_unravel(dims,o,curn)   ! reduced multi-index; o == its flat offset
+                   i   = idx(d)
+                   l1  = p + i                          ! knot addressing identical to 2-D pardtc
+                   l2  = i + k(d) + 1
+                   fac = t(l2,d) - t(l1,d)
+                   src_lo = fp_grid_index(dims,idx,str)
+                   if (fac>zero) then
+                      idx(d) = i+1
+                      src_hi = fp_grid_index(dims,idx,str)
+                      tmp(o+1) = (newc(src_hi+1)-newc(src_lo+1))*ak/fac
+                   else
+                      tmp(o+1) = newc(src_lo+1)         ! coincident knots: keep source (2-D semantics)
+                   end if
+                end do
+                newc(1:ncn) = tmp(1:ncn)
+                cur = curn
+             end do passes
+          end do axes
+          return
+      end subroutine pardtc
+
+      !> @brief Evaluate a partial derivative of a tensor-product spline on a grid (any dimension).
       !!
-      !! @see pardeu — scattered-point variant; pardtc — coefficient transformation only;
-      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
-      pure subroutine parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
+      !! Computes the derivative coefficients via `pardtc`, then evaluates the resulting reduced-degree
+      !! spline on the grid through the N-D evaluation front-end `ndspev`. The flat real workspace is
+      !! carved into `[nc derivative coefficients | ndspev basis scratch]`, mirroring 2-D parder.
+      !!
+      !! @param[in]     dims  Number of axes (domain dimension)
+      !! @param[in]     t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]     n     Number of knots per axis, `n(dims)`
+      !! @param[in]     c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]     k     Spline degree per axis, `k(dims)`
+      !! @param[in]     nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[in]     xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]     m     Number of evaluation points per axis, `m(dims)`
+      !! @param[out]    z     Derivative values, flat row-major, length `product(m)`
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge \prod_d nk1_d + \max_d m_d\,(\max_d(k_d{-}\nu_d){+}1)\,d \f$
+      !! @param[in]     lwrk  Declared dimension of `wrk`
+      !! @param[in,out] iwrk  Integer workspace, length \f$ \ge \max_d m_d \cdot dims \f$
+      !! @param[in]     kwrk  Declared dimension of `iwrk`
+      !! @param[out]    ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace
+      !!
+      !! @see parder, pardtc, ndspev; todo/fitpack_nd_grids.md
+      pure subroutine parder(dims,t,n,c,k,nu,xg,m,z,wrk,lwrk,iwrk,kwrk,ier)
+          integer(FP_DIM),  intent(in)    :: dims
+          integer(FP_SIZE), intent(in)    :: n(dims),k(dims),nu(dims),m(dims),lwrk,kwrk
+          real(FP_REAL),    intent(in)    :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(out)   :: z(:)
+          real(FP_REAL),    intent(inout) :: wrk(lwrk)
+          integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+          integer(FP_FLAG), intent(out)   :: ier
 
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in)      :: nx,ny,kx,ky,nux,nuy,mx,my,lwrk,kwrk
-      integer(FP_FLAG), intent(out)     :: ier
-      !  ..array arguments..
-      integer(FP_SIZE), intent(inout)   :: iwrk(kwrk)
-      real(FP_REAL), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      real(FP_REAL), intent(out) :: z(mx*my)
-      real(FP_REAL), intent(inout) :: wrk(lwrk)
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,m,m0,m1,nc,nkx1,nky1,nxx,nyy
-      real(FP_REAL) :: ak,fac
-      !  ..
-      !  before starting computations a data check is made. if the input data
-      !  are invalid control is immediately repassed to the calling program.
-      ier   = FITPACK_INPUT_ERROR
-      kx1   = kx+1
-      ky1   = ky+1
-      nkx1  = nx-kx1
-      nky1  = ny-ky1
-      nc    = nkx1*nky1
-      lwest = nc +(kx1-nux)*mx+(ky1-nuy)*my
-      if (nux<0 .or. nux>=kx) return
-      if (nuy<0 .or. nuy>=ky) return
-      if (lwrk<lwest)         return
-      if (kwrk<(mx+my))       return
-      if (mx<1 .or. my<1)     return
-      if (mx>1 .and. any(x(2:mx)<x(1:mx-1))) return
-      if (my>1 .and. any(y(2:my)<y(1:my-1))) return
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),kn(dims),nn(dims),nc,maxm,maxk1,lev,lwest,kwest
+          real(FP_REAL)    :: ttrim(maxval(n),dims)
 
-      ! All checks passed
-      ier = FITPACK_OK
-      nxx = nkx1
-      nyy = nky1
-      kkx = kx
-      kky = ky
+          ier   = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          if (any(m<1)) return
 
-      !  the partial derivative of order (nux,nuy) of a bivariate spline of degrees kx,ky is a bivariate
-      !  spline of degrees kx-nux,ky-nuy. we calculate the b-spline coefficients of this spline
-      wrk(1:nc) = c(1:nc)
-      if (nux>0) then
-          lx = 1
-          x_deriv_order: do j=1,nux
-            ak  = kkx
-            nxx = nxx-1
-            l1  = lx
-            m0  = 1
-            do i=1,nxx
-              l1 = l1+1
-              l2 = l1+kkx
-              fac = tx(l2)-tx(l1)
-              if (fac>zero) then
-                 do m=1,nyy
-                    m1 = m0+nyy
-                    wrk(m0) = (wrk(m1)-wrk(m0))*ak/fac
-                    m0  = m0+1
-                 end do
-              endif
-            end do
-            lx = lx+1
-            kkx = kkx-1
-          end do x_deriv_order
-      endif
+          nk1   = n-k-1
+          nc    = product(nk1)
+          kn    = k-nu
+          nn    = n-2*nu
+          maxm  = maxval(m)
+          maxk1 = maxval(kn)+1
+          lev   = maxm*maxk1*dims
+          lwest = nc + lev
+          kwest = maxm*dims
+          if (lwrk<lwest .or. kwrk<kwest) return
 
-      if (nuy>0) then
-         ly = 1
-         y_deriv_order: do j=1,nuy
-            ak = kky
-            nyy = nyy-1
-            l1 = ly
-            do i=1,nyy
-               l1 = l1+1
-               l2 = l1+kky
-               fac = ty(l2)-ty(l1)
-               if (fac>zero) then
-                  m0 = i
-                  do m=1,nxx
-                     m1 = m0+1
-                     wrk(m0) = (wrk(m1)-wrk(m0))*ak/fac
-                     m0  = m0+nky1
-                  end do
-               endif
-            end do
-            ly = ly+1
-            kky = kky-1
-         end do y_deriv_order
-         m0 = nyy
-         m1 = nky1
-         do m=2,nxx
-            do i=1,nyy
-               m0 = m0+1
-               m1 = m1+1
-               wrk(m0) = wrk(m1)
-            end do
-            m1 = m1+nuy
-         end do
-      endif
+          !  derivative coefficients (packed at the front of wrk)
+          call pardtc(dims,t,n,c,k,nu,wrk(1:nc),ier)
+          if (.not.FITPACK_SUCCESS(ier)) return
 
-      !  evaluate the partial derivative (fpbisp self-manages its basis tables)
-      call fpbisp(tx(nux+1),nx-ITWO*nux,ty(nuy+1),ny-ITWO*nuy,wrk,kkx,kky, &
-                  x,mx,y,my,z)
+          !  trimmed per-axis knot vectors of the derivative spline
+          ttrim = zero
+          do d=1,dims
+             ttrim(1:nn(d),d) = t(nu(d)+1:n(d)-nu(d),d)
+          end do
 
-      return
+          !  evaluate the reduced-degree spline on the grid
+          call ndspev(dims,ttrim,nn,wrk(1:nc),kn,xg,m,z, &
+                      wrk(nc+1:nc+lev),lev,iwrk(1:kwest),kwest,ier)
+          return
       end subroutine parder
 
-
-
-      !> @brief Evaluate a partial derivative of a bivariate spline at scattered points.
+      !> @brief Evaluate a partial derivative of a tensor-product spline at scattered points (any dimension).
       !!
-      !! Computes \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x_i,y_i)
-      !! \f$ for \f$ i=1,\ldots,m \f$ at arbitrary (unstructured) points. This is the scattered-point
-      !! counterpart of parder, which evaluates on a rectangular grid.
+      !! Scattered-point counterpart of `parder`: derivative coefficients via `pardtc`, then a
+      !! per-point evaluation via `ndspeu`. Only the derivative coefficients need workspace.
       !!
-      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
-      !! @param[in]     nx    Total number of knots in \f$ x \f$.
-      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
-      !! @param[in]     ny    Total number of knots in \f$ y \f$.
-      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     kx    Degree in \f$ x \f$.
-      !! @param[in]     ky    Degree in \f$ y \f$.
-      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
-      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
-      !! @param[in]     x     \f$ x \f$-coordinates of evaluation points (length \f$ m \f$).
-      !! @param[in]     y     \f$ y \f$-coordinates of evaluation points (length \f$ m \f$).
-      !! @param[out]    z     Derivative values (length \f$ m \f$).
-      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$.
-      !! @param[in,out] wrk   Real workspace, length \f$ \ge m(k_x{+}1{-}\nu_x) + m(k_y{+}1{-}\nu_y)
-      !!                      + (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     lwrk  Declared dimension of `wrk`.
-      !! @param[in,out] iwrk  Integer workspace (length \f$ \ge 2m \f$).
-      !! @param[in]     kwrk  Declared dimension of `iwrk`.
-      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
+      !! @param[in]     dims  Number of axes (domain dimension)
+      !! @param[in]     t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]     n     Number of knots per axis, `n(dims)`
+      !! @param[in]     c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]     k     Spline degree per axis, `k(dims)`
+      !! @param[in]     nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[in]     xg    Point coordinates, `xg(d,i)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !!                      (point \f$ i \f$ = contiguous column `xg(:,i)`)
+      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$
+      !! @param[out]    z     Derivative values at the points, `z(m)`
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge \prod_d (n(d)-k(d)-1) \f$
+      !! @param[in]     lwrk  Declared dimension of `wrk`
+      !! @param[out]    ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace
       !!
-      !! @see parder — grid variant; pardtc — coefficient transformation only;
-      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
-      pure subroutine pardeu(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,y,z,m,wrk,lwrk,iwrk,kwrk,ier)
+      !! @see pardeu, pardtc, ndspeu; todo/fitpack_nd_grids.md
+      pure subroutine pardeu(dims,t,n,c,k,nu,xg,m,z,wrk,lwrk,ier)
+          integer(FP_DIM),  intent(in)    :: dims
+          integer(FP_SIZE), intent(in)    :: n(dims),k(dims),nu(dims),m,lwrk
+          real(FP_REAL),    intent(in)    :: t(:,:),c(:)
+          real(FP_REAL),    intent(in), contiguous :: xg(:,:)   ! passed straight to ndspeu (no pack)
+          real(FP_REAL),    intent(out)   :: z(m)
+          real(FP_REAL),    intent(inout) :: wrk(lwrk)
+          integer(FP_FLAG), intent(out)   :: ier
 
-      !  ..scalar arguments..
-      integer(FP_SIZE),  intent(in)    :: nx,ny,kx,ky,m,lwrk,kwrk,nux,nuy
-      integer(FP_SIZE),  intent(out)   :: ier
-      !  ..array arguments..
-      integer(FP_SIZE),  intent(inout) :: iwrk(kwrk)
-      real(FP_REAL), intent(in)    :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
-      real(FP_REAL), intent(out)   :: z(m)
-      real(FP_REAL), intent(inout) :: wrk(lwrk)
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),kn(dims),nn(dims),nc
+          real(FP_REAL)    :: ttrim(maxval(n),dims)
 
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,mm,m0,m1,nc,nkx1,nky1,nxx,nyy
-      real(FP_REAL) :: ak,fac
+          ier = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          if (m<1) return
+          nk1 = n-k-1
+          nc  = product(nk1)
+          kn  = k-nu
+          nn  = n-2*nu
+          if (lwrk<nc) return
 
-      !  ..
-      !  before starting computations a data check is made. if the input data are invalid control is
-      !  immediately repassed to the calling program.
-      ier   = FITPACK_INPUT_ERROR
-      kx1   = kx+1
-      ky1   = ky+1
-      nkx1  = nx-kx1
-      nky1  = ny-ky1
-      nc    = nkx1*nky1
-      lwest = nc +(kx1-nux)*m+(ky1-nuy)*m
-      if (nux<0 .or. nux>=kx) return
-      if (nuy<0 .or. nuy>=ky) return
-      if (lwrk<lwest)         return
-      if (kwrk<(m+m))         return
-      if (m<1)                return
+          call pardtc(dims,t,n,c,k,nu,wrk(1:nc),ier)
+          if (.not.FITPACK_SUCCESS(ier)) return
 
-      ier = FITPACK_OK
-      nxx = nkx1
-      nyy = nky1
-      kkx = kx
-      kky = ky
-
-      !  the partial derivative of order (nux,nuy) of a bivariate spline of degrees kx,ky is a bivariate
-      !  spline of degrees kx-nux,ky-nuy. we calculate the b-spline coefficients of this spline
-      wrk(:nc) = c(:nc)
-
-      if (nux>0) then
-          lx = 1
-          x_deriv_order: do j=1,nux
-             ak = kkx
-             nxx = nxx-1
-             l1 = lx
-             m0 = 1
-             do i=1,nxx
-                l1 = l1+1
-                l2 = l1+kkx
-                fac = tx(l2)-tx(l1)
-                if (fac>zero) THEN
-                   do mm=1,nyy
-                      m1 = m0+nyy
-                      wrk(m0) = (wrk(m1)-wrk(m0))*ak/fac
-                      m0  = m0+1
-                   end do
-                endif
-             end do
-             lx = lx+1
-             kkx = kkx-1
-         end do x_deriv_order
-      endif
-
-      if (nuy>0) then
-          ly = 1
-          y_deriv_order: do j=1,nuy
-             ak = kky
-             nyy = nyy-1
-             l1 = ly
-             do i=1,nyy
-                l1 = l1+1
-                l2 = l1+kky
-                fac = ty(l2)-ty(l1)
-                if (fac>zero) then
-                   m0 = i
-                   do mm=1,nxx
-                      m1 = m0+1
-                      wrk(m0) = (wrk(m1)-wrk(m0))*ak/fac
-                      m0  = m0+nky1
-                   end do
-                endif
-             end do
-             ly = ly+1
-             kky = kky-1
-          end do y_deriv_order
-          m0 = nyy
-          m1 = nky1
-          do mm=2,nxx
-            do i=1,nyy
-              m0 = m0+1
-              m1 = m1+1
-              wrk(m0) = wrk(m1)
-            end do
-            m1 = m1+nuy
+          ttrim = zero
+          do d=1,dims
+             ttrim(1:nn(d),d) = t(nu(d)+1:n(d)-nu(d),d)
           end do
-      endif
 
-      !  evaluate the partial derivative at each point (fpbisp self-manages its basis tables)
-      do i=1,m
-         call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,wrk,kkx,kky, &
-                     x(i),IONE,y(i),IONE,z(i))
-      end do
-      return
+          call ndspeu(dims,ttrim,nn,wrk(1:nc),kn,xg,m,z,ier)
+          return
       end subroutine pardeu
-
-
-      !> @brief Transform B-spline coefficients to obtain the partial derivative spline.
-      !!
-      !! Given a bivariate spline \f$ s(x,y) \f$ of degrees \f$ k_x, k_y \f$, computes the B-spline
-      !! coefficients of the derivative spline
-      !! \f$ \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x,y) \f$
-      !! of degrees \f$ k_x - \nu_x, k_y - \nu_y \f$.
-      !!
-      !! Unlike parder / pardeu, this routine does **not** evaluate the derivative at any point; it only
-      !! transforms the coefficient array. The resulting spline can then be evaluated with bispev or bispeu.
-      !!
-      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
-      !! @param[in]     nx    Total number of knots in \f$ x \f$.
-      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
-      !! @param[in]     ny    Total number of knots in \f$ y \f$.
-      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     kx    Degree in \f$ x \f$.
-      !! @param[in]     ky    Degree in \f$ y \f$.
-      !! @param[in]     nux   Derivative order in \f$ x \f$, \f$ 0 \le \nu_x < k_x \f$.
-      !! @param[in]     nuy   Derivative order in \f$ y \f$, \f$ 0 \le \nu_y < k_y \f$.
-      !! @param[out]    newc  Derivative-spline coefficients, dimension
-      !!                      \f$ (n_x{-}\nu_x{-}k_x{-}1)(n_y{-}\nu_y{-}k_y{-}1) \f$.
-      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
-      !!
-      !! @see parder — evaluate derivative on a grid; pardeu — evaluate at scattered points;
-      !!      de Boor (1972), *J. Approx. Theory* 6, 50–62
-      pure subroutine pardtc(tx,nx,ty,ny,c,kx,ky,nux,nuy,newc,ier)
-
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in) :: nx,ny,kx,ky,nux,nuy
-      integer(FP_FLAG), intent(out) :: ier
-      !  ..array arguments..
-      real(FP_REAL), intent(in) :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(FP_REAL), intent(out) :: newc((nx-kx-1)*(ny-ky-1))
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,j,kx1,ky1,lx,ly,l1,l2,m,m0,m1,nkx1,nky1,nxx,nyy,newkx,newky,nc
-      real(FP_REAL) ak,fac
-      !  ..
-      !  before starting computations a data check is made. if the input data
-      !  are invalid control is immediately repassed to the calling program.
-      ier     = FITPACK_INPUT_ERROR
-      if (nux<0 .or. nux>=kx) return
-      if (nuy<0 .or. nuy>=ky) return
-
-      kx1  = kx+1
-      ky1  = ky+1
-      nkx1 = nx-kx1
-      nky1 = ny-ky1
-      nc   = nkx1*nky1
-
-      ier   = FITPACK_OK
-      nxx   = nkx1
-      nyy   = nky1
-      newkx = kx
-      newky = ky
-
-      !  the partial derivative of order (nux,nuy) of a bivariate spline of degrees kx,ky is a bivariate
-      !  spline of degrees kx-nux,ky-nuy. we calculate the b-spline coefficients of this spline
-      !  that is to say newkx = kx - nux, newky = ky - nuy
-      newc(:nc) = c(:nc)
-
-      if (nux>0) then
-          lx = 1
-          x_deriv_order: do j=1,nux
-            ak  = newkx
-            nxx = nxx-1
-            l1  = lx
-            m0  = 1
-            do i=1,nxx
-              l1 = l1+1
-              l2 = l1+newkx
-              fac = tx(l2)-tx(l1)
-              if (fac>zero) then
-                 do m=1,nyy
-                    m1 = m0+nyy
-                    newc(m0) = (newc(m1)-newc(m0))*ak/fac
-                    m0  = m0+1
-                 end do
-              endif
-            end do
-            lx = lx+1
-            newkx = newkx-1
-          end do x_deriv_order
-      endif
-
-      if (nuy>0) then
-         ly = 1
-         y_deriv_order: do j=1,nuy
-            ak = newky
-            nyy = nyy-1
-            l1 = ly
-            do i=1,nyy
-               l1 = l1+1
-               l2 = l1+newky
-               fac = ty(l2)-ty(l1)
-               if (fac>zero) then
-                  m0 = i
-                  do m=1,nxx
-                     m1 = m0+1
-                     newc(m0) = (newc(m1)-newc(m0))*ak/fac
-                     m0  = m0+nky1
-                  end do
-               endif
-            end do
-            ly = ly+1
-            newky = newky-1
-         end do y_deriv_order
-         m0 = nyy
-         m1 = nky1
-         do m=2,nxx
-            do i=1,nyy
-               m0 = m0+1
-               m1 = m1+1
-               newc(m0) = newc(m1)
-            end do
-            m1 = m1+nuy
-         end do
-      endif
-
-      return
-      end subroutine pardtc
 
 
 
@@ -16858,106 +16631,68 @@ module fitpack_core
       ! if iopt=0, f(y) = s(u,y)
       ! if iopt=1, g(x) = s(x,u)
       ! with s(x,y) a bivariate spline of degrees kx and ky, given in the b-spline representation.
-      !> @brief Extract a cross-section (profile) of a bivariate spline.
+
+      !> @brief Cross-section of a tensor-product spline: fix one axis (any dimension).
       !!
-      !! Given a bivariate spline \f$ s(x,y) \f$, computes the B-spline coefficients of a
-      !! univariate cross-section:
+      !! Fixing axis `ax` at the value `u` collapses one tensor rank: the result is the coefficient tensor
+      !! of a `dims-1`-D spline over the remaining axes (their knot vectors and degrees are unchanged, in
+      !! their original relative order). The fixed axis' `k(ax)+1` non-zero B-splines at `u` are contracted
+      !! against the coefficient support along that axis. At `dims=2` this reduces to the classic
+      !! bivariate cross-section (the same `fpbspl` values and `dot_product` accumulation).
       !!
-      !! - `iopt=0`: \f$ f(y) = s(u, y) \f$ — profile at fixed \f$ x = u \f$.
-      !! - `iopt=1`: \f$ g(x) = s(x, u) \f$ — profile at fixed \f$ y = u \f$.
+      !! @param[in]  ax    Axis to fix, \f$ 1 \le ax \le dims \f$
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  u     Value at which axis `ax` is fixed, \f$ t(k(ax){+}1,ax) \le u \le t(nk1(ax){+}1,ax) \f$
+      !! @param[out] cu    Cross-section coefficients: flat row-major over the surviving axes (in original
+      !!                   order, skipping `ax`), length \f$ \prod_{d \ne ax}(n(d)-k(d)-1) \f$
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
       !!
-      !! The resulting 1-D spline can be evaluated using splev or other univariate routines.
-      !!
-      !! @param[in]     iopt  Profile direction: `0` = fix \f$ x \f$, extract \f$ f(y) \f$;
-      !!                      `1` = fix \f$ y \f$, extract \f$ g(x) \f$.
-      !! @param[in]     tx    Knot positions in \f$ x \f$-direction (length \f$ n_x \f$).
-      !! @param[in]     nx    Total number of knots in \f$ x \f$.
-      !! @param[in]     ty    Knot positions in \f$ y \f$-direction (length \f$ n_y \f$).
-      !! @param[in]     ny    Total number of knots in \f$ y \f$.
-      !! @param[in]     c     B-spline coefficients, length \f$ (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \f$.
-      !! @param[in]     kx    Degree in \f$ x \f$.
-      !! @param[in]     ky    Degree in \f$ y \f$.
-      !! @param[in]     u     Cross-section coordinate. Must satisfy
-      !!                      \f$ t_{k_x+1} \le u \le t_{n_x-k_x} \f$ if `iopt=0`, or
-      !!                      \f$ t_{k_y+1} \le u \le t_{n_y-k_y} \f$ if `iopt=1`.
-      !! @param[in]     nu    Declared dimension of `cu`. Must be \f$ \ge n_y \f$ if `iopt=0`,
-      !!                      \f$ \ge n_x \f$ if `iopt=1`.
-      !! @param[out]    cu    B-spline coefficients of the 1-D cross-section (length `nu`).
-      !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
-      !!
-      !! @see bispev — full surface evaluation; fpbspl — B-spline basis evaluation
-      pure subroutine profil(iopt,tx,nx,ty,ny,c,kx,ky,u,nu,cu,ier)
+      !! @see profil, fpbspl; todo/fitpack_nd_grids.md
+      pure subroutine profil(ax,dims,t,n,c,k,u,cu,ier)
+          integer(FP_DIM),  intent(in)  :: ax,dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),u
+          real(FP_REAL),    intent(out) :: cu(:)
+          integer(FP_FLAG), intent(out) :: ier
 
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in)  :: iopt,nx,ny,kx,ky,nu
-      integer(FP_FLAG), intent(out) :: ier
-      real(FP_REAL), intent(in)  :: u
-      !  ..array arguments..
-      real(FP_REAL), intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1))
-      real(FP_REAL), intent(out) :: cu(nu)
+          integer(FP_SIZE) :: nk1(dims),cstride(dims),fidx(dims),oidx(dims-1),osize(dims-1)
+          integer(FP_SIZE) :: k1a,nk1a,l,nout,o,s,coff
+          real(FP_REAL)    :: h(MAX_ORDER+1),csupp(MAX_ORDER+1)
 
-      !  ..local scalars..
-      integer(FP_SIZE) :: i,kx1,ky1,l,l1,m0,nkx1,nky1
-      !  ..local array
-      real(FP_REAL) :: h(MAX_ORDER+1)
-      !  ..
-      !  before starting computations a data check is made. if the input data
-      !  are invalid control is immediately repassed to the calling program.
-      kx1  = kx+1
-      ky1  = ky+1
-      nkx1 = nx-kx1
-      nky1 = ny-ky1
-      ier  = FITPACK_INPUT_ERROR
+          ier  = FITPACK_INPUT_ERROR
+          if (ax<1 .or. ax>dims) return
+          nk1  = n-k-1
+          k1a  = k(ax)+1
+          nk1a = nk1(ax)
+          if (u<t(k1a,ax) .or. u>t(nk1a+1,ax)) return
+          ier  = FITPACK_OK
 
-      select case (iopt)
+          !  non-zero B-splines of the fixed axis at u
+          l = fp_knot_interval(t(1:n(ax),ax), u, k1a, nk1a)
+          h = fpbspl(t(1:n(ax),ax), n(ax), k(ax), u, l)
 
-         case (0)
+          cstride = fp_grid_strides(dims,nk1)
 
-             if (nu<ny) return
-             if (u<tx(kx1) .or. u>tx(nkx1+1)) return
+          !  sizes of the surviving axes, in original order (all axes except ax)
+          osize = pack(nk1, IDIMS(:dims)/=ax)
+          nout  = product(osize)
 
-             ! the b-spline coefficients of f(y) = s(u,y).
-             ier = FITPACK_OK
-             l   = kx1
-             l1  = l+1
-             do while (u>=tx(l1) .and. l/=nkx1)
-                 l = l1
-                l1 = l+1
+          !  for each surviving-axis multi-index, contract the ax-support against h
+          do o=0,nout-1
+             oidx = fp_grid_unravel(dims-1,o,osize)
+             !  full multi-index: axis ax at the support root (1-based l-k1a+1), the rest from oidx
+             fidx = unpack(oidx, IDIMS(:dims)/=ax, l-k1a+1)
+             coff = fp_grid_index(dims,fidx,cstride)     ! 0-based offset of the support root
+             do s=1,k1a
+                csupp(s) = c(coff + (s-1)*cstride(ax) + 1)
              end do
-
-             h = fpbspl(tx,nx,kx,u,l)
-
-             m0 = (l-kx1)*nky1+1
-             do i=1,nky1
-                cu(i) = dot_product(h(1:kx1),c(m0:m0+nky1*kx:nky1))
-                m0 = m0+1
-             end do
-
-         case (1)
-
-             if (nu<nx) return
-             if (u<ty(ky1) .or. u>ty(nky1+1)) return
-
-             ! the b-spline coefficients of g(x) = s(x,u).
-             ier = FITPACK_OK
-               l = ky1
-              l1 = l+1
-             do while (u>=ty(l1) .and. l/=nky1)
-                 l = l1
-                l1 = l+1
-             end do
-
-             h = fpbspl(ty,ny,ky,u,l)
-
-             m0 = l-ky
-             do i=1,nkx1
-                cu(i) = dot_product(h(1:ky1),c(m0:m0+ky))
-                m0 = m0+nky1
-             end do
-
-      end select
-
-      return
+             cu(o+1) = dot_product(h(1:k1a),csupp(1:k1a))
+          end do
+          return
       end subroutine profil
 
 
@@ -17086,7 +16821,7 @@ module fitpack_core
       ier  = FITPACK_OK
       offr = 2+dims                                  ! wrk(1)=fp0, wrk(2)=fpold, wrk(3:2+dims)=reduc
       pfpint(1:maxnest,1:dims)       => wrk(offr+1:offr+maxnest*dims);          offr = offr+maxnest*dims
-      psp(1:maxm,1:maxk1,1:dims)     => wrk(offr+1:offr+maxm*maxk1*dims);       offr = offr+maxm*maxk1*dims
+      psp(1:maxk1,1:maxm,1:dims)     => wrk(offr+1:offr+maxm*maxk1*dims);       offr = offr+maxm*maxk1*dims
       pa(1:maxnest,1:maxk2,1:dims)   => wrk(offr+1:offr+maxnest*maxk2*dims);    offr = offr+maxnest*maxk2*dims
       pb(1:maxnest,1:maxk2,1:dims)   => wrk(offr+1:offr+maxnest*maxk2*dims);    offr = offr+maxnest*maxk2*dims
       pright(1:mm)                   => wrk(offr+1:offr+mm);                    offr = offr+mm

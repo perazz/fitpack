@@ -1279,6 +1279,7 @@ module fitpack_tests
           real(FP_REAL) :: fac,facx,aint,exint,xb,xe,yb,ye
           integer(FP_SIZE) :: i,j,kx,kx1,ky,ky1,mx,my,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
           real(FP_REAL) :: tx(15),ty(15),c(100),x(6),y(6),wrk(50)
+          real(FP_REAL) :: t2(15,2)
 
           success = .true.
           if (present(iunit)) then
@@ -1353,7 +1354,8 @@ module fitpack_tests
                       xe = x(j)
                       ye = xe
                       j = j-1
-                      aint  = dblint(tx,nx,ty,ny,c,kx,ky,xb,xe,yb,ye,wrk)
+                      t2(1:nx,1)=tx(1:nx); t2(1:ny,2)=ty(1:ny)
+                      aint  = dblint(2_FP_DIM,t2,[nx,ny],c,[kx,ky],[xb,yb],[xe,ye])
                       exint = (xe-xb)*(xe+xb)*(ye-yb)*(ye+yb)*0.25
                       write(useUnit,970) xb,xe,yb,ye,aint,exint
 
@@ -1914,6 +1916,7 @@ module fitpack_tests
           integer(FP_FLAG) :: ier
           real(FP_REAL) :: tx(15),ty(15),c(100),x(mx),y(my),z(mx*my),wrk(200)
           integer(FP_SIZE) :: iwrk(20)
+          real(FP_REAL) :: t2(15,2),xg2(mx,2)
 
           ! Initialization.
           success = .true.
@@ -1980,8 +1983,11 @@ module fitpack_tests
                       nux = ix-1
                       do iy=1,2
                           nuy = iy-1
-                          !  evaluation of the spline derivative
-                          call parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,200,iwrk,20,ier)
+                          !  evaluation of the spline derivative (dimension-generic parder, dims=2)
+                          t2(1:nx,1)=tx(1:nx); t2(1:ny,2)=ty(1:ny)
+                          xg2(1:mx,1)=x;       xg2(1:my,2)=y
+                          call parder(2_FP_DIM,t2,[nx,ny],c,[kx,ky],[nux,nuy],xg2,[mx,my],z, &
+                                      wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ier)
 
                           if (.not.FITPACK_SUCCESS(ier)) then
                               success = .false.
@@ -3010,6 +3016,7 @@ module fitpack_tests
           integer(FP_SIZE) :: i,iopt,j,kx,kx1,ky,ky1,m0,m1,m2,m3,nc,nkx1,nky1,nx,ny,useUnit
           integer(FP_FLAG) :: ier
           real(FP_REAL) :: tx(15),ty(15),c(100),x(mx),y(my),z(m),cc(15)
+          real(FP_REAL) :: t2(15,2)
 
           ! Initialization.
           success = .true.
@@ -3079,7 +3086,8 @@ module fitpack_tests
                   y_profiles: do i=1,mx
 
                       u = x(i)
-                      call profil(iopt,tx,nx,ty,ny,c,kx,ky,u,15,cc,ier)
+                      t2(1:nx,1)=tx(1:nx); t2(1:ny,2)=ty(1:ny)
+                      call profil(1_FP_DIM,2_FP_DIM,t2,[nx,ny],c,[kx,ky],u,cc,ier)
 
                       if (.not.FITPACK_SUCCESS(ier)) then
                           write(useUnit,1000)'y',kx,ky,i,FITPACK_MESSAGE(ier)
@@ -3111,7 +3119,8 @@ module fitpack_tests
                   x_profiles: do i=1,my
 
                       u = y(i)
-                      call profil(iopt,tx,nx,ty,ny,c,kx,ky,u,15,cc,ier)
+                      t2(1:nx,1)=tx(1:nx); t2(1:ny,2)=ty(1:ny)
+                      call profil(2_FP_DIM,2_FP_DIM,t2,[nx,ny],c,[kx,ky],u,cc,ier)
 
                       if (.not.FITPACK_SUCCESS(ier)) then
                           write(useUnit,1000)'x',kx,ky,i,FITPACK_MESSAGE(ier)

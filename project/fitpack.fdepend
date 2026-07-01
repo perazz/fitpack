@@ -1,51 +1,144 @@
-# fdepslib dependency file v1.1
-1771352414source:/Users/federico/code/fitpack/src/fitpack.f90
+# fdepslib dependency file v2.0
+source:../src/fitpack.f90
+	use:fitpack_convex_curves
+	use:fitpack_core
+	use:fitpack_curves
+	use:fitpack_fitters
+	use:fitpack_gridded_polar
+	use:fitpack_gridded_sphere
+	use:fitpack_gridded_surfaces
+	use:fitpack_parametric_curves
+	use:fitpack_parametric_surfaces
+	use:fitpack_polar_domains
+	use:fitpack_sphere_domains
+	use:fitpack_surfaces
+	decl:fitpack
 
-1704620662source:/Users/federico/code/fitpack/src/fitpack_closed_c.f90
+source:../src/fitpack_closed_c.f90
+	use:fitpack_core
+	use:fitpack_parametric_curves
+	use:iso_c_binding
+	decl:fitpack_closed_curves_c
 
-1704623491source:/Users/federico/code/fitpack/src/fitpack_constrained_c.f90
+source:../src/fitpack_constrained_c.f90
+	use:fitpack_core
+	use:fitpack_parametric_curves
+	use:iso_c_binding
+	decl:fitpack_constrained_curves_c
 
-1771352396source:/Users/federico/code/fitpack/src/fitpack_convex_curves.f90
+source:../src/fitpack_convex_curves.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:fitpack_fitters
+	decl:fitpack_convex_curves
 
-1771352267source:/Users/federico/code/fitpack/src/fitpack_core.F90
+source:../src/fitpack_core.F90
+	use:iso_c_binding
+	decl:fitpack_core
 
-1771352267source:/Users/federico/code/fitpack/src/fitpack_core.f90
+source:../src/fitpack_core_c.f90
+	use:fitpack_core
+	use:iso_c_binding
+	decl:fitpack_core_c
 
-1766849605source:/Users/federico/code/fitpack/src/fitpack_core_c.f90
+source:../src/fitpack_curves.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	use:ieee_arithmetic
+	decl:fitpack_curves
 
-1771352308source:/Users/federico/code/fitpack/src/fitpack_curves.f90
+source:../src/fitpack_curves_c.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:iso_c_binding
+	decl:fitpack_curves_c
 
-1764238257source:/Users/federico/code/fitpack/src/fitpack_curves_c.f90
+source:../src/fitpack_fitters.f90
+	use:fitpack_core
+	decl:fitpack_fitters
 
-1771259735source:/Users/federico/code/fitpack/src/fitpack_fitters.f90
+source:../src/fitpack_gridded_polar.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_gridded_polar
 
-1771269940source:/Users/federico/code/fitpack/src/fitpack_grid_surfaces.f90
+source:../src/fitpack_gridded_sphere.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_gridded_sphere
 
-1771269944source:/Users/federico/code/fitpack/src/fitpack_gridded_polar.f90
+source:../src/fitpack_gridded_surfaces.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:fitpack_fitters
+	decl:fitpack_gridded_surfaces
 
-1771269947source:/Users/federico/code/fitpack/src/fitpack_gridded_sphere.f90
+source:../src/fitpack_parametric.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_parametric_curves
 
-1771269934source:/Users/federico/code/fitpack/src/fitpack_parametric.f90
+source:../src/fitpack_parametric_c.f90
+	use:fitpack_core
+	use:fitpack_parametric_curves
+	use:iso_c_binding
+	decl:fitpack_parametric_curves_c
 
-1741628651source:/Users/federico/code/fitpack/src/fitpack_parametric_c.f90
+source:../src/fitpack_parametric_surfaces.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_parametric_surfaces
 
-1771269941source:/Users/federico/code/fitpack/src/fitpack_parametric_surfaces.f90
+source:../src/fitpack_periodic_curves_c.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:iso_c_binding
+	decl:fitpack_periodic_curves_c
 
-1703948614source:/Users/federico/code/fitpack/src/fitpack_periodic_curves_c.f90
+source:../src/fitpack_polar.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_polar_domains
 
-1771269943source:/Users/federico/code/fitpack/src/fitpack_polar.f90
+source:../src/fitpack_spheres.f90
+	use:fitpack_core
+	use:fitpack_fitters
+	decl:fitpack_sphere_domains
 
-1771269945source:/Users/federico/code/fitpack/src/fitpack_spheres.f90
+source:../src/fitpack_surfaces.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:fitpack_fitters
+	decl:fitpack_surfaces
 
-1771269938source:/Users/federico/code/fitpack/src/fitpack_surfaces.f90
+source:../test/fitpack_cpp_tests.f90
+	use:fitpack_core
+	use:iso_c_binding
+	decl:fitpack_cpp_tests
 
-1704617612source:/Users/federico/code/fitpack/test/fitpack_cpp_tests.f90
+source:../test/fitpack_curve_tests.f90
+	use:fitpack
+	use:fitpack_core
+	use:fitpack_test_data
+	use:iso_fortran_env
+	decl:fitpack_curve_tests
 
-1771352536source:/Users/federico/code/fitpack/test/fitpack_curve_tests.f90
+source:../test/fitpack_test_data.f90
+	use:fitpack_core
+	decl:fitpack_test_data
 
-1740771300source:/Users/federico/code/fitpack/test/fitpack_test_data.f90
+source:../test/fitpack_tests.f90
+	use:fitpack_core
+	use:fitpack_test_data
+	use:iso_fortran_env
+	decl:fitpack_tests
 
-1765036074source:/Users/federico/code/fitpack/test/fitpack_tests.f90
-
-1771352474source:/Users/federico/code/fitpack/test/test.f90
+source:../test/test.f90
+	use:fitpack_core
+	use:fitpack_cpp_tests
+	use:fitpack_curve_tests
+	use:fitpack_grid_nd_tests
+	use:fitpack_test_data
+	use:fitpack_tests
+	use:iso_fortran_env
 

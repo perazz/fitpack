@@ -26,9 +26,9 @@
 !! derivatives, integration, cross-section extraction, and derivative-spline computation.
 !!
 !! @see Dierckx, Ch. 5, §5.4 (pp. 98–103); regrid, bispev, parder, pardeu, dblint, profil
-module fitpack_grid_surfaces
+module fitpack_gridded_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_DIM,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
-                            IOPT_NEW_LEASTSQUARES,bispev,bispeu,fitpack_error_handling,get_smoothing,regrid, &
+                            IOPT_NEW_LEASTSQUARES,bispev,ndspeu,fitpack_error_handling,get_smoothing,regrid, &
                             parder,pardeu,FITPACK_INPUT_ERROR, &
                             dblint,profil,pardtc, &
                             FP_COMM_SIZE,FP_COMM_PACK,FP_COMM_EXPAND
@@ -81,7 +81,7 @@ module fitpack_grid_surfaces
            !> Generate new fit
            procedure :: new_fit       => surf_new_fit
 
-           !> Generate/update fitting curve, with optional /Users/federico/code/fitpack/test/fitpack_curve_tests.f90smoothing
+           !> Generate/update fitting curve, with optional smoothing
            procedure :: fit           => surface_fit_automatic_knots
            procedure :: least_squares => surface_fit_least_squares
            procedure :: interpolate   => surface_fit_interpolating
@@ -206,19 +206,19 @@ module fitpack_grid_surfaces
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
             
-            call regrid(this%iopt,                 &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
-                        2_FP_DIM,                     &  ! domain dimension (bivariate grid)
-                        m2,xg,                        &  ! per-axis point counts and coordinates xg(1:m(d),d)
-                        this%z,                       &  ! z(iy,ix) gridded data, flat row-major (x slowest, y fastest)
-                        this%left,this%right,         &  ! per-axis lo/hi range
-                        this%order,                   &  ! [1:5] per-axis spline order. Recommended: bicubic (=3)
-                        this%smoothing,               &  ! spline accuracy (iopt>=0)
-                        this%nest,                    &  ! estimated number of knots / storage nest(d) >= 2*(k(d)+1)
-                        this%knots,this%t,            &  ! per-axis knot counts (out) and knots t(1:n(d),d) (out)
-                        this%c,this%fp,               &  ! spline output. size(c)>=product(nest-order-1)
-                        this%wrk,this%lwrk,           &  ! memory
-                        this%iwrk,this%liwrk,         &  ! memory
-                        ierr)                           ! Error flag
+            call regrid(iopt=this%iopt,               &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
+                        dims=2_FP_DIM,                &  ! domain dimension (bivariate grid)
+                        m=m2,xg=xg,                   &  ! per-axis point counts and coordinates xg(1:m(d),d)
+                        z=this%z,                     &  ! z(iy,ix) gridded data, flat row-major (x slowest, y fastest)
+                        lo=this%left,hi=this%right,   &  ! per-axis lo/hi range
+                        k=this%order,                 &  ! [1:5] per-axis spline degree. Recommended: bicubic (=3)
+                        s=this%smoothing,             &  ! spline accuracy (iopt>=0)
+                        nest=this%nest,               &  ! estimated number of knots / storage nest(d) >= 2*(k(d)+1)
+                        n=this%knots,t=this%t,        &  ! per-axis knot counts (out) and knots t(1:n(d),d) (out)
+                        c=this%c,fp=this%fp,          &  ! spline output. size(c)>=product(nest-order-1)
+                        wrk=this%wrk,lwrk=this%lwrk,  &  ! memory
+                        iwrk=this%iwrk,kwrk=this%liwrk, & ! memory
+                        ier=ierr)                       ! Error flag
 
             ! If fit was successful, set iopt to "old"
             if (FITPACK_SUCCESS(ierr)) this%iopt = IOPT_OLD_FIT
@@ -387,20 +387,19 @@ module fitpack_grid_surfaces
         integer(FP_FLAG), optional, intent(out) :: ierr
 
         integer(FP_FLAG) :: ier
-        integer(FP_SIZE) :: min_lwrk
-        real(FP_REAL), allocatable :: wrk(:)
+        real(FP_REAL)    :: xg(2,size(x))
 
-        ! bispeu workspace: lwrk >= kx+ky+2
-        min_lwrk = sum(this%order) + 2
-        allocate(wrk(min_lwrk))
+        ! scattered points in the dimension-generic column layout: point i = xg(:,i)
+        xg(1,:) = x;  xg(2,:) = y
 
-        call bispeu(tx=this%t(:,1),nx=this%knots(1),   &
-                    ty=this%t(:,2),ny=this%knots(2),   &
-                    c=this%c,                          &
-                    kx=this%order(1),ky=this%order(2), &
-                    x=x,y=y,z=f,m=size(x),            &
-                    wrk=wrk,lwrk=min_lwrk,             &
-                    ier=ier)
+        ! On successful exit f(i) contains the value of s(x,y) at point (x(i),y(i)), i=1,...,m
+        call ndspeu(dims=2_FP_DIM,                     &    ! domain dimension (bivariate spline)
+                    t=this%t,n=this%knots(1:2),        &    ! position of the knots per axis, and their number
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:2),                 &    ! the degrees of the spline
+                    xg=xg,m=size(x,kind=FP_SIZE),      &    ! scattered points xg(:,i), and their number
+                    z=f,                               &    ! value of the spline at the points
+                    ier=ier)                                ! error flag
 
         call fitpack_error_handling(ier,ierr,'evaluate grid surface at scattered points')
 
@@ -439,15 +438,16 @@ module fitpack_grid_surfaces
 
         ! On successful exit f(j,i) contains the value of s(x,y) at point
         ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
-        call bispev(tx=this%t(:,1),nx=this%knots(1), &
-                    ty=this%t(:,2),ny=this%knots(2), &
-                    c=this%c, &
-                    kx=this%order(1),ky=this%order(2), &
-                    x=x,mx=size(x), &
-                    y=y,my=size(y), &
-                    z=f, &
-                    wrk=this%wrk,lwrk=this%lwrk, &
-                    iwrk=this%iwrk,kwrk=this%liwrk,ier=ier)
+        call bispev(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
+                    ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
+                    c=this%c,                          &    ! the b-spline coefficients
+                    kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
+                    x=x,mx=size(x),                    &    ! x grid points: tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2:mx
+                    y=y,my=size(y),                    &    ! y grid points: ty(ky+1)<=y(i-1)<=y(i)<=ty(ny-ky), i=2:my
+                    z=f,                               &    ! value of the spline at the grid points
+                    wrk=this%wrk,lwrk=this%lwrk,       &    ! memory
+                    iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
+                    ier=ier)                                ! error flag
 
         call fitpack_error_handling(ier,ierr,'evaluate gridded surface')
 
@@ -483,43 +483,50 @@ module fitpack_grid_surfaces
         ! Optional error flag
         integer(FP_FLAG), optional, intent(out) :: ierr 
 
-        integer(FP_FLAG) :: ier        
-        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
-        real(FP_REAL), allocatable :: min_wrk(:)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk,min_kwrk,mx,my,maxm,nc
+        real(FP_REAL),    allocatable :: min_wrk(:)
         integer(FP_SIZE), allocatable :: min_iwrk(:)
-        
-        ! Check if the internal working storage is large enough: reallocate it if necessary
-        m = [size(x),size(y)]
-        
-        ! Assert real working storage
-        min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-        if (min_lwrk>this%lwrk) then 
+        real(FP_REAL)    :: xg(max(size(x),size(y)),2),zt(size(x)*size(y))
+
+        mx   = size(x,kind=FP_SIZE); my = size(y,kind=FP_SIZE)
+        maxm = max(mx,my)
+        nc   = product(this%knots(1:2)-this%order(1:2)-1)
+
+        ! Assert real working storage (parder scratch: nc derivative coeffs + per-axis basis cuboid)
+        min_lwrk = nc + maxm*(max(this%order(1)-dx,this%order(2)-dy)+1)*2
+        if (min_lwrk>this%lwrk) then
             allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
             call move_alloc(from=min_wrk,to=this%wrk)
             this%lwrk = min_lwrk
         end if
-        
+
         ! Assert integer working storage
-        min_kwrk = sum(m)
-        if (min_kwrk>this%liwrk) then 
+        min_kwrk = maxm*2
+        if (min_kwrk>this%liwrk) then
             allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
             call move_alloc(from=min_iwrk,to=this%iwrk)
             this%liwrk = min_kwrk
         end if
-        
-        ! On successful exit f(j,i) contains the value of s(x,y) at point
-        ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
-        call parder(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
-                    ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
-                    c=this%c,                          &    ! the b-spline coefficients                  
-                    kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
-                    nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
-                    x=x,mx=size(x),                    &    ! x grid points: tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2:mx.
-                    y=y,my=size(y),                    &    ! y grid points: ty(ky+1)<=y(i-1)<=y(i)<=ty(ny-ky), i=2:mx.
-                    z=f,                               &    ! Value of the partial derivative
+
+        ! grid nodes in the dimension-generic per-axis column layout: xg(1:m(d),d)
+        xg(1:mx,1) = x;  xg(1:my,2) = y
+
+        ! On successful exit zt contains the value of the specified partial derivative
+        ! of s(x,y) at point (x(i),y(j)),i=1,...,mx; j=1,...,my.
+        call parder(dims=2_FP_DIM,                     &    ! domain dimension (bivariate spline)
+                    t=this%t,n=this%knots(1:2),        &    ! position of the knots per axis, and their number
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:2),                 &    ! the degrees of the spline
+                    nu=[dx,dy],                        &    ! order of the derivatives 0<=nu(d)<k(d)
+                    xg=xg,m=[mx,my],                   &    ! per-axis grid points xg(1:m(d),d), ascending
+                    z=zt,                              &    ! value of the partial derivative, flat row-major
                     wrk=this%wrk,lwrk=this%lwrk,       &    ! memory
                     iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
-                    ier=ier)
+                    ier=ier)                                ! error flag
+
+        ! N-D output is flat (x slowest, y fastest): z((i-1)*my+j) = deriv(x_i,y_j) -> f(j,i)
+        f = reshape(zt,[my,mx])
 
         call fitpack_error_handling(ier,ierr,'evaluate gridded derivatives')
 
@@ -543,52 +550,46 @@ module fitpack_grid_surfaces
         ! Optional error flag
         integer(FP_FLAG), optional, intent(out) :: ierr 
 
-        integer(FP_FLAG) :: ier        
-        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk,nc,npts
         real(FP_REAL), allocatable :: min_wrk(:)
-        integer(FP_SIZE), allocatable :: min_iwrk(:)
-        
-        ! Check if the input arrays have the same size
-        m = [size(x),size(y)]
-        if (m(1)/=m(2)) then 
-            
+        real(FP_REAL)    :: xg(2,size(x))
+
+        ! Require matching (x,y) point lists
+        if (size(x)/=size(y)) then
+
             ier = FITPACK_INPUT_ERROR
-            
+
         else
-        
-            ! Assert real working storage
-            min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-            if (min_lwrk>this%lwrk) then 
+
+            npts = size(x,kind=FP_SIZE)
+            nc   = product(this%knots(1:2)-this%order(1:2)-1)
+
+            ! Assert real working storage (pardeu scratch: nc derivative coefficients)
+            min_lwrk = nc
+            if (min_lwrk>this%lwrk) then
                 allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
                 call move_alloc(from=min_wrk,to=this%wrk)
                 this%lwrk = min_lwrk
             end if
-            
-            ! Assert integer working storage
-            min_kwrk = sum(m)
-            if (min_kwrk>this%liwrk) then 
-                allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
-                call move_alloc(from=min_iwrk,to=this%iwrk)
-                this%liwrk = min_kwrk
-            end if
-            
-            ! On successful exit f(j,i) contains the value of s(x,y) at point
-            ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
-            call pardeu(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
-                        ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
-                        c=this%c,                          &    ! the b-spline coefficients                  
-                        kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
-                        nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
-                        x=x,y=y,                           &    ! list of (x,y) points
-                        z=f,                               &    ! Value of the partial derivative
-                        m=m(1),                            &    ! Number of input points
-                        wrk=this%wrk,lwrk=this%lwrk,       &    ! memory
-                        iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
-                        ier=ier)
 
-            
+            ! scattered points in the dimension-generic column layout: point i = xg(:,i)
+            xg(1,:) = x;  xg(2,:) = y
+
+            ! On successful exit f(i) contains the value of the specified partial derivative
+            ! of s(x,y) at point (x(i),y(i)), i=1,...,m
+            call pardeu(dims=2_FP_DIM,                 &    ! domain dimension (bivariate spline)
+                        t=this%t,n=this%knots(1:2),    &    ! position of the knots per axis, and their number
+                        c=this%c,                      &    ! the b-spline coefficients
+                        k=this%order(1:2),             &    ! the degrees of the spline
+                        nu=[dx,dy],                    &    ! order of the derivatives 0<=nu(d)<k(d)
+                        xg=xg,m=npts,                  &    ! scattered points xg(:,i), and their number
+                        z=f,                           &    ! value of the partial derivative at the points
+                        wrk=this%wrk,lwrk=this%lwrk,   &    ! memory
+                        ier=ier)                            ! error flag
+
         end if
-        
+
         call fitpack_error_handling(ier,ierr,'evaluate bivariate derivatives')
 
     end function gridded_derivatives_many
@@ -625,13 +626,11 @@ module fitpack_grid_surfaces
         class(fitpack_grid_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(2), upper(2)
 
-        real(FP_REAL) :: wrk(this%knots(1)+this%knots(2)-this%order(1)-this%order(2)-2)
-
-        gridsurf_integral = dblint(this%t(:,1), this%knots(1), &
-                                   this%t(:,2), this%knots(2), &
-                                   this%c, &
-                                   this%order(1), this%order(2), &
-                                   lower(1), upper(1), lower(2), upper(2), wrk)
+        gridsurf_integral = dblint(dims=2_FP_DIM,              &  ! domain dimension (bivariate spline)
+                                   t=this%t,n=this%knots(1:2), &  ! position of the knots per axis, and their number
+                                   c=this%c,                   &  ! the b-spline coefficients
+                                   k=this%order(1:2),          &  ! the degrees of the spline
+                                   xb=lower,xe=upper)             ! per-axis integration bounds
 
     end function gridsurf_integral
 
@@ -648,26 +647,34 @@ module fitpack_grid_surfaces
         type(fitpack_curve) :: curve
 
         integer(FP_FLAG) :: ier
-        integer(FP_SIZE) :: iopt, nu, nc
+        integer(FP_DIM)  :: ax
+        integer(FP_SIZE) :: nu, nc
         real(FP_REAL), allocatable :: cu(:)
 
         if (along_y) then
-            iopt = 0
-            nu   = this%knots(2)
-            nc   = this%knots(2) - this%order(2) - 1
+            ! f(y) = s(u,y): fix axis x, result over y
+            ax = 1
+            nu = this%knots(2)
+            nc = this%knots(2) - this%order(2) - 1
         else
-            iopt = 1
-            nu   = this%knots(1)
-            nc   = this%knots(1) - this%order(1) - 1
+            ! g(x) = s(x,u): fix axis y, result over x
+            ax = 2
+            nu = this%knots(1)
+            nc = this%knots(1) - this%order(1) - 1
         end if
 
         allocate(cu(nu))
 
-        call profil(iopt, this%t(:,1), this%knots(1), &
-                          this%t(:,2), this%knots(2), &
-                          this%c, &
-                          this%order(1), this%order(2), &
-                          u, nu, cu, ier)
+        ! On successful exit cu contains the b-spline coefficients of the univariate
+        ! cross-section spline f(y)=s(u,y) (ax=1) or g(x)=s(x,u) (ax=2)
+        call profil(ax=ax,                             &    ! axis to fix (1=x, 2=y)
+                    dims=2_FP_DIM,                     &    ! domain dimension (bivariate spline)
+                    t=this%t,n=this%knots(1:2),        &    ! position of the knots per axis, and their number
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:2),                 &    ! the degrees of the spline
+                    u=u,                               &    ! value at which the fixed axis is frozen
+                    cu=cu,                             &    ! cross-section spline coefficients
+                    ier=ier)                                ! error flag
 
         if (FITPACK_SUCCESS(ier)) then
             curve%order = merge(this%order(2), this%order(1), along_y)
@@ -709,9 +716,15 @@ module fitpack_grid_surfaces
 
         allocate(newc(nc_old))
 
-        call pardtc(this%t(:,1), nx, this%t(:,2), ny, &
-                    this%c, this%order(1), this%order(2), &
-                    nux, nuy, newc, ier)
+        ! On successful exit newc contains the b-spline coefficients of the derivative
+        ! spline, of degrees (kx-nux,ky-nuy) over the trimmed knot vectors
+        call pardtc(dims=2_FP_DIM,                     &    ! domain dimension (bivariate spline)
+                    t=this%t,n=this%knots(1:2),        &    ! position of the knots per axis, and their number
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:2),                 &    ! the degrees of the spline
+                    nu=[nux,nuy],                      &    ! order of the derivatives 0<=nu(d)<k(d)
+                    newc=newc,                         &    ! derivative spline coefficients
+                    ier=ier)                                ! error flag
 
         if (FITPACK_SUCCESS(ier)) then
             newkx  = this%order(1) - nux
@@ -817,4 +830,4 @@ module fitpack_grid_surfaces
         call FP_COMM_EXPAND(this%t, buffer(pos:))
     end subroutine gridsurf_comm_expand
 
-end module fitpack_grid_surfaces
+end module fitpack_gridded_surfaces
