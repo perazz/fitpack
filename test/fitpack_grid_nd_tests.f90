@@ -1041,13 +1041,13 @@ module fitpack_grid_nd_tests
         integer(FP_FLAG) :: ier,ier2
         real(FP_REAL)    :: tx(NXEST),ty(NYEST),c(NCMAX),fp
         real(FP_REAL)    :: px(NP),py(NP),zref(NP),ztest(NP),bwrk(64)
-        real(FP_REAL)    :: t2(NXEST,2),xg2(NP,2)
+        real(FP_REAL)    :: t2(NXEST,2),xg2(2,NP)
         integer(FP_SIZE) :: n2(2),k2(2)
         ! dims=3
         integer(FP_SIZE), parameter :: kx3=3,ky3=2,kw3=4,nk1x=6,nk1y=5,nk1w=7
         integer(FP_SIZE), parameter :: nxk=nk1x+kx3+1,nyk=nk1y+ky3+1,nwk=nk1w+kw3+1,maxn=nwk
         real(FP_REAL)    :: t3(maxn,3),c3(nk1x*nk1y*nk1w),ca(nk1x),cb(nk1y),cd(nk1w)
-        real(FP_REAL)    :: xg3(NP,3),znd(NP),fx(NP),fy(NP),fw(NP)
+        real(FP_REAL)    :: xg3(3,NP),znd(NP),fx(NP),fy(NP),fw(NP)
         real(FP_REAL)    :: sa(maxn),sb(maxn),sd(maxn)
         integer(FP_SIZE) :: n3(3),k3(3)
         real(FP_REAL)    :: maxdiff
@@ -1070,7 +1070,7 @@ module fitpack_grid_nd_tests
             end do
             call bispeu(tx,nx,ty,ny,c,kx,ky,px,py,zref,NP,bwrk,size(bwrk,kind=FP_SIZE),ier)
             t2 = zero; t2(1:nx,1)=tx(1:nx); t2(1:ny,2)=ty(1:ny)
-            n2 = [nx,ny]; k2 = [kx,ky]; xg2(:,1)=px; xg2(:,2)=py
+            n2 = [nx,ny]; k2 = [kx,ky]; xg2(1,:)=px; xg2(2,:)=py
             call bispeu_nd(2_FP_DIM,t2,n2,c(1:nc),k2,xg2,NP,ztest,ier2)
             if (.not.FITPACK_SUCCESS(ier) .or. .not.FITPACK_SUCCESS(ier2) .or. .not.all(zref==ztest)) then
                 ok=.false.; write(useUnit,5100) trim(gc%label),maxval(abs(zref-ztest)); return
@@ -1080,18 +1080,18 @@ module fitpack_grid_nd_tests
         ! ---- dims=3 : separable spline vs product of 1-D splev ----
         call build_separable_3d(kx3,ky3,kw3,nk1x,nk1y,nk1w,t3,n3,k3,c3,ca,cb,cd)
         do i=1,NP
-           xg3(i,1) = (real(i,FP_REAL)-half)/real(NP,FP_REAL)
-           xg3(i,2) = one - 0.7_FP_REAL*xg3(i,1)
-           xg3(i,3) = 0.2_FP_REAL + 0.6_FP_REAL*xg3(i,1)
+           xg3(1,i) = (real(i,FP_REAL)-half)/real(NP,FP_REAL)
+           xg3(2,i) = one - 0.7_FP_REAL*xg3(1,i)
+           xg3(3,i) = 0.2_FP_REAL + 0.6_FP_REAL*xg3(1,i)
         end do
         call bispeu_nd(3_FP_DIM,t3,n3,c3,k3,xg3,NP,znd,ier)
         if (.not.FITPACK_SUCCESS(ier)) then
             ok=.false.; write(useUnit,'(a,i0)') '[gate I] bispeu_nd(dims=3) failed, ier=',ier; return
         end if
         sa=zero; sa(1:nk1x)=ca; sb=zero; sb(1:nk1y)=cb; sd=zero; sd(1:nk1w)=cd
-        call splev(t3(1:n3(1),1),n3(1),sa(1:n3(1)),kx3,xg3(:,1),fx,NP,OUTSIDE_NEAREST_BND,ier)
-        call splev(t3(1:n3(2),2),n3(2),sb(1:n3(2)),ky3,xg3(:,2),fy,NP,OUTSIDE_NEAREST_BND,ier)
-        call splev(t3(1:n3(3),3),n3(3),sd(1:n3(3)),kw3,xg3(:,3),fw,NP,OUTSIDE_NEAREST_BND,ier)
+        call splev(t3(1:n3(1),1),n3(1),sa(1:n3(1)),kx3,xg3(1,:),fx,NP,OUTSIDE_NEAREST_BND,ier)
+        call splev(t3(1:n3(2),2),n3(2),sb(1:n3(2)),ky3,xg3(2,:),fy,NP,OUTSIDE_NEAREST_BND,ier)
+        call splev(t3(1:n3(3),3),n3(3),sd(1:n3(3)),kw3,xg3(3,:),fw,NP,OUTSIDE_NEAREST_BND,ier)
         maxdiff = maxval(abs(znd - fx*fy*fw))
         if (maxdiff > 1.0e-12_FP_REAL) then
             ok=.false.; write(useUnit,5200) maxdiff; return
@@ -1121,7 +1121,7 @@ module fitpack_grid_nd_tests
         real(FP_REAL)    :: px(NP),py(NP),zs2(NP),zsnd(NP)
         real(FP_REAL)    :: wrkp(4000),wrknd(4000)
         integer(FP_SIZE) :: iwrkp(400),iwrknd(400)
-        real(FP_REAL)    :: t2(NXEST,2),xg2(size(daregr_x),2),xgp2(NP,2)
+        real(FP_REAL)    :: t2(NXEST,2),xg2(size(daregr_x),2),xgp2(2,NP)
         integer(FP_SIZE) :: n2(2),k2(2),m2(2),nu2(2),dxy(2,3)
         ! dims=3
         integer(FP_SIZE), parameter :: k3v=3,nk1=6,mg=8,nkk=nk1+k3v+1
@@ -1130,7 +1130,7 @@ module fitpack_grid_nd_tests
         real(FP_REAL),    parameter :: py_c(4)=[0.8_FP_REAL,-0.4_FP_REAL,0.6_FP_REAL,0.1_FP_REAL]
         real(FP_REAL),    parameter :: pw_c(4)=[1.2_FP_REAL,0.3_FP_REAL,-0.5_FP_REAL,0.15_FP_REAL]
         real(FP_REAL)    :: t3(nkk,3),xg3(mg,3),c3(nc3),z3(mg*mg*mg),fpf,lo(3),hi(3)
-        real(FP_REAL)    :: xgp(maxmp,3),zp(mpx*mpy*mpw),ptsc(NP,3),zsc(NP)
+        real(FP_REAL)    :: xgp(maxmp,3),zp(mpx*mpy*mpw),ptsc(3,NP),zsc(NP)
         integer(FP_SIZE) :: n3(3),k3(3),m3(3),nest3(3),mp3(3),nu3(3)
         integer(FP_SIZE) :: ix,iy,iw,iout
         real(FP_REAL)    :: x,y,w,maxdiff
@@ -1155,7 +1155,7 @@ module fitpack_grid_nd_tests
                px(i) = daregr_x(1) + (daregr_x(mx)-daregr_x(1))*(real(i,FP_REAL)-half)/real(NP,FP_REAL)
                py(i) = daregr_y(1) + (daregr_y(my)-daregr_y(1))*(real(NP-i,FP_REAL)+half)/real(NP,FP_REAL)
             end do
-            xgp2(:,1)=px; xgp2(:,2)=py
+            xgp2(1,:)=px; xgp2(2,:)=py
 
             do ic=1,3
                 nu2 = dxy(:,ic)
@@ -1246,9 +1246,9 @@ module fitpack_grid_nd_tests
 
         ! pardeu_nd at scattered interior points vs the same analytic derivative
         do i=1,NP
-           ptsc(i,1) = (real(i,FP_REAL)-half)/real(NP,FP_REAL)
-           ptsc(i,2) = one - 0.7_FP_REAL*ptsc(i,1)
-           ptsc(i,3) = 0.2_FP_REAL + 0.6_FP_REAL*ptsc(i,1)
+           ptsc(1,i) = (real(i,FP_REAL)-half)/real(NP,FP_REAL)
+           ptsc(2,i) = one - 0.7_FP_REAL*ptsc(1,i)
+           ptsc(3,i) = 0.2_FP_REAL + 0.6_FP_REAL*ptsc(1,i)
         end do
         call pardeu_nd(3_FP_DIM,t3,n3,c3,k3,nu3,ptsc,NP,zsc,wrknd,size(wrknd,kind=FP_SIZE),ier)
         if (.not.FITPACK_SUCCESS(ier)) then
@@ -1257,7 +1257,7 @@ module fitpack_grid_nd_tests
         maxdiff = zero
         do i=1,NP
            maxdiff = max(maxdiff, abs(zsc(i) - &
-               poly_deriv(px_c,nu3(1),ptsc(i,1))*poly_deriv(py_c,nu3(2),ptsc(i,2))*poly_deriv(pw_c,nu3(3),ptsc(i,3))))
+               poly_deriv(px_c,nu3(1),ptsc(1,i))*poly_deriv(py_c,nu3(2),ptsc(2,i))*poly_deriv(pw_c,nu3(3),ptsc(3,i))))
         end do
         if (maxdiff > 1.0e-8_FP_REAL) then
             ok=.false.; write(useUnit,6300) 'pardeu_nd', maxdiff; return
@@ -1531,7 +1531,7 @@ module fitpack_grid_nd_tests
         integer(FP_SIZE) :: k3(3),n3(3),nu(3)
         real(FP_REAL), allocatable :: xg(:,:),zflat(:),wrk(:),wrk2(:),cu_dir(:),newc_dir(:)
         integer(FP_SIZE), allocatable :: iwrk(:)
-        real(FP_REAL) :: xp(NP,dims),fe_cls(NP),fe_dir(NP),fd_cls(NP),fd_dir(NP)
+        real(FP_REAL) :: xp(dims,NP),fe_cls(NP),fe_dir(NP),fd_cls(NP),fd_dir(NP)
         real(FP_REAL) :: fg_cls(product(m)),fg_dir(product(m)),fg_dsp(product(m))
         real(FP_REAL) :: lo(dims),hi(dims),int_cls,int_dir,u,s
         real(FP_REAL) :: xgf(maxval(m),dims),zf_full(m(1)*m(2)),zf_sub(m(1)*m(2))
@@ -1550,15 +1550,15 @@ module fitpack_grid_nd_tests
 
         ! scattered points strictly inside the fitted domain
         do i=1,NP
-           xp(i,1) = obj%left(1) + (obj%right(1)-obj%left(1))*(real(i,FP_REAL)-half)/real(NP,FP_REAL)
-           xp(i,2) = obj%left(2) + (obj%right(2)-obj%left(2))*(real(NP-i,FP_REAL)+half)/real(NP,FP_REAL)
-           xp(i,3) = obj%left(3) + (obj%right(3)-obj%left(3))*half
+           xp(1,i) = obj%left(1) + (obj%right(1)-obj%left(1))*(real(i,FP_REAL)-half)/real(NP,FP_REAL)
+           xp(2,i) = obj%left(2) + (obj%right(2)-obj%left(2))*(real(NP-i,FP_REAL)+half)/real(NP,FP_REAL)
+           xp(3,i) = obj%left(3) + (obj%right(3)-obj%left(3))*half
         end do
 
         ! --- eval (scattered) vs direct bispeu_nd (+ single-point overload) ---
         fe_cls = obj%eval(xp,ier)
         call bispeu_nd(dims,obj%t,n3,obj%c,k3,xp,NP,fe_dir,ier)
-        if (.not.all(fe_cls==fe_dir) .or. obj%eval(xp(1,:))/=fe_dir(1)) then
+        if (.not.all(fe_cls==fe_dir) .or. obj%eval(xp(:,1))/=fe_dir(1)) then
             write(useUnit,9100) 'eval'; ok=.false.; return
         end if
 
@@ -1575,7 +1575,7 @@ module fitpack_grid_nd_tests
         allocate(wrk2(nc),source=zero)
         fd_cls = obj%dfdx(xp,nu,ier)
         call pardeu_nd(dims,obj%t,n3,obj%c,k3,nu,xp,NP,fd_dir,wrk2,nc,ier)
-        if (.not.all(fd_cls==fd_dir) .or. obj%dfdx(xp(1,:),nu)/=fd_dir(1)) then
+        if (.not.all(fd_cls==fd_dir) .or. obj%dfdx(xp(:,1),nu)/=fd_dir(1)) then
             write(useUnit,9100) 'dfdx'; ok=.false.; return
         end if
 

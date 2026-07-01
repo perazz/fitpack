@@ -2467,7 +2467,8 @@ module fitpack_core
       !! @param[in]  n     Number of knots per axis, `n(dims)`
       !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
       !! @param[in]  k     Spline degree per axis, `k(dims)`
-      !! @param[in]  xg    Point coordinates, `xg(i,d)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !! @param[in]  xg    Point coordinates, `xg(d,i)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$;
+      !!                   point \f$ i \f$ is the contiguous column `xg(:,i)` (matches curev/parcur layout)
       !! @param[in]  m     Number of evaluation points, \f$ m \ge 1 \f$
       !! @param[out] z     Spline values at the points, `z(m)`
       !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
@@ -2481,8 +2482,9 @@ module fitpack_core
           integer(FP_FLAG), intent(out) :: ier
 
           integer(FP_SIZE) :: i,mone(dims)
-          !  a scattered point is a 1x...x1 grid: singleton basis/interval scratch for the fpndsp kernel
-          real(FP_REAL)    :: w(MAX_ORDER+1,1,dims)
+          !  a scattered point is a 1x...x1 grid. fpndsp reads xg(node,axis), so the single node is the
+          !  leading extent; keep the row fixed-size (MAX_IDIM axes) so the temp is not re-sized per call.
+          real(FP_REAL)    :: xp(1,MAX_IDIM),w(MAX_ORDER+1,1,dims)
           integer(FP_SIZE) :: lidx(1,dims)
 
           ier = FITPACK_INPUT_ERROR
@@ -2491,7 +2493,8 @@ module fitpack_core
 
           mone = 1
           do i=1,m
-             call fpndsp(dims,t,n,c,k,xg(i:i,1:dims),mone,z(i:i),w,lidx)
+             xp(1,1:dims) = xg(1:dims,i)              ! point i (contiguous column) -> singleton grid row
+             call fpndsp(dims,t,n,c,k,xp(:,:dims),mone,z(i:i),w,lidx)
           end do
           return
       end subroutine bispeu_nd
@@ -15983,7 +15986,8 @@ module fitpack_core
       !! @param[in]     c     B-spline coefficient tensor, flat row-major (first axis slowest)
       !! @param[in]     k     Spline degree per axis, `k(dims)`
       !! @param[in]     nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
-      !! @param[in]     xg    Point coordinates, `xg(i,d)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !! @param[in]     xg    Point coordinates, `xg(d,i)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !!                      (point \f$ i \f$ = contiguous column `xg(:,i)`)
       !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$
       !! @param[out]    z     Derivative values at the points, `z(m)`
       !! @param[in,out] wrk   Real workspace, length \f$ \ge \prod_d (n(d)-k(d)-1) \f$

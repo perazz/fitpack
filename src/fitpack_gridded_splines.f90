@@ -313,20 +313,21 @@ module fitpack_gridded_splines
 
     !> @brief Evaluate the fitted spline at scattered points (delegates to bispeu_nd).
     !!
-    !! @param[in]  xp   Point coordinates, `xp(i,d)` = axis-`d` coordinate of point `i` (shape `(m,dims)`).
+    !! @param[in]  xp   Point coordinates, `xp(d,i)` = axis-`d` coordinate of point `i` (shape `(dims,m)`,
+    !!                  point `i` = contiguous column `xp(:,i)`; matches curev/parcur layout).
     !! @param[out] ierr Optional error flag.
     !! @return     f    Spline values at the `m` points.
     function grid_eval_many(this,xp,ierr) result(f)
         class(fitpack_gridded_spline), intent(in) :: this
         real(FP_REAL),    intent(in) :: xp(:,:)
         integer(FP_FLAG), intent(out), optional :: ierr
-        real(FP_REAL) :: f(size(xp,1))
+        real(FP_REAL) :: f(size(xp,2))
 
         integer(FP_FLAG) :: ier
         integer(FP_SIZE) :: m
 
-        m = size(xp,1,kind=FP_SIZE)
-        if (size(xp,2)/=this%dims) then
+        m = size(xp,2,kind=FP_SIZE)
+        if (size(xp,1)/=this%dims) then
             ier = FITPACK_INPUT_ERROR
         else
             call bispeu_nd(this%dims,this%t,this%knots(1:this%dims),this%c, &
@@ -340,8 +341,8 @@ module fitpack_gridded_splines
         class(fitpack_gridded_spline), intent(in) :: this
         real(FP_REAL),    intent(in) :: x(:)
         integer(FP_FLAG), intent(out), optional :: ierr
-        real(FP_REAL) :: xp(1,size(x)),f1(1)
-        xp(1,:) = x
+        real(FP_REAL) :: xp(size(x),1),f1(1)
+        xp(:,1) = x
         f1 = grid_eval_many(this,xp,ierr)
         f  = f1(1)
     end function grid_eval_one
@@ -379,12 +380,15 @@ module fitpack_gridded_splines
     end function grid_derivatives_gridded
 
     !> @brief Evaluate partial derivatives of order `nu(:)` at scattered points (delegates to pardeu_nd).
+    !!
+    !! @param[in]  xp   Point coordinates, `xp(d,i)` = axis-`d` coordinate of point `i` (shape `(dims,m)`,
+    !!                  point `i` = contiguous column `xp(:,i)`).
     function grid_derivatives_many(this,xp,nu,ierr) result(f)
         class(fitpack_gridded_spline), intent(in) :: this
         real(FP_REAL),    intent(in) :: xp(:,:)
         integer(FP_SIZE), intent(in) :: nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
-        real(FP_REAL) :: f(size(xp,1))
+        real(FP_REAL) :: f(size(xp,2))
 
         integer(FP_FLAG) :: ier
         integer(FP_DIM)  :: dims
@@ -392,8 +396,8 @@ module fitpack_gridded_splines
         real(FP_REAL), allocatable :: wrk(:)
 
         dims = this%dims
-        m    = size(xp,1,kind=FP_SIZE)
-        if (size(xp,2)/=dims) then
+        m    = size(xp,2,kind=FP_SIZE)
+        if (size(xp,1)/=dims) then
             ier = FITPACK_INPUT_ERROR
         else
             nc = product(this%knots(1:dims)-this%order(1:dims)-1)
@@ -410,8 +414,8 @@ module fitpack_gridded_splines
         real(FP_REAL),    intent(in) :: x(:)
         integer(FP_SIZE), intent(in) :: nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
-        real(FP_REAL) :: xp(1,size(x)),f1(1)
-        xp(1,:) = x
+        real(FP_REAL) :: xp(size(x),1),f1(1)
+        xp(:,1) = x
         f1 = grid_derivatives_many(this,xp,nu,ierr)
         f  = f1(1)
     end function grid_derivatives_one
