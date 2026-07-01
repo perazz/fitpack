@@ -20,6 +20,7 @@
 ! **************************************************************************************************
 module fitpack_grid_nd_tests
     use fitpack_core
+    use fitpack_gridded_splines, only: fitpack_gridded_spline
     use fitpack_test_data, only: daregr_x,daregr_y,daregr_z
     use iso_fortran_env, only: output_unit
     implicit none
@@ -67,6 +68,9 @@ module fitpack_grid_nd_tests
 
         ! Gate G: regrid at dims=3 SMOOTHING (s>0) — the generalized knot-direction arbiter
         if (success) success = gate_regrid_nd_3d_smoothing(useUnit)
+
+        ! Gate H: the generic fitpack_gridded_spline class (dims=3/5 fit+eval, row_major flag, comm)
+        if (success) success = gate_gridded_spline_class(useUnit)
 
         if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all N-D gridded gates OK'
 
@@ -770,5 +774,181 @@ module fitpack_grid_nd_tests
         end function runge
 
     end function gate_regrid_nd_3d_smoothing
+
+    !> @brief Gate H — the generic fitpack_gridded_spline class is pure marshalling over regrid/ndspev.
+    !!
+    !! Asserts that a dims=3 and a dims=5 fit+eval through the class reproduce a direct regrid+ndspev
+    !! call bit-for-bit; that the row_major flag (a natural column-major array) yields the same fit as
+    !! the flat row-major buffer; and that comm pack/expand round-trips.
+    logical function gate_gridded_spline_class(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+        ok = .true.
+        if (ok) ok = class_matches_direct(useUnit,'dims=3',3_FP_DIM,[6_FP_SIZE,5_FP_SIZE,7_FP_SIZE],3_FP_SIZE)
+        if (ok) ok = class_matches_direct(useUnit,'dims=5', &
+                          5_FP_DIM,[4_FP_SIZE,3_FP_SIZE,4_FP_SIZE,3_FP_SIZE,4_FP_SIZE],2_FP_SIZE)
+        if (ok) ok = class_row_major_flag(useUnit)
+        if (ok) ok = class_comm_roundtrip(useUnit)
+        if (ok) write(useUnit,'(a)') &
+            '[gate H] fitpack_gridded_spline == direct regrid+ndspev; row_major flag; comm round-trip'
+    end function gate_gridded_spline_class
+
+    !> @brief Build a strictly-increasing coordinate table and a smooth flat (row-major) value grid.
+    subroutine build_grid(dims,m,xg,zflat)
+        integer(FP_DIM),  intent(in)  :: dims
+        integer(FP_SIZE), intent(in)  :: m(:)
+        real(FP_REAL),    intent(out) :: xg(:,:)
+        real(FP_REAL),    intent(out) :: zflat(:)
+        integer(FP_DIM)  :: d
+        integer(FP_SIZE) :: p,idx(dims),k
+        real(FP_REAL)    :: v
+        xg = zero
+        do d=1,dims
+           do p=1,m(d)
+              xg(p,d) = real(p-1,FP_REAL)/real(m(d)-1,FP_REAL) + 0.15_FP_REAL*real(d,FP_REAL)
+           end do
+        end do
+        ! flat row-major (axis 1 slowest): iterate the multi-index with axis dims fastest
+        idx = 1
+        do p=1,product(m(1:dims))
+           v = one
+           do d=1,dims
+              v = v + real(d,FP_REAL)*xg(idx(d),d) + xg(idx(d),d)**2      ! smooth, non-symmetric
+           end do
+           zflat(p) = v
+           k = dims
+           do
+              idx(k) = idx(k)+1
+              if (idx(k)<=m(k)) exit
+              idx(k) = 1; k = k-1
+              if (k<1) exit
+           end do
+        end do
+    end subroutine build_grid
+
+    !> @brief Fit+eval a grid through the class and compare bit-for-bit to a direct regrid+ndspev call.
+    logical function class_matches_direct(useUnit,label,dims,m,korder) result(ok)
+        integer,          intent(in) :: useUnit
+        character(*),     intent(in) :: label
+        integer(FP_DIM),  intent(in) :: dims
+        integer(FP_SIZE), intent(in) :: m(:),korder
+
+        type(fitpack_gridded_spline) :: obj
+        integer(FP_SIZE) :: maxm,nz,k(dims),n2(dims)
+        real(FP_REAL), allocatable :: xg(:,:),zflat(:),t2(:,:),c2(:),wrk(:),zc_dir(:),zc_cls(:)
+        integer(FP_SIZE), allocatable :: iwrk(:)
+        real(FP_REAL)    :: fp2,s
+        integer(FP_FLAG) :: ier,ierc
+
+        ok  = .true.
+        maxm = maxval(m); nz = product(m(1:dims)); k = korder; s = 0.05_FP_REAL
+        allocate(xg(maxm,dims),zflat(nz),zc_dir(nz),zc_cls(nz))
+        call build_grid(dims,m,xg,zflat)
+
+        ! ---- class path ----
+        ierc = obj%new_fit(xg,zflat,m=m,order=korder,smoothing=s)
+        if (.not.FITPACK_SUCCESS(ierc)) then
+            write(useUnit,4000) trim(label),'class fit',ierc; ok = .false.; return
+        end if
+        zc_cls = obj%eval_ongrid(xg,m,ier)
+        if (.not.FITPACK_SUCCESS(ier)) then
+            write(useUnit,4000) trim(label),'class eval',ier; ok = .false.; return
+        end if
+
+        ! ---- direct regrid + ndspev with identical inputs (obj already sized the workspace) ----
+        allocate(t2(maxval(obj%nest(1:dims)),dims),source=zero)
+        allocate(c2(size(obj%c)),source=zero)
+        allocate(wrk(obj%lwrk),source=zero)
+        allocate(iwrk(obj%liwrk),source=0)
+        n2 = 0
+        call regrid(IOPT_NEW_SMOOTHING,dims,m,xg,zflat,obj%left(1:dims),obj%right(1:dims), &
+                    k,s,obj%nest(1:dims),n2,t2,c2,fp2,wrk,obj%lwrk,iwrk,obj%liwrk,ier)
+        if (.not.FITPACK_SUCCESS(ier)) then
+            write(useUnit,4000) trim(label),'direct regrid',ier; ok = .false.; return
+        end if
+
+        if (any(n2/=obj%knots(1:dims)) .or. fp2/=obj%fp .or. &
+            .not.all(c2(1:size(obj%c))==obj%c)) then
+            write(useUnit,4100) trim(label); ok = .false.; return
+        end if
+
+        call ndspev(dims,t2,n2,c2,k,xg,m,zc_dir,wrk,obj%lwrk,iwrk,obj%liwrk,ier)
+        if (.not.all(zc_dir==zc_cls)) then
+            write(useUnit,4200) trim(label),maxval(abs(zc_dir-zc_cls)); ok = .false.; return
+        end if
+
+        4000 format('[gate H] ',a,': ',a,' failed, ier=',i0)
+        4100 format('[gate H] ',a,': class fit /= direct regrid (knots/c/fp)')
+        4200 format('[gate H] ',a,': class eval /= direct ndspev, max|diff| = ',1pe12.3)
+    end function class_matches_direct
+
+    !> @brief A natural column-major array (row_major=.false.) must give the same fit as the flat
+    !!        row-major buffer of the same logical grid.
+    logical function class_row_major_flag(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_DIM),  parameter :: dims = 3
+        integer(FP_SIZE), parameter :: m1 = 6, m2 = 5, m3 = 7
+        type(fitpack_gridded_spline) :: obj_flat,obj_nat
+        real(FP_REAL) :: xg(max(m1,max(m2,m3)),dims),zflat(m1*m2*m3),anat(m1,m2,m3)
+        integer(FP_SIZE) :: mm(dims),i1,i2,i3,p
+        integer(FP_FLAG) :: e1,e2
+
+        ok = .true.
+        mm = [m1,m2,m3]
+        call build_grid(dims,mm,xg,zflat)
+
+        ! natural Fortran array A(i1,i2,i3) = f(x_i1,y_i2,w_i3), same values as the flat row-major grid
+        p = 0
+        do i1=1,m1
+           do i2=1,m2
+              do i3=1,m3
+                 p = p+1                       ! p walks row-major (axis 1 slowest) == zflat order
+                 anat(i1,i2,i3) = zflat(p)
+              end do
+           end do
+        end do
+
+        e1 = obj_flat%new_fit(xg,zflat,m=mm,smoothing=0.02_FP_REAL)                    ! flat row-major
+        e2 = obj_nat %new_fit(xg,anat,row_major=.false._FP_BOOL,smoothing=0.02_FP_REAL) ! natural column-major
+
+        if (.not.FITPACK_SUCCESS(e1) .or. .not.FITPACK_SUCCESS(e2)) then
+            write(useUnit,'(a)') '[gate H] row_major: a fit failed'; ok = .false.; return
+        end if
+        if (any(obj_flat%knots(1:dims)/=obj_nat%knots(1:dims)) .or. obj_flat%fp/=obj_nat%fp .or. &
+            .not.all(obj_flat%c==obj_nat%c)) then
+            write(useUnit,'(a)') '[gate H] row_major=.false. fit /= flat row-major fit'; ok = .false.; return
+        end if
+    end function class_row_major_flag
+
+    !> @brief comm pack/expand must round-trip a fitted class object.
+    logical function class_comm_roundtrip(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_DIM),  parameter :: dims = 3
+        integer(FP_SIZE), parameter :: mm(3) = [6,5,7]
+        type(fitpack_gridded_spline) :: obj,obj2
+        real(FP_REAL) :: xg(7,dims),zflat(6*5*7)
+        real(FP_COMM), allocatable :: buffer(:)
+        integer(FP_FLAG) :: e1
+
+        ok = .true.
+        call build_grid(dims,mm,xg,zflat)
+        e1 = obj%new_fit(xg,zflat,m=mm,smoothing=0.03_FP_REAL)
+        if (.not.FITPACK_SUCCESS(e1)) then
+            write(useUnit,'(a)') '[gate H] comm: fit failed'; ok = .false.; return
+        end if
+
+        allocate(buffer(obj%comm_size()))
+        call obj%comm_pack(buffer)
+        call obj2%comm_expand(buffer)
+
+        if (obj2%dims/=obj%dims .or. any(obj2%knots(1:dims)/=obj%knots(1:dims)) .or. &
+            obj2%fp/=obj%fp .or. size(obj2%c)/=size(obj%c)) then
+            write(useUnit,'(a)') '[gate H] comm: metadata round-trip mismatch'; ok = .false.; return
+        end if
+        if (.not.all(obj2%c==obj%c) .or. .not.all(obj2%z==obj%z)) then
+            write(useUnit,'(a)') '[gate H] comm: bulk-array round-trip mismatch'; ok = .false.; return
+        end if
+    end function class_comm_roundtrip
 
 end module fitpack_grid_nd_tests
