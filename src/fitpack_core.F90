@@ -113,10 +113,7 @@ module fitpack_core
     ! 1-based axis ID (1 = first dim x/u, 2 = second dim y/v, ... up to MAX_IDIM), so the value can
     ! be used directly as an array/axis index. This generalizes to N dimensions.
     integer(FP_SIZE), parameter,  public :: MAX_IDIM      = 10  ! Max number of dimensions
-    ! Axis-index ladder [1,2,...,MAX_IDIM]. Slicing IDIMS(:dims) yields 1..dims, so an axis mask
-    ! like IDIMS(:dims)/=ax selects "every axis except ax" for pack/unpack (see profil). Keep the
-    ! literal list in sync with MAX_IDIM.
-    integer(FP_DIM),  parameter          :: IDIMS(MAX_IDIM) = [1,2,3,4,5,6,7,8,9,10]
+    integer(FP_DIM),  parameter,  public :: IDIMS(MAX_IDIM) = [1,2,3,4,5,6,7,8,9,10]
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)

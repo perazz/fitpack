@@ -31,7 +31,7 @@
 !!
 !! @see fitpack_grid_surface — concrete 2-D face; regrid, ndspev — N-D core routines
 module fitpack_gridded_splines
-    use fitpack_core, only: FP_REAL,FP_SIZE,FP_FLAG,FP_DIM,FP_BOOL,FP_COMM,MAX_IDIM,zero,one, &
+    use fitpack_core, only: FP_REAL,FP_SIZE,FP_FLAG,FP_DIM,FP_BOOL,FP_COMM,MAX_IDIM,IDIMS,zero,one, &
                             IOPT_NEW_SMOOTHING,IOPT_OLD_FIT,IOPT_NEW_LEASTSQUARES, &
                             regrid,ndspev,FITPACK_SUCCESS,FITPACK_MESSAGE,fitpack_error_handling, &
                             get_smoothing,FITPACK_INPUT_ERROR, &
@@ -245,10 +245,22 @@ module fitpack_gridded_splines
 
         do loop=1,nit
             this%smoothing = smooth_now(loop)
-            call regrid(this%iopt,this%dims,this%m(1:this%dims),this%xg,this%z, &
-                        this%left(1:this%dims),this%right(1:this%dims),this%order(1:this%dims), &
-                        this%smoothing,this%nest(1:this%dims),this%knots(1:this%dims),this%t, &
-                        this%c,this%fp,this%wrk,this%lwrk,this%iwrk,this%liwrk,ierr)
+
+            call regrid(iopt=this%iopt,                    &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
+                        dims=this%dims,                    &  ! domain dimension
+                        m=this%m(1:this%dims),xg=this%xg,  &  ! per-axis point counts and coordinates xg(1:m(d),d)
+                        z=this%z,                          &  ! gridded data, flat row-major (axis 1 slowest)
+                        lo=this%left(1:this%dims),         &  ! per-axis lower domain bound
+                        hi=this%right(1:this%dims),        &  ! per-axis upper domain bound
+                        k=this%order(1:this%dims),         &  ! [1:5] per-axis spline degree
+                        s=this%smoothing,                  &  ! spline accuracy (iopt>=0)
+                        nest=this%nest(1:this%dims),       &  ! per-axis knot storage sizes nest(d) >= 2*(k(d)+1)
+                        n=this%knots(1:this%dims),t=this%t,&  ! per-axis knot counts (out) and knots t(1:n(d),d) (out)
+                        c=this%c,fp=this%fp,               &  ! spline output. size(c)>=product(nest-order-1)
+                        wrk=this%wrk,lwrk=this%lwrk,       &  ! memory
+                        iwrk=this%iwrk,kwrk=this%liwrk,    &  ! memory
+                        ier=ierr)                             ! error flag
+
             if (FITPACK_SUCCESS(ierr)) this%iopt = IOPT_OLD_FIT
         end do
     end function grid_fit_automatic_knots
@@ -284,25 +296,37 @@ module fitpack_gridded_splines
     !! @param[out] ierr  Optional error flag.
     !! @return     zeval Flat, row-major (axis 1 slowest) evaluated values, length `product(m)`.
     function grid_eval_ongrid(this,xg,m,ierr) result(zeval)
-        class(fitpack_gridded_spline), intent(in) :: this
+        class(fitpack_gridded_spline), intent(inout) :: this
         real(FP_REAL),    intent(in)  :: xg(:,:)
         integer(FP_SIZE), intent(in)  :: m(:)
         integer(FP_FLAG), intent(out), optional :: ierr
         real(FP_REAL) :: zeval(product(m))
 
-        integer(FP_SIZE) :: maxm,maxk1,lwrk,kwrk
-        real(FP_REAL),    allocatable :: wrk(:)
-        integer(FP_SIZE), allocatable :: iwrk(:)
+        integer(FP_SIZE) :: ofsr,ofsi
         integer(FP_FLAG) :: ier
 
-        maxm  = maxval(m)
-        maxk1 = maxval(this%order(1:this%dims))+1
-        lwrk  = maxm*maxk1*this%dims
-        kwrk  = maxm*this%dims
-        allocate(wrk(lwrk),source=zero); allocate(iwrk(kwrk),source=0_FP_SIZE)
+        ! The internal workspace is sized once, maximally, at construction; this only grows it
+        ! for evaluation grids finer than the data grid
+        call grid_ensure_eval_workspace(this,maxval(m))
 
-        call ndspev(this%dims,this%t,this%knots(1:this%dims),this%c,this%order(1:this%dims), &
-                    xg,m,zeval,wrk,lwrk,iwrk,kwrk,ier)
+        ! Carve the scratch past regrid's persistent iopt=1 state, wrk(1:2+dims)/iwrk(1:1+dims)
+        ofsr = 2+this%dims
+        ofsi = 1+this%dims
+
+        ! On successful exit zeval contains the value of s(x) at the grid points,
+        ! flat row-major (axis 1 slowest)
+        call ndspev(dims=this%dims,                    &    ! domain dimension
+                    t=this%t,                          &    ! position of the knots per axis t(1:n(d),d)
+                    n=this%knots(1:this%dims),         &    ! number of knots per axis
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:this%dims),         &    ! the degrees of the spline
+                    xg=xg,m=m,                         &    ! per-axis grid points xg(1:m(d),d), ascending
+                    z=zeval,                           &    ! value of the spline at the grid points
+                    wrk=this%wrk(ofsr+1:),             &    ! memory
+                    lwrk=this%lwrk-ofsr,               &    ! memory
+                    iwrk=this%iwrk(ofsi+1:),           &    ! memory
+                    kwrk=this%liwrk-ofsi,              &    ! memory
+                    ier=ier)                                ! error flag
 
         call fitpack_error_handling(ier,ierr,'gridded spline eval_ongrid')
     end function grid_eval_ongrid
@@ -330,8 +354,15 @@ module fitpack_gridded_splines
         if (size(xp,1)/=this%dims) then
             ier = FITPACK_INPUT_ERROR
         else
-            call ndspeu(this%dims,this%t,this%knots(1:this%dims),this%c, &
-                           this%order(1:this%dims),xp,m,f,ier)
+            ! On successful exit f(i) contains the value of s(x) at point xp(:,i), i=1,...,m
+            call ndspeu(dims=this%dims,                &    ! domain dimension
+                        t=this%t,                      &    ! position of the knots per axis t(1:n(d),d)
+                        n=this%knots(1:this%dims),     &    ! number of knots per axis
+                        c=this%c,                      &    ! the b-spline coefficients
+                        k=this%order(1:this%dims),     &    ! the degrees of the spline
+                        xg=xp,m=m,                     &    ! scattered points xp(:,i), and their number
+                        z=f,                           &    ! value of the spline at the points
+                        ier=ier)                            ! error flag
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline eval (scattered)')
     end function grid_eval_many
@@ -355,7 +386,7 @@ module fitpack_gridded_splines
     !! @param[out] ierr Optional error flag.
     !! @return     f    Flat row-major derivative values, length `product(m)`.
     function grid_derivatives_gridded(this,xg,m,nu,ierr) result(f)
-        class(fitpack_gridded_spline), intent(in) :: this
+        class(fitpack_gridded_spline), intent(inout) :: this
         real(FP_REAL),    intent(in) :: xg(:,:)
         integer(FP_SIZE), intent(in) :: m(:),nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
@@ -363,19 +394,34 @@ module fitpack_gridded_splines
 
         integer(FP_FLAG) :: ier
         integer(FP_DIM)  :: dims
-        integer(FP_SIZE) :: nc,maxm,maxk1,lwrk,kwrk
-        real(FP_REAL),    allocatable :: wrk(:)
-        integer(FP_SIZE), allocatable :: iwrk(:)
+        integer(FP_SIZE) :: ofsr,ofsi
 
-        dims  = this%dims
-        nc    = product(this%knots(1:dims)-this%order(1:dims)-1)
-        maxm  = maxval(m)
-        maxk1 = max(1_FP_SIZE, maxval(this%order(1:dims)-nu)+1)
-        lwrk  = nc + maxm*maxk1*dims
-        kwrk  = maxm*dims
-        allocate(wrk(lwrk),source=zero); allocate(iwrk(kwrk),source=0_FP_SIZE)
-        call parder(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
-                       xg,m,f,wrk,lwrk,iwrk,kwrk,ier)
+        dims = this%dims
+
+        ! The internal workspace is sized once, maximally, at construction; this only grows it
+        ! for evaluation grids finer than the data grid
+        call grid_ensure_eval_workspace(this,maxval(m))
+
+        ! Carve the scratch past regrid's persistent iopt=1 state, wrk(1:2+dims)/iwrk(1:1+dims)
+        ofsr = 2+dims
+        ofsi = 1+dims
+
+        ! On successful exit f contains the specified partial derivative of s(x) at the
+        ! grid points, flat row-major (axis 1 slowest)
+        call parder(dims=dims,                         &    ! domain dimension
+                    t=this%t,                          &    ! position of the knots per axis t(1:n(d),d)
+                    n=this%knots(1:dims),              &    ! number of knots per axis
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:dims),              &    ! the degrees of the spline
+                    nu=nu,                             &    ! order of the derivatives 0<=nu(d)<k(d)
+                    xg=xg,m=m,                         &    ! per-axis grid points xg(1:m(d),d), ascending
+                    z=f,                               &    ! value of the partial derivative, flat row-major
+                    wrk=this%wrk(ofsr+1:),             &    ! memory
+                    lwrk=this%lwrk-ofsr,               &    ! memory
+                    iwrk=this%iwrk(ofsi+1:),           &    ! memory
+                    kwrk=this%liwrk-ofsi,              &    ! memory
+                    ier=ier)                                ! error flag
+
         call fitpack_error_handling(ier,ierr,'gridded spline dfdx_ongrid')
     end function grid_derivatives_gridded
 
@@ -384,7 +430,7 @@ module fitpack_gridded_splines
     !! @param[in]  xp   Point coordinates, `xp(d,i)` = axis-`d` coordinate of point `i` (shape `(dims,m)`,
     !!                  point `i` = contiguous column `xp(:,i)`).
     function grid_derivatives_many(this,xp,nu,ierr) result(f)
-        class(fitpack_gridded_spline), intent(in) :: this
+        class(fitpack_gridded_spline), intent(inout) :: this
         real(FP_REAL),    intent(in), contiguous :: xp(:,:)   ! forwarded straight to pardeu (no pack)
         integer(FP_SIZE), intent(in) :: nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
@@ -392,25 +438,41 @@ module fitpack_gridded_splines
 
         integer(FP_FLAG) :: ier
         integer(FP_DIM)  :: dims
-        integer(FP_SIZE) :: m,nc
-        real(FP_REAL), allocatable :: wrk(:)
+        integer(FP_SIZE) :: m,ofsr
 
         dims = this%dims
         m    = size(xp,2,kind=FP_SIZE)
         if (size(xp,1)/=dims) then
             ier = FITPACK_INPUT_ERROR
         else
-            nc = product(this%knots(1:dims)-this%order(1:dims)-1)
-            allocate(wrk(nc),source=zero)
-            call pardeu(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
-                           xp,m,f,wrk,nc,ier)
+
+            ! The internal workspace is sized once, maximally, at construction; pardeu only
+            ! needs the derivative-coefficient scratch, so this never grows it
+            call grid_ensure_eval_workspace(this,1_FP_SIZE)
+
+            ! Carve the scratch past regrid's persistent iopt=1 state, wrk(1:2+dims)
+            ofsr = 2+dims
+
+            ! On successful exit f(i) contains the specified partial derivative of s(x)
+            ! at point xp(:,i), i=1,...,m
+            call pardeu(dims=dims,                     &    ! domain dimension
+                        t=this%t,                      &    ! position of the knots per axis t(1:n(d),d)
+                        n=this%knots(1:dims),          &    ! number of knots per axis
+                        c=this%c,                      &    ! the b-spline coefficients
+                        k=this%order(1:dims),          &    ! the degrees of the spline
+                        nu=nu,                         &    ! order of the derivatives 0<=nu(d)<k(d)
+                        xg=xp,m=m,                     &    ! scattered points xp(:,i), and their number
+                        z=f,                           &    ! value of the partial derivative at the points
+                        wrk=this%wrk(ofsr+1:),         &    ! memory
+                        lwrk=this%lwrk-ofsr,           &    ! memory
+                        ier=ier)                            ! error flag
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline dfdx (scattered)')
     end function grid_derivatives_many
 
     !> @brief Evaluate a partial derivative of order `nu(:)` at a single point `x(1:dims)`.
     real(FP_REAL) function grid_derivatives_one(this,x,nu,ierr) result(f)
-        class(fitpack_gridded_spline), intent(in) :: this
+        class(fitpack_gridded_spline), intent(inout) :: this
         real(FP_REAL),    intent(in) :: x(:)
         integer(FP_SIZE), intent(in) :: nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
@@ -424,8 +486,12 @@ module fitpack_gridded_splines
     real(FP_REAL) function grid_integral(this,lower,upper) result(v)
         class(fitpack_gridded_spline), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(:),upper(:)
-        v = dblint(this%dims,this%t,this%knots(1:this%dims),this%c, &
-                      this%order(1:this%dims),lower,upper)
+        v = dblint(dims=this%dims,                 &  ! domain dimension
+                   t=this%t,                       &  ! position of the knots per axis t(1:n(d),d)
+                   n=this%knots(1:this%dims),      &  ! number of knots per axis
+                   c=this%c,                       &  ! the b-spline coefficients
+                   k=this%order(1:this%dims),      &  ! the degrees of the spline
+                   xb=lower,xe=upper)                 ! per-axis integration bounds
     end function grid_integral
 
     !> @brief Cross-section: fix axis `ax` at value `u`, returning the `(dims-1)`-D spline \f$ s|_{x_{ax}=u} \f$.
@@ -456,14 +522,21 @@ module fitpack_gridded_splines
         end if
 
         !  coefficient count of the surviving-axis tensor
-        nc_sub = 1
-        do d=1,dims
-           if (d==ax) cycle
-           nc_sub = nc_sub*(this%knots(d)-this%order(d)-1)
-        end do
+        nc_sub = product(this%knots-this%order-1,IDIMS<=dims .and. IDIMS/=ax)
 
         allocate(cu(nc_sub))
-        call profil(ax,dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),u,cu,ier)
+
+        ! On successful exit cu contains the b-spline coefficients of the (dims-1)-D
+        ! cross-section spline over the surviving axes (in their original order)
+        call profil(ax=ax,                             &    ! axis to fix
+                    dims=dims,                         &    ! domain dimension
+                    t=this%t,                          &    ! position of the knots per axis t(1:n(d),d)
+                    n=this%knots(1:dims),              &    ! number of knots per axis
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:dims),              &    ! the degrees of the spline
+                    u=u,                               &    ! value at which the fixed axis is frozen
+                    cu=cu,                             &    ! cross-section spline coefficients
+                    ier=ier)                                ! error flag
 
         if (FITPACK_SUCCESS(ier)) then
             sdim = dims-1
@@ -490,6 +563,9 @@ module fitpack_gridded_splines
             allocate(sub%c(nc_sub),source=cu)
             sub%fp   = zero
             sub%iopt = IOPT_OLD_FIT
+
+            ! One-time, maximally-sized evaluation workspace for the sub-spline
+            call grid_prepare_workspace(sub)
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline cross_section')
     end function grid_cross_section
@@ -510,7 +586,17 @@ module fitpack_gridded_splines
         dims   = this%dims
         nc_old = product(this%knots(1:dims)-this%order(1:dims)-1)
         allocate(newc(nc_old))
-        call pardtc(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu,newc,ier)
+
+        ! On successful exit newc contains the b-spline coefficients of the derivative
+        ! spline, of per-axis degrees k(d)-nu(d) over the trimmed knot vectors
+        call pardtc(dims=dims,                         &    ! domain dimension
+                    t=this%t,                          &    ! position of the knots per axis t(1:n(d),d)
+                    n=this%knots(1:dims),              &    ! number of knots per axis
+                    c=this%c,                          &    ! the b-spline coefficients
+                    k=this%order(1:dims),              &    ! the degrees of the spline
+                    nu=nu,                             &    ! order of the derivatives 0<=nu(d)<k(d)
+                    newc=newc,                         &    ! derivative spline coefficients
+                    ier=ier)                                ! error flag
 
         if (FITPACK_SUCCESS(ier)) then
             dsp%dims = dims
@@ -529,6 +615,9 @@ module fitpack_gridded_splines
             allocate(dsp%c(nc_new),source=newc(1:nc_new))
             dsp%fp   = zero
             dsp%iopt = IOPT_OLD_FIT
+
+            ! One-time, maximally-sized evaluation workspace for the derivative spline
+            call grid_prepare_workspace(dsp)
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline derivative_spline')
     end function grid_derivative_spline
@@ -537,14 +626,16 @@ module fitpack_gridded_splines
     ! WORKSPACE + LAYOUT HELPERS
     ! =================================================================================================
 
-    !> @brief (Re)size the fit workspace to regrid's requirement for the current dims/order/nest/grid.
-    !!        Mirrors regrid's internal lwest/kwest so the type is a correctly-sized caller; grows the
-    !!        arrays only when needed so an iopt=1 continuation keeps its state in wrk(1:2+dims).
+    !> @brief (Re)size the persistent workspace, maximally, so it is allocated only once, at spline
+    !!        construction. Covers both regrid's fit requirement (mirroring its internal lwest/kwest)
+    !!        and the peripheral evaluations (ndspev/parder/pardeu on grids up to the data-grid size),
+    !!        which carve their scratch past regrid's persistent iopt=1 state in wrk(1:2+dims)/
+    !!        iwrk(1:1+dims). Grows the arrays only when needed so a continuation keeps that state.
     subroutine grid_prepare_workspace(this)
         class(fitpack_gridded_spline), intent(inout) :: this
 
         integer(FP_DIM)  :: dims,i
-        integer(FP_SIZE) :: maxm,maxnest,maxk1,maxk2,mm,mynx,bufmax,lwrk,kwrk
+        integer(FP_SIZE) :: maxm,maxnest,maxk1,maxk2,mm,mynx,bufmax,ncmax,lwrk,kwrk
         integer(FP_SIZE) :: nk1(MAX_IDIM)
 
         dims    = this%dims
@@ -562,8 +653,15 @@ module fitpack_gridded_splines
                    product(nk1(1:dims-1)), maxval(nk1(1:dims)))
         mynx = 2*bufmax
 
+        ! fit (regrid) requirement
         kwrk = (1+dims) + maxm*dims + maxnest*dims
         lwrk = (2+dims) + maxnest*dims + maxm*maxk1*dims + 2*maxnest*maxk2*dims + mm + mynx
+
+        ! peripheral (ndspev/parder/pardeu) requirement, past the persistent fit state:
+        ! derivative-coefficient scratch + per-axis basis cuboid / interval indices
+        ncmax = product(nk1(1:dims))
+        lwrk  = max(lwrk, (2+dims) + ncmax + maxm*maxk1*dims)
+        kwrk  = max(kwrk, (1+dims) + maxm*dims)
 
         if (.not.allocated(this%iwrk)) then
             allocate(this%iwrk(kwrk),source=0)
@@ -580,6 +678,41 @@ module fitpack_gridded_splines
         this%lwrk = size(this%wrk,kind=FP_SIZE)
 
     end subroutine grid_prepare_workspace
+
+    !> @brief Ensure the persistent workspace covers a peripheral evaluation with per-axis grids of
+    !!        up to `maxm` points. grid_prepare_workspace already sized it for grids up to the data
+    !!        grid, so this only grows the arrays for finer evaluation grids; contents are preserved
+    !!        so regrid's iopt=1 state in wrk(1:2+dims)/iwrk(1:1+dims) survives the growth.
+    subroutine grid_ensure_eval_workspace(this,maxm)
+        class(fitpack_gridded_spline), intent(inout) :: this
+        integer(FP_SIZE), intent(in) :: maxm
+
+        integer(FP_DIM)  :: dims
+        integer(FP_SIZE) :: maxk1,ncmax,min_lwrk,min_kwrk
+        real(FP_REAL),    allocatable :: grown_wrk(:)
+        integer(FP_SIZE), allocatable :: grown_iwrk(:)
+
+        dims  = this%dims
+        maxk1 = maxval(this%order(1:dims))+1
+        ncmax = product(this%nest(1:dims)-this%order(1:dims)-1)
+
+        min_lwrk = (2+dims) + ncmax + maxm*maxk1*dims
+        if (min_lwrk>this%lwrk) then
+            allocate(grown_wrk(min_lwrk),source=zero)
+            if (allocated(this%wrk)) grown_wrk(1:this%lwrk) = this%wrk
+            call move_alloc(from=grown_wrk,to=this%wrk)
+            this%lwrk = min_lwrk
+        end if
+
+        min_kwrk = (1+dims) + maxm*dims
+        if (min_kwrk>this%liwrk) then
+            allocate(grown_iwrk(min_kwrk),source=0_FP_SIZE)
+            if (allocated(this%iwrk)) grown_iwrk(1:this%liwrk) = this%iwrk
+            call move_alloc(from=grown_iwrk,to=this%iwrk)
+            this%liwrk = min_kwrk
+        end if
+
+    end subroutine grid_ensure_eval_workspace
 
     !> @brief Map a rank-`d` array shape to per-axis domain sizes, honouring the row_major flag.
     !!        row_major=.true.: axes are reversed (z(m_d,...,m_1)); .false.: natural (z(m_1,...,m_d)).

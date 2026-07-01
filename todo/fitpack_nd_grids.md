@@ -142,7 +142,7 @@ Separate **logic** from **face**:
 | **Public face** | concrete `fitpack_gridded_3d … _Nd`, rank-natural `z(:,:,:…)`, type-safe `eval_ongrid` | N **types**, **one** fypp template |
 
 ### 5.1 Avoid PDT (`fitpack_grid(d)`)
-- **Compiler reality.** PDT `len`/`kind` parameters + allocatable components + type-bound procedures are exactly gfortran's fragile corner (long-standing ICEs/miscompiles). This repo already works around gfortran-13 codegen bugs (`surf_new_points`: *"Do not use sum() or it will segfault gfortran 13"*, `fitpack_grid_surfaces.f90:296`). Don't bet the architecture on the toolchain's weakest feature.
+- **Compiler reality.** PDT `len`/`kind` parameters + allocatable components + type-bound procedures are exactly gfortran's fragile corner (long-standing ICEs/miscompiles). This repo already works around gfortran-13 codegen bugs (`surf_new_points`: *"Do not use sum() or it will segfault gfortran 13"*, `fitpack_gridded_surfaces.f90:296`). Don't bet the architecture on the toolchain's weakest feature.
 - **Ergonomic friction.** A `len` parameter propagates into every declaration and complicates the C-interop layer.
 
 ### 5.2 Avoid a single runtime-`ndim` type for the public API — the rank problem
@@ -186,7 +186,7 @@ The paired-scalar pattern is replicated widely; mechanical but it is the bulk of
 
 **OOP types** (all share `order(2)`, `knots(2)`, `t(:,2)`, `nest(2)`, `left(2)/right(2)`):
 - `fitpack_surface` (`fitpack_surfaces.f90:45`) — scattered, **not** generalized here
-- `fitpack_grid_surface` (`fitpack_grid_surfaces.f90:50`) — **the template seed**, `z(iy,ix)`
+- `fitpack_grid_surface` (`fitpack_gridded_surfaces.f90:50`) — **the template seed**, `z(iy,ix)`
 - `fitpack_parametric_surface`, `fitpack_polar`, `fitpack_grid_polar`, `fitpack_sphere`, `fitpack_grid_sphere` — specialized 2-D domains, separate effort
 
 **Core evaluation/analysis (gridded), all hard-wired to 2 directions:**

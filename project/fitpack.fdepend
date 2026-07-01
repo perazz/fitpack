@@ -4,9 +4,9 @@ source:../src/fitpack.f90
 	use:fitpack_core
 	use:fitpack_curves
 	use:fitpack_fitters
-	use:fitpack_grid_surfaces
 	use:fitpack_gridded_polar
 	use:fitpack_gridded_sphere
+	use:fitpack_gridded_surfaces
 	use:fitpack_parametric_curves
 	use:fitpack_parametric_surfaces
 	use:fitpack_polar_domains
@@ -57,12 +57,6 @@ source:../src/fitpack_fitters.f90
 	use:fitpack_core
 	decl:fitpack_fitters
 
-source:../src/fitpack_grid_surfaces.f90
-	use:fitpack_core
-	use:fitpack_curves
-	use:fitpack_fitters
-	decl:fitpack_grid_surfaces
-
 source:../src/fitpack_gridded_polar.f90
 	use:fitpack_core
 	use:fitpack_fitters
@@ -72,6 +66,12 @@ source:../src/fitpack_gridded_sphere.f90
 	use:fitpack_core
 	use:fitpack_fitters
 	decl:fitpack_gridded_sphere
+
+source:../src/fitpack_gridded_surfaces.f90
+	use:fitpack_core
+	use:fitpack_curves
+	use:fitpack_fitters
+	decl:fitpack_gridded_surfaces
 
 source:../src/fitpack_parametric.f90
 	use:fitpack_core

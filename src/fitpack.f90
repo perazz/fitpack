@@ -35,8 +35,8 @@ module fitpack
    use fitpack_fitters
    use fitpack_curves
    use fitpack_surfaces
-   use fitpack_grid_surfaces
    use fitpack_gridded_splines
+   use fitpack_gridded_surfaces
    use fitpack_gridded_polar
    use fitpack_gridded_sphere
    use fitpack_polar_domains
