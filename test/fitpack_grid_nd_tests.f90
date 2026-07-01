@@ -8,9 +8,9 @@
 !
 !   Gates:
 !     A. fpndsp  vs bispev  (gridded evaluation, dims=2 bit-for-bit)
-!     D. regrid_nd  vs regrid  (gridded fit; transitively covers fpregr_nd and fpgrre_nd, whose
-!                               outputs tx,ty,c,fp,nx,ny are exactly what regrid_nd returns)
-!     D'. regrid_nd vs regrid on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
+!     D. regrid_nd fit self-consistency (fp==SSR via bispev, s=0 interpolates, valid knots) across the
+!                               cubic iopt-chain, quintic and iopt=-1 lsq — covers fpregr_nd + fpgrre_nd
+!     D'. same fp==SSR oracle on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
 !                               convention so an x<->y axis/size swap cannot hide behind mx==my
 !     E. fpndsp(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
 !                               splev, and non-separable coeffs vs the dims=2 path combined along z
@@ -81,27 +81,33 @@ module fitpack_grid_nd_tests
         cs(3) = grid_case(5,5,0.2_FP_REAL ,'quintic smoothing s=0.2')
     end function cases
 
-    !> @brief Run regrid for one case, returning the fitted knots/coefficients.
+    !> @brief Run a dims=2 gridded fit for one case, returning the fitted knots/coefficients in the
+    !!        bivariate (nx,tx,ny,ty) form the evaluation gates expect.
     subroutine fit_regrid(gc,nx,tx,ny,ty,c,fp,ier)
         type(grid_case),  intent(in)  :: gc
         integer(FP_SIZE), intent(out) :: nx,ny
         real(FP_REAL),    intent(out) :: tx(NXEST),ty(NYEST),c(NCMAX),fp
         integer(FP_FLAG), intent(out) :: ier
 
-        integer(FP_SIZE) :: mx,my
-        real(FP_REAL)    :: xb,xe,yb,ye,wrk(LWRK)
+        integer(FP_SIZE) :: mx,my,m2(2),n2(2),k2(2),nest2(2)
+        real(FP_REAL)    :: lo(2),hi(2),wrk(LWRK),t2(NXEST,2),xg(size(daregr_x),2)
         integer(FP_SIZE) :: iwrk(KWRK)
         real(FP_REAL)    :: zin(size(daregr_x)*size(daregr_y))
 
         mx = size(daregr_x,kind=FP_SIZE)
         my = size(daregr_y,kind=FP_SIZE)
-        xb = daregr_x(1); xe = daregr_x(mx)
-        yb = daregr_y(1); ye = daregr_y(my)
-        zin = reshape(daregr_z,[mx*my])   ! same sequence association legacy mnregr relies on
+        zin = reshape(daregr_z,[mx*my])   ! flat row-major (x slowest, y fastest) = regrid_nd's z contract
+        m2 = [mx,my]; k2 = [gc%kx,gc%ky]; nest2 = [NXEST,NYEST]
+        lo = [daregr_x(1),daregr_y(1)]; hi = [daregr_x(mx),daregr_y(my)]
+        xg = zero; xg(1:mx,1) = daregr_x; xg(1:my,2) = daregr_y
+        t2 = zero; wrk = zero; iwrk = 0
 
-        call regrid(IOPT_NEW_SMOOTHING,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye, &
-                    gc%kx,gc%ky,gc%s,NXEST,NYEST,nx,tx,ny,ty,c,fp, &
-                    wrk,LWRK,iwrk,KWRK,ier)
+        call regrid_nd(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,zin,lo,hi,k2,gc%s,nest2, &
+                       n2,t2,c,fp,wrk,LWRK,iwrk,KWRK,ier)
+
+        nx = n2(1); ny = n2(2)
+        tx = zero; tx(1:n2(1)) = t2(1:n2(1),1)
+        ty = zero; ty(1:n2(2)) = t2(1:n2(2),2)
     end subroutine fit_regrid
 
     !> @brief Gate A — the three 2-D entry points (fpndsp kernel, ndspev wrapper, bispev adapter)
@@ -224,27 +230,22 @@ module fitpack_grid_nd_tests
         1300 format('[gate A] fpndsp /= splev oracle for ',a,'  (max |diff| = ',1pe12.3,')')
     end function gate_fpndsp
 
-    !> @brief Gate D — regrid_nd(dims=2) must equal regrid bit-for-bit across all iopt modes.
+    !> @brief Gate D — regrid_nd(dims=2) fit is self-consistent across all iopt modes.
     !!
-    !! Runs regrid (reference) and regrid_nd (test) through the same iopt sequence and asserts
-    !! nx,ny,tx,ty,c,fp and ier match to the last bit. The two are independent invocations with
-    !! their own preserved workspace; iopt=1 cases continue from the previous knot set on both
-    !! sides. A green result here certifies fpregr_nd and fpgrre_nd as well (their outputs ARE
-    !! what regrid_nd returns).
+    !! With regrid_nd now the sole gridded engine there is no legacy regrid to compare against, so
+    !! this asserts the defining property of every fit instead: fp equals the unit-weight residual
+    !! sum of squares recomputed independently on the data grid through bispev (which routes through
+    !! fpndsp), an s=0 smoothing fit interpolates (fp collapses to zero), and the knots stay valid.
+    !! It runs the cubic iopt=0->1 continuation chain, a quintic fit, and a least-squares fit on
+    !! prescribed knots (iopt=-1), so it still exercises fpregr_nd + fpgrre_nd end-to-end.
     logical function gate_regrid_nd(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
-        ! reference (regrid) state
-        integer(FP_SIZE) :: mx,my,nxr,nyr
-        real(FP_REAL)    :: txr(NXEST),tyr(NYEST),cr(NCMAX),fpr,wrkr(LWRK)
-        integer(FP_SIZE) :: iwrkr(KWRK)
-        integer(FP_FLAG) :: ier_r
-        ! test (regrid_nd) state
+        integer(FP_SIZE) :: mx,my
         integer(FP_SIZE) :: ntst(2),kk(2),m2(2),nest2(2)
         real(FP_REAL)    :: ttst(NXEST,2),ctst(NCMAX),fptst,wrkt(LWRK),xgt(size(daregr_x),2)
         integer(FP_SIZE) :: iwrkt(KWRK)
         integer(FP_FLAG) :: ier_t
-        ! shared
         real(FP_REAL)    :: zin(size(daregr_x)*size(daregr_y)),xb,xe,yb,ye,s,lo(2),hi(2)
         integer(FP_SIZE) :: kx,ky,iopt,icase,i
         character(len=40):: lbl
@@ -254,10 +255,9 @@ module fitpack_grid_nd_tests
         xb = daregr_x(1); xe = daregr_x(mx); yb = daregr_y(1); ye = daregr_y(my)
         zin = reshape(daregr_z,[mx*my])    ! flat row-major (x slowest, y fastest) = regrid_nd's z contract
 
-        ! regrid_nd marshalling that is constant across calls
         m2 = [mx,my]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
         xgt = zero; xgt(1:mx,1) = daregr_x; xgt(1:my,2) = daregr_y
-        wrkr = zero; iwrkr = 0; wrkt = zero; iwrkt = 0
+        wrkt = zero; iwrkt = 0
 
         ! ---- Phase A: cubic, iopt=0 then iopt=1 continuation chain (incl. s=0 interpolation) ----
         kx = 3; ky = 3; kk = [kx,ky]
@@ -268,70 +268,54 @@ module fitpack_grid_nd_tests
                case (3); iopt = 1; s = 0.1_FP_REAL
                case (4); iopt = 1; s = 0.0_FP_REAL
             end select
-            call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
-                        nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
             call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'cubic iopt-chain #',icase
-            if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
-                             ntst,ttst,ctst,fptst,ier_t)) then
+            if (.not.fit_ssr_ok(useUnit,trim(lbl),kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
                 ok = .false.; return
             end if
         end do
 
         ! ---- Phase B: quintic, fresh iopt=0 ----
         kx = 5; ky = 5; kk = [kx,ky]; iopt = 0; s = 0.2_FP_REAL
-        call regrid(iopt,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
-                    nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
         call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
-        if (.not.pair_ok(useUnit,'quintic fresh iopt=0',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
-                         ntst,ttst,ctst,fptst,ier_t)) then
+        if (.not.fit_ssr_ok(useUnit,'quintic fresh iopt=0',kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
             ok = .false.; return
         end if
 
-        ! ---- Phase C: least-squares on given knots, iopt=-1 ----
+        ! ---- Phase C: least-squares on given knots, iopt=-1 (s=0 here is lsq, NOT interpolation) ----
         kx = 3; ky = 3; kk = [kx,ky]; s = 0.0_FP_REAL
-        nxr = 11; nyr = 11; ntst = [11,11]
-        txr = zero; txr(kx+2:kx+4) = [(half*(i-2),i=1,3)]; tyr = zero; tyr(ky+2:ky+4) = txr(kx+2:kx+4)
+        ntst = [11,11]
         ttst = zero
-        ttst(kx+2:kx+4,1) = txr(kx+2:kx+4); ttst(ky+2:ky+4,2) = tyr(ky+2:ky+4)
-        call regrid(-1_FP_FLAG,mx,daregr_x,my,daregr_y,zin,xb,xe,yb,ye,kx,ky,s,NXEST,NYEST, &
-                    nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
+        ttst(kx+2:kx+4,1) = [(half*(i-2),i=1,3)]
+        ttst(ky+2:ky+4,2) = ttst(kx+2:kx+4,1)
         call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
-        if (.not.pair_ok(useUnit,'lsq given knots iopt=-1',kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
-                         ntst,ttst,ctst,fptst,ier_t)) then
+        if (.not.fit_ssr_ok(useUnit,'lsq given knots iopt=-1',kk,m2,xgt,zin,s,-1_FP_SIZE,ntst,ttst,ctst,fptst,ier_t)) then
             ok = .false.; return
         end if
 
-        write(useUnit,'(a)') '[gate D] regrid_nd == regrid (bit-for-bit; iopt=-1,0,1; cubic+quintic)'
+        write(useUnit,'(a)') '[gate D] regrid_nd(dims=2): fp==SSR, s=0 interpolates, valid knots (cubic chain, quintic, iopt=-1)'
     end function gate_regrid_nd
 
-    !> @brief Gate D' — regrid_nd vs regrid on a NON-SQUARE grid (mx /= my).
+    !> @brief Gate D' — regrid_nd(dims=2) on a NON-SQUARE grid (mx /= my).
     !!
     !! The square 11x11 daregr battery cannot expose an x<->y swap in the data tensor or in the
-    !! per-axis sizing: with mx==my both indexings address the same elements. A non-square grid
-    !! makes any such swap a hard bit-for-bit failure, so this directly guards the z = (ny,nx)
-    !! (y-fast) storage convention as the *_nd path heads toward dims>2. The synthetic data is
-    !! deliberately NON-symmetric under x<->y (different centres/weights) so even a pure transpose
-    !! on a hypothetical square grid would be caught.
+    !! per-axis sizing: with mx==my both indexings address the same elements. A non-square grid makes
+    !! any such swap a hard failure, so this directly guards the z = (ny,nx) (y-fast) storage
+    !! convention. The synthetic data is deliberately NON-symmetric under x<->y (different
+    !! centres/weights) so even a pure transpose on a hypothetical square grid would be caught. The
+    !! fp==SSR oracle would not hold under any axis confusion.
     logical function gate_regrid_nd_nonsquare(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
         integer(FP_SIZE), parameter :: MX = 9, MY = 13
         real(FP_REAL)    :: xg1(MX),yg1(MY),zin(MX*MY)
-        ! reference (regrid)
-        integer(FP_SIZE) :: nxr,nyr
-        real(FP_REAL)    :: txr(NXEST),tyr(NYEST),cr(NCMAX),fpr,wrkr(LWRK)
-        integer(FP_SIZE) :: iwrkr(KWRK)
-        integer(FP_FLAG) :: ier_r
-        ! test (regrid_nd)
         integer(FP_SIZE) :: ntst(2),kk(2),m2(2),nest2(2)
         real(FP_REAL)    :: ttst(NXEST,2),ctst(NCMAX),fptst,wrkt(LWRK),xgt(MY,2)
         integer(FP_SIZE) :: iwrkt(KWRK)
         integer(FP_FLAG) :: ier_t
-        ! shared
         real(FP_REAL)    :: xb,xe,yb,ye,s,lo(2),hi(2)
         integer(FP_SIZE) :: i,j,iopt,icase
         character(len=40):: lbl
@@ -353,7 +337,7 @@ module fitpack_grid_nd_tests
         xb = xg1(1); xe = xg1(MX); yb = yg1(1); ye = yg1(MY)
         m2 = [MX,MY]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
         xgt = zero; xgt(1:MX,1) = xg1; xgt(1:MY,2) = yg1
-        wrkr = zero; iwrkr = 0; wrkt = zero; iwrkt = 0
+        wrkt = zero; iwrkt = 0
         kk = [3_FP_SIZE,3_FP_SIZE]
 
         do icase=1,2
@@ -361,58 +345,67 @@ module fitpack_grid_nd_tests
                case (1); iopt = 0; s = 0.05_FP_REAL   ! smoothing
                case (2); iopt = 0; s = 0.0_FP_REAL    ! interpolation
             end select
-            call regrid(iopt,MX,xg1,MY,yg1,zin,xb,xe,yb,ye,kk(1),kk(2),s,NXEST,NYEST, &
-                        nxr,txr,nyr,tyr,cr,fpr,wrkr,LWRK,iwrkr,KWRK,ier_r)
             call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'non-square 9x13 #',icase
-            if (.not.pair_ok(useUnit,trim(lbl),kk,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
-                             ntst,ttst,ctst,fptst,ier_t)) then
+            if (.not.fit_ssr_ok(useUnit,trim(lbl),kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
                 ok = .false.; return
             end if
         end do
 
-        write(useUnit,'(a)') '[gate D''] regrid_nd == regrid (bit-for-bit; non-square 9x13)'
+        write(useUnit,'(a)') '[gate D''] regrid_nd(dims=2): fp==SSR, s=0 interpolates (non-square 9x13)'
     end function gate_regrid_nd_nonsquare
 
-    !> @brief Compare a regrid vs regrid_nd result pair bit-for-bit; report on mismatch.
-    logical function pair_ok(useUnit,label,k,nxr,nyr,txr,tyr,cr,fpr,ier_r, &
-                             ntst,ttst,ctst,fptst,ier_t) result(ok)
+    !> @brief Oracle check for one dims=2 regrid_nd fit: the residual sum of squares fp must match
+    !!        the value recomputed independently on the data grid through bispev, an s=0 smoothing
+    !!        fit must interpolate (fp≈0), and the knots must be non-decreasing on each axis.
+    logical function fit_ssr_ok(useUnit,label,k,m,xg,zin,s,iopt,n,t,c,fp,ier) result(ok)
         integer,          intent(in) :: useUnit
         character(*),     intent(in) :: label
-        integer(FP_SIZE), intent(in) :: k(2),nxr,nyr,ntst(2)
-        real(FP_REAL),    intent(in) :: txr(:),tyr(:),cr(:),fpr,ttst(:,:),ctst(:),fptst
-        integer(FP_FLAG), intent(in) :: ier_r,ier_t
-        integer(FP_SIZE) :: nc
+        integer(FP_SIZE), intent(in) :: k(2),m(2),iopt,n(2)
+        real(FP_REAL),    intent(in) :: xg(:,:),zin(:),s,t(:,:),c(:),fp
+        integer(FP_FLAG), intent(in) :: ier
+
+        real(FP_REAL)    :: zeval(m(1)*m(2)),ewrk((k(1)+1)*m(1)+(k(2)+1)*m(2)),ssr
+        integer(FP_SIZE) :: eiwrk(m(1)+m(2)),d
+        integer(FP_FLAG) :: ier_e
 
         ok = .true.
 
-        if (ier_r/=ier_t) then
-            write(useUnit,2000) trim(label),'ier',ier_r,ier_t; ok = .false.; return
-        end if
-        if (nxr/=ntst(1) .or. nyr/=ntst(2)) then
-            write(useUnit,2100) trim(label),nxr,ntst(1),nyr,ntst(2); ok = .false.; return
+        ! the fit itself must have succeeded
+        if (.not.FITPACK_SUCCESS(ier)) then
+            write(useUnit,2000) trim(label),'fit',ier; ok = .false.; return
         end if
 
-        nc = (nxr-k(1)-1)*(nyr-k(2)-1)
+        ! knots must be non-decreasing on each axis
+        do d=1,2
+           if (any(t(2:n(d),d)<t(1:n(d)-1,d))) then
+              write(useUnit,2100) trim(label),d; ok = .false.; return
+           end if
+        end do
 
-        if (.not.all(txr(1:nxr)==ttst(1:ntst(1),1))) ok = .false.
-        if (.not.all(tyr(1:nyr)==ttst(1:ntst(2),2))) ok = .false.
-        if (.not.all(cr(1:nc)==ctst(1:nc)))          ok = .false.
-        if (fpr/=fptst)                              ok = .false.
-
-        if (.not.ok) then
-            write(useUnit,2200) trim(label), &
-                maxval(abs(txr(1:nxr)-ttst(1:ntst(1),1))), &
-                maxval(abs(tyr(1:nyr)-ttst(1:ntst(2),2))), &
-                maxval(abs(cr(1:nc)-ctst(1:nc))), abs(fpr-fptst)
+        ! fp must equal the unit-weight SSR recomputed independently through bispev (-> fpndsp)
+        call bispev(t(1:n(1),1),n(1),t(1:n(2),2),n(2),c,k(1),k(2), &
+                    xg(1:m(1),1),m(1),xg(1:m(2),2),m(2),zeval, &
+                    ewrk,size(ewrk,kind=FP_SIZE),eiwrk,size(eiwrk,kind=FP_SIZE),ier_e)
+        if (.not.FITPACK_SUCCESS(ier_e)) then
+            write(useUnit,2000) trim(label),'bispev',ier_e; ok = .false.; return
+        end if
+        ssr = sum((zin(1:m(1)*m(2))-zeval)**2)
+        if (abs(ssr-fp) > 1.0e-9_FP_REAL*max(fp,one)) then
+            write(useUnit,2200) trim(label),abs(ssr-fp); ok = .false.; return
         end if
 
-        2000 format('[gate D] ',a,': ',a,' mismatch (ref=',i0,' nd=',i0,')')
-        2100 format('[gate D] ',a,': knot count mismatch nx ',i0,'/',i0,' ny ',i0,'/',i0)
-        2200 format('[gate D] ',a,' NOT bit-for-bit: max|dtx|=',1pe10.2,' max|dty|=',e10.2, &
-                    ' max|dc|=',e10.2,' |dfp|=',e10.2)
-    end function pair_ok
+        ! a smoothing fit (iopt>=0) with s=0 is an interpolating spline: the residual collapses to zero
+        if (iopt>=0 .and. s==zero .and. fp>1.0e-9_FP_REAL) then
+            write(useUnit,2300) trim(label),fp; ok = .false.; return
+        end if
+
+        2000 format('[gate D] ',a,': ',a,' failed, ier=',i0)
+        2100 format('[gate D] ',a,': knots not non-decreasing on axis ',i0)
+        2200 format('[gate D] ',a,': fp /= SSR via bispev, |diff| = ',1pe12.3)
+        2300 format('[gate D] ',a,': s=0 did not interpolate, fp = ',1pe12.3)
+    end function fit_ssr_ok
 
     !> @brief Build a clamped knot vector on [0,1] for order k with nk1 coefficients (uniform interior).
     subroutine clamped_unit_knots(k,nk1,t,n)

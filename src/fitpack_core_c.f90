@@ -249,7 +249,7 @@ module fitpack_core_c
                                tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       end subroutine surfit_c
 
-      ! regular grid fit
+      ! regular grid fit (bivariate 2-D shim over the dimension-generic regrid_nd engine)
       pure subroutine regrid_c(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
                                nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_regrid_c')
           real(FP_REAL),    intent(in), value :: xb,xe,yb,ye,s
@@ -260,8 +260,33 @@ module fitpack_core_c
           real(FP_REAL),    intent(in)        :: x(mx),y(my),z(mx*my)
           real(FP_REAL),    intent(inout)     :: tx(nxest),ty(nyest),c((nxest-kx-1)*(nyest-ky-1)),wrk(lwrk)
           integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
-          call regrid(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
-                               nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+
+          !  dims=2 marshalling for regrid_nd. The caller's wrk/iwrk are passed straight through so an
+          !  iopt=1 continuation keeps its persistent state across calls; note regrid_nd's workspace
+          !  requirement can exceed legacy regrid's, so size lwrk/kwrk per regrid_nd (a too-small
+          !  buffer returns ier=FITPACK_INPUT_ERROR rather than corrupting memory).
+          integer(FP_SIZE) :: mdim(2),n2(2),k2(2),nest2(2)
+          real(FP_REAL)    :: lo(2),hi(2),t2(max(nxest,nyest),2),xg(max(mx,my),2)
+
+          mdim = [mx,my]; k2 = [kx,ky]; nest2 = [nxest,nyest]
+          lo = [xb,yb]; hi = [xe,ye]
+          xg = zero; xg(1:mx,1) = x; xg(1:my,2) = y
+
+          !  seed the incoming knot set for continuation (iopt=1) or prescribed knots (iopt=-1);
+          !  a fresh iopt=0 fit ignores it (and nx/ny may be unset, so don't dereference them).
+          n2 = [nx,ny]
+          t2 = zero
+          if (iopt/=0) then
+             t2(1:nx,1) = tx(1:nx)
+             t2(1:ny,2) = ty(1:ny)
+          end if
+
+          call regrid_nd(iopt,2_FP_DIM,mdim,xg,z,lo,hi,k2,s,nest2, &
+                         n2,t2,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+
+          nx = n2(1); ny = n2(2)
+          tx = zero; tx(1:nx) = t2(1:nx,1)
+          ty = zero; ty(1:ny) = t2(1:ny,2)
       end subroutine regrid_c
 
       subroutine polar_c(iopt,m,x,y,z,w,rad,s,nuest,nvest,eps,nu,tu,nv,tv,u,v,c,&
