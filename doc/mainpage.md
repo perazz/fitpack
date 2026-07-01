@@ -23,6 +23,7 @@ fitpack_fitter (abstract base)
 │   └── fitpack_constrained_curve   — endpoint derivative constraints
 ├── fitpack_surface                 — 2D spline from scattered data
 ├── fitpack_grid_surface            — 2D spline from gridded data
+├── fitpack_gridded_spline          — N-D spline from gridded data (3D+)
 ├── fitpack_parametric_surface      — parametric surfaces
 ├── fitpack_polar                   — polar-domain fitting (scattered)
 ├── fitpack_grid_polar              — polar-domain fitting (gridded)
@@ -80,7 +81,7 @@ fpm test           # run all tests
 
 - @ref theory_bsplines &mdash; B-spline basis functions, de Boor evaluation, derivatives, integration, knot insertion
 - @ref theory_curve_fitting &mdash; Smoothing criterion, adaptive knot placement, periodic and parametric curves
-- @ref theory_surface_fitting &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency
+- @ref theory_surface_fitting &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency, N-dimensional gridded splines
 - @ref theory_special_domains &mdash; Polar coordinate transform, spherical coordinates, pole boundary conditions
 
 ## Tutorials

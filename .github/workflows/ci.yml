@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         toolchain:
-          - {compiler: gcc, version: 9}
+          # gcc 9 dropped: fitpack_gridded_spline uses F2018 select rank (gfortran >= 10)
           - {compiler: gcc, version: 10}
           - {compiler: gcc, version: 11}
           - {compiler: gcc, version: 12}
