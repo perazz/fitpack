@@ -176,7 +176,7 @@ module fitpack_grid_nd_tests
 
             nc = (nx-kx-1)*(ny-ky-1)
 
-            ! reference: bispev (which internally calls fpbisp)
+            ! reference: bispev (which internally calls fpndsp)
             call bispev(tx,nx,ty,ny,c,kx,ky,daregr_x,mx,daregr_y,my,zref, &
                         ewrk,size(ewrk,kind=FP_SIZE),eiwrk,size(eiwrk,kind=FP_SIZE),ier)
             if (.not.FITPACK_SUCCESS(ier)) then

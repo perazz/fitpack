@@ -65,19 +65,19 @@ module fitpack_core
     ! N-D gridded core (dimensionalized behind a bit-for-bit gate at dims=2; see
     ! todo/fitpack_nd_grids.md). fpregr/fpgrre stay private and are covered transitively
     ! by the regrid backbone gate. fpndsp is the N-D evaluation kernel; ndspev its public
-    ! flat-workspace wrapper (the N-D analogue of fpbisp/bispev).
+    ! flat-workspace wrapper (the N-D analogue of bispev).
     public :: regrid ! tensor-product gridded smoothing-spline fit (any domain dimension)
-    public :: fpndsp    ! N-D generalization of fpbisp (gridded evaluation kernel)
-    public :: ndspev    ! Tensor-product spline evaluation on a grid (any dimension; flat workspace)
-    public :: ndspeu    ! Tensor-product spline evaluation at scattered points (any dimension)
-    public :: parder    ! Partial derivatives of a tensor-product spline on a grid (any dimension)
-    public :: pardeu    ! Partial derivatives of a tensor-product spline at scattered points
-    public :: pardtc    ! B-spline coefficients of a partial-derivative spline (any dimension)
-    public :: dblint    ! Box/domain integral of a tensor-product spline (any dimension)
-    public :: profil    ! Cross-section of a tensor-product spline: fix one axis (any dimension)
+    public :: fpndsp ! N-D gridded evaluation kernel (the engine behind bispev)
+    public :: ndspev ! N-D generalization of bispev (gridded evaluation, flat workspace)
 
     ! Surface application routines
+    public :: ndspeu ! * Evaluation of a tensor-product spline at scattered points (any dimension)
     public :: bispev ! * Evaluation of a bivariate spline function (2-D grid)
+    public :: parder ! Partial derivatives of a tensor-product spline on a grid (any dimension)
+    public :: pardeu ! Partial derivatives of a tensor-product spline at scattered points (any dimension)
+    public :: pardtc ! B-spline coefficients of a partial-derivative spline (any dimension)
+    public :: dblint ! Box/domain integral of a tensor-product spline (any dimension)
+    public :: profil ! Cross-section of a tensor-product spline: fix one axis (any dimension)
     public :: evapol ! * Evaluation of a polar spline
     public :: surev  ! * Evaluation of a parametric spline surface
 
@@ -419,7 +419,7 @@ module fitpack_core
       !! @param[in]     kwrk  Declared dimension of `iwrk`.
       !! @param[out]    ier   Error flag: `0` = normal return; `10` = invalid input.
       !!
-      !! @see ndspeu — scattered-point variant; fpbisp — tensor-product evaluation kernel
+      !! @see ndspeu — scattered-point variant; fpndsp — tensor-product evaluation kernel
       pure subroutine bispev(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
@@ -432,10 +432,13 @@ module fitpack_core
       real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
       integer(FP_SIZE) :: lwest
+      !  ..N-D column-layout marshalling scratch (fpndsp fills its basis tables into w2/lidx2)..
+      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(kx,ky)+1,max(mx,my),2)
+      integer(FP_SIZE) :: lidx2(max(mx,my),2)
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
-      !  (wrk/iwrk retained for ABI; fpbisp self-manages its basis tables since slice 6.)
+      !  (wrk/iwrk retained for ABI; the marshalling scratch below is local, fpndsp self-manages.)
       ier   = FITPACK_INPUT_ERROR
       lwest = (kx+1)*mx+(ky+1)*my
 
@@ -443,9 +446,13 @@ module fitpack_core
       if (mx>1 .and. any(x(2:mx)<x(1:mx-1))) return
       if (my>1 .and. any(y(2:my)<y(1:my-1))) return
 
-      ! Evaluate spline
+      ! Evaluate spline: marshal the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D
+      ! column layout and defer the basis build + tensor contraction to fpndsp, the single
+      ! evaluation kernel (bit-for-bit identical to the classic 2-D contraction, locked by gate A).
       ier = FITPACK_OK
-      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
+      t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
+      xg2(1:mx,1) = x;    xg2(1:my,2) = y
+      call fpndsp(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg2,[mx,my],z,w2,lidx2)
 
       end subroutine bispev
 
@@ -2115,44 +2122,7 @@ module fitpack_core
       end subroutine fpbfou
 
 
-      !> @brief Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).
-      !!
-      !! Computes \f$ s(x_i, y_j) \f$ on the grid \f$ i=1,\ldots,m_x;\, j=1,\ldots,m_y \f$ for a
-      !! bivariate spline of degrees \f$ k_x, k_y \f$. Since slice 6 this is a thin adapter: it
-      !! marshals the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D column layout and defers
-      !! the basis build + tensor contraction to fpndsp, the single evaluation kernel. At dims=2
-      !! fpndsp reproduces the former in-line 2-D contraction bit-for-bit (locked by gate A). The
-      !! per-axis basis tables are automatic locals here, so no caller scratch is needed.
-      !!
-      !! @param[in]  tx,ty  Per-axis knot vectors, lengths `nx`, `ny`
-      !! @param[in]  nx,ny  Number of knots per axis
-      !! @param[in]  c      B-spline coefficients, length \f$ (n_x-k_x-1)(n_y-k_y-1) \f$
-      !! @param[in]  kx,ky  Spline degree per axis
-      !! @param[in]  x,y    Per-axis evaluation points, lengths `mx`, `my`
-      !! @param[in]  mx,my  Number of evaluation points per axis
-      !! @param[out] z      Spline values, row-major: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
-      !!
-      !! @see fpndsp, bispev; Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
-      pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
-
-      !  ..scalar arguments..
-      integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,mx,my
-      !  ..array arguments..
-      real(FP_REAL),    intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      real(FP_REAL),    intent(out) :: z(mx*my)
-
-      !  ..N-D column-layout marshalling; fpndsp builds its own basis tables (automatic locals)..
-      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(kx,ky)+1,max(mx,my),2)
-      integer(FP_SIZE) :: lidx2(max(mx,my),2)
-
-      t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
-      xg2(1:mx,1) = x;    xg2(1:my,2) = y
-      call fpndsp(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg2,[mx,my],z,w2,lidx2)
-      return
-      end subroutine fpbisp
-
-
-      !> @brief N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.
+      !> @brief Evaluate a tensor-product spline on a grid (any dimension; bispev's kernel).
       !!
       !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
       !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
@@ -2167,8 +2137,8 @@ module fitpack_core
       !!     \tag{2.14-2.15}
       !! \f]
       !!
-      !! At `dims=2` this is bit-for-bit identical to fpbisp: both the per-axis basis-
-      !! table build and the evaluation contraction are dimension-generic runtime loops
+      !! At `dims=2` this reproduces the classic bivariate contraction bit-for-bit: both the
+      !! per-axis basis-table build and the evaluation contraction are dimension-generic runtime loops
       !! over the `dims` axes, with the innermost `dot_product` on the fastest (axis
       !! `dims`, contiguous) coefficient axis as the FP-reassociation anchor. The
       !! B-spline values and knot interval indices are stored per axis in workspace
@@ -2182,10 +2152,10 @@ module fitpack_core
       !! @param[in]  xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]  m     Number of evaluation points per axis, `m(dims)`
       !! @param[out] z     Spline values at grid points, flat row-major (first axis varies slowest)
-      !! @param[out] w     Per-axis B-spline basis values, `w(k(d)+1,m(d),d)` (basis-major; mirrors fpbisp `wx,wy`)
-      !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (mirrors fpbisp `lx,ly`)
+      !! @param[out] w     Per-axis B-spline basis values, `w(k(d)+1,m(d),d)` (basis-major, one page per axis)
+      !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (one column per axis)
       !!
-      !! @see fpbisp, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
+      !! @see bispev, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
       pure subroutine fpndsp(dims,t,n,c,k,xg,m,z,w,lidx)
           integer(FP_DIM),  intent(in)  :: dims
           integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m(dims)
