@@ -113,6 +113,10 @@ module fitpack_core
     ! 1-based axis ID (1 = first dim x/u, 2 = second dim y/v, ... up to MAX_IDIM), so the value can
     ! be used directly as an array/axis index. This generalizes to N dimensions.
     integer(FP_SIZE), parameter,  public :: MAX_IDIM      = 10  ! Max number of dimensions
+    ! Axis-index ladder [1,2,...,MAX_IDIM]. Slicing IDIMS(:dims) yields 1..dims, so an axis mask
+    ! like IDIMS(:dims)/=ax selects "every axis except ax" for pack/unpack (see profil). Keep the
+    ! literal list in sync with MAX_IDIM.
+    integer(FP_DIM),  parameter          :: IDIMS(MAX_IDIM) = [1,2,3,4,5,6,7,8,9,10]
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_NONE =  0  ! No knots added yet
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)
@@ -2316,8 +2320,10 @@ module fitpack_core
       !! @param[in]  n     Number of knots per axis, `n(dims)`
       !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
       !! @param[in]  k     Spline degree per axis, `k(dims)`
-      !! @param[in]  xg    Point coordinates, `xg(d,i)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$;
-      !!                   point \f$ i \f$ is the contiguous column `xg(:,i)` (matches curev/parcur layout)
+      !! @param[in]  xg    Point coordinates, `xg(d,i)` = axis-\f$ d \f$ coordinate of point \f$ i \f$, passed
+      !!                   column-major (point \f$ i \f$ = contiguous column, matching curev/parcur). Declared
+      !!                   with a leading singleton node, `xg(1,dims,*)`, so the slice `xg(:,:,i)` is already
+      !!                   the `(1,dims)` grid fpndsp reads; callers pass a plain contiguous `(dims,m)` array.
       !! @param[in]  m     Number of evaluation points, \f$ m \ge 1 \f$
       !! @param[out] z     Spline values at the points, `z(m)`
       !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
@@ -2326,24 +2332,24 @@ module fitpack_core
       pure subroutine ndspeu(dims,t,n,c,k,xg,m,z,ier)
           integer(FP_DIM),  intent(in)  :: dims
           integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m
-          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xg(1,dims,*)
           real(FP_REAL),    intent(out) :: z(m)
           integer(FP_FLAG), intent(out) :: ier
 
           integer(FP_SIZE) :: i,mone(dims)
-          !  a scattered point is a 1x...x1 grid. fpndsp reads xg(node,axis), so the single node is the
-          !  leading extent; keep the row fixed-size (MAX_IDIM axes) so the temp is not re-sized per call.
-          real(FP_REAL)    :: xp(1,MAX_IDIM),w(MAX_ORDER+1,1,dims)
+          !  singleton-grid basis scratch fpndsp fills (one node per point)
+          real(FP_REAL)    :: w(MAX_ORDER+1,1,dims)
           integer(FP_SIZE) :: lidx(1,dims)
 
           ier = FITPACK_INPUT_ERROR
           if (m<1) return
           ier = FITPACK_OK
 
+          !  a scattered point is a 1x...x1 grid; xg(:,:,i) is already the (1,dims) singleton grid row
+          !  fpndsp reads (xg(node,axis)), so hand each point's slice straight to the kernel -- no copy.
           mone = 1
           do i=1,m
-             xp(1,1:dims) = xg(1:dims,i)              ! point i (contiguous column) -> singleton grid row
-             call fpndsp(dims,t,n,c,k,xp(:,:dims),mone,z(i:i),w,lidx)
+             call fpndsp(dims,t,n,c,k,xg(:,:,i),mone,z(i:i),w,lidx)
           end do
           return
       end subroutine ndspeu
@@ -15447,7 +15453,8 @@ module fitpack_core
       pure subroutine pardeu(dims,t,n,c,k,nu,xg,m,z,wrk,lwrk,ier)
           integer(FP_DIM),  intent(in)    :: dims
           integer(FP_SIZE), intent(in)    :: n(dims),k(dims),nu(dims),m,lwrk
-          real(FP_REAL),    intent(in)    :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(in)    :: t(:,:),c(:)
+          real(FP_REAL),    intent(in), contiguous :: xg(:,:)   ! passed straight to ndspeu (no pack)
           real(FP_REAL),    intent(out)   :: z(m)
           real(FP_REAL),    intent(inout) :: wrk(lwrk)
           integer(FP_FLAG), intent(out)   :: ier
@@ -16655,7 +16662,6 @@ module fitpack_core
           real(FP_REAL),    intent(out) :: cu(:)
           integer(FP_FLAG), intent(out) :: ier
 
-          integer(FP_DIM)  :: d,dd
           integer(FP_SIZE) :: nk1(dims),cstride(dims),fidx(dims),oidx(dims-1),osize(dims-1)
           integer(FP_SIZE) :: k1a,nk1a,l,nout,o,s,coff
           real(FP_REAL)    :: h(MAX_ORDER+1),csupp(MAX_ORDER+1)
@@ -16674,28 +16680,15 @@ module fitpack_core
 
           cstride = fp_grid_strides(dims,nk1)
 
-          !  sizes of the surviving axes, in original order (skipping ax)
-          dd = 0
-          do d=1,dims
-             if (d==ax) cycle
-             dd = dd+1
-             osize(dd) = nk1(d)
-          end do
-          nout = product(osize)
+          !  sizes of the surviving axes, in original order (all axes except ax)
+          osize = pack(nk1, IDIMS(:dims)/=ax)
+          nout  = product(osize)
 
           !  for each surviving-axis multi-index, contract the ax-support against h
           do o=0,nout-1
              oidx = fp_grid_unravel(dims-1,o,osize)
-             !  build the full multi-index with axis ax at the support root (1-based l-k1a+1)
-             dd = 0
-             do d=1,dims
-                if (d==ax) then
-                   fidx(d) = l-k1a+1
-                else
-                   dd = dd+1
-                   fidx(d) = oidx(dd)
-                end if
-             end do
+             !  full multi-index: axis ax at the support root (1-based l-k1a+1), the rest from oidx
+             fidx = unpack(oidx, IDIMS(:dims)/=ax, l-k1a+1)
              coff = fp_grid_index(dims,fidx,cstride)     ! 0-based offset of the support root
              do s=1,k1a
                 csupp(s) = c(coff + (s-1)*cstride(ax) + 1)

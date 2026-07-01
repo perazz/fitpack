@@ -319,7 +319,7 @@ module fitpack_gridded_splines
     !! @return     f    Spline values at the `m` points.
     function grid_eval_many(this,xp,ierr) result(f)
         class(fitpack_gridded_spline), intent(in) :: this
-        real(FP_REAL),    intent(in) :: xp(:,:)
+        real(FP_REAL),    intent(in), contiguous :: xp(:,:)   ! forwarded straight to ndspeu (no pack)
         integer(FP_FLAG), intent(out), optional :: ierr
         real(FP_REAL) :: f(size(xp,2))
 
@@ -385,7 +385,7 @@ module fitpack_gridded_splines
     !!                  point `i` = contiguous column `xp(:,i)`).
     function grid_derivatives_many(this,xp,nu,ierr) result(f)
         class(fitpack_gridded_spline), intent(in) :: this
-        real(FP_REAL),    intent(in) :: xp(:,:)
+        real(FP_REAL),    intent(in), contiguous :: xp(:,:)   ! forwarded straight to pardeu (no pack)
         integer(FP_SIZE), intent(in) :: nu(:)
         integer(FP_FLAG), intent(out), optional :: ierr
         real(FP_REAL) :: f(size(xp,2))
