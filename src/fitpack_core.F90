@@ -3181,7 +3181,8 @@ module fitpack_core
 
           ! determine the number of knots nplus we are going to add.
           rn    = nplus
-          npl1  = merge(int(rn*fpms/(fpold-fp)),nplus*ITWO,fpold-fp>acc)
+          npl1  = nplus*ITWO
+          if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))  ! guard the division: skip it when fpold-fp<=acc
           nplus = min(nplus*2,max(npl1,nplus/2,1))
           fpold = fp
 
@@ -5665,8 +5666,14 @@ module fitpack_core
           real(FP_REAL) :: dd,store
 
           store = abs(piv)
-          dd  = merge(store*sqrt(one+(ww/piv)**2), &
-                      ww   *sqrt(one+(piv/ww)**2), store>=ww)
+          !  evaluate only the taken branch: an if (not merge) avoids a spurious
+          !  divide-by-zero in the unselected expression (ww/piv or piv/ww) when
+          !  the other operand is zero, which would raise IEEE_INVALID under FPE traps.
+          if (store>=ww) then
+             dd = store*sqrt(one+(ww/piv)**2)
+          else
+             dd = ww   *sqrt(one+(piv/ww)**2)
+          end if
           cos = ww/dd
           sin = piv/dd
           ww  = dd
@@ -8556,22 +8563,29 @@ module fitpack_core
       maxbeg = 0
       k      = (n-nrint-1)/2
       !  search for knot interval t(number+k) <= x <= t(number+k+1) where fpint(number) is maximal on the
-      !  condition that nrdata(number)/=0 .
+      !  condition that nrdata(number)/=0. An interval is eligible only if it holds at least one interior
+      !  data point (jpoint/=0); the first eligible interval seeds the search (number==0), after which any
+      !  interval with a strictly larger residual takes over. Seeding on the first eligible interval, rather
+      !  than only on fpmax<fpint(j), guarantees a valid selection even when every residual is exactly zero
+      !  (an all-zero fpint would otherwise leave number==0 and fall through to use of uninitialized am).
       fpmax  = zero
-      jbegin = istart      
+      jbegin = istart
       do j=1,nrint
         jpoint = nrdata(j)
 
-        if (fpmax<fpint(j) .and. jpoint/=0) then
-           fpmax = fpint(j)
+        if (jpoint/=0 .and. (number==0 .or. fpint(j)>fpmax)) then
+           fpmax  = fpint(j)
            number = j
-           maxpt = jpoint
+           maxpt  = jpoint
            maxbeg = jbegin
         endif
 
         jbegin = jbegin+jpoint+1
       end do
-      
+
+      !  no interval carries an interior data point: there is nothing to refine, so leave the knot set as is
+      if (number==0) return
+
       !  let coincide the new knot t(number+k+1) with a data point x(nrx)
       !  inside the old knot interval t(number+k) <= x <= t(number+k+1).
       ihalf = maxpt/2+1
@@ -8589,14 +8603,14 @@ module fitpack_core
          end do
       endif
       
-      if (number>0) then 
-          nrdata(number) = ihalf-1
-          nrdata(next)   = maxpt-ihalf
-          am = maxpt
-          an = nrdata(number)
-          fpint(number) = fpmax*an/am
-      endif
-      
+      !  split the selected interval in two, apportioning its residual between the halves.
+      !  number>0 is guaranteed by the early return above, so am is always initialized here.
+      nrdata(number) = ihalf-1
+      nrdata(next)   = maxpt-ihalf
+      am = maxpt
+      an = nrdata(number)
+      fpint(number) = fpmax*an/am
+
       an = nrdata(next)
       fpint(next) = fpmax*an/am
       jk = next+k
@@ -10303,7 +10317,8 @@ module fitpack_core
         end if
 
         ! determine the number of knots nplus we are going to add.
-        npl1  = merge(int((nplus*fpms)/(fpold-fp),FP_SIZE),nplus*ITWO,fpold-fp>acc)
+        npl1  = nplus*ITWO
+        if (fpold-fp>acc) npl1 = int((nplus*fpms)/(fpold-fp),FP_SIZE)  ! guard the division: skip it when fpold-fp<=acc
         nplus = min(nplus*2,max(npl1,nplus/2,1))
         fpold = fp
 
@@ -10948,6 +10963,8 @@ module fitpack_core
                   fpold     = zero
                   reducu    = zero
                   reducv    = zero
+                  lasttu    = 0     ! force step (zmax-zmin) to be computed on the first pass;
+                  step      = zero  ! both are inout persistent state, uninitialized on a fresh fit
               endif
 
           endif
@@ -13628,7 +13645,9 @@ module fitpack_core
                   fpold     = zero
                   reducu    = zero
                   reducv    = zero
-
+                  lastu0    = 0     ! force step(1)/step(2) (rmax-rmin per pole) to be computed on
+                  lastu1    = 0     ! the first pass; step and the last* caches are inout persistent
+                  step      = zero  ! state, uninitialized on a fresh fit (F77 relied on zeroed statics)
 
               else
 
@@ -13780,7 +13799,8 @@ module fitpack_core
             nplu = 1
             if (nu/=8) then
                rn   = nplusu
-               npl1 = merge(int(rn*fpms/reducu),nplusu*2,reducu>acc)
+               npl1 = nplusu*2
+               if (reducu>acc) npl1 = int(rn*fpms/reducu)  ! guard the division: skip it when reducu<=acc
                nplu = min(nplusu*2,max(npl1,nplusu/2,1))
             endif
 
@@ -13788,7 +13808,8 @@ module fitpack_core
             nplv = 3
             if (nv/=8) then
                rn   = nplusv
-               npl1 = merge(int(rn*fpms/reducv),nplusv*2,reducv>acc)
+               npl1 = nplusv*2
+               if (reducv>acc) npl1 = int(rn*fpms/reducv)  ! guard the division: skip it when reducv<=acc
                nplv = min(nplusv*2,max(npl1,nplusv/2,1))
             endif
 
