@@ -116,12 +116,12 @@ $(function(){initNavTree('theory_special_domains.html',''); initResizable(true);
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2theory__special__domains"></a></p>
 <p>Fitting on non-rectangular domains&mdash;disc-shaped regions in the plane and the surface of a sphere&mdash;requires coordinate transformations that map the physical domain to a rectangular parameter space where tensor-product B-splines can be applied. These transformations introduce singularities (the origin of a disc, the poles of a sphere) where special continuity conditions must be imposed on the B-spline coefficients to ensure a smooth, single-valued result.</p>
 <p>The presentation follows Dierckx (1993), Chapter 11.</p>
-<h1><a class="anchor" id="autotoc_md65"></a>
+<h1><a class="anchor" id="autotoc_md70"></a>
 Polar Coordinates</h1>
-<h2><a class="anchor" id="autotoc_md66"></a>
+<h2><a class="anchor" id="autotoc_md71"></a>
 The polar domain</h2>
 <p>A general polar domain is the set of points \( (x, y) \) satisfying \( x^2 + y^2 \leq R(\theta)^2 \), where \( R(\theta) \) is a positive boundary function and \( \theta = \mathrm{atan2}(y, x) \). When \( R(\theta) \) is constant the domain is a circular disc.</p>
-<h2><a class="anchor" id="autotoc_md67"></a>
+<h2><a class="anchor" id="autotoc_md72"></a>
 Normalized polar transform</h2>
 <p>FITPACK maps the physical coordinates \( (x, y) \) to normalized polar coordinates \( (u, v) \) via</p>
 <p class="formulaDsp">
@@ -134,7 +134,7 @@ Normalized polar transform</h2>
 \]
 </p>
 <p>that approximates the data in a weighted least-squares sense, subject to a smoothing condition or prescribed knot placement.</p>
-<h2><a class="anchor" id="autotoc_md68"></a>
+<h2><a class="anchor" id="autotoc_md73"></a>
 FITPACK routines</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -144,12 +144,12 @@ FITPACK routines</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>pogrid</code> (gridded)   </td><td class="markdownTableBodyNone">Data on a polar grid \( (u_i, v_j) \)   </td><td class="markdownTableBodyNone">Constant radius \( R \)   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md69"></a>
+<h1><a class="anchor" id="autotoc_md74"></a>
 Continuity at the Origin</h1>
-<h2><a class="anchor" id="autotoc_md70"></a>
+<h2><a class="anchor" id="autotoc_md75"></a>
 The problem</h2>
 <p>At \( u = 0 \) all values of the angle \( v \) map to the same physical point&mdash;the origin. A naive tensor-product spline in \( (u, v) \) would assign potentially different values to \( s(0, v) \) for different \( v \), producing a discontinuous or non-smooth surface at the centre of the disc.</p>
-<h2><a class="anchor" id="autotoc_md71"></a>
+<h2><a class="anchor" id="autotoc_md76"></a>
 Continuity orders</h2>
 <p>To obtain a physically meaningful result the B-spline coefficients near \( u = 0 \) must satisfy algebraic constraints that enforce continuity to the desired order.</p>
 <p>** \( C^0 \) continuity.** The function value at the origin must be single-valued:</p>
@@ -160,7 +160,7 @@ Continuity orders</h2>
 <p>This is achieved by constraining all coefficients associated with the first radial B-spline to be equal.</p>
 <p>** \( C^1 \) continuity.** In addition to \( C^0 \), the first radial derivative \( \partial s / \partial u \) at \( u = 0 \) must be consistent with a well-defined gradient vector in the \( (x, y) \) plane. Without this constraint, the directional derivative at the origin could depend on the approach angle in an unphysical way. The constraint takes the form of a linear relation among the coefficients of the first two radial B-splines.</p>
 <p>** \( C^2 \) continuity.** The second radial derivatives must likewise be consistent with a well-defined Hessian at the origin. This imposes additional linear relations on the first three rows of coefficients.</p>
-<h2><a class="anchor" id="autotoc_md72"></a>
+<h2><a class="anchor" id="autotoc_md77"></a>
 Implementation in FITPACK</h2>
 <p>The <code>bc_continuity_origin</code> parameter selects the continuity order:</p>
 <table class="markdownTable">
@@ -174,7 +174,7 @@ Implementation in FITPACK</h2>
 <td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone">\( C^2 \) (default)   </td><td class="markdownTableBodyNone">Scattered polar only   </td></tr>
 </table>
 <p>The constraints are incorporated into the least-squares system during fitting, reducing the effective number of free coefficients near \( u = 0 \).</p>
-<h1><a class="anchor" id="autotoc_md73"></a>
+<h1><a class="anchor" id="autotoc_md78"></a>
 Boundary Conditions on the Disc Edge</h1>
 <p>At the outer boundary \( u = 1 \) the following options are available:</p>
 <ul>
@@ -186,16 +186,16 @@ Boundary Conditions on the Disc Edge</h1>
 <li><b>Prescribed origin value</b>: The value \( z_0 = s(0, v) \) can be supplied explicitly. It can be enforced exactly (<code>z0_exact = .true.</code>) or treated as an additional data point to be approximated.</li>
 <li><b>Zero gradient at the origin</b>: Setting <code>z0_zero_gradient = .true.</code> enforces \( \nabla s(0, 0) = 0 \), creating a flat spot at the centre of the disc.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md74"></a>
+<h1><a class="anchor" id="autotoc_md79"></a>
 Spherical Coordinates</h1>
-<h2><a class="anchor" id="autotoc_md75"></a>
+<h2><a class="anchor" id="autotoc_md80"></a>
 The spherical domain</h2>
 <p>The unit sphere is parameterized by colatitude \( \theta \in [0, \pi] \) and longitude \( \phi \in [0, 2\pi] \). A scalar function on the sphere is represented as a tensor-product B-spline:</p>
 <p class="formulaDsp">
 \[    s(\theta, \phi) = \sum_{i} \sum_{j} c_{ij} \, N_{i,k}(\theta) \, M_{j,k}(\phi)
 \]
 </p>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 Periodicity in longitude</h2>
 <p>Because the sphere is periodic in \( \phi \), the spline must satisfy</p>
 <p class="formulaDsp">
@@ -203,7 +203,7 @@ Periodicity in longitude</h2>
 \]
 </p>
 <p>together with matching of all derivatives at \( \phi = 0 \) and \( \phi = 2\pi \). FITPACK enforces this by using a periodic knot vector and periodic B-spline basis in the \( \phi \) direction.</p>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md82"></a>
 FITPACK routines</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -213,12 +213,12 @@ FITPACK routines</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>spgrid</code> (gridded)   </td><td class="markdownTableBodyNone">Data on a \( (\theta_i, \phi_j) \) grid   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md78"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 The Pole Problem</h1>
-<h2><a class="anchor" id="autotoc_md79"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Analogy with the origin problem</h2>
 <p>The pole problem on the sphere is the direct analogue of the origin problem in polar coordinates. At the <b>north pole</b> ( \( \theta = 0 \)) and the <b>south pole</b> ( \( \theta = \pi \)), all longitudes \( \phi \) correspond to the same physical point. A naive tensor-product spline would allow different values of \( s(0, \phi) \) at different longitudes, producing a discontinuity at the pole.</p>
-<h2><a class="anchor" id="autotoc_md80"></a>
+<h2><a class="anchor" id="autotoc_md85"></a>
 Continuity conditions</h2>
 <p>** \( C^0 \) continuity.** The function value at each pole must be single-valued:</p>
 <p class="formulaDsp">
@@ -229,7 +229,7 @@ Continuity conditions</h2>
 </p>
 <p>** \( C^1 \) continuity.** Additionally, the angular derivatives at each pole must be consistent with a well-defined gradient on the sphere. Without this constraint the directional derivative would depend on the approach azimuth in a manner incompatible with the smoothness of the underlying surface.</p>
 <p>FITPACK enforces these conditions by imposing linear constraints on the B-spline coefficients near \( \theta = 0 \) and \( \theta = \pi \), reducing the number of free parameters at each pole.</p>
-<h2><a class="anchor" id="autotoc_md81"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 Pole boundary conditions for gridded spheres</h2>
 <p>For gridded spherical fitting (<code>spgrid</code>), the north and south poles have <b>independently configurable</b> boundary conditions:</p>
 <table class="markdownTable">
@@ -245,7 +245,7 @@ Pole boundary conditions for gridded spheres</h2>
 <td class="markdownTableBodyNone"><code>zero_gradient</code>   </td><td class="markdownTableBodyNone">If <code>.true.</code>, enforce vanishing gradient at the pole   </td></tr>
 </table>
 <p>Each pole is configured independently via <code>BC_north_pole</code> and <code>BC_south_pole</code>, allowing asymmetric physical conditions (e.g., a known temperature at the north pole with a free south pole).</p>
-<h1><a class="anchor" id="autotoc_md82"></a>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Practical Considerations</h1>
 <ul>
 <li><b>Arbitrary boundary shape</b>: The scattered polar fitter (<code>polar</code>) accepts a general boundary function \( R(\theta) \) through a function pointer, allowing fitting on non-circular disc-shaped domains. The gridded polar fitter (<code>pogrid</code>) requires a constant radius \( R \).</li>

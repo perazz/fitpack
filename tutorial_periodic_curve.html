@@ -115,7 +115,7 @@ $(function(){initNavTree('tutorial_periodic_curve.html',''); initResizable(true)
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__periodic__curve"></a></p>
 <p>This tutorial covers periodic spline fitting with <code>fitpack_periodic_curve</code>: constructing a B-spline \( y = s(x) \) that satisfies periodic boundary conditions, evaluating it, and computing derivatives and integrals across the period boundary.</p>
-<h1><a class="anchor" id="autotoc_md97"></a>
+<h1><a class="anchor" id="autotoc_md102"></a>
 Overview</h1>
 <p>A periodic spline enforces continuity of the function and all its derivatives up to order \( k-1 \) at the period boundary:</p>
 <p class="formulaDsp">
@@ -129,7 +129,7 @@ Overview</h1>
 <li><b>Angular measurements</b> such as wind direction, phase angles, or azimuth</li>
 </ul>
 <p>The type <code>fitpack_periodic_curve</code> extends <code>fitpack_curve</code> and inherits all of its methods (<code>eval</code>, <code>dfdx</code>, <code>integral</code>, <code>zeros</code>, <code>destroy</code>, etc.). The only difference is that fitting calls the <code>percur</code> algorithm instead of <code>curfit</code>, which constructs a periodic knot vector and ties the B-spline coefficients at the boundary.</p>
-<h1><a class="anchor" id="autotoc_md98"></a>
+<h1><a class="anchor" id="autotoc_md103"></a>
 Mathematical Background</h1>
 <p>Given \( m \) data points \( (x_i, y_i) \) with \( x_1 &lt; x_2 &lt; \cdots &lt; x_m \), the period is \( P = x_m - x_1 \). The <code>percur</code> routine places a <b>wrapped knot vector</b>: interior knots \( t_{k+2}, \ldots, t_{n-k-1} \) lie inside \( [x_1, x_m) \), while the boundary knots satisfy</p>
 <p class="formulaDsp">
@@ -144,7 +144,7 @@ Mathematical Background</h1>
 \]
 </p>
 <p>Note that the last data point \( (x_m, y_m) \) defines the period length but is <b>not</b> included in the residual sum (only \( m-1 \) points are fitted).</p>
-<h1><a class="anchor" id="autotoc_md99"></a>
+<h1><a class="anchor" id="autotoc_md104"></a>
 Basic Example</h1>
 <p>Fit the periodic function \( f(x) = \cos(x) + \sin(2x) \) on \( [0, 2\pi] \). The data <b>must</b> include the right endpoint \( x_m = 2\pi \) so that <code>percur</code> can determine the period.</p>
 <div class="fragment"><div class="line"><span class="keyword">program</span> periodic_demo</div>
@@ -181,7 +181,7 @@ Basic Example</h1>
 <div class="line"><span class="keyword">end program </span>periodic_demo</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p>The call to <code>curve\new_fit</code> loads the data and performs a smoothing fit in one step. Because <code>fitpack_periodic_curve</code> extends <code>fitpack_curve</code>, all evaluation and query methods work identically.</p>
-<h1><a class="anchor" id="autotoc_md100"></a>
+<h1><a class="anchor" id="autotoc_md105"></a>
 Periodicity Verification</h1>
 <p>A key property of the periodic spline is that function values <b>and</b> derivatives match at the endpoints. After fitting, verify:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: y_left, y_right, dy_left, dy_right</div>
@@ -203,7 +203,7 @@ Periodicity Verification</h1>
 \]
 </p>
 <p>This is <b>not</b> the case for a non-periodic <code>fitpack_curve</code>, where the boundary derivatives are generally unrelated.</p>
-<h1><a class="anchor" id="autotoc_md101"></a>
+<h1><a class="anchor" id="autotoc_md106"></a>
 Integration Across the Boundary</h1>
 <p>The <code>curve\integral</code> method works with periodic splines exactly as with non-periodic ones. The integration limits need not coincide with the data range. For example, integrate from \( \pi/2 \) to \( 3\pi \) (which crosses the period boundary at \( 2\pi \)):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: area</div>
@@ -217,7 +217,7 @@ Integration Across the Boundary</h1>
     = -\frac{3}{2}
 \]
 </p>
-<h1><a class="anchor" id="autotoc_md102"></a>
+<h1><a class="anchor" id="autotoc_md107"></a>
 Smoothing and Interpolation</h1>
 <p>The periodic variant supports the same fitting modes as <code>fitpack_curve</code>:</p>
 <table class="markdownTable">
@@ -240,7 +240,7 @@ Smoothing and Interpolation</h1>
 <div class="line">        print <span class="stringliteral">&#39;(es10.1,i8,es12.3)&#39;</span>, curve%smoothing, curve%knots, curve%mse()</div>
 <div class="line"><span class="keywordflow">    end if</span></div>
 <div class="line"><span class="keyword">end </span>do</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md103"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md108"></a>
 Complete Example</h1>
 <p>A self-contained program demonstrating periodic fitting, evaluation, periodicity verification, integration, interpolation, and a smoothing sweep is provided in the repository:</p>
 <dl class="section see"><dt>See also</dt><dd><code>examples/example_periodic_curve.f90</code></dd>

@@ -12,11 +12,12 @@ var searchData=
   ['fitpack_5fgrid_5fsurfaces_2ef90_9',['fitpack_grid_surfaces.f90',['../fitpack__grid__surfaces_8f90.html',1,'']]],
   ['fitpack_5fgridded_5fpolar_2ef90_10',['fitpack_gridded_polar.f90',['../fitpack__gridded__polar_8f90.html',1,'']]],
   ['fitpack_5fgridded_5fsphere_2ef90_11',['fitpack_gridded_sphere.f90',['../fitpack__gridded__sphere_8f90.html',1,'']]],
-  ['fitpack_5fparametric_2ef90_12',['fitpack_parametric.f90',['../fitpack__parametric_8f90.html',1,'']]],
-  ['fitpack_5fparametric_5fc_2ef90_13',['fitpack_parametric_c.f90',['../fitpack__parametric__c_8f90.html',1,'']]],
-  ['fitpack_5fparametric_5fsurfaces_2ef90_14',['fitpack_parametric_surfaces.f90',['../fitpack__parametric__surfaces_8f90.html',1,'']]],
-  ['fitpack_5fperiodic_5fcurves_5fc_2ef90_15',['fitpack_periodic_curves_c.f90',['../fitpack__periodic__curves__c_8f90.html',1,'']]],
-  ['fitpack_5fpolar_2ef90_16',['fitpack_polar.f90',['../fitpack__polar_8f90.html',1,'']]],
-  ['fitpack_5fspheres_2ef90_17',['fitpack_spheres.f90',['../fitpack__spheres_8f90.html',1,'']]],
-  ['fitpack_5fsurfaces_2ef90_18',['fitpack_surfaces.f90',['../fitpack__surfaces_8f90.html',1,'']]]
+  ['fitpack_5fgridded_5fsplines_2ef90_12',['fitpack_gridded_splines.f90',['../fitpack__gridded__splines_8f90.html',1,'']]],
+  ['fitpack_5fparametric_2ef90_13',['fitpack_parametric.f90',['../fitpack__parametric_8f90.html',1,'']]],
+  ['fitpack_5fparametric_5fc_2ef90_14',['fitpack_parametric_c.f90',['../fitpack__parametric__c_8f90.html',1,'']]],
+  ['fitpack_5fparametric_5fsurfaces_2ef90_15',['fitpack_parametric_surfaces.f90',['../fitpack__parametric__surfaces_8f90.html',1,'']]],
+  ['fitpack_5fperiodic_5fcurves_5fc_2ef90_16',['fitpack_periodic_curves_c.f90',['../fitpack__periodic__curves__c_8f90.html',1,'']]],
+  ['fitpack_5fpolar_2ef90_17',['fitpack_polar.f90',['../fitpack__polar_8f90.html',1,'']]],
+  ['fitpack_5fspheres_2ef90_18',['fitpack_spheres.f90',['../fitpack__spheres_8f90.html',1,'']]],
+  ['fitpack_5fsurfaces_2ef90_19',['fitpack_surfaces.f90',['../fitpack__surfaces_8f90.html',1,'']]]
 ];

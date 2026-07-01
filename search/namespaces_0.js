@@ -12,11 +12,12 @@ var searchData=
   ['fitpack_5fgrid_5fsurfaces_9',['fitpack_grid_surfaces',['../namespacefitpack__grid__surfaces.html',1,'']]],
   ['fitpack_5fgridded_5fpolar_10',['fitpack_gridded_polar',['../namespacefitpack__gridded__polar.html',1,'']]],
   ['fitpack_5fgridded_5fsphere_11',['fitpack_gridded_sphere',['../namespacefitpack__gridded__sphere.html',1,'']]],
-  ['fitpack_5fparametric_5fcurves_12',['fitpack_parametric_curves',['../namespacefitpack__parametric__curves.html',1,'']]],
-  ['fitpack_5fparametric_5fcurves_5fc_13',['fitpack_parametric_curves_c',['../namespacefitpack__parametric__curves__c.html',1,'']]],
-  ['fitpack_5fparametric_5fsurfaces_14',['fitpack_parametric_surfaces',['../namespacefitpack__parametric__surfaces.html',1,'']]],
-  ['fitpack_5fperiodic_5fcurves_5fc_15',['fitpack_periodic_curves_c',['../namespacefitpack__periodic__curves__c.html',1,'']]],
-  ['fitpack_5fpolar_5fdomains_16',['fitpack_polar_domains',['../namespacefitpack__polar__domains.html',1,'']]],
-  ['fitpack_5fsphere_5fdomains_17',['fitpack_sphere_domains',['../namespacefitpack__sphere__domains.html',1,'']]],
-  ['fitpack_5fsurfaces_18',['fitpack_surfaces',['../namespacefitpack__surfaces.html',1,'']]]
+  ['fitpack_5fgridded_5fsplines_12',['fitpack_gridded_splines',['../namespacefitpack__gridded__splines.html',1,'']]],
+  ['fitpack_5fparametric_5fcurves_13',['fitpack_parametric_curves',['../namespacefitpack__parametric__curves.html',1,'']]],
+  ['fitpack_5fparametric_5fcurves_5fc_14',['fitpack_parametric_curves_c',['../namespacefitpack__parametric__curves__c.html',1,'']]],
+  ['fitpack_5fparametric_5fsurfaces_15',['fitpack_parametric_surfaces',['../namespacefitpack__parametric__surfaces.html',1,'']]],
+  ['fitpack_5fperiodic_5fcurves_5fc_16',['fitpack_periodic_curves_c',['../namespacefitpack__periodic__curves__c.html',1,'']]],
+  ['fitpack_5fpolar_5fdomains_17',['fitpack_polar_domains',['../namespacefitpack__polar__domains.html',1,'']]],
+  ['fitpack_5fsphere_5fdomains_18',['fitpack_sphere_domains',['../namespacefitpack__sphere__domains.html',1,'']]],
+  ['fitpack_5fsurfaces_19',['fitpack_surfaces',['../namespacefitpack__surfaces.html',1,'']]]
 ];

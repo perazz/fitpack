@@ -38,6 +38,9 @@ var annotated_dup =
     [ "fitpack_gridded_sphere", "namespacefitpack__gridded__sphere.html", [
       [ "fitpack_grid_sphere", "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html", "structfitpack__gridded__sphere_1_1fitpack__grid__sphere" ]
     ] ],
+    [ "fitpack_gridded_splines", "namespacefitpack__gridded__splines.html", [
+      [ "fitpack_gridded_spline", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html", "structfitpack__gridded__splines_1_1fitpack__gridded__spline" ]
+    ] ],
     [ "fitpack_parametric_curves", "namespacefitpack__parametric__curves.html", [
       [ "fitpack_closed_curve", "structfitpack__parametric__curves_1_1fitpack__closed__curve.html", null ],
       [ "fitpack_constrained_curve", "structfitpack__parametric__curves_1_1fitpack__constrained__curve.html", "structfitpack__parametric__curves_1_1fitpack__constrained__curve" ],

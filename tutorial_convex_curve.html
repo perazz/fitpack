@@ -115,7 +115,7 @@ $(function(){initNavTree('tutorial_convex_curve.html',''); initResizable(true); 
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__convex__curve"></a></p>
 <p>This tutorial covers shape-preserving spline fitting with <code>fitpack_convex_curve</code>, which enforces local convexity or concavity constraints on a cubic spline. Use it when the data represents a physical quantity that must be convex or concave — e.g. moisture content vs depth, dose-response curves, or thermodynamic isotherms — and an unconstrained spline would introduce spurious wiggles.</p>
-<h1><a class="anchor" id="autotoc_md117"></a>
+<h1><a class="anchor" id="autotoc_md122"></a>
 Mathematical Background</h1>
 <p>A cubic B-spline \( s(x) = \sum_j c_j B_j(x) \) is locally convex ( \( s&#39;&#39;(x) \geq 0 \)) when the coefficient second differences satisfy</p>
 <p class="formulaDsp">
@@ -140,7 +140,7 @@ Mathematical Background</h1>
 </table>
 <p>The fitting always uses cubic splines ( \( k = 3 \)). The core solver (<code>concon</code>) places knots automatically to satisfy the smoothing constraint while respecting the requested convexity at every data point.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, &sect;8.3&ndash;8.4 (pp. 173&ndash;196)</dd></dl>
-<h1><a class="anchor" id="autotoc_md118"></a>
+<h1><a class="anchor" id="autotoc_md123"></a>
 Basic Example</h1>
 <p>Consider moisture-content measurements as a function of depth. The data rises quickly then levels off — a concave profile.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_convex_curve, fp_real, fp_flag, &amp;</div>
@@ -161,7 +161,7 @@ Basic Example</h1>
 <div class="line">     0.317_fp_real, 0.326_fp_real, 0.323_fp_real, 0.321_fp_real, 0.322_fp_real, &amp;</div>
 <div class="line">     0.328_fp_real]</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md119"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md124"></a>
 Step 1 — Load Data and Set Convexity Flags</h2>
 <div class="fragment"><div class="line"><span class="comment">! Load data points</span></div>
 <div class="line"><span class="keyword">call </span>curve%new_points(x, y)</div>
@@ -170,12 +170,12 @@ Step 1 — Load Data and Set Convexity Flags</h2>
 <div class="line">v = one</div>
 <div class="line">ierr = curve%set_convexity(v)</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md120"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md125"></a>
 Step 2 — Fit with Constraints</h2>
 <p>Call <code>curve\fit</code> with a smoothing parameter. The solver selects knots automatically while enforcing \( s&#39;&#39;(x_i) \leq 0 \) at every data point:</p>
 <div class="fragment"><div class="line">ierr = curve%fit(smoothing=0.04_fp_real)</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md121"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md126"></a>
 Step 3 — Evaluate and Inspect</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">real</span>(FP_REAL) :: y_eval, d2y</div>
 <div class="line"><span class="keywordtype">integer</span> :: i</div>
@@ -187,7 +187,7 @@ Step 3 — Evaluate and Inspect</h2>
 <div class="line"><span class="keywordflow">end do</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md122"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md127"></a>
 Comparing Constrained vs Unconstrained</h1>
 <p>Without constraints, a standard <code>fitpack_curve</code> may oscillate through noisy data, creating regions where the second derivative changes sign. The constrained fit eliminates these wiggles:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_curve, fitpack_convex_curve, fp_real, fp_flag, one</div>
@@ -211,19 +211,19 @@ Comparing Constrained vs Unconstrained</h1>
 <div class="line"><span class="keyword">call </span>free_curve%destroy()</div>
 <div class="line"><span class="keyword">call </span>constrained%destroy()</div>
 </div><!-- fragment --><p>The constrained spline guarantees \( s&#39;&#39;(x) \leq 0 \) throughout.</p>
-<h1><a class="anchor" id="autotoc_md123"></a>
+<h1><a class="anchor" id="autotoc_md128"></a>
 Mixed Constraints</h1>
 <p>The constraint vector need not be uniform. Assign different flags per point for data that changes curvature sign:</p>
 <div class="fragment"><div class="line">v(1:6)  = -one   <span class="comment">! convex region: s&#39;&#39;(x_i) &gt;= 0</span></div>
 <div class="line">v(7:m)  =  one   <span class="comment">! concave region: s&#39;&#39;(x_i) &lt;= 0</span></div>
 <div class="line">ierr = curve%set_convexity(v)</div>
 </div><!-- fragment --><p>Setting \( v_i = 0 \) leaves individual points unconstrained, which is useful at transition regions where the curvature sign is unknown.</p>
-<h1><a class="anchor" id="autotoc_md124"></a>
+<h1><a class="anchor" id="autotoc_md129"></a>
 Constructor Shortcut</h1>
 <p>A one-step constructor combines <code>new_points</code>, <code>set_convexity</code>, and <code>fit</code>:</p>
 <div class="fragment"><div class="line">v = one</div>
 <div class="line">curve = fitpack_convex_curve(x, y, v, smoothing=0.04_fp_real, ierr=ierr)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md125"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md130"></a>
 API Summary</h1>
 <p><code>fitpack_convex_curve</code> extends <code>fitpack_curve</code> with convexity constraints. The spline degree is always cubic ( \( k = 3 \)).</p>
 <table class="markdownTable">
@@ -246,7 +246,7 @@ API Summary</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>curve\destroy()</code>   </td><td class="markdownTableBodyNone">Release allocated memory   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md126"></a>
+<h1><a class="anchor" id="autotoc_md131"></a>
 Complete Example</h1>
 <p>See <code>examples/example_convex_curve.f90</code> (<code>examples/example_convex_curve.f90</code>) for a full working program that loads moisture-content data with endpoint-emphasized weights, fits at multiple smoothing levels, and prints a comparison table of knot count, residual, and maximum second derivative.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacefitpack__convex__curves.html">fitpack_convex_curves</a>, Dierckx Ch. 8 (pp. 173&ndash;196) </dd></dl>

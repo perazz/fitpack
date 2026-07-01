@@ -115,7 +115,7 @@ $(function(){initNavTree('tutorial_sphere.html',''); initResizable(true); });
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__sphere"></a></p>
 <p>This tutorial covers bivariate spline fitting on the unit sphere with FITPACK: constructing a bicubic spline \( r = s(\theta, \phi) \) from data in spherical coordinates, handling pole singularities, and evaluating the fitted surface.</p>
-<h1><a class="anchor" id="autotoc_md166"></a>
+<h1><a class="anchor" id="autotoc_md171"></a>
 Overview</h1>
 <p>Many physical problems produce data on the surface of a sphere — geophysical fields, satellite measurements, radiation patterns, or angular distributions. FITPACK provides two sphere-specific types, selected by input data structure:</p>
 <table class="markdownTable">
@@ -127,7 +127,7 @@ Overview</h1>
 <td class="markdownTableBodyNone"><code>fitpack_grid_sphere</code>   </td><td class="markdownTableBodyNone">Grid \( z(v_j, u_i) \)   </td><td class="markdownTableBodyNone"><code>spgrid</code>   </td><td class="markdownTableBodyNone">Latitude-longitude grids   </td></tr>
 </table>
 <p><b>Always prefer <code>fitpack_grid_sphere</code> when data lies on a regular latitude-longitude grid</b> — the <code>spgrid</code> algorithm exploits the grid structure and is significantly more efficient.</p>
-<h1><a class="anchor" id="autotoc_md167"></a>
+<h1><a class="anchor" id="autotoc_md172"></a>
 Mathematical Background</h1>
 <p>Points on the unit sphere are parameterized by colatitude \( \theta \in [0, \pi] \) (measured from the north pole) and longitude \( \phi \in [0, 2\pi) \). The Cartesian embedding is:</p>
 <p class="formulaDsp">
@@ -136,10 +136,10 @@ Mathematical Background</h1>
     z = \cos\theta
 \]
 </p>
-<h2><a class="anchor" id="autotoc_md168"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 The Pole Problem</h2>
 <p>At the north pole ( \( \theta = 0 \)) and south pole ( \( \theta = \pi \)), all values of \( \phi \) correspond to the same geometric point. A naive tensor-product spline in \( (\theta, \phi) \) would not enforce this single-valuedness. FITPACK's sphere routines automatically impose pole constraints so that the fitted spline is smooth and well-defined at both poles.</p>
-<h2><a class="anchor" id="autotoc_md169"></a>
+<h2><a class="anchor" id="autotoc_md174"></a>
 Spherical Harmonics Connection</h2>
 <p>The real spherical harmonics \( Y_l^m(\theta, \phi) \) form a natural basis for functions on the sphere. The first few are:</p>
 <p class="formulaDsp">
@@ -149,10 +149,10 @@ Spherical Harmonics Connection</h2>
 \]
 </p>
 <p>A smooth test function built from these harmonics provides a useful validation target, since the spline should reproduce low-order harmonics to high accuracy with only a moderate number of knots.</p>
-<h1><a class="anchor" id="autotoc_md170"></a>
+<h1><a class="anchor" id="autotoc_md175"></a>
 Scattered Sphere Data — <code>fitpack_sphere</code></h1>
 <p>Use <code>fitpack_sphere</code> when data points are irregularly distributed over the sphere.</p>
-<h2><a class="anchor" id="autotoc_md171"></a>
+<h2><a class="anchor" id="autotoc_md176"></a>
 Construction and Fitting</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_sphere, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, one, half, pi</div>
@@ -165,7 +165,7 @@ Construction and Fitting</h2>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p>The <code>new_fit</code> method stores the data, allocates workspace, and performs a smoothing fit in one call. The smoothing parameter \( s \) controls the trade-off between fidelity and smoothness. A practical starting value is \( s = m \) (the number of data points).</p>
-<h2><a class="anchor" id="autotoc_md172"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 Evaluation</h2>
 <p>The <code>eval</code> method returns values on a tensor-product grid:</p>
 <div class="fragment"><div class="line">f = sph%eval(t_eval, p_eval, ierr)</div>
@@ -176,7 +176,7 @@ Evaluation</h2>
 </div><!-- fragment --><p>After fitting, the knot counts are available from <code>sph\knots</code>:</p>
 <div class="fragment"><div class="line">print *, <span class="stringliteral">&#39;Theta knots:&#39;</span>, sph%knots(1), <span class="stringliteral">&#39;  Phi knots:&#39;</span>, sph%knots(2)</div>
 </div><!-- fragment --><p>The residual (weighted sum of squared errors) is returned by <code>sph\mse()</code>.</p>
-<h2><a class="anchor" id="autotoc_md173"></a>
+<h2><a class="anchor" id="autotoc_md178"></a>
 Example: Spherical Harmonic Test Function</h2>
 <p>The following test function combines three harmonics:</p>
 <p class="formulaDsp">
@@ -200,10 +200,10 @@ Example: Spherical Harmonic Test Function</h2>
 <div class="line">ierr = sph%new_fit(theta, phi, r, smoothing=real(m, fp_real))</div>
 <div class="line">ierr = sph%fit(smoothing=10.0_fp_real)</div>
 </div><!-- fragment --><p>Tightening the smoothing parameter increases the number of knots and reduces the residual, allowing the spline to capture finer angular structure.</p>
-<h1><a class="anchor" id="autotoc_md174"></a>
+<h1><a class="anchor" id="autotoc_md179"></a>
 Gridded Sphere Data — <code>fitpack_grid_sphere</code></h1>
 <p>Use <code>fitpack_grid_sphere</code> when data is sampled on a regular colatitude-longitude grid — the typical case for reanalysis products, climate model output, or any field stored on a lat-lon mesh.</p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md180"></a>
 Construction and Fitting</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_sphere, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, one, pi</div>
@@ -216,7 +216,7 @@ Construction and Fitting</h2>
 <div class="line"><span class="comment">! zg(j, i) = f(u(i), v(j))</span></div>
 <div class="line">ierr = gsph%new_fit(u, v, zg, smoothing=zero)</div>
 </div><!-- fragment --><p>Note the array layout: <code>zg</code> has shape <code>(size(v), size(u))</code>, with the longitude index first. The colatitude grid must satisfy \( 0 &lt; u_1 &lt; \cdots &lt; u_{n_u} &lt; \pi \) (strictly interior — the poles are not grid points). The longitude grid must satisfy \( 0 \leq v_1 &lt; v_2 &lt; \cdots &lt; v_{n_v} &lt; 2\pi \).</p>
-<h2><a class="anchor" id="autotoc_md176"></a>
+<h2><a class="anchor" id="autotoc_md181"></a>
 Pole Boundary Conditions</h2>
 <p>Because the grid excludes the poles, FITPACK allows you to supply pole values and control the smoothness there:</p>
 <div class="fragment"><div class="line"><span class="keyword">call </span>gsph%BC_north_pole(z0=z_north, exact=.true., differentiable=.true.)</div>
@@ -235,7 +235,7 @@ Pole Boundary Conditions</h2>
 <td class="markdownTableBodyNone"><code>zero_grad</code>   </td><td class="markdownTableBodyNone"><code>logical</code>   </td><td class="markdownTableBodyNone"><code>.true.</code>: enforce \( \nabla s = 0 \) at the pole   </td></tr>
 </table>
 <p>When <code>z0</code> is omitted, no function-value constraint is imposed at that pole.</p>
-<h2><a class="anchor" id="autotoc_md177"></a>
+<h2><a class="anchor" id="autotoc_md182"></a>
 Example: Function on a Lat-Lon Grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: nu = 15, nv = 30</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: u(nu), v(nv), zg(nv, nu), du, dv</div>
@@ -266,7 +266,7 @@ Example: Function on a Lat-Lon Grid</h2>
 <div class="line"><span class="comment">! Evaluate on a new grid</span></div>
 <div class="line">f = gsph%eval(u_eval, v_eval, ierr)</div>
 <div class="line">! f(j, i) = s(u_eval(i), v_eval(j))</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md178"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md183"></a>
 Complete Example</h1>
 <p>A full working program demonstrating both scattered fitting with progressive refinement and gridded fitting with pole boundary conditions is provided in <code>examples/example_sphere.f90</code>. Build and run it with:</p>
 <div class="fragment"><div class="line">fpm run --example example_sphere</div>

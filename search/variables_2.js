@@ -6,5 +6,6 @@ var searchData=
   ['degree_5f4_3',['degree_4',['../namespacefitpack__core.html#a3d07187113a320a4bf1fa751018181d2',1,'fitpack_core']]],
   ['degree_5f5_4',['degree_5',['../namespacefitpack__core.html#a4d7d7b394bfadf0160a6986d06c7952d',1,'fitpack_core']]],
   ['deriv_5fbegin_5',['deriv_begin',['../structfitpack__parametric__curves_1_1fitpack__constrained__curve.html#aa1524add5a9df2c6e27cfd880ae14a7b',1,'fitpack_parametric_curves::fitpack_constrained_curve']]],
-  ['deriv_5fend_6',['deriv_end',['../structfitpack__parametric__curves_1_1fitpack__constrained__curve.html#acabb92091b558a892f38c34f49cc7b81',1,'fitpack_parametric_curves::fitpack_constrained_curve']]]
+  ['deriv_5fend_6',['deriv_end',['../structfitpack__parametric__curves_1_1fitpack__constrained__curve.html#acabb92091b558a892f38c34f49cc7b81',1,'fitpack_parametric_curves::fitpack_constrained_curve']]],
+  ['dims_7',['dims',['../structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a114dbf4f84c3bb75ad20290dcb9d5e00',1,'fitpack_gridded_splines::fitpack_gridded_spline']]]
 ];

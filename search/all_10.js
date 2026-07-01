@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['m_0',['m',['../structfitpack__curves_1_1fitpack__curve.html#a4d3c472381ed9f47b16cc001caa26d82',1,'fitpack_curves::fitpack_curve::m'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#aa444acf938855d3a30f3f9fdbfbdb1c9',1,'fitpack_parametric_curves::fitpack_parametric_curve::m'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ab3fc7226342d3c6fa08f0c64dbf1ce4e',1,'fitpack_polar_domains::fitpack_polar::m'],['../structfitpack__sphere__domains_1_1fitpack__sphere.html#aa768337fec1418a5589d96008da80700',1,'fitpack_sphere_domains::fitpack_sphere::m'],['../structfitpack__surfaces_1_1fitpack__surface.html#a96ae7c2223abd75447562d3ddb43d006',1,'fitpack_surfaces::fitpack_surface::m']]],
+  ['m_0',['m',['../structfitpack__curves_1_1fitpack__curve.html#a4d3c472381ed9f47b16cc001caa26d82',1,'fitpack_curves::fitpack_curve::m'],['../structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a79e7829f1440a39c7d9397d7641e8e6d',1,'fitpack_gridded_splines::fitpack_gridded_spline::m'],['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#aa444acf938855d3a30f3f9fdbfbdb1c9',1,'fitpack_parametric_curves::fitpack_parametric_curve::m'],['../structfitpack__polar__domains_1_1fitpack__polar.html#ab3fc7226342d3c6fa08f0c64dbf1ce4e',1,'fitpack_polar_domains::fitpack_polar::m'],['../structfitpack__sphere__domains_1_1fitpack__sphere.html#aa768337fec1418a5589d96008da80700',1,'fitpack_sphere_domains::fitpack_sphere::m'],['../structfitpack__surfaces_1_1fitpack__surface.html#a96ae7c2223abd75447562d3ddb43d006',1,'fitpack_surfaces::fitpack_surface::m']]],
   ['mainpage_2emd_1',['mainpage.md',['../mainpage_8md.html',1,'']]],
-  ['mathematical_20background_2',['Mathematical Background',['../tutorial_curve.html#autotoc_md83',1,'Mathematical Background'],['../tutorial_periodic_curve.html#autotoc_md98',1,'Mathematical Background'],['../tutorial_convex_curve.html#autotoc_md117',1,'Mathematical Background'],['../tutorial_surface.html#autotoc_md127',1,'Mathematical Background'],['../tutorial_polar.html#autotoc_md155',1,'Mathematical Background'],['../tutorial_sphere.html#autotoc_md167',1,'Mathematical Background']]],
+  ['mathematical_20background_2',['Mathematical Background',['../tutorial_curve.html#autotoc_md88',1,'Mathematical Background'],['../tutorial_periodic_curve.html#autotoc_md103',1,'Mathematical Background'],['../tutorial_convex_curve.html#autotoc_md122',1,'Mathematical Background'],['../tutorial_surface.html#autotoc_md132',1,'Mathematical Background'],['../tutorial_polar.html#autotoc_md160',1,'Mathematical Background'],['../tutorial_sphere.html#autotoc_md172',1,'Mathematical Background']]],
   ['matrix_3',['The Observation Matrix',['../theory_surface_fitting.html#autotoc_md51',1,'']]],
   ['matrix_20structure_4',['Matrix structure',['../namespacefitpack__core.html#autotoc_md0',1,'']]],
   ['max_5fidim_5',['max_idim',['../namespacefitpack__core.html#acea3d2d817763c46755c944d4ea72a24',1,'fitpack_core']]],
@@ -11,9 +11,9 @@ var searchData=
   ['maxbin_8',['maxbin',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#aaf16c0217bf4248a2e1520c5c9edf21c',1,'fitpack_convex_curves::fitpack_convex_curve']]],
   ['maxtr_9',['maxtr',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00',1,'fitpack_convex_curves::fitpack_convex_curve']]],
   ['merge_5fknots_10',['merge_knots',['../namespacefitpack__surfaces.html#a0d7f13ca2d46ab67f1cc3d7b1bb664d8',1,'fitpack_surfaces']]],
-  ['mixed_20constraints_11',['Mixed Constraints',['../tutorial_convex_curve.html#autotoc_md123',1,'']]],
+  ['mixed_20constraints_11',['Mixed Constraints',['../tutorial_convex_curve.html#autotoc_md128',1,'']]],
   ['modern_20fortran_20spline_20fitting_12',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]],
-  ['modes_13',['Fitting Modes',['../tutorial_surface.html#autotoc_md137',1,'']]],
+  ['modes_13',['Fitting Modes',['../tutorial_surface.html#autotoc_md142',1,'']]],
   ['mse_14',['mse',['../structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973',1,'fitpack_fitters::fitpack_fitter']]],
-  ['multi_20component_20surfaces_15',['Multi-Component Surfaces',['../tutorial_grid_surface.html#autotoc_md148',1,'']]]
+  ['multi_20component_20surfaces_15',['Multi-Component Surfaces',['../tutorial_grid_surface.html#autotoc_md153',1,'']]]
 ];

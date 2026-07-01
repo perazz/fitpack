@@ -14,6 +14,7 @@ var hierarchy =
       [ "fitpack_grid_surfaces::fitpack_grid_surface", "structfitpack__grid__surfaces_1_1fitpack__grid__surface.html", null ],
       [ "fitpack_gridded_polar::fitpack_grid_polar", "structfitpack__gridded__polar_1_1fitpack__grid__polar.html", null ],
       [ "fitpack_gridded_sphere::fitpack_grid_sphere", "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html", null ],
+      [ "fitpack_gridded_splines::fitpack_gridded_spline", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html", null ],
       [ "fitpack_parametric_curves::fitpack_parametric_curve", "structfitpack__parametric__curves_1_1fitpack__parametric__curve.html", [
         [ "fitpack_parametric_curves::fitpack_closed_curve", "structfitpack__parametric__curves_1_1fitpack__closed__curve.html", null ],
         [ "fitpack_parametric_curves::fitpack_constrained_curve", "structfitpack__parametric__curves_1_1fitpack__constrained__curve.html", null ]

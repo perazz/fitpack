@@ -115,7 +115,7 @@ $(function(){initNavTree('tutorial_polar.html',''); initResizable(true); });
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__polar"></a></p>
 <p>This tutorial covers bivariate spline fitting on disc-shaped domains using FITPACK's polar coordinate types: <code>fitpack_polar</code> for scattered data and <code>fitpack_grid_polar</code> for gridded data.</p>
-<h1><a class="anchor" id="autotoc_md154"></a>
+<h1><a class="anchor" id="autotoc_md159"></a>
 Overview</h1>
 <p>Many physical problems produce data on disc-shaped or circular regions. FITPACK provides two types that handle the polar coordinate transformation internally and enforce the continuity constraints required at the origin:</p>
 <table class="markdownTable">
@@ -127,9 +127,9 @@ Overview</h1>
 <td class="markdownTableBodyNone"><code>fitpack_grid_polar</code>   </td><td class="markdownTableBodyNone">Grid \( z(v_j, u_i) \)   </td><td class="markdownTableBodyNone">Constant radius \( r \)   </td><td class="markdownTableBodyNone"><code>pogrid</code>   </td></tr>
 </table>
 <p><b>Always prefer <code>fitpack_grid_polar</code> when data lies on a polar grid</b> &ndash; the <code>pogrid</code> algorithm exploits the grid structure and is significantly more efficient.</p>
-<h1><a class="anchor" id="autotoc_md155"></a>
+<h1><a class="anchor" id="autotoc_md160"></a>
 Mathematical Background</h1>
-<h2><a class="anchor" id="autotoc_md156"></a>
+<h2><a class="anchor" id="autotoc_md161"></a>
 Normalized polar coordinates</h2>
 <p>Given a disc bounded by \( r(\theta) \), FITPACK maps Cartesian coordinates to normalized polar coordinates \( (u, v) \):</p>
 <p class="formulaDsp">
@@ -138,7 +138,7 @@ Normalized polar coordinates</h2>
 \]
 </p>
 <p>The normalized radial coordinate \( u = \sqrt{x^2 + y^2} / r(\theta) \) lies in \( [0, 1] \) regardless of boundary shape, and \( v = \theta \) is the polar angle. A bicubic spline \( s(u, v) \) is fitted in the rectangular parameter domain \( [0, 1] \times [-\pi, \pi] \).</p>
-<h2><a class="anchor" id="autotoc_md157"></a>
+<h2><a class="anchor" id="autotoc_md162"></a>
 Continuity at the origin</h2>
 <p>Because all angles \( v \) map to the same physical point when \( u = 0 \), the spline must satisfy continuity constraints:</p>
 <table class="markdownTable">
@@ -152,7 +152,7 @@ Continuity at the origin</h2>
 <td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone">\( C^2 \): second-order consistency (default for <code>fitpack_polar</code>)   </td></tr>
 </table>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 11, &sect;11.1 (pp. 255&ndash;263)</dd></dl>
-<h1><a class="anchor" id="autotoc_md158"></a>
+<h1><a class="anchor" id="autotoc_md163"></a>
 Scattered Data: <code>fitpack_polar</code></h1>
 <p><code>fitpack_polar</code> accepts scattered Cartesian coordinates and a user-supplied boundary function \( r(\theta) \):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_polar, fp_real, fp_flag, &amp;</div>
@@ -182,7 +182,7 @@ Scattered Data: <code>fitpack_polar</code></h1>
 </div><!-- fragment --><p>Evaluate at Cartesian points &ndash; the \( (u, v) \) transform is internal:</p>
 <div class="fragment"><div class="line">z_val = pol%eval(x_val, y_val, ierr)        <span class="comment">! single point</span></div>
 <div class="line">z_arr = pol%eval(x_arr, y_arr, ierr)        ! array of points</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md159"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md164"></a>
 Example: smooth function on a unit disc</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: m = 100</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: x(m), y(m), z(m), w(m), r, theta</div>
@@ -201,7 +201,7 @@ Example: smooth function on a unit disc</h2>
 <div class="line">ierr = pol%new_fit(x, y, z, unit_disk, w, smoothing=real(m, fp_real))</div>
 <div class="line">print *, pol%eval(zero, zero, ierr)</div>
 <div class="line"><span class="keyword">call </span>pol%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md160"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md165"></a>
 Gridded Data: <code>fitpack_grid_polar</code></h1>
 <p><code>fitpack_grid_polar</code> accepts data on a polar grid with a <b>constant</b> boundary radius:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_polar, fp_real, fp_flag, &amp;</div>
@@ -226,7 +226,7 @@ Gridded Data: <code>fitpack_grid_polar</code></h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>smoothing</code>   </td><td class="markdownTableBodyNone">Optional smoothing parameter \( s \)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md161"></a>
+<h2><a class="anchor" id="autotoc_md166"></a>
 Origin boundary conditions</h2>
 <p>Use <code>gpol\set_origin_BC</code> to control spline behavior at the origin:</p>
 <div class="fragment"><div class="line"><span class="keyword">call </span>gpol%set_origin_BC(z0=z0, exact=.true., differentiable=.true.)</div>
@@ -245,7 +245,7 @@ Origin boundary conditions</h2>
 <p>Evaluate on \( (u, v) \) coordinates:</p>
 <div class="fragment"><div class="line">z_val  = gpol%eval(u_val, v_val, ierr)       <span class="comment">! single point</span></div>
 <div class="line">z_grid = gpol%eval(u_new, v_new, ierr)       ! grid: shape [<span class="keyword">size</span>(v), <span class="keyword">size</span>(u)]</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md162"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md167"></a>
 Example: data on a polar grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">integer</span>, <span class="keywordtype">parameter</span> :: nu = 10, nv = 20</div>
 <div class="line"><span class="keywordtype">real</span>(FP_REAL) :: u(nu), v(nv), zg(nv, nu), z0</div>
@@ -267,7 +267,7 @@ Example: data on a polar grid</h2>
 <div class="line">ierr = gpol%fit(smoothing=real(nu * nv, fp_real))</div>
 <div class="line">print *, <span class="stringliteral">&#39;Residual: &#39;</span>, gpol%mse()</div>
 <div class="line"><span class="keyword">call </span>gpol%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md163"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md168"></a>
 Boundary Function</h1>
 <p>The boundary function for <code>fitpack_polar</code> must match the abstract interface <code>fitpack_polar_boundary</code> &ndash; a <code>pure</code> function receiving \( \theta \in [-\pi, \pi] \) and returning a positive radius:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">pure</span> <span class="keyword">real(FP_REAL) </span><span class="keyword">function </span>my_boundary(theta) <span class="keyword">result</span>(r)</div>
@@ -285,12 +285,12 @@ Boundary Function</h1>
 <div class="line"><span class="keywordtype">    real</span>(FP_REAL), <span class="keywordtype">parameter</span> :: a = 2.0_fp_real, b = 1.0_fp_real</div>
 <div class="line">    ellipse = a * b / sqrt((b * cos(theta))**2 + (a * sin(theta))**2)</div>
 <div class="line"><span class="keyword">end function</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md164"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md169"></a>
 Complete Example</h1>
 <p>A fully worked program covering both scattered and gridded polar fitting is provided in the source tree. Build and run with:</p>
 <div class="fragment"><div class="line">fpm run --example example_polar</div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><code>examples/example_polar.f90</code></dd></dl>
-<h1><a class="anchor" id="autotoc_md165"></a>
+<h1><a class="anchor" id="autotoc_md170"></a>
 Error Handling</h1>
 <p>All routines return an <code>integer(FP_FLAG)</code> error code:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) <span class="keywordflow">then</span></div>

@@ -1,0 +1,23 @@
+var structfitpack__gridded__splines_1_1fitpack__gridded__spline =
+[
+    [ "comm_expand", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a5c1103097260138936fc42c3fa48f82b", null ],
+    [ "comm_pack", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a5d7bef8d11f0626af3a96f5de3db7a30", null ],
+    [ "comm_size", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a67249c9aceaa70a0dd9bbaa162daaa19", null ],
+    [ "destroy", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aba641b01e17d9920e09b1b5f71b3da08", null ],
+    [ "eval_ongrid", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a519f5e608699902b08153f8c86c0ee55", null ],
+    [ "fit", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aac25b0490be5da5ce0bd2a1f30cde035", null ],
+    [ "interpolate", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aa6a0f5bc53ded57283dbe55fed881b66", null ],
+    [ "least_squares", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a1807b01c944971506679b3d57f0820d3", null ],
+    [ "new_fit", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aace1d0d5bf674057e22a10ea76d0785a", null ],
+    [ "new_points", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a814e5a70eecec0cd054bf0a8c92a303c", null ],
+    [ "dims", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a114dbf4f84c3bb75ad20290dcb9d5e00", null ],
+    [ "knots", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aab6792db67f1c083673f371ba7a1ee6e", null ],
+    [ "left", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a35b0a72a99831d3deeced8d85584a13a", null ],
+    [ "m", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a79e7829f1440a39c7d9397d7641e8e6d", null ],
+    [ "nest", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a612cc623891a0c167a75453759ae2cbe", null ],
+    [ "order", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#af3aa52ef523f8ba789497c5a17f2c010", null ],
+    [ "right", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aa7eabfe8b0374e8e91b24f9b4075ff67", null ],
+    [ "t", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a886f858fec8d6a42c9347b0f2349055a", null ],
+    [ "xg", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#aacd6864bcdbd71638c7dca0b590f3e26", null ],
+    [ "z", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html#a0012ca3e84a86e5afddeed7146e8ec8e", null ]
+];

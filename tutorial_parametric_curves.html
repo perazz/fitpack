@@ -115,7 +115,7 @@ $(function(){initNavTree('tutorial_parametric_curves.html',''); initResizable(tr
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__parametric__curves"></a></p>
 <p>This tutorial covers parametric curve fitting in \( \mathbb{R}^d \) with FITPACK: open parametric curves, closed (periodic) curves, and curves with prescribed endpoint derivatives.</p>
-<h1><a class="anchor" id="autotoc_md104"></a>
+<h1><a class="anchor" id="autotoc_md109"></a>
 Overview</h1>
 <p>A standard 1D spline \( y = s(x) \) cannot represent multi-valued or looping paths. A <b>parametric curve</b> expresses each coordinate as a separate spline over a common parameter \( u \):</p>
 <p class="formulaDsp">
@@ -135,9 +135,9 @@ Overview</h1>
 <td class="markdownTableBodyNone"><code>fitpack_constrained_curve</code>   </td><td class="markdownTableBodyNone">Endpoint derivative constraints   </td><td class="markdownTableBodyNone"><code>concur</code>   </td></tr>
 </table>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9 (pp. 199&ndash;228)</dd></dl>
-<h1><a class="anchor" id="autotoc_md105"></a>
+<h1><a class="anchor" id="autotoc_md110"></a>
 Parametric Curves</h1>
-<h2><a class="anchor" id="autotoc_md106"></a>
+<h2><a class="anchor" id="autotoc_md111"></a>
 Chord-Length Parameterization</h2>
 <p>When no parameter values are supplied, FITPACK computes them from <b>cumulative chord lengths</b>, normalized to \( [0, 1] \):</p>
 <p class="formulaDsp">
@@ -147,7 +147,7 @@ Chord-Length Parameterization</h2>
 \]
 </p>
 <p>You may also supply your own strictly increasing parameter values (e.g. time stamps) via the optional <code>u</code> argument.</p>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md112"></a>
 API</h2>
 <p>Construct and fit with <code>new_fit</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_curve, fp_real, fp_flag, &amp;</div>
@@ -171,7 +171,7 @@ API</h2>
 <li><code>curve\dfdx(u, order, ierr)</code> &mdash; returns <code>array(idim)</code>, the <code>order</code>-th derivative.</li>
 <li><code>curve\dfdx_all(u, ierr)</code> &mdash; returns <code>array(idim, 0:k)</code>, all derivatives at once.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md113"></a>
 Example: Lissajous Figure</h2>
 <p>A Lissajous curve \( x = \sin(3t),\; y = \sin(2t) \) is multi-valued in both coordinates, making it a natural test case.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_curve, fp_real, fp_flag, &amp;</div>
@@ -201,7 +201,7 @@ Example: Lissajous Figure</h2>
 <div class="line">dy = curve%dfdx(zero, order=1, ierr=ierr)  <span class="comment">! tangent at u=0</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md109"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md114"></a>
 Closed Curves</h1>
 <p><code>fitpack_closed_curve</code> extends <code>fitpack_parametric_curve</code> with periodic boundary conditions, guaranteeing:</p>
 <p class="formulaDsp">
@@ -210,7 +210,7 @@ Closed Curves</h1>
 \]
 </p>
 <p><b>Do not</b> duplicate the first point as the last; periodicity is handled internally by <code>clocur</code>.</p>
-<h2><a class="anchor" id="autotoc_md110"></a>
+<h2><a class="anchor" id="autotoc_md115"></a>
 Example: Ellipse</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_closed_curve, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, pi</div>
@@ -242,10 +242,10 @@ Example: Ellipse</h2>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
 </div><!-- fragment --><p>The fields <code>curve\ubegin</code> and <code>curve\uend</code> give the parameter range. For a closed curve, evaluating at either boundary returns the same point.</p>
-<h1><a class="anchor" id="autotoc_md111"></a>
+<h1><a class="anchor" id="autotoc_md116"></a>
 Constrained Curves</h1>
 <p><code>fitpack_constrained_curve</code> extends <code>fitpack_parametric_curve</code> to prescribe function values and derivatives at the endpoints. This is useful when the curve must join smoothly to another segment, or when physical boundary conditions (position, velocity, acceleration) are known.</p>
-<h2><a class="anchor" id="autotoc_md112"></a>
+<h2><a class="anchor" id="autotoc_md117"></a>
 Setting Constraints</h2>
 <div class="fragment"><div class="line"><span class="keyword">call </span>curve%set_constraints(ddx_begin, ddx_end, ierr)</div>
 </div><!-- fragment --><ul>
@@ -254,7 +254,7 @@ Setting Constraints</h2>
 <li>Both arguments are optional; omitting one removes constraints at that endpoint.</li>
 </ul>
 <p>Shape <code>(idim, 0:1)</code> prescribes position and first derivative; <code>(idim, 0:2)</code> adds the second derivative, and so on.</p>
-<h2><a class="anchor" id="autotoc_md113"></a>
+<h2><a class="anchor" id="autotoc_md118"></a>
 Example: Spiral with Prescribed Tangents</h2>
 <p>Fit \( x = u\cos u,\; y = u\sin u \) over \( [0, \pi] \) with prescribed endpoint positions and tangent vectors.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_constrained_curve, fp_real, fp_flag, &amp;</div>
@@ -304,11 +304,11 @@ Example: Spiral with Prescribed Tangents</h2>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>curve%destroy()</div>
 </div><!-- fragment --><p>Note the two-step workflow: <code>new_fit</code> loads data and produces an initial fit; then <code>set_constraints</code> + <code>curve\fit</code> re-fits with boundary conditions enforced.</p>
-<h1><a class="anchor" id="autotoc_md114"></a>
+<h1><a class="anchor" id="autotoc_md119"></a>
 Complete Example</h1>
 <p>A full working program combining all three curve types is provided in <code>examples/example_parametric_curves.f90</code>. Build and run with:</p>
 <div class="fragment"><div class="line">fpm run --example example_parametric_curves</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md115"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md120"></a>
 Error Handling</h1>
 <p>All routines return an <code>integer(FP_FLAG)</code> error code:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_ok, fitpack_success, fitpack_message</div>
@@ -317,7 +317,7 @@ Error Handling</h1>
 <div class="line">    print *, <span class="stringliteral">&#39;Error: &#39;</span>, fitpack_message(ierr)</div>
 <div class="line"><span class="keyword">end </span>if</div>
 </div><!-- fragment --><p>When the optional <code>ierr</code> argument is omitted, the library halts on failure.</p>
-<h1><a class="anchor" id="autotoc_md116"></a>
+<h1><a class="anchor" id="autotoc_md121"></a>
 Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">

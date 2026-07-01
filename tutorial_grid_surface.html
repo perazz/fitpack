@@ -116,9 +116,9 @@ $(function(){initNavTree('tutorial_grid_surface.html',''); initResizable(true); 
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2tutorial__grid__surface"></a></p>
 <p>This tutorial covers two specialized surface types for data on rectangular parameter grids: <code>fitpack_grid_surface</code> for scalar-valued surfaces \( z = s(x, y) \), and <code>fitpack_parametric_surface</code> for multi-component surfaces \( \mathbf{s}(u, v) \in \mathbb{R}^d \).</p>
 <p>Both exploit the Kronecker product structure of tensor-product B-splines on rectangular grids. When the data points \( (x_i, y_j) \) form a full grid, the normal equations decouple into smaller systems along each axis, reducing the computational cost from \( \mathcal{O}(n_x \, n_y) \) to \( \mathcal{O}(n_x + n_y) \) per iteration. This makes gridded fitting significantly faster than the general scattered-data algorithm (<code>surfit</code>).</p>
-<h1><a class="anchor" id="autotoc_md140"></a>
+<h1><a class="anchor" id="autotoc_md145"></a>
 fitpack_grid_surface</h1>
-<h2><a class="anchor" id="autotoc_md141"></a>
+<h2><a class="anchor" id="autotoc_md146"></a>
 Creating a Fit</h2>
 <p>Construct a grid surface from coordinate vectors <code>x(nx)</code>, <code>y(ny)</code> and function values <code>z(ny, nx)</code>. Note that <b>the first index of <code>z</code> corresponds to <code>y</code></b> and the second to <code>x</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface, fp_real, fp_flag, &amp;</div>
@@ -131,21 +131,21 @@ Creating a Fit</h2>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
 </div><!-- fragment --><p>The <code>smoothing</code> parameter controls the trade-off between fidelity and smoothness, just as for curves. Setting <code>smoothing=zero</code> produces an interpolating spline. An optional <code>order</code> argument sets the B-spline degree (default 3, i.e. bicubic).</p>
-<h2><a class="anchor" id="autotoc_md142"></a>
+<h2><a class="anchor" id="autotoc_md147"></a>
 Evaluation</h2>
 <p>Evaluate the fitted surface at scattered points or on a rectangular output grid:</p>
 <div class="fragment"><div class="line">z_val = gsurf%eval(x0, y0, ierr)              <span class="comment">! single point</span></div>
 <div class="line">z_pts = gsurf%eval(x_pts, y_pts, ierr)        <span class="comment">! scattered points</span></div>
 <div class="line">z_out = gsurf%eval_ongrid(x_out, y_out, ierr)  ! grid -&gt; z_out(my, mx)</div>
 </div><!-- fragment --><p>The <code>gsurf\eval</code> generic dispatches to scattered-point evaluation (<code>bispeu</code>), while <code>gsurf\eval_ongrid</code> uses the faster grid evaluator (<code>bispev</code>) and returns an array with shape <code>(size(y_out), size(x_out))</code>.</p>
-<h2><a class="anchor" id="autotoc_md143"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 Partial Derivatives</h2>
 <p>Compute partial derivatives \( \partial^{n_x + n_y} s / \partial x^{n_x} \partial y^{n_y} \):</p>
 <div class="fragment"><div class="line">dzdx = gsurf%dfdx(x0, y0, 1, 0, ierr)              <span class="comment">! ds/dx at a point</span></div>
 <div class="line">d2z  = gsurf%dfdx(x_pts, y_pts, 1, 1, ierr)         <span class="comment">! d2s/dxdy scattered</span></div>
 <div class="line">dzdy = gsurf%dfdx_ongrid(x_out, y_out, 0, 1, ierr)  ! ds/dy on a grid</div>
 </div><!-- fragment --><p>The integer arguments are the derivative orders \( n_x \) and \( n_y \) (both must satisfy \( 0 \leq n_x &lt; k_x \) and \( 0 \leq n_y &lt; k_y \)).</p>
-<h2><a class="anchor" id="autotoc_md144"></a>
+<h2><a class="anchor" id="autotoc_md149"></a>
 Integration</h2>
 <p>Compute the double integral over a rectangular sub-domain:</p>
 <p class="formulaDsp">
@@ -154,7 +154,7 @@ Integration</h2>
 </p>
 <div class="fragment"><div class="line">vol = gsurf%integral([x1, y1], [x2, y2])</div>
 </div><!-- fragment --><p>The two arguments are the lower and upper corners of the integration rectangle.</p>
-<h2><a class="anchor" id="autotoc_md145"></a>
+<h2><a class="anchor" id="autotoc_md150"></a>
 Cross-Sections and Derivative Splines</h2>
 <p>Extract a 1D profile at a fixed coordinate value:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_curve) :: profile</div>
@@ -164,7 +164,7 @@ Cross-Sections and Derivative Splines</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">type</span>(fitpack_grid_surface) :: dsurf</div>
 <div class="line">dsurf = gsurf%derivative_spline(1, 0, ierr)   <span class="comment">! ds/dx</span></div>
 <div class="line">z_val = dsurf%eval(x0, y0, ierr)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md146"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md151"></a>
 Example: Peaks Function on a Grid</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface, fp_real, fp_flag, &amp;</div>
 <div class="line">                   fitpack_success, fitpack_message, zero, half</div>
@@ -202,12 +202,12 @@ Example: Peaks Function on a Grid</h2>
 <div class="line">print <span class="stringliteral">&#39;(a,f12.6)&#39;</span>, <span class="stringliteral">&#39;s(0, 0) = &#39;</span>, z_val</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>gsurf%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md147"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md152"></a>
 fitpack_parametric_surface</h1>
-<h2><a class="anchor" id="autotoc_md148"></a>
+<h2><a class="anchor" id="autotoc_md153"></a>
 Multi-Component Surfaces</h2>
 <p><code>fitpack_parametric_surface</code> fits a bicubic tensor-product spline surface \( \mathbf{s}(u, v) = (s_1(u,v), \ldots, s_d(u,v)) \) through data given on a rectangular parameter grid \( (u_i, v_j) \). This is the natural choice for geometry embedded in \( \mathbb{R}^3 \) (or higher dimensions) where the surface is described by a mapping from a 2D parameter domain.</p>
-<h2><a class="anchor" id="autotoc_md149"></a>
+<h2><a class="anchor" id="autotoc_md154"></a>
 Creating a Fit</h2>
 <p>The data array <code>z</code> has shape <code>(nv, nu, idim)</code>, where <code>idim</code> is the number of coordinate components:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_parametric_surface, fp_real, fp_flag, &amp;</div>
@@ -220,12 +220,12 @@ Creating a Fit</h2>
 <div class="line">                     periodic_bc=[.true., .true.])</div>
 <div class="line"><span class="keywordflow">if</span> (.not. fitpack_success(ierr)) error stop fitpack_message(ierr)</div>
 </div><!-- fragment --><p>The <code>periodic_BC</code> argument is a 2-element logical array <code>[periodic_u, periodic_v]</code>. When an element is <code>.true.</code>, the corresponding parameter direction is treated as periodic, enforcing continuity of the spline and its derivatives across the boundary.</p>
-<h2><a class="anchor" id="autotoc_md150"></a>
+<h2><a class="anchor" id="autotoc_md155"></a>
 Evaluation</h2>
 <p>Evaluation returns an array with the surface coordinates:</p>
 <div class="fragment"><div class="line">pt = psurf%eval(u0, v0, ierr)        <span class="comment">! single point -&gt; pt(idim)</span></div>
 <div class="line">f  = psurf%eval(u_out, v_out, ierr)  ! grid -&gt; f(mv, mu, idim)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md151"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md156"></a>
 Example: Fitting a Torus</h2>
 <p>A torus with major radius \( R \) and tube radius \( r \) is periodic in both \( u \) (around the hole) and \( v \) (around the tube):</p>
 <p class="formulaDsp">
@@ -277,7 +277,7 @@ Example: Fitting a Torus</h2>
 <div class="line">print <span class="stringliteral">&#39;(a,3f10.4)&#39;</span>, <span class="stringliteral">&#39;s(0, 0) = &#39;</span>, pt</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">call </span>psurf%destroy()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md152"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md157"></a>
 Grid vs Scattered Fitting</h1>
 <p>Choose the surface type based on the structure of your input data:</p>
 <table class="markdownTable">
@@ -296,7 +296,7 @@ Grid vs Scattered Fitting</h1>
 </table>
 <p><b>Rule of thumb</b>: if the data can be arranged on a rectangular grid with no missing values, <code>fitpack_grid_surface</code> is always the better choice. For irregular point clouds, use <code>fitpack_surface</code>.</p>
 <p>For surfaces embedded in \( \mathbb{R}^d \) (e.g. geometry defined by a parameter mapping), use <code>fitpack_parametric_surface</code> instead.</p>
-<h1><a class="anchor" id="autotoc_md153"></a>
+<h1><a class="anchor" id="autotoc_md158"></a>
 Complete Example</h1>
 <p>A full working program demonstrating both <code>fitpack_grid_surface</code> (peaks function with evaluation, integration, cross-sections, and derivative splines) and <code>fitpack_parametric_surface</code> (torus with periodic boundary conditions) is available in:</p>
 <div class="fragment"><div class="line">examples/example_grid_surface.f90</div>

@@ -18,6 +18,7 @@ var namespacefitpack__grid__surfaces =
     [ "surf_new_fit", "namespacefitpack__grid__surfaces.html#addc2f456d0094535879a5d3e3d3a8a33", null ],
     [ "surf_new_from_points", "namespacefitpack__grid__surfaces.html#a055123b778d317194d0806e0736fd5d9", null ],
     [ "surf_new_points", "namespacefitpack__grid__surfaces.html#a36816f1ba9ca963354e0d8bf5c20ed60", null ],
+    [ "surf_prepare_workspace", "namespacefitpack__grid__surfaces.html#a0746d2e696052fb10a1a6686951693fd", null ],
     [ "surface_fit_automatic_knots", "namespacefitpack__grid__surfaces.html#af133b6bc9f226909115b9dcfb438b116", null ],
     [ "surface_fit_interpolating", "namespacefitpack__grid__surfaces.html#a0baef20aea39001e18cf49f65353a88a", null ],
     [ "surface_fit_least_squares", "namespacefitpack__grid__surfaces.html#ab515eb46735d1a5840f43682162d9bcf", null ]

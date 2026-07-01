@@ -213,7 +213,57 @@ Computational Advantage</h2>
 <p>For a 100 x 100 grid with 20 knots in each direction, the gridded approach is roughly two orders of magnitude faster. <b>Always prefer <code>fitpack_grid_surface</code> when data lie on a rectangular grid.</b></p>
 <p>The smoothing framework (roughness minimization subject to a fidelity constraint) is identical to the scattered case; only the numerical solution method differs.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.4 (pp. 98&ndash;103)</dd></dl>
-<h1><a class="anchor" id="autotoc_md59"></a>
+<h1><a class="anchor" id="nd_gridded_splines"></a>
+N-Dimensional Gridded Splines</h1>
+<p>The Kronecker structure that makes <code>regrid</code> fast is not special to two dimensions. For data sampled on a \( d \)-dimensional rectangular grid \( z_{i_1 i_2 \cdots i_d} = z\big(x^{(1)}_{i_1}, x^{(2)}_{i_2}, \ldots, x^{(d)}_{i_d}\big) \), FITPACK fits a \( d \)-fold <b>tensor-product</b> B-spline</p>
+<p class="formulaDsp">
+\[    s(x_1, \ldots, x_d) = \sum_{j_1} \sum_{j_2} \cdots \sum_{j_d}
+        c_{j_1 j_2 \cdots j_d} \prod_{r=1}^{d} N^{(r)}_{j_r, k_r}(x_r)
+\]
+</p>
+<p>where \( N^{(r)}_{j, k_r} \) is the \( j \)-th B-spline of degree \( k_r \) on the knot vector of axis \( r \). The routines that fit and evaluate the 2-D surface &mdash; <code>regrid</code> and <code>ndspev</code> &mdash; are written for runtime dimension <code>dims</code>, and the generic <code>fitpack_gridded_spline</code> type wraps them for any \( d \le \) <code>MAX_IDIM</code>.</p>
+<h2><a class="anchor" id="autotoc_md59"></a>
+Dimension-by-Dimension Solution</h2>
+<p>The observation matrix is a \( d \)-fold Kronecker product</p>
+<p class="formulaDsp">
+\[    \mathbf{A}_{\text{grid}} = \mathbf{B}_1 \otimes \mathbf{B}_2 \otimes \cdots \otimes \mathbf{B}_d
+\]
+</p>
+<p>so the least-squares system separates: the coefficient tensor is obtained by solving banded systems <b>one axis at a time</b>, sweeping \( r = 1, \ldots, d \) and contracting each axis in turn. The cost is</p>
+<p class="formulaDsp">
+\[    \mathcal{O}\!\left( \Big(\textstyle\prod_{r=1}^{d} m_r\Big) \cdot \sum_{r=1}^{d} k_r \right),
+\]
+</p>
+<p>linear in the total number of grid points \( \prod_r m_r \) &mdash; the same per-point efficiency as the 2-D case, generalized.</p>
+<h2><a class="anchor" id="autotoc_md60"></a>
+Alternating-Direction Knot Placement</h2>
+<p>In the smoothing mode, knots are added adaptively until the residual meets the target. With more than one axis, only one axis is refined per iteration: the arbiter <code>new_knot_dimension_nd</code> picks the axis with the largest residual that has not yet reached its knot ceiling, so refinement <b>alternates</b> between directions rather than exhausting one axis first. This is the \( d \)-way generalization of the two-way \( x \leftrightarrow y \) alternation in <code>regrid</code>.</p>
+<h2><a class="anchor" id="autotoc_md61"></a>
+Canonical Data Layout</h2>
+<p>The value grid is stored as a <b>flat, row-major buffer</b> with domain axis 1 the slowest-varying and axis \( d \) the fastest:</p>
+<p class="formulaDsp">
+\[    \text{offset}(i_1, \ldots, i_d)
+      = \Big( \cdots \big( (i_1 - 1)\, m_2 + (i_2 - 1) \big)\, m_3 + \cdots \Big)\, m_d + (i_d - 1).
+\]
+</p>
+<p>The concrete 2-D <code>fitpack_grid_surface</code> stores \( z(i_y, i_x) \), whose column-major memory is exactly this row-major buffer with the axes reversed; <code>fitpack_gridded_spline</code> accepts either convention through an optional <code>row_major</code> flag (permuting only on the one-time ingest copy).</p>
+<h2><a class="anchor" id="autotoc_md62"></a>
+Smoothing Target and Vocabulary</h2>
+<p>The smoothing factor scales with the grid size: a natural starting choice is \( S \approx \prod_{r=1}^{d} m_r \) (roughly unit expected squared residual per point), decreased to follow more detail. Two distinct "dimension" counts appear and must not be confused:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Symbol   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">\( d \) (<code>dims</code>, <code>ndim</code>)   </td><td class="markdownTableBodyNone">number of <b>domain</b> axes \( x_1, \ldots, x_d \)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>idim</code>   </td><td class="markdownTableBodyNone">number of <b>codomain</b> components (for vector-valued data)   </td></tr>
+</table>
+<p>The gridded routines fit a scalar field ( \( \texttt{idim} = 1 \)); <code>dims</code> is what the generic type varies at runtime.</p>
+<h2><a class="anchor" id="autotoc_md63"></a>
+Practical Ceiling</h2>
+<p>Memory, not arithmetic, sets the limit. The coefficient tensor has \( \prod_r (n_r - k_r - 1) \) entries and the value grid \( \prod_r m_r \), both growing exponentially in \( d \). In practice \( d \approx 3\text{&ndash;}5 \) is the useful range for dense grids; beyond that the full tensor becomes memory-bound, and sparse or reduced-rank representations are preferable.</p>
+<dl class="section see"><dt>See also</dt><dd><code>regrid</code>, <code>ndspev</code>, <code>fitpack_gridded_spline</code>; Dierckx, Ch. 5, &sect;5.4</dd></dl>
+<h1><a class="anchor" id="autotoc_md64"></a>
 The Smoothing Norm</h1>
 <p>For bivariate splines, the roughness measure used in the smoothing formulation is the thin-plate energy functional:</p>
 <p class="formulaDsp">
@@ -226,7 +276,7 @@ The Smoothing Norm</h1>
 </p>
 <p>This is the natural extension of \( \int (s&#39;&#39;)^2 \, dx \) to two dimensions. It penalizes curvature equally in all directions and is invariant under rotation of the coordinate axes. The cross-derivative term \( (\partial^2 s / \partial x \, \partial y)^2 \) ensures that diagonal oscillations are penalized as well.</p>
 <p>For a tensor product spline, this integral can be expressed as a quadratic form in the coefficients \( c_{ij} \), involving integrals of products of B-spline second derivatives. FITPACK computes these integrals analytically using the knot vectors.</p>
-<h1><a class="anchor" id="autotoc_md60"></a>
+<h1><a class="anchor" id="autotoc_md65"></a>
 Choosing the Smoothing Factor</h1>
 <p>The smoothing factor \( S \) controls the balance between fidelity and smoothness:</p>
 <ul>
@@ -234,7 +284,7 @@ Choosing the Smoothing Factor</h1>
 <li>**Small \( S \)**: Close fit to the data, but the surface may exhibit spurious oscillations.</li>
 <li>**Large \( S \)**: Very smooth surface that may underfit the data.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md66"></a>
 Practical Guidelines</h2>
 <p>For <b>scattered data</b> with unit weights ( \( w_i = 1 \)), a reasonable starting point is:</p>
 <p class="formulaDsp">
@@ -249,7 +299,7 @@ Practical Guidelines</h2>
 </p>
 <p>After fitting, inspect the mean squared error via the <code>mse()</code> method to assess fit quality. If the residual is too large, decrease \( S \); if the surface oscillates, increase \( S \).</p>
 <p>When data have non-unit weights, interpret \( S \) relative to the weighted residual. Setting \( w_i = 1 / \sigma_i \) (where \( \sigma_i \) is the measurement standard deviation) makes the residual sum an approximate \( \chi^2 \) statistic, and \( S \approx m \) corresponds to a reduced \( \chi^2 \) of unity.</p>
-<h1><a class="anchor" id="autotoc_md62"></a>
+<h1><a class="anchor" id="autotoc_md67"></a>
 Parametric Surfaces</h1>
 <p>For surfaces embedded in \( \mathbb{R}^d \) and parameterized by \( (u, v) \), each coordinate component is represented as a separate bivariate spline sharing common knot vectors:</p>
 <p class="formulaDsp">
@@ -259,7 +309,7 @@ Parametric Surfaces</h1>
 \]
 </p>
 <p>All \( d \) components share the same knot vectors \( \mathbf{t}_u \) and \( \mathbf{t}_v \), and the same spline degrees \( k_u \) and \( k_v \). Only the coefficient arrays \( c_{ij}^{(l)} \) differ between components.</p>
-<h2><a class="anchor" id="autotoc_md63"></a>
+<h2><a class="anchor" id="autotoc_md68"></a>
 Periodicity</h2>
 <p>Either parameter direction (or both) may be periodic:</p>
 <ul>
@@ -268,7 +318,7 @@ Periodicity</h2>
 </ul>
 <p>Periodicity is useful for closed surfaces such as cylinders and tori. The FITPACK routine <code>parsur</code> handles the general case.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 10, &sect;10.2 (pp. 241&ndash;254)</dd></dl>
-<h1><a class="anchor" id="autotoc_md64"></a>
+<h1><a class="anchor" id="autotoc_md69"></a>
 Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
