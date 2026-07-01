@@ -27,7 +27,7 @@
 !!
 !! @see Dierckx, Ch. 5, §5.4 (pp. 98–103); regrid, bispev, parder, pardeu, dblint, profil
 module fitpack_grid_surfaces
-    use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
+    use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_DIM,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
                             IOPT_NEW_LEASTSQUARES,bispev,bispeu,fitpack_error_handling,get_smoothing,regrid, &
                             parder,pardeu,FITPACK_INPUT_ERROR, &
                             dblint,profil,pardtc, &
@@ -176,11 +176,20 @@ module fitpack_grid_surfaces
         integer, optional, intent(in) :: order
         logical, optional, intent(in) :: keep_knots
 
-        integer(FP_SIZE) :: loop,nit
+        integer(FP_SIZE) :: loop,nit,m2(2)
         real(FP_REAL) :: smooth_now(3)
+        real(FP_REAL) :: xg(max(size(this%x),size(this%y)),2)  ! per-axis grid coords, padded to the wider axis
         logical :: do_guard
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
+
+        ! Marshal the two grid-coordinate vectors into the (m,dims) column layout regrid expects.
+        ! z (stored z(iy,ix), y-fast) and t(:,1:2) already match regrid's flat-z and (n,dims) knot
+        ! contracts, so they pass through by storage/array association without a copy.
+        m2 = [size(this%x),size(this%y)]
+        xg = zero
+        xg(1:m2(1),1) = this%x
+        xg(1:m2(2),2) = this%y
 
         !> Ensure we start with new knots (unless caller wants to keep them)
         do_guard = .true.; if (present(keep_knots)) do_guard = .not.keep_knots
@@ -188,26 +197,27 @@ module fitpack_grid_surfaces
 
         ! User may want to change the order for both x and y
         if (present(order)) this%order = order
-        
+
+        ! The workspace need grows with the order; ensure it covers the (possibly raised) order.
+        call surf_prepare_workspace(this)
+
         do loop=1,nit
 
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
             
-            call regrid(this%iopt,                   &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
-                        size(this%x),this%x,         &  ! x coordinate of the grid points
-                        size(this%y),this%y,         &  ! y coordinate of the grid points
-                        this%z,                      &  ! z(ix,jy) gridded data points
-                        this%left(1),this%right(1),  &  ! x range
-                        this%left(2),this%right(2),  &  ! y range
-                        this%order(1),this%order(2), &  ! [1:5] x,y spline order. Recommended: bicubic (x=y=3)
-                        this%smoothing,              &  ! spline accuracy (iopt>=0)
-                        this%nest(1),this%nest(2),   &  ! estimated number of knots and storage nxest >= 2*(kx+1), nyest >= 2*(ky+1)
-                        this%knots(1),this%t(:,1),   &  ! x knots (out)
-                        this%knots(2),this%t(:,2),   &  ! y knots (out)
-                        this%c,this%fp,              &  ! spline output. size(c)>=(nxest-kx-1)*(nyest-ky-1)
-                        this%wrk,this%lwrk,          &  ! memory
-                        this%iwrk,this%liwrk,        &  ! memory
+            call regrid(this%iopt,                 &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
+                        2_FP_DIM,                     &  ! domain dimension (bivariate grid)
+                        m2,xg,                        &  ! per-axis point counts and coordinates xg(1:m(d),d)
+                        this%z,                       &  ! z(iy,ix) gridded data, flat row-major (x slowest, y fastest)
+                        this%left,this%right,         &  ! per-axis lo/hi range
+                        this%order,                   &  ! [1:5] per-axis spline order. Recommended: bicubic (=3)
+                        this%smoothing,               &  ! spline accuracy (iopt>=0)
+                        this%nest,                    &  ! estimated number of knots / storage nest(d) >= 2*(k(d)+1)
+                        this%knots,this%t,            &  ! per-axis knot counts (out) and knots t(1:n(d),d) (out)
+                        this%c,this%fp,               &  ! spline output. size(c)>=product(nest-order-1)
+                        this%wrk,this%lwrk,           &  ! memory
+                        this%iwrk,this%liwrk,         &  ! memory
                         ierr)                           ! Error flag
 
             ! If fit was successful, set iopt to "old"
@@ -251,7 +261,7 @@ module fitpack_grid_surfaces
         class(fitpack_grid_surface), intent(inout) :: this
         real(FP_REAL), intent(in) :: x(:),y(:),z(size(y),size(x))
 
-        integer(FP_SIZE) :: clen,u,m(2)
+        integer(FP_SIZE) :: clen,m(2)
         integer(FP_SIZE), parameter :: SAFE = 2
 
         associate(nest=>this%nest,nmax=>this%nmax,order=>this%order)
@@ -286,21 +296,55 @@ module fitpack_grid_surfaces
 
         this%fp = zero
 
-        ! Working space
-        this%liwrk = 3+sum(m+nest)
-        allocate(this%iwrk(this%liwrk),source=0)
-
-        ! wrk
-        ! lwrk >= 4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+mx*(kx+1)+ my*(ky+1) +u
-        u = max(m(2),nest(1))
-        ! Do not use sum() or it wil segfault gfortran 13
-        this%lwrk = 4+u+ (nest(1)*(m(1)+2*order(1)+5)) + (m(1)*(order(1)+1)) &
-                        + (nest(2)*(m(2)+2*order(2)+5)) + (m(2)*(order(2)+1))
-        allocate(this%wrk(this%lwrk),source=zero)
-
         endassociate
 
+        ! Working space, sized for regrid(dims=2) at the current order
+        call surf_prepare_workspace(this)
+
     end subroutine surf_new_points
+
+    !> @brief (Re)size the fit workspace to regrid(dims=2)'s requirement for the current order.
+    !!
+    !! The wrk/iwrk requirement grows with the spline order, but `fit` lets the caller raise the
+    !! order after `new_points` sized the arrays. This mirrors regrid's lwest/kwest formulas
+    !! (evaluated at dims=2) so the type is a correctly-sized single-source caller, and grows the
+    !! arrays only when needed — a large-enough existing allocation is left in place so an iopt=1
+    !! continuation keeps its persistent state in wrk(1:2+dims).
+    subroutine surf_prepare_workspace(this)
+        class(fitpack_grid_surface), intent(inout) :: this
+
+        integer(FP_SIZE) :: m(2),nk1(2),maxm,maxnest,maxk1,maxk2,mm,mynx,bufmax,lwrk,liwrk
+
+        m = [size(this%x),size(this%y)]
+
+        associate(nest=>this%nest,order=>this%order)
+        maxm    = maxval(m)
+        maxnest = maxval(nest)
+        maxk1   = maxval(order)+1
+        maxk2   = maxval(order)+2
+        nk1     = nest-(order+1)             ! nk1max(d) = nest(d)-(k(d)+1)
+        bufmax  = nk1(1)*m(2)               ! sum-over-i term reduces to i=1 at dims=2
+        mm      = max(maxnest,maxm,m(2),nk1(1),maxval(nk1))
+        mynx    = 2*bufmax
+        liwrk   = (1+2) + maxm*2 + maxnest*2
+        lwrk    = (2+2) + maxnest*2 + maxm*maxk1*2 + 2*maxnest*maxk2*2 + mm + mynx
+        endassociate
+
+        if (.not.allocated(this%iwrk)) then
+            allocate(this%iwrk(liwrk),source=0)
+        elseif (size(this%iwrk)<liwrk) then
+            deallocate(this%iwrk); allocate(this%iwrk(liwrk),source=0)
+        end if
+        this%liwrk = size(this%iwrk,kind=FP_SIZE)
+
+        if (.not.allocated(this%wrk)) then
+            allocate(this%wrk(lwrk),source=zero)
+        elseif (size(this%wrk)<lwrk) then
+            deallocate(this%wrk); allocate(this%wrk(lwrk),source=zero)
+        end if
+        this%lwrk = size(this%wrk,kind=FP_SIZE)
+
+    end subroutine surf_prepare_workspace
 
     !> @brief Construct a grid surface from gridded data and perform a default fit.
     !!

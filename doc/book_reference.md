@@ -52,7 +52,7 @@ in the primary reference:
 | Routine | Book Reference | Description |
 |---------|---------------|-------------|
 | `surfit` | Ch. 5, &sect;5.3 (pp. 85&ndash;98) | Scattered bivariate fitting |
-| `regrid` | Ch. 5, &sect;5.4 (pp. 98&ndash;103) | Gridded bivariate fitting |
+| `regrid` | Ch. 5, &sect;5.4 (pp. 98&ndash;103) | Gridded fitting (tensor product, any domain dimension) |
 | `parsur` | Ch. 10, &sect;10.2 (pp. 241&ndash;254) | Parametric surface fitting |
 
 ## Surface Evaluation
@@ -60,6 +60,7 @@ in the primary reference:
 | Routine | Book Reference | Description |
 |---------|---------------|-------------|
 | `bispev` | Ch. 1, &sect;1.5 | Evaluate bivariate spline on grid |
+| `ndspev` | Ch. 1, &sect;1.5 | Evaluate N-D gridded spline on grid (generalizes `bispev`) |
 | `bispeu` | Ch. 1, &sect;1.5 | Evaluate bivariate spline at scattered points |
 | `parder` | Ch. 1, &sect;1.5 | Partial derivatives on grid |
 | `pardeu` | Ch. 1, &sect;1.5 | Partial derivatives at scattered points |
