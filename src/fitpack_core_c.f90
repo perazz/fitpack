@@ -390,9 +390,15 @@ module fitpack_core_c
           real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(m),y(m)
           real(FP_REAL), intent(inout)        :: wrk(lwrk)
           real(FP_REAL), intent(out)          :: z(m)
-          
-          call bispeu(tx,nx,ty,ny,c,kx,ky,x,y,z,m,wrk,lwrk,ier)
-          
+
+          !  marshal the 2-D inputs into the dimension-generic column layout and evaluate at the
+          !  scattered points (ndspeu self-manages its basis scratch; wrk/lwrk retained for ABI)
+          real(FP_REAL) :: t2(max(nx,ny),2),xg(2,m)
+
+          t2(1:nx,1) = tx;  t2(1:ny,2) = ty
+          xg(1,:)    = x;   xg(2,:)    = y
+          call ndspeu(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg,m,z,ier)
+
       end function bispeu_c
 
       integer(FP_FLAG) function bispev_c(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk) &
@@ -416,9 +422,19 @@ module fitpack_core_c
           real(FP_REAL), intent(in)           :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
           real(FP_REAL), intent(out)          :: z(mx*my)
           real(FP_REAL), intent(inout)        :: wrk(lwrk)
-          
-          call parder(tx,nx,ty,ny,c,kx,ky,nux,nuy,x,mx,y,my,z,wrk,lwrk,iwrk,kwrk,ier)
-          
+
+          !  marshal the 2-D inputs into the dimension-generic column layout and evaluate the partial
+          !  derivative on the grid. parder self-sizes its own scratch here (rwrk/rkwrk); the passed
+          !  wrk/iwrk are retained for ABI compatibility only.
+          real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2)
+          real(FP_REAL)    :: rwrk((nx-kx-1)*(ny-ky-1) + max(mx,my)*(max(kx-nux,ky-nuy)+1)*2)
+          integer(FP_SIZE) :: rkwrk(max(mx,my)*2)
+
+          t2(1:nx,1)  = tx;  t2(1:ny,2)  = ty
+          xg2(1:mx,1) = x;   xg2(1:my,2) = y
+          call parder(2_FP_DIM,t2,[nx,ny],c,[kx,ky],[nux,nuy],xg2,[mx,my],z, &
+                      rwrk,size(rwrk,kind=FP_SIZE),rkwrk,size(rkwrk,kind=FP_SIZE),ier)
+
       end function parder_c
 
 end module fitpack_core_c

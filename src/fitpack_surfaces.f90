@@ -233,20 +233,13 @@ module fitpack_surfaces
         integer(FP_FLAG), optional, intent(out) :: ierr
 
         integer(FP_FLAG) :: ier
-        integer(FP_SIZE) :: min_lwrk
-        real(FP_REAL), allocatable :: wrk(:)
+        real(FP_REAL)    :: xg(2,size(x))
 
-        ! bispeu workspace: lwrk >= kx+ky+2
-        min_lwrk = sum(this%order) + 2
-        allocate(wrk(min_lwrk))
+        ! scattered points in the dimension-generic column layout: point i = xg(:,i)
+        xg(1,:) = x;  xg(2,:) = y
 
-        call bispeu(tx=this%t(:,1),nx=this%knots(1),   &
-                    ty=this%t(:,2),ny=this%knots(2),   &
-                    c=this%c,                          &
-                    kx=this%order(1),ky=this%order(2), &
-                    x=x,y=y,z=f,m=size(x),            &
-                    wrk=wrk,lwrk=min_lwrk,             &
-                    ier=ier)
+        call ndspeu(2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2), &
+                    xg,size(x,kind=FP_SIZE),f,ier)
 
         call fitpack_error_handling(ier,ierr,'evaluate bivariate surface')
 
@@ -483,43 +476,40 @@ module fitpack_surfaces
         ! Optional error flag
         integer(FP_FLAG), optional, intent(out) :: ierr 
 
-        integer(FP_FLAG) :: ier        
-        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
-        real(FP_REAL), allocatable :: min_wrk(:)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk,min_kwrk,mx,my,maxm,nc
+        real(FP_REAL),    allocatable :: min_wrk(:)
         integer(FP_SIZE), allocatable :: min_iwrk(:)
-        
-        ! Check if the internal working storage is large enough: reallocate it if necessary
-        m = [size(x),size(y)]
-        
-        ! Assert real working storage
-        min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-        if (min_lwrk>this%lwrk) then 
+        real(FP_REAL)    :: xg(max(size(x),size(y)),2),zt(size(x)*size(y))
+
+        mx   = size(x,kind=FP_SIZE); my = size(y,kind=FP_SIZE)
+        maxm = max(mx,my)
+        nc   = product(this%knots(1:2)-this%order(1:2)-1)
+
+        ! Assert real working storage (parder scratch: nc derivative coeffs + per-axis basis cuboid)
+        min_lwrk = nc + maxm*(max(this%order(1)-dx,this%order(2)-dy)+1)*2
+        if (min_lwrk>this%lwrk) then
             allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
             call move_alloc(from=min_wrk,to=this%wrk)
             this%lwrk = min_lwrk
         end if
-        
+
         ! Assert integer working storage
-        min_kwrk = sum(m)
-        if (min_kwrk>this%liwrk) then 
+        min_kwrk = maxm*2
+        if (min_kwrk>this%liwrk) then
             allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
             call move_alloc(from=min_iwrk,to=this%iwrk)
             this%liwrk = min_kwrk
         end if
-        
-        ! On successful exit f(j,i) contains the value of s(x,y) at point
-        ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
-        call parder(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
-                    ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
-                    c=this%c,                          &    ! the b-spline coefficients                  
-                    kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
-                    nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
-                    x=x,mx=size(x),                    &    ! x grid points: tx(kx+1)<=x(i-1)<=x(i)<=tx(nx-kx), i=2:mx.
-                    y=y,my=size(y),                    &    ! y grid points: ty(ky+1)<=y(i-1)<=y(i)<=ty(ny-ky), i=2:mx.
-                    z=f,                               &    ! Value of the partial derivative
-                    wrk=this%wrk,lwrk=this%lwrk,     &    ! memory
-                    iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
-                    ier=ier)
+
+        ! grid nodes in the dimension-generic per-axis column layout: xg(1:m(d),d)
+        xg(1:mx,1) = x;  xg(1:my,2) = y
+
+        call parder(2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2),[dx,dy], &
+                    xg,[mx,my],zt,this%wrk,this%lwrk,this%iwrk,this%liwrk,ier)
+
+        ! N-D output is flat (x slowest, y fastest): z((i-1)*my+j) = deriv(x_i,y_j) -> f(j,i)
+        f = reshape(zt,[my,mx])
 
         call fitpack_error_handling(ier,ierr,'evaluate gridded derivatives')
 
@@ -543,52 +533,37 @@ module fitpack_surfaces
         ! Optional error flag
         integer(FP_FLAG), optional, intent(out) :: ierr 
 
-        integer(FP_FLAG) :: ier        
-        integer(FP_SIZE) :: min_lwrk,min_kwrk,m(2)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: min_lwrk,nc,npts
         real(FP_REAL), allocatable :: min_wrk(:)
-        integer(FP_SIZE), allocatable :: min_iwrk(:)
-        
-        ! Check if the input arrays have the same size
-        m = [size(x),size(y)]
-        if (m(1)/=m(2)) then 
-            
+        real(FP_REAL)    :: xg(2,size(x))
+
+        ! Require matching (x,y) point lists
+        if (size(x)/=size(y)) then
+
             ier = FITPACK_INPUT_ERROR
-            
+
         else
-        
-            ! Assert real working storage
-            min_lwrk = sum(m*(this%order+1)) + product(this%knots-this%order-1)   
-            if (min_lwrk>this%lwrk) then 
+
+            npts = size(x,kind=FP_SIZE)
+            nc   = product(this%knots(1:2)-this%order(1:2)-1)
+
+            ! Assert real working storage (pardeu scratch: nc derivative coefficients)
+            min_lwrk = nc
+            if (min_lwrk>this%lwrk) then
                 allocate(min_wrk(min_lwrk),source=0.0_FP_REAL)
                 call move_alloc(from=min_wrk,to=this%wrk)
                 this%lwrk = min_lwrk
             end if
-            
-            ! Assert integer working storage
-            min_kwrk = sum(m)
-            if (min_kwrk>this%liwrk) then 
-                allocate(min_iwrk(min_kwrk),source=0_FP_SIZE)
-                call move_alloc(from=min_iwrk,to=this%iwrk)
-                this%liwrk = min_kwrk
-            end if
-            
-            ! On successful exit f(j,i) contains the value of s(x,y) at point
-            ! (x(i),y(j)),i=1,...,mx; j=1,...,my.
-            call pardeu(tx=this%t(:,1),nx=this%knots(1),   &    ! position of the knots in the x-direction
-                        ty=this%t(:,2),ny=this%knots(2),   &    ! position of the knots in the y-direction
-                        c=this%c,                          &    ! the b-spline coefficients                  
-                        kx=this%order(1),ky=this%order(2), &    ! the degrees of the spline
-                        nux=dx,nuy=dy,                     &    ! order of the derivatives 0<=nux<kx, 0<=nuy<ky 
-                        x=x,y=y,                           &    ! list of (x,y) points
-                        z=f,                               &    ! Value of the partial derivative
-                        m=m(1),                            &    ! Number of input points
-                        wrk=this%wrk,lwrk=this%lwrk,     &    ! memory
-                        iwrk=this%iwrk,kwrk=this%liwrk,    &    ! memory
-                        ier=ier)
 
-            
+            ! scattered points in the dimension-generic column layout: point i = xg(:,i)
+            xg(1,:) = x;  xg(2,:) = y
+
+            call pardeu(2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2),[dx,dy], &
+                        xg,npts,f,this%wrk,this%lwrk,ier)
+
         end if
-        
+
         call fitpack_error_handling(ier,ierr,'evaluate bivariate derivatives')
 
     end function surface_derivatives_many
@@ -633,13 +608,7 @@ module fitpack_surfaces
         class(fitpack_surface), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(2), upper(2)
 
-        real(FP_REAL) :: wrk(this%knots(1)+this%knots(2)-this%order(1)-this%order(2)-2)
-
-        surface_integral = dblint(this%t(:,1), this%knots(1), &
-                                  this%t(:,2), this%knots(2), &
-                                  this%c, &
-                                  this%order(1), this%order(2), &
-                                  lower(1), upper(1), lower(2), upper(2), wrk)
+        surface_integral = dblint(2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2),lower,upper)
 
     end function surface_integral
 
@@ -657,28 +626,25 @@ module fitpack_surfaces
         type(fitpack_curve) :: curve
 
         integer(FP_FLAG) :: ier
-        integer(FP_SIZE) :: iopt, nu, nc
+        integer(FP_DIM)  :: ax
+        integer(FP_SIZE) :: nu, nc
         real(FP_REAL), allocatable :: cu(:)
 
         if (along_y) then
-            ! f(y) = s(u,y): result has knots=ty, order=ky
-            iopt = 0
-            nu   = this%knots(2)
-            nc   = this%knots(2) - this%order(2) - 1
+            ! f(y) = s(u,y): fix axis x, result over y (knots=ty, order=ky)
+            ax = 1
+            nu = this%knots(2)
+            nc = this%knots(2) - this%order(2) - 1
         else
-            ! g(x) = s(x,u): result has knots=tx, order=kx
-            iopt = 1
-            nu   = this%knots(1)
-            nc   = this%knots(1) - this%order(1) - 1
+            ! g(x) = s(x,u): fix axis y, result over x (knots=tx, order=kx)
+            ax = 2
+            nu = this%knots(1)
+            nc = this%knots(1) - this%order(1) - 1
         end if
 
         allocate(cu(nu))
 
-        call profil(iopt, this%t(:,1), this%knots(1), &
-                          this%t(:,2), this%knots(2), &
-                          this%c, &
-                          this%order(1), this%order(2), &
-                          u, nu, cu, ier)
+        call profil(ax,2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2),u,cu,ier)
 
         if (FITPACK_SUCCESS(ier)) then
             ! Build a fitpack_curve from the cross-section coefficients
@@ -718,9 +684,7 @@ module fitpack_surfaces
 
         allocate(newc(nc_old))
 
-        call pardtc(this%t(:,1), nx, this%t(:,2), ny, &
-                    this%c, this%order(1), this%order(2), &
-                    nux, nuy, newc, ier)
+        call pardtc(2_FP_DIM,this%t,this%knots(1:2),this%c,this%order(1:2),[nux,nuy],newc,ier)
 
         if (FITPACK_SUCCESS(ier)) then
             newkx  = this%order(1) - nux

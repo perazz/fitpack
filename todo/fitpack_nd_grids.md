@@ -1,6 +1,6 @@
 # Extending FITPACK to N-Dimensional Gridded Splines — Feasibility & Design
 
-**Status:** IMPLEMENTED. The dimension-generic core (`regrid → fpregr → fpgrre` fit, `ndspev → fpndsp` eval) replaced the legacy 2-D trio and now backs both the 2-D `fitpack_grid_surface` and the new runtime-`dims` `fitpack_gridded_spline` class (3D+). Note: the endgame differed from §5.3 below — the team chose **one runtime-`dims` public type** (not fypp-generated concrete faces), with an F2018 `select rank` + `row_major` face for rank-natural input, since a `select rank` construct sidesteps the "rank problem" of §5.2 without preprocessing. The **peripherals are now generalized too** — scattered evaluation (`bispeu_nd`), partial derivatives (`pardtc_nd`/`parder_nd`/`pardeu_nd`), the box integral (`dblint_nd`), and the cross-section (`profil_nd`), each gated bit-for-bit against its 2-D routine at dims=2 (Gates I–M) and wired as `fitpack_gridded_spline` methods (`eval`/`dfdx`/`dfdx_ongrid`/`integral`/`cross_section`/`derivative_spline`). **C bindings (§ slice 10) are the sole remaining future work.**
+**Status:** IMPLEMENTED. The dimension-generic core (`regrid → fpregr → fpgrre` fit, `ndspev → fpndsp` eval) replaced the legacy 2-D trio and now backs both the 2-D `fitpack_grid_surface` and the new runtime-`dims` `fitpack_gridded_spline` class (3D+). Note: the endgame differed from §5.3 below — the team chose **one runtime-`dims` public type** (not fypp-generated concrete faces), with an F2018 `select rank` + `row_major` face for rank-natural input, since a `select rank` construct sidesteps the "rank problem" of §5.2 without preprocessing. The **peripherals are now generalized too** — scattered evaluation (`ndspeu`), partial derivatives (`pardtc`/`parder`/`pardeu`), the box integral (`dblint`), and the cross-section (`profil`), wired as `fitpack_gridded_spline` methods (`eval`/`dfdx`/`dfdx_ongrid`/`integral`/`cross_section`/`derivative_spline`). The legacy 2-D peripherals were **collapsed into these dimension-generic routines** (the classic `(tx,nx,ty,ny,…)` bodies were removed; the `_nd` suffix was dropped, and the scattered evaluator was renamed `bispeu_nd → ndspeu` to pair with `ndspev`). The 2-D surface classes and the `fp_bispeu_c`/`fp_parder_c` C ABI wrappers marshal their 2-D arguments into these routines; the classic-signature regression tests were migrated likewise (Gates I–M retain the dims=3 analytic/separable oracles). **C bindings (§ slice 10) are the sole remaining future work.**
 **Scope:** tensor-product *gridded* smoothing splines over a `d`-dimensional domain (`d = 3 … ~6`), generalizing the current 1-D (`fitpack_curve`) and 2-D (`fitpack_grid_surface`) gridded fitters.
 **Out of scope:** N-D *scattered* fitting (see §3).
 
@@ -15,18 +15,19 @@ in `test/fitpack_grid_nd_tests.f90` asserts the class equals a direct `regrid`+`
 bit-for-bit at dims=3 and dims=5, plus the `row_major` flag and comm round-trip. The peripherals
 below are **now DONE** (Gates I–M); only the C bindings remain:
 
-| Item | 2-D routine(s) generalized | Status |
+| Item | Dimension-generic routine (classic 2-D removed) | Status |
 |------|------------------------------|--------|
-| **Scattered evaluation** | `bispeu` | **DONE** — `bispeu_nd` (mixed-radix odometer, self-managed basis). Class `%eval`. Gate I. |
-| **Partial derivatives** | `parder`, `pardeu`, `pardtc` | **DONE** — `pardtc_nd` (per-axis derivative recurrence + repack), `parder_nd` (= `pardtc_nd` + `ndspev`), `pardeu_nd` (= `pardtc_nd` + `bispeu_nd`). Class `%dfdx` / `%dfdx_ongrid` / `%derivative_spline`. Gate J/M. |
-| **Domain integral** | `dblint` (2-D box integral) | **DONE** — `dblint_nd`: per-axis `fpintb` vectors contracted against the coefficient tensor (fpndsp odometer, bit-for-bit at dims=2). Class `%integral`. Gate K. |
-| **Cross-section / slice** | `profil` (fix one axis) | **DONE** — `profil_nd`: fix one axis → `dims-1` spline. Class `%cross_section` returns a `fitpack_gridded_spline` of `dims-1`. Gate L/M. |
+| **Scattered evaluation** | `ndspeu` (was `bispeu`) | **DONE** — mixed-radix odometer, self-managed basis. Class `%eval`. Gate I. |
+| **Partial derivatives** | `parder`/`pardeu`/`pardtc` (classic 2-D bodies removed) | **DONE** — `pardtc` (per-axis derivative recurrence + repack), `parder` (= `pardtc` + `ndspev`), `pardeu` (= `pardtc` + `ndspeu`). Class `%dfdx` / `%dfdx_ongrid` / `%derivative_spline`. Gate J/M. |
+| **Domain integral** | `dblint` (classic 2-D body removed) | **DONE** — per-axis `fpintb` vectors contracted against the coefficient tensor (fpndsp odometer). Class `%integral`. Gate K. |
+| **Cross-section / slice** | `profil` (classic 2-D body removed) | **DONE** — fix one axis → `dims-1` spline. Class `%cross_section` returns a `fitpack_gridded_spline` of `dims-1`. Gate L/M. |
 | **C bindings (slice 10)** | `regrid_c` / `bispev_c` template | **REMAINING.** First surface-family opaque-pointer C binding. Follow `fitpack_curve_c` (`src/fitpack_curves_c.f90`): opaque `type, bind(C)` + `_allocate`/`_destroy`/`_get_pointer` + flat `fp_*_c` method functions (scalars by value, arrays by pointer). New file `src/fitpack_gridded_splines_c.f90`. |
 
 **Where things live**
 - Core N-D routines (all in `src/fitpack_core.F90`): `regrid`, `fpregr`, `fpgrre` (fit);
   `ndspev`, `fpndsp` (eval); `new_knot_dimension_nd` (knot-direction arbiter); peripherals
-  `bispeu_nd`, `pardtc_nd`, `parder_nd`, `pardeu_nd`, `dblint_nd`, `profil_nd`.
+  `ndspeu`, `pardtc`, `parder`, `pardeu`, `dblint`, `profil` (dimension-generic; the classic 2-D
+  bodies were removed and their public names/signatures now belong to these routines).
 - Public class: `src/fitpack_gridded_splines.f90` (`fitpack_gridded_spline`, extends
   `fitpack_fitter`; runtime `dims`, fixed-`MAX_IDIM` metadata, `select rank` + `row_major` face;
   methods `eval`/`eval_ongrid`/`dfdx`/`dfdx_ongrid`/`integral`/`cross_section`/`derivative_spline`).

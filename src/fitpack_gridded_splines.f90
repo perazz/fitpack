@@ -35,7 +35,7 @@ module fitpack_gridded_splines
                             IOPT_NEW_SMOOTHING,IOPT_OLD_FIT,IOPT_NEW_LEASTSQUARES, &
                             regrid,ndspev,FITPACK_SUCCESS,FITPACK_MESSAGE,fitpack_error_handling, &
                             get_smoothing,FITPACK_INPUT_ERROR, &
-                            bispeu_nd,parder_nd,pardeu_nd,pardtc_nd,dblint_nd,profil_nd, &
+                            ndspeu,parder,pardeu,pardtc,dblint,profil, &
                             FP_COMM_SIZE,FP_COMM_PACK,FP_COMM_EXPAND
     use fitpack_fitters
     implicit none
@@ -77,26 +77,26 @@ module fitpack_gridded_splines
             procedure :: interpolate   => grid_fit_interpolating
             procedure :: eval_ongrid   => grid_eval_ongrid
 
-            !> Evaluate at scattered points x(i,d) (bispeu_nd). For gridded output use eval_ongrid.
+            !> Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid.
             procedure, private :: grid_eval_one
             procedure, private :: grid_eval_many
             generic :: eval => grid_eval_one, grid_eval_many
 
-            !> Partial derivatives of order nu(:) on a rectangular grid (parder_nd)
+            !> Partial derivatives of order nu(:) on a rectangular grid (parder)
             procedure :: dfdx_ongrid => grid_derivatives_gridded
 
-            !> Partial derivatives of order nu(:) at scattered points (pardeu_nd)
+            !> Partial derivatives of order nu(:) at scattered points (pardeu)
             procedure, private :: grid_derivatives_one
             procedure, private :: grid_derivatives_many
             generic :: dfdx => grid_derivatives_one, grid_derivatives_many
 
-            !> Integral over a box [lower(d),upper(d)] (dblint_nd)
+            !> Integral over a box [lower(d),upper(d)] (dblint)
             procedure :: integral => grid_integral
 
-            !> Cross-section: fix one axis to obtain a (dims-1)-D spline (profil_nd)
+            !> Cross-section: fix one axis to obtain a (dims-1)-D spline (profil)
             procedure :: cross_section => grid_cross_section
 
-            !> Partial-derivative spline: reduced degrees, trimmed knots (pardtc_nd)
+            !> Partial-derivative spline: reduced degrees, trimmed knots (pardtc)
             procedure :: derivative_spline => grid_derivative_spline
 
             !> Parallel communication
@@ -311,7 +311,7 @@ module fitpack_gridded_splines
     ! PERIPHERALS: scattered eval / derivatives / integral / cross-section / derivative spline
     ! =================================================================================================
 
-    !> @brief Evaluate the fitted spline at scattered points (delegates to bispeu_nd).
+    !> @brief Evaluate the fitted spline at scattered points (delegates to ndspeu).
     !!
     !! @param[in]  xp   Point coordinates, `xp(d,i)` = axis-`d` coordinate of point `i` (shape `(dims,m)`,
     !!                  point `i` = contiguous column `xp(:,i)`; matches curev/parcur layout).
@@ -330,7 +330,7 @@ module fitpack_gridded_splines
         if (size(xp,1)/=this%dims) then
             ier = FITPACK_INPUT_ERROR
         else
-            call bispeu_nd(this%dims,this%t,this%knots(1:this%dims),this%c, &
+            call ndspeu(this%dims,this%t,this%knots(1:this%dims),this%c, &
                            this%order(1:this%dims),xp,m,f,ier)
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline eval (scattered)')
@@ -347,7 +347,7 @@ module fitpack_gridded_splines
         f  = f1(1)
     end function grid_eval_one
 
-    !> @brief Evaluate partial derivatives of order `nu(:)` on a rectangular grid (delegates to parder_nd).
+    !> @brief Evaluate partial derivatives of order `nu(:)` on a rectangular grid (delegates to parder).
     !!
     !! @param[in]  xg   Per-axis evaluation grids, `xg(1:m(d),d)` strictly increasing.
     !! @param[in]  m    Per-axis grid sizes.
@@ -374,12 +374,12 @@ module fitpack_gridded_splines
         lwrk  = nc + maxm*maxk1*dims
         kwrk  = maxm*dims
         allocate(wrk(lwrk),source=zero); allocate(iwrk(kwrk),source=0_FP_SIZE)
-        call parder_nd(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
+        call parder(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
                        xg,m,f,wrk,lwrk,iwrk,kwrk,ier)
         call fitpack_error_handling(ier,ierr,'gridded spline dfdx_ongrid')
     end function grid_derivatives_gridded
 
-    !> @brief Evaluate partial derivatives of order `nu(:)` at scattered points (delegates to pardeu_nd).
+    !> @brief Evaluate partial derivatives of order `nu(:)` at scattered points (delegates to pardeu).
     !!
     !! @param[in]  xp   Point coordinates, `xp(d,i)` = axis-`d` coordinate of point `i` (shape `(dims,m)`,
     !!                  point `i` = contiguous column `xp(:,i)`).
@@ -402,7 +402,7 @@ module fitpack_gridded_splines
         else
             nc = product(this%knots(1:dims)-this%order(1:dims)-1)
             allocate(wrk(nc),source=zero)
-            call pardeu_nd(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
+            call pardeu(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu, &
                            xp,m,f,wrk,nc,ier)
         end if
         call fitpack_error_handling(ier,ierr,'gridded spline dfdx (scattered)')
@@ -420,11 +420,11 @@ module fitpack_gridded_splines
         f  = f1(1)
     end function grid_derivatives_one
 
-    !> @brief Integral of the fitted spline over the box `[lower(d),upper(d)]` (delegates to dblint_nd).
+    !> @brief Integral of the fitted spline over the box `[lower(d),upper(d)]` (delegates to dblint).
     real(FP_REAL) function grid_integral(this,lower,upper) result(v)
         class(fitpack_gridded_spline), intent(in) :: this
         real(FP_REAL), intent(in) :: lower(:),upper(:)
-        v = dblint_nd(this%dims,this%t,this%knots(1:this%dims),this%c, &
+        v = dblint(this%dims,this%t,this%knots(1:this%dims),this%c, &
                       this%order(1:this%dims),lower,upper)
     end function grid_integral
 
@@ -463,7 +463,7 @@ module fitpack_gridded_splines
         end do
 
         allocate(cu(nc_sub))
-        call profil_nd(ax,dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),u,cu,ier)
+        call profil(ax,dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),u,cu,ier)
 
         if (FITPACK_SUCCESS(ier)) then
             sdim = dims-1
@@ -495,7 +495,7 @@ module fitpack_gridded_splines
     end function grid_cross_section
 
     !> @brief Partial-derivative spline of order `nu(:)`: a new gridded spline of per-axis degrees
-    !!        `order-nu` on trimmed knots (delegates to pardtc_nd). Eval-only, like `cross_section`.
+    !!        `order-nu` on trimmed knots (delegates to pardtc). Eval-only, like `cross_section`.
     function grid_derivative_spline(this,nu,ierr) result(dsp)
         class(fitpack_gridded_spline), intent(in) :: this
         integer(FP_SIZE), intent(in) :: nu(:)
@@ -510,7 +510,7 @@ module fitpack_gridded_splines
         dims   = this%dims
         nc_old = product(this%knots(1:dims)-this%order(1:dims)-1)
         allocate(newc(nc_old))
-        call pardtc_nd(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu,newc,ier)
+        call pardtc(dims,this%t,this%knots(1:dims),this%c,this%order(1:dims),nu,newc,ier)
 
         if (FITPACK_SUCCESS(ier)) then
             dsp%dims = dims
