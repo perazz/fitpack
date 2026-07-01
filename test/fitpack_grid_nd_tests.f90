@@ -189,7 +189,7 @@ module fitpack_grid_nd_tests
             maxn  = max(nx,ny); maxm = max(mx,my); maxk1 = max(kx,ky)+1
             n2 = [nx,ny]; k2 = [kx,ky]; m2 = [mx,my]
             if (allocated(t)) deallocate(t,xg,w,lidx)
-            allocate(t(maxn,2),xg(maxm,2),w(maxm,maxk1,2),lidx(maxm,2))
+            allocate(t(maxn,2),xg(maxm,2),w(maxk1,maxm,2),lidx(maxm,2))
             t = zero
             t(1:nx,1) = tx(1:nx);      t(1:ny,2) = ty(1:ny)
             xg(1:mx,1) = daregr_x;     xg(1:my,2) = daregr_y
@@ -461,12 +461,12 @@ module fitpack_grid_nd_tests
         integer(FP_SIZE), parameter :: nc3=nk1x*nk1y*nk1z, mout3=mx*my*mz, mxy=mx*my
         real(FP_REAL),    parameter :: tol=1.0e-12_FP_REAL
 
-        real(FP_REAL)    :: t3(maxn,3),xg3(maxm,3),c3(nc3),z3(mout3),w3(maxm,maxk1,3)
+        real(FP_REAL)    :: t3(maxn,3),xg3(maxm,3),c3(nc3),z3(mout3),w3(maxk1,maxm,3)
         integer(FP_SIZE) :: lidx3(maxm,3),n3(3),k3(3),m3(3)
         ! separable reference (outer product of three 1-D splev evaluations)
         real(FP_REAL)    :: av(maxn),bv(maxn),dv(maxn),sx(mx),sy(my),sz(mz),ref
         ! non-separable reference (verified dims=2 plane evals, combined along z by splev)
-        real(FP_REAL)    :: v2(mxy,nk1z),z2(mxy),c2(nk1x*nk1y),w2(mx,kx+1,2),vz(mz),cz(maxn)
+        real(FP_REAL)    :: v2(mxy,nk1z),z2(mxy),c2(nk1x*nk1y),w2(kx+1,mx,2),vz(mz),cz(maxn)
         real(FP_REAL)    :: t2(maxn,2),xg2(mx,2),maxdiff
         integer(FP_SIZE) :: lidx2(mx,2),n2(2),k2(2),m2(2)
         integer(FP_SIZE) :: ix,iy,iz,i,nx,ny,nz,l,ic,iout
@@ -599,7 +599,7 @@ module fitpack_grid_nd_tests
         integer(FP_SIZE) :: iwrk(KWRK),n3(3),k3(3),m3(3),nest3(3)
         integer(FP_FLAG) :: ier
         ! probe / closed-form oracle
-        real(FP_REAL)    :: xgp(maxmp,3),zp(mpx*mpy*mpw),wp(maxmp,maxk1,3)
+        real(FP_REAL)    :: xgp(maxmp,3),zp(mpx*mpy*mpw),wp(maxk1,maxmp,3)
         integer(FP_SIZE) :: lidxp(maxmp,3),mp3(3)
         real(FP_REAL)    :: x,y,w,maxdiff
         integer(FP_SIZE) :: ix,iy,iw,i,iout
@@ -708,7 +708,7 @@ module fitpack_grid_nd_tests
         integer(FP_SIZE), parameter :: nest=17, maxm=mx, maxk1=kx+1
         integer(FP_SIZE), parameter :: maxc=(nest-kx-1)**3, lwrk3=4000, kwrk3=200
 
-        real(FP_REAL)    :: t3(nest,3),xg3(maxm,3),c3(maxc),z3(mz),zfit(mz),w3(maxm,maxk1,3)
+        real(FP_REAL)    :: t3(nest,3),xg3(maxm,3),c3(maxc),z3(mz),zfit(mz),w3(maxk1,maxm,3)
         real(FP_REAL)    :: fp0cal,fp,s,lo(3),hi(3),ssr,wrk(lwrk3)
         integer(FP_SIZE) :: iwrk(kwrk3),n3(3),k3(3),m3(3),nest3(3),nmin3(3),lidx3(maxm,3)
         integer(FP_FLAG) :: ier

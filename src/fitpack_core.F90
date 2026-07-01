@@ -2262,7 +2262,7 @@ module fitpack_core
       real(FP_REAL),    intent(out) :: z(mx*my)
 
       !  ..N-D column-layout marshalling; fpndsp builds its own basis tables (automatic locals)..
-      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(mx,my),max(kx,ky)+1,2)
+      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(kx,ky)+1,max(mx,my),2)
       integer(FP_SIZE) :: lidx2(max(mx,my),2)
 
       t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
@@ -2302,7 +2302,7 @@ module fitpack_core
       !! @param[in]  xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]  m     Number of evaluation points per axis, `m(dims)`
       !! @param[out] z     Spline values at grid points, flat row-major (first axis varies slowest)
-      !! @param[out] w     Per-axis B-spline basis values, `w(m(d),k(d)+1,d)` (mirrors fpbisp `wx,wy`)
+      !! @param[out] w     Per-axis B-spline basis values, `w(k(d)+1,m(d),d)` (basis-major; mirrors fpbisp `wx,wy`)
       !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (mirrors fpbisp `lx,ly`)
       !!
       !! @see fpbisp, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
@@ -2337,7 +2337,7 @@ module fitpack_core
                 l = fp_knot_interval(t(1:n(d),d), arg, l, nkd)
                 h = fpbspl(t(1:n(d),d), n(d), k(d), arg, l)
                 lidx(i,d) = l-k1(d)
-                w(i,1:k1(d),d) = h(1:k1(d))
+                w(1:k1(d),i,d) = h(1:k1(d))
              end do
           end do
 
@@ -2362,12 +2362,12 @@ module fitpack_core
              coff  = coff0
              pw(0) = one
              do a=1,dims-1
-                pw(a) = pw(a-1)*w(gidx(a),cidx(a),a)
+                pw(a) = pw(a-1)*w(cidx(a),gidx(a),a)
              end do
 
              sp = zero
              do q=1,nsupp
-                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(gidx(dims),1:k1(dims),dims))
+                sp = sp + pw(dims-1)*dot_product(c(coff+1:coff+k1(dims)),w(1:k1(dims),gidx(dims),dims))
                 if (q==nsupp) exit
                 !  advance: bump the fastest axis; on overflow reset it and carry to the next-slower axis
                 do a=dims-1,1,-1
@@ -2375,7 +2375,7 @@ module fitpack_core
                       cidx(a) = cidx(a)+1
                       coff    = coff + cstride(a)
                       do d=a,dims-1               ! refresh partial products from the changed axis upward
-                         pw(d) = pw(d-1)*w(gidx(d),cidx(d),d)
+                         pw(d) = pw(d-1)*w(cidx(d),gidx(d),d)
                       end do
                       exit
                    else
@@ -2393,7 +2393,7 @@ module fitpack_core
       !!
       !! Public flat-workspace front-end to fpndsp (the evaluation kernel). Mirrors bispev: the
       !! caller supplies flat real `wrk(lwrk)` / integer `iwrk(kwrk)` scratch, which are carved by
-      !! pointer bounds remapping into the padded per-axis basis table `w(maxm,maxk1,dims)` and the
+      !! pointer bounds remapping into the padded per-axis basis table `w(maxk1,maxm,dims)` and the
       !! interval-index matrix `lidx(maxm,dims)` that fpndsp expects (`maxm=maxval(m)`,
       !! `maxk1=maxval(k)+1`). At `dims=2` this is bit-for-bit identical to bispev.
       !!
@@ -2446,7 +2446,7 @@ module fitpack_core
           end do
 
           ier = FITPACK_OK
-          pw(1:maxm,1:maxk1,1:dims) => wrk(1:lwest)
+          pw(1:maxk1,1:maxm,1:dims) => wrk(1:lwest)
           plidx(1:maxm,1:dims)      => iwrk(1:kwest)
           call fpndsp(dims,t,n,c,k,xg,m,z,pw,plidx)
           return
@@ -2482,7 +2482,7 @@ module fitpack_core
 
           integer(FP_SIZE) :: i,mone(dims)
           !  a scattered point is a 1x...x1 grid: singleton basis/interval scratch for the fpndsp kernel
-          real(FP_REAL)    :: w(1,MAX_ORDER+1,dims)
+          real(FP_REAL)    :: w(MAX_ORDER+1,1,dims)
           integer(FP_SIZE) :: lidx(1,dims)
 
           ier = FITPACK_INPUT_ERROR
@@ -7311,7 +7311,7 @@ module fitpack_core
                   number = number+1
                end do
                h = fpbspl(t(1:n(d),d),n(d),k(d),arg,l)
-               sp(it,1:k1(d),d) = h(1:k1(d))
+               sp(1:k1(d),it,d) = h(1:k1(d))
                nr(it,d) = number
             end do
             ifs(d) = 1
@@ -7358,7 +7358,7 @@ module fitpack_core
                   inner_block: do
                      if (nrold==number) then
                         h(iband(d)) = zero
-                        h(1:k1(d))  = sp(it,1:k1(d),d)
+                        h(1:k1(d))  = sp(1:k1(d),it,d)
                         if (d==1) then
                            ibase = (it-1)*td_trail
                            right(1:td_trail) = z(ibase+1:ibase+td_trail)
@@ -7400,7 +7400,7 @@ module fitpack_core
                inner_stride: do
                   if (nrold==number) then
                      h(iband(dims)) = zero
-                     h(1:k1(dims))  = sp(it,1:k1(dims),dims)
+                     h(1:k1(dims))  = sp(1:k1(dims),it,dims)
                      do j=1,pd_lead
                         right(j) = q(ibuf + (j-1)*m(dims) + it)
                      end do
@@ -7461,19 +7461,19 @@ module fitpack_core
          coff  = coff0
          pw(0) = one
          do a_ax=1,dims-1
-            pw(a_ax) = pw(a_ax-1)*sp(gidx(a_ax),cidx(a_ax),a_ax)
+            pw(a_ax) = pw(a_ax-1)*sp(cidx(a_ax),gidx(a_ax),a_ax)
          end do
 
          sp_val = zero
          do qq=1,nsupp
-            sp_val = sp_val + pw(dims-1)*dot_product(sp(gidx(dims),1:k1(dims),dims),c(coff+1:coff+k1(dims)))
+            sp_val = sp_val + pw(dims-1)*dot_product(sp(1:k1(dims),gidx(dims),dims),c(coff+1:coff+k1(dims)))
             if (qq==nsupp) exit
             do a_ax=dims-1,1,-1
                if (cidx(a_ax)<k1(a_ax)) then
                   cidx(a_ax) = cidx(a_ax)+1
                   coff       = coff + cstr(a_ax)
                   do dd=a_ax,dims-1
-                     pw(dd) = pw(dd-1)*sp(gidx(dd),cidx(dd),dd)
+                     pw(dd) = pw(dd-1)*sp(cidx(dd),gidx(dd),dd)
                   end do
                   exit
                else
@@ -17479,7 +17479,7 @@ module fitpack_core
       ier  = FITPACK_OK
       offr = 2+dims                                  ! wrk(1)=fp0, wrk(2)=fpold, wrk(3:2+dims)=reduc
       pfpint(1:maxnest,1:dims)       => wrk(offr+1:offr+maxnest*dims);          offr = offr+maxnest*dims
-      psp(1:maxm,1:maxk1,1:dims)     => wrk(offr+1:offr+maxm*maxk1*dims);       offr = offr+maxm*maxk1*dims
+      psp(1:maxk1,1:maxm,1:dims)     => wrk(offr+1:offr+maxm*maxk1*dims);       offr = offr+maxm*maxk1*dims
       pa(1:maxnest,1:maxk2,1:dims)   => wrk(offr+1:offr+maxnest*maxk2*dims);    offr = offr+maxnest*maxk2*dims
       pb(1:maxnest,1:maxk2,1:dims)   => wrk(offr+1:offr+maxnest*maxk2*dims);    offr = offr+maxnest*maxk2*dims
       pright(1:mm)                   => wrk(offr+1:offr+mm);                    offr = offr+mm
