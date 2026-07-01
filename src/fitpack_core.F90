@@ -429,9 +429,9 @@ module fitpack_core
       real(FP_REAL), intent(out)   :: z(m)
 
       !  ..local scalars..
-      integer(FP_SIZE) :: iwrk(2),i,lwest
+      integer(FP_SIZE) :: i,lwest
 
-      !  Check inputs
+      !  Check inputs (wrk/lwrk retained for ABI; fpbisp self-manages its basis tables)
       lwest = kx+ky+2
 
       if (lwrk<lwest .or. m<1) then
@@ -443,7 +443,7 @@ module fitpack_core
 
          ier = FITPACK_OK
          do i=1,m
-            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),IONE,y(i),IONE,z(i),wrk(1),wrk(kx+2),iwrk(1),iwrk(2))
+            call fpbisp(tx,nx,ty,ny,c,kx,ky,x(i),IONE,y(i),IONE,z(i))
          end do
 
       end if
@@ -486,10 +486,11 @@ module fitpack_core
       real(FP_REAL), intent(out)   :: z(mx*my)
       real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
-      integer(FP_SIZE) :: iw,lwest
+      integer(FP_SIZE) :: lwest
       !  ..
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
+      !  (wrk/iwrk retained for ABI; fpbisp self-manages its basis tables since slice 6.)
       ier   = FITPACK_INPUT_ERROR
       lwest = (kx+1)*mx+(ky+1)*my
 
@@ -499,8 +500,7 @@ module fitpack_core
 
       ! Evaluate spline
       ier = FITPACK_OK
-      iw  = mx*(kx+1)+1
-      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wrk(1),wrk(iw),iwrk(1),iwrk(mx+1))
+      call fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
 
       end subroutine bispev
 
@@ -2156,108 +2156,39 @@ module fitpack_core
       end subroutine fpbfou
 
 
-      !> @brief Evaluate a tensor product spline on a grid.
+      !> @brief Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).
       !!
-      !! Computes the values of a bivariate spline \f$ s(x, y) \f$ of degrees
-      !! \f$ k_x \f$ and \f$ k_y \f$ at the grid points
-      !! \f$ (x_i, y_j) \f$, \f$ i = 1, \ldots, m_x \f$, \f$ j = 1, \ldots, m_y \f$.
+      !! Computes \f$ s(x_i, y_j) \f$ on the grid \f$ i=1,\ldots,m_x;\, j=1,\ldots,m_y \f$ for a
+      !! bivariate spline of degrees \f$ k_x, k_y \f$. Since slice 6 this is a thin adapter: it
+      !! marshals the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D column layout and defers
+      !! the basis build + tensor contraction to fpndsp, the single evaluation kernel. At dims=2
+      !! fpndsp reproduces the former in-line 2-D contraction bit-for-bit (locked by gate A). The
+      !! per-axis basis tables are automatic locals here, so no caller scratch is needed.
       !!
-      !! The evaluation uses the two-step algorithm: first compute the B-spline
-      !! basis values in each direction, then assemble:
+      !! @param[in]  tx,ty  Per-axis knot vectors, lengths `nx`, `ny`
+      !! @param[in]  nx,ny  Number of knots per axis
+      !! @param[in]  c      B-spline coefficients, length \f$ (n_x-k_x-1)(n_y-k_y-1) \f$
+      !! @param[in]  kx,ky  Spline degree per axis
+      !! @param[in]  x,y    Per-axis evaluation points, lengths `mx`, `my`
+      !! @param[in]  mx,my  Number of evaluation points per axis
+      !! @param[out] z      Spline values, row-major: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
       !!
-      !! \f[
-      !!     s(x, y) = \sum_{i} \left( \sum_{j} c_{i,j} \, M_{j, k_y+1}(y) \right)
-      !!               N_{i, k_x+1}(x)
-      !!     \tag{2.14-2.15}
-      !! \f]
-      !!
-      !! The B-spline values and knot interval indices are stored in workspace
-      !! arrays `wx`, `wy`, `lx`, `ly` for reuse.
-      !!
-      !! @param[in]  tx    Knot vector in \f$ x \f$, length `nx`
-      !! @param[in]  nx    Number of knots in \f$ x \f$
-      !! @param[in]  ty    Knot vector in \f$ y \f$, length `ny`
-      !! @param[in]  ny    Number of knots in \f$ y \f$
-      !! @param[in]  c     B-spline coefficients \f$ c_{i,j} \f$, length
-      !!                   \f$ (n_x - k_x - 1)(n_y - k_y - 1) \f$
-      !! @param[in]  kx    Spline degree in \f$ x \f$
-      !! @param[in]  ky    Spline degree in \f$ y \f$
-      !! @param[in]  x     Evaluation points in \f$ x \f$, length `mx`
-      !! @param[in]  mx    Number of evaluation points in \f$ x \f$
-      !! @param[in]  y     Evaluation points in \f$ y \f$, length `my`
-      !! @param[in]  my    Number of evaluation points in \f$ y \f$
-      !! @param[out] z     Spline values at grid points, length `mx * my`,
-      !!                   stored in row-major order: \f$ z((i-1) m_y + j) = s(x_i, y_j) \f$
-      !! @param[out] wx    B-spline basis values in \f$ x \f$, `wx(mx, kx+1)`
-      !! @param[out] wy    B-spline basis values in \f$ y \f$, `wy(my, ky+1)`
-      !! @param[out] lx    Knot interval indices in \f$ x \f$, length `mx`
-      !! @param[out] ly    Knot interval indices in \f$ y \f$, length `my`
-      !!
-      !! @see Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
-      pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z,wx,wy,lx,ly)
+      !! @see fpndsp, bispev; Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17
+      pure subroutine fpbisp(tx,nx,ty,ny,c,kx,ky,x,mx,y,my,z)
 
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)  :: nx,ny,kx,ky,mx,my
       !  ..array arguments..
       real(FP_REAL),    intent(in)  :: tx(nx),ty(ny),c((nx-kx-1)*(ny-ky-1)),x(mx),y(my)
-      integer(FP_SIZE), intent(out) :: lx(mx),ly(my)
-      real(FP_REAL),    intent(out) :: wx(mx,kx+1),wy(my,ky+1),z(mx*my)
+      real(FP_REAL),    intent(out) :: z(mx*my)
 
-      !  ..local variables..
-      integer(FP_SIZE) :: kx1,ky1,l,l1,m,nkx1,nky1,i,i1,j
-      real(FP_REAL) :: arg,sp,tb,te,h(MAX_ORDER+1)
+      !  ..N-D column-layout marshalling; fpndsp builds its own basis tables (automatic locals)..
+      real(FP_REAL)    :: t2(max(nx,ny),2),xg2(max(mx,my),2),w2(max(mx,my),max(kx,ky)+1,2)
+      integer(FP_SIZE) :: lidx2(max(mx,my),2)
 
-      ! X
-      kx1  = kx+1
-      nkx1 = nx-kx1
-      tb   = tx(kx1)
-      te   = tx(nkx1+1)
-      l = kx1
-      l1 = l+1
-      x_array: do i=1,mx
-        arg = x(i)
-        if(arg<tb) arg = tb
-        if(arg>te) arg = te
-        l = fp_knot_interval(tx, arg, l, nkx1)
-        l1 = l + 1
-        h = fpbspl(tx,nx,kx,arg,l)
-        lx(i) = l-kx1
-        wx(i,1:kx1) = h(1:kx1)
-      end do x_array
-
-      ! Y
-      ky1  = ky+1
-      nky1 = ny-ky1
-      tb   = ty(ky1)
-      te   = ty(nky1+1)
-      l    = ky1
-      l1   = l+1
-      y_array: do i=1,my
-        arg = y(i)
-        if(arg<tb) arg = tb
-        if(arg>te) arg = te
-        l = fp_knot_interval(ty, arg, l, nky1)
-        l1 = l + 1
-        h = fpbspl(ty,ny,ky,arg,l)
-        ly(i) = l-ky1
-        wy(i,1:ky1) = h(1:ky1)
-      end do y_array
-
-      m = 0
-      do i=1,mx
-        l = lx(i)*nky1
-        h(1:kx1) = wx(i,1:kx1)
-        do j=1,my
-          l1 = l+ly(j)
-          sp = zero
-          do i1=1,kx1
-            sp = sp+h(i1)*dot_product(c(l1+1:l1+ky1),wy(j,1:ky1))
-            l1 = l1+nky1
-          end do
-          m = m+1
-          z(m) = sp
-         end do
-      end do
+      t2(1:nx,1)  = tx;   t2(1:ny,2)  = ty
+      xg2(1:mx,1) = x;    xg2(1:my,2) = y
+      call fpndsp(2_FP_DIM,t2,[nx,ny],c,[kx,ky],xg2,[mx,my],z,w2,lidx2)
       return
       end subroutine fpbisp
 
@@ -16160,7 +16091,7 @@ module fitpack_core
       real(FP_REAL), intent(out) :: z(mx*my)
       real(FP_REAL), intent(inout) :: wrk(lwrk)
       !  ..local scalars..
-      integer(FP_SIZE) :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,m,m0,m1,nc,nkx1,nky1,nxx,nyy
+      integer(FP_SIZE) :: i,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,m,m0,m1,nc,nkx1,nky1,nxx,nyy
       real(FP_REAL) :: ak,fac
       !  ..
       !  before starting computations a data check is made. if the input data
@@ -16248,11 +16179,9 @@ module fitpack_core
          end do
       endif
 
-      !  we partition the working space and evaluate the partial derivative
-      iwx = 1+nxx*nyy
-      iwy = iwx+mx*(kx1-nux)
+      !  evaluate the partial derivative (fpbisp self-manages its basis tables)
       call fpbisp(tx(nux+1),nx-ITWO*nux,ty(nuy+1),ny-ITWO*nuy,wrk,kkx,kky, &
-                  x,mx,y,my,z,wrk(iwx),wrk(iwy),iwrk(1),iwrk(mx+1))
+                  x,mx,y,my,z)
 
       return
       end subroutine parder
@@ -16299,7 +16228,7 @@ module fitpack_core
       real(FP_REAL), intent(inout) :: wrk(lwrk)
 
       !  ..local scalars..
-      integer(FP_SIZE) :: i,iwx,iwy,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,mm,m0,m1,nc,nkx1,nky1,nxx,nyy
+      integer(FP_SIZE) :: i,j,kkx,kky,kx1,ky1,lx,ly,lwest,l1,l2,mm,m0,m1,nc,nkx1,nky1,nxx,nyy
       real(FP_REAL) :: ak,fac
 
       !  ..
@@ -16386,13 +16315,10 @@ module fitpack_core
           end do
       endif
 
-      !  we partition the working space and evaluate the partial derivative
-      iwx = 1+nxx*nyy
-      iwy = iwx+m*(kx1-nux)
-
+      !  evaluate the partial derivative at each point (fpbisp self-manages its basis tables)
       do i=1,m
          call fpbisp(tx(nux+1),nx-2*nux,ty(nuy+1),ny-2*nuy,wrk,kkx,kky, &
-                     x(i),IONE,y(i),IONE,z(i),wrk(iwx),wrk(iwy),iwrk(1),iwrk(2))
+                     x(i),IONE,y(i),IONE,z(i))
       end do
       return
       end subroutine pardeu

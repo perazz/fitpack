@@ -104,7 +104,10 @@ module fitpack_grid_nd_tests
                     wrk,LWRK,iwrk,KWRK,ier)
     end subroutine fit_regrid
 
-    !> @brief Gate A — fpndsp(dims=2) must equal bispev's gridded evaluation bit-for-bit.
+    !> @brief Gate A — the three 2-D entry points (fpndsp kernel, ndspev wrapper, bispev adapter)
+    !!        must agree bit-for-bit, and all must match an independent splev separation-of-variables
+    !!        oracle. Since slice 6 every 2-D path routes through fpndsp, so the oracle (not the mutual
+    !!        identity) is what guards correctness.
     logical function gate_fpndsp(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
@@ -123,6 +126,11 @@ module fitpack_grid_nd_tests
         integer(FP_SIZE) :: n2(2),k2(2),m2(2)
         integer          :: icase
         real(FP_REAL)    :: maxdiff
+        ! independent oracle (separation of variables via the 1-D splev)
+        real(FP_REAL)    :: zoracle(size(daregr_x)*size(daregr_y))
+        real(FP_REAL)    :: crow(NYEST),ccol(NXEST),drow(size(daregr_y)),scol(size(daregr_x))
+        real(FP_REAL)    :: dmat(NXEST,size(daregr_y))
+        integer(FP_SIZE) :: a,ii,jj,nkx1,nky1
 
         ok = .true.
         cs = cases()
@@ -180,13 +188,40 @@ module fitpack_grid_nd_tests
                 write(useUnit,1200) trim(gc%label),maxval(abs(zref(1:mz)-ztest2(1:mz)))
                 return
             end if
+
+            ! independent oracle: separation of variables through the 1-D splev (now that every
+            !   2-D path routes through fpndsp, this is the non-tautological correctness check).
+            !   d(a,j)     = sum_b c_{a,b} M_b(y_j)   (ny-spline per x-coefficient-row a)
+            !   s(x_i,y_j) = sum_a d(a,j) N_a(x_i)    (nx-spline per y-column j)
+            nkx1 = nx-kx-1; nky1 = ny-ky-1
+            do a=1,nkx1
+                crow = zero
+                crow(1:nky1) = c((a-1)*nky1+1:(a-1)*nky1+nky1)
+                call splev(ty(1:ny),ny,crow(1:ny),ky,daregr_y,drow,my,OUTSIDE_NEAREST_BND,ier)
+                dmat(a,1:my) = drow
+            end do
+            do jj=1,my
+                ccol = zero
+                ccol(1:nkx1) = dmat(1:nkx1,jj)
+                call splev(tx(1:nx),nx,ccol(1:nx),kx,daregr_x,scol,mx,OUTSIDE_NEAREST_BND,ier)
+                do ii=1,mx
+                    zoracle((ii-1)*my+jj) = scol(ii)
+                end do
+            end do
+            maxdiff = maxval(abs(ztest(1:mz)-zoracle(1:mz)))
+            if (maxdiff > 1.0e-10_FP_REAL*max(one,maxval(abs(zoracle(1:mz))))) then
+                ok = .false.
+                write(useUnit,1300) trim(gc%label),maxdiff
+                return
+            end if
         end do
 
-        write(useUnit,'(a)') '[gate A] fpndsp == ndspev == bispev (bit-for-bit, all cases)'
+        write(useUnit,'(a)') '[gate A] fpndsp == ndspev == bispev, all == splev separation-of-variables'
 
         1000 format('[gate A] ',a,' failed for ',a,': ',a)
         1100 format('[gate A] fpndsp /= bispev for ',a,'  (max |diff| = ',1pe12.3,')')
         1200 format('[gate A] ndspev /= bispev for ',a,'  (max |diff| = ',1pe12.3,')')
+        1300 format('[gate A] fpndsp /= splev oracle for ',a,'  (max |diff| = ',1pe12.3,')')
     end function gate_fpndsp
 
     !> @brief Gate D — regrid_nd(dims=2) must equal regrid bit-for-bit across all iopt modes.
