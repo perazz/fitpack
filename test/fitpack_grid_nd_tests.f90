@@ -1,20 +1,19 @@
 ! **************************************************************************************************
-!   FITPACK N-D gridded core — equivalence gate (slice 1) + first dims>2 path (slice 2)
+!   FITPACK N-D gridded core — correctness gates for the dimension-generic regrid/fpregr/fpgrre/fpndsp
 !
-!   Gates A/D/D' assert that the dimensionalized *_nd gridded routines reproduce their 2-D originals
-!   EXACTLY (bit-for-bit) when run at dims=2, over the standard 11x11 `daregr` battery across all iopt
-!   modes and spline orders — the oracle that licenses extending the *_nd path to dims>2. Gate E then
-!   exercises the first genuine dims>2 path (the eval contraction at dims=3) against independent refs.
+!   Gates A/D/D' pin the dims=2 behaviour of the (now sole) gridded routines against independent
+!   oracles over the standard 11x11 `daregr` battery across all iopt modes and spline orders; Gates
+!   E/F/G exercise the genuine dims>2 paths (eval contraction and fit) against independent references.
 !
 !   Gates:
-!     A. fpndsp  vs bispev  (gridded evaluation, dims=2 bit-for-bit)
-!     D. regrid_nd fit self-consistency (fp==SSR via bispev, s=0 interpolates, valid knots) across the
-!                               cubic iopt-chain, quintic and iopt=-1 lsq — covers fpregr_nd + fpgrre_nd
+!     A. fpndsp vs bispev vs a splev separation-of-variables oracle (gridded evaluation, dims=2)
+!     D. regrid fit self-consistency (fp==SSR via bispev, s=0 interpolates, valid knots) across the
+!                               cubic iopt-chain, quintic and iopt=-1 lsq — covers fpregr + fpgrre
 !     D'. same fp==SSR oracle on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
 !                               convention so an x<->y axis/size swap cannot hide behind mx==my
 !     E. fpndsp(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
 !                               splev, and non-separable coeffs vs the dims=2 path combined along z
-!     F. regrid_nd(dims=3) least-squares FIT on given knots (slice 3) — the generalized fpgrre_nd solve
+!     F. regrid(dims=3) least-squares FIT on given knots (slice 3) — the generalized fpgrre solve
 !                               recovers an in-space polynomial; checked vs the closed-form (fpndsp)
 !
 !   See todo/fitpack_nd_grids.md (slices 1–3) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
@@ -41,7 +40,7 @@ module fitpack_grid_nd_tests
 
     contains
 
-    !> @brief Bit-for-bit equivalence gate for the N-D gridded core at dims=2.
+    !> @brief Correctness gates for the gridded core: dims=2 oracles (A/D/D') and dims>2 paths (E/F/G).
     logical function test_nd_grid_equivalence(iunit) result(success)
         integer, optional, intent(in) :: iunit
         integer :: useUnit
@@ -51,7 +50,7 @@ module fitpack_grid_nd_tests
 
         success = .true.
 
-        ! Gate D: regrid_nd vs regrid (backbone; transitively covers fpregr_nd + fpgrre_nd)
+        ! Gate D: regrid(dims=2) fit self-consistency (backbone; transitively covers fpregr + fpgrre)
         if (success) success = gate_regrid_nd(useUnit)
 
         ! Gate D': same, on a NON-SQUARE grid (mx /= my) so an x<->y data/size swap cannot hide
@@ -63,10 +62,10 @@ module fitpack_grid_nd_tests
         ! Gate E: fpndsp at dims=3 vs two independent references (the first genuine dims>2 path)
         if (success) success = gate_fpndsp_3d(useUnit)
 
-        ! Gate F: regrid_nd at dims=3 — the first genuine dims>2 FIT (generalized fpgrre_nd solve)
+        ! Gate F: regrid at dims=3 — the first genuine dims>2 FIT (generalized fpgrre solve)
         if (success) success = gate_regrid_nd_3d(useUnit)
 
-        ! Gate G: regrid_nd at dims=3 SMOOTHING (s>0) — the generalized knot-direction arbiter
+        ! Gate G: regrid at dims=3 SMOOTHING (s>0) — the generalized knot-direction arbiter
         if (success) success = gate_regrid_nd_3d_smoothing(useUnit)
 
         if (success) write(useUnit,'(a)') '[test_nd_grid_equivalence] all N-D gridded gates OK'
@@ -96,13 +95,13 @@ module fitpack_grid_nd_tests
 
         mx = size(daregr_x,kind=FP_SIZE)
         my = size(daregr_y,kind=FP_SIZE)
-        zin = reshape(daregr_z,[mx*my])   ! flat row-major (x slowest, y fastest) = regrid_nd's z contract
+        zin = reshape(daregr_z,[mx*my])   ! flat row-major (x slowest, y fastest) = regrid's z contract
         m2 = [mx,my]; k2 = [gc%kx,gc%ky]; nest2 = [NXEST,NYEST]
         lo = [daregr_x(1),daregr_y(1)]; hi = [daregr_x(mx),daregr_y(my)]
         xg = zero; xg(1:mx,1) = daregr_x; xg(1:my,2) = daregr_y
         t2 = zero; wrk = zero; iwrk = 0
 
-        call regrid_nd(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,zin,lo,hi,k2,gc%s,nest2, &
+        call regrid(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,zin,lo,hi,k2,gc%s,nest2, &
                        n2,t2,c,fp,wrk,LWRK,iwrk,KWRK,ier)
 
         nx = n2(1); ny = n2(2)
@@ -230,14 +229,14 @@ module fitpack_grid_nd_tests
         1300 format('[gate A] fpndsp /= splev oracle for ',a,'  (max |diff| = ',1pe12.3,')')
     end function gate_fpndsp
 
-    !> @brief Gate D — regrid_nd(dims=2) fit is self-consistent across all iopt modes.
+    !> @brief Gate D — regrid(dims=2) fit is self-consistent across all iopt modes.
     !!
-    !! With regrid_nd now the sole gridded engine there is no legacy regrid to compare against, so
+    !! With regrid now the sole gridded engine there is no legacy regrid to compare against, so
     !! this asserts the defining property of every fit instead: fp equals the unit-weight residual
     !! sum of squares recomputed independently on the data grid through bispev (which routes through
     !! fpndsp), an s=0 smoothing fit interpolates (fp collapses to zero), and the knots stay valid.
     !! It runs the cubic iopt=0->1 continuation chain, a quintic fit, and a least-squares fit on
-    !! prescribed knots (iopt=-1), so it still exercises fpregr_nd + fpgrre_nd end-to-end.
+    !! prescribed knots (iopt=-1), so it still exercises fpregr + fpgrre end-to-end.
     logical function gate_regrid_nd(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
@@ -253,7 +252,7 @@ module fitpack_grid_nd_tests
         ok = .true.
         mx = size(daregr_x,kind=FP_SIZE); my = size(daregr_y,kind=FP_SIZE)
         xb = daregr_x(1); xe = daregr_x(mx); yb = daregr_y(1); ye = daregr_y(my)
-        zin = reshape(daregr_z,[mx*my])    ! flat row-major (x slowest, y fastest) = regrid_nd's z contract
+        zin = reshape(daregr_z,[mx*my])    ! flat row-major (x slowest, y fastest) = regrid's z contract
 
         m2 = [mx,my]; nest2 = [NXEST,NYEST]; lo = [xb,yb]; hi = [xe,ye]
         xgt = zero; xgt(1:mx,1) = daregr_x; xgt(1:my,2) = daregr_y
@@ -268,7 +267,7 @@ module fitpack_grid_nd_tests
                case (3); iopt = 1; s = 0.1_FP_REAL
                case (4); iopt = 1; s = 0.0_FP_REAL
             end select
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+            call regrid(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'cubic iopt-chain #',icase
             if (.not.fit_ssr_ok(useUnit,trim(lbl),kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
@@ -278,7 +277,7 @@ module fitpack_grid_nd_tests
 
         ! ---- Phase B: quintic, fresh iopt=0 ----
         kx = 5; ky = 5; kk = [kx,ky]; iopt = 0; s = 0.2_FP_REAL
-        call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+        call regrid(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.fit_ssr_ok(useUnit,'quintic fresh iopt=0',kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
             ok = .false.; return
@@ -290,16 +289,16 @@ module fitpack_grid_nd_tests
         ttst = zero
         ttst(kx+2:kx+4,1) = [(half*(i-2),i=1,3)]
         ttst(ky+2:ky+4,2) = ttst(kx+2:kx+4,1)
-        call regrid_nd(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+        call regrid(-1_FP_FLAG,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                        ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
         if (.not.fit_ssr_ok(useUnit,'lsq given knots iopt=-1',kk,m2,xgt,zin,s,-1_FP_SIZE,ntst,ttst,ctst,fptst,ier_t)) then
             ok = .false.; return
         end if
 
-        write(useUnit,'(a)') '[gate D] regrid_nd(dims=2): fp==SSR, s=0 interpolates, valid knots (cubic chain, quintic, iopt=-1)'
+        write(useUnit,'(a)') '[gate D] regrid(dims=2): fp==SSR, s=0 interpolates, valid knots (cubic chain, quintic, iopt=-1)'
     end function gate_regrid_nd
 
-    !> @brief Gate D' — regrid_nd(dims=2) on a NON-SQUARE grid (mx /= my).
+    !> @brief Gate D' — regrid(dims=2) on a NON-SQUARE grid (mx /= my).
     !!
     !! The square 11x11 daregr battery cannot expose an x<->y swap in the data tensor or in the
     !! per-axis sizing: with mx==my both indexings address the same elements. A non-square grid makes
@@ -345,7 +344,7 @@ module fitpack_grid_nd_tests
                case (1); iopt = 0; s = 0.05_FP_REAL   ! smoothing
                case (2); iopt = 0; s = 0.0_FP_REAL    ! interpolation
             end select
-            call regrid_nd(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
+            call regrid(iopt,2_FP_DIM,m2,xgt,zin,lo,hi,kk,s,nest2, &
                            ntst,ttst,ctst,fptst,wrkt,LWRK,iwrkt,KWRK,ier_t)
             write(lbl,'(a,i0)') 'non-square 9x13 #',icase
             if (.not.fit_ssr_ok(useUnit,trim(lbl),kk,m2,xgt,zin,s,iopt,ntst,ttst,ctst,fptst,ier_t)) then
@@ -353,10 +352,10 @@ module fitpack_grid_nd_tests
             end if
         end do
 
-        write(useUnit,'(a)') '[gate D''] regrid_nd(dims=2): fp==SSR, s=0 interpolates (non-square 9x13)'
+        write(useUnit,'(a)') '[gate D''] regrid(dims=2): fp==SSR, s=0 interpolates (non-square 9x13)'
     end function gate_regrid_nd_nonsquare
 
-    !> @brief Oracle check for one dims=2 regrid_nd fit: the residual sum of squares fp must match
+    !> @brief Oracle check for one dims=2 regrid fit: the residual sum of squares fp must match
     !!        the value recomputed independently on the data grid through bispev, an s=0 smoothing
     !!        fit must interpolate (fp≈0), and the knots must be non-decreasing on each axis.
     logical function fit_ssr_ok(useUnit,label,k,m,xg,zin,s,iopt,n,t,c,fp,ier) result(ok)
@@ -553,12 +552,12 @@ module fitpack_grid_nd_tests
         3000 format('[gate E] fpndsp(dims=3) /= ',a,' reference  (max |diff| = ',1pe12.3,')')
     end function gate_fpndsp_3d
 
-    !> @brief Gate F — regrid_nd at dims=3 (least-squares fit on given knots) vs a closed-form oracle.
+    !> @brief Gate F — regrid at dims=3 (least-squares fit on given knots) vs a closed-form oracle.
     !!
-    !! The first genuine dims>2 FIT path: the generalized fpgrre_nd solve (alternating-direction
+    !! The first genuine dims>2 FIT path: the generalized fpgrre solve (alternating-direction
     !! reduction + ping-pong buffer + back-substitution + residual contraction). Data is a separable
     !! in-space polynomial f(x,y,w)=Px(x)*Py(y)*Pw(w) with deg Px/Py/Pw = kx/ky/kw, which lies EXACTLY
-    !! in the tensor B-spline space for any clamped knots. Fit via regrid_nd(dims=3, iopt=-1) on
+    !! in the tensor B-spline space for any clamped knots. Fit via regrid(dims=3, iopt=-1) on
     !! hand-built clamped knots with nk1(d)<m(d) (genuinely over-determined, so the residual path runs);
     !! the binary knot-direction arbiter is provably untouched on the iopt<0 path. Two independent
     !! checks: the residual fp must vanish, and the fitted spline -- evaluated by the gate-A/E-verified
@@ -615,10 +614,10 @@ module fitpack_grid_nd_tests
 
         ! least-squares fit on the given clamped knots (iopt=-1): the arbiter-free dims=3 solve
         s = zero; wrk = zero; iwrk = 0
-        call regrid_nd(-1_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
+        call regrid(-1_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
                        n3,t3,c3,fpf,wrk,LWRK,iwrk,KWRK,ier)
         if (ier/=FITPACK_OK) then
-           ok = .false.; write(useUnit,'(a,i0)') '[gate F] regrid_nd(dims=3) fit failed, ier=',ier; return
+           ok = .false.; write(useUnit,'(a,i0)') '[gate F] regrid(dims=3) fit failed, ier=',ier; return
         end if
 
         ! check 1: data exactly in space -> least-squares residual must vanish
@@ -650,10 +649,10 @@ module fitpack_grid_nd_tests
            ok = .false.; write(useUnit,3100) maxdiff; return
         end if
 
-        write(useUnit,'(a)') '[gate F] regrid_nd(dims=3) least-squares fit reproduces in-space polynomial'
+        write(useUnit,'(a)') '[gate F] regrid(dims=3) least-squares fit reproduces in-space polynomial'
 
-        3000 format('[gate F] regrid_nd(dims=3) ',a,' = ',1pe12.3)
-        3100 format('[gate F] regrid_nd(dims=3) fit /= closed-form f  (max |diff| = ',1pe12.3,')')
+        3000 format('[gate F] regrid(dims=3) ',a,' = ',1pe12.3)
+        3100 format('[gate F] regrid(dims=3) fit /= closed-form f  (max |diff| = ',1pe12.3,')')
 
     contains
 
@@ -672,7 +671,7 @@ module fitpack_grid_nd_tests
 
     end function gate_regrid_nd_3d
 
-    !> @brief Gate G — regrid_nd at dims=3 SMOOTHING (s>0): the generalized knot-direction arbiter.
+    !> @brief Gate G — regrid at dims=3 SMOOTHING (s>0): the generalized knot-direction arbiter.
     !!
     !! The first dims>2 smoothing fit, so the first runtime exercise of the N-D argmax arbiter
     !! (new_knot_dimension_nd) AND of the p>0 discontinuity branch at dims>2. No legacy dims=3
@@ -717,7 +716,7 @@ module fitpack_grid_nd_tests
 
         ! calibrate: a huge s returns the least-squares polynomial residual fp0
         wrk = zero; iwrk = 0
-        call regrid_nd(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,1.0e30_FP_REAL,nest3, &
+        call regrid(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,1.0e30_FP_REAL,nest3, &
                        n3,t3,c3,fp0cal,wrk,lwrk3,iwrk,kwrk3,ier)
         if (.not.FITPACK_SUCCESS(ier) .or. fp0cal<=zero) then
            ok = .false.; write(useUnit,3000) 'calibration failed (ier/fp0)', fp0cal; return
@@ -726,10 +725,10 @@ module fitpack_grid_nd_tests
         ! smoothing fit at s = 1% of the polynomial residual: forces knot addition on every axis
         s = 1.0e-2_FP_REAL*fp0cal
         t3 = zero; wrk = zero; iwrk = 0
-        call regrid_nd(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
+        call regrid(0_FP_FLAG,3_FP_DIM,m3,xg3,z3,lo,hi,k3,s,nest3, &
                        n3,t3,c3,fp,wrk,lwrk3,iwrk,kwrk3,ier)
         if (.not.FITPACK_SUCCESS(ier)) then
-           ok = .false.; write(useUnit,'(a,i0)') '[gate G] regrid_nd(dims=3) smoothing failed, ier=',ier; return
+           ok = .false.; write(useUnit,'(a,i0)') '[gate G] regrid(dims=3) smoothing failed, ier=',ier; return
         end if
 
         ! check 1: smoothing identity -- the solver converges to |fp-s| < tol*s (tol = 1e-3)
@@ -758,10 +757,10 @@ module fitpack_grid_nd_tests
            ok = .false.; write(useUnit,3000) 'fp /= SSR via fpndsp', abs(ssr-fp); return
         end if
 
-        write(useUnit,'(a)') '[gate G] regrid_nd(dims=3) smoothing converges, distributes knots, fp==SSR'
+        write(useUnit,'(a)') '[gate G] regrid(dims=3) smoothing converges, distributes knots, fp==SSR'
 
-        3000 format('[gate G] regrid_nd(dims=3) smoothing ',a,' = ',1pe12.3)
-        3100 format('[gate G] regrid_nd(dims=3) knots not distributed: n = ',i0,1x,i0,1x,i0)
+        3000 format('[gate G] regrid(dims=3) smoothing ',a,' = ',1pe12.3)
+        3100 format('[gate G] regrid(dims=3) knots not distributed: n = ',i0,1x,i0,1x,i0)
 
     contains
 

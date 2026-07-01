@@ -249,7 +249,7 @@ module fitpack_core_c
                                tx,ny,ty,c,fp,wrk1,lwrk1,wrk2,lwrk2,iwrk,kwrk,ier)
       end subroutine surfit_c
 
-      ! regular grid fit (bivariate 2-D shim over the dimension-generic regrid_nd engine)
+      ! regular grid fit (bivariate 2-D shim over the dimension-generic regrid engine)
       pure subroutine regrid_c(iopt,mx,x,my,y,z,xb,xe,yb,ye,kx,ky,s,nxest,nyest, &
                                nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier) bind(C,name='fp_regrid_c')
           real(FP_REAL),    intent(in), value :: xb,xe,yb,ye,s
@@ -261,9 +261,9 @@ module fitpack_core_c
           real(FP_REAL),    intent(inout)     :: tx(nxest),ty(nyest),c((nxest-kx-1)*(nyest-ky-1)),wrk(lwrk)
           integer(FP_SIZE), intent(inout)     :: iwrk(kwrk)
 
-          !  dims=2 marshalling for regrid_nd. The caller's wrk/iwrk are passed straight through so an
-          !  iopt=1 continuation keeps its persistent state across calls; note regrid_nd's workspace
-          !  requirement can exceed legacy regrid's, so size lwrk/kwrk per regrid_nd (a too-small
+          !  dims=2 marshalling for regrid. The caller's wrk/iwrk are passed straight through so an
+          !  iopt=1 continuation keeps its persistent state across calls; note regrid's workspace
+          !  requirement can exceed legacy regrid's, so size lwrk/kwrk per regrid (a too-small
           !  buffer returns ier=FITPACK_INPUT_ERROR rather than corrupting memory).
           integer(FP_SIZE) :: mdim(2),n2(2),k2(2),nest2(2)
           real(FP_REAL)    :: lo(2),hi(2),t2(max(nxest,nyest),2),xg(max(mx,my),2)
@@ -281,7 +281,7 @@ module fitpack_core_c
              t2(1:ny,2) = ty(1:ny)
           end if
 
-          call regrid_nd(iopt,2_FP_DIM,mdim,xg,z,lo,hi,k2,s,nest2, &
+          call regrid(iopt,2_FP_DIM,mdim,xg,z,lo,hi,k2,s,nest2, &
                          n2,t2,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
           nx = n2(1); ny = n2(2)

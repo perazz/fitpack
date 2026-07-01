@@ -63,10 +63,10 @@ module fitpack_core
     public :: parsur ! * Parametric surface fitting to data on a grid
 
     ! N-D gridded core (dimensionalized behind a bit-for-bit gate at dims=2; see
-    ! todo/fitpack_nd_grids.md). fpregr_nd/fpgrre_nd stay private and are covered transitively
-    ! by the regrid_nd backbone gate. fpndsp is the N-D evaluation kernel; ndspev its public
+    ! todo/fitpack_nd_grids.md). fpregr/fpgrre stay private and are covered transitively
+    ! by the regrid backbone gate. fpndsp is the N-D evaluation kernel; ndspev its public
     ! flat-workspace wrapper (the N-D analogue of fpbisp/bispev).
-    public :: regrid_nd ! N-D generalization of regrid (gridded smoothing fit)
+    public :: regrid ! tensor-product gridded smoothing-spline fit (any domain dimension)
     public :: fpndsp    ! N-D generalization of fpbisp (gridded evaluation kernel)
     public :: ndspev    ! N-D generalization of bispev (gridded evaluation, flat workspace)
 
@@ -7068,7 +7068,7 @@ module fitpack_core
       end subroutine fpgrpa
 
 
-      !> @brief N-D generalization of fpgrre: tensor-product least-squares gridded solver.
+      !> @brief Tensor-product least-squares gridded solver for `dims` dimensions.
       !!
       !! For data on a rectangular grid \f$ \{x_i\} \times \{y_j\} \f$, solves
       !! the smoothing least-squares system using the Kronecker product structure
@@ -7130,7 +7130,7 @@ module fitpack_core
       !!
       !! @see fpgrre, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; fp_rotate_row_block,
       !!      fp_rotate_row_stride — grid Givens rotations; todo/fitpack_nd_grids.md (slice 1, §2/§9)
-      pure subroutine fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint, &
+      pure subroutine fpgrre(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint, &
                                 mm,mynx,sp,right,q,a,b,nr)
 
       !  ..scalar arguments..
@@ -7379,7 +7379,7 @@ module fitpack_core
          end do
       end do grid_points
       return
-      end subroutine fpgrre_nd
+      end subroutine fpgrre
 
       !> @brief Compute spherical grid spline coefficients via Kronecker product.
       !!
@@ -12047,20 +12047,20 @@ module fitpack_core
       end subroutine fprati
 
 
-      !> @brief N-D generalization of fpregr: knot determination + p-iteration for gridded fits.
+      !> @brief Knot determination + p-iteration for `dims`-dimensional gridded fits.
       !!
       !! Outer iteration loop for fitting a smoothing spline surface on a
       !! rectangular grid \f$ \{x_i\} \times \{y_j\} \f$. Manages the knot
       !! selection strategy (alternating between axis directions based on residuals)
       !! and the smoothing-parameter search, delegating the grid computation to
-      !! fpgrre_nd at each step. At `dims=2` this is bit-for-bit identical to fpregr:
+      !! fpgrre at each step. At `dims=2` this is bit-for-bit identical to fpregr:
       !! the paired per-axis state becomes `dims`-length arrays and the knot-init /
       !! knot-placement passes become runtime do-loops over the axes, while the binary
       !! knot-direction arbiter and the scalar p-iteration root find for f(p)=s are
       !! kept literal-2 until the dims>2 step.
       !!
       !! WORKSPACE: per the no-allocation rule, all scratch (`sp,a,b,right,q,fpint,nr,
-      !! nrdat`) is supplied by the caller (regrid_nd carves it from the user wrk/iwrk)
+      !! nrdat`) is supplied by the caller (regrid carves it from the user wrk/iwrk)
       !! and received here as assumed-shape inout views; the persistent fit-state
       !! (`fp0,fpold,reduc,lastdi,nplus`) is passed explicitly rather than hidden in
       !! wrk offsets.
@@ -12069,7 +12069,7 @@ module fitpack_core
       !! @param[in]     dims    Number of axes (domain dimension)
       !! @param[in]     xg      Per-axis grid values; column \f$ d \f$ is `xg(1:m(d),d)`
       !! @param[in]     m       Number of grid points per axis, `m(dims)`
-      !! @param[in]     z       Data values, flat row-major `z(*)` (passed through to fpgrre_nd)
+      !! @param[in]     z       Data values, flat row-major `z(*)` (passed through to fpgrre)
       !! @param[in]     lo      Per-axis lower boundary (orig xb,yb)
       !! @param[in]     hi      Per-axis upper boundary (orig xe,ye)
       !! @param[in]     k       Degree per axis, `k(dims)`
@@ -12097,8 +12097,8 @@ module fitpack_core
       !! @param[in,out] b       Work: per-axis discontinuity matrices
       !! @param[in,out] ier     Error flag
       !!
-      !! @see fpregr, fpgrre_nd, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; todo/fitpack_nd_grids.md (slice 1, §8 part C)
-      pure subroutine fpregr_nd(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
+      !! @see fpregr, fpgrre, Dierckx Ch. 10 §10.2 (pp. 170-172) Eq. 10.4-10.8; todo/fitpack_nd_grids.md (slice 1, §8 part C)
+      pure subroutine fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
                                 n,t,c,fp,fp0,fpold,reduc,lastdi,nplus, &
                                 fpint,nr,nrdat,sp,right,q,a,b,ier)
 
@@ -12116,7 +12116,7 @@ module fitpack_core
       integer(FP_SIZE), intent(inout) :: n(dims),nplus(dims)
       real(FP_REAL),    intent(inout) :: reduc(dims)
       !  ..array arguments (data + caller-supplied workspace views)..
-      !  z(*): flat row-major gridded data, passed straight to fpgrre_nd; fpregr_nd never reads it.
+      !  z(*): flat row-major gridded data, passed straight to fpgrre; fpregr never reads it.
       real(FP_REAL),    intent(in)               :: z(*)
       real(FP_REAL),    intent(in),    contiguous :: xg(:,:)
       real(FP_REAL),    intent(inout), contiguous :: t(:,:),fpint(:,:),sp(:,:,:),right(:),q(:),a(:,:,:),b(:,:,:)
@@ -12234,7 +12234,7 @@ module fitpack_core
           end forall
 
           ! least-squares spline + per-interval residuals fpint(:,d) and total fp.
-          call fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
+          call fpgrre(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
 
           if (ier==FITPACK_LEASTSQUARES_OK) fp0 = fp
 
@@ -12306,7 +12306,7 @@ module fitpack_core
 
       root_iterations: do iter = 1,maxit
 
-          call fpgrre_nd(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
+          call fpgrre(dims,ifs,ifb,xg,m,z,k,t,n,p,c,nc,fp,fpint,mm,mynx,sp,right,q,a,b,nr)
 
           fpms = fp-s; if (abs(fpms)<acc) return
 
@@ -12322,7 +12322,7 @@ module fitpack_core
       ier = FITPACK_MAXIT
       return
 
-      end subroutine fpregr_nd
+      end subroutine fpregr
 
       !> @brief Choose which dimension receives the next knot during bivariate fitting.
       !!
@@ -16973,20 +16973,18 @@ module fitpack_core
       ! smoothing factor. the fit is given in the b-spline representation (b-spline coefficients
       ! c((ny-ky-1)*(i-1)+j),i=1,...,nx-kx-1;j=1,...,ny-ky-1) and can be evaluated by means of subroutine
       ! bispev.
-      !> @brief N-D generalization of regrid: tensor-product gridded smoothing-spline driver.
+      !> @brief Tensor-product gridded smoothing-spline fit driver for any domain dimension `dims`.
       !!
-      !! Dimensionalized duplicate of regrid. At `dims=2` it produces results bit-for-bit identical
-      !! to regrid (verified by the regrid_nd-vs-regrid equivalence gate over all iopt modes and
-      !! spline orders). Validation, boundary-knot clamping and Schoenberg-Whitney (`fpchec`) checks
-      !! become runtime do-loops over the `dims` axes; the binary knot-direction logic stays literal-2
-      !! inside fpregr_nd until the dims>2 step.
+      !! Fits a `dims`-fold tensor-product B-spline to data on a rectangular grid. Validation,
+      !! boundary-knot clamping and Schoenberg-Whitney (`fpchec`) checks are runtime do-loops over the
+      !! `dims` axes; the knot-direction arbiter is the N-D `new_knot_dimension_nd`. At `dims=2` this
+      !! is the engine behind the bivariate grid surface and the fp_regrid_c binding.
       !!
       !! WORKSPACE (no allocation): the caller supplies a flat real `wrk(lwrk)` and integer
-      !! `iwrk(kwrk)`, both `target`. regrid_nd carves them into the rank-N work views needed by
-      !! fpregr_nd/fpgrre_nd via pointer bounds remapping (the N-D analogue of regrid's flat-offset
-      !! partition). The persistent fit-state lives at fixed offsets: wrk(1)=fp0, wrk(2)=fpold,
-      !! wrk(3:2+dims)=reduc; iwrk(1)=lastdi, iwrk(2:1+dims)=nplus -- so preserving wrk/iwrk between
-      !! calls (with iopt=1) continues from the previous knot set, exactly as regrid does.
+      !! `iwrk(kwrk)`, both `target`. regrid carves them into the rank-N work views needed by
+      !! fpregr/fpgrre via pointer bounds remapping. The persistent fit-state lives at fixed offsets:
+      !! wrk(1)=fp0, wrk(2)=fpold, wrk(3:2+dims)=reduc; iwrk(1)=lastdi, iwrk(2:1+dims)=nplus -- so
+      !! preserving wrk/iwrk between calls (with iopt=1) continues from the previous knot set.
       !!
       !! Minimum sizes:
       !!   lwrk >= 2 + dims + nestmax*dims + mmax*(kmax+1)*dims + 2*nestmax*(kmax+2)*dims + mm + mq
@@ -16995,8 +16993,8 @@ module fitpack_core
       !!   mq = 2*max_{i=1..dims-1} [ product(nk1max(1:i)) * product(m(i+1:dims)) ]
       !!   mm = max(nestmax, mmax, product(m(2:dims)), product(nk1max(1:dims-1)))
       !!
-      !! @see regrid, fpregr_nd; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4.
-      pure subroutine regrid_nd(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      !! @see regrid, fpregr; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4.
+      pure subroutine regrid(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: iopt
@@ -17098,12 +17096,12 @@ module fitpack_core
       pnr(1:maxm,1:dims)             => iwrk(offi+1:offi+maxm*dims);            offi = offi+maxm*dims
       pnrdat(1:maxnest,1:dims)       => iwrk(offi+1:offi+maxnest*dims)
 
-      call fpregr_nd(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
+      call fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
                      n,t,c,fp,wrk(1),wrk(2),wrk(3:2+dims),iwrk(1),iwrk(2:1+dims), &
                      pfpint,pnr,pnrdat,psp,pright,pq,pa,pb,ier)
       return
 
-      end subroutine regrid_nd
+      end subroutine regrid
 
 
       !  subroutine spalde evaluates at a point x ALL the derivatives

@@ -28,7 +28,7 @@
 !! @see Dierckx, Ch. 5, §5.4 (pp. 98–103); regrid, bispev, parder, pardeu, dblint, profil
 module fitpack_grid_surfaces
     use fitpack_core, only: FITPACK_SUCCESS,FP_REAL,FP_SIZE,FP_FLAG,FP_DIM,FP_COMM,zero,IOPT_NEW_SMOOTHING,IOPT_OLD_FIT, &
-                            IOPT_NEW_LEASTSQUARES,bispev,bispeu,fitpack_error_handling,get_smoothing,regrid_nd, &
+                            IOPT_NEW_LEASTSQUARES,bispev,bispeu,fitpack_error_handling,get_smoothing,regrid, &
                             parder,pardeu,FITPACK_INPUT_ERROR, &
                             dblint,profil,pardtc, &
                             FP_COMM_SIZE,FP_COMM_PACK,FP_COMM_EXPAND
@@ -183,8 +183,8 @@ module fitpack_grid_surfaces
 
         call get_smoothing(this%smoothing,smoothing,nit,smooth_now)
 
-        ! Marshal the two grid-coordinate vectors into the (m,dims) column layout regrid_nd expects.
-        ! z (stored z(iy,ix), y-fast) and t(:,1:2) already match regrid_nd's flat-z and (n,dims) knot
+        ! Marshal the two grid-coordinate vectors into the (m,dims) column layout regrid expects.
+        ! z (stored z(iy,ix), y-fast) and t(:,1:2) already match regrid's flat-z and (n,dims) knot
         ! contracts, so they pass through by storage/array association without a copy.
         m2 = [size(this%x),size(this%y)]
         xg = zero
@@ -206,7 +206,7 @@ module fitpack_grid_surfaces
             ! Set current smoothing
             this%smoothing = smooth_now(loop)
             
-            call regrid_nd(this%iopt,                 &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
+            call regrid(this%iopt,                 &  ! [-1]=lsq on given knots; [0,1]=smoothing spline
                         2_FP_DIM,                     &  ! domain dimension (bivariate grid)
                         m2,xg,                        &  ! per-axis point counts and coordinates xg(1:m(d),d)
                         this%z,                       &  ! z(iy,ix) gridded data, flat row-major (x slowest, y fastest)
@@ -298,15 +298,15 @@ module fitpack_grid_surfaces
 
         endassociate
 
-        ! Working space, sized for regrid_nd(dims=2) at the current order
+        ! Working space, sized for regrid(dims=2) at the current order
         call surf_prepare_workspace(this)
 
     end subroutine surf_new_points
 
-    !> @brief (Re)size the fit workspace to regrid_nd(dims=2)'s requirement for the current order.
+    !> @brief (Re)size the fit workspace to regrid(dims=2)'s requirement for the current order.
     !!
     !! The wrk/iwrk requirement grows with the spline order, but `fit` lets the caller raise the
-    !! order after `new_points` sized the arrays. This mirrors regrid_nd's lwest/kwest formulas
+    !! order after `new_points` sized the arrays. This mirrors regrid's lwest/kwest formulas
     !! (evaluated at dims=2) so the type is a correctly-sized single-source caller, and grows the
     !! arrays only when needed — a large-enough existing allocation is left in place so an iopt=1
     !! continuation keeps its persistent state in wrk(1:2+dims).
