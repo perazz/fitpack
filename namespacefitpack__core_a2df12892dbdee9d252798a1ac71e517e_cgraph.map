@@ -1,0 +1,9 @@
+<map id="fitpack_core::pardtc" name="fitpack_core::pardtc">
+<area shape="rect" id="Node000001" title="B&#45;spline coefficients of a partial&#45;derivative spline (any dimension)." alt="" coords="5,77,156,102"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="204,5,359,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,74,204,47,206,52,122,79"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="204,69,359,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,87,191,87,191,92,156,92"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="204,133,359,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="122,100,206,127,204,132,121,105"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="fitpack_core::profil" name="fitpack_core::profil">
+<area shape="rect" id="Node000001" title="Cross&#45;section of a tensor&#45;product spline: fix one axis (any dimension)." alt="" coords="5,141,148,166"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="198,5,353,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,138,134,99,195,55,206,49,208,54,197,60,137,103,93,142"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="198,69,353,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="116,138,199,111,201,116,118,143"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="198,133,353,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="148,151,184,151,184,156,148,156"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="196,197,355,237"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="118,164,201,191,199,196,116,169"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="201,262,350,287"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="92,164,137,205,166,227,197,247,214,255,212,260,195,252,163,232,133,209,89,168"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="403,262,576,287"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="351,272,389,272,389,277,351,277"/>
+<area shape="poly" id="edge9_Node000007_Node000007" title=" " alt="" coords="456,264,448,254,452,244,466,238,489,235,518,239,529,248,526,252,516,244,489,241,467,243,456,247,454,253,460,260"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="624,262,769,287"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="576,272,610,272,610,277,576,277"/>
+<area shape="poly" id="edge8_Node000008_Node000008" title=" " alt="" coords="663,264,656,254,659,244,673,238,697,235,725,239,737,248,733,252,723,244,697,241,675,243,663,247,661,253,667,260"/>
+</map>

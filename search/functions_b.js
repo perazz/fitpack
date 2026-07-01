@@ -6,10 +6,10 @@ var searchData=
   ['parcur_5fcomm_5fpack_3',['parcur_comm_pack',['../namespacefitpack__parametric__curves.html#a0301e07e54f825f003a95a895fd4e703',1,'fitpack_parametric_curves']]],
   ['parcur_5fcomm_5fsize_4',['parcur_comm_size',['../namespacefitpack__parametric__curves.html#a27cc5949043793919847bec44b813caf',1,'fitpack_parametric_curves']]],
   ['parcur_5ffit_5fleast_5fsquares_5',['parcur_fit_least_squares',['../namespacefitpack__parametric__curves.html#a6f11eaa020c4e7a71174b8a4fa3f05ad',1,'fitpack_parametric_curves']]],
-  ['parder_6',['parder',['../namespacefitpack__core.html#a01477d82a007d0853de3bc8247ef8c27',1,'fitpack_core']]],
+  ['parder_6',['parder',['../namespacefitpack__core.html#ada64d2701a6d6972021eef11dd739c8c',1,'fitpack_core']]],
   ['parder_5fc_7',['parder_c',['../namespacefitpack__core__c.html#a9039b6d640734923b1e07146fb4097f2',1,'fitpack_core_c']]],
-  ['pardeu_8',['pardeu',['../namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba',1,'fitpack_core']]],
-  ['pardtc_9',['pardtc',['../namespacefitpack__core.html#ae277d8a029f43ac5702946468c8bd54f',1,'fitpack_core']]],
+  ['pardeu_8',['pardeu',['../namespacefitpack__core.html#a4dcc3ba5bf005644f88135b432881f54',1,'fitpack_core']]],
+  ['pardtc_9',['pardtc',['../namespacefitpack__core.html#a2df12892dbdee9d252798a1ac71e517e',1,'fitpack_core']]],
   ['parsur_10',['parsur',['../namespacefitpack__core.html#a900e08c9d4a7e79e93c9c25c80ad967b',1,'fitpack_core']]],
   ['parsur_5fc_11',['parsur_c',['../namespacefitpack__core__c.html#a85eb44989bddccc3a4b7b8654bf7bb78',1,'fitpack_core_c']]],
   ['parsurf_5fcomm_5fexpand_12',['parsurf_comm_expand',['../namespacefitpack__parametric__surfaces.html#ad4158ebf4a444ae0e4f89f81df65245e',1,'fitpack_parametric_surfaces']]],
@@ -34,5 +34,5 @@ var searchData=
   ['polr_5ffit_5fleast_5fsquares_31',['polr_fit_least_squares',['../namespacefitpack__gridded__polar.html#ae12e732a1972aac2984e2586d413089f',1,'fitpack_gridded_polar']]],
   ['polr_5fnew_5ffit_32',['polr_new_fit',['../namespacefitpack__polar__domains.html#aade5d2c37b54c50acc3301144d185249',1,'fitpack_polar_domains']]],
   ['polr_5fnew_5ffrom_5fpoints_33',['polr_new_from_points',['../structfitpack__polar__domains_1_1fitpack__polar.html#aad7ae0d07ba7850c35ab5d605c02a694',1,'fitpack_polar_domains::fitpack_polar::polr_new_from_points()'],['../namespacefitpack__polar__domains.html#ab87954e5439cd167ce02409ecdf31c90',1,'fitpack_polar_domains::polr_new_from_points()']]],
-  ['profil_34',['profil',['../namespacefitpack__core.html#a7ea4ba8b0cda533eb078e95b28d782db',1,'fitpack_core']]]
+  ['profil_34',['profil',['../namespacefitpack__core.html#aca69c8d7519a73e88f9a148c44bfd09d',1,'fitpack_core']]]
 ];

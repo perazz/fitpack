@@ -1,5 +1,5 @@
 <map id="fitpack_core::fpndsp" name="fitpack_core::fpndsp">
-<area shape="rect" id="Node000001" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="5,141,159,166"/>
+<area shape="rect" id="Node000001" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="5,141,159,166"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="209,5,363,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,138,142,99,205,55,216,49,219,54,208,60,146,103,99,142"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="209,69,363,109"/>

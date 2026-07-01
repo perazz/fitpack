@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_surfaces::fitpack_grid_surface::dfdx_ongrid" name="fitpack_gridded_surfaces::fitpack_grid_surface::dfdx_ongrid">
+<area shape="rect" id="Node000001" title="Evaluate derivatives at given coordinates." alt="" coords="5,5,189,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__surfaces.html#ae605ac62fb4c1c2631800094801dd946" title="Evaluate partial derivatives on a rectangular grid." alt="" coords="237,13,452,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,30,224,30,224,35,189,35"/>
+</map>

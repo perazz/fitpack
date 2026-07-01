@@ -1,0 +1,13 @@
+<map id="fitpack_core::dblint" name="fitpack_core::dblint">
+<area shape="rect" id="Node000001" title="Integral of a tensor&#45;product spline over an axis&#45;aligned box (any dimension)." alt="" coords="5,57,152,83"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="409,29,555,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,55,157,44,200,35,301,29,395,32,395,37,301,34,200,41,158,49,119,60"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="200,50,355,90"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="152,67,186,67,186,73,152,73"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#aaa4be60a77a5e3a8b9e0013517b221b2" title="Compute definite integrals of the normalized B&#45;splines." alt="" coords="204,115,351,140"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="124,80,220,108,219,113,123,85"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="449,31,442,21,445,11,459,5,482,3,510,6,522,16,518,20,508,11,482,8,460,10,449,15,447,20,453,28"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="319,112,354,100,443,59,445,63,356,104,321,117"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="403,107,561,147"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="351,125,389,125,389,130,351,130"/>
+</map>

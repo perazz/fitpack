@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_splines::grid_derivatives_many" name="fitpack_gridded_splines::grid_derivatives_many">
+<area shape="rect" id="Node000001" title="Evaluate partial derivatives of order nu(:) at scattered points (delegates to pardeu)." alt="" coords="5,5,184,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__splines.html#a96bc9262b32953b7a5ae744e09d8d151" title="Ensure the persistent workspace covers a peripheral evaluation with per&#45;axis grids of up to maxm poin..." alt="" coords="232,5,451,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,23,218,23,218,28,184,28"/>
+</map>

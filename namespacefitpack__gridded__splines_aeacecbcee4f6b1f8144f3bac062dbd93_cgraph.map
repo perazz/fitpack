@@ -2,7 +2,7 @@
 <area shape="rect" id="Node000001" title="Load new gridded data. z is assumed&#45;rank: a rank&#45;d array (2 &lt;= d &lt;= MAX_IDIM) whose shape gives the p..." alt="" coords="5,69,180,109"/>
 <area shape="rect" id="Node000002" href="$namespacefitpack__gridded__splines.html#ab80f648e673b3bde31f34de75b5c2dce" title="Return the flat row&#45;major (axis&#45;1&#45;slowest) value buffer from a column&#45;major flatten...." alt="" coords="235,5,410,45"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,67,237,46,238,52,166,72"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the fit workspace to regrid&#39;s requirement for the current dims/order/nest/grid...." alt="" coords="228,69,417,109"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the persistent workspace, maximally, so it is allocated only once, at spline construction...." alt="" coords="228,69,417,109"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,87,214,87,214,92,181,92"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__gridded__splines.html#ad68972f8286c8bef9ad943142a88b1da" title="Map a rank&#45;d array shape to per&#45;axis domain sizes, honouring the row_major flag. row_major=...." alt="" coords="235,133,410,173"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,107,238,127,237,132,165,112"/>

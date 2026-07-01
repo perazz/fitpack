@@ -4,7 +4,7 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,466,243,433,269,424,271,429,245,438,155,471"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="244,447,451,472"/>
 <area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="196,475,230,471,231,476,197,480"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the fit workspace to regrid&#39;s requirement for the current dims/order/nest/grid...." alt="" coords="253,497,442,537"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the persistent workspace, maximally, so it is allocated only once, at spline construction...." alt="" coords="253,497,442,537"/>
 <area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="197,497,239,502,239,507,196,502"/>
 <area shape="rect" id="Node000005" href="$namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="274,561,421,587"/>
 <area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="146,506,245,546,276,555,274,560,243,551,144,511"/>

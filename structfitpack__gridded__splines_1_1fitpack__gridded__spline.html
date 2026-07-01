@@ -113,6 +113,7 @@ $(function(){initNavTree('structfitpack__gridded__splines_1_1fitpack__gridded__s
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="structfitpack__gridded__splines_1_1fitpack__gridded__spline-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">fitpack_gridded_splines::fitpack_gridded_spline Type Reference</div></div>
 </div><!--header-->
@@ -164,6 +165,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a519f5e608699902b08153f8c86c0ee55" id="r_a519f5e608699902b08153f8c86c0ee55"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a519f5e608699902b08153f8c86c0ee55">eval_ongrid</a> (this, <a class="el" href="#aacd6864bcdbd71638c7dca0b590f3e26">xg</a>, <a class="el" href="#a79e7829f1440a39c7d9397d7641e8e6d">m</a>, ierr)</td></tr>
 <tr class="memdesc:a519f5e608699902b08153f8c86c0ee55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the fitted spline on a rectangular grid (delegates to ndspev).  <br /></td></tr>
 <tr class="separator:a519f5e608699902b08153f8c86c0ee55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a157e77e762cc3444ee3f5a22c1b5c76c" id="r_a157e77e762cc3444ee3f5a22c1b5c76c"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a157e77e762cc3444ee3f5a22c1b5c76c">eval</a> (this, x, ierr)</td></tr>
+<tr class="memdesc:a157e77e762cc3444ee3f5a22c1b5c76c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid.  <br /></td></tr>
+<tr class="separator:a157e77e762cc3444ee3f5a22c1b5c76c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3466d1af16cf9bfeede53281ca2cd313" id="r_a3466d1af16cf9bfeede53281ca2cd313"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3466d1af16cf9bfeede53281ca2cd313">eval</a> (this, xp, ierr)</td></tr>
+<tr class="memdesc:a3466d1af16cf9bfeede53281ca2cd313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the fitted spline at scattered points (delegates to ndspeu).  <br /></td></tr>
+<tr class="separator:a3466d1af16cf9bfeede53281ca2cd313"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0646e3111d585c2b59a78550824ea76" id="r_ad0646e3111d585c2b59a78550824ea76"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0646e3111d585c2b59a78550824ea76">dfdx_ongrid</a> (this, <a class="el" href="#aacd6864bcdbd71638c7dca0b590f3e26">xg</a>, <a class="el" href="#a79e7829f1440a39c7d9397d7641e8e6d">m</a>, nu, ierr)</td></tr>
+<tr class="memdesc:ad0646e3111d585c2b59a78550824ea76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partial derivatives of order nu(:) on a rectangular grid (parder)  <br /></td></tr>
+<tr class="separator:ad0646e3111d585c2b59a78550824ea76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa03e585cae6373a65703db53bd1d5f4" id="r_afa03e585cae6373a65703db53bd1d5f4"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa03e585cae6373a65703db53bd1d5f4">dfdx</a> (this, x, nu, ierr)</td></tr>
+<tr class="memdesc:afa03e585cae6373a65703db53bd1d5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partial derivatives of order nu(:) at scattered points (pardeu)  <br /></td></tr>
+<tr class="separator:afa03e585cae6373a65703db53bd1d5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5843f1a34a4dedba7971d2a8049af42c" id="r_a5843f1a34a4dedba7971d2a8049af42c"><td class="memItemLeft" align="right" valign="top">generic&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5843f1a34a4dedba7971d2a8049af42c">dfdx</a> (this, xp, nu, ierr)</td></tr>
+<tr class="memdesc:a5843f1a34a4dedba7971d2a8049af42c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives of order <code>nu(:)</code> at scattered points (delegates to pardeu).  <br /></td></tr>
+<tr class="separator:a5843f1a34a4dedba7971d2a8049af42c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40b970a967a212c60680359fb3239574" id="r_a40b970a967a212c60680359fb3239574"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40b970a967a212c60680359fb3239574">integral</a> (this, lower, upper)</td></tr>
+<tr class="memdesc:a40b970a967a212c60680359fb3239574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integral over a box [lower(d),upper(d)] (dblint)  <br /></td></tr>
+<tr class="separator:a40b970a967a212c60680359fb3239574"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac33cafba2dd8a961aa91c76397501165" id="r_ac33cafba2dd8a961aa91c76397501165"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac33cafba2dd8a961aa91c76397501165">cross_section</a> (this, ax, u, ierr)</td></tr>
+<tr class="memdesc:ac33cafba2dd8a961aa91c76397501165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cross-section: fix one axis to obtain a (dims-1)-D spline (profil)  <br /></td></tr>
+<tr class="separator:ac33cafba2dd8a961aa91c76397501165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c9f25c501f70f7b42ef86a8a2e97645" id="r_a4c9f25c501f70f7b42ef86a8a2e97645"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c9f25c501f70f7b42ef86a8a2e97645">derivative_spline</a> (this, nu, ierr)</td></tr>
+<tr class="memdesc:a4c9f25c501f70f7b42ef86a8a2e97645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partial-derivative spline: reduced degrees, trimmed knots (pardtc)  <br /></td></tr>
+<tr class="separator:a4c9f25c501f70f7b42ef86a8a2e97645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67249c9aceaa70a0dd9bbaa162daaa19" id="r_a67249c9aceaa70a0dd9bbaa162daaa19"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67249c9aceaa70a0dd9bbaa162daaa19">comm_size</a> (this)</td></tr>
 <tr class="memdesc:a67249c9aceaa70a0dd9bbaa162daaa19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel communication.  <br /></td></tr>
 <tr class="separator:a67249c9aceaa70a0dd9bbaa162daaa19"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -247,6 +272,21 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a40e456707e34524cb2b4d80d7b2ac3b7 inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter" id="r_a79e872bcc881c071816f4a9560b7991a"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfitpack__fitters_1_1fitpack__fitter.html#a79e872bcc881c071816f4a9560b7991a">iwrk</a></td></tr>
 <tr class="separator:a79e872bcc881c071816f4a9560b7991a inherit pub_attribs_structfitpack__fitters_1_1fitpack__fitter"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a3421c323d8986e0b5b626d25e6601963" id="r_a3421c323d8986e0b5b626d25e6601963"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3421c323d8986e0b5b626d25e6601963">grid_eval_one</a> (this, x, ierr)</td></tr>
+<tr class="memdesc:a3421c323d8986e0b5b626d25e6601963"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid.  <br /></td></tr>
+<tr class="separator:a3421c323d8986e0b5b626d25e6601963"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca496e57922c3525d47181e8b19d9be5" id="r_aca496e57922c3525d47181e8b19d9be5"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca496e57922c3525d47181e8b19d9be5">grid_eval_many</a> (this, xp, ierr)</td></tr>
+<tr class="memdesc:aca496e57922c3525d47181e8b19d9be5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the fitted spline at scattered points (delegates to ndspeu).  <br /></td></tr>
+<tr class="separator:aca496e57922c3525d47181e8b19d9be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5fdae8a1b3ee415db74e475cd17ed18" id="r_aa5fdae8a1b3ee415db74e475cd17ed18"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5fdae8a1b3ee415db74e475cd17ed18">grid_derivatives_one</a> (this, x, nu, ierr)</td></tr>
+<tr class="memdesc:aa5fdae8a1b3ee415db74e475cd17ed18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Partial derivatives of order nu(:) at scattered points (pardeu)  <br /></td></tr>
+<tr class="separator:aa5fdae8a1b3ee415db74e475cd17ed18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4616d6a423caf24761c2d6de6db6b48" id="r_ac4616d6a423caf24761c2d6de6db6b48"><td class="memItemLeft" align="right" valign="top">procedure, private&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4616d6a423caf24761c2d6de6db6b48">grid_derivatives_many</a> (this, xp, nu, ierr)</td></tr>
+<tr class="memdesc:ac4616d6a423caf24761c2d6de6db6b48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate partial derivatives of order <code>nu(:)</code> at scattered points (delegates to pardeu).  <br /></td></tr>
+<tr class="separator:ac4616d6a423caf24761c2d6de6db6b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Tensor-product gridded smoothing-spline fitter for any domain dimension. </p>
@@ -316,6 +356,76 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac33cafba2dd8a961aa91c76397501165" name="ac33cafba2dd8a961aa91c76397501165"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac33cafba2dd8a961aa91c76397501165">&#9670;&#160;</a></span>cross_section()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_gridded_splines::fitpack_gridded_spline::cross_section </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ax</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>u</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cross-section: fix one axis to obtain a (dims-1)-D spline (profil) </p>
+<p>The result is a fully-formed, evaluable <code><a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html" title="Tensor-product gridded smoothing-spline fitter for any domain dimension.">fitpack_gridded_spline</a></code> over the surviving axes (in their original relative order). Like the 2-D <code>cross_section</code> it carries only the spline (knots/degrees/ coefficients/bounds), not a data grid, so it is eval-only.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ax</td><td>Axis to fix, <code>1 &lt;= ax &lt;= dims</code> (requires <code>dims &gt;= 2</code>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Value at which axis <code>ax</code> is fixed. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4c9f25c501f70f7b42ef86a8a2e97645" name="a4c9f25c501f70f7b42ef86a8a2e97645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c9f25c501f70f7b42ef86a8a2e97645">&#9670;&#160;</a></span>derivative_spline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_gridded_splines::fitpack_gridded_spline::derivative_spline </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Partial-derivative spline: reduced degrees, trimmed knots (pardtc) </p>
+
+</div>
+</div>
 <a id="aba641b01e17d9920e09b1b5f71b3da08" name="aba641b01e17d9920e09b1b5f71b3da08"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aba641b01e17d9920e09b1b5f71b3da08">&#9670;&#160;</a></span>destroy()</h2>
 
@@ -335,6 +445,245 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="afa03e585cae6373a65703db53bd1d5f4" name="afa03e585cae6373a65703db53bd1d5f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa03e585cae6373a65703db53bd1d5f4">&#9670;&#160;</a></span>dfdx() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_gridded_splines::fitpack_gridded_spline::dfdx </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Partial derivatives of order nu(:) at scattered points (pardeu) </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__gridded__splines_1_1fitpack__gridded__spline_afa03e585cae6373a65703db53bd1d5f4_cgraph.png" border="0" usemap="#astructfitpack__gridded__splines_1_1fitpack__gridded__spline_afa03e585cae6373a65703db53bd1d5f4_cgraph" alt=""/></div>
+<map name="astructfitpack__gridded__splines_1_1fitpack__gridded__spline_afa03e585cae6373a65703db53bd1d5f4_cgraph" id="astructfitpack__gridded__splines_1_1fitpack__gridded__spline_afa03e585cae6373a65703db53bd1d5f4_cgraph">
+<area shape="rect" title="Partial derivatives of order nu(:) at scattered points (pardeu)" alt="" coords="5,5,219,45"/>
+<area shape="rect" href="namespacefitpack__gridded__splines.html#a7c917cf07fa796537e9131b75bba3649" title="Evaluate partial derivatives of order nu(:) at scattered points (delegates to pardeu)." alt="" coords="489,5,668,45"/>
+<area shape="poly" title=" " alt="" coords="219,20,267,19,441,19,476,19,476,25,441,24,267,24,219,25"/>
+<area shape="rect" href="namespacefitpack__gridded__splines.html#ae08148e96ec368047dacb4a6cc83c7f9" title="Evaluate a partial derivative of order nu(:) at a single point x(1:dims)." alt="" coords="267,33,441,73"/>
+<area shape="poly" title=" " alt="" coords="219,35,253,39,253,44,219,40"/>
+<area shape="rect" href="namespacefitpack__gridded__splines.html#a96bc9262b32953b7a5ae744e09d8d151" title="Ensure the persistent workspace covers a peripheral evaluation with per&#45;axis grids of up to maxm poin..." alt="" coords="716,5,935,45"/>
+<area shape="poly" title=" " alt="" coords="668,23,702,23,702,28,668,28"/>
+<area shape="poly" title=" " alt="" coords="441,40,476,35,476,41,442,45"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a5843f1a34a4dedba7971d2a8049af42c" name="a5843f1a34a4dedba7971d2a8049af42c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5843f1a34a4dedba7971d2a8049af42c">&#9670;&#160;</a></span>dfdx() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_gridded_splines::fitpack_gridded_spline::dfdx </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate partial derivatives of order <code>nu(:)</code> at scattered points (delegates to pardeu). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xp</td><td>Point coordinates, <code>xp(d,i)</code> = axis-<code>d</code> coordinate of point <code>i</code> (shape <code>(dims,m)</code>, point <code>i</code> = contiguous column <code>xp(:,i)</code>). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad0646e3111d585c2b59a78550824ea76" name="ad0646e3111d585c2b59a78550824ea76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0646e3111d585c2b59a78550824ea76">&#9670;&#160;</a></span>dfdx_ongrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_gridded_splines::fitpack_gridded_spline::dfdx_ongrid </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Partial derivatives of order nu(:) on a rectangular grid (parder) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis evaluation grids, <code><a class="el" href="#aacd6864bcdbd71638c7dca0b590f3e26">xg(1:m(d),d)</a></code> strictly increasing. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Per-axis grid sizes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Per-axis derivative orders, <code>0 &lt;= nu(d) &lt; <a class="el" href="#af3aa52ef523f8ba789497c5a17f2c010" title="Per-axis spline degree.">order(d)</a></code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>f Flat row-major derivative values, length <code>product(m)</code>. </dd></dl>
+
+</div>
+</div>
+<a id="a157e77e762cc3444ee3f5a22c1b5c76c" name="a157e77e762cc3444ee3f5a22c1b5c76c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a157e77e762cc3444ee3f5a22c1b5c76c">&#9670;&#160;</a></span>eval() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_gridded_splines::fitpack_gridded_spline::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid. </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfitpack__gridded__splines_1_1fitpack__gridded__spline_a157e77e762cc3444ee3f5a22c1b5c76c_cgraph.png" border="0" usemap="#astructfitpack__gridded__splines_1_1fitpack__gridded__spline_a157e77e762cc3444ee3f5a22c1b5c76c_cgraph" alt=""/></div>
+<map name="astructfitpack__gridded__splines_1_1fitpack__gridded__spline_a157e77e762cc3444ee3f5a22c1b5c76c_cgraph" id="astructfitpack__gridded__splines_1_1fitpack__gridded__spline_a157e77e762cc3444ee3f5a22c1b5c76c_cgraph">
+<area shape="rect" title="Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid." alt="" coords="5,123,217,163"/>
+<area shape="rect" href="namespacefitpack__gridded__splines.html#aede30361852f45696ee9f98a2633cbad" title="Evaluate the fitted spline at scattered points (delegates to ndspeu)." alt="" coords="488,123,663,163"/>
+<area shape="poly" title=" " alt="" coords="217,137,265,136,440,136,474,137,474,142,440,141,265,141,217,142"/>
+<area shape="rect" href="namespacefitpack__gridded__splines.html#a777088652dc6d51c67f38dd77acbfab2" title="Evaluate the fitted spline at a single point x(1:dims)." alt="" coords="265,151,440,191"/>
+<area shape="poly" title=" " alt="" coords="218,152,252,156,251,162,217,158"/>
+<area shape="rect" href="namespacefitpack__core.html#a2df24a0ee6fecec68ea6b06ee1f28e08" title="Dispatch an error code: return it to caller or halt with a message." alt="" coords="712,93,865,133"/>
+<area shape="poly" title=" " alt="" coords="663,128,698,123,699,128,663,133"/>
+<area shape="rect" href="namespacefitpack__core.html#aa9b85afb382e9b5cdfb4c5ccbb918421" title="Evaluate a tensor&#45;product spline at scattered points (any dimension)." alt="" coords="711,158,867,183"/>
+<area shape="poly" title=" " alt="" coords="663,151,698,156,697,161,663,157"/>
+<area shape="rect" href="namespacefitpack__core.html#acecd9e9bd2b5f16cc9ba6d0263b275c5" title="Convert an integer error flag to a human&#45;readable message string." alt="" coords="915,5,1068,45"/>
+<area shape="poly" title=" " alt="" coords="833,91,914,55,929,48,931,53,916,60,835,96"/>
+<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="915,93,1068,133"/>
+<area shape="poly" title=" " alt="" coords="866,111,901,111,901,116,866,116"/>
+<area shape="poly" title=" " alt="" coords="953,94,951,84,957,75,971,69,991,67,1015,70,1028,77,1025,82,1013,75,991,72,972,74,960,79,956,85,958,92"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="915,158,1068,183"/>
+<area shape="poly" title=" " alt="" coords="867,168,901,168,901,173,867,173"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="1118,23,1273,63"/>
+<area shape="poly" title=" " alt="" coords="1044,156,1066,143,1082,126,1090,109,1098,91,1114,73,1121,68,1124,72,1118,77,1103,94,1095,111,1086,129,1070,147,1046,160"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="1118,87,1273,127"/>
+<area shape="poly" title=" " alt="" coords="1032,155,1117,128,1119,133,1034,160"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="1118,151,1273,191"/>
+<area shape="poly" title=" " alt="" coords="1068,168,1104,168,1104,173,1068,173"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="1116,215,1275,255"/>
+<area shape="poly" title=" " alt="" coords="1034,181,1119,208,1117,213,1032,186"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="1121,279,1270,305"/>
+<area shape="poly" title=" " alt="" coords="1008,182,1054,222,1117,264,1134,272,1132,277,1115,269,1051,226,1004,186"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="1323,279,1496,305"/>
+<area shape="poly" title=" " alt="" coords="1271,289,1309,289,1309,295,1271,295"/>
+<area shape="poly" title=" " alt="" coords="1376,281,1368,271,1372,261,1386,255,1409,253,1438,256,1449,265,1446,270,1436,261,1409,258,1387,260,1376,265,1374,270,1380,278"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1544,279,1689,305"/>
+<area shape="poly" title=" " alt="" coords="1496,289,1530,289,1530,295,1496,295"/>
+<area shape="poly" title=" " alt="" coords="1583,281,1576,271,1579,261,1593,255,1617,253,1645,256,1657,265,1653,270,1643,261,1617,258,1595,260,1583,265,1581,270,1587,278"/>
+<area shape="poly" title=" " alt="" coords="440,157,474,153,475,158,441,162"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a3466d1af16cf9bfeede53281ca2cd313" name="a3466d1af16cf9bfeede53281ca2cd313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3466d1af16cf9bfeede53281ca2cd313">&#9670;&#160;</a></span>eval() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">generic fitpack_gridded_splines::fitpack_gridded_spline::eval </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate the fitted spline at scattered points (delegates to ndspeu). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xp</td><td>Point coordinates, <code>xp(d,i)</code> = axis-<code>d</code> coordinate of point <code>i</code> (shape <code>(dims,m)</code>, point <code>i</code> = contiguous column <code>xp(:,i)</code>; matches curev/parcur layout). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>f Spline values at the <code>m</code> points. </dd></dl>
+
+</div>
+</div>
 <a id="a519f5e608699902b08153f8c86c0ee55" name="a519f5e608699902b08153f8c86c0ee55"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a519f5e608699902b08153f8c86c0ee55">&#9670;&#160;</a></span>eval_ongrid()</h2>
 
@@ -344,7 +693,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">procedure fitpack_gridded_splines::fitpack_gridded_spline::eval_ongrid </td>
           <td>(</td>
-          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -402,6 +751,202 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Fit a smoothing spline with automatic knot placement (delegates to regrid). </p>
+
+</div>
+</div>
+<a id="ac4616d6a423caf24761c2d6de6db6b48" name="ac4616d6a423caf24761c2d6de6db6b48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4616d6a423caf24761c2d6de6db6b48">&#9670;&#160;</a></span>grid_derivatives_many()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_gridded_splines::fitpack_gridded_spline::grid_derivatives_many </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate partial derivatives of order <code>nu(:)</code> at scattered points (delegates to pardeu). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xp</td><td>Point coordinates, <code>xp(d,i)</code> = axis-<code>d</code> coordinate of point <code>i</code> (shape <code>(dims,m)</code>, point <code>i</code> = contiguous column <code>xp(:,i)</code>). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa5fdae8a1b3ee415db74e475cd17ed18" name="aa5fdae8a1b3ee415db74e475cd17ed18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5fdae8a1b3ee415db74e475cd17ed18">&#9670;&#160;</a></span>grid_derivatives_one()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_gridded_splines::fitpack_gridded_spline::grid_derivatives_one </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Partial derivatives of order nu(:) at scattered points (pardeu) </p>
+
+</div>
+</div>
+<a id="aca496e57922c3525d47181e8b19d9be5" name="aca496e57922c3525d47181e8b19d9be5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca496e57922c3525d47181e8b19d9be5">&#9670;&#160;</a></span>grid_eval_many()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_gridded_splines::fitpack_gridded_spline::grid_eval_many </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate the fitted spline at scattered points (delegates to ndspeu). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xp</td><td>Point coordinates, <code>xp(d,i)</code> = axis-<code>d</code> coordinate of point <code>i</code> (shape <code>(dims,m)</code>, point <code>i</code> = contiguous column <code>xp(:,i)</code>; matches curev/parcur layout). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ierr</td><td>Optional error flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>f Spline values at the <code>m</code> points. </dd></dl>
+
+</div>
+</div>
+<a id="a3421c323d8986e0b5b626d25e6601963" name="a3421c323d8986e0b5b626d25e6601963"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3421c323d8986e0b5b626d25e6601963">&#9670;&#160;</a></span>grid_eval_one()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure, private fitpack_gridded_splines::fitpack_gridded_spline::grid_eval_one </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="namespacefitpack__core.html#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out), optional</td>          <td class="paramname"><span class="paramname"><em>ierr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate at scattered points x(i,d) (ndspeu). For gridded output use eval_ongrid. </p>
+
+</div>
+</div>
+<a id="a40b970a967a212c60680359fb3239574" name="a40b970a967a212c60680359fb3239574"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40b970a967a212c60680359fb3239574">&#9670;&#160;</a></span>integral()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure fitpack_gridded_splines::fitpack_gridded_spline::integral </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="structfitpack__gridded__splines_1_1fitpack__gridded__spline.html">fitpack_gridded_spline</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>this</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>lower</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="namespacefitpack__core.html#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>upper</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Integral over a box [lower(d),upper(d)] (dblint) </p>
 
 </div>
 </div>

@@ -29,9 +29,6 @@ var annotated_dup =
       [ "comm_size_if", "interfacefitpack__fitters_1_1comm__size__if.html", "interfacefitpack__fitters_1_1comm__size__if" ],
       [ "fitpack_fitter", "structfitpack__fitters_1_1fitpack__fitter.html", "structfitpack__fitters_1_1fitpack__fitter" ]
     ] ],
-    [ "fitpack_grid_surfaces", "namespacefitpack__grid__surfaces.html", [
-      [ "fitpack_grid_surface", "structfitpack__grid__surfaces_1_1fitpack__grid__surface.html", "structfitpack__grid__surfaces_1_1fitpack__grid__surface" ]
-    ] ],
     [ "fitpack_gridded_polar", "namespacefitpack__gridded__polar.html", [
       [ "fitpack_grid_polar", "structfitpack__gridded__polar_1_1fitpack__grid__polar.html", "structfitpack__gridded__polar_1_1fitpack__grid__polar" ]
     ] ],
@@ -40,6 +37,9 @@ var annotated_dup =
     ] ],
     [ "fitpack_gridded_splines", "namespacefitpack__gridded__splines.html", [
       [ "fitpack_gridded_spline", "structfitpack__gridded__splines_1_1fitpack__gridded__spline.html", "structfitpack__gridded__splines_1_1fitpack__gridded__spline" ]
+    ] ],
+    [ "fitpack_gridded_surfaces", "namespacefitpack__gridded__surfaces.html", [
+      [ "fitpack_grid_surface", "structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html", "structfitpack__gridded__surfaces_1_1fitpack__grid__surface" ]
     ] ],
     [ "fitpack_parametric_curves", "namespacefitpack__parametric__curves.html", [
       [ "fitpack_closed_curve", "structfitpack__parametric__curves_1_1fitpack__closed__curve.html", null ],

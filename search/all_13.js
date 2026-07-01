@@ -11,10 +11,10 @@ var searchData=
   ['parcur_5fcomm_5fpack_8',['parcur_comm_pack',['../namespacefitpack__parametric__curves.html#a0301e07e54f825f003a95a895fd4e703',1,'fitpack_parametric_curves']]],
   ['parcur_5fcomm_5fsize_9',['parcur_comm_size',['../namespacefitpack__parametric__curves.html#a27cc5949043793919847bec44b813caf',1,'fitpack_parametric_curves']]],
   ['parcur_5ffit_5fleast_5fsquares_10',['parcur_fit_least_squares',['../namespacefitpack__parametric__curves.html#a6f11eaa020c4e7a71174b8a4fa3f05ad',1,'fitpack_parametric_curves']]],
-  ['parder_11',['parder',['../namespacefitpack__core.html#a01477d82a007d0853de3bc8247ef8c27',1,'fitpack_core']]],
+  ['parder_11',['parder',['../namespacefitpack__core.html#ada64d2701a6d6972021eef11dd739c8c',1,'fitpack_core']]],
   ['parder_5fc_12',['parder_c',['../namespacefitpack__core__c.html#a9039b6d640734923b1e07146fb4097f2',1,'fitpack_core_c']]],
-  ['pardeu_13',['pardeu',['../namespacefitpack__core.html#a1fd21985777d3dd9a85782026ff7aeba',1,'fitpack_core']]],
-  ['pardtc_14',['pardtc',['../namespacefitpack__core.html#ae277d8a029f43ac5702946468c8bd54f',1,'fitpack_core']]],
+  ['pardeu_13',['pardeu',['../namespacefitpack__core.html#a4dcc3ba5bf005644f88135b432881f54',1,'fitpack_core']]],
+  ['pardtc_14',['pardtc',['../namespacefitpack__core.html#a2df12892dbdee9d252798a1ac71e517e',1,'fitpack_core']]],
   ['parsur_15',['parsur',['../namespacefitpack__core.html#a900e08c9d4a7e79e93c9c25c80ad967b',1,'fitpack_core']]],
   ['parsur_5fc_16',['parsur_c',['../namespacefitpack__core__c.html#a85eb44989bddccc3a4b7b8654bf7bb78',1,'fitpack_core_c']]],
   ['parsurf_5fcomm_5fexpand_17',['parsurf_comm_expand',['../namespacefitpack__parametric__surfaces.html#ad4158ebf4a444ae0e4f89f81df65245e',1,'fitpack_parametric_surfaces']]],
@@ -84,7 +84,7 @@ var searchData=
   ['product_20splines_81',['Tensor Product Splines',['../theory_surface_fitting.html#autotoc_md49',1,'']]],
   ['product_20structure_82',['Kronecker Product Structure',['../theory_surface_fitting.html#autotoc_md57',1,'']]],
   ['products_20for_20bivariate_20splines_83',['Tensor Products for Bivariate Splines',['../theory_bsplines.html#autotoc_md29',1,'']]],
-  ['profil_84',['profil',['../namespacefitpack__core.html#a7ea4ba8b0cda533eb078e95b28d782db',1,'fitpack_core']]],
+  ['profil_84',['profil',['../namespacefitpack__core.html#aca69c8d7519a73e88f9a148c44bfd09d',1,'fitpack_core']]],
   ['programming_20formulation_85',['Quadratic Programming Formulation',['../theory_curve_fitting.html#autotoc_md47',1,'']]],
   ['properties_86',['Key properties',['../theory_bsplines.html#autotoc_md23',1,'']]]
 ];

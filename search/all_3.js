@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['569_0',['Recurrence for degree  \_form#569',['../theory_bsplines.html#autotoc_md22',1,'']]]
+  ['556_0',['Recurrence for degree  \_form#556',['../theory_bsplines.html#autotoc_md22',1,'']]]
 ];

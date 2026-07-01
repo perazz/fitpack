@@ -1,0 +1,10 @@
+<map id="fitpack_gridded_splines::fitpack_gridded_spline::dfdx" name="fitpack_gridded_splines::fitpack_gridded_spline::dfdx">
+<area shape="rect" id="Node000001" title="Partial derivatives of order nu(:) at scattered points (pardeu)" alt="" coords="5,5,219,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__splines.html#a7c917cf07fa796537e9131b75bba3649" title="Evaluate partial derivatives of order nu(:) at scattered points (delegates to pardeu)." alt="" coords="489,5,668,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,20,267,19,441,19,476,19,476,25,441,24,267,24,219,25"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__gridded__splines.html#ae08148e96ec368047dacb4a6cc83c7f9" title="Evaluate a partial derivative of order nu(:) at a single point x(1:dims)." alt="" coords="267,33,441,73"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="219,35,253,39,253,44,219,40"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__gridded__splines.html#a96bc9262b32953b7a5ae744e09d8d151" title="Ensure the persistent workspace covers a peripheral evaluation with per&#45;axis grids of up to maxm poin..." alt="" coords="716,5,935,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="668,23,702,23,702,28,668,28"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="441,40,476,35,476,41,442,45"/>
+</map>

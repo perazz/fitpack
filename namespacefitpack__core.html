@@ -160,9 +160,6 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:ab0ebd1c826f330de0103ba72e55260ba" id="r_ab0ebd1c826f330de0103ba72e55260ba"><td class="memItemLeft" align="right" valign="top">elemental logical(<a class="el" href="#a650e5831ebea638e634b52942aae265c">fp_bool</a>) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0ebd1c826f330de0103ba72e55260ba">fitpack_success</a> (ierr)</td></tr>
 <tr class="memdesc:ab0ebd1c826f330de0103ba72e55260ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test whether a FITPACK error flag indicates success.  <br /></td></tr>
 <tr class="separator:ab0ebd1c826f330de0103ba72e55260ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fc6de0b9389c7699809c138e0cb8604" id="r_a7fc6de0b9389c7699809c138e0cb8604"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fc6de0b9389c7699809c138e0cb8604">bispeu</a> (tx, nx, ty, ny, c, kx, ky, x, y, z, m, wrk, lwrk, ier)</td></tr>
-<tr class="memdesc:a7fc6de0b9389c7699809c138e0cb8604"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a bivariate spline at scattered points \( (x_i, y_i) \).  <br /></td></tr>
-<tr class="separator:a7fc6de0b9389c7699809c138e0cb8604"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac8fa7ec692eb2758290f050c302d22d" id="r_aac8fa7ec692eb2758290f050c302d22d"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d">bispev</a> (tx, nx, ty, ny, c, kx, ky, x, mx, y, my, z, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:aac8fa7ec692eb2758290f050c302d22d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a bivariate spline on a rectangular grid.  <br /></td></tr>
 <tr class="separator:aac8fa7ec692eb2758290f050c302d22d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,9 +184,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:ac65af4d46ed853e0bfe2274ea2660b0f" id="r_ac65af4d46ed853e0bfe2274ea2660b0f"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac65af4d46ed853e0bfe2274ea2660b0f">curfit</a> (iopt, m, x, y, w, xb, xe, k, s, nest, n, t, c, fp, wrk, lwrk, iwrk, ier)</td></tr>
 <tr class="memdesc:ac65af4d46ed853e0bfe2274ea2660b0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine a smooth spline approximation of degree \( k \) to a set of data points.  <br /></td></tr>
 <tr class="separator:ac65af4d46ed853e0bfe2274ea2660b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad87800d8674963f83316e6a9a6c9cce" id="r_aad87800d8674963f83316e6a9a6c9cce"><td class="memItemLeft" align="right" valign="top">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad87800d8674963f83316e6a9a6c9cce">dblint</a> (tx, nx, ty, ny, c, kx, ky, xb, xe, yb, ye, wrk)</td></tr>
-<tr class="memdesc:aad87800d8674963f83316e6a9a6c9cce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the double integral of a bivariate spline over a rectangle.  <br /></td></tr>
-<tr class="separator:aad87800d8674963f83316e6a9a6c9cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47a39601be6f179193f5d0a7fa3ef571" id="r_a47a39601be6f179193f5d0a7fa3ef571"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a47a39601be6f179193f5d0a7fa3ef571">dblint</a> (dims, t, n, c, k, xb, xe)</td></tr>
+<tr class="memdesc:a47a39601be6f179193f5d0a7fa3ef571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integral of a tensor-product spline over an axis-aligned box (any dimension).  <br /></td></tr>
+<tr class="separator:a47a39601be6f179193f5d0a7fa3ef571"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe28377d1376dd629fcd34340fd3949b" id="r_afe28377d1376dd629fcd34340fd3949b"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe28377d1376dd629fcd34340fd3949b">evapol</a> (tu, nu, tv, nv, c, rad, x, y)</td></tr>
 <tr class="memdesc:afe28377d1376dd629fcd34340fd3949b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a polar spline \( f(x,y) = s(u,v) \) at a Cartesian point.  <br /></td></tr>
 <tr class="separator:afe28377d1376dd629fcd34340fd3949b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,15 +211,15 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:acc0e64bf7c182c225873ce2bfac77ab1" id="r_acc0e64bf7c182c225873ce2bfac77ab1"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc0e64bf7c182c225873ce2bfac77ab1">fpbfou</a> (t, n, par, ress, resc)</td></tr>
 <tr class="memdesc:acc0e64bf7c182c225873ce2bfac77ab1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute Fourier coefficients of cubic B-splines.  <br /></td></tr>
 <tr class="separator:acc0e64bf7c182c225873ce2bfac77ab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eb67a6a12dce3e101d8caa8383986b2" id="r_a4eb67a6a12dce3e101d8caa8383986b2"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4eb67a6a12dce3e101d8caa8383986b2">fpbisp</a> (tx, nx, ty, ny, c, kx, ky, x, mx, y, my, z)</td></tr>
-<tr class="memdesc:a4eb67a6a12dce3e101d8caa8383986b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).  <br /></td></tr>
-<tr class="separator:a4eb67a6a12dce3e101d8caa8383986b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7b6bebee71853d91e4222e3fa85a245" id="r_ae7b6bebee71853d91e4222e3fa85a245"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae7b6bebee71853d91e4222e3fa85a245">fpndsp</a> (dims, t, n, c, k, xg, m, z, w, lidx)</td></tr>
-<tr class="memdesc:ae7b6bebee71853d91e4222e3fa85a245"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.  <br /></td></tr>
+<tr class="memdesc:ae7b6bebee71853d91e4222e3fa85a245"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a tensor-product spline on a grid (any dimension; bispev's kernel).  <br /></td></tr>
 <tr class="separator:ae7b6bebee71853d91e4222e3fa85a245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94c6ca65ab6cbcc12363d2548e466103" id="r_a94c6ca65ab6cbcc12363d2548e466103"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94c6ca65ab6cbcc12363d2548e466103">ndspev</a> (dims, t, n, c, k, xg, m, z, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:a94c6ca65ab6cbcc12363d2548e466103"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-D generalization of bispev: evaluate a tensor-product spline on a grid.  <br /></td></tr>
 <tr class="separator:a94c6ca65ab6cbcc12363d2548e466103"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9b85afb382e9b5cdfb4c5ccbb918421" id="r_aa9b85afb382e9b5cdfb4c5ccbb918421"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa9b85afb382e9b5cdfb4c5ccbb918421">ndspeu</a> (dims, t, n, c, k, xg, m, z, ier)</td></tr>
+<tr class="memdesc:aa9b85afb382e9b5cdfb4c5ccbb918421"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a tensor-product spline at scattered points (any dimension).  <br /></td></tr>
+<tr class="separator:aa9b85afb382e9b5cdfb4c5ccbb918421"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5fb8acceffae7a31a838c1d7ff97d31" id="r_ac5fb8acceffae7a31a838c1d7ff97d31"><td class="memItemLeft" align="right" valign="top">pure real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, dimension(<a class="el" href="#a6c5b21fc23625ebfc7f555075c13eb07">max_order</a>+1)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5fb8acceffae7a31a838c1d7ff97d31">fpbspl</a> (t, n, k, x, l)</td></tr>
 <tr class="memdesc:ac5fb8acceffae7a31a838c1d7ff97d31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the non-zero B-splines at a given point.  <br /></td></tr>
 <tr class="separator:ac5fb8acceffae7a31a838c1d7ff97d31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -418,15 +415,15 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:ae2ad7fd4cae431c05938a167488df6f0" id="r_ae2ad7fd4cae431c05938a167488df6f0"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2ad7fd4cae431c05938a167488df6f0">parcur</a> (iopt, ipar, idim, m, u, mx, x, w, ub, ue, k, s, nest, n, t, nc, c, fp, wrk, lwrk, iwrk, ier)</td></tr>
 <tr class="memdesc:ae2ad7fd4cae431c05938a167488df6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine a smooth parametric spline curve approximation.  <br /></td></tr>
 <tr class="separator:ae2ad7fd4cae431c05938a167488df6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01477d82a007d0853de3bc8247ef8c27" id="r_a01477d82a007d0853de3bc8247ef8c27"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01477d82a007d0853de3bc8247ef8c27">parder</a> (tx, nx, ty, ny, c, kx, ky, nux, nuy, x, mx, y, my, z, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
-<tr class="memdesc:a01477d82a007d0853de3bc8247ef8c27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative of a bivariate spline on a rectangular grid.  <br /></td></tr>
-<tr class="separator:a01477d82a007d0853de3bc8247ef8c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fd21985777d3dd9a85782026ff7aeba" id="r_a1fd21985777d3dd9a85782026ff7aeba"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fd21985777d3dd9a85782026ff7aeba">pardeu</a> (tx, nx, ty, ny, c, kx, ky, nux, nuy, x, y, z, m, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
-<tr class="memdesc:a1fd21985777d3dd9a85782026ff7aeba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative of a bivariate spline at scattered points.  <br /></td></tr>
-<tr class="separator:a1fd21985777d3dd9a85782026ff7aeba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae277d8a029f43ac5702946468c8bd54f" id="r_ae277d8a029f43ac5702946468c8bd54f"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae277d8a029f43ac5702946468c8bd54f">pardtc</a> (tx, nx, ty, ny, c, kx, ky, nux, nuy, newc, ier)</td></tr>
-<tr class="memdesc:ae277d8a029f43ac5702946468c8bd54f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform B-spline coefficients to obtain the partial derivative spline.  <br /></td></tr>
-<tr class="separator:ae277d8a029f43ac5702946468c8bd54f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2df12892dbdee9d252798a1ac71e517e" id="r_a2df12892dbdee9d252798a1ac71e517e"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2df12892dbdee9d252798a1ac71e517e">pardtc</a> (dims, t, n, c, k, nu, newc, ier)</td></tr>
+<tr class="memdesc:a2df12892dbdee9d252798a1ac71e517e"><td class="mdescLeft">&#160;</td><td class="mdescRight">B-spline coefficients of a partial-derivative spline (any dimension).  <br /></td></tr>
+<tr class="separator:a2df12892dbdee9d252798a1ac71e517e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada64d2701a6d6972021eef11dd739c8c" id="r_ada64d2701a6d6972021eef11dd739c8c"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada64d2701a6d6972021eef11dd739c8c">parder</a> (dims, t, n, c, k, nu, xg, m, z, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
+<tr class="memdesc:ada64d2701a6d6972021eef11dd739c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative of a tensor-product spline on a grid (any dimension).  <br /></td></tr>
+<tr class="separator:ada64d2701a6d6972021eef11dd739c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dcc3ba5bf005644f88135b432881f54" id="r_a4dcc3ba5bf005644f88135b432881f54"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4dcc3ba5bf005644f88135b432881f54">pardeu</a> (dims, t, n, c, k, nu, xg, m, z, wrk, lwrk, ier)</td></tr>
+<tr class="memdesc:a4dcc3ba5bf005644f88135b432881f54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a partial derivative of a tensor-product spline at scattered points (any dimension).  <br /></td></tr>
+<tr class="separator:a4dcc3ba5bf005644f88135b432881f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a900e08c9d4a7e79e93c9c25c80ad967b" id="r_a900e08c9d4a7e79e93c9c25c80ad967b"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a900e08c9d4a7e79e93c9c25c80ad967b">parsur</a> (iopt, ipar, idim, mu, u, mv, v, f, s, nuest, nvest, nu, tu, nv, tv, c, fp, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:a900e08c9d4a7e79e93c9c25c80ad967b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a smooth parametric surface to gridded data.  <br /></td></tr>
 <tr class="separator:a900e08c9d4a7e79e93c9c25c80ad967b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -439,9 +436,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a406065ef7b15f1380c2759e9650355f2" id="r_a406065ef7b15f1380c2759e9650355f2"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a406065ef7b15f1380c2759e9650355f2">polar</a> (iopt, m, x, y, z, w, rad, s, nuest, nvest, eps, nu, tu, nv, tv, u, v, c, fp, wrk1, lwrk1, wrk2, lwrk2, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:a406065ef7b15f1380c2759e9650355f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a smooth bivariate spline to scattered data on a polar domain.  <br /></td></tr>
 <tr class="separator:a406065ef7b15f1380c2759e9650355f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ea4ba8b0cda533eb078e95b28d782db" id="r_a7ea4ba8b0cda533eb078e95b28d782db"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ea4ba8b0cda533eb078e95b28d782db">profil</a> (iopt, tx, nx, ty, ny, c, kx, ky, u, nu, cu, ier)</td></tr>
-<tr class="memdesc:a7ea4ba8b0cda533eb078e95b28d782db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract a cross-section (profile) of a bivariate spline.  <br /></td></tr>
-<tr class="separator:a7ea4ba8b0cda533eb078e95b28d782db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca69c8d7519a73e88f9a148c44bfd09d" id="r_aca69c8d7519a73e88f9a148c44bfd09d"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca69c8d7519a73e88f9a148c44bfd09d">profil</a> (ax, dims, t, n, c, k, u, cu, ier)</td></tr>
+<tr class="memdesc:aca69c8d7519a73e88f9a148c44bfd09d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cross-section of a tensor-product spline: fix one axis (any dimension).  <br /></td></tr>
+<tr class="separator:aca69c8d7519a73e88f9a148c44bfd09d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3f1f98998618d10983c93ca4b5614d3" id="r_af3f1f98998618d10983c93ca4b5614d3"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3f1f98998618d10983c93ca4b5614d3">regrid</a> (iopt, dims, m, xg, z, lo, hi, k, s, nest, n, t, c, fp, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
 <tr class="memdesc:af3f1f98998618d10983c93ca4b5614d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tensor-product gridded smoothing-spline fit driver for any domain dimension <code>dims</code>.  <br /></td></tr>
 <tr class="separator:af3f1f98998618d10983c93ca4b5614d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -584,6 +581,8 @@ Variables</h2></td></tr>
 <tr class="separator:a979a930a27067e89d9a12cdfa770887e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acea3d2d817763c46755c944d4ea72a24" id="r_acea3d2d817763c46755c944d4ea72a24"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acea3d2d817763c46755c944d4ea72a24">max_idim</a> = 10</td></tr>
 <tr class="separator:acea3d2d817763c46755c944d4ea72a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba15b82b58840b6b08392e1877557c02" id="r_aba15b82b58840b6b08392e1877557c02"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), dimension(<a class="el" href="#acea3d2d817763c46755c944d4ea72a24">max_idim</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba15b82b58840b6b08392e1877557c02">idims</a> = [1,2,3,4,5,6,7,8,9,10]</td></tr>
+<tr class="separator:aba15b82b58840b6b08392e1877557c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae335f58a7994bbafd5ff9cfb81d1e7fb" id="r_ae335f58a7994bbafd5ff9cfb81d1e7fb"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae335f58a7994bbafd5ff9cfb81d1e7fb">knot_dim_none</a> = 0</td></tr>
 <tr class="separator:ae335f58a7994bbafd5ff9cfb81d1e7fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d8475ed3cb1c0bfccef4ca66ef6bf59" id="r_a1d8475ed3cb1c0bfccef4ca66ef6bf59"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d8475ed3cb1c0bfccef4ca66ef6bf59">knot_dim_1</a> = 1</td></tr>
@@ -694,138 +693,6 @@ Variables</h2></td></tr>
 <tr class="separator:ab1ef41e135e2b19a4fef06743624081d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function/Subroutine Documentation</h2>
-<a id="a7fc6de0b9389c7699809c138e0cb8604" name="a7fc6de0b9389c7699809c138e0cb8604"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7fc6de0b9389c7699809c138e0cb8604">&#9670;&#160;</a></span>bispeu()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine, public fitpack_core::bispeu </td>
-          <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(lwrk), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>wrk</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>lwrk</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Evaluate a bivariate spline at scattered points \( (x_i, y_i) \). </p>
-<p>Given a bivariate spline \( s(x,y) \) of degrees \( k_x \) and \( k_y \) in tensor-product B-spline representation, evaluates \( s(x_i, y_i) \) for \( i = 1,\ldots,m \) at arbitrary (scattered) points.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx</td><td>Knot positions in \( x \)-direction (length \( n_x \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx</td><td>Total number of knots in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ty</td><td>Knot positions in \( y \)-direction (length \( n_y \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ny</td><td>Total number of knots in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx</td><td>Degree in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ky</td><td>Degree in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>\( x \)-coordinates of evaluation points (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>\( y \)-coordinates of evaluation points (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Spline values \( s(x_i, y_i) \) (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points, \( m \ge 1 \). </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">wrk</td><td>Real workspace, length \( \ge k_x + k_y + 2 \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lwrk</td><td>Declared dimension of <code>wrk</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>Error flag: <code>0</code> = normal return; <code>10</code> = invalid input.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> — grid evaluation variant; <a class="el" href="#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).">fpbisp</a> — tensor-product evaluation kernel </dd></dl>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_a7fc6de0b9389c7699809c138e0cb8604_cgraph.png" border="0" usemap="#anamespacefitpack__core_a7fc6de0b9389c7699809c138e0cb8604_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_a7fc6de0b9389c7699809c138e0cb8604_cgraph" id="anamespacefitpack__core_a7fc6de0b9389c7699809c138e0cb8604_cgraph">
-<area shape="rect" title="Evaluate a bivariate spline at scattered points ." alt="" coords="5,141,157,166"/>
-<area shape="rect" href="namespacefitpack__core.html#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="205,141,355,166"/>
-<area shape="poly" title=" " alt="" coords="158,151,192,151,192,156,158,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="403,141,556,166"/>
-<area shape="poly" title=" " alt="" coords="355,151,389,151,389,156,355,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="606,5,761,45"/>
-<area shape="poly" title=" " alt="" coords="493,138,540,99,603,55,614,49,616,54,605,60,543,103,496,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="606,69,761,109"/>
-<area shape="poly" title=" " alt="" coords="520,138,605,111,607,116,522,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="606,133,761,173"/>
-<area shape="poly" title=" " alt="" coords="556,151,592,151,592,156,556,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="604,197,763,237"/>
-<area shape="poly" title=" " alt="" coords="522,164,607,191,605,196,520,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="609,262,758,287"/>
-<area shape="poly" title=" " alt="" coords="496,164,542,205,605,247,622,255,620,260,603,252,539,209,492,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="811,262,984,287"/>
-<area shape="poly" title=" " alt="" coords="759,272,797,272,797,277,759,277"/>
-<area shape="poly" title=" " alt="" coords="864,264,856,254,860,244,874,238,897,235,926,239,937,248,934,252,924,244,897,241,875,243,864,247,862,253,868,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1032,262,1177,287"/>
-<area shape="poly" title=" " alt="" coords="984,272,1018,272,1018,277,984,277"/>
-<area shape="poly" title=" " alt="" coords="1071,264,1064,254,1067,244,1081,238,1105,235,1133,239,1145,248,1141,252,1131,244,1105,241,1083,243,1071,247,1069,253,1075,260"/>
-</map>
-</div>
-
-</div>
-</div>
 <a id="aac8fa7ec692eb2758290f050c302d22d" name="aac8fa7ec692eb2758290f050c302d22d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aac8fa7ec692eb2758290f050c302d22d">&#9670;&#160;</a></span>bispev()</h2>
 
@@ -929,26 +796,24 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="namespacefitpack__core_aac8fa7ec692eb2758290f050c302d22d_cgraph.png" border="0" usemap="#anamespacefitpack__core_aac8fa7ec692eb2758290f050c302d22d_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_aac8fa7ec692eb2758290f050c302d22d_cgraph" id="anamespacefitpack__core_aac8fa7ec692eb2758290f050c302d22d_cgraph">
 <area shape="rect" title="Evaluate a bivariate spline on a rectangular grid." alt="" coords="5,141,157,166"/>
-<area shape="rect" href="namespacefitpack__core.html#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="205,141,355,166"/>
-<area shape="poly" title=" " alt="" coords="158,151,192,151,192,156,158,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="403,141,556,166"/>
-<area shape="poly" title=" " alt="" coords="355,151,389,151,389,156,355,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="606,5,761,45"/>
-<area shape="poly" title=" " alt="" coords="493,138,540,99,603,55,614,49,616,54,605,60,543,103,496,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="606,69,761,109"/>
-<area shape="poly" title=" " alt="" coords="520,138,605,111,607,116,522,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="606,133,761,173"/>
-<area shape="poly" title=" " alt="" coords="556,151,592,151,592,156,556,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="604,197,763,237"/>
-<area shape="poly" title=" " alt="" coords="522,164,607,191,605,196,520,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="609,262,758,287"/>
-<area shape="poly" title=" " alt="" coords="496,164,542,205,605,247,622,255,620,260,603,252,539,209,492,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="811,262,984,287"/>
-<area shape="poly" title=" " alt="" coords="759,272,797,272,797,277,759,277"/>
-<area shape="poly" title=" " alt="" coords="864,264,856,254,860,244,874,238,897,235,926,239,937,248,934,252,924,244,897,241,875,243,864,247,862,253,868,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1032,262,1177,287"/>
-<area shape="poly" title=" " alt="" coords="984,272,1018,272,1018,277,984,277"/>
-<area shape="poly" title=" " alt="" coords="1071,264,1064,254,1067,244,1081,238,1105,235,1133,239,1145,248,1141,252,1131,244,1105,241,1083,243,1071,247,1069,253,1075,260"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="205,141,359,166"/>
+<area shape="poly" title=" " alt="" coords="158,151,191,151,191,156,158,156"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="409,5,563,45"/>
+<area shape="poly" title=" " alt="" coords="295,138,342,99,405,55,416,49,419,54,408,60,346,103,299,142"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="409,69,563,109"/>
+<area shape="poly" title=" " alt="" coords="323,138,408,111,409,116,324,143"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="409,133,563,173"/>
+<area shape="poly" title=" " alt="" coords="359,151,395,151,395,156,359,156"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="407,197,565,237"/>
+<area shape="poly" title=" " alt="" coords="324,164,409,191,408,196,323,169"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="411,262,561,287"/>
+<area shape="poly" title=" " alt="" coords="298,164,345,205,408,247,425,255,423,260,405,252,342,209,295,168"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="613,262,787,287"/>
+<area shape="poly" title=" " alt="" coords="561,272,600,272,600,277,561,277"/>
+<area shape="poly" title=" " alt="" coords="666,264,659,254,663,244,677,238,700,235,729,239,740,248,737,252,726,244,700,241,678,243,667,247,664,253,670,260"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="835,262,980,287"/>
+<area shape="poly" title=" " alt="" coords="787,272,821,272,821,277,787,277"/>
+<area shape="poly" title=" " alt="" coords="874,264,866,254,870,244,884,238,907,235,936,239,947,248,944,252,934,244,907,241,885,243,874,247,872,253,878,260"/>
 </map>
 </div>
 
@@ -2105,110 +1970,82 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="aad87800d8674963f83316e6a9a6c9cce" name="aad87800d8674963f83316e6a9a6c9cce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad87800d8674963f83316e6a9a6c9cce">&#9670;&#160;</a></span>dblint()</h2>
+<a id="a47a39601be6f179193f5d0a7fa3ef571" name="a47a39601be6f179193f5d0a7fa3ef571"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47a39601be6f179193f5d0a7fa3ef571">&#9670;&#160;</a></span>dblint()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, public fitpack_core::dblint </td>
+          <td class="memname">pure real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>) function, public fitpack_core::dblint </td>
           <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xb</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xb</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xe</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>yb</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ye</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx+ny-kx-ky-2), intent(out)</td>          <td class="paramname"><span class="paramname"><em>wrk</em></span>&#160;)</td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xe</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Compute the double integral of a bivariate spline over a rectangle. </p>
-<p>Calculates \( \int_{x_b}^{x_e} \int_{y_b}^{y_e} s(x,y)\,dx\,dy \) for a bivariate spline of degrees \( k_x \) and \( k_y \) in tensor-product B-spline representation. The spline is considered identically zero outside its support rectangle \( (t^x_{k_x+1}, t^x_{n_x-k_x}) \times (t^y_{k_y+1}, t^y_{n_y-k_y}) \).</p>
+<p>Integral of a tensor-product spline over an axis-aligned box (any dimension). </p>
+<p>Computes \( \int_{xb_1}^{xe_1}\!\cdots\!\int_{xb_d}^{xe_d} s(x_1,\ldots,x_d)\,dx_1\cdots dx_d \). The box integral is separable: with \( s=\sum_{\mathbf i} c_{\mathbf i}\prod_d N^{(d)}_{i_d} \) it factors into a product of 1-D B-spline integrals per axis contracted against the coefficient tensor. Each per-axis integral vector is produced by <code>fpintb</code>; the contraction reuses the fpndsp odometer. At <code>dims=2</code> the terms and their accumulation order reduce to the classic bivariate box integral.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx</td><td>Knot positions in \( x \) (length \( n_x \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx</td><td>Total number of knots in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ty</td><td>Knot positions in \( y \) (length \( n_y \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ny</td><td>Total number of knots in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx</td><td>Degree in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ky</td><td>Degree in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">xb</td><td>Left boundary of integration in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">xe</td><td>Right boundary of integration in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">yb</td><td>Lower boundary of integration in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ye</td><td>Upper boundary of integration in \( y \). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">wrk</td><td>Workspace (length \( \ge n_x + n_y - k_x - k_y - 2 \)). On exit, contains integrals of normalized B-splines in each direction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis varies slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xb</td><td>Per-axis lower integration limits, <code>xb(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xe</td><td>Per-axis upper integration limits, <code>xe(dims)</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The double integral \( \iint s(x,y)\,dx\,dy \).</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a7125f23ea644bcee0719e6279126b038" title="Compute the definite integral of a spline  over .">splint</a> — univariate integral; <a class="el" href="#aaa4be60a77a5e3a8b9e0013517b221b2" title="Compute definite integrals of the normalized B-splines.">fpintb</a> — B-spline integration </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>res Value of the box integral</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a47a39601be6f179193f5d0a7fa3ef571" title="Integral of a tensor-product spline over an axis-aligned box (any dimension).">dblint</a>, <a class="el" href="#aaa4be60a77a5e3a8b9e0013517b221b2" title="Compute definite integrals of the normalized B-splines.">fpintb</a>; todo/fitpack_nd_grids.md </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_aad87800d8674963f83316e6a9a6c9cce_cgraph.png" border="0" usemap="#anamespacefitpack__core_aad87800d8674963f83316e6a9a6c9cce_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_aad87800d8674963f83316e6a9a6c9cce_cgraph" id="anamespacefitpack__core_aad87800d8674963f83316e6a9a6c9cce_cgraph">
-<area shape="rect" title="Compute the double integral of a bivariate spline over a rectangle." alt="" coords="5,55,152,80"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="401,29,547,55"/>
-<area shape="poly" title=" " alt="" coords="152,60,387,45,388,50,152,65"/>
-<area shape="rect" href="namespacefitpack__core.html#aaa4be60a77a5e3a8b9e0013517b221b2" title="Compute definite integrals of the normalized B&#45;splines." alt="" coords="200,80,347,105"/>
-<area shape="poly" title=" " alt="" coords="152,74,187,79,186,84,152,79"/>
-<area shape="poly" title=" " alt="" coords="441,31,434,21,438,11,451,5,474,3,502,6,513,16,510,20,500,11,474,8,453,10,442,15,439,20,445,28"/>
-<area shape="poly" title=" " alt="" coords="324,77,409,55,411,61,325,82"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="395,79,553,119"/>
-<area shape="poly" title=" " alt="" coords="347,92,381,94,381,99,347,98"/>
+<div class="center"><img src="namespacefitpack__core_a47a39601be6f179193f5d0a7fa3ef571_cgraph.png" border="0" usemap="#anamespacefitpack__core_a47a39601be6f179193f5d0a7fa3ef571_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a47a39601be6f179193f5d0a7fa3ef571_cgraph" id="anamespacefitpack__core_a47a39601be6f179193f5d0a7fa3ef571_cgraph">
+<area shape="rect" title="Integral of a tensor&#45;product spline over an axis&#45;aligned box (any dimension)." alt="" coords="5,57,152,83"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="409,29,555,55"/>
+<area shape="poly" title=" " alt="" coords="117,55,157,44,200,35,301,29,395,32,395,37,301,34,200,41,158,49,119,60"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="200,50,355,90"/>
+<area shape="poly" title=" " alt="" coords="152,67,186,67,186,73,152,73"/>
+<area shape="rect" href="namespacefitpack__core.html#aaa4be60a77a5e3a8b9e0013517b221b2" title="Compute definite integrals of the normalized B&#45;splines." alt="" coords="204,115,351,140"/>
+<area shape="poly" title=" " alt="" coords="124,80,220,108,219,113,123,85"/>
+<area shape="poly" title=" " alt="" coords="449,31,442,21,445,11,459,5,482,3,510,6,522,16,518,20,508,11,482,8,460,10,449,15,447,20,453,28"/>
+<area shape="poly" title=" " alt="" coords="319,112,354,100,443,59,445,63,356,104,321,117"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="403,107,561,147"/>
+<area shape="poly" title=" " alt="" coords="351,125,389,125,389,130,351,130"/>
 </map>
 </div>
 
@@ -2325,26 +2162,24 @@ Here is the call graph for this function:</div>
 <area shape="rect" title="Evaluate a polar spline &#160;at a Cartesian point." alt="" coords="5,141,159,166"/>
 <area shape="rect" href="namespacefitpack__core.html#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid." alt="" coords="207,141,359,166"/>
 <area shape="poly" title=" " alt="" coords="159,151,193,151,193,156,159,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="407,141,556,166"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="407,141,560,166"/>
 <area shape="poly" title=" " alt="" coords="359,151,393,151,393,156,359,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="604,141,757,166"/>
-<area shape="poly" title=" " alt="" coords="556,151,590,151,590,156,556,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="807,5,962,45"/>
-<area shape="poly" title=" " alt="" coords="694,138,741,99,804,55,815,49,818,54,807,60,744,103,698,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="807,69,962,109"/>
-<area shape="poly" title=" " alt="" coords="721,138,806,111,808,116,723,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="807,133,962,173"/>
-<area shape="poly" title=" " alt="" coords="758,151,794,151,794,156,758,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="805,197,964,237"/>
-<area shape="poly" title=" " alt="" coords="723,164,808,191,806,196,721,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="810,262,959,287"/>
-<area shape="poly" title=" " alt="" coords="697,164,743,205,807,247,823,255,821,260,804,252,740,209,694,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="1012,262,1185,287"/>
-<area shape="poly" title=" " alt="" coords="960,272,998,272,998,277,960,277"/>
-<area shape="poly" title=" " alt="" coords="1065,264,1058,254,1061,244,1075,238,1099,235,1127,239,1139,248,1135,252,1125,244,1099,241,1077,243,1065,247,1063,253,1069,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1233,262,1379,287"/>
-<area shape="poly" title=" " alt="" coords="1186,272,1220,272,1220,277,1186,277"/>
-<area shape="poly" title=" " alt="" coords="1272,264,1265,254,1269,244,1283,238,1306,235,1335,239,1346,248,1343,252,1332,244,1306,241,1284,243,1273,247,1270,253,1276,260"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="610,5,765,45"/>
+<area shape="poly" title=" " alt="" coords="497,138,544,99,607,55,618,49,620,54,609,60,547,103,500,142"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="610,69,765,109"/>
+<area shape="poly" title=" " alt="" coords="524,138,609,111,611,116,526,143"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="610,133,765,173"/>
+<area shape="poly" title=" " alt="" coords="560,151,596,151,596,156,560,156"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="608,197,767,237"/>
+<area shape="poly" title=" " alt="" coords="526,164,611,191,609,196,524,169"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="613,262,762,287"/>
+<area shape="poly" title=" " alt="" coords="500,164,546,205,609,247,626,255,624,260,607,252,543,209,496,168"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="815,262,988,287"/>
+<area shape="poly" title=" " alt="" coords="763,272,801,272,801,277,763,277"/>
+<area shape="poly" title=" " alt="" coords="868,264,860,254,864,244,878,238,901,235,930,239,941,248,938,252,928,244,901,241,879,243,868,247,866,253,872,260"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1036,262,1181,287"/>
+<area shape="poly" title=" " alt="" coords="988,272,1022,272,1022,277,988,277"/>
+<area shape="poly" title=" " alt="" coords="1075,264,1068,254,1071,244,1085,238,1109,235,1137,239,1149,248,1145,252,1135,244,1109,241,1087,243,1075,247,1073,253,1079,260"/>
 </map>
 </div>
 
@@ -4783,127 +4618,6 @@ Here is the call graph for this function:</div>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="425,79,571,104"/>
 <area shape="poly" title=" " alt="" coords="378,89,412,89,412,94,378,94"/>
 <area shape="poly" title=" " alt="" coords="464,80,457,70,461,60,475,54,498,52,527,56,538,65,535,69,524,61,498,57,476,59,465,64,462,70,468,77"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a4eb67a6a12dce3e101d8caa8383986b2" name="a4eb67a6a12dce3e101d8caa8383986b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4eb67a6a12dce3e101d8caa8383986b2">&#9670;&#160;</a></span>fpbisp()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine fitpack_core::fpbisp </td>
-          <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>mx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(my), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>my</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mx*my), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp). </p>
-<p>Computes \( s(x_i, y_j) \) on the grid \( i=1,\ldots,m_x;\, j=1,\ldots,m_y \) for a bivariate spline of degrees \( k_x, k_y \). Since slice 6 this is a thin adapter: it marshals the split 2-D arguments (tx/ty, x/y, kx/ky) into the N-D column layout and defers the basis build + tensor contraction to fpndsp, the single evaluation kernel. At dims=2 fpndsp reproduces the former in-line 2-D contraction bit-for-bit (locked by gate A). The per-axis basis tables are automatic locals here, so no caller scratch is needed.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx,ty</td><td>Per-axis knot vectors, lengths <code>nx</code>, <code>ny</code> </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx,ny</td><td>Number of knots per axis </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x-k_x-1)(n_y-k_y-1) \) </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx,ky</td><td>Spline degree per axis </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x,y</td><td>Per-axis evaluation points, lengths <code>mx</code>, <code>my</code> </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mx,my</td><td>Number of evaluation points per axis </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Spline values, row-major: \( z((i-1) m_y + j) = s(x_i, y_j) \)</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#ae7b6bebee71853d91e4222e3fa85a245" title="N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.">fpndsp</a>, <a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a>; Dierckx, Ch. 2, §2.1.2 (pp. 28-30), Eq. 2.14-2.17 </dd></dl>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_a4eb67a6a12dce3e101d8caa8383986b2_cgraph.png" border="0" usemap="#anamespacefitpack__core_a4eb67a6a12dce3e101d8caa8383986b2_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_a4eb67a6a12dce3e101d8caa8383986b2_cgraph" id="anamespacefitpack__core_a4eb67a6a12dce3e101d8caa8383986b2_cgraph">
-<area shape="rect" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="5,141,155,166"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="203,141,356,166"/>
-<area shape="poly" title=" " alt="" coords="155,151,189,151,189,156,155,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="406,5,561,45"/>
-<area shape="poly" title=" " alt="" coords="293,138,340,99,403,55,414,49,416,54,405,60,343,103,296,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="406,69,561,109"/>
-<area shape="poly" title=" " alt="" coords="320,138,405,111,407,116,322,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="406,133,561,173"/>
-<area shape="poly" title=" " alt="" coords="356,151,392,151,392,156,356,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="404,197,563,237"/>
-<area shape="poly" title=" " alt="" coords="322,164,407,191,405,196,320,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="409,262,558,287"/>
-<area shape="poly" title=" " alt="" coords="296,164,342,205,405,247,422,255,420,260,403,252,339,209,292,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="611,262,784,287"/>
-<area shape="poly" title=" " alt="" coords="559,272,597,272,597,277,559,277"/>
-<area shape="poly" title=" " alt="" coords="664,264,656,254,660,244,674,238,697,235,726,239,737,248,734,252,724,244,697,241,675,243,664,247,662,253,668,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="832,262,977,287"/>
-<area shape="poly" title=" " alt="" coords="784,272,818,272,818,277,784,277"/>
-<area shape="poly" title=" " alt="" coords="871,264,864,254,867,244,881,238,905,235,933,239,945,248,941,252,931,244,905,241,883,243,871,247,869,253,875,260"/>
 </map>
 </div>
 
@@ -8615,7 +8329,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>N-D generalization of fpbisp: evaluate a tensor-product spline on a grid. </p>
+<p>Evaluate a tensor-product spline on a grid (any dimension; bispev's kernel). </p>
 <p>Computes the values of a bivariate spline \( s(x, y) \) of degrees \( k_x \) and \( k_y \) at the grid points \( (x_i, y_j) \), \( i = 1, \ldots, m_x \), \( j = 1, \ldots, m_y \).</p>
 <p>The evaluation uses the two-step algorithm: first compute the B-spline basis values in each direction, then assemble:</p>
 <p class="formulaDsp">
@@ -8624,7 +8338,7 @@ Here is the call graph for this function:</div>
               \tag{2.14-2.15}
 \]
 </p>
-<p>At <code>dims=2</code> this is bit-for-bit identical to fpbisp: both the per-axis basis- table build and the evaluation contraction are dimension-generic runtime loops over the <code>dims</code> axes, with the innermost <code>dot_product</code> on the fastest (axis <code>dims</code>, contiguous) coefficient axis as the FP-reassociation anchor. The B-spline values and knot interval indices are stored per axis in workspace arrays <code>w</code> and <code>lidx</code> (one column per axis) for reuse.</p>
+<p>At <code>dims=2</code> this reproduces the classic bivariate contraction bit-for-bit: both the per-axis basis-table build and the evaluation contraction are dimension-generic runtime loops over the <code>dims</code> axes, with the innermost <code>dot_product</code> on the fastest (axis <code>dims</code>, contiguous) coefficient axis as the FP-reassociation anchor. The B-spline values and knot interval indices are stored per axis in workspace arrays <code>w</code> and <code>lidx</code> (one column per axis) for reuse.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
@@ -8635,18 +8349,18 @@ Here is the call graph for this function:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis evaluation grids; column \( d \) is <code>xg(1:m(d),d)</code> </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points per axis, <code>m(dims)</code> </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Spline values at grid points, flat row-major (first axis varies slowest) </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>Per-axis B-spline basis values, <code>w(m(d),k(d)+1,d)</code> (mirrors fpbisp <code>wx,wy</code>) </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">lidx</td><td>Per-axis knot interval indices, <code>lidx(m(d),d)</code> (mirrors fpbisp <code>lx,ly</code>)</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>Per-axis B-spline basis values, <code>w(k(d)+1,m(d),d)</code> (basis-major, one page per axis) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lidx</td><td>Per-axis knot interval indices, <code>lidx(m(d),d)</code> (one column per axis)</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2-D thin adapter over fpndsp).">fpbisp</a>, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1) </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a>, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1) </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__core_ae7b6bebee71853d91e4222e3fa85a245_cgraph.png" border="0" usemap="#anamespacefitpack__core_ae7b6bebee71853d91e4222e3fa85a245_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_ae7b6bebee71853d91e4222e3fa85a245_cgraph" id="anamespacefitpack__core_ae7b6bebee71853d91e4222e3fa85a245_cgraph">
-<area shape="rect" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="5,141,159,166"/>
+<area shape="rect" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="5,141,159,166"/>
 <area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="209,5,363,45"/>
 <area shape="poly" title=" " alt="" coords="95,138,142,99,205,55,216,49,219,54,208,60,146,103,99,142"/>
 <area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="209,69,363,109"/>
@@ -13740,6 +13454,106 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="aa9b85afb382e9b5cdfb4c5ccbb918421" name="aa9b85afb382e9b5cdfb4c5ccbb918421"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9b85afb382e9b5cdfb4c5ccbb918421">&#9670;&#160;</a></span>ndspeu()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine, public fitpack_core::ndspeu </td>
+          <td>(</td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(1,dims,*), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluate a tensor-product spline at scattered points (any dimension). </p>
+<p>Scattered-point counterpart of ndspev (which evaluates on a rectangular grid). A scattered point is just a degenerate 1x...x1 grid, so each point is handed to the fpndsp kernel with a singleton per-axis grid (one call per point). This keeps a single source of truth for the tensor contraction (fpndsp); at <code>dims=2</code> it reduces to the classic bivariate scattered evaluation. Self-manages its (singleton) basis scratch, so no work arrays are required.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis varies slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Point coordinates, <code>xg(d,i)</code> = axis- \( d \) coordinate of point \( i \), passed column-major (point \( i \) = contiguous column, matching curev/parcur). Declared with a leading singleton node, <code>xg(1,dims,*)</code>, so the slice <code>xg(:,:,i)</code> is already the <code>(1,dims)</code> grid fpndsp reads; callers pass a plain contiguous <code>(dims,m)</code> array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points, \( m \ge 1 \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Spline values at the points, <code>z(m)</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a94c6ca65ab6cbcc12363d2548e466103" title="N-D generalization of bispev: evaluate a tensor-product spline on a grid.">ndspev</a> — gridded variant; <a class="el" href="#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor-product spline on a grid (any dimension; bispev&#39;s kernel).">fpndsp</a> — tensor-product evaluation kernel </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_aa9b85afb382e9b5cdfb4c5ccbb918421_cgraph.png" border="0" usemap="#anamespacefitpack__core_aa9b85afb382e9b5cdfb4c5ccbb918421_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_aa9b85afb382e9b5cdfb4c5ccbb918421_cgraph" id="anamespacefitpack__core_aa9b85afb382e9b5cdfb4c5ccbb918421_cgraph">
+<area shape="rect" title="Evaluate a tensor&#45;product spline at scattered points (any dimension)." alt="" coords="5,141,161,166"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="209,141,363,166"/>
+<area shape="poly" title=" " alt="" coords="161,151,195,151,195,156,161,156"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="413,5,567,45"/>
+<area shape="poly" title=" " alt="" coords="299,138,346,99,409,55,420,49,423,54,412,60,350,103,303,142"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="413,69,567,109"/>
+<area shape="poly" title=" " alt="" coords="327,138,412,111,413,116,328,143"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="413,133,567,173"/>
+<area shape="poly" title=" " alt="" coords="363,151,399,151,399,156,363,156"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="411,197,569,237"/>
+<area shape="poly" title=" " alt="" coords="328,164,413,191,412,196,327,169"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="415,262,565,287"/>
+<area shape="poly" title=" " alt="" coords="302,164,349,205,412,247,429,255,427,260,409,252,346,209,299,168"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="617,262,791,287"/>
+<area shape="poly" title=" " alt="" coords="565,272,604,272,604,277,565,277"/>
+<area shape="poly" title=" " alt="" coords="670,264,663,254,667,244,681,238,704,235,733,239,744,248,741,252,730,244,704,241,682,243,671,247,668,253,674,260"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="839,262,984,287"/>
+<area shape="poly" title=" " alt="" coords="791,272,825,272,825,277,791,277"/>
+<area shape="poly" title=" " alt="" coords="878,264,870,254,874,244,888,238,911,235,940,239,951,248,948,252,938,244,911,241,889,243,878,247,876,253,882,260"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="a94c6ca65ab6cbcc12363d2548e466103" name="a94c6ca65ab6cbcc12363d2548e466103"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a94c6ca65ab6cbcc12363d2548e466103">&#9670;&#160;</a></span>ndspev()</h2>
 
@@ -13815,7 +13629,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>N-D generalization of bispev: evaluate a tensor-product spline on a grid. </p>
-<p>Public flat-workspace front-end to fpndsp (the evaluation kernel). Mirrors bispev: the caller supplies flat real <code>wrk(lwrk)</code> / integer <code>iwrk(kwrk)</code> scratch, which are carved by pointer bounds remapping into the padded per-axis basis table <code>w(maxm,maxk1,dims)</code> and the interval-index matrix <code>lidx(maxm,dims)</code> that fpndsp expects (<code>maxm=maxval(m)</code>, <code>maxk1=maxval(k)+1</code>). At <code>dims=2</code> this is bit-for-bit identical to bispev.</p>
+<p>Public flat-workspace front-end to fpndsp (the evaluation kernel). Mirrors bispev: the caller supplies flat real <code>wrk(lwrk)</code> / integer <code>iwrk(kwrk)</code> scratch, which are carved by pointer bounds remapping into the padded per-axis basis table <code>w(maxk1,maxm,dims)</code> and the interval-index matrix <code>lidx(maxm,dims)</code> that fpndsp expects (<code>maxm=maxval(m)</code>, <code>maxk1=maxval(k)+1</code>). At <code>dims=2</code> this is bit-for-bit identical to bispev.</p>
 <p>Minimum workspace: <code>lwrk &gt;= maxval(m)*(maxval(k)+1)*dims</code>, <code>kwrk &gt;= maxval(m)*dims</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -13835,14 +13649,14 @@ Here is the call graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a>, <a class="el" href="#ae7b6bebee71853d91e4222e3fa85a245" title="N-D generalization of fpbisp: evaluate a tensor-product spline on a grid.">fpndsp</a>; Dierckx Ch. 2 §2.1.2 (pp. 28-30); todo/fitpack_nd_grids.md (slice 5) </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a>, <a class="el" href="#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor-product spline on a grid (any dimension; bispev&#39;s kernel).">fpndsp</a>; Dierckx Ch. 2 §2.1.2 (pp. 28-30); todo/fitpack_nd_grids.md (slice 5) </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefitpack__core_a94c6ca65ab6cbcc12363d2548e466103_cgraph.png" border="0" usemap="#anamespacefitpack__core_a94c6ca65ab6cbcc12363d2548e466103_cgraph" alt=""/></div>
 <map name="anamespacefitpack__core_a94c6ca65ab6cbcc12363d2548e466103_cgraph" id="anamespacefitpack__core_a94c6ca65ab6cbcc12363d2548e466103_cgraph">
 <area shape="rect" title="N&#45;D generalization of bispev: evaluate a tensor&#45;product spline on a grid." alt="" coords="5,141,161,166"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="209,141,363,166"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="209,141,363,166"/>
 <area shape="poly" title=" " alt="" coords="161,151,195,151,195,156,161,156"/>
 <area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="413,5,567,45"/>
 <area shape="poly" title=" " alt="" coords="299,138,346,99,409,55,420,49,423,54,412,60,350,103,303,142"/>
@@ -14228,8 +14042,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a01477d82a007d0853de3bc8247ef8c27" name="a01477d82a007d0853de3bc8247ef8c27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01477d82a007d0853de3bc8247ef8c27">&#9670;&#160;</a></span>parder()</h2>
+<a id="ada64d2701a6d6972021eef11dd739c8c" name="ada64d2701a6d6972021eef11dd739c8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada64d2701a6d6972021eef11dd739c8c">&#9670;&#160;</a></span>parder()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -14237,72 +14051,47 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">pure subroutine, public fitpack_core::parder </td>
           <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nux</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>m</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nuy</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>mx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(my), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>my</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(mx*my), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -14332,43 +14121,69 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate a partial derivative of a bivariate spline on a rectangular grid. </p>
-<p>Computes the partial derivative  \( \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial
-          y^{\nu_y}} s(x,y) \) of a bivariate spline of degrees \( k_x \) and \( k_y \) on the grid \( (x_i, y_j) \),  \( i=1,\ldots,m_x;\ 
-j=1,\ldots,m_y \). </p>
+<p>Evaluate a partial derivative of a tensor-product spline on a grid (any dimension). </p>
+<p>Computes the derivative coefficients via <code>pardtc</code>, then evaluates the resulting reduced-degree spline on the grid through the N-D evaluation front-end <code>ndspev</code>. The flat real workspace is carved into <code>[nc derivative coefficients | ndspev basis scratch]</code>, mirroring 2-D parder.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Derivative order per axis, \( 0 \le \nu_d &lt; k_d \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Per-axis evaluation grids; column \( d \) is <code>xg(1:m(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points per axis, <code>m(dims)</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Derivative values, flat row-major, length <code>product(m)</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">wrk</td><td>Real workspace, length \( \ge \prod_d nk1_d + \max_d m_d\,(\max_d(k_d{-}\nu_d){+}1)\,d \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lwrk</td><td>Declared dimension of <code>wrk</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">iwrk</td><td>Integer workspace, length \( \ge \max_d m_d \cdot dims \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">kwrk</td><td>Declared dimension of <code>iwrk</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#ada64d2701a6d6972021eef11dd739c8c" title="Evaluate a partial derivative of a tensor-product spline on a grid (any dimension).">parder</a>, <a class="el" href="#a2df12892dbdee9d252798a1ac71e517e" title="B-spline coefficients of a partial-derivative spline (any dimension).">pardtc</a>, <a class="el" href="#a94c6ca65ab6cbcc12363d2548e466103" title="N-D generalization of bispev: evaluate a tensor-product spline on a grid.">ndspev</a>; todo/fitpack_nd_grids.md </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_a01477d82a007d0853de3bc8247ef8c27_cgraph.png" border="0" usemap="#anamespacefitpack__core_a01477d82a007d0853de3bc8247ef8c27_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_a01477d82a007d0853de3bc8247ef8c27_cgraph" id="anamespacefitpack__core_a01477d82a007d0853de3bc8247ef8c27_cgraph">
-<area shape="rect" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid." alt="" coords="5,141,156,166"/>
-<area shape="rect" href="namespacefitpack__core.html#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="204,141,353,166"/>
-<area shape="poly" title=" " alt="" coords="156,151,190,151,190,156,156,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="401,141,555,166"/>
-<area shape="poly" title=" " alt="" coords="354,151,388,151,388,156,354,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="605,5,759,45"/>
-<area shape="poly" title=" " alt="" coords="491,138,538,99,601,55,612,49,615,54,604,60,542,103,495,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="605,69,759,109"/>
-<area shape="poly" title=" " alt="" coords="519,138,604,111,605,116,520,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="605,133,759,173"/>
-<area shape="poly" title=" " alt="" coords="555,151,591,151,591,156,555,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="603,197,761,237"/>
-<area shape="poly" title=" " alt="" coords="520,164,605,191,604,196,519,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="607,262,757,287"/>
-<area shape="poly" title=" " alt="" coords="494,164,541,205,604,247,621,255,619,260,601,252,538,209,491,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="809,262,983,287"/>
-<area shape="poly" title=" " alt="" coords="757,272,796,272,796,277,757,277"/>
-<area shape="poly" title=" " alt="" coords="862,264,855,254,859,244,873,238,896,235,925,239,936,248,933,252,922,244,896,241,874,243,863,247,860,253,866,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1031,262,1176,287"/>
-<area shape="poly" title=" " alt="" coords="983,272,1017,272,1017,277,983,277"/>
-<area shape="poly" title=" " alt="" coords="1070,264,1062,254,1066,244,1080,238,1103,235,1132,239,1143,248,1140,252,1130,244,1103,241,1081,243,1070,247,1068,253,1074,260"/>
+<div class="center"><img src="namespacefitpack__core_ada64d2701a6d6972021eef11dd739c8c_cgraph.png" border="0" usemap="#anamespacefitpack__core_ada64d2701a6d6972021eef11dd739c8c_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_ada64d2701a6d6972021eef11dd739c8c_cgraph" id="anamespacefitpack__core_ada64d2701a6d6972021eef11dd739c8c_cgraph">
+<area shape="rect" title="Evaluate a partial derivative of a tensor&#45;product spline on a grid (any dimension)." alt="" coords="5,94,156,119"/>
+<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="205,29,359,69"/>
+<area shape="poly" title=" " alt="" coords="125,91,197,71,199,76,127,97"/>
+<area shape="rect" href="namespacefitpack__core.html#a94c6ca65ab6cbcc12363d2548e466103" title="N&#45;D generalization of bispev: evaluate a tensor&#45;product spline on a grid." alt="" coords="204,147,360,173"/>
+<area shape="poly" title=" " alt="" coords="130,117,221,141,220,146,129,122"/>
+<area shape="rect" href="namespacefitpack__core.html#a2df12892dbdee9d252798a1ac71e517e" title="B&#45;spline coefficients of a partial&#45;derivative spline (any dimension)." alt="" coords="409,93,560,118"/>
+<area shape="poly" title=" " alt="" coords="156,104,396,103,396,108,156,109"/>
+<area shape="poly" title=" " alt="" coords="244,30,242,20,248,11,262,5,282,3,306,6,318,13,316,18,304,11,282,8,263,10,251,15,247,21,249,28"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="408,154,561,179"/>
+<area shape="poly" title=" " alt="" coords="360,160,395,161,394,166,360,165"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="611,20,766,60"/>
+<area shape="poly" title=" " alt="" coords="518,152,560,127,574,113,583,99,592,85,608,70,616,65,619,69,611,74,596,88,587,102,578,116,563,131,520,156"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="611,84,766,124"/>
+<area shape="poly" title=" " alt="" coords="526,151,609,126,611,131,528,157"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="611,148,766,188"/>
+<area shape="poly" title=" " alt="" coords="562,165,598,165,598,170,562,170"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="609,263,768,303"/>
+<area shape="poly" title=" " alt="" coords="504,177,551,211,611,248,623,255,621,259,608,253,548,216,501,182"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="614,213,763,238"/>
+<area shape="poly" title=" " alt="" coords="530,177,631,206,630,211,529,182"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="816,213,989,238"/>
+<area shape="poly" title=" " alt="" coords="764,223,802,223,802,228,764,228"/>
+<area shape="poly" title=" " alt="" coords="869,214,862,204,865,194,879,188,903,186,931,190,943,199,939,203,929,195,903,191,881,193,869,198,867,204,873,211"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1037,213,1183,238"/>
+<area shape="poly" title=" " alt="" coords="990,223,1024,223,1024,228,990,228"/>
+<area shape="poly" title=" " alt="" coords="1076,214,1069,204,1073,194,1087,188,1110,186,1139,190,1150,199,1147,203,1136,195,1110,191,1088,193,1077,198,1074,204,1080,211"/>
+<area shape="poly" title=" " alt="" coords="524,90,612,62,613,67,526,95"/>
+<area shape="poly" title=" " alt="" coords="560,102,598,102,598,107,560,108"/>
+<area shape="poly" title=" " alt="" coords="528,115,611,141,609,146,526,121"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a1fd21985777d3dd9a85782026ff7aeba" name="a1fd21985777d3dd9a85782026ff7aeba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1fd21985777d3dd9a85782026ff7aeba">&#9670;&#160;</a></span>pardeu()</h2>
+<a id="a4dcc3ba5bf005644f88135b432881f54" name="a4dcc3ba5bf005644f88135b432881f54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dcc3ba5bf005644f88135b432881f54">&#9670;&#160;</a></span>pardeu()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -14376,62 +14191,37 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">pure subroutine, public fitpack_core::pardeu </td>
           <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nux</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nuy</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(in)</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in), contiguous</td>          <td class="paramname"><span class="paramname"><em>xg</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -14441,6 +14231,11 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(m), intent(out)</td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(lwrk), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>wrk</em></span>, </td>
         </tr>
         <tr>
@@ -14451,82 +14246,72 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(kwrk), intent(inout)</td>          <td class="paramname"><span class="paramname"><em>iwrk</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kwrk</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
+          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Evaluate a partial derivative of a bivariate spline at scattered points. </p>
-<p>Computes  \( \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x_i,y_i)
-\) for \( i=1,\ldots,m \) at arbitrary (unstructured) points. This is the scattered-point counterpart of parder, which evaluates on a rectangular grid.</p>
+<p>Evaluate a partial derivative of a tensor-product spline at scattered points (any dimension). </p>
+<p>Scattered-point counterpart of <code>parder</code>: derivative coefficients via <code>pardtc</code>, then a per-point evaluation via <code>ndspeu</code>. Only the derivative coefficients need workspace.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx</td><td>Knot positions in \( x \)-direction (length \( n_x \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx</td><td>Total number of knots in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ty</td><td>Knot positions in \( y \)-direction (length \( n_y \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ny</td><td>Total number of knots in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx</td><td>Degree in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ky</td><td>Degree in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nux</td><td>Derivative order in \( x \), \( 0 \le \nu_x &lt; k_x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nuy</td><td>Derivative order in \( y \), \( 0 \le \nu_y &lt; k_y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>\( x \)-coordinates of evaluation points (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>\( y \)-coordinates of evaluation points (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Derivative values (length \( m \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points, \( m \ge 1 \). </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">wrk</td><td>Real workspace, length  \( \ge m(k_x{+}1{-}\nu_x) + m(k_y{+}1{-}\nu_y)
-                               + (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lwrk</td><td>Declared dimension of <code>wrk</code>. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">iwrk</td><td>Integer workspace (length \( \ge 2m \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kwrk</td><td>Declared dimension of <code>iwrk</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>Error flag: <code>0</code> = normal return; <code>10</code> = invalid input.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Derivative order per axis, \( 0 \le \nu_d &lt; k_d \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">xg</td><td>Point coordinates, <code>xg(d,i)</code> is the axis- \( d \) coordinate of point \( i \) (point \( i \) = contiguous column <code>xg(:,i)</code>) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>Number of evaluation points, \( m \ge 1 \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">z</td><td>Derivative values at the points, <code>z(m)</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">wrk</td><td>Real workspace, length \( \ge \prod_d (n(d)-k(d)-1) \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lwrk</td><td>Declared dimension of <code>wrk</code> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a01477d82a007d0853de3bc8247ef8c27" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid.">parder</a> — grid variant; <a class="el" href="#ae277d8a029f43ac5702946468c8bd54f" title="Transform B-spline coefficients to obtain the partial derivative spline.">pardtc</a> — coefficient transformation only; de Boor (1972), <em>J. Approx. Theory</em> 6, 50–62 </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4dcc3ba5bf005644f88135b432881f54" title="Evaluate a partial derivative of a tensor-product spline at scattered points (any dimension).">pardeu</a>, <a class="el" href="#a2df12892dbdee9d252798a1ac71e517e" title="B-spline coefficients of a partial-derivative spline (any dimension).">pardtc</a>, <a class="el" href="#aa9b85afb382e9b5cdfb4c5ccbb918421" title="Evaluate a tensor-product spline at scattered points (any dimension).">ndspeu</a>; todo/fitpack_nd_grids.md </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_a1fd21985777d3dd9a85782026ff7aeba_cgraph.png" border="0" usemap="#anamespacefitpack__core_a1fd21985777d3dd9a85782026ff7aeba_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_a1fd21985777d3dd9a85782026ff7aeba_cgraph" id="anamespacefitpack__core_a1fd21985777d3dd9a85782026ff7aeba_cgraph">
-<area shape="rect" title="Evaluate a partial derivative of a bivariate spline at scattered points." alt="" coords="5,141,160,166"/>
-<area shape="rect" href="namespacefitpack__core.html#a4eb67a6a12dce3e101d8caa8383986b2" title="Evaluate a tensor product spline on a grid (2&#45;D thin adapter over fpndsp)." alt="" coords="208,141,357,166"/>
-<area shape="poly" title=" " alt="" coords="160,151,194,151,194,156,160,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="N&#45;D generalization of fpbisp: evaluate a tensor&#45;product spline on a grid." alt="" coords="405,141,559,166"/>
-<area shape="poly" title=" " alt="" coords="358,151,392,151,392,156,358,156"/>
-<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="609,5,763,45"/>
-<area shape="poly" title=" " alt="" coords="495,138,542,99,605,55,616,49,619,54,608,60,546,103,499,142"/>
-<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="609,69,763,109"/>
-<area shape="poly" title=" " alt="" coords="523,138,608,111,609,116,524,143"/>
-<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="609,133,763,173"/>
-<area shape="poly" title=" " alt="" coords="559,151,595,151,595,156,559,156"/>
-<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="607,197,765,237"/>
-<area shape="poly" title=" " alt="" coords="524,164,609,191,608,196,523,169"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="611,262,761,287"/>
-<area shape="poly" title=" " alt="" coords="498,164,545,205,608,247,625,255,623,260,605,252,542,209,495,168"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="813,262,987,287"/>
-<area shape="poly" title=" " alt="" coords="761,272,800,272,800,277,761,277"/>
-<area shape="poly" title=" " alt="" coords="866,264,859,254,863,244,877,238,900,235,929,239,940,248,937,252,926,244,900,241,878,243,867,247,864,253,870,260"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1035,262,1180,287"/>
-<area shape="poly" title=" " alt="" coords="987,272,1021,272,1021,277,987,277"/>
-<area shape="poly" title=" " alt="" coords="1074,264,1066,254,1070,244,1084,238,1107,235,1136,239,1147,248,1144,252,1134,244,1107,241,1085,243,1074,247,1072,253,1078,260"/>
+<div class="center"><img src="namespacefitpack__core_a4dcc3ba5bf005644f88135b432881f54_cgraph.png" border="0" usemap="#anamespacefitpack__core_a4dcc3ba5bf005644f88135b432881f54_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a4dcc3ba5bf005644f88135b432881f54_cgraph" id="anamespacefitpack__core_a4dcc3ba5bf005644f88135b432881f54_cgraph">
+<area shape="rect" title="Evaluate a partial derivative of a tensor&#45;product spline at scattered points (any dimension)." alt="" coords="5,94,160,119"/>
+<area shape="rect" href="namespacefitpack__core.html#ab0ebd1c826f330de0103ba72e55260ba" title="Test whether a FITPACK error flag indicates success." alt="" coords="209,29,363,69"/>
+<area shape="poly" title=" " alt="" coords="128,91,201,70,202,76,129,97"/>
+<area shape="rect" href="namespacefitpack__core.html#aa9b85afb382e9b5cdfb4c5ccbb918421" title="Evaluate a tensor&#45;product spline at scattered points (any dimension)." alt="" coords="208,147,364,173"/>
+<area shape="poly" title=" " alt="" coords="133,117,225,141,223,146,131,122"/>
+<area shape="rect" href="namespacefitpack__core.html#a2df12892dbdee9d252798a1ac71e517e" title="B&#45;spline coefficients of a partial&#45;derivative spline (any dimension)." alt="" coords="413,93,564,118"/>
+<area shape="poly" title=" " alt="" coords="160,104,400,103,400,108,160,109"/>
+<area shape="poly" title=" " alt="" coords="248,30,246,20,252,11,265,5,286,3,310,6,323,13,320,18,308,11,286,8,267,10,255,15,251,21,253,28"/>
+<area shape="rect" href="namespacefitpack__core.html#ae7b6bebee71853d91e4222e3fa85a245" title="Evaluate a tensor&#45;product spline on a grid (any dimension; bispev&#39;s kernel)." alt="" coords="412,154,565,179"/>
+<area shape="poly" title=" " alt="" coords="364,160,399,161,398,166,364,165"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="615,20,770,60"/>
+<area shape="poly" title=" " alt="" coords="522,152,564,127,578,113,587,99,596,85,612,70,620,65,623,69,615,74,600,88,591,102,582,116,567,131,524,156"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="615,84,770,124"/>
+<area shape="poly" title=" " alt="" coords="530,151,613,126,615,131,532,157"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="615,148,770,188"/>
+<area shape="poly" title=" " alt="" coords="566,165,602,165,602,170,566,170"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="613,263,772,303"/>
+<area shape="poly" title=" " alt="" coords="508,177,555,211,615,248,627,255,625,259,612,253,552,216,505,182"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="618,213,767,238"/>
+<area shape="poly" title=" " alt="" coords="534,177,635,206,634,211,533,182"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="820,213,993,238"/>
+<area shape="poly" title=" " alt="" coords="768,223,806,223,806,228,768,228"/>
+<area shape="poly" title=" " alt="" coords="873,214,866,204,869,194,883,188,907,186,935,190,947,199,943,203,933,195,907,191,885,193,873,198,871,204,877,211"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1041,213,1187,238"/>
+<area shape="poly" title=" " alt="" coords="994,223,1028,223,1028,228,994,228"/>
+<area shape="poly" title=" " alt="" coords="1080,214,1073,204,1077,194,1091,188,1114,186,1143,190,1154,199,1151,203,1140,195,1114,191,1092,193,1081,198,1078,204,1084,211"/>
+<area shape="poly" title=" " alt="" coords="528,90,616,62,617,67,530,95"/>
+<area shape="poly" title=" " alt="" coords="564,102,602,102,602,107,564,108"/>
+<area shape="poly" title=" " alt="" coords="532,115,615,141,613,146,530,121"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="ae277d8a029f43ac5702946468c8bd54f" name="ae277d8a029f43ac5702946468c8bd54f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae277d8a029f43ac5702946468c8bd54f">&#9670;&#160;</a></span>pardtc()</h2>
+<a id="a2df12892dbdee9d252798a1ac71e517e" name="a2df12892dbdee9d252798a1ac71e517e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2df12892dbdee9d252798a1ac71e517e">&#9670;&#160;</a></span>pardtc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -14534,52 +14319,37 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">pure subroutine, public fitpack_core::pardtc </td>
           <td>(</td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nux</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nuy</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(out)</td>          <td class="paramname"><span class="paramname"><em>newc</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>newc</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -14589,26 +14359,37 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Transform B-spline coefficients to obtain the partial derivative spline. </p>
-<p>Given a bivariate spline \( s(x,y) \) of degrees \( k_x, k_y \), computes the B-spline coefficients of the derivative spline \( \frac{\partial^{\nu_x+\nu_y}}{\partial x^{\nu_x}\,\partial y^{\nu_y}} s(x,y) \) of degrees \( k_x - \nu_x, k_y - \nu_y \).</p>
-<p>Unlike parder / pardeu, this routine does <b>not</b> evaluate the derivative at any point; it only transforms the coefficient array. The resulting spline can then be evaluated with bispev or bispeu.</p>
+<p>B-spline coefficients of a partial-derivative spline (any dimension). </p>
+<p>The partial derivative  \( \partial^{\nu_1+\cdots+\nu_d} s / \partial x_1^{\nu_1}\cdots
+          \partial x_d^{\nu_d} \) of a tensor-product spline is itself a tensor-product spline of per-axis degrees \( k_d-\nu_d \) over the trimmed knot vectors \( t(\nu_d{+}1:n_d{-}\nu_d,d) \). This routine returns that spline's coefficients. The 1-D B-spline derivative recurrence is applied <code>nu(d)</code> times along each axis <code>d</code>; after each axis the tensor is repacked contiguously (the N-D replacement for the 2-D "gaps + compaction" trick). Every output coefficient is a single independent expression (no summation), so at dims=2 the result reduces to the classic bivariate coefficient transform regardless of the fiber-iteration order.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx</td><td>Knot positions in \( x \)-direction (length \( n_x \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx</td><td>Total number of knots in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ty</td><td>Knot positions in \( y \)-direction (length \( n_y \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ny</td><td>Total number of knots in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx</td><td>Degree in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ky</td><td>Degree in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nux</td><td>Derivative order in \( x \), \( 0 \le \nu_x &lt; k_x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nuy</td><td>Derivative order in \( y \), \( 0 \le \nu_y &lt; k_y \). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">newc</td><td>Derivative-spline coefficients, dimension \( (n_x{-}\nu_x{-}k_x{-}1)(n_y{-}\nu_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>Error flag: <code>0</code> = normal return; <code>10</code> = invalid input.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>Input B-spline coefficient tensor, flat row-major (first axis slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Derivative order per axis, \( 0 \le \nu_d &lt; k_d \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">newc</td><td>Derivative coefficients, packed contiguously at the front (row-major over the reduced tensor of size \( \prod_d (n(d)-k(d)-1-\nu_d) \)); must be sized \( \ge \prod_d (n(d)-k(d)-1) \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a01477d82a007d0853de3bc8247ef8c27" title="Evaluate a partial derivative of a bivariate spline on a rectangular grid.">parder</a> — evaluate derivative on a grid; <a class="el" href="#a1fd21985777d3dd9a85782026ff7aeba" title="Evaluate a partial derivative of a bivariate spline at scattered points.">pardeu</a> — evaluate at scattered points; de Boor (1972), <em>J. Approx. Theory</em> 6, 50–62 </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a2df12892dbdee9d252798a1ac71e517e" title="B-spline coefficients of a partial-derivative spline (any dimension).">pardtc</a>, <a class="el" href="#ada64d2701a6d6972021eef11dd739c8c" title="Evaluate a partial derivative of a tensor-product spline on a grid (any dimension).">parder</a>, <a class="el" href="#a4dcc3ba5bf005644f88135b432881f54" title="Evaluate a partial derivative of a tensor-product spline at scattered points (any dimension).">pardeu</a>; todo/fitpack_nd_grids.md </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacefitpack__core_a2df12892dbdee9d252798a1ac71e517e_cgraph.png" border="0" usemap="#anamespacefitpack__core_a2df12892dbdee9d252798a1ac71e517e_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a2df12892dbdee9d252798a1ac71e517e_cgraph" id="anamespacefitpack__core_a2df12892dbdee9d252798a1ac71e517e_cgraph">
+<area shape="rect" title="B&#45;spline coefficients of a partial&#45;derivative spline (any dimension)." alt="" coords="5,77,156,102"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="204,5,359,45"/>
+<area shape="poly" title=" " alt="" coords="121,74,204,47,206,52,122,79"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="204,69,359,109"/>
+<area shape="poly" title=" " alt="" coords="156,87,191,87,191,92,156,92"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="204,133,359,173"/>
+<area shape="poly" title=" " alt="" coords="122,100,206,127,204,132,121,105"/>
+</map>
+</div>
 
 </div>
 </div>
@@ -15359,8 +15140,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a7ea4ba8b0cda533eb078e95b28d782db" name="a7ea4ba8b0cda533eb078e95b28d782db"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ea4ba8b0cda533eb078e95b28d782db">&#9670;&#160;</a></span>profil()</h2>
+<a id="aca69c8d7519a73e88f9a148c44bfd09d" name="aca69c8d7519a73e88f9a148c44bfd09d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca69c8d7519a73e88f9a148c44bfd09d">&#9670;&#160;</a></span>profil()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -15368,42 +15149,32 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">pure subroutine, public fitpack_core::profil </td>
           <td>(</td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>iopt</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ax</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nx), intent(in)</td>          <td class="paramname"><span class="paramname"><em>tx</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>dims</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nx</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:,:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(ny), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ty</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ny</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension((nx-kx-1)*(ny-ky-1)), intent(in)</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>kx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>ky</em></span>, </td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), dimension(dims), intent(in)</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -15413,12 +15184,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in)</td>          <td class="paramname"><span class="paramname"><em>nu</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(nu), intent(out)</td>          <td class="paramname"><span class="paramname"><em>cu</em></span>, </td>
+          <td class="paramtype">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), dimension(:), intent(out)</td>          <td class="paramname"><span class="paramname"><em>cu</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -15428,45 +15194,45 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Extract a cross-section (profile) of a bivariate spline. </p>
-<p>Given a bivariate spline \( s(x,y) \), computes the B-spline coefficients of a univariate cross-section:</p>
-<ul>
-<li><code>iopt=0</code>: \( f(y) = s(u, y) \) — profile at fixed \( x = u \).</li>
-<li><code>iopt=1</code>: \( g(x) = s(x, u) \) — profile at fixed \( y = u \).</li>
-</ul>
-<p>The resulting 1-D spline can be evaluated using splev or other univariate routines.</p>
+<p>Cross-section of a tensor-product spline: fix one axis (any dimension). </p>
+<p>Fixing axis <code>ax</code> at the value <code>u</code> collapses one tensor rank: the result is the coefficient tensor of a <code>dims-1</code>-D spline over the remaining axes (their knot vectors and degrees are unchanged, in their original relative order). The fixed axis' <code>k(ax)+1</code> non-zero B-splines at <code>u</code> are contracted against the coefficient support along that axis. At <code>dims=2</code> this reduces to the classic bivariate cross-section (the same <code>fpbspl</code> values and <code>dot_product</code> accumulation).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">iopt</td><td>Profile direction: <code>0</code> = fix \( x \), extract \( f(y) \); <code>1</code> = fix \( y \), extract \( g(x) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">tx</td><td>Knot positions in \( x \)-direction (length \( n_x \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nx</td><td>Total number of knots in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ty</td><td>Knot positions in \( y \)-direction (length \( n_y \)). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ny</td><td>Total number of knots in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficients, length \( (n_x{-}k_x{-}1)(n_y{-}k_y{-}1) \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">kx</td><td>Degree in \( x \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ky</td><td>Degree in \( y \). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Cross-section coordinate. Must satisfy \( t_{k_x+1} \le u \le t_{n_x-k_x} \) if <code>iopt=0</code>, or \( t_{k_y+1} \le u \le t_{n_y-k_y} \) if <code>iopt=1</code>. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nu</td><td>Declared dimension of <code>cu</code>. Must be \( \ge n_y \) if <code>iopt=0</code>, \( \ge n_x \) if <code>iopt=1</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">cu</td><td>B-spline coefficients of the 1-D cross-section (length <code>nu</code>). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>Error flag: <code>0</code> = normal return; <code>10</code> = invalid input.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ax</td><td>Axis to fix, \( 1 \le ax \le dims \) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dims</td><td>Number of axes (domain dimension) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>Per-axis knot vectors; column \( d \) is <code>t(1:n(d),d)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>Number of knots per axis, <code>n(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c</td><td>B-spline coefficient tensor, flat row-major (first axis slowest) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>Spline degree per axis, <code>k(dims)</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Value at which axis <code>ax</code> is fixed, \( t(k(ax){+}1,ax) \le u \le t(nk1(ax){+}1,ax) \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">cu</td><td>Cross-section coefficients: flat row-major over the surviving axes (in original order, skipping <code>ax</code>), length \( \prod_{d \ne ax}(n(d)-k(d)-1) \) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ier</td><td>FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> — full surface evaluation; <a class="el" href="#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non-zero B-splines at a given point.">fpbspl</a> — B-spline basis evaluation </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aca69c8d7519a73e88f9a148c44bfd09d" title="Cross-section of a tensor-product spline: fix one axis (any dimension).">profil</a>, <a class="el" href="#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non-zero B-splines at a given point.">fpbspl</a>; todo/fitpack_nd_grids.md </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_a7ea4ba8b0cda533eb078e95b28d782db_cgraph.png" border="0" usemap="#anamespacefitpack__core_a7ea4ba8b0cda533eb078e95b28d782db_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_a7ea4ba8b0cda533eb078e95b28d782db_cgraph" id="anamespacefitpack__core_a7ea4ba8b0cda533eb078e95b28d782db_cgraph">
-<area shape="rect" title="Extract a cross&#45;section (profile) of a bivariate spline." alt="" coords="5,29,148,55"/>
-<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="196,29,345,55"/>
-<area shape="poly" title=" " alt="" coords="148,39,183,39,183,45,148,45"/>
-<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="393,29,567,55"/>
-<area shape="poly" title=" " alt="" coords="345,39,380,39,380,45,345,45"/>
-<area shape="poly" title=" " alt="" coords="446,31,439,21,443,11,457,5,480,3,509,6,520,15,517,20,506,11,480,8,458,10,447,15,444,20,450,28"/>
-<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="615,29,760,55"/>
-<area shape="poly" title=" " alt="" coords="567,39,601,39,601,45,567,45"/>
-<area shape="poly" title=" " alt="" coords="654,31,646,21,650,11,664,5,687,3,716,6,727,15,724,20,714,11,687,8,665,10,654,15,652,20,658,28"/>
+<div class="center"><img src="namespacefitpack__core_aca69c8d7519a73e88f9a148c44bfd09d_cgraph.png" border="0" usemap="#anamespacefitpack__core_aca69c8d7519a73e88f9a148c44bfd09d_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_aca69c8d7519a73e88f9a148c44bfd09d_cgraph" id="anamespacefitpack__core_aca69c8d7519a73e88f9a148c44bfd09d_cgraph">
+<area shape="rect" title="Cross&#45;section of a tensor&#45;product spline: fix one axis (any dimension)." alt="" coords="5,141,148,166"/>
+<area shape="rect" href="namespacefitpack__core.html#a654429d58a12e13f845e27dc8d4396ab" title="Flat 0&#45;based offset of a multi&#45;index into a row&#45;major tensor." alt="" coords="198,5,353,45"/>
+<area shape="poly" title=" " alt="" coords="89,138,134,99,195,55,206,49,208,54,197,60,137,103,93,142"/>
+<area shape="rect" href="namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072" title="Row&#45;major strides for a flat tensor of the given per&#45;axis sizes." alt="" coords="198,69,353,109"/>
+<area shape="poly" title=" " alt="" coords="116,138,199,111,201,116,118,143"/>
+<area shape="rect" href="namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf" title="Multi&#45;index of a flat 0&#45;based offset into a row&#45;major tensor (inverse of fp_grid_index)." alt="" coords="198,133,353,173"/>
+<area shape="poly" title=" " alt="" coords="148,151,184,151,184,156,148,156"/>
+<area shape="rect" href="namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="196,197,355,237"/>
+<area shape="poly" title=" " alt="" coords="118,164,201,191,199,196,116,169"/>
+<area shape="rect" href="namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="201,262,350,287"/>
+<area shape="poly" title=" " alt="" coords="92,164,137,205,166,227,197,247,214,255,212,260,195,252,163,232,133,209,89,168"/>
+<area shape="rect" href="namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="403,262,576,287"/>
+<area shape="poly" title=" " alt="" coords="351,272,389,272,389,277,351,277"/>
+<area shape="poly" title=" " alt="" coords="456,264,448,254,452,244,466,238,489,235,518,239,529,248,526,252,516,244,489,241,467,243,456,247,454,253,460,260"/>
+<area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="624,262,769,287"/>
+<area shape="poly" title=" " alt="" coords="576,272,610,272,610,277,576,277"/>
+<area shape="poly" title=" " alt="" coords="663,264,656,254,659,244,673,238,697,235,725,239,737,248,733,252,723,244,697,241,675,243,663,247,661,253,667,260"/>
 </map>
 </div>
 
@@ -17536,6 +17302,20 @@ Here is the call graph for this function:</div>
       <table class="memname">
         <tr>
           <td class="memname">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), parameter, public fitpack_core::half = 0.5_FP_REAL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aba15b82b58840b6b08392e1877557c02" name="aba15b82b58840b6b08392e1877557c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba15b82b58840b6b08392e1877557c02">&#9670;&#160;</a></span>idims</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(<a class="el" href="#a995ea8d768c880ccfab37dbf3eafb3a2">fp_dim</a>), dimension(<a class="el" href="#acea3d2d817763c46755c944d4ea72a24">max_idim</a>), parameter, public fitpack_core::idims = [1,2,3,4,5,6,7,8,9,10]</td>
         </tr>
       </table>
 </div><div class="memdoc">

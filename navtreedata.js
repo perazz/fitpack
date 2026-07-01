@@ -284,12 +284,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"namespacefitpack__core.html#a3d07187113a320a4bf1fa751018181d2",
+"namespacefitpack__core.html#a3d51410017bf94f298da66b1d80fe524",
 "namespacefitpack__fitters.html#ab1a1c88423bde195c1994b746b2b851b",
-"structfitpack__convex__curves_1_1fitpack__convex__curve.html#a4ccb21d964085a1f499c1b4c65e1e0d1",
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a30b175290efe439ce16c032508aa64a5",
-"structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c.html#a0b58779a8538da8f6d92f5c06c9bc4f8",
-"theory_bsplines.html#autotoc_md19"
+"structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html#af3c931356e671b02f97479759e8d2baf",
+"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a605782ce0f8bfcfb0d1be5eea1365c15",
+"structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a8aef881a8fcc0621022b76622fae7cea",
+"structfitpack__surfaces_1_1fitpack__surface.html#ab8e53faa979abaa79cd9712676dd1578"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

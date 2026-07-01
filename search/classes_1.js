@@ -10,7 +10,7 @@ var searchData=
   ['fitpack_5ffitter_7',['fitpack_fitter',['../structfitpack__fitters_1_1fitpack__fitter.html',1,'fitpack_fitters']]],
   ['fitpack_5fgrid_5fpolar_8',['fitpack_grid_polar',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html',1,'fitpack_gridded_polar']]],
   ['fitpack_5fgrid_5fsphere_9',['fitpack_grid_sphere',['../structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html',1,'fitpack_gridded_sphere']]],
-  ['fitpack_5fgrid_5fsurface_10',['fitpack_grid_surface',['../structfitpack__grid__surfaces_1_1fitpack__grid__surface.html',1,'fitpack_grid_surfaces']]],
+  ['fitpack_5fgrid_5fsurface_10',['fitpack_grid_surface',['../structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html',1,'fitpack_gridded_surfaces']]],
   ['fitpack_5fgridded_5fspline_11',['fitpack_gridded_spline',['../structfitpack__gridded__splines_1_1fitpack__gridded__spline.html',1,'fitpack_gridded_splines']]],
   ['fitpack_5fparametric_5fcurve_12',['fitpack_parametric_curve',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html',1,'fitpack_parametric_curves']]],
   ['fitpack_5fparametric_5fcurve_5fc_13',['fitpack_parametric_curve_c',['../structfitpack__parametric__curves__c_1_1fitpack__parametric__curve__c.html',1,'fitpack_parametric_curves_c']]],

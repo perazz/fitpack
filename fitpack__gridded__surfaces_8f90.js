@@ -1,0 +1,25 @@
+var fitpack__gridded__surfaces_8f90 =
+[
+    [ "fitpack_gridded_surfaces::fitpack_grid_surface", "structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html", "structfitpack__gridded__surfaces_1_1fitpack__grid__surface" ],
+    [ "fitpack_gridded_surfaces::gridded_derivatives_gridded", "namespacefitpack__gridded__surfaces.html#ae605ac62fb4c1c2631800094801dd946", null ],
+    [ "fitpack_gridded_surfaces::gridded_derivatives_many", "namespacefitpack__gridded__surfaces.html#ae63e8d908fec192d552b4c58db4321fe", null ],
+    [ "fitpack_gridded_surfaces::gridded_derivatives_one", "namespacefitpack__gridded__surfaces.html#a77d8fdd01d1cb95975208f2a60c55ebb", null ],
+    [ "fitpack_gridded_surfaces::gridded_eval_many", "namespacefitpack__gridded__surfaces.html#a4610ab416c403997749fbea808dda04e", null ],
+    [ "fitpack_gridded_surfaces::gridded_eval_one", "namespacefitpack__gridded__surfaces.html#adc481ae65be18cc6bbff4991406deb42", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_comm_expand", "namespacefitpack__gridded__surfaces.html#a216ee326dfd65fc36bae1f5e92e7c164", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_comm_pack", "namespacefitpack__gridded__surfaces.html#a4c3791ec63a70fd9f9a43a15b574be1e", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_comm_size", "namespacefitpack__gridded__surfaces.html#a91250de8d5ad7db948ed315505c938c6", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_cross_section", "namespacefitpack__gridded__surfaces.html#a0c1ff78db21fa032496b9066e8357e3a", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_derivative_spline", "namespacefitpack__gridded__surfaces.html#ade6d0e101da7c398355018b346c97085", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_eval_many", "namespacefitpack__gridded__surfaces.html#ab509ac3f04b8a4a07a5cd22b95594334", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_eval_one", "namespacefitpack__gridded__surfaces.html#a02ddf5607a34faae476f7f53c60392c0", null ],
+    [ "fitpack_gridded_surfaces::gridsurf_integral", "namespacefitpack__gridded__surfaces.html#ad5da38fc48716a946de3b241328cc862", null ],
+    [ "fitpack_gridded_surfaces::surf_destroy", "namespacefitpack__gridded__surfaces.html#a670113381515013dc2e7305364d5b673", null ],
+    [ "fitpack_gridded_surfaces::surf_new_fit", "namespacefitpack__gridded__surfaces.html#a3d51ee07d2b34354c07ac4e25f766774", null ],
+    [ "fitpack_gridded_surfaces::surf_new_from_points", "namespacefitpack__gridded__surfaces.html#a309786ade281b23c65b2180d668ce520", null ],
+    [ "fitpack_gridded_surfaces::surf_new_points", "namespacefitpack__gridded__surfaces.html#acda627bb6ea49281950bad3febdef1f3", null ],
+    [ "fitpack_gridded_surfaces::surf_prepare_workspace", "namespacefitpack__gridded__surfaces.html#a6274e7209e369b17f2afad6f71e04af1", null ],
+    [ "fitpack_gridded_surfaces::surface_fit_automatic_knots", "namespacefitpack__gridded__surfaces.html#aa42cf56f425119e72dc8b48881b0fb58", null ],
+    [ "fitpack_gridded_surfaces::surface_fit_interpolating", "namespacefitpack__gridded__surfaces.html#a385bac10c12cad35888cea6ab13d7eab", null ],
+    [ "fitpack_gridded_surfaces::surface_fit_least_squares", "namespacefitpack__gridded__surfaces.html#af9a4a75aebeadc74976dbac4b9a688df", null ]
+];

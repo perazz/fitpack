@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_surfaces::surf_new_points" name="fitpack_gridded_surfaces::surf_new_points">
+<area shape="rect" id="Node000001" title="Load new gridded data and allocate workspace." alt="" coords="5,5,189,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__surfaces.html#a6274e7209e369b17f2afad6f71e04af1" title="(Re)size the fit workspace to regrid(dims=2)&#39;s requirement for the current order." alt="" coords="237,5,427,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,23,224,23,224,28,190,28"/>
+</map>
