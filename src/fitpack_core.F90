@@ -69,6 +69,12 @@ module fitpack_core
     public :: regrid ! tensor-product gridded smoothing-spline fit (any domain dimension)
     public :: fpndsp    ! N-D generalization of fpbisp (gridded evaluation kernel)
     public :: ndspev    ! N-D generalization of bispev (gridded evaluation, flat workspace)
+    public :: bispeu_nd ! N-D generalization of bispeu (scattered-point evaluation)
+    public :: parder_nd ! N-D generalization of parder (gridded partial derivatives)
+    public :: pardeu_nd ! N-D generalization of pardeu (scattered partial derivatives)
+    public :: pardtc_nd ! N-D generalization of pardtc (partial-derivative coefficients)
+    public :: dblint_nd ! N-D generalization of dblint (box/domain integral)
+    public :: profil_nd ! N-D generalization of profil (cross-section: fix one axis)
 
     ! Surface application routines
     public :: bispeu ! * Evaluation of a bivariate spline function
@@ -1406,6 +1412,80 @@ module fitpack_core
       return
       end function dblint
 
+      !> @brief N-D generalization of dblint: integral of a tensor-product spline over a box.
+      !!
+      !! Computes \f$ \int_{xb_1}^{xe_1}\!\cdots\!\int_{xb_d}^{xe_d} s(x_1,\ldots,x_d)\,dx_1\cdots dx_d \f$.
+      !! The box integral is separable: with \f$ s=\sum_{\mathbf i} c_{\mathbf i}\prod_d N^{(d)}_{i_d} \f$
+      !! it factors into a product of 1-D B-spline integrals per axis contracted against the coefficient
+      !! tensor. Each per-axis integral vector is produced by `fpintb`; the contraction reuses the fpndsp
+      !! odometer. At `dims=2` the terms and their accumulation order are identical to dblint (bit-for-bit).
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xb    Per-axis lower integration limits, `xb(dims)`
+      !! @param[in]  xe    Per-axis upper integration limits, `xe(dims)`
+      !! @return     res   Value of the box integral
+      !!
+      !! @see dblint, fpintb; todo/fitpack_nd_grids.md
+      pure real(FP_REAL) function dblint_nd(dims,t,n,c,k,xb,xe) result(res)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xb(dims),xe(dims)
+
+          integer(FP_DIM)  :: d,a
+          integer(FP_SIZE) :: nk1(dims),cstride(dims),cidx(dims)
+          integer(FP_SIZE) :: j,q,nsupp,coff
+          real(FP_REAL)    :: pw(0:dims-1)
+          real(FP_REAL)    :: iax(maxval(n-k-1),dims)   ! per-axis B-spline integral vectors
+
+          nk1 = n-k-1
+
+          !  per-axis integrals of the normalized B-splines
+          iax = zero
+          do d=1,dims
+             call fpintb(t(1:n(d),d), n(d), iax(1:nk1(d),d), nk1(d), xb(d), xe(d))
+          end do
+
+          cstride = fp_grid_strides(dims,nk1)
+          nsupp   = product(nk1(1:dims-1))
+
+          !  contract the coefficient tensor against the per-axis integral vectors (fpndsp odometer);
+          !  carry the partial product pw over axes 1..dims-1 and skip a slice whose weight vanishes,
+          !  exactly as dblint skips Ix(i)==0. At dims=2: res += (Ix(i)*Iy(j))*c(m), bit-for-bit.
+          res   = zero
+          cidx(1:dims-1) = 1
+          coff  = 0
+          pw(0) = one
+          do a=1,dims-1
+             pw(a) = pw(a-1)*iax(cidx(a),a)
+          end do
+          do q=1,nsupp
+             if (.not.equal(pw(dims-1),zero)) then
+                do j=1,nk1(dims)
+                   res = res + (pw(dims-1)*iax(j,dims))*c(coff+j)
+                end do
+             end if
+             if (q==nsupp) exit
+             do a=dims-1,1,-1
+                if (cidx(a)<nk1(a)) then
+                   cidx(a) = cidx(a)+1
+                   coff    = coff + cstride(a)
+                   do d=a,dims-1
+                      pw(d) = pw(d-1)*iax(cidx(d),d)
+                   end do
+                   exit
+                else
+                   cidx(a) = 1
+                   coff    = coff - (nk1(a)-1)*cstride(a)
+                end if
+             end do
+          end do
+          return
+      end function dblint_nd
+
       !> @brief Evaluate a polar spline \f$ f(x,y) = s(u,v) \f$ at a Cartesian point.
       !!
       !! Given a bicubic spline \f$ s(u,v) \f$ (\f$ 0 \le u \le 1 \f$, \f$ -\pi \le v \le \pi \f$)
@@ -2372,6 +2452,49 @@ module fitpack_core
           return
 
       end subroutine ndspev
+
+      !> @brief N-D generalization of bispeu: evaluate a tensor-product spline at scattered points.
+      !!
+      !! Scattered-point counterpart of ndspev (which evaluates on a rectangular grid). A scattered
+      !! point is just a degenerate 1x...x1 grid, so each point is handed to the fpndsp kernel with a
+      !! singleton per-axis grid -- exactly as the 2-D bispeu wraps the fpbisp grid kernel (one call
+      !! per point). This keeps a single source of truth for the tensor contraction (fpndsp); at
+      !! `dims=2` it is bit-for-bit identical to bispeu. Self-manages its (singleton) basis scratch,
+      !! so no work arrays are required.
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xg    Point coordinates, `xg(i,d)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !! @param[in]  m     Number of evaluation points, \f$ m \ge 1 \f$
+      !! @param[out] z     Spline values at the points, `z(m)`
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
+      !!
+      !! @see bispeu, fpndsp, ndspev; todo/fitpack_nd_grids.md
+      pure subroutine bispeu_nd(dims,t,n,c,k,xg,m,z,ier)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(out) :: z(m)
+          integer(FP_FLAG), intent(out) :: ier
+
+          integer(FP_SIZE) :: i,mone(dims)
+          !  a scattered point is a 1x...x1 grid: singleton basis/interval scratch for the fpndsp kernel
+          real(FP_REAL)    :: w(1,MAX_ORDER+1,dims)
+          integer(FP_SIZE) :: lidx(1,dims)
+
+          ier = FITPACK_INPUT_ERROR
+          if (m<1) return
+          ier = FITPACK_OK
+
+          mone = 1
+          do i=1,m
+             call fpndsp(dims,t,n,c,k,xg(i:i,1:dims),mone,z(i:i),w,lidx)
+          end do
+          return
+      end subroutine bispeu_nd
 
 
       !> @brief Evaluate the non-zero B-splines at a given point.
@@ -15708,6 +15831,199 @@ module fitpack_core
       return
       end subroutine pardtc
 
+      !> @brief N-D generalization of pardtc: B-spline coefficients of a partial-derivative spline.
+      !!
+      !! The partial derivative \f$ \partial^{\nu_1+\cdots+\nu_d} s / \partial x_1^{\nu_1}\cdots
+      !! \partial x_d^{\nu_d} \f$ of a tensor-product spline is itself a tensor-product spline of
+      !! per-axis degrees \f$ k_d-\nu_d \f$ over the trimmed knot vectors \f$ t(\nu_d{+}1:n_d{-}\nu_d,d) \f$.
+      !! This routine returns that spline's coefficients. The 1-D B-spline derivative recurrence is applied
+      !! `nu(d)` times along each axis `d`; after each axis the tensor is repacked contiguously (the N-D
+      !! replacement for the 2-D "gaps + compaction" trick). Every output coefficient is a single
+      !! independent expression (no summation), so the result is bit-for-bit identical to pardtc at dims=2
+      !! regardless of the fiber-iteration order.
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     Input B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[out] newc  Derivative coefficients, packed contiguously at the front (row-major over the
+      !!                   reduced tensor of size \f$ \prod_d (n(d)-k(d)-1-\nu_d) \f$); must be sized
+      !!                   \f$ \ge \prod_d (n(d)-k(d)-1) \f$
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
+      !!
+      !! @see pardtc, parder_nd, pardeu_nd; todo/fitpack_nd_grids.md
+      pure subroutine pardtc_nd(dims,t,n,c,k,nu,newc,ier)
+          integer(FP_DIM),  intent(in)  :: dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims),nu(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:)
+          real(FP_REAL),    intent(out) :: newc(:)
+          integer(FP_FLAG), intent(out) :: ier
+
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),cur(dims),curn(dims),str(dims),strn(dims),idx(dims)
+          integer(FP_SIZE) :: nc,ncn,p,o,i,l1,l2,src_lo,src_hi
+          real(FP_REAL)    :: ak,fac,tmp(size(newc))
+
+          ier = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          ier = FITPACK_OK
+
+          nk1        = n-k-1
+          nc         = product(nk1)
+          newc(1:nc) = c(1:nc)
+          cur        = nk1
+
+          !  differentiate one axis at a time; after each pass repack into a fresh contiguous tensor
+          axes: do d=1,dims
+             if (nu(d)==0) cycle axes
+             passes: do p=1,nu(d)
+                ak   = real(k(d)-p+1, FP_REAL)       ! running degree before this pass (= 2-D "ak")
+                str  = fp_grid_strides(dims,cur)     ! current (old) layout
+                curn = cur; curn(d) = cur(d)-1       ! one fewer coefficient along axis d
+                strn = fp_grid_strides(dims,curn)    ! new layout
+                ncn  = product(curn)
+                do o=0,ncn-1
+                   idx = fp_grid_unravel(dims,o,curn)   ! reduced multi-index; o == its flat offset
+                   i   = idx(d)
+                   l1  = p + i                          ! knot addressing identical to 2-D pardtc
+                   l2  = i + k(d) + 1
+                   fac = t(l2,d) - t(l1,d)
+                   src_lo = fp_grid_index(dims,idx,str)
+                   if (fac>zero) then
+                      idx(d) = i+1
+                      src_hi = fp_grid_index(dims,idx,str)
+                      tmp(o+1) = (newc(src_hi+1)-newc(src_lo+1))*ak/fac
+                   else
+                      tmp(o+1) = newc(src_lo+1)         ! coincident knots: keep source (2-D semantics)
+                   end if
+                end do
+                newc(1:ncn) = tmp(1:ncn)
+                cur = curn
+             end do passes
+          end do axes
+          return
+      end subroutine pardtc_nd
+
+      !> @brief N-D generalization of parder: evaluate a partial derivative on a rectangular grid.
+      !!
+      !! Computes the derivative coefficients via `pardtc_nd`, then evaluates the resulting reduced-degree
+      !! spline on the grid through the N-D evaluation front-end `ndspev`. The flat real workspace is
+      !! carved into `[nc derivative coefficients | ndspev basis scratch]`, mirroring 2-D parder.
+      !!
+      !! @param[in]     dims  Number of axes (domain dimension)
+      !! @param[in]     t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]     n     Number of knots per axis, `n(dims)`
+      !! @param[in]     c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]     k     Spline degree per axis, `k(dims)`
+      !! @param[in]     nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[in]     xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]     m     Number of evaluation points per axis, `m(dims)`
+      !! @param[out]    z     Derivative values, flat row-major, length `product(m)`
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge \prod_d nk1_d + \max_d m_d\,(\max_d(k_d{-}\nu_d){+}1)\,d \f$
+      !! @param[in]     lwrk  Declared dimension of `wrk`
+      !! @param[in,out] iwrk  Integer workspace, length \f$ \ge \max_d m_d \cdot dims \f$
+      !! @param[in]     kwrk  Declared dimension of `iwrk`
+      !! @param[out]    ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace
+      !!
+      !! @see parder, pardtc_nd, ndspev; todo/fitpack_nd_grids.md
+      pure subroutine parder_nd(dims,t,n,c,k,nu,xg,m,z,wrk,lwrk,iwrk,kwrk,ier)
+          integer(FP_DIM),  intent(in)    :: dims
+          integer(FP_SIZE), intent(in)    :: n(dims),k(dims),nu(dims),m(dims),lwrk,kwrk
+          real(FP_REAL),    intent(in)    :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(out)   :: z(:)
+          real(FP_REAL),    intent(inout) :: wrk(lwrk)
+          integer(FP_SIZE), intent(inout) :: iwrk(kwrk)
+          integer(FP_FLAG), intent(out)   :: ier
+
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),kn(dims),nn(dims),nc,maxm,maxk1,lev,lwest,kwest
+          real(FP_REAL)    :: ttrim(maxval(n),dims)
+
+          ier   = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          if (any(m<1)) return
+
+          nk1   = n-k-1
+          nc    = product(nk1)
+          kn    = k-nu
+          nn    = n-2*nu
+          maxm  = maxval(m)
+          maxk1 = maxval(kn)+1
+          lev   = maxm*maxk1*dims
+          lwest = nc + lev
+          kwest = maxm*dims
+          if (lwrk<lwest .or. kwrk<kwest) return
+
+          !  derivative coefficients (packed at the front of wrk)
+          call pardtc_nd(dims,t,n,c,k,nu,wrk(1:nc),ier)
+          if (.not.FITPACK_SUCCESS(ier)) return
+
+          !  trimmed per-axis knot vectors of the derivative spline
+          ttrim = zero
+          do d=1,dims
+             ttrim(1:nn(d),d) = t(nu(d)+1:n(d)-nu(d),d)
+          end do
+
+          !  evaluate the reduced-degree spline on the grid
+          call ndspev(dims,ttrim,nn,wrk(1:nc),kn,xg,m,z, &
+                      wrk(nc+1:nc+lev),lev,iwrk(1:kwest),kwest,ier)
+          return
+      end subroutine parder_nd
+
+      !> @brief N-D generalization of pardeu: evaluate a partial derivative at scattered points.
+      !!
+      !! Scattered-point counterpart of `parder_nd`: derivative coefficients via `pardtc_nd`, then a
+      !! per-point evaluation via `bispeu_nd`. Only the derivative coefficients need workspace.
+      !!
+      !! @param[in]     dims  Number of axes (domain dimension)
+      !! @param[in]     t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]     n     Number of knots per axis, `n(dims)`
+      !! @param[in]     c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]     k     Spline degree per axis, `k(dims)`
+      !! @param[in]     nu    Derivative order per axis, \f$ 0 \le \nu_d < k_d \f$
+      !! @param[in]     xg    Point coordinates, `xg(i,d)` is the axis-\f$ d \f$ coordinate of point \f$ i \f$
+      !! @param[in]     m     Number of evaluation points, \f$ m \ge 1 \f$
+      !! @param[out]    z     Derivative values at the points, `z(m)`
+      !! @param[in,out] wrk   Real workspace, length \f$ \ge \prod_d (n(d)-k(d)-1) \f$
+      !! @param[in]     lwrk  Declared dimension of `wrk`
+      !! @param[out]    ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace
+      !!
+      !! @see pardeu, pardtc_nd, bispeu_nd; todo/fitpack_nd_grids.md
+      pure subroutine pardeu_nd(dims,t,n,c,k,nu,xg,m,z,wrk,lwrk,ier)
+          integer(FP_DIM),  intent(in)    :: dims
+          integer(FP_SIZE), intent(in)    :: n(dims),k(dims),nu(dims),m,lwrk
+          real(FP_REAL),    intent(in)    :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(out)   :: z(m)
+          real(FP_REAL),    intent(inout) :: wrk(lwrk)
+          integer(FP_FLAG), intent(out)   :: ier
+
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: nk1(dims),kn(dims),nn(dims),nc
+          real(FP_REAL)    :: ttrim(maxval(n),dims)
+
+          ier = FITPACK_INPUT_ERROR
+          if (any(nu<0) .or. any(nu>=k)) return
+          if (m<1) return
+          nk1 = n-k-1
+          nc  = product(nk1)
+          kn  = k-nu
+          nn  = n-2*nu
+          if (lwrk<nc) return
+
+          call pardtc_nd(dims,t,n,c,k,nu,wrk(1:nc),ier)
+          if (.not.FITPACK_SUCCESS(ier)) return
+
+          ttrim = zero
+          do d=1,dims
+             ttrim(1:nn(d),d) = t(nu(d)+1:n(d)-nu(d),d)
+          end do
+
+          call bispeu_nd(dims,ttrim,nn,wrk(1:nc),kn,xg,m,z,ier)
+          return
+      end subroutine pardeu_nd
+
 
 
       !> @brief Fit a smooth parametric surface to gridded data.
@@ -16959,6 +17275,83 @@ module fitpack_core
 
       return
       end subroutine profil
+
+      !> @brief N-D generalization of profil: cross-section of a tensor-product spline (fix one axis).
+      !!
+      !! Fixing axis `ax` at the value `u` collapses one tensor rank: the result is the coefficient tensor
+      !! of a `dims-1`-D spline over the remaining axes (their knot vectors and degrees are unchanged, in
+      !! their original relative order). The fixed axis' `k(ax)+1` non-zero B-splines at `u` are contracted
+      !! against the coefficient support along that axis. At `dims=2` the same `fpbspl` values and
+      !! `dot_product` accumulation are used as in profil, i.e. bit-for-bit.
+      !!
+      !! @param[in]  ax    Axis to fix, \f$ 1 \le ax \le dims \f$
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  u     Value at which axis `ax` is fixed, \f$ t(k(ax){+}1,ax) \le u \le t(nk1(ax){+}1,ax) \f$
+      !! @param[out] cu    Cross-section coefficients: flat row-major over the surviving axes (in original
+      !!                   order, skipping `ax`), length \f$ \prod_{d \ne ax}(n(d)-k(d)-1) \f$
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input
+      !!
+      !! @see profil, fpbspl; todo/fitpack_nd_grids.md
+      pure subroutine profil_nd(ax,dims,t,n,c,k,u,cu,ier)
+          integer(FP_DIM),  intent(in)  :: ax,dims
+          integer(FP_SIZE), intent(in)  :: n(dims),k(dims)
+          real(FP_REAL),    intent(in)  :: t(:,:),c(:),u
+          real(FP_REAL),    intent(out) :: cu(:)
+          integer(FP_FLAG), intent(out) :: ier
+
+          integer(FP_DIM)  :: d,dd
+          integer(FP_SIZE) :: nk1(dims),cstride(dims),fidx(dims),oidx(dims-1),osize(dims-1)
+          integer(FP_SIZE) :: k1a,nk1a,l,nout,o,s,coff
+          real(FP_REAL)    :: h(MAX_ORDER+1),csupp(MAX_ORDER+1)
+
+          ier  = FITPACK_INPUT_ERROR
+          if (ax<1 .or. ax>dims) return
+          nk1  = n-k-1
+          k1a  = k(ax)+1
+          nk1a = nk1(ax)
+          if (u<t(k1a,ax) .or. u>t(nk1a+1,ax)) return
+          ier  = FITPACK_OK
+
+          !  non-zero B-splines of the fixed axis at u
+          l = fp_knot_interval(t(1:n(ax),ax), u, k1a, nk1a)
+          h = fpbspl(t(1:n(ax),ax), n(ax), k(ax), u, l)
+
+          cstride = fp_grid_strides(dims,nk1)
+
+          !  sizes of the surviving axes, in original order (skipping ax)
+          dd = 0
+          do d=1,dims
+             if (d==ax) cycle
+             dd = dd+1
+             osize(dd) = nk1(d)
+          end do
+          nout = product(osize)
+
+          !  for each surviving-axis multi-index, contract the ax-support against h
+          do o=0,nout-1
+             oidx = fp_grid_unravel(dims-1,o,osize)
+             !  build the full multi-index with axis ax at the support root (1-based l-k1a+1)
+             dd = 0
+             do d=1,dims
+                if (d==ax) then
+                   fidx(d) = l-k1a+1
+                else
+                   dd = dd+1
+                   fidx(d) = oidx(dd)
+                end if
+             end do
+             coff = fp_grid_index(dims,fidx,cstride)     ! 0-based offset of the support root
+             do s=1,k1a
+                csupp(s) = c(coff + (s-1)*cstride(ax) + 1)
+             end do
+             cu(o+1) = dot_product(h(1:k1a),csupp(1:k1a))
+          end do
+          return
+      end subroutine profil_nd
 
 
       ! given the set of values z(i,j) on the rectangular grid (x(i),y(j)),i=1,...,mx;j=1,...,my, subroutine

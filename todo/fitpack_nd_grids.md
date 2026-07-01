@@ -1,6 +1,6 @@
 # Extending FITPACK to N-Dimensional Gridded Splines — Feasibility & Design
 
-**Status:** IMPLEMENTED. The dimension-generic core (`regrid → fpregr → fpgrre` fit, `ndspev → fpndsp` eval) replaced the legacy 2-D trio and now backs both the 2-D `fitpack_grid_surface` and the new runtime-`dims` `fitpack_gridded_spline` class (3D+). Note: the endgame differed from §5.3 below — the team chose **one runtime-`dims` public type** (not fypp-generated concrete faces), with an F2018 `select rank` + `row_major` face for rank-natural input, since a `select rank` construct sidesteps the "rank problem" of §5.2 without preprocessing. C bindings (§ slice 10) and derivative/integral peripherals remain future work.
+**Status:** IMPLEMENTED. The dimension-generic core (`regrid → fpregr → fpgrre` fit, `ndspev → fpndsp` eval) replaced the legacy 2-D trio and now backs both the 2-D `fitpack_grid_surface` and the new runtime-`dims` `fitpack_gridded_spline` class (3D+). Note: the endgame differed from §5.3 below — the team chose **one runtime-`dims` public type** (not fypp-generated concrete faces), with an F2018 `select rank` + `row_major` face for rank-natural input, since a `select rank` construct sidesteps the "rank problem" of §5.2 without preprocessing. The **peripherals are now generalized too** — scattered evaluation (`bispeu_nd`), partial derivatives (`pardtc_nd`/`parder_nd`/`pardeu_nd`), the box integral (`dblint_nd`), and the cross-section (`profil_nd`), each gated bit-for-bit against its 2-D routine at dims=2 (Gates I–M) and wired as `fitpack_gridded_spline` methods (`eval`/`dfdx`/`dfdx_ongrid`/`integral`/`cross_section`/`derivative_spline`). **C bindings (§ slice 10) are the sole remaining future work.**
 **Scope:** tensor-product *gridded* smoothing splines over a `d`-dimensional domain (`d = 3 … ~6`), generalizing the current 1-D (`fitpack_curve`) and 2-D (`fitpack_grid_surface`) gridded fitters.
 **Out of scope:** N-D *scattered* fitting (see §3).
 
@@ -12,22 +12,26 @@ The dimension-generic **fit** (`regrid`/`fpregr`/`fpgrre`) and **eval** (`ndspev
 cores are done, the legacy 2-D fit trio is retired, and the public runtime-`dims` class
 `fitpack_gridded_spline` (fit + eval + comm serialization) is implemented and tested — Gate H
 in `test/fitpack_grid_nd_tests.f90` asserts the class equals a direct `regrid`+`ndspev` call
-bit-for-bit at dims=3 and dims=5, plus the `row_major` flag and comm round-trip. What is **not
-yet generalized** to N-D (each was deferred from the v1 method scope):
+bit-for-bit at dims=3 and dims=5, plus the `row_major` flag and comm round-trip. The peripherals
+below are **now DONE** (Gates I–M); only the C bindings remain:
 
-| Item | 2-D routine(s) to generalize | Sketch |
+| Item | 2-D routine(s) generalized | Status |
 |------|------------------------------|--------|
-| **Partial derivatives** | `parder`, `pardeu` | Differentiate the tensor product along one or more axes (per-axis B-spline derivative coefficients), then evaluate through the `ndspev`/`fpndsp` machinery. Add `fitpack_gridded_spline%dfdx` / `%dfdx_ongrid`. |
-| **Domain integral** | `dblint` (2-D box integral) | The `d`-fold box integral \f$ \int\!\cdots\!\int s\,dx_1\cdots dx_d \f$ over per-axis limits is **separable**: a product of 1-D B-spline integrals per axis contracted against the coefficient tensor. Add `%integral`. |
-| **Cross-section / slice** | `profil` (fix one axis) | Partial evaluation: fix one (or more) axes at a value to obtain the coefficients of a `dims-1` spline. Add `%cross_section`. |
-| **C bindings (slice 10)** | `regrid_c` / `bispev_c` template | First surface-family opaque-pointer C binding. Follow `fitpack_curve_c` (`src/fitpack_curves_c.f90`): opaque `type, bind(C)` + `_allocate`/`_destroy`/`_get_pointer` + flat `fp_*_c` method functions (scalars by value, arrays by pointer). New file `src/fitpack_gridded_splines_c.f90`. |
+| **Scattered evaluation** | `bispeu` | **DONE** — `bispeu_nd` (mixed-radix odometer, self-managed basis). Class `%eval`. Gate I. |
+| **Partial derivatives** | `parder`, `pardeu`, `pardtc` | **DONE** — `pardtc_nd` (per-axis derivative recurrence + repack), `parder_nd` (= `pardtc_nd` + `ndspev`), `pardeu_nd` (= `pardtc_nd` + `bispeu_nd`). Class `%dfdx` / `%dfdx_ongrid` / `%derivative_spline`. Gate J/M. |
+| **Domain integral** | `dblint` (2-D box integral) | **DONE** — `dblint_nd`: per-axis `fpintb` vectors contracted against the coefficient tensor (fpndsp odometer, bit-for-bit at dims=2). Class `%integral`. Gate K. |
+| **Cross-section / slice** | `profil` (fix one axis) | **DONE** — `profil_nd`: fix one axis → `dims-1` spline. Class `%cross_section` returns a `fitpack_gridded_spline` of `dims-1`. Gate L/M. |
+| **C bindings (slice 10)** | `regrid_c` / `bispev_c` template | **REMAINING.** First surface-family opaque-pointer C binding. Follow `fitpack_curve_c` (`src/fitpack_curves_c.f90`): opaque `type, bind(C)` + `_allocate`/`_destroy`/`_get_pointer` + flat `fp_*_c` method functions (scalars by value, arrays by pointer). New file `src/fitpack_gridded_splines_c.f90`. |
 
 **Where things live**
 - Core N-D routines (all in `src/fitpack_core.F90`): `regrid`, `fpregr`, `fpgrre` (fit);
-  `ndspev`, `fpndsp` (eval); `new_knot_dimension_nd` (knot-direction arbiter).
+  `ndspev`, `fpndsp` (eval); `new_knot_dimension_nd` (knot-direction arbiter); peripherals
+  `bispeu_nd`, `pardtc_nd`, `parder_nd`, `pardeu_nd`, `dblint_nd`, `profil_nd`.
 - Public class: `src/fitpack_gridded_splines.f90` (`fitpack_gridded_spline`, extends
-  `fitpack_fitter`; runtime `dims`, fixed-`MAX_IDIM` metadata, `select rank` + `row_major` face).
-- Tests: `test/fitpack_grid_nd_tests.f90` — Gates A/D/D'/E/F/G (cores) + H (class).
+  `fitpack_fitter`; runtime `dims`, fixed-`MAX_IDIM` metadata, `select rank` + `row_major` face;
+  methods `eval`/`eval_ongrid`/`dfdx`/`dfdx_ongrid`/`integral`/`cross_section`/`derivative_spline`).
+- Tests: `test/fitpack_grid_nd_tests.f90` — Gates A/D/D'/E/F/G (cores) + H (class) + I/J/K/L
+  (peripheral cores, bit-for-bit at dims=2 & independent oracle at dims=3) + M (class peripherals).
 
 **Method to follow** — same as slices 1–11: generalize each peripheral behind an
 independent-oracle gate (the pattern of Gates D/D'/E/F/G/H, e.g. `fp==SSR`, separable-product,
