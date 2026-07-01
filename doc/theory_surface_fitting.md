@@ -160,6 +160,93 @@ method differs.
 
 @see Dierckx, Ch. 5, &sect;5.4 (pp. 98&ndash;103)
 
+## N-Dimensional Gridded Splines {#nd_gridded_splines}
+
+The Kronecker structure that makes `regrid` fast is not special to two
+dimensions. For data sampled on a \f$ d \f$-dimensional rectangular grid
+\f$ z_{i_1 i_2 \cdots i_d} = z\big(x^{(1)}_{i_1}, x^{(2)}_{i_2}, \ldots, x^{(d)}_{i_d}\big) \f$,
+FITPACK fits a \f$ d \f$-fold **tensor-product** B-spline
+
+\f[
+    s(x_1, \ldots, x_d) = \sum_{j_1} \sum_{j_2} \cdots \sum_{j_d}
+        c_{j_1 j_2 \cdots j_d} \prod_{r=1}^{d} N^{(r)}_{j_r, k_r}(x_r)
+\f]
+
+where \f$ N^{(r)}_{j, k_r} \f$ is the \f$ j \f$-th B-spline of degree
+\f$ k_r \f$ on the knot vector of axis \f$ r \f$. The routines that fit and
+evaluate the 2-D surface &mdash; `regrid` and `ndspev` &mdash; are written for
+runtime dimension `dims`, and the generic `fitpack_gridded_spline` type wraps
+them for any \f$ d \le \f$ `MAX_IDIM`.
+
+### Dimension-by-Dimension Solution
+
+The observation matrix is a \f$ d \f$-fold Kronecker product
+
+\f[
+    \mathbf{A}_{\text{grid}} = \mathbf{B}_1 \otimes \mathbf{B}_2 \otimes \cdots \otimes \mathbf{B}_d
+\f]
+
+so the least-squares system separates: the coefficient tensor is obtained by
+solving banded systems **one axis at a time**, sweeping \f$ r = 1, \ldots, d \f$
+and contracting each axis in turn. The cost is
+
+\f[
+    \mathcal{O}\!\left( \Big(\textstyle\prod_{r=1}^{d} m_r\Big) \cdot \sum_{r=1}^{d} k_r \right),
+\f]
+
+linear in the total number of grid points \f$ \prod_r m_r \f$ &mdash; the same
+per-point efficiency as the 2-D case, generalized.
+
+### Alternating-Direction Knot Placement
+
+In the smoothing mode, knots are added adaptively until the residual meets the
+target. With more than one axis, only one axis is refined per iteration: the
+arbiter `new_knot_dimension_nd` picks the axis with the largest residual that
+has not yet reached its knot ceiling, so refinement **alternates** between
+directions rather than exhausting one axis first. This is the \f$ d \f$-way
+generalization of the two-way \f$ x \leftrightarrow y \f$ alternation in
+`regrid`.
+
+### Canonical Data Layout
+
+The value grid is stored as a **flat, row-major buffer** with domain axis 1 the
+slowest-varying and axis \f$ d \f$ the fastest:
+
+\f[
+    \text{offset}(i_1, \ldots, i_d)
+      = \Big( \cdots \big( (i_1 - 1)\, m_2 + (i_2 - 1) \big)\, m_3 + \cdots \Big)\, m_d + (i_d - 1).
+\f]
+
+The concrete 2-D `fitpack_grid_surface` stores \f$ z(i_y, i_x) \f$, whose
+column-major memory is exactly this row-major buffer with the axes reversed;
+`fitpack_gridded_spline` accepts either convention through an optional
+`row_major` flag (permuting only on the one-time ingest copy).
+
+### Smoothing Target and Vocabulary
+
+The smoothing factor scales with the grid size: a natural starting choice is
+\f$ S \approx \prod_{r=1}^{d} m_r \f$ (roughly unit expected squared residual
+per point), decreased to follow more detail. Two distinct "dimension" counts
+appear and must not be confused:
+
+| Symbol | Meaning |
+|--------|---------|
+| \f$ d \f$ (`dims`, `ndim`) | number of **domain** axes \f$ x_1, \ldots, x_d \f$ |
+| `idim` | number of **codomain** components (for vector-valued data) |
+
+The gridded routines fit a scalar field (\f$ \texttt{idim} = 1 \f$); `dims` is
+what the generic type varies at runtime.
+
+### Practical Ceiling
+
+Memory, not arithmetic, sets the limit. The coefficient tensor has
+\f$ \prod_r (n_r - k_r - 1) \f$ entries and the value grid \f$ \prod_r m_r \f$,
+both growing exponentially in \f$ d \f$. In practice \f$ d \approx 3\text{&ndash;}5 \f$
+is the useful range for dense grids; beyond that the full tensor becomes
+memory-bound, and sparse or reduced-rank representations are preferable.
+
+@see `regrid`, `ndspev`, `fitpack_gridded_spline`; Dierckx, Ch. 5, &sect;5.4
+
 ## The Smoothing Norm
 
 For bivariate splines, the roughness measure used in the smoothing formulation

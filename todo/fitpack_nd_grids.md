@@ -1,6 +1,6 @@
 # Extending FITPACK to N-Dimensional Gridded Splines — Feasibility & Design
 
-**Status:** design / scoping (not yet started)
+**Status:** IMPLEMENTED. The dimension-generic core (`regrid → fpregr → fpgrre` fit, `ndspev → fpndsp` eval) replaced the legacy 2-D trio and now backs both the 2-D `fitpack_grid_surface` and the new runtime-`dims` `fitpack_gridded_spline` class (3D+). Note: the endgame differed from §5.3 below — the team chose **one runtime-`dims` public type** (not fypp-generated concrete faces), with an F2018 `select rank` + `row_major` face for rank-natural input, since a `select rank` construct sidesteps the "rank problem" of §5.2 without preprocessing. C bindings (§ slice 10) and derivative/integral peripherals remain future work.
 **Scope:** tensor-product *gridded* smoothing splines over a `d`-dimensional domain (`d = 3 … ~6`), generalizing the current 1-D (`fitpack_curve`) and 2-D (`fitpack_grid_surface`) gridded fitters.
 **Out of scope:** N-D *scattered* fitting (see §3).
 
