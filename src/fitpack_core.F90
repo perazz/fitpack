@@ -63,11 +63,13 @@ module fitpack_core
     public :: spgrid ! * Surface fitting to data on a spherical grid
     public :: parsur ! * Parametric surface fitting to data on a grid
 
-    ! N-D gridded core (slice 1: dimensionalized at dims=2 behind a bit-for-bit gate; see
+    ! N-D gridded core (dimensionalized behind a bit-for-bit gate at dims=2; see
     ! todo/fitpack_nd_grids.md). fpregr_nd/fpgrre_nd stay private and are covered transitively
-    ! by the regrid_nd backbone gate.
+    ! by the regrid_nd backbone gate. fpndsp is the N-D evaluation kernel; ndspev its public
+    ! flat-workspace wrapper (the N-D analogue of fpbisp/bispev).
     public :: regrid_nd ! N-D generalization of regrid (gridded smoothing fit)
-    public :: fpbisp_nd ! N-D generalization of fpbisp (gridded evaluation)
+    public :: fpndsp    ! N-D generalization of fpbisp (gridded evaluation kernel)
+    public :: ndspev    ! N-D generalization of bispev (gridded evaluation, flat workspace)
 
     ! Surface application routines
     public :: bispeu ! * Evaluation of a bivariate spline function
@@ -2294,7 +2296,7 @@ module fitpack_core
       !! @param[out] lidx  Per-axis knot interval indices, `lidx(m(d),d)` (mirrors fpbisp `lx,ly`)
       !!
       !! @see fpbisp, Dierckx Ch. 2 §2.1.2 (pp. 28-30) Eq. 2.14-2.17; todo/fitpack_nd_grids.md (slice 1)
-      pure subroutine fpbisp_nd(dims,t,n,c,k,xg,m,z,w,lidx)
+      pure subroutine fpndsp(dims,t,n,c,k,xg,m,z,w,lidx)
           integer(FP_DIM),  intent(in)  :: dims
           integer(FP_SIZE), intent(in)  :: n(dims),k(dims),m(dims)
           real(FP_REAL),    intent(in)  :: t(:,:),c(:),xg(:,:)
@@ -2375,7 +2377,71 @@ module fitpack_core
              z(mout) = sp
           end do
           return
-      end subroutine fpbisp_nd
+      end subroutine fpndsp
+
+      !> @brief N-D generalization of bispev: evaluate a tensor-product spline on a grid.
+      !!
+      !! Public flat-workspace front-end to fpndsp (the evaluation kernel). Mirrors bispev: the
+      !! caller supplies flat real `wrk(lwrk)` / integer `iwrk(kwrk)` scratch, which are carved by
+      !! pointer bounds remapping into the padded per-axis basis table `w(maxm,maxk1,dims)` and the
+      !! interval-index matrix `lidx(maxm,dims)` that fpndsp expects (`maxm=maxval(m)`,
+      !! `maxk1=maxval(k)+1`). At `dims=2` this is bit-for-bit identical to bispev.
+      !!
+      !! Minimum workspace: `lwrk >= maxval(m)*(maxval(k)+1)*dims`, `kwrk >= maxval(m)*dims`.
+      !!
+      !! @param[in]  dims  Number of axes (domain dimension)
+      !! @param[in]  t     Per-axis knot vectors; column \f$ d \f$ is `t(1:n(d),d)`
+      !! @param[in]  n     Number of knots per axis, `n(dims)`
+      !! @param[in]  c     B-spline coefficient tensor, flat row-major (first axis varies slowest)
+      !! @param[in]  k     Spline degree per axis, `k(dims)`
+      !! @param[in]  xg    Per-axis evaluation grids; column \f$ d \f$ is `xg(1:m(d),d)`
+      !! @param[in]  m     Number of evaluation points per axis, `m(dims)`
+      !! @param[out] z     Spline values at grid points, flat row-major (first axis varies slowest)
+      !! @param      wrk   Real workspace, `wrk(lwrk)` (target; carved into the basis table)
+      !! @param[in]  lwrk  Size of `wrk`
+      !! @param      iwrk  Integer workspace, `iwrk(kwrk)` (target; carved into the interval indices)
+      !! @param[in]  kwrk  Size of `iwrk`
+      !! @param[out] ier   FITPACK_OK on success, FITPACK_INPUT_ERROR on bad input/workspace
+      !!
+      !! @see bispev, fpndsp; Dierckx Ch. 2 §2.1.2 (pp. 28-30); todo/fitpack_nd_grids.md (slice 5)
+      pure subroutine ndspev(dims,t,n,c,k,xg,m,z,wrk,lwrk,iwrk,kwrk,ier)
+          integer(FP_DIM),  intent(in)            :: dims
+          integer(FP_SIZE), intent(in)            :: n(dims),k(dims),m(dims),lwrk,kwrk
+          real(FP_REAL),    intent(in)            :: t(:,:),c(:),xg(:,:)
+          real(FP_REAL),    intent(out)           :: z(:)
+          real(FP_REAL),    intent(inout), target :: wrk(lwrk)
+          integer(FP_SIZE), intent(inout), target :: iwrk(kwrk)
+          integer(FP_FLAG), intent(out)           :: ier
+
+          !  ..local scalars..
+          integer(FP_DIM)  :: d
+          integer(FP_SIZE) :: maxm,maxk1,lwest,kwest
+          !  ..workspace views (carved from wrk/iwrk; contiguous by construction)..
+          real(FP_REAL),    pointer, contiguous :: pw(:,:,:)
+          integer(FP_SIZE), pointer, contiguous :: plidx(:,:)
+
+          ier = FITPACK_INPUT_ERROR
+
+          !  workspace sizing: padded per-axis cuboid (the widest axis sets both leading extents)
+          maxm  = maxval(m)
+          maxk1 = maxval(k)+1
+          lwest = maxm*maxk1*dims
+          kwest = maxm*dims
+          if (lwrk<lwest .or. kwrk<kwest) return
+          if (any(m<1)) return
+
+          !  strict monotonicity of each evaluation grid (mirrors bispev's x/y checks)
+          do d=1,dims
+             if (m(d)>1 .and. any(xg(2:m(d),d)<xg(1:m(d)-1,d))) return
+          end do
+
+          ier = FITPACK_OK
+          pw(1:maxm,1:maxk1,1:dims) => wrk(1:lwest)
+          plidx(1:maxm,1:dims)      => iwrk(1:kwest)
+          call fpndsp(dims,t,n,c,k,xg,m,z,pw,plidx)
+          return
+
+      end subroutine ndspev
 
 
       !> @brief Evaluate the non-zero B-splines at a given point.

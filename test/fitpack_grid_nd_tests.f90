@@ -7,15 +7,15 @@
 !   exercises the first genuine dims>2 path (the eval contraction at dims=3) against independent refs.
 !
 !   Gates:
-!     A. fpbisp_nd  vs bispev  (gridded evaluation, dims=2 bit-for-bit)
+!     A. fpndsp  vs bispev  (gridded evaluation, dims=2 bit-for-bit)
 !     D. regrid_nd  vs regrid  (gridded fit; transitively covers fpregr_nd and fpgrre_nd, whose
 !                               outputs tx,ty,c,fp,nx,ny are exactly what regrid_nd returns)
 !     D'. regrid_nd vs regrid on a NON-SQUARE grid (mx /= my) — guards the z = (ny,nx) y-fast data
 !                               convention so an x<->y axis/size swap cannot hide behind mx==my
-!     E. fpbisp_nd(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
+!     E. fpndsp(dims=3) vs independent references (slice 2) — separable coeffs vs a product of 1-D
 !                               splev, and non-separable coeffs vs the dims=2 path combined along z
 !     F. regrid_nd(dims=3) least-squares FIT on given knots (slice 3) — the generalized fpgrre_nd solve
-!                               recovers an in-space polynomial; checked vs the closed-form (fpbisp_nd)
+!                               recovers an in-space polynomial; checked vs the closed-form (fpndsp)
 !
 !   See todo/fitpack_nd_grids.md (slices 1–3) and Dierckx, Ch. 5 §5.4 (pp. 98-103).
 ! **************************************************************************************************
@@ -57,11 +57,11 @@ module fitpack_grid_nd_tests
         ! Gate D': same, on a NON-SQUARE grid (mx /= my) so an x<->y data/size swap cannot hide
         if (success) success = gate_regrid_nd_nonsquare(useUnit)
 
-        ! Gate A: fpbisp_nd vs bispev
-        if (success) success = gate_fpbisp_nd(useUnit)
+        ! Gate A: fpndsp vs bispev
+        if (success) success = gate_fpndsp(useUnit)
 
-        ! Gate E: fpbisp_nd at dims=3 vs two independent references (the first genuine dims>2 path)
-        if (success) success = gate_fpbisp_nd_3d(useUnit)
+        ! Gate E: fpndsp at dims=3 vs two independent references (the first genuine dims>2 path)
+        if (success) success = gate_fpndsp_3d(useUnit)
 
         ! Gate F: regrid_nd at dims=3 — the first genuine dims>2 FIT (generalized fpgrre_nd solve)
         if (success) success = gate_regrid_nd_3d(useUnit)
@@ -104,8 +104,8 @@ module fitpack_grid_nd_tests
                     wrk,LWRK,iwrk,KWRK,ier)
     end subroutine fit_regrid
 
-    !> @brief Gate A — fpbisp_nd(dims=2) must equal bispev's gridded evaluation bit-for-bit.
-    logical function gate_fpbisp_nd(useUnit) result(ok)
+    !> @brief Gate A — fpndsp(dims=2) must equal bispev's gridded evaluation bit-for-bit.
+    logical function gate_fpndsp(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
         type(grid_case)  :: cs(3),gc
@@ -115,10 +115,11 @@ module fitpack_grid_nd_tests
         ! reference evaluation (bispev)
         real(FP_REAL)    :: zref(size(daregr_x)*size(daregr_y)),ewrk(NCMAX)
         integer(FP_SIZE) :: eiwrk(KWRK)
-        ! fpbisp_nd marshalling
+        ! fpndsp marshalling
         real(FP_REAL)    :: ztest(size(daregr_x)*size(daregr_y))
-        real(FP_REAL),    allocatable :: t(:,:),xg(:,:),w(:,:,:)
-        integer(FP_SIZE), allocatable :: lidx(:,:)
+        real(FP_REAL)    :: ztest2(size(daregr_x)*size(daregr_y))
+        real(FP_REAL),    allocatable :: t(:,:),xg(:,:),w(:,:,:),nwrk(:)
+        integer(FP_SIZE), allocatable :: lidx(:,:),niwrk(:)
         integer(FP_SIZE) :: n2(2),k2(2),m2(2)
         integer          :: icase
         real(FP_REAL)    :: maxdiff
@@ -151,7 +152,7 @@ module fitpack_grid_nd_tests
                 return
             end if
 
-            ! test: fpbisp_nd at dims=2
+            ! test: fpndsp at dims=2
             maxn  = max(nx,ny); maxm = max(mx,my); maxk1 = max(kx,ky)+1
             n2 = [nx,ny]; k2 = [kx,ky]; m2 = [mx,my]
             if (allocated(t)) deallocate(t,xg,w,lidx)
@@ -160,7 +161,7 @@ module fitpack_grid_nd_tests
             t(1:nx,1) = tx(1:nx);      t(1:ny,2) = ty(1:ny)
             xg(1:mx,1) = daregr_x;     xg(1:my,2) = daregr_y
 
-            call fpbisp_nd(2_FP_DIM,t,n2,c(1:nc),k2,xg,m2,ztest(1:mz),w,lidx)
+            call fpndsp(2_FP_DIM,t,n2,c(1:nc),k2,xg,m2,ztest(1:mz),w,lidx)
 
             maxdiff = maxval(abs(zref(1:mz)-ztest(1:mz)))
             if (.not.all(zref(1:mz)==ztest(1:mz))) then
@@ -168,13 +169,25 @@ module fitpack_grid_nd_tests
                 write(useUnit,1100) trim(gc%label),maxdiff
                 return
             end if
+
+            ! test: public ndspev wrapper (flat workspace, pointer-carved) -- must match bispev too
+            if (allocated(nwrk)) deallocate(nwrk,niwrk)
+            allocate(nwrk(maxm*maxk1*2),niwrk(maxm*2))
+            call ndspev(2_FP_DIM,t,n2,c(1:nc),k2,xg,m2,ztest2(1:mz), &
+                        nwrk,size(nwrk,kind=FP_SIZE),niwrk,size(niwrk,kind=FP_SIZE),ier)
+            if (.not.FITPACK_SUCCESS(ier) .or. .not.all(zref(1:mz)==ztest2(1:mz))) then
+                ok = .false.
+                write(useUnit,1200) trim(gc%label),maxval(abs(zref(1:mz)-ztest2(1:mz)))
+                return
+            end if
         end do
 
-        write(useUnit,'(a)') '[gate A] fpbisp_nd == bispev (bit-for-bit, all cases)'
+        write(useUnit,'(a)') '[gate A] fpndsp == ndspev == bispev (bit-for-bit, all cases)'
 
         1000 format('[gate A] ',a,' failed for ',a,': ',a)
-        1100 format('[gate A] fpbisp_nd /= bispev for ',a,'  (max |diff| = ',1pe12.3,')')
-    end function gate_fpbisp_nd
+        1100 format('[gate A] fpndsp /= bispev for ',a,'  (max |diff| = ',1pe12.3,')')
+        1200 format('[gate A] ndspev /= bispev for ',a,'  (max |diff| = ',1pe12.3,')')
+    end function gate_fpndsp
 
     !> @brief Gate D — regrid_nd(dims=2) must equal regrid bit-for-bit across all iopt modes.
     !!
@@ -382,15 +395,15 @@ module fitpack_grid_nd_tests
         t(n-k:n) = one
     end subroutine clamped_unit_knots
 
-    !> @brief Gate E — fpbisp_nd at dims=3 vs two independent references (the first genuine dims>2 path).
+    !> @brief Gate E — fpndsp at dims=3 vs two independent references (the first genuine dims>2 path).
     !!
     !! Reference 1 (separable): coefficients c(i,j,l)=a(i)*b(j)*d(l) make the 3-D tensor spline
     !! factorize to sx(x)*sy(y)*sz(z); the reference grid is the outer product of three verified 1-D
     !! splev evaluations.  Reference 2 (non-separable): each z-coefficient slab is evaluated over the
-    !! (x,y) plane with the gate-A-verified fpbisp_nd(dims=2), then combined along z with an explicit
+    !! (x,y) plane with the gate-A-verified fpndsp(dims=2), then combined along z with an explicit
     !! B-spline basis (fpbspl) — catching axis-ordering / separation bugs the symmetric case can hide.
     !! Distinct per-axis orders and grid sizes, so an axis swap cannot pass unnoticed.
-    logical function gate_fpbisp_nd_3d(useUnit) result(ok)
+    logical function gate_fpndsp_3d(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
         ! distinct per-axis orders, coefficient counts and eval-grid sizes (never equal: no axis hides)
@@ -445,7 +458,7 @@ module fitpack_grid_nd_tests
            end do
         end do
 
-        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
+        call fpndsp(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
 
         call splev(t3(1:nx,1),nx,av(1:nx),kx,xg3(1:mx,1),sx,mx,OUTSIDE_EXTRAPOLATE,ier)
         call splev(t3(1:ny,2),ny,bv(1:ny),ky,xg3(1:my,2),sy,my,OUTSIDE_EXTRAPOLATE,ier)
@@ -474,7 +487,7 @@ module fitpack_grid_nd_tests
            end do
         end do
 
-        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
+        call fpndsp(3_FP_DIM,t3,n3,c3,k3,xg3,m3,z3,w3,lidx3)
 
         ! evaluate the (x,y) plane of each z-coefficient slab with the gate-A-verified dims=2 path
         n2 = [nx,ny]; k2 = [kx,ky]; m2 = [mx,my]
@@ -486,7 +499,7 @@ module fitpack_grid_nd_tests
                  c2((ix-1)*nk1y+iy) = c3((ix-1)*nk1y*nk1z+(iy-1)*nk1z+l)
               end do
            end do
-           call fpbisp_nd(2_FP_DIM,t2,n2,c2,k2,xg2,m2,z2,w2,lidx2)
+           call fpndsp(2_FP_DIM,t2,n2,c2,k2,xg2,m2,z2,w2,lidx2)
            v2(:,l) = z2
         end do
 
@@ -507,10 +520,10 @@ module fitpack_grid_nd_tests
            ok = .false.; write(useUnit,3000) 'non-separable',maxdiff; return
         end if
 
-        write(useUnit,'(a)') '[gate E] fpbisp_nd(dims=3) == separable & nested-2D references'
+        write(useUnit,'(a)') '[gate E] fpndsp(dims=3) == separable & nested-2D references'
 
-        3000 format('[gate E] fpbisp_nd(dims=3) /= ',a,' reference  (max |diff| = ',1pe12.3,')')
-    end function gate_fpbisp_nd_3d
+        3000 format('[gate E] fpndsp(dims=3) /= ',a,' reference  (max |diff| = ',1pe12.3,')')
+    end function gate_fpndsp_3d
 
     !> @brief Gate F — regrid_nd at dims=3 (least-squares fit on given knots) vs a closed-form oracle.
     !!
@@ -521,7 +534,7 @@ module fitpack_grid_nd_tests
     !! hand-built clamped knots with nk1(d)<m(d) (genuinely over-determined, so the residual path runs);
     !! the binary knot-direction arbiter is provably untouched on the iopt<0 path. Two independent
     !! checks: the residual fp must vanish, and the fitted spline -- evaluated by the gate-A/E-verified
-    !! fpbisp_nd(dims=3) at strictly-interior probe points off the data grid -- must reproduce the
+    !! fpndsp(dims=3) at strictly-interior probe points off the data grid -- must reproduce the
     !! closed-form f. Distinct per-axis orders and grid sizes, so an axis swap cannot pass unnoticed.
     logical function gate_regrid_nd_3d(useUnit) result(ok)
         integer, intent(in) :: useUnit
@@ -591,7 +604,7 @@ module fitpack_grid_nd_tests
         do i=1,mpy; xgp(i,2) = (real(i,FP_REAL)-half)/real(mpy,FP_REAL); end do
         do i=1,mpw; xgp(i,3) = (real(i,FP_REAL)-half)/real(mpw,FP_REAL); end do
 
-        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xgp,mp3,zp,wp,lidxp)
+        call fpndsp(3_FP_DIM,t3,n3,c3,k3,xgp,mp3,zp,wp,lidxp)
 
         maxdiff = zero
         do ix=1,mpx
@@ -639,7 +652,7 @@ module fitpack_grid_nd_tests
     !! spline space, so smoothing genuinely adds knots). After fitting: (1) success, (2) the smoothing
     !! identity |fp-s|<=tol*s, (3) knots distributed -- in particular axis 3 received knots, which the
     !! old literal-2 arbiter could never do, and (4) fp equals the unit-weight SSR recomputed through
-    !! the gate-A/E/F-verified fpbisp_nd.
+    !! the gate-A/E/F-verified fpndsp.
     logical function gate_regrid_nd_3d_smoothing(useUnit) result(ok)
         integer, intent(in) :: useUnit
 
@@ -702,8 +715,8 @@ module fitpack_grid_nd_tests
            ok = .false.; write(useUnit,3100) n3(1),n3(2),n3(3); return
         end if
 
-        ! check 3: fp equals the unit-weight SSR recomputed through the independent fpbisp_nd
-        call fpbisp_nd(3_FP_DIM,t3,n3,c3,k3,xg3,m3,zfit,w3,lidx3)
+        ! check 3: fp equals the unit-weight SSR recomputed through the independent fpndsp
+        call fpndsp(3_FP_DIM,t3,n3,c3,k3,xg3,m3,zfit,w3,lidx3)
         ssr = zero
         do ix=1,mx
            do iy=1,my
@@ -714,7 +727,7 @@ module fitpack_grid_nd_tests
            end do
         end do
         if (abs(ssr-fp) > 1.0e-9_FP_REAL*max(fp,one)) then
-           ok = .false.; write(useUnit,3000) 'fp /= SSR via fpbisp_nd', abs(ssr-fp); return
+           ok = .false.; write(useUnit,3000) 'fp /= SSR via fpndsp', abs(ssr-fp); return
         end if
 
         write(useUnit,'(a)') '[gate G] regrid_nd(dims=3) smoothing converges, distributes knots, fp==SSR'
