@@ -13,6 +13,7 @@
 #include "fpCurve.hpp"
 #include "fpClosedCurve.hpp"
 #include "fpConstrainedCurve.hpp"
+#include "fpConstrainedCurveTemplate.hpp"
 #include "fpParametricCurve.hpp"
 #include "fpPeriodicCurve.hpp"
 
