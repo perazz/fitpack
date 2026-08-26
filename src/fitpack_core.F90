@@ -1864,10 +1864,11 @@ module fitpack_core
 
       !> @brief Is the triangular factor of the Givens reduction rank deficient?
       !!
-      !! fpback and fpbacp divide by the diagonal `a(i,1)`. An exactly zero diagonal - duplicated
-      !! abscissae, or a knot span whose data all carry zero weight - leaves the corresponding
-      !! B-spline coefficient unconstrained, so the fit is not determined. Callers that report a
-      !! status test the factor they have just built before solving with it.
+      !! fpback and fpbacp keep the fit finite whatever the factor looks like: a zero diagonal
+      !! element leaves its coefficient at zero instead of dividing. This predicate is how a caller
+      !! turns that silent repair into a reported status, so it runs **once per fit**, on the factor
+      !! that produced the accepted coefficients - never inside the knot or smoothing iterations,
+      !! where the inline guards already do the work.
       !!
       !! @param[in] a     Triangular factor in band storage; `a(i,1)` is the diagonal
       !! @param[in] n     Number of equations
@@ -1876,7 +1877,12 @@ module fitpack_core
       pure logical(FP_BOOL) function fp_rank_deficient(a,n,nest) result(singular)
          integer(FP_SIZE), intent(in) :: n,nest
          real(FP_REAL),    intent(in) :: a(nest,*)
-         singular = any(equal(a(1:n,1),zero))
+         integer(FP_SIZE) :: i
+         singular = FP_TRUE
+         do i=1,n
+            if (equal(a(i,1),zero)) return
+         end do
+         singular = FP_FALSE
       end function fp_rank_deficient
 
       !> @brief Solve a bordered upper triangular system by back-substitution.
@@ -4823,8 +4829,9 @@ module fitpack_core
       integer(FP_SIZE) :: i,it,iter,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1)
-      logical(FP_BOOL) :: new,check1,check3,success
+      logical(FP_BOOL) :: new,check1,check3,success,accepted
 
+      accepted = FP_FALSE
       fpold = zero
       fp0   = zero
       nplus = 0
@@ -4966,27 +4973,30 @@ module fitpack_core
         fpint(n-1:n) = [fpold,fp0]
         nrdata(n) = nplus
 
-        ! a rank-deficient triangle leaves coefficients unconstrained: the fit is not determined.
-        if (fp_rank_deficient(a,nk1,nest)) then
-            ier = FITPACK_S_TOO_SMALL
-            return
-        end if
-
         ! backward substitution to obtain the b-spline coefficients.
         c(:nk1) = fpback(a,z,nk1,k1,nest)
 
-        ! test whether the approximation sinf(x) is an acceptable solution.
-        if (iopt<0) return
+        ! test whether the approximation sinf(x) is an acceptable solution. the three acceptance
+        ! exits leave through the epilogue below, which screens the accepted factor once.
+        if (iopt<0) then
+            accepted = FP_TRUE
+            exit main_loop
+        end if
 
-        fpms = fp-s; if(abs(fpms)<acc) return
+        fpms = fp-s
+        if (abs(fpms)<acc) then
+            accepted = FP_TRUE
+            exit main_loop
+        end if
 
-        ! if f(p=inf) < s accept the choice of knots.
+        ! if f(p=inf) < s accept the choice of knots and go on to the smoothing spline.
         if (fpms<zero) exit main_loop
 
         ! if n = nmax, sinf(x) is an interpolating spline.
         if (n==nmax) then
-            ier = FITPACK_INTERPOLATING_OK
-            return
+            ier      = FITPACK_INTERPOLATING_OK
+            accepted = FP_TRUE
+            exit main_loop
         end if
 
         ! increase the number of knots.
@@ -5070,9 +5080,14 @@ module fitpack_core
       !  restart the computations with the new set of knots.
       end do main_loop
 
-      !  test whether the least-squares kth degree polynomial is a solution
-      !  of our approximation problem.
-      if (ier==FITPACK_LEASTSQUARES_OK) return
+      !  sinf(x) is the answer whenever the knot pass accepted it, and also when the least-squares
+      !  kth degree polynomial already solves our approximation problem. screen the factor that
+      !  produced those coefficients: a zero diagonal means the back substitution had to leave a
+      !  coefficient unconstrained, so the fit is not determined.
+      if (accepted .or. ier==FITPACK_LEASTSQUARES_OK) then
+          if (fp_rank_deficient(a,nk1,nest)) ier = FITPACK_S_TOO_SMALL
+          return
+      end if
 
       ! *****
       !  part 2: determination of the smoothing spline sp(x).
@@ -5127,11 +5142,6 @@ module fitpack_core
               call fp_rotate_shifted(h, k2, g, nest, yi, c, it, nk1)
           end do b_rows
 
-          if (fp_rank_deficient(g,nk1,nest)) then
-              ier = FITPACK_S_TOO_SMALL
-              return
-          end if
-
           ! backward substitution to obtain the b-spline coefficients.
           c(:nk1) = fpback(g,c,nk1,k2,nest)
 
@@ -5146,8 +5156,12 @@ module fitpack_core
               fp   = fp+(w(it)*(term-y(it)))**2
           end do get_fp
 
-          ! SUCCESS! the approximation sp(x) is an acceptable solution.
-          fpms = fp-s; if (abs(fpms)<acc) return
+          ! SUCCESS! the approximation sp(x) is an acceptable solution: screen its factor once.
+          fpms = fp-s
+          if (abs(fpms)<acc) then
+              if (fp_rank_deficient(g,nk1,nest)) ier = FITPACK_S_TOO_SMALL
+              return
+          end if
 
           ! find the new value of p and carry out one more step.
           call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)
