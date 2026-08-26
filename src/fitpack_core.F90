@@ -1796,11 +1796,18 @@ module fitpack_core
       !! \f$ R_1 \f$ is stored as `a(nest, k)` where `a(i,1)` holds the diagonal
       !! element \f$ r_{i,i} \f$ and `a(i,j)` for \f$ j > 1 \f$ holds \f$ r_{i,i+j-1} \f$.
       !!
-      !! @param[in] a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
-      !! @param[in] z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
-      !! @param[in] n     Number of equations (= number of B-spline coefficients)
-      !! @param[in] k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
-      !! @param[in] nest  Leading dimension of array `a`
+      !! ### Rank deficiency
+      !!
+      !! A row of \f$ R_1 \f$ reduces to exactly zero when the observation matrix is rank
+      !! deficient — duplicated abscissae, or a knot span whose data all carry zero weight. The
+      !! corresponding coefficient is then unconstrained: it is set to zero (the minimum-norm
+      !! choice) instead of being divided out into a NaN that silently poisons the whole fit.
+      !!
+      !! @param[in]  a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
+      !! @param[in]  z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
+      !! @param[in]  n     Number of equations (= number of B-spline coefficients)
+      !! @param[in]  k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
+      !! @param[in]  nest  Leading dimension of array `a`
       !!
       !! @return Solution vector \f$ c \f$ of length \f$ n \f$
       !!
@@ -1816,26 +1823,55 @@ module fitpack_core
       real(FP_REAL) :: store
       integer(FP_SIZE) :: i,i1,j,k1,l,m,jm1
       !  ..
-      k1   = k-1
-      c(n) = z(n)/a(n,1)
-      i    = n-1
-      if (i==0) return
+      k1 = k-1
 
-      jm1 = 1
-      rows: do j=2,n
-        store = z(i)
-        i1 = merge(jm1,k1,j<=k1)
-        m = i
-        do l=1,i1
-          m = m+1
-          store = store-c(m)*a(i,l+1)
-        end do
-        c(i) = store/a(i,1)
-        i = i-1
-        jm1 = j
-      end do rows
+      if (equal(a(n,1),zero)) then
+         c(n) = zero
+      else
+         c(n) = z(n)/a(n,1)
+      end if
+
+      i = n-1
+      if (i>0) then
+
+         jm1 = 1
+         rows: do j=2,n
+           store = z(i)
+           i1 = merge(jm1,k1,j<=k1)
+           m = i
+           do l=1,i1
+             m = m+1
+             store = store-c(m)*a(i,l+1)
+           end do
+           if (equal(a(i,1),zero)) then
+              c(i) = zero
+           else
+              c(i) = store/a(i,1)
+           end if
+           i = i-1
+           jm1 = j
+         end do rows
+
+      end if
 
       end function fpback
+
+      !> @brief Is the triangular factor of the Givens reduction rank deficient?
+      !!
+      !! fpback and fpbacp divide by the diagonal `a(i,1)`. An exactly zero diagonal - duplicated
+      !! abscissae, or a knot span whose data all carry zero weight - leaves the corresponding
+      !! B-spline coefficient unconstrained, so the fit is not determined. Callers that report a
+      !! status test the factor they have just built before solving with it.
+      !!
+      !! @param[in] a     Triangular factor in band storage; `a(i,1)` is the diagonal
+      !! @param[in] n     Number of equations
+      !! @param[in] nest  Leading dimension of `a`
+      !! @return    `.true.` if any diagonal element is exactly zero
+      pure logical(FP_BOOL) function fp_rank_deficient(a,n,nest) result(singular)
+         integer(FP_SIZE), intent(in) :: n,nest
+         real(FP_REAL),    intent(in) :: a(nest,*)
+         singular = any(equal(a(1:n,1),zero))
+      end function fp_rank_deficient
 
       !> @brief Solve a bordered upper triangular system by back-substitution.
       !!
@@ -1855,13 +1891,18 @@ module fitpack_core
       !! \f$ \tilde{N}_{i,k+1} \f$ wrap around the domain, coupling the first
       !! and last \f$ k \f$ coefficients.
       !!
-      !! @param[in] a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
-      !! @param[in] b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
-      !! @param[in] z     Right-hand side vector of length \f$ n \f$
-      !! @param[in] n     Number of equations
-      !! @param[in] k     Number of periodic coupling columns
-      !! @param[in] k1    Bandwidth of the triangular part \f$ A \f$
-      !! @param[in] nest  Leading dimension of arrays `a` and `b`
+      !! ### Rank deficiency
+      !!
+      !! As in fpback, a zero pivot leaves its coefficient unconstrained; it is set to zero
+      !! instead of being divided out into a NaN.
+      !!
+      !! @param[in]  a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
+      !! @param[in]  b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
+      !! @param[in]  z     Right-hand side vector of length \f$ n \f$
+      !! @param[in]  n     Number of equations
+      !! @param[in]  k     Number of periodic coupling columns
+      !! @param[in]  k1    Bandwidth of the triangular part \f$ A \f$
+      !! @param[in]  nest  Leading dimension of arrays `a` and `b`
       !!
       !! @return Solution vector \f$ c \f$ of length \f$ n \f$
       !!
@@ -1879,7 +1920,7 @@ module fitpack_core
       !  ..
       n2 = n-k
       l  = n
-      do i=1,k
+      wrapped_rows: do i=1,k
          store = z(l)
          j = k+2-i
          if (i/=1) then
@@ -1889,35 +1930,55 @@ module fitpack_core
                store = store-c(l0)*b(l,l1)
              end do
          endif
-         c(l) = store/b(l,j-1)
+         if (equal(b(l,j-1),zero)) then
+            c(l) = zero
+         else
+            c(l) = store/b(l,j-1)
+         end if
          l = l-1
-         if (l==0) return
-      end do
-      do i=1,n2
-         store = z(i)
-         l = n2
-         do j=1,k
-           l = l+1
-           store = store-c(l)*b(i,j)
+         if (l==0) exit wrapped_rows
+      end do wrapped_rows
+
+      banded_rows: if (l>0) then
+
+         do i=1,n2
+            store = z(i)
+            l = n2
+            do j=1,k
+              l = l+1
+              store = store-c(l)*b(i,j)
+            end do
+            c(i) = store
          end do
-         c(i) = store
-      end do
-      i = n2
-      c(i) = c(i)/a(i,1)
-      if (i==1) return
-      do j=2,n2
-         i = i-1
-         store = c(i)
-         i1 = k
-         if (j<=k) i1=j-1
-         l = i
-         do l0=1,i1
-           l = l+1
-           store = store-c(l)*a(i,l0+1)
-         end do
-         c(i) = store/a(i,1)
-      end do
-      return
+
+         i = n2
+         if (equal(a(i,1),zero)) then
+            c(i) = zero
+         else
+            c(i) = c(i)/a(i,1)
+         end if
+
+         if (i>1) then
+            do j=2,n2
+               i = i-1
+               store = c(i)
+               i1 = k
+               if (j<=k) i1=j-1
+               l = i
+               do l0=1,i1
+                 l = l+1
+                 store = store-c(l)*a(i,l0+1)
+               end do
+               if (equal(a(i,1),zero)) then
+                  c(i) = zero
+               else
+                  c(i) = store/a(i,1)
+               end if
+            end do
+         end if
+
+      end if banded_rows
+
       end function fpbacp
 
 
@@ -4899,6 +4960,12 @@ module fitpack_core
         fpint(n-1:n) = [fpold,fp0]
         nrdata(n) = nplus
 
+        ! a rank-deficient triangle leaves coefficients unconstrained: the fit is not determined.
+        if (fp_rank_deficient(a,nk1,nest)) then
+            ier = FITPACK_S_TOO_SMALL
+            return
+        end if
+
         ! backward substitution to obtain the b-spline coefficients.
         c(:nk1) = fpback(a,z,nk1,k1,nest)
 
@@ -5053,6 +5120,11 @@ module fitpack_core
               yi = zero
               call fp_rotate_shifted(h, k2, g, nest, yi, c, it, nk1)
           end do b_rows
+
+          if (fp_rank_deficient(g,nk1,nest)) then
+              ier = FITPACK_S_TOO_SMALL
+              return
+          end if
 
           ! backward substitution to obtain the b-spline coefficients.
           c(:nk1) = fpback(g,c,nk1,k2,nest)
