@@ -4758,8 +4758,6 @@ module fitpack_core
       real(FP_REAL) :: h(MAX_ORDER+1)
       logical(FP_BOOL) :: new,check1,check3,success
 
-      ! ier must be defined here: the acceptable-solution exits below fall through without
-      ! setting it, and the knot-addition logic tests it before it is otherwise assigned.
       ier   = FITPACK_OK
       fpold = zero
       fp0   = zero
@@ -12714,8 +12712,6 @@ module fitpack_core
       real(FP_REAL), parameter :: period = pi2
 
       !   initialization
-      ! ier must be defined here: with iopt(1)<0 the least-squares exit below falls through
-      ! without setting it, and fp0 is updated on a test of its value.
       ier   = FITPACK_OK
       ifsu  = 0
       ifsv  = 0
@@ -13239,8 +13235,6 @@ module fitpack_core
       acc = tol*s
 
       ! Initializations
-      ! ier must be defined here: the acceptable-solution exits below only overwrite it in the
-      ! rank-deficient case (ier=-rank), and fall through with the success flag otherwise.
       ier    = FITPACK_OK
       lwest  = 0
       ntt    = 0
