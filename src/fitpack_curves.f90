@@ -491,7 +491,7 @@ module fitpack_curves
     !!
     !! @param[in,out] this   The fitted curve object.
     !! @param[in]     x      Array of evaluation points.
-    !! @param[in]     order  Derivative order (\f$ 0 \leq \text{order} \leq k \f$).
+    !! @param[in]     order  Derivative order (\f$ \text{order} > k \f$ evaluates to zero).
     !! @param[out]    ierr   Optional error flag.
     !! @return Array of derivative values \f$ s^{(\text{order})}(x_i) \f$.
     !!
@@ -598,7 +598,7 @@ module fitpack_curves
     !!
     !! @param[in,out] this   The fitted curve object.
     !! @param[in]     x      Scalar evaluation point.
-    !! @param[in]     order  Derivative order (\f$ 0 \leq \text{order} \leq k \f$).
+    !! @param[in]     order  Derivative order (\f$ \text{order} > k \f$ evaluates to zero).
     !! @param[out]    ierr   Optional error flag.
     !! @return Scalar derivative value \f$ s^{(\text{order})}(x) \f$.
     !!

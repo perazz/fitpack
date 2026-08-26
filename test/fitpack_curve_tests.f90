@@ -53,6 +53,9 @@ module fitpack_curve_tests
     public :: test_cross_section
     public :: test_derivative_spline
     public :: test_grid_surface_scattered_eval
+    public :: test_derivative_order_guard
+    public :: test_fit_weight_guard
+    public :: test_fit_degree_guard
 
 
     contains
@@ -2536,6 +2539,231 @@ module fitpack_curve_tests
         success = .true.
 
     end function test_grid_surface_scattered_eval
+
+    ! Derivative orders beyond the spline degree: s^(nu) vanishes identically for nu>k, so splder
+    ! must return zeros instead of leaving `y` untouched behind an input-error flag.
+    ! Regression test for https://github.com/scipy/scipy/pull/24076
+    logical function test_derivative_order_guard() result(success)
+
+       integer(FP_SIZE), parameter :: m = 21, k = 3
+       real(FP_REAL),    parameter :: POISON = -12345.0_FP_REAL
+
+       type(fitpack_curve) :: curve
+       integer(FP_SIZE)    :: nu
+       integer(FP_FLAG)    :: ierr
+       real(FP_REAL)       :: x(m),y(m),xe(3),ye(3),wrk(m+k+1)
+
+       success = .false.
+
+       x  = linspace(zero,two*pi,m)
+       y  = sin(x)
+       xe = [0.5_FP_REAL,three,5.5_FP_REAL]
+
+       ierr = curve%new_fit(x,y,order=k)
+       if (.not.FITPACK_SUCCESS(ierr)) then
+          print *, '[test_derivative_order_guard] fit failed: ',FITPACK_MESSAGE(ierr)
+          return
+       end if
+
+       ! nu = k is still the (piecewise constant) k-th derivative
+       ye = POISON
+       call splder(curve%t,curve%knots,curve%c,k,k,xe,ye,size(xe,kind=FP_SIZE),OUTSIDE_EXTRAPOLATE,wrk,ierr)
+       if (.not.FITPACK_SUCCESS(ierr) .or. any(equal(ye,POISON))) then
+          print *, '[test_derivative_order_guard] nu=k failed, ierr=',ierr
+          return
+       end if
+
+       ! nu > k: identically zero, reported as a normal return
+       do nu = k+1,k+4
+          ye = POISON
+          call splder(curve%t,curve%knots,curve%c,k,nu,xe,ye,size(xe,kind=FP_SIZE),OUTSIDE_EXTRAPOLATE,wrk,ierr)
+          if (.not.FITPACK_SUCCESS(ierr)) then
+             print *, '[test_derivative_order_guard] nu=',nu,' returned ',FITPACK_MESSAGE(ierr)
+             return
+          end if
+          if (.not.all(equal(ye,zero))) then
+             print *, '[test_derivative_order_guard] nu=',nu,' did not return zeros: ',ye
+             return
+          end if
+       end do
+
+       ! a negative order remains an input error
+       ye = POISON
+       call splder(curve%t,curve%knots,curve%c,k,-1_FP_SIZE,xe,ye,size(xe,kind=FP_SIZE),OUTSIDE_EXTRAPOLATE,wrk,ierr)
+       if (ierr/=FITPACK_INPUT_ERROR) then
+          print *, '[test_derivative_order_guard] nu<0 not rejected, ierr=',ierr
+          return
+       end if
+
+       ! same through the object interface
+       ye = curve%dfdx(xe,order=k+2,ierr=ierr)
+       if (.not.FITPACK_SUCCESS(ierr) .or. .not.all(equal(ye,zero))) then
+          print *, '[test_derivative_order_guard] curve%dfdx(order=k+2) ierr=',ierr,' y=',ye
+          return
+       end if
+
+       success = .true.
+
+    end function test_derivative_order_guard
+
+    ! w=0 is the documented way to exclude a data point, so `m>k` is not a sufficient data check:
+    ! the fit must have at least k+1 strictly positive weights or the normal equations are singular.
+    ! Regression test for https://github.com/scipy/scipy/issues/23542
+    logical function test_fit_weight_guard() result(success)
+
+       integer(FP_SIZE), parameter :: m = 12, k = 3, nest = m+k+1
+
+       real(FP_REAL)    :: x(m),y(m),w(m),t(nest),c(nest),fp
+       real(FP_REAL)    :: wrk(m*(k+1)+nest*(7+3*k))
+       integer(FP_SIZE) :: iwrk(nest),n,i
+       integer(FP_FLAG) :: ier
+
+       success = .false.
+
+       x = linspace(zero,one,m)
+       y = exp(x)
+
+       ! (a) all weights zero: rejected up front instead of returning NaN coefficients
+       w = zero
+       call reset()
+       call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),k,one,nest,n,t,c,fp,wrk,size(wrk,kind=FP_SIZE),iwrk,ier)
+       if (ier/=FITPACK_INPUT_ERROR) then
+          print *, '[test_fit_weight_guard] all-zero weights not rejected, ier=',ier
+          return
+       end if
+
+       ! (b) exactly k positive weights: still one short of a determined system
+       w = zero
+       w(1:k) = one
+       call reset()
+       call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),k,one,nest,n,t,c,fp,wrk,size(wrk,kind=FP_SIZE),iwrk,ier)
+       if (ier/=FITPACK_INPUT_ERROR) then
+          print *, '[test_fit_weight_guard] k positive weights not rejected, ier=',ier
+          return
+       end if
+
+       ! (c) k+1 positive weights: accepted, and the coefficients must be finite
+       w = zero
+       w(1:k+1) = one
+       call reset()
+       call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),k,1.0e6_FP_REAL,nest,n,t,c,fp,wrk, &
+                   size(wrk,kind=FP_SIZE),iwrk,ier)
+       if (.not.FITPACK_SUCCESS(ier)) then
+          print *, '[test_fit_weight_guard] k+1 positive weights rejected, ier=',ier
+          return
+       end if
+       if (.not.all(c(1:n-k-1)==c(1:n-k-1))) then
+          print *, '[test_fit_weight_guard] NaN coefficients with k+1 positive weights'
+          return
+       end if
+
+       success = .true.
+
+       contains
+
+          subroutine reset()
+             n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+          end subroutine reset
+
+    end function test_fit_weight_guard
+
+    ! Degrees below 1 must be rejected coherently by every fitting front end (scipy#25381 hit an
+    ! internal error for k=0), and a high-variance data set must not derail the knot-count estimate
+    ! (scipy#25726: the real-to-integer conversion of that estimate can overflow).
+    logical function test_fit_degree_guard() result(success)
+
+       integer(FP_SIZE), parameter :: m = 12, kmax = 5, nest = m+kmax+1
+       integer(FP_DIM),  parameter :: dims = 2
+       integer(FP_SIZE), parameter :: mg = 6
+
+       real(FP_REAL)    :: x(m),y(m),w(m),t(nest),c(nest),fp
+       real(FP_REAL)    :: wrk(m*(kmax+1)+nest*(8+5*kmax))
+       integer(FP_SIZE) :: iwrk(nest),n,i,j,k
+       integer(FP_FLAG) :: ier
+       type(fitpack_curve) :: curve
+
+       ! gridded fit: per-axis degrees
+       integer(FP_SIZE) :: mgrid(dims),kgrid(dims),nestg(dims),ngrid(dims)
+       real(FP_REAL)    :: xg(mg,dims),lo(dims),hi(dims),tg(mg+kmax+1,dims)
+       real(FP_REAL)    :: zg(mg*mg),cg((mg+kmax+1)**2),fpg,wrkg(20000)
+       integer(FP_SIZE) :: iwrkg(2000)
+
+       success = .false.
+
+       x = linspace(zero,one,m)
+       y = exp(x)
+       w = one
+
+       ! (a) k<1 and k>5 are input errors for the scalar fitters
+       do k = 0,6,6
+          n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+          call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),k,one,nest,n,t,c,fp,wrk, &
+                      size(wrk,kind=FP_SIZE),iwrk,ier)
+          if (ier/=FITPACK_INPUT_ERROR) then
+             print *, '[test_fit_degree_guard] curfit accepted k=',k,' ier=',ier
+             return
+          end if
+
+          n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+          call percur(IOPT_NEW_SMOOTHING,m,x,y,w,k,one,nest,n,t,c,fp,wrk, &
+                      size(wrk,kind=FP_SIZE),iwrk,ier)
+          if (ier/=FITPACK_INPUT_ERROR) then
+             print *, '[test_fit_degree_guard] percur accepted k=',k,' ier=',ier
+             return
+          end if
+       end do
+
+       ! (b) same for the gridded front end, on every axis
+       mgrid = mg
+       nestg = mg+kmax+1
+       do i = 1,mg
+          xg(i,:) = real(i-1,FP_REAL)
+       end do
+       lo = xg(1,:)
+       hi = xg(mg,:)
+       do i = 1,mg
+          do j = 1,mg
+             zg((i-1)*mg+j) = xg(i,1)+xg(j,2)
+          end do
+       end do
+
+       do i = 1,dims
+          kgrid    = 3
+          kgrid(i) = 0
+          ngrid    = 0; tg = zero; cg = zero; fpg = zero
+          call regrid(IOPT_NEW_SMOOTHING,dims,mgrid,xg,zg,lo,hi,kgrid,one,nestg,ngrid,tg,cg,fpg, &
+                      wrkg,size(wrkg,kind=FP_SIZE),iwrkg,size(iwrkg,kind=FP_SIZE),ier)
+          if (ier/=FITPACK_INPUT_ERROR) then
+             print *, '[test_fit_degree_guard] regrid accepted k=0 on axis ',i,' ier=',ier
+             return
+          end if
+       end do
+
+       ! (c) the object interface reports the same input error
+       ier = curve%new_fit(x,y,order=0_FP_SIZE)
+       if (FITPACK_SUCCESS(ier)) then
+          print *, '[test_fit_degree_guard] curve%new_fit accepted order=0'
+          return
+       end if
+
+       ! (d) a data set spanning many orders of magnitude drives the knot-count estimate to
+       !     extreme values: the fit must still terminate with finite coefficients
+       y = [(ten**(2*i-m),i=1,m)]
+       n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+       call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),3_FP_SIZE,smallnum10,nest,n,t,c,fp,wrk, &
+                   size(wrk,kind=FP_SIZE),iwrk,ier)
+       if (ier==FITPACK_INPUT_ERROR) then
+          print *, '[test_fit_degree_guard] high-variance fit rejected'
+          return
+       end if
+       if (.not.all(abs(c(1:n-4))<huge(zero))) then
+          print *, '[test_fit_degree_guard] high-variance fit returned non-finite coefficients'
+          return
+       end if
+
+       success = .true.
+
+    end function test_fit_degree_guard
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)
