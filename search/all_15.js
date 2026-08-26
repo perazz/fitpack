@@ -5,7 +5,7 @@ var searchData=
   ['rank_20deficiency_2',['Rank Deficiency',['../theory_surface_fitting.html#autotoc_md54',1,'']]],
   ['ranked_5fsizes_3',['ranked_sizes',['../namespacefitpack__gridded__splines.html#ad68972f8286c8bef9ad943142a88b1da',1,'fitpack_gridded_splines']]],
   ['reading_4',['Further Reading',['../theory_bsplines.html#autotoc_md30',1,'']]],
-  ['recurrence_20for_20degree_20_5fform_20556_5',['Recurrence for degree  \_form#556',['../theory_bsplines.html#autotoc_md22',1,'']]],
+  ['recurrence_20for_20degree_20_5fform_20560_5',['Recurrence for degree  \_form#560',['../theory_bsplines.html#autotoc_md22',1,'']]],
   ['reference_6',['Reference',['../index.html#autotoc_md12',1,'']]],
   ['reference_20index_7',['Book Reference Index',['../book_reference.html',1,'']]],
   ['regrid_8',['regrid',['../theory_surface_fitting.html#autotoc_md56',1,'Gridded Data Fitting (regrid)'],['../namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3',1,'fitpack_core::regrid()']]],

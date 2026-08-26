@@ -29,6 +29,7 @@ var fitpack__core_8_f90 =
     [ "fitpack_core::fp_grid_strides", "namespacefitpack__core.html#afd6db1accafe304359cbc35ca52cf072", null ],
     [ "fitpack_core::fp_grid_unravel", "namespacefitpack__core.html#a8af7cfd01147538b7aabf5ad9cf5dcbf", null ],
     [ "fitpack_core::fp_knot_interval", "namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5", null ],
+    [ "fitpack_core::fp_knots_to_add", "namespacefitpack__core.html#aebaae2cdfea577725097d51f3aebb2b9", null ],
     [ "fitpack_core::fp_rcomms_per_bits", "namespacefitpack__core.html#a7d6e951acad3110eb2c3dfb6e5215d8b", null ],
     [ "fitpack_core::fp_real_comm_expand_1d", "namespacefitpack__core.html#af9b714724c236d5cd3698b89edc4aeb6", null ],
     [ "fitpack_core::fp_real_comm_expand_2d", "namespacefitpack__core.html#a6ed46f895334511a1dcf2aa83057f99c", null ],
