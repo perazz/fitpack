@@ -23,10 +23,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#ifdef __cplusplus
-    #include <vector>
-    using std::vector;
-#endif // __cplusplus
 
 #ifdef __cplusplus
 extern "C" {
@@ -217,27 +213,9 @@ FP_FLAG fp_parder_c(const FP_REAL* tx, FP_SIZE nx, const FP_REAL* ty, FP_SIZE ny
               
 #ifdef __cplusplus
 }
-
 #endif
 
-// Core C++ functions
-#ifdef __cplusplus
-
-typedef vector<FP_REAL> fpPoint;
-    
-// Flatten a 2D vector
-inline vector<FP_REAL> flatten_2d_vector(const vector<fpPoint>& x2d) {
-    FP_SIZE ndim = 0;
-    for (const auto& p : x2d) ndim = std::max(ndim, static_cast<FP_SIZE>(p.size()));
-
-    vector<FP_REAL> x(x2d.size() * ndim, 0.0);
-    for (FP_SIZE i = 0; i < (FP_SIZE)x2d.size(); i++)
-        copy(x2d[i].begin(), x2d[i].end(), x.begin() + i * ndim);
-
-    return x;
-}
-
-    
-#endif
+// This header is pure C: no <vector>, no `using std::vector`, no C++ helpers. The point type
+// that used to live here is now include/fpPoint.hpp — a fixed-dimension `fpPoint<dims>`.
 
 #endif // FITPACK_CORE_C_H_INCLUDED
