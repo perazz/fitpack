@@ -4831,6 +4831,7 @@ module fitpack_core
       real(FP_REAL) :: h(MAX_ORDER+1)
       logical(FP_BOOL) :: new,check1,check3,success,accepted
 
+      ier      = FITPACK_OK
       accepted = FP_FALSE
       fpold = zero
       fp0   = zero
@@ -12829,6 +12830,7 @@ module fitpack_core
       real(FP_REAL), parameter :: period = pi2
 
       !   initialization
+      ier   = FITPACK_OK
       ifsu  = 0
       ifsv  = 0
       ifbu  = 0
@@ -13351,6 +13353,7 @@ module fitpack_core
       acc = tol*s
 
       ! Initializations
+      ier    = FITPACK_OK
       lwest  = 0
       ntt    = 0
       iband1 = 0
