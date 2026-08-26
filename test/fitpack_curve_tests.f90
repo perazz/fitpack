@@ -56,6 +56,7 @@ module fitpack_curve_tests
     public :: test_derivative_order_guard
     public :: test_fit_weight_guard
     public :: test_fit_degree_guard
+    public :: test_rank_deficient_fit
 
 
     contains
@@ -2764,6 +2765,76 @@ module fitpack_curve_tests
        success = .true.
 
     end function test_fit_degree_guard
+
+    ! A duplicated abscissa empties a knot span, so the reduced triangle carries a zero diagonal and
+    ! the back substitution divided by it: the coefficients came back NaN behind a success flag.
+    ! Regression test for https://github.com/scipy/scipy/issues/22704
+    logical function test_rank_deficient_fit() result(success)
+
+       integer(FP_SIZE), parameter :: m = 18, kmax = 2, nest = m+kmax+1
+       real(FP_REAL),    parameter :: SMOOTHING = 12.0_FP_REAL
+
+       ! the data set from the report: x = 310.10 appears twice
+       real(FP_REAL), parameter :: x(m) = [ &
+             20.00_FP_REAL,153.81_FP_REAL,175.57_FP_REAL,202.47_FP_REAL,237.11_FP_REAL, &
+            253.61_FP_REAL,258.56_FP_REAL,273.40_FP_REAL,284.54_FP_REAL,293.61_FP_REAL, &
+            298.56_FP_REAL,301.86_FP_REAL,305.57_FP_REAL,307.22_FP_REAL,308.45_FP_REAL, &
+            310.10_FP_REAL,310.10_FP_REAL,310.50_FP_REAL]
+       real(FP_REAL), parameter :: y(m) = [ &
+            53.00_FP_REAL,49.50_FP_REAL,48.60_FP_REAL,46.80_FP_REAL,43.20_FP_REAL, &
+            40.32_FP_REAL,39.60_FP_REAL,36.00_FP_REAL,32.40_FP_REAL,28.80_FP_REAL, &
+            25.20_FP_REAL,21.60_FP_REAL,18.00_FP_REAL,14.40_FP_REAL,10.80_FP_REAL, &
+             7.20_FP_REAL, 3.60_FP_REAL, 0.00_FP_REAL]
+
+       real(FP_REAL)    :: w(m),xs(m),t(nest),c(nest),fp
+       real(FP_REAL)    :: wrk(m*(kmax+1)+nest*(7+3*kmax))
+       integer(FP_SIZE) :: iwrk(nest),n,k,nc
+       integer(FP_FLAG) :: ier
+
+       success = .false.
+       w = 1.38723_FP_REAL
+
+       do k = 1,kmax
+
+          n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+          call curfit(IOPT_NEW_SMOOTHING,m,x,y,w,x(1),x(m),k,SMOOTHING,nest,n,t,c,fp,wrk, &
+                      size(wrk,kind=FP_SIZE),iwrk,ier)
+
+          ! the singular system must be reported, not returned as a successful fit
+          if (ier/=FITPACK_S_TOO_SMALL) then
+             print *, '[test_rank_deficient_fit] k=',k,' returned ',FITPACK_MESSAGE(ier), &
+                      ' instead of a rank-deficiency error'
+             return
+          end if
+
+          nc = max(n-k-1,1_FP_SIZE)
+          if (.not.all(c(1:nc)==c(1:nc))) then
+             print *, '[test_rank_deficient_fit] k=',k,' returned NaN coefficients'
+             return
+          end if
+          if (.not.all(abs(c(1:nc))<=1000*maxval(abs(y)))) then
+             print *, '[test_rank_deficient_fit] k=',k,' coefficients blew up: ',maxval(abs(c(1:nc)))
+             return
+          end if
+
+       end do
+
+       ! control: the same data with the duplicate nudged apart fits normally
+       xs = x
+       xs(17:18) = xs(17:18)+one
+       do k = 1,kmax
+          n = 0; t = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+          call curfit(IOPT_NEW_SMOOTHING,m,xs,y,w,xs(1),xs(m),k,SMOOTHING,nest,n,t,c,fp,wrk, &
+                      size(wrk,kind=FP_SIZE),iwrk,ier)
+          if (.not.FITPACK_SUCCESS(ier)) then
+             print *, '[test_rank_deficient_fit] control fit k=',k,' failed: ',FITPACK_MESSAGE(ier)
+             return
+          end if
+       end do
+
+       success = .true.
+
+    end function test_rank_deficient_fit
 
     ! ODE-style reciprocal error weight
     elemental real(FP_REAL) function rewt(RTOL,ATOL,x)

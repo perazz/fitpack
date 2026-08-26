@@ -1802,11 +1802,18 @@ module fitpack_core
       !! \f$ R_1 \f$ is stored as `a(nest, k)` where `a(i,1)` holds the diagonal
       !! element \f$ r_{i,i} \f$ and `a(i,j)` for \f$ j > 1 \f$ holds \f$ r_{i,i+j-1} \f$.
       !!
-      !! @param[in] a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
-      !! @param[in] z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
-      !! @param[in] n     Number of equations (= number of B-spline coefficients)
-      !! @param[in] k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
-      !! @param[in] nest  Leading dimension of array `a`
+      !! ### Rank deficiency
+      !!
+      !! A row of \f$ R_1 \f$ reduces to exactly zero when the observation matrix is rank
+      !! deficient — duplicated abscissae, or a knot span whose data all carry zero weight. The
+      !! corresponding coefficient is then unconstrained: it is set to zero (the minimum-norm
+      !! choice) instead of being divided out into a NaN that silently poisons the whole fit.
+      !!
+      !! @param[in]  a     Upper triangular band matrix \f$ R_1 \f$, stored as `a(nest, k)`
+      !! @param[in]  z     Right-hand side vector \f$ z_1 \f$ of length \f$ n \f$
+      !! @param[in]  n     Number of equations (= number of B-spline coefficients)
+      !! @param[in]  k     Bandwidth of \f$ R_1 \f$ (= spline order \f$ k+1 \f$)
+      !! @param[in]  nest  Leading dimension of array `a`
       !!
       !! @return Solution vector \f$ c \f$ of length \f$ n \f$
       !!
@@ -1822,26 +1829,61 @@ module fitpack_core
       real(FP_REAL) :: store
       integer(FP_SIZE) :: i,i1,j,k1,l,m,jm1
       !  ..
-      k1   = k-1
-      c(n) = z(n)/a(n,1)
-      i    = n-1
-      if (i==0) return
+      k1 = k-1
 
-      jm1 = 1
-      rows: do j=2,n
-        store = z(i)
-        i1 = merge(jm1,k1,j<=k1)
-        m = i
-        do l=1,i1
-          m = m+1
-          store = store-c(m)*a(i,l+1)
-        end do
-        c(i) = store/a(i,1)
-        i = i-1
-        jm1 = j
-      end do rows
+      if (equal(a(n,1),zero)) then
+         c(n) = zero
+      else
+         c(n) = z(n)/a(n,1)
+      end if
+
+      i = n-1
+      if (i>0) then
+
+         jm1 = 1
+         rows: do j=2,n
+           store = z(i)
+           i1 = merge(jm1,k1,j<=k1)
+           m = i
+           do l=1,i1
+             m = m+1
+             store = store-c(m)*a(i,l+1)
+           end do
+           if (equal(a(i,1),zero)) then
+              c(i) = zero
+           else
+              c(i) = store/a(i,1)
+           end if
+           i = i-1
+           jm1 = j
+         end do rows
+
+      end if
 
       end function fpback
+
+      !> @brief Is the triangular factor of the Givens reduction rank deficient?
+      !!
+      !! fpback and fpbacp keep the fit finite whatever the factor looks like: a zero diagonal
+      !! element leaves its coefficient at zero instead of dividing. This predicate is how a caller
+      !! turns that silent repair into a reported status, so it runs **once per fit**, on the factor
+      !! that produced the accepted coefficients - never inside the knot or smoothing iterations,
+      !! where the inline guards already do the work.
+      !!
+      !! @param[in] a     Triangular factor in band storage; `a(i,1)` is the diagonal
+      !! @param[in] n     Number of equations
+      !! @param[in] nest  Leading dimension of `a`
+      !! @return    `.true.` if any diagonal element is exactly zero
+      pure logical(FP_BOOL) function fp_rank_deficient(a,n,nest) result(singular)
+         integer(FP_SIZE), intent(in) :: n,nest
+         real(FP_REAL),    intent(in) :: a(nest,*)
+         integer(FP_SIZE) :: i
+         singular = FP_TRUE
+         do i=1,n
+            if (equal(a(i,1),zero)) return
+         end do
+         singular = FP_FALSE
+      end function fp_rank_deficient
 
       !> @brief Solve a bordered upper triangular system by back-substitution.
       !!
@@ -1861,13 +1903,18 @@ module fitpack_core
       !! \f$ \tilde{N}_{i,k+1} \f$ wrap around the domain, coupling the first
       !! and last \f$ k \f$ coefficients.
       !!
-      !! @param[in] a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
-      !! @param[in] b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
-      !! @param[in] z     Right-hand side vector of length \f$ n \f$
-      !! @param[in] n     Number of equations
-      !! @param[in] k     Number of periodic coupling columns
-      !! @param[in] k1    Bandwidth of the triangular part \f$ A \f$
-      !! @param[in] nest  Leading dimension of arrays `a` and `b`
+      !! ### Rank deficiency
+      !!
+      !! As in fpback, a zero pivot leaves its coefficient unconstrained; it is set to zero
+      !! instead of being divided out into a NaN.
+      !!
+      !! @param[in]  a     Upper triangular band matrix \f$ A \f$, stored as `a(nest, k1)`
+      !! @param[in]  b     Dense coupling matrix \f$ B \f$, stored as `b(nest, k)`
+      !! @param[in]  z     Right-hand side vector of length \f$ n \f$
+      !! @param[in]  n     Number of equations
+      !! @param[in]  k     Number of periodic coupling columns
+      !! @param[in]  k1    Bandwidth of the triangular part \f$ A \f$
+      !! @param[in]  nest  Leading dimension of arrays `a` and `b`
       !!
       !! @return Solution vector \f$ c \f$ of length \f$ n \f$
       !!
@@ -1885,7 +1932,7 @@ module fitpack_core
       !  ..
       n2 = n-k
       l  = n
-      do i=1,k
+      wrapped_rows: do i=1,k
          store = z(l)
          j = k+2-i
          if (i/=1) then
@@ -1895,35 +1942,55 @@ module fitpack_core
                store = store-c(l0)*b(l,l1)
              end do
          endif
-         c(l) = store/b(l,j-1)
+         if (equal(b(l,j-1),zero)) then
+            c(l) = zero
+         else
+            c(l) = store/b(l,j-1)
+         end if
          l = l-1
-         if (l==0) return
-      end do
-      do i=1,n2
-         store = z(i)
-         l = n2
-         do j=1,k
-           l = l+1
-           store = store-c(l)*b(i,j)
+         if (l==0) exit wrapped_rows
+      end do wrapped_rows
+
+      banded_rows: if (l>0) then
+
+         do i=1,n2
+            store = z(i)
+            l = n2
+            do j=1,k
+              l = l+1
+              store = store-c(l)*b(i,j)
+            end do
+            c(i) = store
          end do
-         c(i) = store
-      end do
-      i = n2
-      c(i) = c(i)/a(i,1)
-      if (i==1) return
-      do j=2,n2
-         i = i-1
-         store = c(i)
-         i1 = k
-         if (j<=k) i1=j-1
-         l = i
-         do l0=1,i1
-           l = l+1
-           store = store-c(l)*a(i,l0+1)
-         end do
-         c(i) = store/a(i,1)
-      end do
-      return
+
+         i = n2
+         if (equal(a(i,1),zero)) then
+            c(i) = zero
+         else
+            c(i) = c(i)/a(i,1)
+         end if
+
+         if (i>1) then
+            do j=2,n2
+               i = i-1
+               store = c(i)
+               i1 = k
+               if (j<=k) i1=j-1
+               l = i
+               do l0=1,i1
+                 l = l+1
+                 store = store-c(l)*a(i,l0+1)
+               end do
+               if (equal(a(i,1),zero)) then
+                  c(i) = zero
+               else
+                  c(i) = store/a(i,1)
+               end if
+            end do
+         end if
+
+      end if banded_rows
+
       end function fpbacp
 
 
@@ -4762,9 +4829,10 @@ module fitpack_core
       integer(FP_SIZE) :: i,it,iter,j,k3,l,l0,mk1,nk1,nmax,nmin,nplus,npl1,nrint,n8
       !  ..local arrays..
       real(FP_REAL) :: h(MAX_ORDER+1)
-      logical(FP_BOOL) :: new,check1,check3,success
+      logical(FP_BOOL) :: new,check1,check3,success,accepted
 
-      ier   = FITPACK_OK
+      ier      = FITPACK_OK
+      accepted = FP_FALSE
       fpold = zero
       fp0   = zero
       nplus = 0
@@ -4909,18 +4977,27 @@ module fitpack_core
         ! backward substitution to obtain the b-spline coefficients.
         c(:nk1) = fpback(a,z,nk1,k1,nest)
 
-        ! test whether the approximation sinf(x) is an acceptable solution.
-        if (iopt<0) return
+        ! test whether the approximation sinf(x) is an acceptable solution. the three acceptance
+        ! exits leave through the epilogue below, which screens the accepted factor once.
+        if (iopt<0) then
+            accepted = FP_TRUE
+            exit main_loop
+        end if
 
-        fpms = fp-s; if(abs(fpms)<acc) return
+        fpms = fp-s
+        if (abs(fpms)<acc) then
+            accepted = FP_TRUE
+            exit main_loop
+        end if
 
-        ! if f(p=inf) < s accept the choice of knots.
+        ! if f(p=inf) < s accept the choice of knots and go on to the smoothing spline.
         if (fpms<zero) exit main_loop
 
         ! if n = nmax, sinf(x) is an interpolating spline.
         if (n==nmax) then
-            ier = FITPACK_INTERPOLATING_OK
-            return
+            ier      = FITPACK_INTERPOLATING_OK
+            accepted = FP_TRUE
+            exit main_loop
         end if
 
         ! increase the number of knots.
@@ -5004,9 +5081,14 @@ module fitpack_core
       !  restart the computations with the new set of knots.
       end do main_loop
 
-      !  test whether the least-squares kth degree polynomial is a solution
-      !  of our approximation problem.
-      if (ier==FITPACK_LEASTSQUARES_OK) return
+      !  sinf(x) is the answer whenever the knot pass accepted it, and also when the least-squares
+      !  kth degree polynomial already solves our approximation problem. screen the factor that
+      !  produced those coefficients: a zero diagonal means the back substitution had to leave a
+      !  coefficient unconstrained, so the fit is not determined.
+      if (accepted .or. ier==FITPACK_LEASTSQUARES_OK) then
+          if (fp_rank_deficient(a,nk1,nest)) ier = FITPACK_S_TOO_SMALL
+          return
+      end if
 
       ! *****
       !  part 2: determination of the smoothing spline sp(x).
@@ -5075,8 +5157,12 @@ module fitpack_core
               fp   = fp+(w(it)*(term-y(it)))**2
           end do get_fp
 
-          ! SUCCESS! the approximation sp(x) is an acceptable solution.
-          fpms = fp-s; if (abs(fpms)<acc) return
+          ! SUCCESS! the approximation sp(x) is an acceptable solution: screen its factor once.
+          fpms = fp-s
+          if (abs(fpms)<acc) then
+              if (fp_rank_deficient(g,nk1,nest)) ier = FITPACK_S_TOO_SMALL
+              return
+          end if
 
           ! find the new value of p and carry out one more step.
           call root_finding_iterate(p1,f1,p2,f2,p3,f3,p,fpms,acc,check1,check3,success)

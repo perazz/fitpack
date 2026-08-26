@@ -74,6 +74,7 @@ program test
         call add_test(test_derivative_order_guard())
         call add_test(test_fit_weight_guard())
         call add_test(test_fit_degree_guard())
+        call add_test(test_rank_deficient_fit())
 
     end subroutine run_interface_tests
 
