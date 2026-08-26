@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10 
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -16,7 +16,9 @@ jobs:
           - {compiler: gcc, version: 12}
           - {compiler: gcc, version: 13}
           - {compiler: gcc, version: 14}
-          # - {compiler: gcc, version: 15}  # Not yet available on ubuntu-latest
+          - {compiler: gcc, version: 15}
+          # gcc 16 not yet installable: setup-fortran tops out at gcc 15, and there is
+          # no homebrew gcc@16 formula for its linux fallback. Add it once either lands.
           - {compiler: intel, version: '2023.2'}
           - {compiler: intel, version: '2024.0'}
           - {compiler: intel, version: '2025.0'}          
@@ -25,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup fortran
-        uses: fortran-lang/setup-fortran@v1.6.3
+        uses: fortran-lang/setup-fortran@v1.10.0
         with:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
