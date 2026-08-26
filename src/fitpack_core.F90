@@ -118,6 +118,10 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)
 
+    ! Default cap on the smoothing-parameter iterations of the gridded fit. Large grids can need
+    ! more; regrid takes an optional maxit that overrides it.
+    integer(FP_SIZE), parameter, public :: REGRID_MAXIT = 20
+
     ! Spline degrees
     integer(FP_SIZE), parameter, public :: MAX_ORDER = 19    ! Max spline order (for array allocation)
     integer(FP_SIZE), parameter, public :: DEGREE_3  =  3
@@ -322,7 +326,7 @@ module fitpack_core
             case (FITPACK_LEASTSQUARES_OK); msg = 'Success! (least-squares)'
             case (FITPACK_INSUFFICIENT_STORAGE); msg = 'Insufficient Storage'
             case (FITPACK_S_TOO_SMALL); msg = 'Smoothing parameter is too small'
-            case (FITPACK_MAXIT); msg = 'Infinite loop detected'
+            case (FITPACK_MAXIT); msg = 'Iteration limit reached before f(p)=s'
             case (FITPACK_TOO_MANY_KNOTS); msg = 'More knots than data points'
             case (FITPACK_OVERLAPPING_KNOTS); msg = 'Overlapping knots found'
             case (FITPACK_INVALID_RANGE); msg = 'Invalid variable range'
@@ -1213,7 +1217,8 @@ module fitpack_core
       !! @param[in]     m     Number of data points. Must satisfy \f$ m > k \f$.
       !! @param[in]     x     Abscissae \f$ x_1 < x_2 < \cdots < x_m \f$ (strictly ascending).
       !! @param[in]     y     Ordinates \f$ y_1, y_2, \ldots, y_m \f$.
-      !! @param[in]     w     Weights \f$ w_i > 0 \f$.
+      !! @param[in]     w     Weights \f$ w_i \ge 0 \f$. Setting \f$ w_i = 0 \f$ excludes point \f$ i \f$,
+      !!   so at least \f$ k+1 \f$ weights must be strictly positive.
       !! @param[in]     xb    Left boundary of the approximation interval. \f$ x_b \le x_1 \f$.
       !! @param[in]     xe    Right boundary of the approximation interval. \f$ x_e \ge x_m \f$.
       !! @param[in]     k     Spline degree, \f$ 1 \le k \le 5 \f$. Cubic (\f$ k=3 \f$) recommended.
@@ -1266,6 +1271,7 @@ module fitpack_core
       if (k<=0 .or. k>5)         return
       if (iopt<(-1) .or. iopt>1) return
       if (m<k1 .or. nest<nmin)   return
+      if (count(w>zero)<k1)      return ! w=0 excludes a point, so m>k is not enough on its own
       lwest = m*k1+nest*(7+3*k)
       if (lwrk<lwest)             return
       if (xb>x(1) .or. xe<x(m))  return
@@ -3220,7 +3226,7 @@ module fitpack_core
           ! determine the number of knots nplus we are going to add.
           rn    = nplus
           npl1  = nplus*ITWO
-          if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))  ! guard the division: skip it when fpold-fp<=acc
+          if (fpold-fp>acc) npl1 = fp_knots_to_add(rn,fpms,fpold-fp) ! guard the division: skip it when fpold-fp<=acc
           nplus = min(nplus*2,max(npl1,nplus/2,1))
           fpold = fp
 
@@ -4062,7 +4068,7 @@ module fitpack_core
         if (ier==FITPACK_OK) then
            npl1 = nplus*2
            rn = nplus
-           if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
+           if (fpold-fp>acc) npl1 = fp_knots_to_add(rn,fpms,fpold-fp)
            nplus = min(nplus*2,max(npl1,nplus/2,1))
         else
            nplus = 1
@@ -4994,7 +5000,7 @@ module fitpack_core
         if (ier==FITPACK_OK) then
             npl1 = nplus*2
             rn = nplus
-            if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
+            if (fpold-fp>acc) npl1 = fp_knots_to_add(rn,fpms,fpold-fp)
             nplus = min(nplus*2,max(npl1,nplus/2,1))
         else
             nplus = 1
@@ -8346,6 +8352,32 @@ module fitpack_core
 
       end subroutine fpknot
 
+      !> @brief Estimated number of knots to add next, clamped to the integer range.
+      !!
+      !! Evaluates \f$ rn \cdot fpms / reduc \f$ and truncates it to an integer. On large,
+      !! high-variance data sets the ratio can exceed `huge(0_FP_SIZE)`, where the real-to-integer
+      !! conversion is undefined; the result is saturated instead. Callers apply this estimate only
+      !! when `reduc>acc>0`, so the quotient is finite and non-negative for well-behaved residuals.
+      !!
+      !! @param[in] rn     Number of knots added on the previous iteration
+      !! @param[in] fpms   Residual excess of the current spline, \f$ f_p - s \f$
+      !! @param[in] reduc  Residual reduction achieved by the previous knot addition
+      !! @return    Estimated number of knots to add
+      elemental integer(FP_SIZE) function fp_knots_to_add(rn,fpms,reduc) result(npl1)
+         real(FP_REAL), intent(in) :: rn,fpms,reduc
+
+         real(FP_REAL), parameter :: NPL_MAX = real(huge(0_FP_SIZE),FP_REAL)
+         real(FP_REAL) :: ratio
+
+         ratio = rn*fpms/reduc
+         if (ratio<NPL_MAX) then
+            npl1 = int(max(ratio,zero),FP_SIZE)
+         else
+            npl1 = huge(0_FP_SIZE) ! saturate; a NaN ratio lands here too
+         end if
+
+      end function fp_knots_to_add
+
       !> @brief Compute smoothing spline on a polar grid with origin constraints.
       !!
       !! Given data on a \f$ (u, v) \f$ grid (radial \f$ \times \f$ angular),
@@ -9078,7 +9110,7 @@ module fitpack_core
         if (ier==FITPACK_OK) then
            npl1 = nplus*2
            rn = nplus
-           if (fpold-fp>acc) npl1 = int(rn*fpms/(fpold-fp))
+           if (fpold-fp>acc) npl1 = fp_knots_to_add(rn,fpms,fpold-fp)
            nplus = min(nplus*2,max(npl1,nplus/2,1))
         else
            nplus = 1
@@ -9585,7 +9617,7 @@ module fitpack_core
          if (nu/=nminu) then
             npl1 = nplusu*2
             rn = nplusu
-            if (reducu>acc) npl1 = int(rn*fpms/reducu)
+            if (reducu>acc) npl1 = fp_knots_to_add(rn,fpms,reducu)
             nplu = min(nplusu*2,max(npl1,nplusu/2,1))
          endif
 
@@ -9594,7 +9626,7 @@ module fitpack_core
          if (nv/=nminv) then
             npl1 = nplusv*2
             rn = nplusv
-            if (reducv>acc) npl1 = int(rn*fpms/reducv)
+            if (reducv>acc) npl1 = fp_knots_to_add(rn,fpms,reducv)
             nplv = min(nplusv*2,max(npl1,nplusv/2,1))
          endif
 
@@ -10043,7 +10075,7 @@ module fitpack_core
 
         ! determine the number of knots nplus we are going to add.
         npl1  = nplus*ITWO
-        if (fpold-fp>acc) npl1 = int((nplus*fpms)/(fpold-fp),FP_SIZE)  ! guard the division: skip it when fpold-fp<=acc
+        if (fpold-fp>acc) npl1 = fp_knots_to_add(real(nplus,FP_REAL),fpms,fpold-fp) ! guard the division: skip it when fpold-fp<=acc
         nplus = min(nplus*2,max(npl1,nplus/2,1))
         fpold = fp
 
@@ -10779,7 +10811,7 @@ module fitpack_core
                  if (nu/=8) then
                     npl1 = nplusu*2
                     rn = nplusu
-                    if (reducu>acc) npl1 = int(rn*fpms/reducu)
+                    if (reducu>acc) npl1 = fp_knots_to_add(rn,fpms,reducu)
                     nplu = min(nplusu*2,max(npl1,nplusu/2,1))
                  endif
 
@@ -10788,7 +10820,7 @@ module fitpack_core
                  if (nv/=8) then
                     npl1 = nplusv*2
                     rn = nplusv
-                    if (reducv>acc) npl1 = int(rn*fpms/reducv)
+                    if (reducv>acc) npl1 = fp_knots_to_add(rn,fpms,reducv)
                     nplv = min(nplusv*2,max(npl1,nplusv/2,1))
                  endif
 
@@ -12321,7 +12353,7 @@ module fitpack_core
              if (n(d)/=nmin(d)) then
                  npl1 = nplus(d)*2
                  rn   = nplus(d)
-                 if (reduc(d)>acc) npl1 = int(rn*fpms/reduc(d))
+                 if (reduc(d)>acc) npl1 = fp_knots_to_add(rn,fpms,reduc(d))
                  npl(d) = min(nplus(d)*2,max(npl1,nplus(d)/2,1))
              endif
           end do
@@ -13092,7 +13124,7 @@ module fitpack_core
             if (nu/=8) then
                rn   = nplusu
                npl1 = nplusu*2
-               if (reducu>acc) npl1 = int(rn*fpms/reducu)  ! guard the division: skip it when reducu<=acc
+               if (reducu>acc) npl1 = fp_knots_to_add(rn,fpms,reducu) ! guard the division: skip it when reducu<=acc
                nplu = min(nplusu*2,max(npl1,nplusu/2,1))
             endif
 
@@ -13101,7 +13133,7 @@ module fitpack_core
             if (nv/=8) then
                rn   = nplusv
                npl1 = nplusv*2
-               if (reducv>acc) npl1 = int(rn*fpms/reducv)  ! guard the division: skip it when reducv<=acc
+               if (reducv>acc) npl1 = fp_knots_to_add(rn,fpms,reducv) ! guard the division: skip it when reducv<=acc
                nplv = min(nplusv*2,max(npl1,nplusv/2,1))
             endif
 
@@ -16800,8 +16832,12 @@ module fitpack_core
       !!   mq = 2*max_{i=1..dims-1} [ product(nk1max(1:i)) * product(m(i+1:dims)) ]
       !!   mm = max(nestmax, mmax, product(m(2:dims)), product(nk1max(1:dims-1)))
       !!
+      !! @param[in] maxit  Optional cap on the smoothing-parameter iterations (default
+      !!                   `REGRID_MAXIT`). Large grids may need more than the default before
+      !!                   `f(p)=s` is met; `FITPACK_MAXIT` reports that the cap was reached.
+      !!
       !! @see regrid, fpregr; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4.
-      pure subroutine regrid(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      pure subroutine regrid(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier,maxit)
 
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: iopt
@@ -16810,6 +16846,7 @@ module fitpack_core
       real(FP_REAL),    intent(out)   :: fp
       integer(FP_SIZE), intent(in)    :: lwrk,kwrk
       integer(FP_FLAG), intent(out)   :: ier
+      integer(FP_SIZE), intent(in), optional :: maxit
       !  ..array arguments..
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),nest(dims)
       real(FP_REAL),    intent(in)    :: lo(dims),hi(dims)
@@ -16822,11 +16859,10 @@ module fitpack_core
       integer(FP_SIZE), intent(inout), target     :: iwrk(kwrk)
 
       !  ..parameters..
-      integer(FP_SIZE), parameter :: maxit = 20
       real(FP_REAL),    parameter :: tol = smallnum03
       !  ..local scalars..
       integer(FP_DIM)  :: d
-      integer(FP_SIZE) :: nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi,i,bufmax
+      integer(FP_SIZE) :: nit,nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi,i,bufmax
       !  ..per-axis arrays..
       integer(FP_SIZE) :: k1(dims),k2(dims),nmin(dims),nk1max(MAX_IDIM)
       !  ..workspace views (carved from wrk/iwrk; contiguous by construction)..
@@ -16835,6 +16871,9 @@ module fitpack_core
 
       !  before starting computations a data check is made.
       ier = FITPACK_INPUT_ERROR
+
+      nit  = REGRID_MAXIT
+      if (present(maxit)) nit = max(IONE,maxit)
 
       k1   = k+1
       k2   = k+2
@@ -16903,7 +16942,7 @@ module fitpack_core
       pnr(1:maxm,1:dims)             => iwrk(offi+1:offi+maxm*dims);            offi = offi+maxm*dims
       pnrdat(1:maxnest,1:dims)       => iwrk(offi+1:offi+maxnest*dims)
 
-      call fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
+      call fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,nit,nc, &
                      n,t,c,fp,wrk(1),wrk(2),wrk(3:2+dims),iwrk(1),iwrk(2:1+dims), &
                      pfpint,pnr,pnrdat,psp,pright,pq,pa,pb,ier)
       return
@@ -17756,7 +17795,8 @@ module fitpack_core
       !! @param[in]     n    Total number of knots.
       !! @param[in]     c    B-spline coefficients (length \f$ n \f$).
       !! @param[in]     k    Degree of the spline.
-      !! @param[in]     nu   Order of derivative, \f$ 0 \le \nu \le k \f$.
+      !! @param[in]     nu   Order of derivative, \f$ \nu \ge 0 \f$. For \f$ \nu > k \f$ the derivative
+      !!   vanishes identically and `y` is returned as zero.
       !! @param[in]     x    Evaluation points (length \f$ m \f$).
       !! @param[out]    y    Derivative values \f$ s^{(\nu)}(x_i) \f$ (length \f$ m \f$).
       !! @param[in]     m    Number of evaluation points, \f$ m \ge 1 \f$.
@@ -17788,12 +17828,19 @@ module fitpack_core
       !  before starting computations a data check is made. if the input data
       !  are invalid control is immediately repassed to the calling program.
       ier = FITPACK_INPUT_ERROR
-      if (nu<0 .or. nu>k) return
+      if (nu<0) return
       if (m<1) return
 
-      kk  = k-nu
-
       ier = FITPACK_OK
+
+      !  the nu-th derivative of a degree-k spline vanishes identically for nu>k. Return it
+      !  explicitly: driving the de Boor recursion past its last level reads outside wrk.
+      if (nu>k) then
+         y = zero
+         return
+      end if
+
+      kk  = k-nu
 
       !  fetch tb and te, the boundaries of the approximation interval.
       k1 = k+1
