@@ -71,6 +71,9 @@ program test
         call add_test(test_grid_surface_scattered_eval())
         call add_test(test_nd_grid_equivalence())
         call add_test(test_nd_grid_regressions())
+        call add_test(test_derivative_order_guard())
+        call add_test(test_fit_weight_guard())
+        call add_test(test_fit_degree_guard())
 
     end subroutine run_interface_tests
 
