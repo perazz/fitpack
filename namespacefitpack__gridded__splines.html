@@ -202,7 +202,7 @@ Functions/Subroutines</h2></td></tr>
 <li><code>row_major = .true.</code> (default): the array's Fortran (column-major) storage already equals the internal buffer, so it is copied as-is. For a rank-<code>d</code> array that means passing the axes in reverse, <code>z(m_d, ..., m_1)</code> — the direct generalization of the 2-D <code>z(iy,ix)</code> convention.</li>
 <li><code>row_major = .false.</code>: the array is a natural Fortran grid <code>z(m_1, ..., m_d)</code> (dimension <code>k</code> is domain axis <code>k</code>); it is permuted into the row-major buffer on ingest (a one-time copy). A flat rank-1 <code>z(:)</code> plus explicit <code>m(:)</code> is always accepted (row-major, unambiguous).</li>
 </ul>
-<dl class="section see"><dt>See also</dt><dd>fitpack_grid_surface — concrete 2-D face; <a class="el" href="namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a>, <a class="el" href="namespacefitpack__core.html#a94c6ca65ab6cbcc12363d2548e466103" title="N-D generalization of bispev: evaluate a tensor-product spline on a grid.">ndspev</a> — N-D core routines </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>fitpack_grid_surface — concrete 2-D face; <a class="el" href="namespacefitpack__core.html#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a>, <a class="el" href="namespacefitpack__core.html#a94c6ca65ab6cbcc12363d2548e466103" title="N-D generalization of bispev: evaluate a tensor-product spline on a grid.">ndspev</a> — N-D core routines </dd></dl>
 </div><h2 class="groupheader">Function/Subroutine Documentation</h2>
 <a id="ab80f648e673b3bde31f34de75b5c2dce" name="ab80f648e673b3bde31f34de75b5c2dce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab80f648e673b3bde31f34de75b5c2dce">&#9670;&#160;</a></span>flat_row_major()</h2>
@@ -954,7 +954,7 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="196,475,230,471,231,476,197,480"/>
 <area shape="rect" href="namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the persistent workspace, maximally, so it is allocated only once, at spline construction...." alt="" coords="253,497,442,537"/>
 <area shape="poly" title=" " alt="" coords="197,497,239,502,239,507,196,502"/>
-<area shape="rect" href="namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="274,561,421,587"/>
+<area shape="rect" href="namespacefitpack__core.html#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="274,561,421,587"/>
 <area shape="poly" title=" " alt="" coords="146,506,245,546,276,555,274,560,243,551,144,511"/>
 <area shape="poly" title=" " alt="" coords="305,382,302,372,309,363,324,357,347,355,374,358,388,365,386,370,372,363,347,361,326,363,312,367,308,373,310,381"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1356,473,1501,499"/>

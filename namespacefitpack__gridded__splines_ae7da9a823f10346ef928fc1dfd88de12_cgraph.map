@@ -6,7 +6,7 @@
 <area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="196,475,230,471,231,476,197,480"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4" title="(Re)size the persistent workspace, maximally, so it is allocated only once, at spline construction...." alt="" coords="253,497,442,537"/>
 <area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="197,497,239,502,239,507,196,502"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="274,561,421,587"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="274,561,421,587"/>
 <area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="146,506,245,546,276,555,274,560,243,551,144,511"/>
 <area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="305,382,302,372,309,363,324,357,347,355,374,358,388,365,386,370,372,363,347,361,326,363,312,367,308,373,310,381"/>
 <area shape="rect" id="Node000006" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1356,473,1501,499"/>

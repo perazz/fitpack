@@ -6,7 +6,7 @@
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,527,530,489,532,494,413,533"/>
 <area shape="rect" id="Node000004" href="$namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2" title="Choose the smoothing parameter(s) for an iterative fit." alt="" coords="504,512,711,537"/>
 <area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="456,537,490,533,490,539,457,542"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="534,561,681,587"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="534,561,681,587"/>
 <area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="457,557,520,563,520,569,456,563"/>
 <area shape="rect" id="Node000026" href="$namespacefitpack__gridded__surfaces.html#a6274e7209e369b17f2afad6f71e04af1" title="(Re)size the fit workspace to regrid(dims=2)&#39;s requirement for the current order." alt="" coords="513,611,702,651"/>
 <area shape="poly" id="edge33_Node000002_Node000026" title=" " alt="" coords="413,567,505,597,530,605,528,610,503,602,411,573"/>

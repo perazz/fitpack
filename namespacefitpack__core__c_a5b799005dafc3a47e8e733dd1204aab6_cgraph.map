@@ -1,6 +1,6 @@
 <map id="fitpack_core_c::regrid_c" name="fitpack_core_c::regrid_c">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,561,180,587"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#af3f1f98998618d10983c93ca4b5614d3" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="228,561,375,587"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="228,561,375,587"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,571,214,571,214,577,180,577"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1280,473,1425,499"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,571,707,571,928,571,1082,573,1148,566,1231,546,1279,527,1320,504,1322,509,1281,532,1233,551,1149,571,1082,578,928,577,707,577,375,577"/>

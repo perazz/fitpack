@@ -236,7 +236,7 @@ var NAVTREEINDEX0 =
 "namespacefitpack__core.html#a1d8475ed3cb1c0bfccef4ca66ef6bf59":[14,0,4,186],
 "namespacefitpack__core.html#a20ca1b341438d801bc6903c35d1d0e20":[14,0,4,106],
 "namespacefitpack__core.html#a2256640832da2724f9e5058bcebd6ec2":[14,0,4,21],
-"namespacefitpack__core.html#a2400f32cd48e2a9819ac8679d58ac20e":[14,0,4,209],
+"namespacefitpack__core.html#a2400f32cd48e2a9819ac8679d58ac20e":[14,0,4,210],
 "namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2":[14,0,4,120],
 "namespacefitpack__core.html#a274f3c8c6327076d7195c73fa818ebef":[14,0,4,183],
 "namespacefitpack__core.html#a2ab4fd1ec4cdc14189c1cbec78baaef0":[14,0,4,177],

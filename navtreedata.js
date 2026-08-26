@@ -285,7 +285,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "namespacefitpack__core.html#a3d51410017bf94f298da66b1d80fe524",
-"namespacefitpack__fitters.html#a7e4442da15bd9575206116a727e81ee6",
+"namespacefitpack__fitters.html#a627282de0a389ddfcbd961bc8eb2497e",
 "structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html",
 "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a55114790683bdaf58e8693b244226b65",
 "structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a81fff570cc8f40280fc49d64def9d23b",

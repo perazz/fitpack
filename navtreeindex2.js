@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"namespacefitpack__fitters.html#a627282de0a389ddfcbd961bc8eb2497e":[14,0,8,8],
 "namespacefitpack__fitters.html#a7e4442da15bd9575206116a727e81ee6":[14,0,8,7],
 "namespacefitpack__fitters.html#ab1a1c88423bde195c1994b746b2b851b":[14,0,8,6],
 "namespacefitpack__gridded__polar.html":[14,0,9],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html":[14,0,1,0],
 "structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html":[15,0,0,0],
 "structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html#afff2ab89c849cf8b547f437fc221a2d5":[14,0,1,0,0],
-"structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html#afff2ab89c849cf8b547f437fc221a2d5":[15,0,0,0,0],
-"structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html":[14,0,2,0]
+"structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html#afff2ab89c849cf8b547f437fc221a2d5":[15,0,0,0,0]
 };

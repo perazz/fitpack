@@ -442,9 +442,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:aca69c8d7519a73e88f9a148c44bfd09d" id="r_aca69c8d7519a73e88f9a148c44bfd09d"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca69c8d7519a73e88f9a148c44bfd09d">profil</a> (ax, dims, t, n, c, k, u, cu, ier)</td></tr>
 <tr class="memdesc:aca69c8d7519a73e88f9a148c44bfd09d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cross-section of a tensor-product spline: fix one axis (any dimension).  <br /></td></tr>
 <tr class="separator:aca69c8d7519a73e88f9a148c44bfd09d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3f1f98998618d10983c93ca4b5614d3" id="r_af3f1f98998618d10983c93ca4b5614d3"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3f1f98998618d10983c93ca4b5614d3">regrid</a> (iopt, dims, m, xg, z, lo, hi, k, s, nest, n, t, c, fp, wrk, lwrk, iwrk, kwrk, ier)</td></tr>
-<tr class="memdesc:af3f1f98998618d10983c93ca4b5614d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tensor-product gridded smoothing-spline fit driver for any domain dimension <code>dims</code>.  <br /></td></tr>
-<tr class="separator:af3f1f98998618d10983c93ca4b5614d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ac6b786aee72e47125d7e5c3e6ced0d" id="r_a4ac6b786aee72e47125d7e5c3e6ced0d"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ac6b786aee72e47125d7e5c3e6ced0d">regrid</a> (iopt, dims, m, xg, z, lo, hi, k, s, nest, n, t, c, fp, wrk, lwrk, iwrk, kwrk, ier, maxit)</td></tr>
+<tr class="memdesc:a4ac6b786aee72e47125d7e5c3e6ced0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tensor-product gridded smoothing-spline fit driver for any domain dimension <code>dims</code>.  <br /></td></tr>
+<tr class="separator:a4ac6b786aee72e47125d7e5c3e6ced0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c64b88d2d403641e200a68c9604f425" id="r_a0c64b88d2d403641e200a68c9604f425"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0c64b88d2d403641e200a68c9604f425">spalde</a> (t, n, c, k1, x, d, ier)</td></tr>
 <tr class="memdesc:a0c64b88d2d403641e200a68c9604f425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate all derivatives of a spline at a single point.  <br /></td></tr>
 <tr class="separator:a0c64b88d2d403641e200a68c9604f425"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -592,6 +592,8 @@ Variables</h2></td></tr>
 <tr class="separator:a1d8475ed3cb1c0bfccef4ca66ef6bf59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d99472224f26deec2560fedeab07794" id="r_a7d99472224f26deec2560fedeab07794"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d99472224f26deec2560fedeab07794">knot_dim_2</a> = 2</td></tr>
 <tr class="separator:a7d99472224f26deec2560fedeab07794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af46ee5d754ae1e88a05a71ed9151554f" id="r_af46ee5d754ae1e88a05a71ed9151554f"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af46ee5d754ae1e88a05a71ed9151554f">regrid_maxit</a> = 20</td></tr>
+<tr class="separator:af46ee5d754ae1e88a05a71ed9151554f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c5b21fc23625ebfc7f555075c13eb07" id="r_a6c5b21fc23625ebfc7f555075c13eb07"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c5b21fc23625ebfc7f555075c13eb07">max_order</a> = 19</td></tr>
 <tr class="separator:a6c5b21fc23625ebfc7f555075c13eb07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a668bd0af72972ca4b389eb70672f246b" id="r_a668bd0af72972ca4b389eb70672f246b"><td class="memItemLeft" align="right" valign="top">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a668bd0af72972ca4b389eb70672f246b">degree_3</a> = 3</td></tr>
@@ -15319,8 +15321,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="af3f1f98998618d10983c93ca4b5614d3" name="af3f1f98998618d10983c93ca4b5614d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3f1f98998618d10983c93ca4b5614d3">&#9670;&#160;</a></span>regrid()</h2>
+<a id="a4ac6b786aee72e47125d7e5c3e6ced0d" name="a4ac6b786aee72e47125d7e5c3e6ced0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ac6b786aee72e47125d7e5c3e6ced0d">&#9670;&#160;</a></span>regrid()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -15418,7 +15420,12 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>&#160;)</td>
+          <td class="paramtype">integer(<a class="el" href="#ab2b42bf8ab592eaa2ea37a333fd10f54">fp_flag</a>), intent(out)</td>          <td class="paramname"><span class="paramname"><em>ier</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), intent(in), optional</td>          <td class="paramname"><span class="paramname"><em>maxit</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -15427,12 +15434,18 @@ Here is the call graph for this function:</div>
 <p>Fits a <code>dims</code>-fold tensor-product B-spline to data on a rectangular grid. Validation, boundary-knot clamping and Schoenberg-Whitney (<code>fpchec</code>) checks are runtime do-loops over the <code>dims</code> axes; the knot-direction arbiter is the N-D <code>new_knot_dimension_nd</code>. At <code>dims=2</code> this is the engine behind the bivariate grid surface and the fp_regrid_c binding.</p>
 <p>WORKSPACE (no allocation): the caller supplies a flat real <code>wrk(lwrk)</code> and integer <code>iwrk(kwrk)</code>, both <code>target</code>. regrid carves them into the rank-N work views needed by fpregr/fpgrre via pointer bounds remapping. The persistent fit-state lives at fixed offsets: wrk(1)=fp0, wrk(2)=fpold, wrk(3:2+dims)=reduc; iwrk(1)=lastdi, iwrk(2:1+dims)=nplus &ndash; so preserving wrk/iwrk between calls (with iopt=1) continues from the previous knot set.</p>
 <p>Minimum sizes: lwrk &gt;= 2 + dims + nestmax*dims + mmax*(kmax+1)*dims + 2*nestmax*(kmax+2)*dims + mm + mq kwrk &gt;= 1 + dims + mmax*dims + nestmax*dims with mmax=maxval(m), nestmax=maxval(nest), kmax=maxval(k), nk1max=nest-(k+1): mq = 2*max_{i=1..dims-1} [ product(nk1max(1:i)) * product(m(i+1:dims)) ] mm = max(nestmax, mmax, product(m(2:dims)), product(nk1max(1:dims-1)))</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#af3f1f98998618d10983c93ca4b5614d3" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a>, <a class="el" href="#a5abb595eb30e84354188a06953408ab1" title="Knot determination + p-iteration for dims-dimensional gridded fits.">fpregr</a>; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">maxit</td><td>Optional cap on the smoothing-parameter iterations (default <code>REGRID_MAXIT</code>). Large grids may need more than the default before <code>f(p)=s</code> is met; <code>FITPACK_MAXIT</code> reports that the cap was reached.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a>, <a class="el" href="#a5abb595eb30e84354188a06953408ab1" title="Knot determination + p-iteration for dims-dimensional gridded fits.">fpregr</a>; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4. </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="namespacefitpack__core_af3f1f98998618d10983c93ca4b5614d3_cgraph.png" border="0" usemap="#anamespacefitpack__core_af3f1f98998618d10983c93ca4b5614d3_cgraph" alt=""/></div>
-<map name="anamespacefitpack__core_af3f1f98998618d10983c93ca4b5614d3_cgraph" id="anamespacefitpack__core_af3f1f98998618d10983c93ca4b5614d3_cgraph">
+<div class="center"><img src="namespacefitpack__core_a4ac6b786aee72e47125d7e5c3e6ced0d_cgraph.png" border="0" usemap="#anamespacefitpack__core_a4ac6b786aee72e47125d7e5c3e6ced0d_cgraph" alt=""/></div>
+<map name="anamespacefitpack__core_a4ac6b786aee72e47125d7e5c3e6ced0d_cgraph" id="anamespacefitpack__core_a4ac6b786aee72e47125d7e5c3e6ced0d_cgraph">
 <area shape="rect" title="Tensor&#45;product gridded smoothing&#45;spline fit driver for any domain dimension dims." alt="" coords="5,561,152,587"/>
 <area shape="rect" href="namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="1057,473,1203,499"/>
 <area shape="poly" title=" " alt="" coords="152,571,485,571,705,571,859,573,926,566,1009,546,1056,527,1097,504,1100,509,1058,532,1010,551,926,571,859,578,705,577,485,577,152,577"/>
@@ -16804,7 +16817,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>For gridded data, use regrid instead — it is significantly faster.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, §5.3 (pp. 107–117); <a class="el" href="#af3f1f98998618d10983c93ca4b5614d3" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a> — gridded variant; <a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> — evaluate the result </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, §5.3 (pp. 107–117); <a class="el" href="#a4ac6b786aee72e47125d7e5c3e6ced0d" title="Tensor-product gridded smoothing-spline fit driver for any domain dimension dims.">regrid</a> — gridded variant; <a class="el" href="#aac8fa7ec692eb2758290f050c302d22d" title="Evaluate a bivariate spline on a rectangular grid.">bispev</a> — evaluate the result </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -17813,6 +17826,20 @@ Here is the call graph for this function:</div>
       <table class="memname">
         <tr>
           <td class="memname">real(<a class="el" href="#ae6ce471487dec031d833fc0e5dfdb065">fp_real</a>), parameter, public fitpack_core::pio8 = 0.125_FP_REAL*<a class="el" href="#a46706d00dd4c5a65aad4dca9b490db91">pi</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af46ee5d754ae1e88a05a71ed9151554f" name="af46ee5d754ae1e88a05a71ed9151554f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af46ee5d754ae1e88a05a71ed9151554f">&#9670;&#160;</a></span>regrid_maxit</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(<a class="el" href="#a813df3760ab07292679bf3d7384ddcb7">fp_size</a>), parameter, public fitpack_core::regrid_maxit = 20</td>
         </tr>
       </table>
 </div><div class="memdoc">
