@@ -450,8 +450,8 @@ FP_BOOL test_cpp_constrained_fit() {
                                     { 6.8420,-0.6650},{ 6.5930,-0.9010},{ 6.2690,-1.0100}};
 
      // Data derivatives at the extremes (point, 1st, 2nd derivative)
-     static const FP_REAL ddx_begin[][2] = {{-M_PI,3.0},{3.0,0.0},{0.0,-2.0}};
-     static const FP_REAL ddx_end  [][2] = {{2*M_PI,-1.0},{-1.0,0.0},{0.0,2.0}};
+     static const FP_REAL ddx_begin[][2] = {{-pi,3.0},{3.0,0.0},{0.0,-2.0}};
+     static const FP_REAL ddx_end  [][2] = {{2*pi,-1.0},{-1.0,0.0},{0.0,2.0}};
 
      // Fit points into vectors
      vector<fpPoint2> xv,ddx_beginv,ddx_endv;
@@ -464,7 +464,7 @@ FP_BOOL test_cpp_constrained_fit() {
 
      // Parameter space
      vector<FP_REAL> u(m);
-     for (FP_SIZE i=0; i<m; i++) u[i] = i*(3*M_PI)/(m-1.0);
+     for (FP_SIZE i=0; i<m; i++) u[i] = i*(3*pi)/(m-1.0);
 
      // Create curve object
      fpConstrainedCurve curve;
