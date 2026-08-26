@@ -45,18 +45,48 @@ Use `elemental` for scalar operations: `destroy`, `FITPACK_SUCCESS`, simple gett
 
 ## C Interface
 
+**The bindings are generated. Never hand-edit `src/*_c.f90` (except `fitpack_core_c.f90`) or
+anything in `include/` (except `fitpack_core_c.h` and `fpPoint.hpp`).** Change the Fortran
+source, `fitpack_bindings.yaml`, or a snippet under `extra_methods/`, then re-run:
+
+```bash
+FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings \
+    ./generate_bindings.sh
+```
+
+Adding a type to the C API is a YAML entry, not a new file. A missing component accessor
+usually means its type is not registered — add the `- module:/type(s):/cpp_classes:` block and
+regenerate. An ergonomic C++ overload the generator cannot infer goes in `extra_methods/` and
+is listed under the owning class's `extra_methods:` key; the snippet is spliced verbatim into
+the generated header, so it must be valid inside a class body.
+
+Hand-written, and staying that way:
+
+- `src/fitpack_core_c.f90` / `include/fitpack_core_c.h` — the 25 `fp_*_c` core procedural
+  bindings plus `fitpack_message_c` and `FITPACK_SUCCESS_c`. That header is **pure C**: no
+  `<vector>`, no `using`, no C++ helpers.
+- `include/fpPoint.hpp` — the fixed-dimension `fpPoint<dims>`, standard-layout so that
+  `std::vector<fpPoint<dims>>` aliases the Fortran `x(dims,m)` with no copy.
+
 Opaque pointer pattern for types:
 ```fortran
 type, bind(C) :: fitpack_curve_c
     type(c_ptr) :: cptr = c_null_ptr
+    logical(c_bool) :: is_pointer = .false.
+    type(c_ptr) :: name_cptr = c_null_ptr
 end type
 ```
 
 C-callable routines:
 ```fortran
-pure subroutine splev_c(...) bind(C, name='splev_c')
+pure subroutine splev_c(...) bind(C, name='fp_splev_c')
     real(FP_REAL), intent(in), value :: x  ! Scalars by value
     real(FP_REAL), intent(out) :: y(*)     ! Arrays as pointers
+```
+
+After any change to the C ABI, refresh the break list:
+```bash
+./abi_symbols.sh --diff <last-release-tag>   # -> doc/abi_changes_<version>.md
 ```
 
 ## Naming
