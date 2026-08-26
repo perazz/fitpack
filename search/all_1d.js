@@ -5,7 +5,7 @@ var searchData=
   ['z0_5fexact_2',['z0_exact',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a9238ff4df81ae52c29ee76230427a9e5',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
   ['z0_5fpresent_3',['z0_present',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a7ecff74ef9824352515fedd35f724c1e',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
   ['z0_5fzero_5fgradient_4',['z0_zero_gradient',['../structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a87d23232145856156f44f67e1b6a01f2',1,'fitpack_gridded_polar::fitpack_grid_polar']]],
-  ['zero_5',['zero',['../theory_bsplines.html#autotoc_md21',1,'Degree zero'],['../namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b',1,'fitpack_core::zero']]],
-  ['zero_20finding_6',['Zero Finding',['../tutorial_curve.html#autotoc_md96',1,'']]],
+  ['zero_5',['zero',['../theory_bsplines.html#autotoc_md23',1,'Degree zero'],['../namespacefitpack__core.html#a9199b127ebd8fa693ca733b00ec1621b',1,'fitpack_core::zero']]],
+  ['zero_20finding_6',['Zero Finding',['../tutorial_curve.html#autotoc_md98',1,'']]],
   ['zeros_7',['zeros',['../structfitpack__curves_1_1fitpack__curve.html#a2abcd592a21323f4da5a5ccb8faef7d2',1,'fitpack_curves::fitpack_curve::zeros()'],['../namespacefitpack__curves.html#a775612f44532e86d2844d2c74079f456',1,'fitpack_curves::zeros()']]]
 ];

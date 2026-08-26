@@ -1,0 +1,6 @@
+<map id="fitpack_core::fp_rank_deficient" name="fitpack_core::fp_rank_deficient">
+<area shape="rect" id="Node000001" title="Is the triangular factor of the Givens reduction rank deficient?" alt="" coords="5,22,164,62"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="212,29,357,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,39,198,39,198,45,165,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="252,31,245,21,248,11,262,5,285,3,313,6,324,16,320,20,310,11,285,8,263,10,252,15,250,20,256,28"/>
+</map>

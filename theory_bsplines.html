@@ -116,7 +116,7 @@ $(function(){initNavTree('theory_bsplines.html',''); initResizable(true); });
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2theory__bsplines"></a></p>
 <p>This page introduces the mathematical foundations of B-splines as used throughout FITPACK. All curve and surface fitting routines in the library represent their results as linear combinations of B-spline basis functions, so understanding these foundations is essential for interpreting knot vectors, coefficients, and the various evaluation, differentiation, and integration operations.</p>
 <p>The presentation follows Dierckx (1993), Chapters 1 and 6.</p>
-<h1><a class="anchor" id="autotoc_md19"></a>
+<h1><a class="anchor" id="autotoc_md21"></a>
 Piecewise Polynomials and Knot Vectors</h1>
 <p>A <b>spline</b> of degree \( k \) is a piecewise polynomial function whose pieces join with \( k - 1 \) continuous derivatives at designated breakpoints called <b>knots</b>. The knots are collected into a non-decreasing <b>knot vector</b></p>
 <p class="formulaDsp">
@@ -132,10 +132,10 @@ Piecewise Polynomials and Knot Vectors</h1>
 \]
 </p>
 <p>so that the spline interpolates (rather than merely approximates) its coefficient values at the endpoints.</p>
-<h1><a class="anchor" id="autotoc_md20"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 B-Spline Basis Functions</h1>
 <p>Every element of \( \mathcal{S}(k, \mathbf{t}) \) can be written uniquely as a linear combination of <b>B-spline basis functions</b> \( N_{i,k}(x) \), which are defined recursively by the <b>Cox&ndash;de Boor recurrence</b>.</p>
-<h2><a class="anchor" id="autotoc_md21"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 Degree zero</h2>
 <p>For \( k = 0 \) the basis functions are simple indicator functions:</p>
 <p class="formulaDsp">
@@ -146,7 +146,7 @@ Degree zero</h2>
     \end{cases}
 \]
 </p>
-<h2><a class="anchor" id="autotoc_md22"></a>
+<h2><a class="anchor" id="autotoc_md24"></a>
 Recurrence for degree \( k \geq 1 \)</h2>
 <p>Higher-degree basis functions are built from lower-degree ones:</p>
 <p class="formulaDsp">
@@ -156,7 +156,7 @@ Recurrence for degree \( k \geq 1 \)</h2>
 \]
 </p>
 <p>where any fraction with a zero denominator is taken to be zero (this arises when consecutive knots coincide). The routine <code>fpbspl</code> implements this recurrence.</p>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 Key properties</h2>
 <p>The B-spline basis functions enjoy several properties that make them ideal for numerical computation:</p>
 <ol type="1">
@@ -166,7 +166,7 @@ Key properties</h2>
 <li><b>Smoothness</b>: At a simple knot (multiplicity 1), \( N_{i,k} \) has \( k - 1 \) continuous derivatives. Each additional coincident knot reduces smoothness by one order.</li>
 </ol>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, &sect;1.1&ndash;1.2</dd></dl>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md26"></a>
 Spline as a Linear Combination</h1>
 <p>Any spline \( s \in \mathcal{S}(k, \mathbf{t}) \) is represented as</p>
 <p class="formulaDsp">
@@ -175,7 +175,7 @@ Spline as a Linear Combination</h1>
 </p>
 <p>where the \( c_i \) are the <b>B-spline coefficients</b> (also called control points or de Boor points). The entire fitting problem therefore reduces to determining the \( n + 1 \) coefficients for a given knot vector.</p>
 <p>In FITPACK the coefficient array is stored alongside the knot vector in each derived type (e.g., <code>fitpack_curve</code>, <code>fitpack_surface</code>). Once computed by the fitting routines, the same coefficients are used by all evaluation, derivative, and integration routines.</p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md27"></a>
 Evaluation: the de Boor Algorithm</h1>
 <p>Given a point \( x \in [t_j,\, t_{j+1}) \), the spline value \( s(x) \) can be computed without explicitly forming all basis functions. The <b>de Boor algorithm</b> is a triangular recurrence analogous to Horner's method for ordinary polynomials.</p>
 <p>Define the initial values</p>
@@ -193,7 +193,7 @@ Evaluation: the de Boor Algorithm</h1>
 </p>
 <p>After \( k \) stages the result is \( s(x) = d_j^{[k]} \). The cost is \( \mathcal{O}(k^2) \) per evaluation point, independent of the total number of knots. This is the core loop in <code>splev</code> and underlies every <code>eval</code> method in the library.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, Eq. 1.11</dd></dl>
-<h1><a class="anchor" id="autotoc_md26"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 Derivatives</h1>
 <p>Differentiation of a B-spline representation yields another B-spline of one degree lower. The derivative of \( s(x) = \sum_i c_i \, N_{i,k}(x) \) is</p>
 <p class="formulaDsp">
@@ -208,7 +208,7 @@ Derivatives</h1>
 <p>Higher-order derivatives follow by repeated application: the \( \nu \)-th derivative is a spline of degree \( k - \nu \) with coefficients obtained from \( \nu \) successive differencing steps. This structure is exploited by <code>splder</code>, which computes derivatives of any order up to \( k \).</p>
 <p>Because each differentiation reduces the degree by one, at most \( k \) derivatives are nonzero. A cubic spline ( \( k = 3 \)) therefore has a piecewise-constant third derivative and a zero fourth derivative, regardless of the coefficients.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, &sect;1.3</dd></dl>
-<h1><a class="anchor" id="autotoc_md27"></a>
+<h1><a class="anchor" id="autotoc_md29"></a>
 Integration</h1>
 <p>The definite integral of a spline over an interval can be expressed directly in terms of its coefficients, without numerical quadrature. For a spline \( s(x) = \sum_i c_i \, N_{i,k}(x) \) on the interval \( [a, b] \):</p>
 <p class="formulaDsp">
@@ -222,7 +222,7 @@ Integration</h1>
 </p>
 <p>when the knot vector is clamped at both ends. The routine <code>splint</code> implements this formula, giving exact results (up to floating-point arithmetic) regardless of the complexity of the spline.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, &sect;1.4</dd></dl>
-<h1><a class="anchor" id="autotoc_md28"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Knot Insertion (Oslo Algorithm)</h1>
 <p>A fundamental operation on B-spline representations is <b>knot insertion</b>: adding a new knot \( \bar{t} \) to the knot vector without changing the spline function itself. The resulting representation has one more knot, one more coefficient, and the same function values everywhere.</p>
 <p>Suppose a knot \( \bar{t} \in [t_j,\, t_{j+1}) \) is inserted. The new coefficients \( \bar{c}_i \) are obtained from the old ones by a <b>convex combination</b>:</p>
@@ -244,7 +244,7 @@ Knot Insertion (Oslo Algorithm)</h1>
 <p>Because \( 0 \leq \alpha_i \leq 1 \), the new coefficients lie in the convex hull of their neighbours&mdash;a key property that preserves shape.</p>
 <p>Knot insertion is the basis of the <b>Oslo algorithm</b> (Cohen, Lyche, and Schumaker, 1986), which generalizes the operation to insert several knots at once. In FITPACK the <code>insert</code> routine performs single knot insertion and is used both for refinement and for the zero-finding algorithm in <code>sproot</code>.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, &sect;6.2 (pp. 114&ndash;118)</dd></dl>
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md31"></a>
 Tensor Products for Bivariate Splines</h1>
 <p>The B-spline framework extends naturally to two dimensions via <b>tensor products</b>. Given knot vectors \( \mathbf{t}_x \) and \( \mathbf{t}_y \) with associated basis functions \( N_{i,k_x}(x) \) and \( M_{j,k_y}(y) \), a bivariate spline is</p>
 <p class="formulaDsp">
@@ -256,7 +256,7 @@ Tensor Products for Bivariate Splines</h1>
 <p>Evaluation of a tensor-product spline decomposes into two sequences of univariate evaluations: first evaluate in \( x \) for each row of coefficients, then evaluate the resulting intermediate values in \( y \). This separability is the reason tensor-product splines scale well to two dimensions.</p>
 <p>The routines <code>bispev</code> (grid evaluation) and <code>bispeu</code> (scattered evaluation) implement this strategy. Partial derivatives (<code>parder</code>, <code>pardeu</code>) and double integrals (<code>dblint</code>) follow the same tensor-product decomposition.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 1, &sect;1.5</dd></dl>
-<h1><a class="anchor" id="autotoc_md30"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Further Reading</h1>
 <p>The foundations described on this page underpin all fitting algorithms in the library. The fitting problem itself&mdash;choosing knots and coefficients to approximate given data&mdash;is covered separately.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="theory_curve_fitting.html">Curve Fitting Theory</a> </dd>

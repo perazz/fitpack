@@ -1,45 +1,47 @@
 <map id="fitpack_core::fpopdi" name="fitpack_core::fpopdi">
-<area shape="rect" id="Node000001" title="Compute smoothing spline on a polar grid with origin constraints." alt="" coords="5,313,156,338"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a03d606165767f7703429cb55181efe11" title="Compute spline coefficients on a polar/spherical grid via Kronecker product." alt="" coords="207,287,353,313"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,313,192,308,193,314,157,318"/>
-<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#a0055c06b11885b09b3da8a5b9b24d0bb" title="Solve a small symmetric linear system by Cholesky factorization." alt="" coords="204,337,356,362"/>
-<area shape="poly" id="edge26_Node000001_Node000017" title=" " alt="" coords="157,332,190,336,190,341,156,337"/>
+<area shape="rect" id="Node000001" title="Compute smoothing spline on a polar grid with origin constraints." alt="" coords="5,286,156,311"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a03d606165767f7703429cb55181efe11" title="Compute spline coefficients on a polar/spherical grid via Kronecker product." alt="" coords="207,261,353,286"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,286,192,282,193,287,157,292"/>
+<area shape="rect" id="Node000017" href="$namespacefitpack__core.html#a0055c06b11885b09b3da8a5b9b24d0bb" title="Solve a small symmetric linear system by Cholesky factorization." alt="" coords="204,310,356,335"/>
+<area shape="poly" id="edge28_Node000001_Node000017" title=" " alt="" coords="157,305,190,309,190,314,156,310"/>
 <area shape="rect" id="Node000003" href="$namespacefitpack__core.html#ab8705afed0d461ae20bf35a10b0579f5" title="Find knot interval index l such that t(l) &lt;= x &lt; t(l+1). Uses hybrid search: linear for small ranges,..." alt="" coords="409,5,567,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="282,286,294,243,318,181,353,115,376,83,402,55,408,51,411,55,406,59,380,87,358,117,323,183,299,244,287,288"/>
-<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#abba3243913c5e568249cd4d789a2b1d2" title="Rotate a split row into the block&#45;triangular periodic system with stride RHS." alt="" coords="404,197,572,237"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="312,285,423,240,425,245,314,290"/>
-<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="404,69,572,109"/>
-<area shape="poly" id="edge11_Node000002_Node000009" title=" " alt="" coords="284,286,300,253,326,209,360,161,402,119,409,114,412,119,406,123,364,165,330,212,305,256,289,288"/>
-<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="404,133,572,173"/>
-<area shape="poly" id="edge15_Node000002_Node000010" title=" " alt="" coords="290,285,336,237,368,208,403,183,413,177,416,182,405,188,371,213,340,241,294,289"/>
-<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="411,311,565,337"/>
-<area shape="poly" id="edge19_Node000002_Node000011" title=" " alt="" coords="354,306,398,311,397,316,353,311"/>
-<area shape="rect" id="Node000012" href="$namespacefitpack__core.html#ae7f22eea056465653c17c25aaf23b06f" title="Solve a bordered upper triangular system by back&#45;substitution." alt="" coords="411,361,565,386"/>
-<area shape="poly" id="edge20_Node000002_Node000012" title=" " alt="" coords="323,310,357,323,405,347,425,354,423,359,403,352,355,328,321,315"/>
-<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="413,262,563,287"/>
-<area shape="poly" id="edge21_Node000002_Node000013" title=" " alt="" coords="353,288,400,283,400,288,354,294"/>
-<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#a95f95a1ab846dcf0b4035058fdde4bad" title="LU&#45;decompose a cyclic tridiagonal matrix." alt="" coords="413,410,563,435"/>
-<area shape="poly" id="edge23_Node000002_Node000014" title=" " alt="" coords="335,310,358,323,374,342,382,361,390,379,406,397,413,402,410,406,402,401,385,382,377,363,370,345,354,327,333,315"/>
-<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a3781580dd8295b2e2a32266fd0fcf027" title="Solve a cyclic tridiagonal system using LU factors from fpcyt1." alt="" coords="413,459,563,485"/>
-<area shape="poly" id="edge24_Node000002_Node000015" title=" " alt="" coords="339,310,358,323,371,339,378,355,382,387,387,417,394,432,406,446,411,450,408,454,402,450,389,434,382,419,377,387,373,357,366,342,354,327,336,315"/>
-<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="414,509,562,534"/>
-<area shape="poly" id="edge25_Node000002_Node000016" title=" " alt="" coords="340,311,358,323,374,346,381,368,382,412,383,454,390,475,406,496,410,499,406,503,402,499,386,477,378,455,377,412,376,369,369,348,354,327,337,315"/>
-<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="841,202,987,227"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="572,214,828,213,828,218,572,219"/>
-<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="632,77,781,102"/>
-<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="552,195,570,183,585,166,593,148,602,130,618,113,630,105,633,110,622,117,606,133,598,151,590,169,574,187,555,199"/>
-<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="633,126,781,151"/>
-<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="543,195,656,154,658,159,545,200"/>
-<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="620,302,793,327"/>
-<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="542,235,573,248,669,293,667,298,571,253,540,240"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="880,204,873,194,877,184,891,178,914,175,943,179,954,188,951,192,940,184,914,181,892,183,881,187,878,193,884,200"/>
-<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="733,299,873,231,875,236,736,304"/>
-<area shape="poly" id="edge10_Node000008_Node000008" title=" " alt="" coords="673,304,666,294,669,284,683,278,707,275,735,279,747,288,743,292,733,284,707,281,685,283,673,287,671,293,677,300"/>
-<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="542,67,596,52,661,42,729,43,763,50,795,62,832,88,863,122,887,157,904,188,899,191,883,160,859,125,829,92,792,66,761,55,729,48,661,47,597,57,543,72"/>
-<area shape="poly" id="edge13_Node000009_Node000006" title=" " alt="" coords="572,87,618,87,618,92,572,92"/>
-<area shape="poly" id="edge14_Node000009_Node000007" title=" " alt="" coords="573,106,637,120,636,126,572,111"/>
-<area shape="poly" id="edge16_Node000010_Node000005" title=" " alt="" coords="573,163,828,200,827,205,572,168"/>
-<area shape="poly" id="edge17_Node000010_Node000006" title=" " alt="" coords="556,131,649,103,650,108,558,136"/>
-<area shape="poly" id="edge18_Node000010_Node000007" title=" " alt="" coords="572,145,619,142,619,147,572,150"/>
-<area shape="poly" id="edge22_Node000013_Node000008" title=" " alt="" coords="559,285,624,297,623,302,558,290"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="283,259,298,222,323,170,358,113,402,62,418,50,421,54,406,66,362,116,328,172,303,224,288,261"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__core.html#abba3243913c5e568249cd4d789a2b1d2" title="Rotate a split row into the block&#45;triangular periodic system with stride RHS." alt="" coords="404,221,572,261"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="353,259,390,254,391,259,354,265"/>
+<area shape="rect" id="Node000009" href="$namespacefitpack__core.html#aed0bf32d459d0a6b5f61a5f43b4a038d" title="Rotate a row into a band matrix with contiguous&#45;block RHS." alt="" coords="404,285,572,325"/>
+<area shape="poly" id="edge11_Node000002_Node000009" title=" " alt="" coords="354,282,391,288,390,293,353,287"/>
+<area shape="rect" id="Node000010" href="$namespacefitpack__core.html#aa701068a010acc01614dbdb3d2d0af77" title="Rotate a row into a band matrix with stride (row&#45;access) RHS." alt="" coords="404,349,572,389"/>
+<area shape="poly" id="edge15_Node000002_Node000010" title=" " alt="" coords="331,284,357,295,382,315,406,335,417,341,414,346,402,340,378,319,355,300,329,289"/>
+<area shape="rect" id="Node000011" href="$namespacefitpack__core.html#ae590b9ba81851ee9d9c76e1fe127c0d1" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="630,49,783,74"/>
+<area shape="poly" id="edge19_Node000002_Node000011" title=" " alt="" coords="285,259,301,229,327,190,361,150,403,116,454,92,510,75,565,65,616,59,616,65,566,70,511,80,456,97,405,121,365,154,331,193,306,232,290,262"/>
+<area shape="rect" id="Node000012" href="$namespacefitpack__core.html#ae7f22eea056465653c17c25aaf23b06f" title="Solve a bordered upper triangular system by back&#45;substitution." alt="" coords="630,98,783,123"/>
+<area shape="poly" id="edge21_Node000002_Node000012" title=" " alt="" coords="289,259,334,208,366,179,403,156,456,136,511,121,566,113,616,109,617,114,567,118,512,127,457,141,405,161,369,184,337,212,293,262"/>
+<area shape="rect" id="Node000013" href="$namespacefitpack__core.html#ac5fb8acceffae7a31a838c1d7ff97d31" title="Evaluate the non&#45;zero B&#45;splines at a given point." alt="" coords="413,171,563,197"/>
+<area shape="poly" id="edge23_Node000002_Node000013" title=" " alt="" coords="302,258,348,233,403,207,426,198,428,203,405,212,350,238,304,263"/>
+<area shape="rect" id="Node000014" href="$namespacefitpack__core.html#a95f95a1ab846dcf0b4035058fdde4bad" title="LU&#45;decompose a cyclic tridiagonal matrix." alt="" coords="413,414,563,439"/>
+<area shape="poly" id="edge25_Node000002_Node000014" title=" " alt="" coords="340,284,358,295,370,309,377,322,383,349,388,375,395,387,406,399,414,405,411,410,402,403,390,390,383,377,377,350,372,324,365,312,354,299,337,288"/>
+<area shape="rect" id="Node000015" href="$namespacefitpack__core.html#a3781580dd8295b2e2a32266fd0fcf027" title="Solve a cyclic tridiagonal system using LU factors from fpcyt1." alt="" coords="413,463,563,489"/>
+<area shape="poly" id="edge26_Node000002_Node000015" title=" " alt="" coords="342,284,358,295,373,315,380,335,383,374,385,412,392,430,406,449,412,454,409,458,402,452,387,433,380,413,377,374,375,336,368,318,354,299,339,288"/>
+<area shape="rect" id="Node000016" href="$namespacefitpack__core.html#a57fba861443159865065312aa46b6627" title="Compute the discontinuity jumps of the B&#45;spline derivatives." alt="" coords="414,513,562,538"/>
+<area shape="poly" id="edge27_Node000002_Node000016" title=" " alt="" coords="343,284,358,295,376,322,384,348,385,374,382,400,380,425,381,450,389,475,406,500,410,503,406,507,402,503,384,477,376,451,375,425,377,399,379,374,379,349,371,324,354,299,340,288"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="841,197,987,222"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="572,232,828,213,828,218,573,238"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__core.html#aee86d7e7c8bbb38a98dd2dff92861293" title="Compute parameters of a Givens plane rotation." alt="" coords="632,273,781,298"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="573,256,630,267,629,273,572,261"/>
+<area shape="rect" id="Node000007" href="$namespacefitpack__core.html#a3804afa034c5c78f99a71f867d53de7c" title="Apply a Givens plane rotation to two scalars." alt="" coords="633,374,781,399"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="550,259,573,271,625,311,683,363,679,366,622,315,571,276,547,264"/>
+<area shape="rect" id="Node000008" href="$namespacefitpack__core.html#a2509dd629f972935555488cd2db1bff2" title="Test whether two reals differ beyond machine precision." alt="" coords="620,171,793,197"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="564,219,643,198,645,203,566,224"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="880,198,873,188,877,178,891,172,914,170,943,174,954,183,951,187,940,179,914,175,892,177,881,182,878,188,884,195"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="794,192,828,196,827,201,793,197"/>
+<area shape="poly" id="edge10_Node000008_Node000008" title=" " alt="" coords="673,173,666,163,669,153,683,147,707,145,735,148,747,157,743,162,733,153,707,150,685,152,673,157,671,162,677,170"/>
+<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="573,319,624,325,680,326,737,321,792,307,822,292,850,272,892,231,896,234,853,276,825,297,794,312,738,326,680,331,623,330,572,325"/>
+<area shape="poly" id="edge13_Node000009_Node000006" title=" " alt="" coords="572,295,618,291,618,296,572,300"/>
+<area shape="poly" id="edge14_Node000009_Node000007" title=" " alt="" coords="544,323,621,352,660,367,658,372,619,357,542,328"/>
+<area shape="poly" id="edge16_Node000010_Node000005" title=" " alt="" coords="541,387,579,399,621,408,710,427,748,426,769,420,792,408,815,392,835,372,868,324,890,275,904,234,909,236,895,277,872,327,839,375,819,396,795,413,771,425,749,431,710,432,619,413,578,404,539,392"/>
+<area shape="poly" id="edge17_Node000010_Node000006" title=" " alt="" coords="540,347,571,335,659,301,661,306,573,340,542,352"/>
+<area shape="poly" id="edge18_Node000010_Node000007" title=" " alt="" coords="572,373,619,377,619,382,572,379"/>
+<area shape="poly" id="edge20_Node000011_Node000005" title=" " alt="" coords="770,72,795,83,827,106,855,133,898,184,894,187,851,137,823,110,792,88,768,77"/>
+<area shape="poly" id="edge22_Node000012_Node000005" title=" " alt="" coords="763,121,794,132,844,159,886,186,883,191,841,163,792,137,761,126"/>
+<area shape="poly" id="edge24_Node000013_Node000008" title=" " alt="" coords="563,181,606,181,606,187,563,187"/>
 </map>

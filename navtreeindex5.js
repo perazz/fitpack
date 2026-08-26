@@ -1,5 +1,6 @@
 var NAVTREEINDEX5 =
 {
+"structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a81fff570cc8f40280fc49d64def9d23b":[14,0,13,2,11],
 "structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a81fff570cc8f40280fc49d64def9d23b":[15,0,11,2,10],
 "structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a81fff570cc8f40280fc49d64def9d23b":[15,0,11,2,11],
 "structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a8aef881a8fcc0621022b76622fae7cea":[14,0,13,2,12],
@@ -248,6 +249,5 @@ var NAVTREEINDEX5 =
 "structfitpack__surfaces_1_1fitpack__surface.html#aa2e02b8065b11429588c4743bb990c13":[15,0,17,0,0],
 "structfitpack__surfaces_1_1fitpack__surface.html#aa543488cdd55be359d9fc2ac6025cc96":[14,0,19,0,36],
 "structfitpack__surfaces_1_1fitpack__surface.html#aa543488cdd55be359d9fc2ac6025cc96":[15,0,17,0,36],
-"structfitpack__surfaces_1_1fitpack__surface.html#aad5db2e2af661e995a0fba591c39778d":[14,0,19,0,5],
-"structfitpack__surfaces_1_1fitpack__surface.html#aad5db2e2af661e995a0fba591c39778d":[15,0,17,0,5]
+"structfitpack__surfaces_1_1fitpack__surface.html#aad5db2e2af661e995a0fba591c39778d":[14,0,19,0,5]
 };

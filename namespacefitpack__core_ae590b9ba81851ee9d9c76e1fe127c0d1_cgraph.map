@@ -1,0 +1,6 @@
+<map id="fitpack_core::fpback" name="fitpack_core::fpback">
+<area shape="rect" id="Node000001" title="Solve an upper triangular banded system by back&#45;substitution." alt="" coords="5,29,159,55"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__core.html#a44e0185b61cf87f55a1a6ffb9f10fb98" title="Test whether two reals are equal within machine precision." alt="" coords="207,29,352,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,39,193,39,193,45,159,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="247,31,240,21,243,11,257,5,279,3,306,6,318,15,314,19,304,11,279,8,258,10,247,15,245,20,251,28"/>
+</map>

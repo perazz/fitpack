@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html#afff2ab89c849cf8b547f437fc221a2d5":[15,0,0,0,0],
 "structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html":[14,0,2,0],
 "structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html":[15,0,1,0],
 "structfitpack__constrained__curves__c_1_1fitpack__constrained__curve__c.html#af3c931356e671b02f97479759e8d2baf":[14,0,2,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a4e97b36baf09c12d0cbb466b2ad81e21":[15,0,8,0,14],
 "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a4fe393cc86c03b57f34c9293381b15e3":[14,0,10,0,27],
 "structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a4fe393cc86c03b57f34c9293381b15e3":[15,0,8,0,27],
-"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a50736b5a5ff3a1d4539dcc993c030b7c":[14,0,10,0,13],
-"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a50736b5a5ff3a1d4539dcc993c030b7c":[15,0,8,0,13]
+"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a50736b5a5ff3a1d4539dcc993c030b7c":[14,0,10,0,13]
 };

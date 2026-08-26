@@ -1,12 +1,12 @@
 var searchData=
 [
   ['get_5fsmoothing_0',['get_smoothing',['../namespacefitpack__core.html#af9c168cddc6b453b8a23cd0d27e899e2',1,'fitpack_core']]],
-  ['givens_20rotations_1',['QR Factorization via Givens Rotations',['../theory_curve_fitting.html#autotoc_md34',1,'']]],
-  ['grid_2',['Grid',['../tutorial_sphere.html#autotoc_md182',1,'Example: Function on a Lat-Lon Grid'],['../tutorial_grid_surface.html#autotoc_md151',1,'Example: Peaks Function on a Grid']]],
-  ['grid_3',['Example: data on a polar grid',['../tutorial_polar.html#autotoc_md167',1,'']]],
+  ['givens_20rotations_1',['QR Factorization via Givens Rotations',['../theory_curve_fitting.html#autotoc_md36',1,'']]],
+  ['grid_2',['Grid',['../tutorial_sphere.html#autotoc_md184',1,'Example: Function on a Lat-Lon Grid'],['../tutorial_grid_surface.html#autotoc_md153',1,'Example: Peaks Function on a Grid']]],
+  ['grid_3',['Example: data on a polar grid',['../tutorial_polar.html#autotoc_md169',1,'']]],
   ['grid_20and_20parametric_20surface_20tutorial_4',['Grid and Parametric Surface Tutorial',['../tutorial_grid_surface.html',1,'']]],
-  ['grid_20evaluation_5',['Grid evaluation',['../tutorial_surface.html#autotoc_md136',1,'']]],
-  ['grid_20vs_20scattered_20fitting_6',['Grid vs Scattered Fitting',['../tutorial_grid_surface.html#autotoc_md157',1,'']]],
+  ['grid_20evaluation_5',['Grid evaluation',['../tutorial_surface.html#autotoc_md138',1,'']]],
+  ['grid_20vs_20scattered_20fitting_6',['Grid vs Scattered Fitting',['../tutorial_grid_surface.html#autotoc_md159',1,'']]],
   ['grid_5fcomm_5fexpand_7',['grid_comm_expand',['../namespacefitpack__gridded__splines.html#afec97610e21f23cb73c68b5b0235bd09',1,'fitpack_gridded_splines']]],
   ['grid_5fcomm_5fpack_8',['grid_comm_pack',['../namespacefitpack__gridded__splines.html#a857fd0ec924a273e76e831d79a720bc8',1,'fitpack_gridded_splines']]],
   ['grid_5fcomm_5fsize_9',['grid_comm_size',['../namespacefitpack__gridded__splines.html#abb468fcc77b8cd4529971170b6c88653',1,'fitpack_gridded_splines']]],
@@ -27,10 +27,10 @@ var searchData=
   ['grid_5fnew_5ffit_24',['grid_new_fit',['../namespacefitpack__gridded__splines.html#a16c3d66c59e2a75bea922c0585341463',1,'fitpack_gridded_splines']]],
   ['grid_5fnew_5fpoints_25',['grid_new_points',['../namespacefitpack__gridded__splines.html#aeacecbcee4f6b1f8144f3bac062dbd93',1,'fitpack_gridded_splines']]],
   ['grid_5fprepare_5fworkspace_26',['grid_prepare_workspace',['../namespacefitpack__gridded__splines.html#a464d1313ceed236674c9e45b5d06bfa4',1,'fitpack_gridded_splines']]],
-  ['gridded_20data_20fitting_20regrid_27',['Gridded Data Fitting (regrid)',['../theory_surface_fitting.html#autotoc_md56',1,'']]],
-  ['gridded_20data_3a_20tt_20fitpack_5fgrid_5fpolar_20tt_28',['Gridded Data: &lt;tt&gt;fitpack_grid_polar&lt;/tt&gt;',['../tutorial_polar.html#autotoc_md165',1,'']]],
-  ['gridded_20sphere_20data_20—_20tt_20fitpack_5fgrid_5fsphere_20tt_29',['Gridded Sphere Data — &lt;tt&gt;fitpack_grid_sphere&lt;/tt&gt;',['../tutorial_sphere.html#autotoc_md179',1,'']]],
-  ['gridded_20spheres_30',['Pole boundary conditions for gridded spheres',['../theory_special_domains.html#autotoc_md86',1,'']]],
+  ['gridded_20data_20fitting_20regrid_27',['Gridded Data Fitting (regrid)',['../theory_surface_fitting.html#autotoc_md58',1,'']]],
+  ['gridded_20data_3a_20tt_20fitpack_5fgrid_5fpolar_20tt_28',['Gridded Data: &lt;tt&gt;fitpack_grid_polar&lt;/tt&gt;',['../tutorial_polar.html#autotoc_md167',1,'']]],
+  ['gridded_20sphere_20data_20—_20tt_20fitpack_5fgrid_5fsphere_20tt_29',['Gridded Sphere Data — &lt;tt&gt;fitpack_grid_sphere&lt;/tt&gt;',['../tutorial_sphere.html#autotoc_md181',1,'']]],
+  ['gridded_20spheres_30',['Pole boundary conditions for gridded spheres',['../theory_special_domains.html#autotoc_md88',1,'']]],
   ['gridded_20splines_31',['N-Dimensional Gridded Splines',['../theory_surface_fitting.html#nd_gridded_splines',1,'']]],
   ['gridded_5fderivatives_5fgridded_32',['gridded_derivatives_gridded',['../structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html#aad9f093e04307e73338a28df3d08f80a',1,'fitpack_gridded_surfaces::fitpack_grid_surface::gridded_derivatives_gridded()'],['../namespacefitpack__gridded__surfaces.html#ae605ac62fb4c1c2631800094801dd946',1,'fitpack_gridded_surfaces::gridded_derivatives_gridded()']]],
   ['gridded_5fderivatives_5fmany_33',['gridded_derivatives_many',['../structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html#a46ef78bb2a510f0328e26e8d0e5d5a43',1,'fitpack_gridded_surfaces::fitpack_grid_surface::gridded_derivatives_many()'],['../namespacefitpack__gridded__surfaces.html#ae63e8d908fec192d552b4c58db4321fe',1,'fitpack_gridded_surfaces::gridded_derivatives_many()']]],
@@ -53,5 +53,5 @@ var searchData=
   ['gridsurf_5feval_5fone_50',['gridsurf_eval_one',['../structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html#a936b228cb24be42ed9428813ea5085a5',1,'fitpack_gridded_surfaces::fitpack_grid_surface::gridsurf_eval_one()'],['../namespacefitpack__gridded__surfaces.html#a02ddf5607a34faae476f7f53c60392c0',1,'fitpack_gridded_surfaces::gridsurf_eval_one(this, x, y, ierr)']]],
   ['gridsurf_5fintegral_51',['gridsurf_integral',['../namespacefitpack__gridded__surfaces.html#ad5da38fc48716a946de3b241328cc862',1,'fitpack_gridded_surfaces']]],
   ['grow_5fknot_5fstorage_52',['grow_knot_storage',['../namespacefitpack__curves.html#a0b26792808063c7ee78d2666d04e690b',1,'fitpack_curves']]],
-  ['guidelines_53',['Practical Guidelines',['../theory_surface_fitting.html#autotoc_md66',1,'']]]
+  ['guidelines_53',['Practical Guidelines',['../theory_surface_fitting.html#autotoc_md68',1,'']]]
 ];

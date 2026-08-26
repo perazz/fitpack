@@ -115,7 +115,7 @@ $(function(){initNavTree('theory_curve_fitting.html',''); initResizable(true); }
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2fitpack_2fitpack_2doc_2theory__curve__fitting"></a></p>
 <p>This page describes the mathematical foundations of the curve fitting algorithms in FITPACK: given data points \( (x_i, y_i) \) for \( i = 1, \ldots, m \), find a spline \( s(x) \) in the B-spline space \( S(k, \mathbf{t}) \) that represents the data well. The library supports several formulations of this problem, from simple least-squares with user-supplied knots to fully automatic smoothing with adaptive knot placement.</p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md33"></a>
 The Approximation Problem</h1>
 <p>Given \( m \) data points \( (x_i, y_i) \) with strictly increasing abscissae</p>
 <p class="formulaDsp">
@@ -129,7 +129,7 @@ The Approximation Problem</h1>
 <li><b>Smoothing.</b> Let the algorithm choose the knot vector automatically, balancing closeness-of-fit against smoothness of the spline. This is FITPACK's primary mode of operation.</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 4&ndash;5 (pp. 49&ndash;103)</dd></dl>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Least-Squares with Fixed Knots</h1>
 <p>Suppose a knot vector \( \mathbf{t} = (t_1, \ldots, t_{n+k+1}) \) is given. The spline has the B-spline representation</p>
 <p class="formulaDsp">
@@ -142,10 +142,10 @@ Least-Squares with Fixed Knots</h1>
 \]
 </p>
 <p>over all coefficient vectors \( \mathbf{c} \in \mathbb{R}^n \).</p>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md35"></a>
 Normal Equations and Banded Structure</h2>
 <p>Setting the gradient to zero yields the normal equations \( A^T W^2 A \, \mathbf{c} = A^T W^2 \mathbf{y} \), where \( A_{ij} = B_j(x_i) \) is the \( m \times n \) collocation matrix and \( W = \mathrm{diag}(w_i) \). Because each B-spline \( B_j \) is nonzero on at most \( k+1 \) knot spans, the matrix \( A \) has at most \( k+1 \) nonzero entries per row. The resulting normal equations matrix \( A^T W^2 A \) is symmetric, positive semi-definite, and banded with bandwidth \( k+1 \).</p>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md36"></a>
 QR Factorization via Givens Rotations</h2>
 <p>Rather than forming and solving the normal equations directly (which squares the condition number), FITPACK solves the least-squares problem by computing a QR factorization of the weighted matrix \( W A \) using Givens rotations. Each data point \( (x_i, y_i) \) contributes one row to the system; Givens rotations annihilate entries below the diagonal one at a time, maintaining the banded structure throughout.</p>
 <p>This approach has several advantages:</p>
@@ -156,7 +156,7 @@ QR Factorization via Givens Rotations</h2>
 </ul>
 <p>The back-substitution step solves the upper triangular system \( R \mathbf{c} = Q^T W \mathbf{y} \) for the coefficients.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 4, &sect;4.2 (pp. 53&ndash;62)</dd></dl>
-<h1><a class="anchor" id="autotoc_md35"></a>
+<h1><a class="anchor" id="autotoc_md37"></a>
 The Smoothing Problem</h1>
 <p>Instead of fixing the knot vector a priori, the smoothing formulation treats the number and positions of knots as unknowns. The problem is to find a spline \( s \in S(k, \mathbf{t}) \) that minimizes a roughness measure subject to a constraint on the residual:</p>
 <p class="formulaDsp">
@@ -173,7 +173,7 @@ The Smoothing Problem</h1>
 </ul>
 <p>For a given \( S \), the theoretical solution is a natural spline of degree \( 2k + 1 \) with knots at the data sites. FITPACK approximates this solution using a spline of degree \( k \) on a much smaller knot set, determined adaptively.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2 (pp. 67&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Adaptive Knot Placement</h1>
 <p>FITPACK's <code>curfit</code> routine implements an iterative strategy to determine both the number and positions of knots:</p>
 <ol type="1">
@@ -193,7 +193,7 @@ Adaptive Knot Placement</h1>
 </ol>
 <p>The procedure is designed to produce a spline with as few knots as possible while satisfying the smoothing constraint \( f_p \leq S \).</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2.4 (pp. 78&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 Choosing the Smoothing Factor</h1>
 <p>Selecting an appropriate value of \( S \) is the most important practical decision in spline smoothing. The following guidelines apply:</p>
 <ul>
@@ -211,7 +211,7 @@ Choosing the Smoothing Factor</h1>
 </ul>
 <p>A practical workflow is to try a sequence of \( S \) values (e.g., on a logarithmic scale) and select the one that gives the best balance between smoothness and fidelity, or use cross-validation techniques.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 5, &sect;5.2.4 (pp. 78&ndash;84)</dd></dl>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 Periodic Splines</h1>
 <p>When the data represent a function that is periodic on \( [x_1, x_m] \) (for example, angular measurements as a function of time), the fitted spline should satisfy periodicity constraints:</p>
 <p class="formulaDsp">
@@ -227,7 +227,7 @@ Periodic Splines</h1>
 <p>This reduces the number of free coefficients from \( n \) to \( n - k \). The modified least-squares problem is solved with the same Givens rotation approach.</p>
 <p>FITPACK's <code>percur</code> routine implements automatic-knot periodic curve fitting. The corresponding type is <code>fitpack_periodic_curve</code>.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 6, &sect;6.1 (pp. 105&ndash;114)</dd></dl>
-<h1><a class="anchor" id="autotoc_md39"></a>
+<h1><a class="anchor" id="autotoc_md41"></a>
 Parametric Curves</h1>
 <p>A parametric curve in \( \mathbb{R}^d \) is defined by \( d \) coordinate functions of a common parameter \( u \):</p>
 <p class="formulaDsp">
@@ -235,7 +235,7 @@ Parametric Curves</h1>
 \]
 </p>
 <p>Given data points \( \mathbf{x}_i \in \mathbb{R}^d \) for \( i = 1, \ldots, m \), the first step is to assign parameter values \( u_i \).</p>
-<h2><a class="anchor" id="autotoc_md40"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 Chord-Length Parameterization</h2>
 <p>The default choice is cumulative chord length:</p>
 <p class="formulaDsp">
@@ -244,7 +244,7 @@ Chord-Length Parameterization</h2>
 \]
 </p>
 <p>This ensures that parameter increments are proportional to the spacing between successive data points, preventing bunching in regions of high curvature.</p>
-<h2><a class="anchor" id="autotoc_md41"></a>
+<h2><a class="anchor" id="autotoc_md43"></a>
 Shared Knot Vector</h2>
 <p>All \( d \) component splines \( s_j(u) \) share the same knot vector \( \mathbf{t} \) and degree \( k \). The smoothing problem becomes: minimize</p>
 <p class="formulaDsp">
@@ -254,7 +254,7 @@ Shared Knot Vector</h2>
 \]
 </p>
 <p>FITPACK's <code>parcur</code> routine handles this by solving \( d \) coupled least-squares problems with a common knot vector.</p>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 Closed Curves</h2>
 <p>For closed parametric curves, the spline must satisfy periodic boundary conditions in every component:</p>
 <p class="formulaDsp">
@@ -262,7 +262,7 @@ Closed Curves</h2>
 \]
 </p>
 <p>This is implemented by <code>clocur</code> (type <code>fitpack_closed_curve</code>).</p>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md45"></a>
 Endpoint Constraints</h2>
 <p>In some applications, the tangent vector or higher derivatives at the curve endpoints are prescribed. FITPACK's <code>concur</code> routine supports derivative constraints of the form:</p>
 <p class="formulaDsp">
@@ -271,10 +271,10 @@ Endpoint Constraints</h2>
 </p>
 <p>for selected orders \( l \) and components \( j \), implemented by <code>fitpack_constrained_curve</code>.</p>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 9 (pp. 199&ndash;228)</dd></dl>
-<h1><a class="anchor" id="autotoc_md44"></a>
+<h1><a class="anchor" id="autotoc_md46"></a>
 Convexity-Constrained Fitting</h1>
 <p>In many applications the fitted curve must be shape-preserving: convex data should produce a convex spline, concave data a concave spline. FITPACK supports local convexity constraints via the second derivative.</p>
-<h2><a class="anchor" id="autotoc_md45"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 B-Spline Coefficient Conditions</h2>
 <p>A spline \( s(x) \) of degree \( k \geq 2 \) is convex on an interval if and only if \( s&#39;&#39;(x) \geq 0 \) there. For B-splines, this translates into conditions on the second-order divided differences of the coefficients:</p>
 <p class="formulaDsp">
@@ -282,7 +282,7 @@ B-Spline Coefficient Conditions</h2>
 \]
 </p>
 <p>for all \( j \) whose corresponding B-splines overlap the interval. Concavity requires \( \Delta^2 c_j \leq 0 \).</p>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 Per-Interval Convexity Flags</h2>
 <p>FITPACK allows the user to specify convexity constraints independently for each data interval via a flag vector \( v_i \):</p>
 <table class="markdownTable">
@@ -295,7 +295,7 @@ Per-Interval Convexity Flags</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">\( 0 \)   </td><td class="markdownTableBodyNone">No constraint (the spline is free)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md49"></a>
 Quadratic Programming Formulation</h2>
 <p>The constrained fitting problem becomes a quadratic program (QP): minimize the roughness integral (or weighted residual) subject to the linear inequality constraints on \( \Delta^2 c_j \) and the smoothing constraint \( f_p \leq S \). FITPACK solves this QP iteratively, combining the adaptive knot strategy with active-set management for the convexity constraints.</p>
 <p>Two routines are provided:</p>
@@ -304,7 +304,7 @@ Quadratic Programming Formulation</h2>
 <li><b><code>cocosp</code></b>: fixed knot vector with convexity constraints. The user supplies the knots and the routine solves the constrained least-squares problem.</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>Dierckx, Ch. 8, &sect;8.3&ndash;8.4 (pp. 173&ndash;196)</dd></dl>
-<h1><a class="anchor" id="autotoc_md48"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">

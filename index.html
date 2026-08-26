@@ -116,7 +116,7 @@ $(function(){initNavTree('index.html',''); initResizable(true); });
 <div class="textblock"><p><a class="anchor" id="mainpage"></a></p>
 <p><b>fitpack</b> is a Modern Fortran (2008+) library for curve and surface fitting with splines, based on the FITPACK package by Paul Dierckx.</p>
 <p>It provides an object-oriented API with derived types for all major fitting tasks: smoothing, interpolation, least-squares approximation, and constrained fitting. All routines support spline degrees 1 through 5 (cubic by default) and return B-spline representations that can be evaluated, differentiated, integrated, and root-found efficiently.</p>
-<h1><a class="anchor" id="autotoc_md1"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Type Hierarchy</h1>
 <p>All fitter types extend the abstract base <code>fitpack_fitter</code>:</p>
 <div class="fragment"><div class="line">fitpack_fitter (abstract base)</div>
@@ -134,9 +134,9 @@ Type Hierarchy</h1>
 <div class="line">├── fitpack_grid_polar              — polar-domain fitting (gridded)</div>
 <div class="line">├── fitpack_sphere                  — spherical-domain fitting (scattered)</div>
 <div class="line">└── fitpack_grid_sphere             — spherical-domain fitting (gridded)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4"></a>
 Quick Start</h1>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Fit a curve</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_curve</div>
 <div class="line"> </div>
@@ -154,7 +154,7 @@ Fit a curve</h2>
 <div class="line">area  = curve%integral(x(1), x(<span class="keyword">size</span>(x)), ierr)</div>
 <div class="line">roots = curve%zeros(ierr)</div>
 <div class="ttc" id="anamespacefitpack_html"><div class="ttname"><a href="namespacefitpack.html">fitpack</a></div><div class="ttdoc">Umbrella module that re-exports the complete FITPACK public API.</div><div class="ttdef"><b>Definition</b> fitpack.f90:33</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
 Fit a surface</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code hl_namespace" href="namespacefitpack.html">fitpack</a>, <span class="keywordtype">only</span>: fitpack_grid_surface</div>
 <div class="line"> </div>
@@ -166,12 +166,12 @@ Fit a surface</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">! Evaluate on a new grid</span></div>
 <div class="line">z_new = surf%eval(x_new, y_new, ierr)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md7"></a>
 Building</h1>
 <p>fitpack uses <a href="https://fpm.fortran-lang.org/">fpm</a> (Fortran Package Manager):</p>
 <div class="fragment"><div class="line">fpm build          # build the library</div>
 <div class="line">fpm test           # run all tests</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md8"></a>
 Spline Theory</h1>
 <ul>
 <li><a class="el" href="theory_bsplines.html">B-Spline Foundations</a> &mdash; B-spline basis functions, de Boor evaluation, derivatives, integration, knot insertion</li>
@@ -179,9 +179,9 @@ Spline Theory</h1>
 <li><a class="el" href="theory_surface_fitting.html">Surface Fitting Theory</a> &mdash; Tensor product splines, scattered vs. gridded fitting, Kronecker product efficiency, N-dimensional gridded splines</li>
 <li><a class="el" href="theory_special_domains.html">Polar and Spherical Domains</a> &mdash; Polar coordinate transform, spherical coordinates, pole boundary conditions</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Tutorials</h1>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md10"></a>
 Curves</h2>
 <ul>
 <li><a class="el" href="tutorial_curve.html">Univariate Curve Fitting with fitpack_curve</a> &mdash; Univariate smoothing and interpolation with <code>fitpack_curve</code></li>
@@ -189,19 +189,19 @@ Curves</h2>
 <li><a class="el" href="tutorial_parametric_curves.html">Parametric, Closed, and Constrained Curves</a> &mdash; Parametric, closed, and constrained curves</li>
 <li><a class="el" href="tutorial_convex_curve.html">Convexity-Constrained Curve Fitting</a> &mdash; Shape-preserving fitting with convexity constraints</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 Surfaces</h2>
 <ul>
 <li><a class="el" href="tutorial_surface.html">Scattered Surface Fitting Tutorial</a> &mdash; Scattered bivariate data with <code>fitpack_surface</code></li>
 <li><a class="el" href="tutorial_grid_surface.html">Grid and Parametric Surface Tutorial</a> &mdash; Gridded data and parametric surfaces</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md12"></a>
 Special Domains</h2>
 <ul>
 <li><a class="el" href="tutorial_polar.html">Polar Domain Fitting Tutorial</a> &mdash; Disc-shaped domains with <code>fitpack_polar</code> and <code>fitpack_grid_polar</code></li>
 <li><a class="el" href="tutorial_sphere.html">Spherical Spline Fitting Tutorial</a> &mdash; Spherical data with <code>fitpack_sphere</code> and <code>fitpack_grid_sphere</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md11"></a>
+<h1><a class="anchor" id="autotoc_md13"></a>
 Examples</h1>
 <p>Compilable example programs are in the <code>examples/</code> directory. Build and run with:</p>
 <div class="fragment"><div class="line">fpm run --example example_curve</div>
@@ -212,7 +212,7 @@ Examples</h1>
 <div class="line">fpm run --example example_grid_surface</div>
 <div class="line">fpm run --example example_polar</div>
 <div class="line">fpm run --example example_sphere</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md12"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md14"></a>
 Reference</h1>
 <ul>
 <li><a class="el" href="book_reference.html">Book Reference Index</a> &mdash; Quick-reference table mapping routines to book chapters and equations</li>
