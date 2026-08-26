@@ -27,6 +27,7 @@ module fitpack_grid_nd_tests
     private
 
     public :: test_nd_grid_equivalence
+    public :: test_nd_grid_regressions
 
     !> regrid workspace sizing (generous; mirrors legacy mnregr which uses nxest=nyest=17)
     integer(FP_SIZE), parameter :: NXEST = 17, NYEST = 17
@@ -1620,5 +1621,312 @@ module fitpack_grid_nd_tests
         9100 format('[gate M] class ',a,' /= direct core call')
         9200 format('[gate M] class ',a,' functional check failed  (max |diff| = ',1pe12.3,')')
     end function gate_gridded_spline_peripherals
+
+    !> @brief Regression gates for the gridded defects SciPy reported against FITPACK.
+    !!
+    !! N. Per-axis validation of the derivative orders in pardtc/parder (scipy#24084)
+    !! O. Knot saturation at the interpolating maximum leaves a usable fit (scipy#22433, scipy#17787)
+    !! P. The smoothing-parameter iteration cap is honoured and configurable (scipy#22433)
+    logical function test_nd_grid_regressions(iunit) result(success)
+        integer, optional, intent(in) :: iunit
+        integer :: useUnit
+
+        useUnit = output_unit
+        if (present(iunit)) useUnit = iunit
+
+        success = .true.
+
+        if (success) success = gate_pardtc_axis_orders(useUnit)
+        if (success) success = gate_regrid_saturated_knots(useUnit)
+        if (success) success = gate_regrid_maxit(useUnit)
+
+        if (success) write(useUnit,'(a)') '[test_nd_grid_regressions] all gridded regression gates OK'
+
+    end function test_nd_grid_regressions
+
+    !> @brief Gate N — each derivative order is validated against its own axis degree.
+    !!
+    !! With kx=3 and ky=2, the order (2,0) is legal in x and must be accepted; comparing it against
+    !! the y degree (the scipy#24084 defect) would reject it. The result is checked against the
+    !! analytic derivative of an in-space separable polynomial, and orders that really do reach the
+    !! per-axis degree must still be refused. Repeated at dims=3 with three distinct degrees.
+    logical function gate_pardtc_axis_orders(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: kx = 3, ky = 2, mg = 8, nk1 = 6
+        integer(FP_SIZE), parameter :: nkk = nk1+kx+1, nc2 = nk1*nk1
+        real(FP_REAL),    parameter :: cpx(4) = [1.0_FP_REAL,0.5_FP_REAL,-0.3_FP_REAL,0.2_FP_REAL]
+        real(FP_REAL),    parameter :: cpy(3) = [0.8_FP_REAL,-0.4_FP_REAL,0.6_FP_REAL]
+        real(FP_REAL),    parameter :: DTOL = 1.0e-8_FP_REAL
+
+        integer(FP_SIZE) :: n2(2),k2(2),m2(2),nest2(2),nu2(2)
+        real(FP_REAL)    :: t2(nkk,2),xg2(mg,2),c2(nc2),z2(mg*mg),lo(2),hi(2),fp
+        real(FP_REAL)    :: zd(mg*mg),wrk(8000)
+        integer(FP_SIZE) :: iwrk(800)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: i,j,iout
+        real(FP_REAL)    :: maxdiff,x,y
+
+        ! dims=3 leg: degrees 3/2/4, orders legal on one axis but not on another
+        integer(FP_SIZE), parameter :: kz = 4, nk1z = 7
+        integer(FP_SIZE) :: n3(3),k3(3),nu3(3)
+        real(FP_REAL)    :: t3(nk1z+kz+1,3),c3(nk1*nk1*nk1z),newc3(nk1*nk1*nk1z)
+        real(FP_REAL)    :: ca(nk1),cb(nk1),cd(nk1z)
+
+        ok = .true.
+
+        ! in-space separable polynomial: degree kx in x, degree ky in y
+        t2 = zero; xg2 = zero
+        call clamped_unit_knots(kx,nk1,t2(:,1),n2(1))
+        call clamped_unit_knots(ky,nk1,t2(:,2),n2(2))
+        nest2 = n2
+        k2    = [kx,ky]
+        m2    = mg
+        lo    = zero
+        hi    = one
+        do i=1,mg; xg2(i,1) = real(i-1,FP_REAL)/real(mg-1,FP_REAL); end do
+        xg2(:,2) = xg2(:,1)
+        do i=1,mg
+           do j=1,mg
+              z2((i-1)*mg+j) = poly_deriv(cpx,0_FP_SIZE,xg2(i,1))*poly_deriv(cpy,0_FP_SIZE,xg2(j,2))
+           end do
+        end do
+
+        wrk = zero; iwrk = 0
+        call regrid(-1_FP_FLAG,2_FP_DIM,m2,xg2,z2,lo,hi,k2,zero,nest2,n2,t2,c2,fp, &
+                    wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ier)
+        if (.not.FITPACK_SUCCESS(ier) .or. fp>1.0e-9_FP_REAL) then
+            ok = .false.; write(useUnit,4000) 'least-squares fit',ier; return
+        end if
+
+        ! (a) nu=(2,0): 2 >= ky but 2 < kx, so it is a legal x-derivative
+        nu2 = [2_FP_SIZE,0_FP_SIZE]
+        call parder(2_FP_DIM,t2,n2,c2,k2,nu2,xg2,m2,zd, &
+                    wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ier)
+        if (.not.FITPACK_SUCCESS(ier)) then
+            ok = .false.; write(useUnit,4100) nu2(1),nu2(2),kx,ky,ier; return
+        end if
+        maxdiff = zero
+        do i=1,mg
+           x = xg2(i,1)
+           do j=1,mg
+              y = xg2(j,2)
+              iout = (i-1)*mg+j
+              maxdiff = max(maxdiff, abs(zd(iout) - &
+                        poly_deriv(cpx,nu2(1),x)*poly_deriv(cpy,nu2(2),y)))
+           end do
+        end do
+        if (.not.(maxdiff<=DTOL)) then
+            ok = .false.; write(useUnit,4200) maxdiff; return
+        end if
+
+        ! (b) orders that reach their own axis degree stay rejected
+        nu2 = [0_FP_SIZE,ky]
+        call pardtc(2_FP_DIM,t2,n2,c2,k2,nu2,zd,ier)
+        if (ier/=FITPACK_INPUT_ERROR) then
+            ok = .false.; write(useUnit,4300) nu2(1),nu2(2),ier; return
+        end if
+        nu2 = [kx,0_FP_SIZE]
+        call pardtc(2_FP_DIM,t2,n2,c2,k2,nu2,zd,ier)
+        if (ier/=FITPACK_INPUT_ERROR) then
+            ok = .false.; write(useUnit,4300) nu2(1),nu2(2),ier; return
+        end if
+
+        ! (c) dims=3, three distinct degrees: (2,1,3) is legal on every axis, (0,2,0) is not
+        call build_separable_3d(kx,ky,kz,nk1,nk1,nk1z,t3,n3,k3,c3,ca,cb,cd)
+        nu3 = [2_FP_SIZE,1_FP_SIZE,3_FP_SIZE]
+        call pardtc(3_FP_DIM,t3,n3,c3,k3,nu3,newc3,ier)
+        if (.not.FITPACK_SUCCESS(ier)) then
+            ok = .false.; write(useUnit,4400) nu3,ier; return
+        end if
+        nu3 = [0_FP_SIZE,ky,0_FP_SIZE]
+        call pardtc(3_FP_DIM,t3,n3,c3,k3,nu3,newc3,ier)
+        if (ier/=FITPACK_INPUT_ERROR) then
+            ok = .false.; write(useUnit,4400) nu3,ier; return
+        end if
+
+        write(useUnit,'(a)') '[gate N] pardtc/parder validate each derivative order against its own axis degree'
+
+        4000 format('[gate N] ',a,' failed, ier=',i0)
+        4100 format('[gate N] order (',i0,',',i0,') rejected with kx=',i0,', ky=',i0,': ier=',i0)
+        4200 format('[gate N] d2/dx2 /= analytic derivative  (max |diff| = ',1pe12.3,')')
+        4300 format('[gate N] order (',i0,',',i0,') should be an input error, got ier=',i0)
+        4400 format('[gate N] dims=3 order (',i0,',',i0,',',i0,') gave ier=',i0)
+    end function gate_pardtc_axis_orders
+
+    !> @brief Gate O — a fit whose knot count saturates at the interpolating maximum stays usable.
+    !!
+    !! Aliased (noise-like) data on a modest grid drives fpknot until one or both axes reach
+    !! nmax = m+k+1. Upstream that produced NaN coefficients without any error flag (scipy#17787);
+    !! here fpknot refuses to split a knot interval that holds no interior data point, so the
+    !! Schoenberg-Whitney condition survives saturation. The gate pins that: saturation must
+    !! actually happen, and the fit must come back successful, finite and within tolerance of s.
+    logical function gate_regrid_saturated_knots(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: mx = 9, my = 25, kk = 3
+        integer(FP_SIZE), parameter :: NXS = mx+kk+1, NYS = my+kk+1, NCS = (NXS-kk-1)*(NYS-kk-1)
+        real(FP_REAL),    parameter :: RTOL = 2.0e-3_FP_REAL
+
+        integer(FP_SIZE) :: m2(2),k2(2),nest2(2),n2(2)
+        real(FP_REAL)    :: xg(max(mx,my),2),lo(2),hi(2),t2(max(NXS,NYS),2)
+        real(FP_REAL)    :: z(mx*my),c(NCS),zev(mx*my),fp,s
+        real(FP_REAL)    :: wrk(20000),ewrk(4000)
+        integer(FP_SIZE) :: iwrk(2000),eiwrk(400)
+        integer(FP_FLAG) :: ier
+        integer(FP_SIZE) :: i,j,is,nc
+        logical          :: saturated
+
+        ok = .true.
+        saturated = .false.
+
+        m2    = [mx,my]
+        k2    = kk
+        nest2 = [NXS,NYS]
+        xg    = zero
+        do i=1,mx; xg(i,1) = real(i-1,FP_REAL); end do
+        do j=1,my; xg(j,2) = real(j-1,FP_REAL); end do
+        lo = [xg(1,1),xg(1,2)]
+        hi = [xg(mx,1),xg(my,2)]
+        do i=1,mx
+           do j=1,my
+              z((i-1)*my+j) = aliased_sample(i,j)
+           end do
+        end do
+
+        do is=1,10
+           s  = 0.05_FP_REAL*is
+           n2 = 0; t2 = zero; c = zero; fp = zero; wrk = zero; iwrk = 0
+           call regrid(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,z,lo,hi,k2,s,nest2,n2,t2,c,fp, &
+                       wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ier)
+           if (.not.FITPACK_SUCCESS(ier)) then
+               ok = .false.; write(useUnit,5000) s,ier; return
+           end if
+
+           nc = product(n2-k2-1)
+           if (.not.all(c(1:nc)==c(1:nc)) .or. .not.(abs(fp)<huge(zero))) then
+               ok = .false.; write(useUnit,5100) s; return
+           end if
+           if (.not.(abs(fp-s)<=RTOL*s)) then
+               ok = .false.; write(useUnit,5200) s,fp; return
+           end if
+           saturated = saturated .or. any(n2==m2+k2+1)
+
+           ! the fitted spline must evaluate to finite values on the data grid
+           call ndspev(2_FP_DIM,t2,n2,c(1:nc),k2,xg,m2,zev, &
+                       ewrk,size(ewrk,kind=FP_SIZE),eiwrk,size(eiwrk,kind=FP_SIZE),ier)
+           if (.not.FITPACK_SUCCESS(ier) .or. .not.all(abs(zev)<huge(zero))) then
+               ok = .false.; write(useUnit,5300) s; return
+           end if
+        end do
+
+        if (.not.saturated) then
+            ok = .false.
+            write(useUnit,'(a)') '[gate O] no axis ever reached its interpolating knot count: gate is vacuous'
+            return
+        end if
+
+        write(useUnit,'(a)') '[gate O] regrid stays finite and on-tolerance when a knot count saturates at nmax'
+
+        5000 format('[gate O] fit failed at s=',1pe10.3,', ier=',i0)
+        5100 format('[gate O] non-finite coefficients or residual at s=',1pe10.3)
+        5200 format('[gate O] residual off tolerance at s=',1pe10.3,': fp=',1pe12.5)
+        5300 format('[gate O] evaluation of the saturated fit failed at s=',1pe10.3)
+    end function gate_regrid_saturated_knots
+
+    !> @brief Gate P — the smoothing-parameter iteration cap is honoured and overridable.
+    !!
+    !! Large grids can need more than the historical hard-coded 20 iterations of the f(p)=s root
+    !! search (scipy#22433). The cap is now a named default that regrid takes as an optional
+    !! argument: a cap of one iteration must report FITPACK_MAXIT, omitting the argument must be
+    !! identical to passing REGRID_MAXIT, and a raised cap must never do worse than the default.
+    logical function gate_regrid_maxit(useUnit) result(ok)
+        integer, intent(in) :: useUnit
+
+        integer(FP_SIZE), parameter :: mx = 20, my = 30, kk = 1
+        integer(FP_SIZE), parameter :: NXS = mx+kk+1, NYS = my+kk+1, NCS = (NXS-kk-1)*(NYS-kk-1)
+
+        integer(FP_SIZE) :: m2(2),k2(2),nest2(2),n2(2),ndef(2)
+        real(FP_REAL)    :: xg(max(mx,my),2),lo(2),hi(2),t2(max(NXS,NYS),2)
+        real(FP_REAL)    :: z(mx*my),c(NCS),cdef(NCS),fp,fpdef,s
+        real(FP_REAL)    :: wrk(40000)
+        integer(FP_SIZE) :: iwrk(4000)
+        integer(FP_FLAG) :: ier,ierdef
+        integer(FP_SIZE) :: i,j
+
+        ok = .true.
+
+        m2    = [mx,my]
+        k2    = kk
+        nest2 = [NXS,NYS]
+        xg    = zero
+        do i=1,mx; xg(i,1) = real(i-1,FP_REAL); end do
+        do j=1,my; xg(j,2) = real(j-1,FP_REAL); end do
+        lo = [xg(1,1),xg(1,2)]
+        hi = [xg(mx,1),xg(my,2)]
+        do i=1,mx
+           do j=1,my
+              z((i-1)*my+j) = aliased_sample(i,j)
+           end do
+        end do
+        s = 0.01_FP_REAL*mx*my
+
+        ! (a) a single iteration cannot reach f(p)=s: the cap must be reported, not ignored
+        call fit(1_FP_SIZE,n2,c,fp,ier)
+        if (ier/=FITPACK_MAXIT) then
+            ok = .false.; write(useUnit,7000) ier; return
+        end if
+
+        ! (b) omitting maxit must be identical to passing the documented default
+        n2 = 0; t2 = zero; cdef = zero; fpdef = zero; wrk = zero; iwrk = 0
+        call regrid(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,z,lo,hi,k2,s,nest2,n2,t2,cdef,fpdef, &
+                    wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ierdef)
+        ndef = n2
+        call fit(REGRID_MAXIT,n2,c,fp,ier)
+        if (ier/=ierdef .or. any(n2/=ndef) .or. .not.(fp==fpdef) .or. .not.all(c==cdef)) then
+            ok = .false.
+            write(useUnit,'(a)') '[gate P] explicit maxit=REGRID_MAXIT differs from the default'
+            return
+        end if
+
+        ! (c) a raised cap must never do worse than the default
+        call fit(10*REGRID_MAXIT,n2,c,fp,ier)
+        if (.not.FITPACK_SUCCESS(ier) .and. FITPACK_SUCCESS(ierdef)) then
+            ok = .false.; write(useUnit,7100) ier,ierdef; return
+        end if
+        if (ierdef==FITPACK_MAXIT .and. ier==FITPACK_MAXIT) then
+            ok = .false.
+            write(useUnit,'(a)') '[gate P] raising the iteration cap did not help convergence'
+            return
+        end if
+
+        write(useUnit,'(a)') '[gate P] regrid honours its iteration cap and the optional maxit override'
+
+        7000 format('[gate P] maxit=1 returned ier=',i0,' instead of FITPACK_MAXIT')
+        7100 format('[gate P] raised cap regressed: ier=',i0,' vs default ier=',i0)
+
+        contains
+
+           subroutine fit(mit,nout,cout,fpout,ierout)
+              integer(FP_SIZE), intent(in)  :: mit
+              integer(FP_SIZE), intent(out) :: nout(2)
+              real(FP_REAL),    intent(out) :: cout(NCS),fpout
+              integer(FP_FLAG), intent(out) :: ierout
+              nout = 0; t2 = zero; cout = zero; fpout = zero; wrk = zero; iwrk = 0
+              call regrid(IOPT_NEW_SMOOTHING,2_FP_DIM,m2,xg,z,lo,hi,k2,s,nest2,nout,t2,cout,fpout, &
+                          wrk,size(wrk,kind=FP_SIZE),iwrk,size(iwrk,kind=FP_SIZE),ierout,maxit=mit)
+           end subroutine fit
+
+    end function gate_regrid_maxit
+
+    !> @brief Deterministic aliased sample: smooth in the continuum, noise-like on an integer grid.
+    !!        Reproducible across platforms, unlike a pseudo-random generator.
+    pure real(FP_REAL) function aliased_sample(i,j) result(v)
+        integer(FP_SIZE), intent(in) :: i,j
+        real(FP_REAL) :: ri,rj
+        ri = real(i,FP_REAL)
+        rj = real(j,FP_REAL)
+        v  = sin(3.1_FP_REAL*ri)*cos(2.7_FP_REAL*rj) + half*sin(11.3_FP_REAL*ri+5.9_FP_REAL*rj)
+    end function aliased_sample
 
 end module fitpack_grid_nd_tests

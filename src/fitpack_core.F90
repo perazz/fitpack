@@ -118,6 +118,10 @@ module fitpack_core
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_1    =  1  ! Last knot added on 1st dim (x or u)
     integer(FP_FLAG), parameter,  public :: KNOT_DIM_2    =  2  ! Last knot added on 2nd dim (y or v)
 
+    ! Default cap on the smoothing-parameter iterations of the gridded fit. Large grids can need
+    ! more; regrid takes an optional maxit that overrides it.
+    integer(FP_SIZE), parameter, public :: REGRID_MAXIT = 20
+
     ! Spline degrees
     integer(FP_SIZE), parameter, public :: MAX_ORDER = 19    ! Max spline order (for array allocation)
     integer(FP_SIZE), parameter, public :: DEGREE_3  =  3
@@ -322,7 +326,7 @@ module fitpack_core
             case (FITPACK_LEASTSQUARES_OK); msg = 'Success! (least-squares)'
             case (FITPACK_INSUFFICIENT_STORAGE); msg = 'Insufficient Storage'
             case (FITPACK_S_TOO_SMALL); msg = 'Smoothing parameter is too small'
-            case (FITPACK_MAXIT); msg = 'Infinite loop detected'
+            case (FITPACK_MAXIT); msg = 'Iteration limit reached before f(p)=s'
             case (FITPACK_TOO_MANY_KNOTS); msg = 'More knots than data points'
             case (FITPACK_OVERLAPPING_KNOTS); msg = 'Overlapping knots found'
             case (FITPACK_INVALID_RANGE); msg = 'Invalid variable range'
@@ -16728,8 +16732,12 @@ module fitpack_core
       !!   mq = 2*max_{i=1..dims-1} [ product(nk1max(1:i)) * product(m(i+1:dims)) ]
       !!   mm = max(nestmax, mmax, product(m(2:dims)), product(nk1max(1:dims-1)))
       !!
+      !! @param[in] maxit  Optional cap on the smoothing-parameter iterations (default
+      !!                   `REGRID_MAXIT`). Large grids may need more than the default before
+      !!                   `f(p)=s` is met; `FITPACK_MAXIT` reports that the cap was reached.
+      !!
       !! @see regrid, fpregr; Dierckx, SIAM J.Numer.Anal. 19 (1982) 1286-1304; Ch.5 §5.4.
-      pure subroutine regrid(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier)
+      pure subroutine regrid(iopt,dims,m,xg,z,lo,hi,k,s,nest,n,t,c,fp,wrk,lwrk,iwrk,kwrk,ier,maxit)
 
       !  ..scalar arguments..
       integer(FP_SIZE), intent(in)    :: iopt
@@ -16738,6 +16746,7 @@ module fitpack_core
       real(FP_REAL),    intent(out)   :: fp
       integer(FP_SIZE), intent(in)    :: lwrk,kwrk
       integer(FP_FLAG), intent(out)   :: ier
+      integer(FP_SIZE), intent(in), optional :: maxit
       !  ..array arguments..
       integer(FP_SIZE), intent(in)    :: m(dims),k(dims),nest(dims)
       real(FP_REAL),    intent(in)    :: lo(dims),hi(dims)
@@ -16750,11 +16759,10 @@ module fitpack_core
       integer(FP_SIZE), intent(inout), target     :: iwrk(kwrk)
 
       !  ..parameters..
-      integer(FP_SIZE), parameter :: maxit = 20
       real(FP_REAL),    parameter :: tol = smallnum03
       !  ..local scalars..
       integer(FP_DIM)  :: d
-      integer(FP_SIZE) :: nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi,i,bufmax
+      integer(FP_SIZE) :: nit,nc,lwest,kwest,maxm,maxnest,maxk1,maxk2,mm,mynx,offr,offi,i,bufmax
       !  ..per-axis arrays..
       integer(FP_SIZE) :: k1(dims),k2(dims),nmin(dims),nk1max(MAX_IDIM)
       !  ..workspace views (carved from wrk/iwrk; contiguous by construction)..
@@ -16763,6 +16771,9 @@ module fitpack_core
 
       !  before starting computations a data check is made.
       ier = FITPACK_INPUT_ERROR
+
+      nit  = REGRID_MAXIT
+      if (present(maxit)) nit = max(IONE,maxit)
 
       k1   = k+1
       k2   = k+2
@@ -16831,7 +16842,7 @@ module fitpack_core
       pnr(1:maxm,1:dims)             => iwrk(offi+1:offi+maxm*dims);            offi = offi+maxm*dims
       pnrdat(1:maxnest,1:dims)       => iwrk(offi+1:offi+maxnest*dims)
 
-      call fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,maxit,nc, &
+      call fpregr(iopt,dims,xg,m,z,lo,hi,k,s,nest,tol,nit,nc, &
                      n,t,c,fp,wrk(1),wrk(2),wrk(3:2+dims),iwrk(1),iwrk(2:1+dims), &
                      pfpint,pnr,pnrdat,psp,pright,pq,pa,pb,ier)
       return

@@ -70,6 +70,7 @@ program test
         call add_test(test_derivative_spline())
         call add_test(test_grid_surface_scattered_eval())
         call add_test(test_nd_grid_equivalence())
+        call add_test(test_nd_grid_regressions())
 
     end subroutine run_interface_tests
 
