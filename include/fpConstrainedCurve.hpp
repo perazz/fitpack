@@ -1,183 +1,690 @@
+/*   ***********************************************************************************************
+ *   **                                         FITPACK                                          **
+ *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
+ *   ***********************************************************************************************
+ *   **    fpConstrainedCurve.hpp                                                                     **
+ *   ** @brief Standalone C++ wrapper for fitpack_constrained_curve (no fortran-arrays dependency)
+ *   ***********************************************************************************************
+ *   ** @author Binding Generator
+ *   *********************************************************************************************** */
+
 #ifndef FPCONSTRAINEDCURVE_HPP_INCLUDED
 #define FPCONSTRAINEDCURVE_HPP_INCLUDED
 
-/***************************************************************************************************
-!                                ____________________  ___   ________ __
-!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
-!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
-!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
-!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
-!
-!                                     A Curve Fitting Package
-!
-!   fpConstrainedCurve
-!> @brief C++ interface to fitpack_constrained_curve
-!
-!   Author: (C) Federico Perini
-!> @since     01/06/2024
-!
-!   References :
-!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
-!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
-!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
-!                    Oxford university press, 1993.
-!
-! **************************************************************************************************/
+#include "fitpack_config.h"
 
-// Import Fortran-C interface
-#include "fitpack_constrained_curves_c.h"
+#if HAVE_FXARRAY
+#include "fxArrays.hpp"
+#endif
+
+#include "fitpack_constrained_curve_c.h"
 #include "fpParametricCurve.hpp"
+#include <string>
 #include <vector>
-#include <iostream>
-using std::vector;
+#include <cstdint>
+#include <memory>
+#include <stdexcept>
+#include <variant>
+#include <optional>
+#include <cstring>
+#include <array>
 
-class fpConstrainedCurve
-{
-    public:
+static_assert(sizeof(fitpack_constrained_curve_c) == sizeof(fitpack_parametric_curve_c),
+    "C descriptor layout mismatch: fitpack_constrained_curve_c vs fitpack_parametric_curve_c");
 
-        // Constructors/destructors
-         fpConstrainedCurve() { fitpack_constrained_curve_c_allocate(&cptr); };
-        ~fpConstrainedCurve() { fitpack_constrained_curve_c_destroy(&cptr); };
-        fpConstrainedCurve(const fpConstrainedCurve &rhs) { fitpack_constrained_curve_c_copy(&cptr, &rhs.cptr); };
-        fpConstrainedCurve(fitpack_constrained_curve_c & rhs, const bool move_alloc=false)
-            { move_alloc ? fitpack_constrained_curve_c_move_alloc(&cptr, &rhs)
-                         : fitpack_constrained_curve_c_copy(&cptr, &rhs); };
-        void operator= ( const fpConstrainedCurve &rhs) { fitpack_constrained_curve_c_copy(&cptr, &rhs.cptr); };
-        void destroy() { fitpack_constrained_curve_c_destroy(&cptr); };
+/**
+ * @brief Standalone C++ RAII wrapper for Fortran fitpack_constrained_curve
+ *
+ * This class provides automatic memory management (RAII) and a natural C++ API
+ * for the underlying Fortran fitpack_constrained_curve, without requiring the fortran-arrays library.
+ * Array arguments use std::vector<T> for standalone operation.
+ * Extends fpParametricCurve (Fortran: extends(fitpack_parametric_curve))
+ */
+class fpConstrainedCurve : public fpParametricCurve {
+public:
+    // ===========================================================================================
+    // Constructors and Destructor
+    // ===========================================================================================
 
-        // New curve from x (guess u with Euclidean distance)
-        FP_FLAG new_fit(vector<fpPoint> x, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
-        {
-            FP_SIZE npts = x.size();
-            FP_SIZE ndim = npts>0? x[0].size() : 0;
-            vector<FP_REAL> x1d = flatten_2d_vector(x);
+    /**
+     * @brief Default constructor - allocates new fitpack_constrained_curve
+     */
+    fpConstrainedCurve() : fpParametricCurve(NoAlloc{}) {
+        fitpack_constrained_curve_c_allocate(as<fitpack_constrained_curve_c>(), nullptr);
+    }
 
-            return fitpack_constrained_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),nullptr,nullptr,&smoothing,&order);
+    /**
+     * @brief Destructor - deallocates if owned
+     */
+    ~fpConstrainedCurve() override {
+        fitpack_constrained_curve_c_destroy(as<fitpack_constrained_curve_c>(), nullptr);
+    }
+
+    /**
+     * @brief Copy constructor - deep copy
+     */
+    fpConstrainedCurve(const fpConstrainedCurve& other) : fpParametricCurve(NoAlloc{}) {
+        *as<fitpack_constrained_curve_c>() = fitpack_constrained_curve_c_null;
+        fitpack_constrained_curve_c_copy(as<fitpack_constrained_curve_c>(), other.as<fitpack_constrained_curve_c>(), false, nullptr);
+    }
+
+    /**
+     * @brief Copy assignment - deep copy
+     */
+    fpConstrainedCurve& operator=(const fpConstrainedCurve& other) {
+        if (this != &other) {
+            fitpack_constrained_curve_c_destroy(as<fitpack_constrained_curve_c>(), nullptr);
+            fitpack_constrained_curve_c_copy(as<fitpack_constrained_curve_c>(), other.as<fitpack_constrained_curve_c>(), false, nullptr);
         }
+        return *this;
+    }
 
-        // New curve from x,u only
-        FP_FLAG new_fit(vector<fpPoint> x, vector<FP_REAL> u, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
-        {
-            FP_SIZE npts = x.size();
-            FP_SIZE ndim = npts>0? x[0].size() : 0;
-            vector<FP_REAL> x1d = flatten_2d_vector(x);
+    /**
+     * @brief Move constructor - transfer ownership
+     */
+    fpConstrainedCurve(fpConstrainedCurve&& other) noexcept : fpParametricCurve(NoAlloc{}) {
+        *as<fitpack_constrained_curve_c>() = fitpack_constrained_curve_c_null;
+        fitpack_constrained_curve_c_move_alloc(as<fitpack_constrained_curve_c>(), other.as<fitpack_constrained_curve_c>(), nullptr);
+    }
 
-            return fitpack_constrained_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),u.data(),nullptr,&smoothing,&order);
+    /**
+     * @brief Move assignment - transfer ownership
+     */
+    fpConstrainedCurve& operator=(fpConstrainedCurve&& other) noexcept {
+        if (this != &other) {
+            fitpack_constrained_curve_c_destroy(as<fitpack_constrained_curve_c>(), nullptr);
+            fitpack_constrained_curve_c_move_alloc(as<fitpack_constrained_curve_c>(), other.as<fitpack_constrained_curve_c>(), nullptr);
         }
+        return *this;
+    }
 
-        // New curve from x, y and weights w
-        FP_FLAG new_fit(vector<fpPoint> x, vector<FP_REAL> u, vector<FP_REAL> w, FP_REAL smoothing = 1000.0, FP_SIZE order = 3)
-        {
-            FP_SIZE npts = x.size();
-            FP_SIZE ndim = npts>0? x[0].size() : 0;
-            vector<FP_REAL> x1d = flatten_2d_vector(x);
-
-            return fitpack_constrained_curve_c_new_fit(&cptr,ndim,npts,x1d.data(),u.data(),w.data(),&smoothing,&order);
+    /**
+     * @brief Construct from existing C wrapper (takes ownership if move=true)
+     */
+    explicit fpConstrainedCurve(fitpack_constrained_curve_c& c_wrapper, bool move = false) : fpParametricCurve(NoAlloc{}) {
+        if (move) {
+            fitpack_constrained_curve_c_move_alloc(as<fitpack_constrained_curve_c>(), &c_wrapper, nullptr);
+        } else {
+            *as<fitpack_constrained_curve_c>() = fitpack_constrained_curve_c_null;
+            fitpack_constrained_curve_c_copy(as<fitpack_constrained_curve_c>(), &c_wrapper, false, nullptr);
         }
+    }
 
-        // Update fit with new parameters
-        FP_FLAG fit(FP_SIZE order)                    { return fitpack_constrained_curve_c_fit(&cptr,nullptr,&order); }
-        FP_FLAG fit(FP_REAL smoothing)                { return fitpack_constrained_curve_c_fit(&cptr,&smoothing,nullptr); }
-        FP_FLAG fit(FP_REAL smoothing, FP_SIZE order) { return fitpack_constrained_curve_c_fit(&cptr,&smoothing,&order); }
+    /**
+     * @brief Non-owning view ctor: bit-copy the C handle, mark
+     * is_pointer=true. Used by parent classes' polymorphic accessors
+     * to wrap a base-class handle as the correct concrete subtype.
+     */
+    explicit fpConstrainedCurve(fitpack_constrained_curve_c& c_wrapper, ViewTag) : fpParametricCurve(NoAlloc{}) {
+        *as<fitpack_constrained_curve_c>() = c_wrapper;
+        as<fitpack_constrained_curve_c>()->is_pointer = true;
+    }
 
-        // Get the interpolating fit
-        FP_FLAG interpolate()                         { return fitpack_constrained_curve_c_interpolating(&cptr); }
+    // ===========================================================================================
+    // Utility Methods
+    // ===========================================================================================
 
-        // Fit properties
-        FP_SIZE degree   () { return fitpack_constrained_curve_c_degree(&cptr); };
-        FP_REAL smoothing() { return fitpack_constrained_curve_c_smoothing(&cptr); };
-        FP_REAL mse      () { return fitpack_constrained_curve_c_mse(&cptr); };
-        FP_SIZE ndim     () { return fitpack_constrained_curve_c_idim(&cptr); };
-        FP_REAL ubegin   () { return fitpack_constrained_curve_c_ubegin(&cptr); };
-        FP_REAL uend     () { return fitpack_constrained_curve_c_uend(&cptr); };
+    /**
+     * @brief Check if object is allocated
+     */
+    bool is_allocated() const override {
+        return as<fitpack_constrained_curve_c>()->cptr != nullptr;
+    }
 
-        // Set constraints, begin point only
-        FP_FLAG constrain_begin(vector<fpPoint> ddx_begin)
-        {
-            FP_SIZE nbegin = ddx_begin.size();
-            FP_SIZE nend = 0;
-            vector<FP_REAL> begin_1d = flatten_2d_vector(ddx_begin);
-            return fitpack_constrained_curve_c_set_constraints(&cptr,nbegin,nend,begin_1d.data(),nullptr);
+    /**
+     * @brief Check if this is a non-owning pointer
+     */
+    bool is_pointer() const override {
+        return as<fitpack_constrained_curve_c>()->is_pointer;
+    }
+
+    /**
+     * @brief Return the C wrapper struct name for this class (e.g. "fitpack_constrained_curve_c").
+     */
+    const char* c_type_name() const override {
+        return fitpack_constrained_curve_c_c_type_name(*as<fitpack_constrained_curve_c>());
+    }
+
+    /**
+     * @brief Return the fully-qualified C++ class name for this class.
+     * Owned by the C++ layer — does not round-trip through Fortran.
+     */
+    const char* cpp_type_name() const override {
+        return "fpConstrainedCurve";
+    }
+
+    /**
+     * @brief Get underlying C wrapper (for interop)
+     */
+    fitpack_constrained_curve_c& c_handle() {
+        return *as<fitpack_constrained_curve_c>();
+    }
+
+    /**
+     * @brief Get underlying C wrapper (const, for interop)
+     */
+    const fitpack_constrained_curve_c& c_handle() const {
+        return *as<fitpack_constrained_curve_c>();
+    }
+
+    /**
+     * @brief Construct an empty (non-owning) wrapper, for use as a view target.
+     *
+     * The returned object has a null handle (cptr==nullptr, is_pointer==false)
+     * and does NOT allocate a Fortran object. Intended as a fill target for
+     * member-view accessors emitted on parent types — the parent populates
+     * the handle with c_loc() into its own storage and sets is_pointer=true.
+     */
+    static fpConstrainedCurve make_view() {
+        return fpConstrainedCurve(NoAlloc{});
+    }
+
+    /**
+     * @brief Upcast to parent type (reference, no copy)
+     */
+    fpParametricCurve& as_parent() {
+        return static_cast<fpParametricCurve&>(*this);
+    }
+    const fpParametricCurve& as_parent() const {
+        return static_cast<const fpParametricCurve&>(*this);
+    }
+
+    // ===========================================================================================
+    // Method Wrappers (standalone — no fxArray dependency)
+    // ===========================================================================================
+
+    virtual void clean_constraints() {
+        fitpack_constrained_curve_c_clean_constraints(as<fitpack_constrained_curve_c>());
+    }
+
+    /**
+     * @brief set_constraints
+     */
+    virtual void set_constraints(int32_t ddx_begin_n1, int32_t ddx_begin_n2, int32_t ddx_end_n1, int32_t ddx_end_n2, double* ddx_begin = nullptr, double* ddx_end = nullptr, int32_t* ierr = nullptr) {
+        fitpack_constrained_curve_c_set_constraints(as<fitpack_constrained_curve_c>(), ddx_begin_n1, ddx_begin_n2, ddx_begin, ddx_end_n1, ddx_end_n2, ddx_end, ierr);
+    }
+
+
+    int32_t comm_size() const override {
+        return fitpack_constrained_curve_c_comm_size(as<fitpack_constrained_curve_c>());
+    }
+
+    /**
+     * @brief comm_pack
+     */
+    void comm_pack(std::vector<double>& buffer) override {
+        int32_t n = static_cast<int32_t>(buffer.size());
+        fitpack_constrained_curve_c_comm_pack(as<fitpack_constrained_curve_c>(), n, buffer.data());
+    }
+
+
+    /**
+     * @brief comm_expand
+     */
+    void comm_expand(std::vector<double>& buffer) override {
+        int32_t n = static_cast<int32_t>(buffer.size());
+        fitpack_constrained_curve_c_comm_expand(as<fitpack_constrained_curve_c>(), n, buffer.data());
+    }
+
+
+    /**
+     * @brief new_points
+     */
+    void new_points(int32_t x_n1, int32_t x_n2, std::vector<double>& x, double* u = nullptr, double* w = nullptr) override {
+        fitpack_constrained_curve_c_new_points(as<fitpack_constrained_curve_c>(), x_n1, x_n2, x.data(), u, w);
+    }
+
+
+    void set_default_parameters() override {
+        fitpack_constrained_curve_c_set_default_parameters(as<fitpack_constrained_curve_c>());
+    }
+
+    /**
+     * @brief new_fit
+     */
+    int32_t new_fit(int32_t x_n1, int32_t x_n2, std::vector<double>& x, double* u = nullptr, double* w = nullptr, double* smoothing = nullptr, int32_t* order = nullptr) const override {
+        return fitpack_constrained_curve_c_new_fit(as<fitpack_constrained_curve_c>(), x_n1, x_n2, x.data(), u, w, smoothing, order);
+    }
+
+
+    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) const override {
+        return fitpack_constrained_curve_c_fit(as<fitpack_constrained_curve_c>(), smoothing, order, keep_knots);
+    }
+
+    int32_t interpolate(int32_t* order = nullptr, bool* reset_knots = nullptr) const override {
+        return fitpack_constrained_curve_c_interpolate(as<fitpack_constrained_curve_c>(), order, reset_knots);
+    }
+
+    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const override {
+        return fitpack_constrained_curve_c_least_squares(as<fitpack_constrained_curve_c>(), smoothing, reset_knots);
+    }
+
+    /**
+     * @brief eval_one
+     */
+    std::vector<double> eval_one(double u, int32_t n_result, int32_t* ierr = nullptr) override {
+        std::vector<double> result(n_result);
+        fitpack_constrained_curve_c_eval_one(as<fitpack_constrained_curve_c>(), u, ierr, result.data(), n_result);
+        return result;
+    }
+
+
+    /**
+     * @brief eval_many
+     */
+    std::vector<double> eval_many(std::vector<double>& u, int32_t n_result, int32_t* ierr = nullptr) override {
+        int32_t n = static_cast<int32_t>(u.size());
+        std::vector<double> result(n_result);
+        fitpack_constrained_curve_c_eval_many(as<fitpack_constrained_curve_c>(), n, u.data(), ierr, result.data(), n_result);
+        return result;
+    }
+
+
+    /**
+     * @brief dfdx
+     */
+    std::vector<double> dfdx(double u, int32_t order, int32_t n_result, int32_t* ierr = nullptr) override {
+        std::vector<double> result(n_result);
+        fitpack_constrained_curve_c_curve_derivative(as<fitpack_constrained_curve_c>(), u, order, ierr, result.data(), n_result);
+        return result;
+    }
+
+
+    /**
+     * @brief dfdx
+     */
+    std::vector<double> dfdx(std::vector<double>& u, int32_t order, int32_t n_result, int32_t* ierr = nullptr) override {
+        int32_t n = static_cast<int32_t>(u.size());
+        std::vector<double> result(n_result);
+        fitpack_constrained_curve_c_curve_derivatives(as<fitpack_constrained_curve_c>(), n, u.data(), order, ierr, result.data(), n_result);
+        return result;
+    }
+
+
+    /**
+     * @brief dfdx_all
+     */
+    std::vector<double> dfdx_all(double u, int32_t n_result, int32_t* ierr = nullptr) override {
+        std::vector<double> result(n_result);
+        fitpack_constrained_curve_c_curve_all_derivatives(as<fitpack_constrained_curve_c>(), u, ierr, result.data(), n_result);
+        return result;
+    }
+
+
+    double mse() const override {
+        return fitpack_constrained_curve_c_mse(as<fitpack_constrained_curve_c>());
+    }
+
+    int32_t core_comm_size() const override {
+        return fitpack_constrained_curve_c_core_comm_size(as<fitpack_constrained_curve_c>());
+    }
+
+    /**
+     * @brief core_comm_pack
+     */
+    void core_comm_pack(std::vector<double>& buffer) override {
+        int32_t n = static_cast<int32_t>(buffer.size());
+        fitpack_constrained_curve_c_core_comm_pack(as<fitpack_constrained_curve_c>(), n, buffer.data());
+    }
+
+
+    /**
+     * @brief core_comm_expand
+     */
+    void core_comm_expand(std::vector<double>& buffer) override {
+        int32_t n = static_cast<int32_t>(buffer.size());
+        fitpack_constrained_curve_c_core_comm_expand(as<fitpack_constrained_curve_c>(), n, buffer.data());
+    }
+
+
+    void destroy_base() override {
+        fitpack_constrained_curve_c_destroy_base(as<fitpack_constrained_curve_c>());
+    }
+
+    // ===========================================================================================
+    // Component Array Accessors
+    // ===========================================================================================
+
+    /**
+     * @brief Deep copy of component 'deriv_begin' as a std::vector.
+     *
+     * The rank-2 component is flattened COLUMN-MAJOR (Fortran order):
+     * element (i, j, ...) — zero-based — is at index i + j * extents[0] + ...
+     * Query the extents with deriv_begin_shape().
+     * @return An owning copy, empty when the component is unallocated.
+     */
+    std::vector<double> deriv_begin_vector() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_begin(as<fitpack_constrained_curve_c>(), &raw, extents);
+        const int64_t total = extents[0] * extents[1];
+        if (raw == nullptr || total <= 0) return {};
+        const double* first = reinterpret_cast<const double*>(raw);
+        return std::vector<double>(first, first + total);
+    }
+
+    /**
+     * @brief Extents of component 'deriv_begin', leading dimension first.
+     * @return All zeros when the component is unallocated.
+     */
+    std::array<int64_t, 2> deriv_begin_shape() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_begin(as<fitpack_constrained_curve_c>(), &raw, extents);
+        return { extents[0], extents[1] };
+    }
+
+#if HAVE_FXARRAY
+    /**
+     * @brief Zero-copy fxArray view of component 'deriv_begin'.
+     *
+     * The descriptor is built here from the borrowed pointer and extents, so
+     * the view aliases the Fortran storage directly — nothing is copied and
+     * writes through deriv_begin()(i, j) land in the object. Requires linking
+     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
+     * __has_include("fxArrays.hpp")).
+     *
+     * @warning The view is invalidated by any refit, assignment or destroy
+     *          call on this object; re-read it rather than retaining it.
+     */
+    fxArray<double> deriv_begin() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_begin(as<fitpack_constrained_curve_c>(), &raw, extents);
+        array_c descr = array_c_null;
+        std::strncpy(descr.name, "deriv_begin", FX_LEN_NAME - 1);
+        descr.base_address = static_cast<void*>(raw);
+        descr.type = getCFITypeFlag<double>();
+        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
+        descr.rank = static_cast<FX_RANK>(2);
+        descr.is_pointer = true;   // non-owning: the object still owns the storage
+        descr.is_slice = false;
+        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
+        FX_SIZE stride = descr.elem_bytes;
+        for (int k = 0; k < 2; ++k) {
+            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
+            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
+            descr.dim[k].stride_bytes = stride;
+            stride *= descr.dim[k].extent;
         }
-        // Set constraints, both endpoints
-        FP_FLAG constrain_both(vector<fpPoint> ddx_begin, vector<fpPoint> ddx_end)
-        {
-            FP_SIZE nbegin = ddx_begin.size();
-            FP_SIZE nend   = ddx_end.size();
-            vector<FP_REAL> begin_1d = flatten_2d_vector(ddx_begin);
-            vector<FP_REAL>   end_1d = flatten_2d_vector(ddx_end);
-            return fitpack_constrained_curve_c_set_constraints(&cptr,nbegin,nend,begin_1d.data(),end_1d.data());
+        return fxArray<double>(descr);
+    }
+#endif // HAVE_FXARRAY
+
+    /**
+     * @brief Deep copy of component 'deriv_end' as a std::vector.
+     *
+     * The rank-2 component is flattened COLUMN-MAJOR (Fortran order):
+     * element (i, j, ...) — zero-based — is at index i + j * extents[0] + ...
+     * Query the extents with deriv_end_shape().
+     * @return An owning copy, empty when the component is unallocated.
+     */
+    std::vector<double> deriv_end_vector() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_end(as<fitpack_constrained_curve_c>(), &raw, extents);
+        const int64_t total = extents[0] * extents[1];
+        if (raw == nullptr || total <= 0) return {};
+        const double* first = reinterpret_cast<const double*>(raw);
+        return std::vector<double>(first, first + total);
+    }
+
+    /**
+     * @brief Extents of component 'deriv_end', leading dimension first.
+     * @return All zeros when the component is unallocated.
+     */
+    std::array<int64_t, 2> deriv_end_shape() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_end(as<fitpack_constrained_curve_c>(), &raw, extents);
+        return { extents[0], extents[1] };
+    }
+
+#if HAVE_FXARRAY
+    /**
+     * @brief Zero-copy fxArray view of component 'deriv_end'.
+     *
+     * The descriptor is built here from the borrowed pointer and extents, so
+     * the view aliases the Fortran storage directly — nothing is copied and
+     * writes through deriv_end()(i, j) land in the object. Requires linking
+     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
+     * __has_include("fxArrays.hpp")).
+     *
+     * @warning The view is invalidated by any refit, assignment or destroy
+     *          call on this object; re-read it rather than retaining it.
+     */
+    fxArray<double> deriv_end() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_deriv_end(as<fitpack_constrained_curve_c>(), &raw, extents);
+        array_c descr = array_c_null;
+        std::strncpy(descr.name, "deriv_end", FX_LEN_NAME - 1);
+        descr.base_address = static_cast<void*>(raw);
+        descr.type = getCFITypeFlag<double>();
+        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
+        descr.rank = static_cast<FX_RANK>(2);
+        descr.is_pointer = true;   // non-owning: the object still owns the storage
+        descr.is_slice = false;
+        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
+        FX_SIZE stride = descr.elem_bytes;
+        for (int k = 0; k < 2; ++k) {
+            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
+            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
+            descr.dim[k].stride_bytes = stride;
+            stride *= descr.dim[k].extent;
         }
-        // Set constraints, end point only
-        FP_FLAG constrain_end(vector<fpPoint> ddx_end)
-        {
-            FP_SIZE nbegin = 0;
-            FP_SIZE nend = ddx_end.size();
-            vector<FP_REAL> end_1d = flatten_2d_vector(ddx_end);
-            return fitpack_constrained_curve_c_set_constraints(&cptr,nbegin,nend,nullptr,end_1d.data());
+        return fxArray<double>(descr);
+    }
+#endif // HAVE_FXARRAY
+
+    /**
+     * @brief Deep copy of component 'xx' as a std::vector.
+     *
+     * The rank-2 component is flattened COLUMN-MAJOR (Fortran order):
+     * element (i, j, ...) — zero-based — is at index i + j * extents[0] + ...
+     * Query the extents with xx_shape().
+     * @return An owning copy, empty when the component is unallocated.
+     */
+    std::vector<double> xx_vector() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_xx(as<fitpack_constrained_curve_c>(), &raw, extents);
+        const int64_t total = extents[0] * extents[1];
+        if (raw == nullptr || total <= 0) return {};
+        const double* first = reinterpret_cast<const double*>(raw);
+        return std::vector<double>(first, first + total);
+    }
+
+    /**
+     * @brief Extents of component 'xx', leading dimension first.
+     * @return All zeros when the component is unallocated.
+     */
+    std::array<int64_t, 2> xx_shape() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_xx(as<fitpack_constrained_curve_c>(), &raw, extents);
+        return { extents[0], extents[1] };
+    }
+
+#if HAVE_FXARRAY
+    /**
+     * @brief Zero-copy fxArray view of component 'xx'.
+     *
+     * The descriptor is built here from the borrowed pointer and extents, so
+     * the view aliases the Fortran storage directly — nothing is copied and
+     * writes through xx()(i, j) land in the object. Requires linking
+     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
+     * __has_include("fxArrays.hpp")).
+     *
+     * @warning The view is invalidated by any refit, assignment or destroy
+     *          call on this object; re-read it rather than retaining it.
+     */
+    fxArray<double> xx() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_xx(as<fitpack_constrained_curve_c>(), &raw, extents);
+        array_c descr = array_c_null;
+        std::strncpy(descr.name, "xx", FX_LEN_NAME - 1);
+        descr.base_address = static_cast<void*>(raw);
+        descr.type = getCFITypeFlag<double>();
+        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
+        descr.rank = static_cast<FX_RANK>(2);
+        descr.is_pointer = true;   // non-owning: the object still owns the storage
+        descr.is_slice = false;
+        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
+        FX_SIZE stride = descr.elem_bytes;
+        for (int k = 0; k < 2; ++k) {
+            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
+            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
+            descr.dim[k].stride_bytes = stride;
+            stride *= descr.dim[k].extent;
         }
+        return fxArray<double>(descr);
+    }
+#endif // HAVE_FXARRAY
 
-        // Clean constraints
-        void clean_constraints() { fitpack_constrained_curve_c_clean_constraints(&cptr); }
+    /**
+     * @brief Deep copy of component 'cp' as a std::vector.
+     *
+     * The rank-2 component is flattened COLUMN-MAJOR (Fortran order):
+     * element (i, j, ...) — zero-based — is at index i + j * extents[0] + ...
+     * Query the extents with cp_shape().
+     * @return An owning copy, empty when the component is unallocated.
+     */
+    std::vector<double> cp_vector() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_cp(as<fitpack_constrained_curve_c>(), &raw, extents);
+        const int64_t total = extents[0] * extents[1];
+        if (raw == nullptr || total <= 0) return {};
+        const double* first = reinterpret_cast<const double*>(raw);
+        return std::vector<double>(first, first + total);
+    }
 
-        // Get value at u
-        fpPoint eval(FP_REAL u, FP_FLAG* ierr=nullptr)
-        {
-            fpPoint y(fitpack_constrained_curve_c_idim(&cptr),0.0);
-            FP_FLAG ierr0 = fitpack_constrained_curve_c_eval_one(&cptr, u, y.data());
-            if (ierr) (*ierr) = ierr0;
-            return y;
+    /**
+     * @brief Extents of component 'cp', leading dimension first.
+     * @return All zeros when the component is unallocated.
+     */
+    std::array<int64_t, 2> cp_shape() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_cp(as<fitpack_constrained_curve_c>(), &raw, extents);
+        return { extents[0], extents[1] };
+    }
+
+#if HAVE_FXARRAY
+    /**
+     * @brief Zero-copy fxArray view of component 'cp'.
+     *
+     * The descriptor is built here from the borrowed pointer and extents, so
+     * the view aliases the Fortran storage directly — nothing is copied and
+     * writes through cp()(i, j) land in the object. Requires linking
+     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
+     * __has_include("fxArrays.hpp")).
+     *
+     * @warning The view is invalidated by any refit, assignment or destroy
+     *          call on this object; re-read it rather than retaining it.
+     */
+    fxArray<double> cp() const {
+        double* raw = nullptr;
+        int64_t extents[2] = {0, 0};
+        fitpack_constrained_curve_c_getcomp_cp(as<fitpack_constrained_curve_c>(), &raw, extents);
+        array_c descr = array_c_null;
+        std::strncpy(descr.name, "cp", FX_LEN_NAME - 1);
+        descr.base_address = static_cast<void*>(raw);
+        descr.type = getCFITypeFlag<double>();
+        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
+        descr.rank = static_cast<FX_RANK>(2);
+        descr.is_pointer = true;   // non-owning: the object still owns the storage
+        descr.is_slice = false;
+        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
+        FX_SIZE stride = descr.elem_bytes;
+        for (int k = 0; k < 2; ++k) {
+            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
+            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
+            descr.dim[k].stride_bytes = stride;
+            stride *= descr.dim[k].extent;
         }
+        return fxArray<double>(descr);
+    }
+#endif // HAVE_FXARRAY
 
-        // Get value at many u
-        vector<fpPoint> eval(vector<FP_REAL> u, FP_FLAG* ierr=nullptr)
-        {
-            FP_FLAG ierr0 = FITPACK_OK;
-            fpPoint y1(fitpack_constrained_curve_c_idim(&cptr),0.0);
-            vector<fpPoint> y(u.size(),y1);
+    // ===========================================================================================
+    // Scalar Property Accessors
+    // ===========================================================================================
 
-            for (FP_SIZE i=0; i<static_cast<FP_SIZE>(u.size()); i++)
-            {
-                y[i] = eval(u[i],&ierr0);
-                if (!FITPACK_SUCCESS_c(ierr0)) break;
-            }
+    int32_t& ib() {
+        return *fitpack_constrained_curve_c_ref_ib(as<fitpack_constrained_curve_c>());
+    }
+    const int32_t& ib() const {
+        return *fitpack_constrained_curve_c_ref_ib(as<fitpack_constrained_curve_c>());
+    }
 
-            // Return error flag
-            if (ierr) (*ierr) = ierr0;
-            return y;
+    int32_t& ie() {
+        return *fitpack_constrained_curve_c_ref_ie(as<fitpack_constrained_curve_c>());
+    }
+    const int32_t& ie() const {
+        return *fitpack_constrained_curve_c_ref_ie(as<fitpack_constrained_curve_c>());
+    }
 
-        }
+    // ===========================================================================================
+    // extra_methods/fpParametricInherit.hpp (hand-maintained)
+    //
+    // This class overrides the raw new_fit / fit, which hides the fpPoint<dim> overloads
+    // spliced into fpParametricCurve. Re-expose them; the overrides above still win for their
+    // own signatures, and every fpPoint<dim> overload dispatches back through them.
+    // ===========================================================================================
 
-        // Get single derivative at u
-        fpPoint ddu(FP_REAL u, FP_SIZE order, FP_FLAG* ierr=nullptr)
-        {
-            fpPoint dx(fitpack_constrained_curve_c_idim(&cptr),0.0);
-            FP_FLAG ierr0 = fitpack_constrained_curve_c_derivative(&cptr,u,order,dx.data());
-            if (ierr) (*ierr) = ierr0;
-            return dx;
-        }
+    using fpParametricCurve::new_fit;
+    using fpParametricCurve::fit;
 
-        // Get all derivatives at u
-        vector<fpPoint> ddu_all(FP_REAL u, FP_FLAG* ierr=nullptr)
-        {
-           vector<fpPoint> deriv(degree()+1);
-           FP_FLAG ierr0 = FITPACK_OK;
-           for (FP_SIZE order = 0; order<degree()+1; order++) {
-                deriv[order] = ddu(u,order,&ierr0);
-                if (!FITPACK_SUCCESS_c(ierr0)) break;
-           }
-           if (ierr) (*ierr)=ierr0;
-           return deriv;
-        }
+    // ===========================================================================================
+    // Endpoint constraints — extra_methods/fpConstrainedPoints.hpp (hand-maintained)
+    //
+    // Each list holds the position and the successive derivatives to pin at that endpoint:
+    // entry j is the j-th derivative, so a single entry fixes the point only.
+    //
+    // The const_cast is safe: the Fortran dummy is `optional, intent(in)`. The generated
+    // wrapper takes a non-const pointer only because an OPTIONAL argument is passed by
+    // address, and nullptr is how a C caller says "absent".
+    // ===========================================================================================
 
-    protected:
+    //! @brief Pin the begin endpoint; leave the end endpoint free.
+    template <FP_SIZE dim>
+    FP_FLAG constrain_begin(const std::vector<fpPoint<dim>>& ddx_begin)
+    {
+        FP_FLAG ierr = FITPACK_OK;
+        set_constraints(dim, static_cast<FP_SIZE>(ddx_begin.size()), dim, 0,
+                        const_cast<FP_REAL*>(fpPointData<dim>(ddx_begin)), nullptr, &ierr);
+        return ierr;
+    }
 
-    private:
+    //! @brief Pin both endpoints.
+    template <FP_SIZE dim>
+    FP_FLAG constrain_both(const std::vector<fpPoint<dim>>& ddx_begin,
+                           const std::vector<fpPoint<dim>>& ddx_end)
+    {
+        FP_FLAG ierr = FITPACK_OK;
+        set_constraints(dim, static_cast<FP_SIZE>(ddx_begin.size()),
+                        dim, static_cast<FP_SIZE>(ddx_end.size()),
+                        const_cast<FP_REAL*>(fpPointData<dim>(ddx_begin)),
+                        const_cast<FP_REAL*>(fpPointData<dim>(ddx_end)), &ierr);
+        return ierr;
+    }
 
-        // Opaque C structure
-        fitpack_constrained_curve_c cptr = fitpack_constrained_curve_c_null;
+    //! @brief Pin the end endpoint; leave the begin endpoint free.
+    template <FP_SIZE dim>
+    FP_FLAG constrain_end(const std::vector<fpPoint<dim>>& ddx_end)
+    {
+        FP_FLAG ierr = FITPACK_OK;
+        set_constraints(dim, 0, dim, static_cast<FP_SIZE>(ddx_end.size()),
+                        nullptr, const_cast<FP_REAL*>(fpPointData<dim>(ddx_end)), &ierr);
+        return ierr;
+    }
+
+protected:
+    explicit fpConstrainedCurve(NoAlloc tag) : fpParametricCurve(tag) {}
 
 };
 
-#endif // FPCONSTRAINEDCURVE_HPP_INCLUDED
-
+#endif /* FPCONSTRAINEDCURVE_HPP_INCLUDED */

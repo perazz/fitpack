@@ -1,10 +1,19 @@
+// This repository builds a static archive, so the C entry points are plain symbols. Without
+// this, FITPACK_CAPI_EXPORT defaults to __declspec(dllimport) on Windows and the link fails on
+// __imp_fitpack_*. Every Windows consumer that links libfitpack.a needs the same define.
+#define FITPACK_CAPI_STATIC
+
 #include "../include/fitpack_core_c.h"
+#include "../include/fpPoint.hpp"
 #include "../include/fpCurve.hpp"
-#include "../include/fitpack_periodic_curves_c.h"
 #include "../include/fpPeriodicCurve.hpp"
-#include "../include/fitpack_parametric_curves_c.h"
 #include "../include/fpParametricCurve.hpp"
+#include "../include/fpClosedCurve.hpp"
 #include "../include/fpConstrainedCurve.hpp"
+#include "../include/fpGridSpline.hpp"
+
+// Every curve in this file is planar, so its points are fpPoint<2>.
+typedef fpPoint<2> fpPoint2;
 
 #include <cmath>
 #include <vector>
@@ -212,8 +221,8 @@ FP_BOOL test_cpp_parametric_fit()
                                     { 0.2498,-1.7409},{-0.2306,-1.7178},{-0.7571,-1.2989},{-1.1222,-0.5572}};
 
      // Fit points into a vector
-     vector<fpPoint> xv;
-     for (FP_SIZE i=0; i<32; i++) xv.push_back(fpPoint(x[i],x[i]+2));
+     vector<fpPoint2> xv;
+     for (FP_SIZE i=0; i<32; i++) xv.push_back({x[i][0],x[i][1]});
 
      vector<FP_REAL> uv(u, u+32);
 
@@ -282,7 +291,7 @@ FP_BOOL test_cpp_parametric_fit()
          }
 
           // Evaluate the spline at all nodes
-          vector<fpPoint> y = curve.eval(uv,&ierr);
+          vector<fpPoint2> y = curve.eval<2>(uv,&ierr);
 
           if (!FITPACK_SUCCESS_c(ierr)) {
             fitpack_message_c(ierr,msg);
@@ -292,7 +301,7 @@ FP_BOOL test_cpp_parametric_fit()
 
           // Evaluate derivatives at a random point from the initial set
           if (loop<6) {
-              vector<fpPoint> dy = curve.ddu_all(uv[12], &ierr);
+              vector<fpPoint2> dy = curve.ddu_all<2>(uv[12], &ierr);
 
               if (!FITPACK_SUCCESS_c(ierr)) {
                 fitpack_message_c(ierr,msg);
@@ -324,8 +333,8 @@ FP_BOOL test_cpp_closed_fit()
                                      {-3.0640,-2.5710},{-3.6650,-1.3340},{-4.7000, 0.0000}};
 
      // Fit points into a vector
-     vector<fpPoint> xv;
-     for (FP_SIZE i=0; i<npts; i++) xv.push_back(fpPoint(x[i],x[i]+2));
+     vector<fpPoint2> xv;
+     for (FP_SIZE i=0; i<npts; i++) xv.push_back({x[i][0],x[i][1]});
 
      // Supply parameter values (also used as evaluation points)
      vector<FP_REAL> u(npts);
@@ -396,7 +405,7 @@ FP_BOOL test_cpp_closed_fit()
          }
 
           // Evaluate the spline at all nodes
-          vector<fpPoint> y = curve.eval(u,&ierr);
+          vector<fpPoint2> y = curve.eval<2>(u,&ierr);
 
           if (!FITPACK_SUCCESS_c(ierr)) {
             fitpack_message_c(ierr,msg);
@@ -406,7 +415,7 @@ FP_BOOL test_cpp_closed_fit()
 
           // Evaluate derivatives at a random point from the initial set
           if (loop<6) {
-              vector<fpPoint> dy = curve.ddu_all(u[12], &ierr);
+              vector<fpPoint2> dy = curve.ddu_all<2>(u[12], &ierr);
 
               if (!FITPACK_SUCCESS_c(ierr)) {
                 fitpack_message_c(ierr,msg);
@@ -441,21 +450,21 @@ FP_BOOL test_cpp_constrained_fit() {
                                     { 6.8420,-0.6650},{ 6.5930,-0.9010},{ 6.2690,-1.0100}};
 
      // Data derivatives at the extremes (point, 1st, 2nd derivative)
-     static const FP_REAL ddx_begin[][2] = {{-M_PI,3.0},{3.0,0.0},{0.0,-2.0}};
-     static const FP_REAL ddx_end  [][2] = {{2*M_PI,-1.0},{-1.0,0.0},{0.0,2.0}};
+     static const FP_REAL ddx_begin[][2] = {{-pi,3.0},{3.0,0.0},{0.0,-2.0}};
+     static const FP_REAL ddx_end  [][2] = {{2*pi,-1.0},{-1.0,0.0},{0.0,2.0}};
 
      // Fit points into vectors
-     vector<fpPoint> xv,ddx_beginv,ddx_endv;
-     for (FP_SIZE i=0; i<m; i++) xv        .push_back(fpPoint(x[i],x[i]+2));
-     for (FP_SIZE i=0; i<3; i++) ddx_beginv.push_back(fpPoint(ddx_begin[i],ddx_begin[i]+2));
-     for (FP_SIZE i=0; i<3; i++) ddx_endv  .push_back(fpPoint(ddx_end  [i],ddx_end  [i]+2));
+     vector<fpPoint2> xv,ddx_beginv,ddx_endv;
+     for (FP_SIZE i=0; i<m; i++) xv        .push_back({x[i][0],x[i][1]});
+     for (FP_SIZE i=0; i<3; i++) ddx_beginv.push_back({ddx_begin[i][0],ddx_begin[i][1]});
+     for (FP_SIZE i=0; i<3; i++) ddx_endv  .push_back({ddx_end  [i][0],ddx_end  [i][1]});
 
      // weights: 1/sigma with sigma an estimate of the standard deviation of the data points.
      vector<FP_REAL> w(m,1.0/0.04);
 
      // Parameter space
      vector<FP_REAL> u(m);
-     for (FP_SIZE i=0; i<m; i++) u[i] = i*(3*M_PI)/(m-1.0);
+     for (FP_SIZE i=0; i<m; i++) u[i] = i*(3*pi)/(m-1.0);
 
      // Create curve object
      fpConstrainedCurve curve;
@@ -472,24 +481,24 @@ FP_BOOL test_cpp_constrained_fit() {
             }
          case 2: // Constraints on points only
             {
-                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+1),
-                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
+                ierr = curve.constrain_both(vector<fpPoint2>(ddx_beginv.begin(),ddx_beginv.begin()+1),
+                                            vector<fpPoint2>(ddx_endv  .begin(),ddx_endv  .begin()+1));
                 if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
             }
          case 3: // Fix points, 1st derivative (begin)
             {
-                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
-                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+1));
+                ierr = curve.constrain_both(vector<fpPoint2>(ddx_beginv.begin(),ddx_beginv.begin()+2),
+                                            vector<fpPoint2>(ddx_endv  .begin(),ddx_endv  .begin()+1));
                 if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
             }
          case 4: // Fix points, 1st derivative (both)
             {
-                ierr = curve.constrain_both(vector<fpPoint>(ddx_beginv.begin(),ddx_beginv.begin()+2),
-                                            vector<fpPoint>(ddx_endv  .begin(),ddx_endv  .begin()+2));
+                ierr = curve.constrain_both(vector<fpPoint2>(ddx_beginv.begin(),ddx_beginv.begin()+2),
+                                            vector<fpPoint2>(ddx_endv  .begin(),ddx_endv  .begin()+2));
                 if (!FITPACK_SUCCESS_c(ierr)) break;
                 ierr = curve.fit((FP_REAL) m);
                 break;
@@ -517,7 +526,7 @@ FP_BOOL test_cpp_constrained_fit() {
          }
 
           // Evaluate the spline at all nodes
-          vector<fpPoint> y = curve.eval(u,&ierr);
+          vector<fpPoint2> y = curve.eval<2>(u,&ierr);
           if (!FITPACK_SUCCESS_c(ierr)) {
             fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] point evaluation " << loop << " failed: " << msg << std::endl;
@@ -525,7 +534,7 @@ FP_BOOL test_cpp_constrained_fit() {
           }
 
          // Calculate derivatives at the begin point.
-         vector<fpPoint> ybegin = curve.ddu_all(curve.ubegin(), &ierr);
+         vector<fpPoint2> ybegin = curve.ddu_all<2>(curve.ubegin(), &ierr);
          if (!FITPACK_SUCCESS_c(ierr)) {
             fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] begin point derivatives " << loop << " failed: " << msg << std::endl;
@@ -533,7 +542,7 @@ FP_BOOL test_cpp_constrained_fit() {
          }
 
          // Calculate derivatives at the end point
-         vector<fpPoint> yend = curve.ddu_all(curve.uend(), &ierr);
+         vector<fpPoint2> yend = curve.ddu_all<2>(curve.uend(), &ierr);
          if (!FITPACK_SUCCESS_c(ierr)) {
             fitpack_message_c(ierr,msg);
             std::cout << "[test_constrained_fit] end point derivatives " << loop << " failed: " << msg << std::endl;
@@ -602,6 +611,160 @@ FP_BOOL test_cpp_constrained_fit() {
    return FITPACK_SUCCESS_c(ierr);
 
 }
+
+#define FAIL(what) { std::cout << "[test_ergonomics] " << what << std::endl; return FP_FALSE; }
+
+// Exercise the hand-maintained splices under extra_methods/ that the tests above do not reach.
+// Overloads and member templates are only type-checked where they are instantiated, so this is
+// the compile gate for those snippets as well as a numerical check.
+FP_BOOL test_cpp_ergonomics()
+{
+    FP_FLAG ierr = FITPACK_OK;
+
+    // ---------------------------------------------------------------------- fpPoint<dims>
+    // A vector of points IS the Fortran x(dims,m) buffer: contiguous, column-major, no padding.
+    vector<fpPoint<3>> pts = {{1.0,2.0,3.0},{4.0,5.0,6.0}};
+    if (sizeof(fpPoint<3>) != 3*sizeof(FP_REAL))               FAIL("fpPoint<3> is padded")
+    const FP_REAL* raw = fpPointData<3>(pts);
+    for (FP_SIZE i=0; i<6; i++) if (raw[i] != one+i)           FAIL("fpPoint storage is not Fortran order")
+    if (pts[1].x()!=4.0 || pts[1].y()!=5.0 || pts[1].z()!=6.0) FAIL("fpPoint accessors")
+
+    // ------------------------------------------------------------------- fpCurve ergonomics
+    static const FP_SIZE N = 51;
+    vector<FP_REAL> x(N), y(N), w(N,one);
+    for (FP_SIZE i=0; i<N; i++) { x[i] = pi2*i/(N-1); y[i] = sin(x[i]); }
+
+    fpCurve c;
+    if (!FITPACK_SUCCESS_c(c.new_fit(x,y,w,0.0)))  FAIL("weighted new_fit")
+    if (c.degree() != 3)                           FAIL("default degree")
+    if (!FITPACK_SUCCESS_c(c.fit(5)))              FAIL("fit(order)")
+    if (c.degree() != 5)                           FAIL("fit(order) did not change the degree")
+    if (!FITPACK_SUCCESS_c(c.fit(0.1)))            FAIL("fit(smoothing)")
+    if (!FITPACK_SUCCESS_c(c.fit(0.1,3)))          FAIL("fit(smoothing,order)")
+    if (!FITPACK_SUCCESS_c(c.interpolate(3)))      FAIL("interpolate(order)")
+
+    c.set_bc(OUTSIDE_NEAREST_BND);
+    if (c.get_bc() != OUTSIDE_NEAREST_BND)         FAIL("set_bc/get_bc round trip")
+    c.set_bc(OUTSIDE_EXTRAPOLATE);
+
+    const FP_REAL ymid = c.eval(half*pi,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                  FAIL("scalar eval with a status pointer")
+    if (abs(ymid-one) > smallnum03)                FAIL("scalar eval value")
+
+    vector<FP_REAL> ys = c.eval(x,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr) || ys.size()!=x.size()) FAIL("vector eval with a status pointer")
+
+    // Range eval returns the (x,y) pairs, so the result plots without a second array.
+    vector<fpPoint<2>> xy = c.eval(0.0,pi2,21,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr) || xy.size()!=21) FAIL("range eval")
+    if (abs(xy[0].x()) > smallnum08 || abs(xy[20].x()-pi2) > smallnum06) FAIL("range eval endpoints")
+    for (size_t i=0; i<xy.size(); i++)
+        if (abs(xy[i].y()-sin(xy[i].x())) > smallnum03) FAIL("range eval values")
+
+    vector<FP_REAL> d = c.ddx(half*pi,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                  FAIL("all-derivatives ddx")
+    if ((FP_SIZE)d.size() != c.degree()+1)         FAIL("all-derivatives ddx size")
+    if (abs(d[0]-one) > smallnum03 || abs(d[1]) > smallnum03) FAIL("all-derivatives ddx values")
+
+    vector<FP_REAL> alpha(3), A, B;
+    alpha[0] = one; alpha[1] = 2*one; alpha[2] = 3*one;
+    if (!FITPACK_SUCCESS_c(c.fourier(alpha,A,B)))  FAIL("fourier")
+    if (A.size()!=3 || B.size()!=3)                FAIL("fourier resized its outputs wrong")
+
+    // --------------------------------------------------- fpParametricCurve fpPoint<2> overloads
+    static const FP_SIZE M = 17;
+    vector<fpPoint<2>> circle(M);
+    vector<FP_REAL> u(M), uw(M,one);
+    for (FP_SIZE i=0; i<M; i++) { u[i] = pi2*i/(M-1); circle[i] = {cos(u[i]), sin(u[i])}; }
+
+    fpParametricCurve pc;
+    if (!FITPACK_SUCCESS_c(pc.new_fit(circle,u,0.0))) FAIL("parametric new_fit from points")
+    if (pc.ndim() != 2)                               FAIL("parametric ndim")
+
+    fpPoint<2> p0 = pc.eval<2>(0.0,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                     FAIL("parametric scalar eval")
+    if (abs(p0.x()-one) > smallnum03 || abs(p0.y()) > smallnum03) FAIL("parametric scalar eval value")
+
+    // d/du (cos u, sin u) = (-sin u, cos u), so at u = pi/2 it is (-1, 0).
+    fpPoint<2> dp = pc.ddu<2>(half*pi,1,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                     FAIL("parametric ddu")
+    if (abs(dp.x()+one) > smallnum03 || abs(dp.y()) > smallnum03) FAIL("parametric ddu value")
+
+    // A dimension mismatch is refused, not read past the end of the result buffer.
+    (void) pc.eval<3>(0.0,&ierr);
+    if (ierr != FITPACK_INPUT_ERROR)                  FAIL("parametric dimension guard")
+
+    // ------------------------------------------- fpConstrainedCurve one-sided constraints
+    fpConstrainedCurve cc;
+    if (!FITPACK_SUCCESS_c(cc.new_fit(circle,u,uw,0.5))) FAIL("constrained new_fit from points")
+
+    vector<fpPoint<2>> pin_begin(1,circle[0]);
+    if (!FITPACK_SUCCESS_c(cc.constrain_begin(pin_begin))) FAIL("constrain_begin")
+    if (!FITPACK_SUCCESS_c(cc.fit(0.5)))                   FAIL("fit after constrain_begin")
+    vector<fpPoint<2>> db = cc.ddu_all<2>(cc.ubegin(),&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                          FAIL("ddu_all at the begin point")
+    if (abs(db[0].x()-circle[0].x()) > smallnum06 ||
+        abs(db[0].y()-circle[0].y()) > smallnum06)         FAIL("begin constraint not honoured")
+
+    cc.clean_constraints();
+    vector<fpPoint<2>> pin_end(1,circle[M-1]);
+    if (!FITPACK_SUCCESS_c(cc.constrain_end(pin_end)))     FAIL("constrain_end")
+    if (!FITPACK_SUCCESS_c(cc.fit(0.5)))                   FAIL("fit after constrain_end")
+    vector<fpPoint<2>> de = cc.ddu_all<2>(cc.uend(),&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                          FAIL("ddu_all at the end point")
+    if (abs(de[0].x()-circle[M-1].x()) > smallnum06 ||
+        abs(de[0].y()-circle[M-1].y()) > smallnum06)       FAIL("end constraint not honoured")
+
+    // fpClosedCurve inherits the same overloads through its `using` declaration.
+    fpClosedCurve loop;
+    vector<fpPoint<2>> lpts(circle);
+    lpts[M-1] = lpts[0];   // clocur wants the first and last point bit-identical
+    if (!FITPACK_SUCCESS_c(loop.new_fit(lpts,0.5)))        FAIL("closed new_fit from points")
+    (void) loop.eval<2>(loop.ubegin(),&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                          FAIL("closed eval")
+
+    // ------------------------------------------------ fpGridSpline N-D point overloads
+    // f(x,y) = sin(x) cos(y) on an 11x11 grid over [0,pi]^2.
+    static const FP_SIZE ng = 11;
+    vector<FP_REAL> xg(ng*2), zf(ng*ng);
+    for (FP_SIZE i=0; i<ng; i++) { xg[i] = pi*i/(ng-1); xg[ng+i] = xg[i]; }   // xg(ng,2), column-major
+    for (FP_SIZE i=0; i<ng; i++)
+        for (FP_SIZE j=0; j<ng; j++) zf[i*ng+j] = sin(xg[i])*cos(xg[ng+j]);   // flat, row-major
+
+    vector<FP_SIZE> m(2,ng);
+    FP_REAL s = 0.0;
+    fpGridSpline gs;
+    if (!FITPACK_SUCCESS_c(gs.new_fit(2,ng,2,xg,zf,m.data(),nullptr,nullptr,&s))) FAIL("grid spline new_fit")
+    if (gs.dims() != 2)                                    FAIL("grid spline dims")
+
+    fpPoint<2> q = {half*pi, 0.25*pi};
+    const FP_REAL fq = gs.eval(q,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                          FAIL("grid spline point eval")
+    if (abs(fq - sin(q.x())*cos(q.y())) > smallnum03)      FAIL("grid spline point eval value")
+
+    vector<fpPoint<2>> qs(2); qs[0] = q; qs[1] = {0.25*pi, half*pi};
+    vector<FP_REAL> fqs = gs.eval(qs,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr) || fqs.size()!=2)         FAIL("grid spline multi-point eval")
+
+    vector<FP_SIZE> nu(2); nu[0] = 1; nu[1] = 0;           // d/dx sin(x)cos(y) = cos(x)cos(y)
+    const FP_REAL dq = gs.dfdx(q,nu,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr))                          FAIL("grid spline point derivative")
+    if (abs(dq - cos(q.x())*cos(q.y())) > smallnum03)      FAIL("grid spline point derivative value")
+
+    vector<FP_REAL> dqs = gs.dfdx(qs,nu,&ierr);
+    if (!FITPACK_SUCCESS_c(ierr) || dqs.size()!=2)         FAIL("grid spline multi-point derivative")
+
+    fpPoint<2> lo = {0.0, 0.0}, hi = {pi, pi};             // int sin x dx * int cos y dy = 2*0
+    if (abs(gs.integral(lo,hi)) > smallnum03)              FAIL("grid spline box integral")
+
+    fpPoint<3> q3 = {0.0, 0.0, 0.0};
+    (void) gs.eval(q3,&ierr);
+    if (ierr != FITPACK_INPUT_ERROR)                       FAIL("grid spline dimension guard")
+
+    return FP_TRUE;
+}
+
+#undef FAIL
 
 }
 

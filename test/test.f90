@@ -152,6 +152,7 @@ program test
         call add_testl(test_cpp_parametric_fit())
         call add_testl(test_cpp_closed_fit())
         call add_testl(test_cpp_constrained_fit())
+        call add_testl(test_cpp_ergonomics())
 
     end subroutine run_cpp_tests
 
