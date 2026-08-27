@@ -11,9 +11,10 @@ var searchData=
   ['maxbin_8',['maxbin',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#aaf16c0217bf4248a2e1520c5c9edf21c',1,'fitpack_convex_curves::fitpack_convex_curve']]],
   ['maxtr_9',['maxtr',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00',1,'fitpack_convex_curves::fitpack_convex_curve']]],
   ['merge_5fknots_10',['merge_knots',['../namespacefitpack__surfaces.html#a0d7f13ca2d46ab67f1cc3d7b1bb664d8',1,'fitpack_surfaces']]],
-  ['mixed_20constraints_11',['Mixed Constraints',['../tutorial_convex_curve.html#autotoc_md130',1,'']]],
-  ['modern_20fortran_20spline_20fitting_12',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]],
-  ['modes_13',['Fitting Modes',['../tutorial_surface.html#autotoc_md144',1,'']]],
-  ['mse_14',['mse',['../structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973',1,'fitpack_fitters::fitpack_fitter']]],
-  ['multi_20component_20surfaces_15',['Multi-Component Surfaces',['../tutorial_grid_surface.html#autotoc_md155',1,'']]]
+  ['message_11',['message',['../structfitpack__fx__status_1_1fx__status.html#a32adb625e99536b0812f9d7498348dd8',1,'fitpack_fx_status::fx_status']]],
+  ['mixed_20constraints_12',['Mixed Constraints',['../tutorial_convex_curve.html#autotoc_md130',1,'']]],
+  ['modern_20fortran_20spline_20fitting_13',['fitpack — Modern Fortran Spline Fitting',['../index.html',1,'']]],
+  ['modes_14',['Fitting Modes',['../tutorial_surface.html#autotoc_md144',1,'']]],
+  ['mse_15',['mse',['../structfitpack__fitters_1_1fitpack__fitter.html#a76262da39321e6f256f82296c37bd973',1,'fitpack_fitters::fitpack_fitter']]],
+  ['multi_20component_20surfaces_16',['Multi-Component Surfaces',['../tutorial_grid_surface.html#autotoc_md155',1,'']]]
 ];

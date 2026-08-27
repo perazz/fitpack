@@ -1,8 +1,0 @@
-<map id="fitpack_periodic_curves_c::fitpack_periodic_curve_c_smoothing" name="fitpack_periodic_curves_c::fitpack_periodic_curve_c_smoothing">
-<area shape="rect" id="Node000001" title="Get smoothing." alt="" coords="5,29,196,84"/>
-<area shape="poly" id="edge3_Node000001_Node000001" title=" " alt="" coords="54,29,55,19,63,10,78,5,101,3,128,6,143,14,140,18,126,11,101,8,79,10,66,15,60,21,60,29"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__periodic__curves__c.html#aeef2651aa247d1b16df2bf49c9db5004" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="244,29,435,84"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,54,230,54,230,59,196,59"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7" title="Get pointer to embedded Fortran object." alt="" coords="483,29,673,84"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,54,469,54,469,59,435,59"/>
-</map>

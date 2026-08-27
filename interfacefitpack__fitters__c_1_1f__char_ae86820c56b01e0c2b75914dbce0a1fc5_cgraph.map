@@ -1,0 +1,5 @@
+<map id="fitpack_fitters_c::f_char::from_c_string_ptr_cptr" name="fitpack_fitters_c::f_char::from_c_string_ptr_cptr">
+<area shape="rect" id="Node000001" title="Pointer view from a type(c_ptr) C string. Aliases the C buffer; always associated (0&#45;length sentinel ..." alt="" coords="5,5,164,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fitters__c.html#a1c95521796e43890d7241230001c8e16" title="Turn array of characters to a character string." alt="" coords="212,13,347,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,30,198,30,198,35,164,35"/>
+</map>

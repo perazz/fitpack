@@ -1,7 +1,0 @@
-<map id="fitpack_constrained_curves_c::fitpack_constrained_curve_c_move_alloc" name="fitpack_constrained_curves_c::fitpack_constrained_curve_c_move_alloc">
-<area shape="rect" id="Node000001" title="Move allocation from one object to another." alt="" coords="5,5,227,60"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__constrained__curves__c.html#af610d2fbf2fdb56cc4cc97eb5343d5bb" title="Deallocate Fortran object." alt="" coords="275,5,496,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,30,261,30,261,35,227,35"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__constrained__curves__c.html#a2c58bbfb916ea4597716ed3e52781acc" title="Get pointer to embedded Fortran object." alt="" coords="544,5,765,60"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="496,30,530,30,530,35,496,35"/>
-</map>

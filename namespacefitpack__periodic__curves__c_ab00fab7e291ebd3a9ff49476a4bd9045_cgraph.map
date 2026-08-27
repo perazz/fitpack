@@ -1,8 +1,0 @@
-<map id="fitpack_periodic_curves_c::fitpack_periodic_curve_c_mse" name="fitpack_periodic_curves_c::fitpack_periodic_curve_c_mse">
-<area shape="rect" id="Node000001" title="Get MSE." alt="" coords="5,29,244,69"/>
-<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="76,30,73,20,81,10,98,5,125,3,155,6,171,13,169,18,154,11,125,8,99,10,84,15,78,21,81,28"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__periodic__curves__c.html#aeef2651aa247d1b16df2bf49c9db5004" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="292,22,483,77"/>
-<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="244,47,278,47,278,52,244,52"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__periodic__curves__c.html#adee76099f06c5641b60ce4c1963172d7" title="Get pointer to embedded Fortran object." alt="" coords="531,22,721,77"/>
-<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="483,47,517,47,517,52,483,52"/>
-</map>

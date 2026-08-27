@@ -1,0 +1,6 @@
+<map id="fitpack_fitters_c::fitpack_fitter_c_ref_smoothing" name="fitpack_fitters_c::fitpack_fitter_c_ref_smoothing">
+<area shape="rect" id="Node000001" title="Get pointer to scalar property &#39;smoothing&#39;." alt="" coords="5,29,148,84"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="39,29,39,19,46,10,58,5,77,3,99,6,111,14,108,18,97,11,77,8,60,10,49,15,44,21,44,29"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fitters__c.html#a78db4c5f4a34f26c5a9a5aa2b82b19b7" title="Concrete&#45;typed pointer for reading base&#45;declared components on this proxy&#45;less abstract base...." alt="" coords="196,29,343,84"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,54,182,54,182,59,148,59"/>
+</map>

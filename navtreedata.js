@@ -284,12 +284,16 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"namespacefitpack__core.html#a3d51410017bf94f298da66b1d80fe524",
-"namespacefitpack__fitters.html#a313f62bf3e894f3a50066b3513dc45a2",
-"structfitpack__closed__curves__c_1_1fitpack__closed__curve__c.html#afff2ab89c849cf8b547f437fc221a2d5",
-"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#a50736b5a5ff3a1d4539dcc993c030b7c",
-"structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a81fff570cc8f40280fc49d64def9d23b",
-"structfitpack__surfaces_1_1fitpack__surface.html#aad5db2e2af661e995a0fba591c39778d"
+"interfacefitpack__gridded__polar__c_1_1fitpack__grid__polar__c.html#af45cafc0797fa058a945d8cf36feb027",
+"namespacefitpack__core.html#a3d07187113a320a4bf1fa751018181d2",
+"namespacefitpack__curves__c.html#a462ddd270337221dd650e7868a53c7ad",
+"namespacefitpack__gridded__splines.html#adb6c3408413d6e3204120223aa31f056",
+"namespacefitpack__parametric__curves__c__types.html#a5d59c4b3f5618f00c6e652780dd39daf",
+"namespacemembers_func_i.html",
+"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a7ecff74ef9824352515fedd35f724c1e",
+"structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html#ac8dddec521b41c2a116ac521f58acf90",
+"structfitpack__polar__domains_1_1fitpack__polar.html#acf92c07749717d22d0ba4447c161818f",
+"tutorial_convex_curve.html#autotoc_md128"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_splines_c::fitpack_gridded_spline_c::fitpack_gridded_spline_c_f2c" name="fitpack_gridded_splines_c::fitpack_gridded_spline_c::fitpack_gridded_spline_c_f2c">
+<area shape="rect" id="Node000001" title="Create from Fortran object (owns copy)" alt="" coords="5,5,236,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__splines__c.html#a30dee80bbd934eacc8ec77f80016bc22" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="284,5,475,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,30,270,30,270,35,236,35"/>
+</map>

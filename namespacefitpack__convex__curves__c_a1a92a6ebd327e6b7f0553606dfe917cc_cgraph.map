@@ -1,0 +1,7 @@
+<map id="fitpack_convex_curves_c::fitpack_convex_curve_c_destroy" name="fitpack_convex_curves_c::fitpack_convex_curve_c_destroy">
+<area shape="rect" id="Node000001" title="[bind(C)] Deallocate object" alt="" coords="5,5,191,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="239,13,380,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,30,225,30,225,35,191,35"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="428,13,576,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,30,414,30,414,35,380,35"/>
+</map>

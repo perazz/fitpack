@@ -1,0 +1,5 @@
+<map id="fitpack_convex_curves_c::fitpack_convex_curve_c::fitpack_convex_curve_c_f2c" name="fitpack_convex_curves_c::fitpack_convex_curve_c::fitpack_convex_curve_c_f2c">
+<area shape="rect" id="Node000001" title="Create from Fortran object (owns copy)" alt="" coords="5,5,232,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__convex__curves__c.html#aa8c117c9ea6f6f0d6ad35e06dffd4a85" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="280,5,465,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,30,266,30,266,35,232,35"/>
+</map>

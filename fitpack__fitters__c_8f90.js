@@ -1,0 +1,27 @@
+var fitpack__fitters__c_8f90 =
+[
+    [ "fitpack_fitters_c::f_pointer", "interfacefitpack__fitters__c_1_1f__pointer.html", "interfacefitpack__fitters__c_1_1f__pointer" ],
+    [ "fitpack_fitters_c::f_poly_pointer", "interfacefitpack__fitters__c_1_1f__poly__pointer.html", "interfacefitpack__fitters__c_1_1f__poly__pointer" ],
+    [ "fitpack_fitters_c::f_associated", "interfacefitpack__fitters__c_1_1f__associated.html", "interfacefitpack__fitters__c_1_1f__associated" ],
+    [ "fitpack_fitters_c::f_char", "interfacefitpack__fitters__c_1_1f__char.html", "interfacefitpack__fitters__c_1_1f__char" ],
+    [ "fitpack_fitters_c::c_array_to_string", "namespacefitpack__fitters__c.html#a1c95521796e43890d7241230001c8e16", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_core_comm_expand", "namespacefitpack__fitters__c.html#a85ba0a4f90ad12832e9e3e4c7d1b4de8", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_core_comm_pack", "namespacefitpack__fitters__c.html#ac18b487fad1f266b15cb9c40f7b4f467", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_core_comm_size", "namespacefitpack__fitters__c.html#a889762725cc5034d4a9548c8564ece0c", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_destroy_base", "namespacefitpack__fitters__c.html#a45ca4323668f7341d9194bb3fb65fca5", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_get_accessor_pointer", "namespacefitpack__fitters__c.html#a78db4c5f4a34f26c5a9a5aa2b82b19b7", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_get_pointer", "namespacefitpack__fitters__c.html#a55c4738883140cca04795ede843595b9", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_get_poly_pointer", "namespacefitpack__fitters__c.html#ad42afdea6a92770e6c37ecb95e731e1e", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_getcomp_c", "namespacefitpack__fitters__c.html#a38e1e0c81a290574c9c40880869bb72e", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_getcomp_iwrk", "namespacefitpack__fitters__c.html#a6e56614eb1f7e027b093edf4cfc25156", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_getcomp_wrk", "namespacefitpack__fitters__c.html#a9a8d5bb359d86995fdf06c4d73085ccf", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_is_same", "namespacefitpack__fitters__c.html#af88f66ecb1afef530b358c2227bf01a1", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_mse", "namespacefitpack__fitters__c.html#a47e3613bd80018be8a54c11a6e7fa91b", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_ref_fp", "namespacefitpack__fitters__c.html#a3fdfdc22b09a4ff2f5544d473b216a19", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_ref_iopt", "namespacefitpack__fitters__c.html#a687389aaa1f022754df3162a440cf8de", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_ref_liwrk", "namespacefitpack__fitters__c.html#a653afdb32f8d9f88dc542523012b4b98", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_ref_lwrk", "namespacefitpack__fitters__c.html#a3bf04694e42c94c574321c31bdda1230", null ],
+    [ "fitpack_fitters_c::fitpack_fitter_c_ref_smoothing", "namespacefitpack__fitters__c.html#a5d26d14f0c0f8e48133faaeaaaabb7e1", null ],
+    [ "fitpack_fitters_c::from_c_string_ptr_arr", "namespacefitpack__fitters__c.html#a1c0c37fbe052dd521f3c2e9376e3a538", null ],
+    [ "fitpack_fitters_c::from_c_string_ptr_cptr", "namespacefitpack__fitters__c.html#add4846e45fcd69fd4a1185f33e06cea6", null ]
+];

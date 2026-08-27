@@ -5,5 +5,6 @@ var searchData=
   ['max_5fk_2',['max_k',['../namespacefitpack__curves.html#abbaa986ed59bf77bf438e8ca1620125a',1,'fitpack_curves::max_k'],['../namespacefitpack__parametric__curves.html#a905da887b57e712cf68308363ab39607',1,'fitpack_parametric_curves::max_k']]],
   ['max_5forder_3',['max_order',['../namespacefitpack__core.html#a6c5b21fc23625ebfc7f555075c13eb07',1,'fitpack_core']]],
   ['maxbin_4',['maxbin',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#aaf16c0217bf4248a2e1520c5c9edf21c',1,'fitpack_convex_curves::fitpack_convex_curve']]],
-  ['maxtr_5',['maxtr',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00',1,'fitpack_convex_curves::fitpack_convex_curve']]]
+  ['maxtr_5',['maxtr',['../structfitpack__convex__curves_1_1fitpack__convex__curve.html#afa9fbc82d89b76d21185ecf172803b00',1,'fitpack_convex_curves::fitpack_convex_curve']]],
+  ['message_6',['message',['../structfitpack__fx__status_1_1fx__status.html#a32adb625e99536b0812f9d7498348dd8',1,'fitpack_fx_status::fx_status']]]
 ];

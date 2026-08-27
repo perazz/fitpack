@@ -1,0 +1,5 @@
+<map id="fitpack_fx_status::handle_error" name="fitpack_fx_status::handle_error">
+<area shape="rect" id="Node000001" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="5,5,147,45"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="195,5,343,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,23,181,23,181,28,147,28"/>
+</map>

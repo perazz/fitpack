@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_polar_c::f_char::from_c_string_ptr_arr" name="fitpack_gridded_polar_c::f_char::from_c_string_ptr_arr">
+<area shape="rect" id="Node000001" title="Pointer view from a character(*) assumed&#45;size C buffer. The dummy is optional: an absent argument (NU..." alt="" coords="5,5,187,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__polar__c.html#a273e4d061faa6341c334a1b27eefa5fe" title="Pointer view from a type(c_ptr) C string. Aliases the C buffer; always associated (0&#45;length sentinel ..." alt="" coords="235,13,425,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,30,221,30,221,35,187,35"/>
+</map>

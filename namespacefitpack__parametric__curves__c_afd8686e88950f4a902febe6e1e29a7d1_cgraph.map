@@ -1,0 +1,11 @@
+<map id="fitpack_parametric_curves_c::fitpack_closed_curve_c_allocate" name="fitpack_parametric_curves_c::fitpack_closed_curve_c_allocate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,41,192,96"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves__c.html#a10552d29e94c9085ecfe5cec283f6611" title=" " alt="" coords="240,5,427,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,52,226,46,227,52,192,57"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="263,85,404,125"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="192,80,250,89,249,94,192,86"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves__c.html#a22bf855634cdd7cae9fff3d00e83a799" title=" " alt="" coords="475,5,661,60"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="427,30,461,30,461,35,427,35"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="494,85,642,125"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="404,102,480,102,480,107,404,107"/>
+</map>

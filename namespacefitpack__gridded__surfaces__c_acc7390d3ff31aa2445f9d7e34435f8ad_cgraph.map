@@ -1,0 +1,9 @@
+<map id="fitpack_gridded_surfaces_c::fitpack_grid_surface_c_allocate" name="fitpack_gridded_surfaces_c::fitpack_grid_surface_c_allocate">
+<area shape="rect" id="Node000001" title="[bind(C)] Allocate new object" alt="" coords="5,41,189,96"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__surfaces__c.html#a06b89e4f9cede79cc7ee67fd1729936b" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="237,5,421,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,52,223,46,224,52,190,57"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="259,85,400,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,80,246,89,245,94,190,86"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="469,85,617,125"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="400,102,455,102,455,107,400,107"/>
+</map>

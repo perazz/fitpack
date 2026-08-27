@@ -1,0 +1,6 @@
+<map id="fitpack_fitters_c::fitpack_fitter_c_ref_lwrk" name="fitpack_fitters_c::fitpack_fitter_c_ref_lwrk">
+<area shape="rect" id="Node000001" title="Get pointer to scalar property &#39;lwrk&#39;." alt="" coords="5,29,184,69"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="55,30,53,20,59,10,73,5,95,3,119,6,133,13,130,18,118,11,95,8,74,10,62,15,58,21,60,28"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fitters__c.html#a78db4c5f4a34f26c5a9a5aa2b82b19b7" title="Concrete&#45;typed pointer for reading base&#45;declared components on this proxy&#45;less abstract base...." alt="" coords="232,22,379,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,47,218,47,218,52,184,52"/>
+</map>

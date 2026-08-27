@@ -26,7 +26,8 @@ var searchData=
   ['boundary_20conditions_20for_20gridded_20spheres_23',['Pole boundary conditions for gridded spheres',['../theory_special_domains.html#autotoc_md88',1,'']]],
   ['boundary_20conditions_20on_20the_20disc_20edge_24',['Boundary Conditions on the Disc Edge',['../theory_special_domains.html#autotoc_md80',1,'']]],
   ['boundary_20function_25',['Boundary Function',['../tutorial_polar.html#autotoc_md170',1,'']]],
-  ['building_26',['Building',['../index.html#autotoc_md7',1,'']]],
-  ['by_20dimension_20solution_27',['Dimension-by-Dimension Solution',['../theory_surface_fitting.html#autotoc_md61',1,'']]],
-  ['by_20step_28',['Step-by-step',['../tutorial_curve.html#autotoc_md93',1,'']]]
+  ['boundary_5fftn_5fadapter_26',['boundary_ftn_adapter',['../fitpack__polar__domains__c_8f90.html#abcb3173807f8946a83a0fa617e5f4687',1,'fitpack_polar_domains_c.f90']]],
+  ['building_27',['Building',['../index.html#autotoc_md7',1,'']]],
+  ['by_20dimension_20solution_28',['Dimension-by-Dimension Solution',['../theory_surface_fitting.html#autotoc_md61',1,'']]],
+  ['by_20step_29',['Step-by-step',['../tutorial_curve.html#autotoc_md93',1,'']]]
 ];

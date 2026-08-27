@@ -1,0 +1,5 @@
+<map id="fitpack_gridded_sphere_c::fitpack_grid_sphere_c::fitpack_grid_sphere_c_f2c" name="fitpack_gridded_sphere_c::fitpack_grid_sphere_c::fitpack_grid_sphere_c_f2c">
+<area shape="rect" id="Node000001" title="Create from Fortran object (owns copy)" alt="" coords="5,5,217,60"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__sphere__c.html#a44fc72669c7bae4c96463246fe6ad54c" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="265,5,439,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,30,252,30,252,35,217,35"/>
+</map>

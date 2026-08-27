@@ -1,0 +1,12 @@
+<map id="fitpack_convex_curves_c::fitpack_convex_curve_c_copy" name="fitpack_convex_curves_c::fitpack_convex_curve_c_copy">
+<area shape="rect" id="Node000001" title="[bind(C)] Copy. By default, mirrors source ownership: a view source yields a view (shallow handle cop..." alt="" coords="5,71,191,125"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__convex__curves__c.html#a1a92a6ebd327e6b7f0553606dfe917cc" title="[bind(C)] Deallocate object" alt="" coords="239,5,424,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,69,225,60,226,65,192,75"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="472,46,613,86"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="191,89,458,69,459,75,191,94"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__convex__curves__c.html#aa8c117c9ea6f6f0d6ad35e06dffd4a85" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="239,136,424,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="192,121,226,131,225,136,190,127"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="425,45,459,50,458,55,424,50"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="661,46,809,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="614,63,647,63,647,69,614,69"/>
+</map>

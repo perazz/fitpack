@@ -1,0 +1,12 @@
+<map id="fitpack_gridded_sphere_c::fitpack_grid_sphere_c_copy" name="fitpack_gridded_sphere_c::fitpack_grid_sphere_c_copy">
+<area shape="rect" id="Node000001" title="[bind(C)] Copy. By default, mirrors source ownership: a view source yields a view (shallow handle cop..." alt="" coords="5,71,179,125"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__gridded__sphere__c.html#ab46d48a132d5a9cc6fb798c200404dab" title="[bind(C)] Deallocate object" alt="" coords="227,5,400,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,70,213,60,214,65,180,75"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="448,46,589,86"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="179,89,434,70,435,75,179,94"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__gridded__sphere__c.html#a44fc72669c7bae4c96463246fe6ad54c" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="227,136,400,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="180,121,214,131,213,136,178,126"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="400,44,434,50,434,55,400,49"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="637,46,785,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="590,63,623,63,623,69,590,69"/>
+</map>

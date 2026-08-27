@@ -1,8 +1,0 @@
-<map id="fitpack_curves_c::fitpack_curve_c_get_bc" name="fitpack_curves_c::fitpack_curve_c_get_bc">
-<area shape="rect" id="Node000001" title="Get spline behavior outside the support." alt="" coords="5,29,188,69"/>
-<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="54,30,51,20,58,10,73,5,97,3,123,6,138,13,136,18,122,11,97,8,75,10,61,15,56,21,59,28"/>
-<area shape="rect" id="Node000002" href="$namespacefitpack__curves__c.html#ab8802e418f18b3e0a731857b3716c89f" title="Get embedded Fortran object; allocate it if not done yet." alt="" coords="236,29,419,69"/>
-<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="188,47,222,47,222,52,188,52"/>
-<area shape="rect" id="Node000003" href="$namespacefitpack__curves__c.html#adb479e307b50b9939f9e689ffd385082" title="Get pointer to embedded Fortran object." alt="" coords="467,29,649,69"/>
-<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="419,47,453,47,453,52,419,52"/>
-</map>

@@ -1,0 +1,6 @@
+<map id="fitpack_fitters_c::fitpack_fitter_c_ref_iopt" name="fitpack_fitters_c::fitpack_fitter_c_ref_iopt">
+<area shape="rect" id="Node000001" title="Get pointer to scalar property &#39;iopt&#39;." alt="" coords="5,29,180,69"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="54,30,51,20,57,10,71,5,93,3,117,6,130,13,128,18,115,11,93,8,73,10,61,15,56,21,59,28"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__fitters__c.html#a78db4c5f4a34f26c5a9a5aa2b82b19b7" title="Concrete&#45;typed pointer for reading base&#45;declared components on this proxy&#45;less abstract base...." alt="" coords="228,22,375,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,47,214,47,214,52,180,52"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="fitpack_curves_c::fitpack_periodic_curve_c_copy" name="fitpack_curves_c::fitpack_periodic_curve_c_copy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,188,103"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__curves__c.html#a54753451dfa3ef65990124a5dfb764bd" title=" " alt="" coords="236,5,431,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,60,237,46,238,51,180,65"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__curves__c.html#a5672efc8010449b3ba95ce451c23ec52" title=" " alt="" coords="479,63,697,103"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="188,80,465,80,465,85,188,85"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__curves__c.html#a1a8832812044caa3d71494823d2d4d92" title=" " alt="" coords="238,120,429,160"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="180,100,238,114,237,119,179,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="423,43,486,57,485,62,422,48"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="422,117,485,103,486,108,423,123"/>
+</map>

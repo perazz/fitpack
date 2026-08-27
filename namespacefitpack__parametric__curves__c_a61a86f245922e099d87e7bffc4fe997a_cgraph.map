@@ -1,0 +1,16 @@
+<map id="fitpack_parametric_curves_c::fitpack_closed_curve_c_copy" name="fitpack_parametric_curves_c::fitpack_closed_curve_c_copy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,69,192,123"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__parametric__curves__c.html#aa981fd8a8dd3c50fa51bedaea3a6b2f5" title=" " alt="" coords="240,107,427,162"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,109,227,114,226,120,192,114"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__parametric__curves__c.html#a22bf855634cdd7cae9fff3d00e83a799" title=" " alt="" coords="475,29,661,83"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="134,66,182,37,239,13,298,4,359,4,417,11,471,23,469,28,417,17,359,10,299,9,241,19,185,41,137,71"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="497,147,639,187"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="138,121,185,150,241,172,303,183,367,187,429,184,484,179,484,184,429,190,367,192,302,189,239,177,183,155,135,126"/>
+<area shape="rect" id="Node000006" href="$namespacefitpack__parametric__curves__c.html#a10552d29e94c9085ecfe5cec283f6611" title=" " alt="" coords="240,29,427,83"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="192,78,226,72,227,77,192,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="415,105,472,85,474,90,417,110"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="427,145,484,153,484,158,426,150"/>
+<area shape="rect" id="Node000005" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="709,147,857,187"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="639,164,696,164,696,169,639,169"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="427,53,461,53,461,59,427,59"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="fitpack_convex_curves_c::fitpack_convex_curve_c_allocate" name="fitpack_convex_curves_c::fitpack_convex_curve_c_allocate">
+<area shape="rect" id="Node000001" title="[bind(C)] Allocate new object" alt="" coords="5,41,191,96"/>
+<area shape="rect" id="Node000002" href="$namespacefitpack__convex__curves__c.html#aa8c117c9ea6f6f0d6ad35e06dffd4a85" title="Get/allocate embedded Fortran object (internal, not bind(C)) Returns .true. on success,..." alt="" coords="239,5,424,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,52,225,46,226,52,192,57"/>
+<area shape="rect" id="Node000003" href="$namespacefitpack__fx__status.html#a18e0081cb8307059e79bb94ecfdcd68e" title="Copy the local status to the caller&#39;s optional out&#45;argument, or stop on error." alt="" coords="261,85,402,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,80,247,89,247,94,191,86"/>
+<area shape="rect" id="Node000004" href="$namespacefitpack__fx__status.html#a6bf6369bff98ee7dd5b87215abd05f5d" title="Read a status message back as a Fortran string." alt="" coords="472,85,620,125"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="402,102,458,102,458,107,402,107"/>
+</map>
