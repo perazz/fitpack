@@ -8,8 +8,8 @@ There is no known binary-only consumer; this file is the migration list.
 Regenerate it at any time with:
 
 ```bash
-./abi_symbols.sh --diff main      # what the generated bindings changed
-./abi_symbols.sh --diff 1.0.0     # everything that changed since the last release
+./scripts/abi_symbols.sh --diff main      # what the generated bindings changed
+./scripts/abi_symbols.sh --diff 1.0.0     # everything that changed since the last release
 ```
 
 ## Summary
@@ -28,11 +28,11 @@ Against `main` — the state just before the generated bindings landed:
 `main` already carries one further ABI change since the 1.0.0 tag, made before this work: the
 25 core procedural bindings gained an `fp_` prefix (`curfit_c` became `fp_curfit_c`, and so on
 for every `fp_*_c` entry point in `fitpack_core_c.h`). Counting from the 1.0.0 tag instead —
-`./abi_symbols.sh --diff 1.0.0` — folds those in: 13 identical, 39 changed, 66 renamed,
+`./scripts/abi_symbols.sh --diff 1.0.0` — folds those in: 13 identical, 39 changed, 66 renamed,
 447 new.
 
 The 38 identical symbols are the 25 `fp_*_c` core procedures plus `fitpack_message_c` and
-`FITPACK_SUCCESS_c` — all still hand-written in `src/fitpack_core_c.f90`, deliberately not
+`FITPACK_SUCCESS_c` — all still hand-written in `src/capi/fitpack_core_c.f90`, deliberately not
 regenerated — and 11 curve methods whose signature happened to survive unchanged.
 
 ## Breaking change: the opaque handle grew from 8 to 24 bytes
@@ -58,16 +58,20 @@ type's handle be passed to a parent type's accessor (see the rename table below)
 
 The lifecycle entry points keep their names and gain trailing arguments:
 
-- `allocate`, `destroy`, `move_alloc`, `associate` gain a trailing `fx_status* status` — pass
+- `allocate`, `destroy`, `move_alloc`, `associate` gain a trailing `fp_status* status` — pass
   `NULL` to keep the old behaviour of stopping on failure.
-- `copy` gains both a by-value `bool deep_copy` and the trailing `fx_status*`.
+- `copy` gains both a by-value `bool deep_copy` and the trailing `fp_status*`.
 
 ```c
-typedef struct fx_status { bool ok; int code; char message[248]; } fx_status;
+typedef struct fp_status { bool ok; int code; char message[248]; } fp_status;
 ```
 
-It is declared inline in the generated C headers behind `FX_STATUS_DEFINED`, so no extra
-header is needed. The hand-written `fitpack_core_c.h` does not use it and is unaffected.
+It is declared inline in the generated C headers behind an include-once guard, so no extra
+header is needed, and the declaration is C99-clean even with all thirty headers in one
+translation unit. Where [fortran-arrays](https://github.com/perazz/fortran-arrays) is on the
+include path its own `fx_status` is used instead and `fp_status` becomes an alias of it; the
+struct layout is the same either way, so both spellings link against the same binary. The
+hand-written `fitpack_core_c.h` does not use it and is unaffected.
 
 ## Breaking change: `FITPACK_CAPI_STATIC` on Windows
 
@@ -75,6 +79,48 @@ The generated headers declare the C entry points with `FITPACK_CAPI_EXPORT`, whi
 `__declspec(dllimport)` on Windows. This repository ships a static archive, so a Windows
 consumer must define `FITPACK_CAPI_STATIC` before including any fitpack header, or the link
 fails on `__imp_fitpack_*`. No effect on Linux or macOS.
+
+## Source-level changes after the first bindings drop
+
+These landed on top of the generated-bindings merge, inside the unreleased 2.0.0 window. None
+of them touches a symbol name or an argument type, so every table below is unchanged by them:
+`const` is not part of the C ABI, and a C++ class name never reaches the archive.
+
+**The status struct is spelled `fp_status`.** 70 C declarations changed `fx_status*` to
+`fp_status*`. Same struct, same layout, same symbols — see the section above.
+
+**Constness follows the Fortran receiver's intent.** A method whose Fortran receiver is
+`intent(in)` is declared `const <type>_c* self` in C and `const` in C++; anything else is
+declared mutable. The previous rule — every function const, every subroutine non-const —
+described the return shape, not the effect on the object, and let a caller mutate a fitter
+through a `const` handle.
+
+- 66 declarations **lost** `const` on `self`, across all thirteen concrete fitter types:
+  `fit` (13), `least_squares` (13), `interpolate` (12), `new_fit` (11), and 17 entry points
+  that update the fitter's cached evaluation state — `fitpack_curve_c_curve_eval_one`,
+  `fitpack_curve_c_curve_derivative`, `fitpack_curve_c_integral`,
+  `fitpack_surface_c_surface_eval_one`, `fitpack_surface_c_surface_derivatives_one`,
+  `fitpack_grid_surface_c_gridded_eval_one`, `fitpack_polar_c_polr_eval_one`,
+  `fitpack_sphere_c_sphere_eval_one`, `fitpack_convex_curve_c_set_convexity` and their
+  siblings on the remaining types.
+- 40 declarations **gained** `const`: the `comm_pack` / `core_comm_pack` serializers (27), the
+  `_pure` evaluators (4), `zeros` (2), and the derived-type returns `cross_section` (3),
+  `derivative_spline` (3) and `grid_eval_many` (1).
+
+The C++ methods carry the same qualifier, so C++ code that called a mutator through a `const`
+object or reference now fails to compile — as it should. Two ergonomic wrappers in
+`extra_methods/` were `const` for that reason and are not any more: `fpCurve::ddx(x, order,
+ierr)` and `fpGridSpline::dfdx(const fpPoint<dim>&, nu, ierr)`.
+
+**`fxFitpackFitter` is `fpFitter`.** The abstract base class now matches the `fp*` family;
+`include/fxFitpackFitter.hpp` and `include/fxFitpackFitter_subtypes.hpp` became
+`include/fpFitter.hpp` and `include/fpFitter_subtypes.hpp`. The C handle is unchanged
+(`fitpack_fitter_c`, `fitpack_fitter_c.h`).
+
+**The Fortran C-API modules moved to `src/capi/`.** Every generated `*_c.f90` / `*_c_types.f90`,
+the generated `fitpack_fx_status.f90`, and the hand-written `fitpack_core_c.f90` now live
+there. Module names, symbol names and the `include/` layout are untouched, and fpm globs `src/`
+recursively, so no consumer sees this.
 
 ## Renamed symbols
 

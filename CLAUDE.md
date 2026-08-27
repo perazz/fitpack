@@ -45,24 +45,36 @@ Use `elemental` for scalar operations: `destroy`, `FITPACK_SUCCESS`, simple gett
 
 ## C Interface
 
-**The bindings are generated. Never hand-edit `src/*_c.f90` (except `fitpack_core_c.f90`) or
-anything in `include/` (except `fitpack_core_c.h` and `fpPoint.hpp`).** Change the Fortran
-source, `fitpack_bindings.yaml`, or a snippet under `extra_methods/`, then re-run:
+**The bindings are generated. Never hand-edit `src/capi/*_c.f90` (except `fitpack_core_c.f90`)
+or anything in `include/` (except `fitpack_core_c.h` and `fpPoint.hpp`).** Change the Fortran
+source, `fitpack_bindings.yaml`, a banner template under `bindings_templates/`, or a snippet
+under `extra_methods/`, then re-run:
 
 ```bash
 FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings \
-    ./generate_bindings.sh
+    ./scripts/generate_bindings.sh
 ```
 
-Adding a type to the C API is a YAML entry, not a new file. A missing component accessor
-usually means its type is not registered — add the `- module:/type(s):/cpp_classes:` block and
-regenerate. An ergonomic C++ overload the generator cannot infer goes in `extra_methods/` and
-is listed under the owning class's `extra_methods:` key; the snippet is spliced verbatim into
-the generated header, so it must be valid inside a class body.
+Every Fortran C-API module lives in `src/capi/`; fpm globs `src/` recursively, so nothing else
+has to know. Adding a type to the C API is a YAML entry, not a new file. A missing component
+accessor usually means its type is not registered — add the `- module:/type(s):/cpp_classes:`
+block and regenerate. An ergonomic C++ overload the generator cannot infer goes in
+`extra_methods/` and is listed under the owning class's `extra_methods:` key; the snippet is
+spliced verbatim into the generated header, so it must be valid inside a class body — and it
+inherits the generated constness rule below, so a wrapper forwarding to a mutator cannot be
+`const`.
+
+The C status struct is `fp_status` (`status_type:` in the YAML): a layout-identical alias of
+fortran-arrays' `fx_status` where that library is on the include path, and a self-contained
+definition where it is not. Method constness follows the Fortran receiver's intent —
+`intent(in)` gives a `const` C++ method and a `const <type>_c*` handle, anything else gives
+the mutable spelling. The `#if HAVE_FXARRAY` members (the zero-copy `fxArray` views) are
+documented because `project/doxygen/Doxyfile` predefines `HAVE_FXARRAY`; leave it there, or
+they vanish from the published docs.
 
 Hand-written, and staying that way:
 
-- `src/fitpack_core_c.f90` / `include/fitpack_core_c.h` — the 25 `fp_*_c` core procedural
+- `src/capi/fitpack_core_c.f90` / `include/fitpack_core_c.h` — the 25 `fp_*_c` core procedural
   bindings plus `fitpack_message_c` and `FITPACK_SUCCESS_c`. That header is **pure C**: no
   `<vector>`, no `using`, no C++ helpers.
 - `include/fpPoint.hpp` — the fixed-dimension `fpPoint<dims>`, standard-layout so that
@@ -86,7 +98,7 @@ pure subroutine splev_c(...) bind(C, name='fp_splev_c')
 
 After any change to the C ABI, refresh the break list:
 ```bash
-./abi_symbols.sh --diff <last-release-tag>   # -> doc/abi_changes_<version>.md
+./scripts/abi_symbols.sh --diff <last-release-tag>   # -> doc/abi_changes_<version>.md
 ```
 
 ## Naming
