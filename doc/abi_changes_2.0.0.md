@@ -68,7 +68,7 @@ typedef struct fp_status { bool ok; int code; char message[248]; } fp_status;
 
 It is declared inline in the generated C headers behind an include-once guard, so no extra
 header is needed, and the declaration is C99-clean even with all thirty headers in one
-translation unit. Where [fortran-arrays](https://github.com/perazz/fortran-arrays) is on the
+translation unit. Where `fortran-arrays` is on the
 include path its own `fx_status` is used instead and `fp_status` becomes an alias of it; the
 struct layout is the same either way, so both spellings link against the same binary. The
 hand-written `fitpack_core_c.h` does not use it and is unaffected.
