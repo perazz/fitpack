@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fitpack_fitter_c.h                                                                          **
- *   ** @brief Standalone C interface to fitpack_fitter (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fitpack_fitter_c.h (module fitpack_fitters)
+!> @brief Standalone C interface to fitpack_fitter (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FITPACK_FITTER_C_H_INCLUDED
 #define FITPACK_FITTER_C_H_INCLUDED
@@ -15,7 +28,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* Minimal fx_status definition for standalone use.
+/* Minimal fp_status definition for standalone use.
  * Layout contract: this struct is the C half of type(fx_status) in the
  * generated <project>_fx_status module (templates/fortran_fx_status.f90.jinja2),
  * which in turn mirrors fortran-arrays' arrays_c. Field order, widths and
@@ -24,11 +37,17 @@
  * translation unit ahead of this header (via fxArrays.hpp), and it defines the
  * same struct and macro behind no FX_STATUS_DEFINED guard — so where both are
  * present the real definition wins and this copy stands down. */
-#if !defined(FX_STATUS_DEFINED) && !defined(ARRAYS_C_H_INCLUDED)
-#define FX_STATUS_DEFINED
+#ifndef FP_STATUS_TYPEDEF_INCLUDED
+#define FP_STATUS_TYPEDEF_INCLUDED
+#if defined(FX_STATUS_DEFINED) || defined(ARRAYS_C_H_INCLUDED)
+typedef fx_status fp_status;               /* the real fortran-arrays struct */
+#else
 #define FX_LEN_STATUS_MSG 248
-typedef struct fx_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fx_status;
+typedef struct fp_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fp_status;
+typedef fp_status fx_status;               /* layout-identical interop alias */
+#define FX_STATUS_DEFINED
 #endif
+#endif /* FP_STATUS_TYPEDEF_INCLUDED */
 
 #include "fitpack_capi_export.h"
 #include "fitpack_fitters_c_types.h"  /* For fitpack_fitter_c, fitpack_fitter_c_null */
@@ -63,7 +82,7 @@ FITPACK_CAPI_EXPORT void fitpack_fitter_c_destroy_base(fitpack_fitter_c* self);
  * @brief core_comm_pack
  * @param buffer 
  */
-FITPACK_CAPI_EXPORT void fitpack_fitter_c_core_comm_pack(fitpack_fitter_c* self, int32_t n, double* buffer);
+FITPACK_CAPI_EXPORT void fitpack_fitter_c_core_comm_pack(const fitpack_fitter_c* self, int32_t n, double* buffer);
 
 /**
  * @brief core_comm_expand

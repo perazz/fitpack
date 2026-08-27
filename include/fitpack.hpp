@@ -2,7 +2,7 @@
 #define FITPACK_HPP_INCLUDED
 
 // Base types
-#include "fxFitpackFitter.hpp"
+#include "fpFitter.hpp"
 
 // Derived types
 #include "fpCurve.hpp"

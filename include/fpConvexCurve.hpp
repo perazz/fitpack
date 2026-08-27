@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fpConvexCurve.hpp                                                                     **
- *   ** @brief Standalone C++ wrapper for fitpack_convex_curve (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fpConvexCurve.hpp (class fpConvexCurve)
+!> @brief Standalone C++ wrapper for fitpack_convex_curve (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FPCONVEXCURVE_HPP_INCLUDED
 #define FPCONVEXCURVE_HPP_INCLUDED
@@ -26,7 +39,6 @@
 #include <stdexcept>
 #include <variant>
 #include <optional>
-#include <cstring>
 
 static_assert(sizeof(fitpack_convex_curve_c) == sizeof(fitpack_curve_c),
     "C descriptor layout mismatch: fitpack_convex_curve_c vs fitpack_curve_c");
@@ -201,18 +213,18 @@ public:
     }
 
 
-    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) const override {
+    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) override {
         return fitpack_convex_curve_c_fit(as<fitpack_convex_curve_c>(), smoothing, order, keep_knots);
     }
 
-    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const override {
+    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) override {
         return fitpack_convex_curve_c_least_squares(as<fitpack_convex_curve_c>(), smoothing, reset_knots);
     }
 
     /**
      * @brief set_convexity
      */
-    virtual int32_t set_convexity(std::vector<double>& v) const {
+    virtual int32_t set_convexity(std::vector<double>& v) {
         int32_t n = static_cast<int32_t>(v.size());
         return fitpack_convex_curve_c_set_convexity(as<fitpack_convex_curve_c>(), n, v.data());
     }
@@ -225,7 +237,7 @@ public:
     /**
      * @brief comm_pack
      */
-    void comm_pack(std::vector<double>& buffer) override {
+    void comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_convex_curve_c_comm_pack(as<fitpack_convex_curve_c>(), n, buffer.data());
     }
@@ -251,7 +263,7 @@ public:
     /**
      * @brief core_comm_pack
      */
-    void core_comm_pack(std::vector<double>& buffer) override {
+    void core_comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_convex_curve_c_core_comm_pack(as<fitpack_convex_curve_c>(), n, buffer.data());
     }
@@ -292,12 +304,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'v'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through v()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through v()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -305,22 +317,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_convex_curve_c_getcomp_v(as<fitpack_convex_curve_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "v", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "v", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -343,12 +349,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'sx'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through sx()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through sx()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -356,22 +362,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_convex_curve_c_getcomp_sx(as<fitpack_convex_curve_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "sx", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "sx", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY

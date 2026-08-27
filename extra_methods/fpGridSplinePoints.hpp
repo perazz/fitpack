@@ -26,8 +26,9 @@
     }
 
     //! @brief Partial derivative of orders nu(1..dim) at one scattered point.
+    //! @note Not const: the Fortran receiver of the raw dfdx is intent(inout).
     template <FP_SIZE dim>
-    FP_REAL dfdx(const fpPoint<dim>& x, const std::vector<FP_SIZE>& nu, FP_FLAG* ierr = nullptr) const
+    FP_REAL dfdx(const fpPoint<dim>& x, const std::vector<FP_SIZE>& nu, FP_FLAG* ierr = nullptr)
     {
         if (dims() != dim) { if (ierr) *ierr = FITPACK_INPUT_ERROR; return FP_REAL(0); }
         std::vector<FP_REAL> xw(x.begin(), x.end());

@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fpGridPolar.hpp                                                                     **
- *   ** @brief Standalone C++ wrapper for fitpack_grid_polar (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fpGridPolar.hpp (class fpGridPolar)
+!> @brief Standalone C++ wrapper for fitpack_grid_polar (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FPGRIDPOLAR_HPP_INCLUDED
 #define FPGRIDPOLAR_HPP_INCLUDED
@@ -18,7 +31,7 @@
 #endif
 
 #include "fitpack_grid_polar_c.h"
-#include "fxFitpackFitter.hpp"
+#include "fpFitter.hpp"
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -26,7 +39,6 @@
 #include <stdexcept>
 #include <variant>
 #include <optional>
-#include <cstring>
 #include <array>
 
 static_assert(sizeof(fitpack_grid_polar_c) == sizeof(fitpack_fitter_c),
@@ -38,9 +50,9 @@ static_assert(sizeof(fitpack_grid_polar_c) == sizeof(fitpack_fitter_c),
  * This class provides automatic memory management (RAII) and a natural C++ API
  * for the underlying Fortran fitpack_grid_polar, without requiring the fortran-arrays library.
  * Array arguments use std::vector<T> for standalone operation.
- * Extends fxFitpackFitter (Fortran: extends(fitpack_fitter))
+ * Extends fpFitter (Fortran: extends(fitpack_fitter))
  */
-class fpGridPolar : public fxFitpackFitter {
+class fpGridPolar : public fpFitter {
 public:
     // ===========================================================================================
     // Constructors and Destructor
@@ -49,7 +61,7 @@ public:
     /**
      * @brief Default constructor - allocates new fitpack_grid_polar
      */
-    fpGridPolar() : fxFitpackFitter(NoAlloc{}) {
+    fpGridPolar() : fpFitter(NoAlloc{}) {
         fitpack_grid_polar_c_allocate(as<fitpack_grid_polar_c>(), nullptr);
     }
 
@@ -63,7 +75,7 @@ public:
     /**
      * @brief Copy constructor - deep copy
      */
-    fpGridPolar(const fpGridPolar& other) : fxFitpackFitter(NoAlloc{}) {
+    fpGridPolar(const fpGridPolar& other) : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_polar_c>() = fitpack_grid_polar_c_null;
         fitpack_grid_polar_c_copy(as<fitpack_grid_polar_c>(), other.as<fitpack_grid_polar_c>(), false, nullptr);
     }
@@ -82,7 +94,7 @@ public:
     /**
      * @brief Move constructor - transfer ownership
      */
-    fpGridPolar(fpGridPolar&& other) noexcept : fxFitpackFitter(NoAlloc{}) {
+    fpGridPolar(fpGridPolar&& other) noexcept : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_polar_c>() = fitpack_grid_polar_c_null;
         fitpack_grid_polar_c_move_alloc(as<fitpack_grid_polar_c>(), other.as<fitpack_grid_polar_c>(), nullptr);
     }
@@ -101,7 +113,7 @@ public:
     /**
      * @brief Construct from existing C wrapper (takes ownership if move=true)
      */
-    explicit fpGridPolar(fitpack_grid_polar_c& c_wrapper, bool move = false) : fxFitpackFitter(NoAlloc{}) {
+    explicit fpGridPolar(fitpack_grid_polar_c& c_wrapper, bool move = false) : fpFitter(NoAlloc{}) {
         if (move) {
             fitpack_grid_polar_c_move_alloc(as<fitpack_grid_polar_c>(), &c_wrapper, nullptr);
         } else {
@@ -115,7 +127,7 @@ public:
      * is_pointer=true. Used by parent classes' polymorphic accessors
      * to wrap a base-class handle as the correct concrete subtype.
      */
-    explicit fpGridPolar(fitpack_grid_polar_c& c_wrapper, ViewTag) : fxFitpackFitter(NoAlloc{}) {
+    explicit fpGridPolar(fitpack_grid_polar_c& c_wrapper, ViewTag) : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_polar_c>() = c_wrapper;
         as<fitpack_grid_polar_c>()->is_pointer = true;
     }
@@ -182,11 +194,11 @@ public:
     /**
      * @brief Upcast to parent type (reference, no copy)
      */
-    fxFitpackFitter& as_parent() {
-        return static_cast<fxFitpackFitter&>(*this);
+    fpFitter& as_parent() {
+        return static_cast<fpFitter&>(*this);
     }
-    const fxFitpackFitter& as_parent() const {
-        return static_cast<const fxFitpackFitter&>(*this);
+    const fpFitter& as_parent() const {
+        return static_cast<const fpFitter&>(*this);
     }
 
     // ===========================================================================================
@@ -205,7 +217,7 @@ public:
     /**
      * @brief new_fit
      */
-    virtual int32_t new_fit(std::vector<double>& u, std::vector<double>& v, double r, int32_t z_n1, int32_t z_n2, std::vector<double>& z, double* z0 = nullptr, double* smoothing = nullptr) const {
+    virtual int32_t new_fit(std::vector<double>& u, std::vector<double>& v, double r, int32_t z_n1, int32_t z_n2, std::vector<double>& z, double* z0 = nullptr, double* smoothing = nullptr) {
         int32_t n = static_cast<int32_t>(u.size());
         return fitpack_grid_polar_c_new_fit(as<fitpack_grid_polar_c>(), n, u.data(), v.data(), r, z_n1, z_n2, z.data(), z0, smoothing);
     }
@@ -215,19 +227,19 @@ public:
         fitpack_grid_polar_c_set_origin_BC(as<fitpack_grid_polar_c>(), z0, exact, differentiable);
     }
 
-    virtual int32_t fit(double* smoothing = nullptr, bool* keep_knots = nullptr) const {
+    virtual int32_t fit(double* smoothing = nullptr, bool* keep_knots = nullptr) {
         return fitpack_grid_polar_c_fit(as<fitpack_grid_polar_c>(), smoothing, keep_knots);
     }
 
-    virtual int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const {
+    virtual int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) {
         return fitpack_grid_polar_c_least_squares(as<fitpack_grid_polar_c>(), smoothing, reset_knots);
     }
 
-    virtual int32_t interpolate(bool* reset_knots = nullptr) const {
+    virtual int32_t interpolate(bool* reset_knots = nullptr) {
         return fitpack_grid_polar_c_interpolate(as<fitpack_grid_polar_c>(), reset_knots);
     }
 
-    virtual double eval(double u, double v, int32_t* ierr = nullptr) const {
+    virtual double eval(double u, double v, int32_t* ierr = nullptr) {
         return fitpack_grid_polar_c_gridded_eval_one(as<fitpack_grid_polar_c>(), u, v, ierr);
     }
 
@@ -251,7 +263,7 @@ public:
     /**
      * @brief comm_pack
      */
-    void comm_pack(std::vector<double>& buffer) override {
+    void comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_grid_polar_c_comm_pack(as<fitpack_grid_polar_c>(), n, buffer.data());
     }
@@ -281,7 +293,7 @@ public:
     /**
      * @brief core_comm_pack
      */
-    void core_comm_pack(std::vector<double>& buffer) override {
+    void core_comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_grid_polar_c_core_comm_pack(as<fitpack_grid_polar_c>(), n, buffer.data());
     }
@@ -322,12 +334,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'u'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through u()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through u()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -335,22 +347,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_grid_polar_c_getcomp_u(as<fitpack_grid_polar_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "u", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "u", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -373,12 +379,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'v'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through v()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through v()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -386,22 +392,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_grid_polar_c_getcomp_v(as<fitpack_grid_polar_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "v", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "v", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -439,12 +439,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'z'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through z()(i, j) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through z()(i, j) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -452,22 +452,16 @@ public:
         double* raw = nullptr;
         int64_t extents[2] = {0, 0};
         fitpack_grid_polar_c_getcomp_z(as<fitpack_grid_polar_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "z", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(2);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[4];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 2; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "z", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(2), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -505,12 +499,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 't'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through t()(i, j) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through t()(i, j) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -518,22 +512,16 @@ public:
         double* raw = nullptr;
         int64_t extents[2] = {0, 0};
         fitpack_grid_polar_c_getcomp_t(as<fitpack_grid_polar_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "t", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(2);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[4];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 2; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "t", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(2), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -599,7 +587,7 @@ public:
     }
 
 protected:
-    explicit fpGridPolar(NoAlloc tag) : fxFitpackFitter(tag) {}
+    explicit fpGridPolar(NoAlloc tag) : fpFitter(tag) {}
 
 };
 

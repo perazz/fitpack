@@ -1,18 +1,20 @@
 #!/bin/bash
 # Extract the C ABI of the Fortran binding layer, and diff it against another git revision.
 #
-# Usage:
-#   ./abi_symbols.sh                 # list the current symbols, one `name(args)` per line
-#   ./abi_symbols.sh --at <ref>      # list the symbols of a git revision instead
-#   ./abi_symbols.sh --diff <ref>    # classify the current ABI against <ref> (e.g. main, 1.0.0)
+# Usage (from anywhere — the script locates the repository from its own path):
+#   ./scripts/abi_symbols.sh                 # list the current symbols, one `name(args)` per line
+#   ./scripts/abi_symbols.sh --at <ref>      # list the symbols of a git revision instead
+#   ./scripts/abi_symbols.sh --diff <ref>    # classify the current ABI against <ref> (e.g. main, 1.0.0)
 #
-# A symbol is any procedure carrying `bind(C, name='...')` in src/*_c.f90. The argument list
-# comes from the Fortran declaration, so the diff separates a pure rename from a signature
-# change. Types declared `bind(C)` are storage layout, not symbols, and are not listed.
+# A symbol is any procedure carrying `bind(C, name='...')` under src/. The argument list comes
+# from the Fortran declaration, so the diff separates a pure rename from a signature change.
+# Types declared `bind(C)` are storage layout, not symbols, and are not listed. Both sides of a
+# diff scan src/ recursively, so a revision predating the src/capi/ layout compares cleanly.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 AWK_EXTRACT='
 function flush_logical(line,   name, rest, depth, i, ch, args, start) {
@@ -60,14 +62,14 @@ END { if (cont != "") flush_logical(cont) }
 # Symbols of the working tree.
 current_symbols() {
     # shellcheck disable=SC2046
-    awk "$AWK_EXTRACT" $(ls "$SCRIPT_DIR"/src/*_c.f90) | LC_ALL=C sort -u
+    awk "$AWK_EXTRACT" $(find "$REPO_ROOT/src" -name '*_c.f90' | LC_ALL=C sort) | LC_ALL=C sort -u
 }
 
 # Symbols of a git revision.
 ref_symbols() {
     local ref="$1" f
-    for f in $(git -C "$SCRIPT_DIR" ls-tree -r --name-only "$ref" -- src | grep '_c\.f90$'); do
-        git -C "$SCRIPT_DIR" show "$ref:$f" | awk "$AWK_EXTRACT"
+    for f in $(git -C "$REPO_ROOT" ls-tree -r --name-only "$ref" -- src | grep '_c\.f90$'); do
+        git -C "$REPO_ROOT" show "$ref:$f" | awk "$AWK_EXTRACT"
     done | LC_ALL=C sort -u
 }
 

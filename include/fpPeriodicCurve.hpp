@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fpPeriodicCurve.hpp                                                                     **
- *   ** @brief Standalone C++ wrapper for fitpack_periodic_curve (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fpPeriodicCurve.hpp (class fpPeriodicCurve)
+!> @brief Standalone C++ wrapper for fitpack_periodic_curve (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FPPERIODICCURVE_HPP_INCLUDED
 #define FPPERIODICCURVE_HPP_INCLUDED
@@ -26,7 +39,6 @@
 #include <stdexcept>
 #include <variant>
 #include <optional>
-#include <cstring>
 
 static_assert(sizeof(fitpack_periodic_curve_c) == sizeof(fitpack_curve_c),
     "C descriptor layout mismatch: fitpack_periodic_curve_c vs fitpack_curve_c");
@@ -204,25 +216,25 @@ public:
     /**
      * @brief new_fit
      */
-    int32_t new_fit(std::vector<double>& x, std::vector<double>& y, double* w = nullptr, double* smoothing = nullptr, int32_t* order = nullptr) const override {
+    int32_t new_fit(std::vector<double>& x, std::vector<double>& y, double* w = nullptr, double* smoothing = nullptr, int32_t* order = nullptr) override {
         int32_t n = static_cast<int32_t>(x.size());
         return fitpack_periodic_curve_c_new_fit(as<fitpack_periodic_curve_c>(), n, x.data(), y.data(), w, smoothing, order);
     }
 
 
-    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) const override {
+    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) override {
         return fitpack_periodic_curve_c_fit(as<fitpack_periodic_curve_c>(), smoothing, order, keep_knots);
     }
 
-    int32_t interpolate(int32_t* order = nullptr, bool* reset_knots = nullptr) const override {
+    int32_t interpolate(int32_t* order = nullptr, bool* reset_knots = nullptr) override {
         return fitpack_periodic_curve_c_interpolate(as<fitpack_periodic_curve_c>(), order, reset_knots);
     }
 
-    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const override {
+    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) override {
         return fitpack_periodic_curve_c_least_squares(as<fitpack_periodic_curve_c>(), smoothing, reset_knots);
     }
 
-    double eval(double x, int32_t& ierr) const override {
+    double eval(double x, int32_t& ierr) override {
         return fitpack_periodic_curve_c_curve_eval_one(as<fitpack_periodic_curve_c>(), x, &ierr);
     }
 
@@ -256,7 +268,7 @@ public:
     }
 
 
-    double integral(double from, double to) const override {
+    double integral(double from, double to) override {
         return fitpack_periodic_curve_c_integral(as<fitpack_periodic_curve_c>(), from, to);
     }
 
@@ -281,7 +293,7 @@ public:
     }
 
 
-    double dfdx(double x, int32_t order, int32_t* ierr = nullptr) const override {
+    double dfdx(double x, int32_t order, int32_t* ierr = nullptr) override {
         return fitpack_periodic_curve_c_curve_derivative(as<fitpack_periodic_curve_c>(), x, order, ierr);
     }
 
@@ -338,7 +350,7 @@ public:
     /**
      * @brief comm_pack
      */
-    void comm_pack(std::vector<double>& buffer) override {
+    void comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_periodic_curve_c_comm_pack(as<fitpack_periodic_curve_c>(), n, buffer.data());
     }
@@ -364,7 +376,7 @@ public:
     /**
      * @brief core_comm_pack
      */
-    void core_comm_pack(std::vector<double>& buffer) override {
+    void core_comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_periodic_curve_c_core_comm_pack(as<fitpack_periodic_curve_c>(), n, buffer.data());
     }

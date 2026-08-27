@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fitpack_surface_c.h                                                                          **
- *   ** @brief Standalone C interface to fitpack_surface (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fitpack_surface_c.h (module fitpack_surfaces)
+!> @brief Standalone C interface to fitpack_surface (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FITPACK_SURFACE_C_H_INCLUDED
 #define FITPACK_SURFACE_C_H_INCLUDED
@@ -15,7 +28,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* Minimal fx_status definition for standalone use.
+/* Minimal fp_status definition for standalone use.
  * Layout contract: this struct is the C half of type(fx_status) in the
  * generated <project>_fx_status module (templates/fortran_fx_status.f90.jinja2),
  * which in turn mirrors fortran-arrays' arrays_c. Field order, widths and
@@ -24,11 +37,17 @@
  * translation unit ahead of this header (via fxArrays.hpp), and it defines the
  * same struct and macro behind no FX_STATUS_DEFINED guard — so where both are
  * present the real definition wins and this copy stands down. */
-#if !defined(FX_STATUS_DEFINED) && !defined(ARRAYS_C_H_INCLUDED)
-#define FX_STATUS_DEFINED
+#ifndef FP_STATUS_TYPEDEF_INCLUDED
+#define FP_STATUS_TYPEDEF_INCLUDED
+#if defined(FX_STATUS_DEFINED) || defined(ARRAYS_C_H_INCLUDED)
+typedef fx_status fp_status;               /* the real fortran-arrays struct */
+#else
 #define FX_LEN_STATUS_MSG 248
-typedef struct fx_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fx_status;
+typedef struct fp_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fp_status;
+typedef fp_status fx_status;               /* layout-identical interop alias */
+#define FX_STATUS_DEFINED
 #endif
+#endif /* FP_STATUS_TYPEDEF_INCLUDED */
 
 #include "fitpack_capi_export.h"
 #include "fitpack_surfaces_c_types.h"  /* For fitpack_surface_c, fitpack_surface_c_null */
@@ -51,14 +70,14 @@ extern "C" {
  * @param self Pointer to wrapper (will be initialized)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_allocate(fitpack_surface_c* self, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_allocate(fitpack_surface_c* self, fp_status* status);
 
 /**
  * @brief Deallocate fitpack_surface object
  * @param self Pointer to wrapper (will be nullified)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_destroy(fitpack_surface_c* self, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_destroy(fitpack_surface_c* self, fp_status* status);
 
 /**
  * @brief Copy fitpack_surface object.
@@ -75,7 +94,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_destroy(fitpack_surface_c* self, fx_s
  *                  deep-copy data, even if the source is a view.
  * @param status    Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_copy(fitpack_surface_c* self, const fitpack_surface_c* other, bool deep_copy, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_copy(fitpack_surface_c* self, const fitpack_surface_c* other, bool deep_copy, fp_status* status);
 
 /**
  * @brief Shallow copy (pointer semantics — Fortran "associate" construct)
@@ -83,7 +102,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_copy(fitpack_surface_c* self, const f
  * @param other Source wrapper (read-only)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_associate(fitpack_surface_c* self, const fitpack_surface_c* other, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_associate(fitpack_surface_c* self, const fitpack_surface_c* other, fp_status* status);
 
 /**
  * @brief Move allocation (transfer ownership)
@@ -91,7 +110,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_associate(fitpack_surface_c* self, co
  * @param from Source wrapper (becomes null)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_move_alloc(fitpack_surface_c* to, fitpack_surface_c* from, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_move_alloc(fitpack_surface_c* to, fitpack_surface_c* from, fp_status* status);
 
 /* ===========================================================================================
  * Method Wrappers (standalone-compatible only)
@@ -104,14 +123,14 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_move_alloc(fitpack_surface_c* to, fit
  * @param keep_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_fit(const fitpack_surface_c* self, double* smoothing, int32_t* order, bool* keep_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_fit(fitpack_surface_c* self, double* smoothing, int32_t* order, bool* keep_knots);
 
 /**
  * @brief interpolate
  * @param reset_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_interpolate(const fitpack_surface_c* self, bool* reset_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_interpolate(fitpack_surface_c* self, bool* reset_knots);
 
 /**
  * @brief least_squares
@@ -119,7 +138,7 @@ FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_interpolate(const fitpack_surface_
  * @param reset_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_least_squares(const fitpack_surface_c* self, double* smoothing, bool* reset_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_least_squares(fitpack_surface_c* self, double* smoothing, bool* reset_knots);
 
 /**
  * @brief surface_eval_one
@@ -128,7 +147,7 @@ FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_least_squares(const fitpack_surfac
  * @param ierr 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_eval_one(const fitpack_surface_c* self, double x, double y, int32_t* ierr);
+FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_eval_one(fitpack_surface_c* self, double x, double y, int32_t* ierr);
 
 /**
  * @brief surface_derivatives_one
@@ -139,7 +158,7 @@ FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_eval_one(const fitpack_surf
  * @param ierr 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_derivatives_one(const fitpack_surface_c* self, double x, double y, int32_t dx, int32_t dy, int32_t* ierr);
+FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_derivatives_one(fitpack_surface_c* self, double x, double y, int32_t dx, int32_t dy, int32_t* ierr);
 
 /**
  * @brief cross_section
@@ -147,7 +166,7 @@ FITPACK_CAPI_EXPORT double fitpack_surface_c_surface_derivatives_one(const fitpa
  * @param along_y 
  * @param ierr 
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_cross_section(fitpack_surface_c* self, double u, bool along_y, int32_t* ierr, fitpack_curve_c* result);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_cross_section(const fitpack_surface_c* self, double u, bool along_y, int32_t* ierr, fitpack_curve_c* result);
 
 /**
  * @brief derivative_spline
@@ -155,7 +174,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_cross_section(fitpack_surface_c* self
  * @param nuy 
  * @param ierr 
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_derivative_spline(fitpack_surface_c* self, int32_t nux, int32_t nuy, int32_t* ierr, fitpack_surface_c* result);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_derivative_spline(const fitpack_surface_c* self, int32_t nux, int32_t nuy, int32_t* ierr, fitpack_surface_c* result);
 
 /**
  * @brief comm_size
@@ -199,7 +218,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_new_points(fitpack_surface_c* self, i
  * @param order 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_new_fit(const fitpack_surface_c* self, int32_t n, const double* x, const double* y, const double* z, double* w, double* smoothing, int32_t* order);
+FITPACK_CAPI_EXPORT int32_t fitpack_surface_c_new_fit(fitpack_surface_c* self, int32_t n, const double* x, const double* y, const double* z, double* w, double* smoothing, int32_t* order);
 
 /**
  * @brief surface_eval_many
@@ -253,7 +272,7 @@ FITPACK_CAPI_EXPORT double fitpack_surface_c_integral(const fitpack_surface_c* s
  * @brief comm_pack
  * @param buffer 
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_comm_pack(fitpack_surface_c* self, int32_t n, double* buffer);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_comm_pack(const fitpack_surface_c* self, int32_t n, double* buffer);
 
 /**
  * @brief comm_expand
@@ -265,7 +284,7 @@ FITPACK_CAPI_EXPORT void fitpack_surface_c_comm_expand(fitpack_surface_c* self, 
  * @brief core_comm_pack
  * @param buffer 
  */
-FITPACK_CAPI_EXPORT void fitpack_surface_c_core_comm_pack(fitpack_surface_c* self, int32_t n, double* buffer);
+FITPACK_CAPI_EXPORT void fitpack_surface_c_core_comm_pack(const fitpack_surface_c* self, int32_t n, double* buffer);
 
 /**
  * @brief core_comm_expand
