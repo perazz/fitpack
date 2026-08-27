@@ -1,23 +1,19 @@
 #ifndef FITPACK_HPP_INCLUDED
 #define FITPACK_HPP_INCLUDED
 
-// Base types
-#include "fxFitpackFitter.hpp"
+// Get whole C library
+#include "fitpack_core_c.h"
+#include "fitpack_curves_c.h"
+#include "fitpack_closed_curves_c.h"
+#include "fitpack_constrained_curves_c.h"
+#include "fitpack_parametric_curves_c.h"
+#include "fitpack_periodic_curves_c.h"
 
-// Derived types
+// Get whole C++ library
 #include "fpCurve.hpp"
-#include "fpGridPolar.hpp"
-#include "fpGridSphere.hpp"
-#include "fpGridSpline.hpp"
-#include "fpGridSurface.hpp"
-#include "fpParametricCurve.hpp"
-#include "fpParametricSurface.hpp"
-#include "fpPolar.hpp"
-#include "fpSphere.hpp"
-#include "fpSurface.hpp"
-#include "fpConvexCurve.hpp"
-#include "fpPeriodicCurve.hpp"
 #include "fpClosedCurve.hpp"
 #include "fpConstrainedCurve.hpp"
+#include "fpParametricCurve.hpp"
+#include "fpPeriodicCurve.hpp"
 
 #endif // FITPACK_HPP_INCLUDED

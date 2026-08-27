@@ -37,53 +37,17 @@ Class      | Description | Degree
 
 ### `C`, `C++` interfaces
 
-The C and C++ header-only interfaces are found in the `include` folder. Every fitter class is bound:
+The C and C++ header-only interfaces are found in the `include` folder. The following scheme shows a comparison between the Fortran, C++ and C struct names for the currently available classes: 
 
 Fortran      | C | C++
 ---        | ---         | ---
-`fitpack_fitter` (abstract) | `fitpack_fitter_c` | `fxFitpackFitter`
 `fitpack_curve` | `fitpack_curve_c` | `fpCurve`
 `fitpack_periodic_curve` | `fitpack_periodic_curve_c` | `fpPeriodicCurve`
 `fitpack_parametric_curve` | `fitpack_parametric_curve_c` | `fpParametricCurve`
 `fitpack_closed_curve` | `fitpack_closed_curve_c` | `fpClosedCurve`
 `fitpack_constrained_curve` | `fitpack_constrained_curve_c` | `fpConstrainedCurve`
-`fitpack_convex_curve` | `fitpack_convex_curve_c` | `fpConvexCurve`
-`fitpack_surface` | `fitpack_surface_c` | `fpSurface`
-`fitpack_grid_surface` | `fitpack_grid_surface_c` | `fpGridSurface`
-`fitpack_gridded_spline` | `fitpack_gridded_spline_c` | `fpGridSpline`
-`fitpack_parametric_surface` | `fitpack_parametric_surface_c` | `fpParametricSurface`
-`fitpack_polar` | `fitpack_polar_c` | `fpPolar`
-`fitpack_grid_polar` | `fitpack_grid_polar_c` | `fpGridPolar`
-`fitpack_sphere` | `fitpack_sphere_c` | `fpSphere`
-`fitpack_grid_sphere` | `fitpack_grid_sphere_c` | `fpGridSphere`
 
-The choice to provide a header-only `C++` implementation is motivated by the need to keep the library C-ABI compatible whatever compiler is being used to build it. For example, on macOS, one may build the library with g++/gfortran, that is not ABI-compatible with clang++. So, it is important that no C++ code is compiled together with the Fortran code in the library. The headers require C++17.
-
-#### Generated bindings
-
-Everything under `include/`, and every `src/*_c.f90` except `src/fitpack_core_c.f90`, is produced by the [fortran-arrays](https://github.com/perazz/fortran-arrays) binding generator from `fitpack_bindings.yaml`. **Never hand-edit a generated file**: change the Fortran source, the config, or an ergonomic snippet under `extra_methods/`, then re-run
-
-```bash
-FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings ./generate_bindings.sh
-```
-
-The hand-written parts of the interface are `src/fitpack_core_c.f90` and `include/fitpack_core_c.h` (the 25 `fp_*_c` core procedures; that header is pure C), `include/fpPoint.hpp`, and the snippets in `extra_methods/`.
-
-On Windows, define `FITPACK_CAPI_STATIC` before including any fitpack header when linking the static archive: the export macro otherwise defaults to `__declspec(dllimport)`.
-
-#### Points: `fpPoint<dims>`
-
-A point of a parametric curve, or a scattered evaluation site of an N-D gridded spline, is an `fpPoint<dims>` — a fixed-size, standard-layout wrapper over `std::array<FP_REAL,dims>`:
-
-```cpp
-std::vector<fpPoint<2>> xy = {{0.0, 0.0}, {1.0, 1.0}, {2.0, 0.0}};
-
-fpParametricCurve curve;
-FP_FLAG ierr = curve.new_fit(xy, 0.05);      // dims deduced from the argument
-fpPoint<2> p = curve.eval<2>(0.5, &ierr);    // dims explicit where it is the return type
-```
-
-A `std::vector<fpPoint<dims>>` is bit-identical to the Fortran `x(dims,m)` it feeds, so there is no per-point allocation and no scatter loop. This replaces the pre-2.0.0 `typedef std::vector<FP_REAL> fpPoint`, which cost one heap allocation per point and leaked C++ into the nominally-C `fitpack_core_c.h`. See [doc/abi_changes_2.0.0.md](doc/abi_changes_2.0.0.md) for the full migration list; `./abi_symbols.sh --diff <ref>` regenerates it.
+The choice to provide a header-only `C++` implementation is motivated by the need to keep the library C-ABI compatible whatever compiler is being used to build it. For example, on macOS, one may build the library with g++/gfortran, that is not ABI-compatible with clang++. So, it is important that no C++ code is compiled together with the Fortran code in the library.
 
 Building, using
 ===============

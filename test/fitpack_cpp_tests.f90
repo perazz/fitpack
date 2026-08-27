@@ -30,7 +30,6 @@ module fitpack_cpp_tests
     public :: test_cpp_parametric_fit
     public :: test_cpp_closed_fit
     public :: test_cpp_constrained_fit
-    public :: test_cpp_ergonomics
 
     interface
         logical(FP_BOOL) function test_cpp_sine_fit() bind(C,name="test_cpp_sine_fit")
@@ -48,9 +47,6 @@ module fitpack_cpp_tests
         logical(FP_BOOL) function test_cpp_constrained_fit() bind(C,name="test_cpp_constrained_fit")
            import FP_BOOL
         end function test_cpp_constrained_fit
-        logical(FP_BOOL) function test_cpp_ergonomics() bind(C,name="test_cpp_ergonomics")
-           import FP_BOOL
-        end function test_cpp_ergonomics
     end interface
 
     contains

@@ -6,10 +6,6 @@ jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
-    env:
-      # The generated C++ wrappers need C++17 (<variant>, <optional>). g++ 10 still
-      # defaults to gnu++14, so say it explicitly rather than rely on the compiler default.
-      FPM_CXXFLAGS: -std=c++17
     strategy:
       matrix:
         os: [ubuntu-latest]
