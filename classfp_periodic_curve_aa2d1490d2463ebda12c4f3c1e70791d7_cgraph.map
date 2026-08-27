@@ -1,0 +1,8 @@
+<map id="fpPeriodicCurve::insert_knot" name="fpPeriodicCurve::insert_knot">
+<area shape="rect" id="Node000001" title="insert_knot" alt="" coords="5,5,212,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="397,5,489,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,15,384,15,384,21,212,21"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="260,31,349,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,28,247,33,246,39,207,33"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="349,33,383,26,384,31,350,38"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="fpGridSphere::operator=" name="fpGridSphere::operator=">
+<area shape="rect" id="Node000001" title="Move assignment &#45; transfer ownership." alt="" coords="5,29,187,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="499,5,591,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,35,485,18,485,24,187,40"/>
+<area shape="rect" id="Node000003" href="$classfp_grid_sphere.html#a57d02a6941efd17ebfaf148ee18731ae" title="Default constructor &#45; allocates new fitpack_grid_sphere." alt="" coords="235,55,435,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,49,221,53,221,58,187,54"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="389,52,485,29,486,34,390,57"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="483,55,607,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="435,65,469,65,469,70,435,70"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="fpPolar::new_points" name="fpPolar::new_points">
+<area shape="rect" id="Node000001" title="new_points" alt="" coords="5,76,156,102"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="339,76,431,102"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,74,141,41,171,24,203,12,247,3,268,5,292,12,333,35,365,63,361,67,330,39,290,17,267,10,248,8,205,17,173,29,144,45,98,78"/>
+<area shape="rect" id="Node000003" href="$classfp_polar.html#a6e45259bf17d7b219bc61c91711ffedf" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="204,27,291,52"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,74,190,54,192,59,125,79"/>
+<area shape="rect" id="Node000004" href="$classfp_polar.html#aed567c42a8bce1f6dce0e411f71aae61" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="205,76,289,102"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="156,86,192,86,192,92,156,92"/>
+<area shape="rect" id="Node000005" href="$classfp_polar.html#ab5e62a8b02b5d35063054514368a46e9" title="Zero&#45;copy fxArray view of component &#39;y&#39;." alt="" coords="205,126,289,151"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="125,99,193,119,191,124,123,104"/>
+<area shape="rect" id="Node000006" href="$classfp_polar.html#a08ca1f4cfd81bfa9e85b13244b0121c8" title="Zero&#45;copy fxArray view of component &#39;z&#39;." alt="" coords="206,175,289,200"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="104,99,214,165,211,170,102,104"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="284,50,336,69,335,74,282,55"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="289,86,325,86,325,92,289,92"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="282,123,335,104,336,109,284,128"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="270,172,289,160,356,108,359,113,292,164,273,177"/>
+</map>

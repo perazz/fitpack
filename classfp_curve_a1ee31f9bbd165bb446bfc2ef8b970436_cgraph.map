@@ -1,0 +1,8 @@
+<map id="fpCurve::dfdx_all" name="fpCurve::dfdx_all">
+<area shape="rect" id="Node000001" title="dfdx_all" alt="" coords="5,5,139,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="324,5,416,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,15,310,15,310,21,139,21"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="187,31,276,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,26,174,32,173,37,138,31"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="276,33,310,26,311,31,277,38"/>
+</map>

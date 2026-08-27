@@ -1,0 +1,8 @@
+<map id="fpClosedCurve::least_squares" name="fpClosedCurve::least_squares">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,163,45"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="405,13,497,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,23,391,23,391,28,163,28"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="211,38,357,63"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,33,198,37,197,42,162,38"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="357,37,392,32,392,37,358,42"/>
+</map>

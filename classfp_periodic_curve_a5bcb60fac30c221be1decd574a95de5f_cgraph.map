@@ -1,0 +1,9 @@
+<map id="fpPeriodicCurve::as_parent" name="fpPeriodicCurve::as_parent">
+<area shape="rect" id="Node000001" title="Upcast to parent type (reference, no copy)" alt="" coords="5,23,153,63"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html#ad0b5c0d3a3b706a3e41c16959a02abfc" title="Default constructor &#45; allocates new fitpack_curve." alt="" coords="201,31,333,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,41,188,41,188,46,153,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="397,5,489,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="333,31,383,24,384,29,334,36"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="381,55,505,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="334,50,368,54,367,60,333,55"/>
+</map>

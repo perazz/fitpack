@@ -1,0 +1,9 @@
+<map id="fpConstrainedCurve::constrain_begin" name="fpConstrainedCurve::constrain_begin">
+<area shape="rect" id="Node000001" title="Pin the begin endpoint; leave the end endpoint free." alt="" coords="5,27,156,67"/>
+<area shape="rect" id="Node000002" href="$fp_point_8hpp.html#ab4fb83d816128b74db86d355a5a0278c" title="Borrow a vector of points as a Fortran x(dims,m) buffer. No copy, no allocation." alt="" coords="230,5,329,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,34,216,25,217,30,156,39"/>
+<area shape="rect" id="Node000003" href="$classfp_constrained_curve.html#a910579d8902791d77474e1073b6217f1" title="set_constraints" alt="" coords="204,55,355,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,55,191,60,190,65,156,61"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="403,63,495,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="355,73,389,73,389,78,355,78"/>
+</map>

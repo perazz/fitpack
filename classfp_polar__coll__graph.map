@@ -1,0 +1,5 @@
+<map id="fpPolar" name="fpPolar">
+<area shape="rect" id="Node000001" title="Standalone C++ RAII wrapper for Fortran fitpack_polar." alt="" coords="6,79,74,104"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html" title="Standalone C++ RAII wrapper for Fortran fitpack_fitter." alt="" coords="5,5,75,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="43,44,43,79,37,79,37,44"/>
+</map>

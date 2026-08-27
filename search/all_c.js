@@ -5,6 +5,6 @@ var searchData=
   ['handling_2',['Handling',['../tutorial_curve.html#autotoc_md103',1,'Error Handling'],['../tutorial_parametric_curves.html#autotoc_md122',1,'Error Handling'],['../tutorial_surface.html#autotoc_md145',1,'Error Handling'],['../tutorial_polar.html#autotoc_md172',1,'Error Handling']]],
   ['harmonic_20test_20function_3',['Example: Spherical Harmonic Test Function',['../tutorial_sphere.html#autotoc_md180',1,'']]],
   ['harmonics_20connection_4',['Spherical Harmonics Connection',['../tutorial_sphere.html#autotoc_md176',1,'']]],
-  ['has_5fparams_5',['has_params',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a569f3e04ec00a8340e7a4b1d9b9f9dd5',1,'fitpack_parametric_curves::fitpack_parametric_curve']]],
+  ['has_5fparams_5',['has_params',['../structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a569f3e04ec00a8340e7a4b1d9b9f9dd5',1,'fitpack_parametric_curves::fitpack_parametric_curve::has_params'],['../classfp_parametric_curve.html#a7f9827a5e4e920a323f8f3f242bd5d32',1,'fpParametricCurve::has_params()']]],
   ['hierarchy_6',['Type Hierarchy',['../index.html#autotoc_md3',1,'']]]
 ];

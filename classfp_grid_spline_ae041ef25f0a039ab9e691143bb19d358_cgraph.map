@@ -1,0 +1,14 @@
+<map id="fpGridSpline::dfdx" name="fpGridSpline::dfdx">
+<area shape="rect" id="Node000001" title="Partial derivative of orders nu(1..dim) at every scattered point." alt="" coords="5,55,144,80"/>
+<area shape="rect" id="Node000002" href="$classfp_grid_spline.html#ab91c4953f66dcb451f07107d7a965e25" title="dfdx" alt="" coords="194,5,333,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,52,200,32,201,37,125,57"/>
+<area shape="rect" id="Node000004" href="$classfp_grid_spline.html#a256aba5ecdfe26b13161a398b2d3cc65" title=" " alt="" coords="192,55,335,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,65,179,65,179,70,144,70"/>
+<area shape="rect" id="Node000005" href="$fp_point_8hpp.html#af0e521deb43bd73530e0c3ecd578801e" title="Flatten a vector of points into Fortran x(dims,m) order. One contiguous copy." alt="" coords="206,104,321,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="125,77,201,98,200,103,123,83"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="386,31,478,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="334,26,373,32,372,37,333,31"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="335,55,372,49,373,54,335,60"/>
+<area shape="rect" id="Node000006" href="$fp_point_8hpp.html#ab4fb83d816128b74db86d355a5a0278c" title="Borrow a vector of points as a Fortran x(dims,m) buffer. No copy, no allocation." alt="" coords="383,104,481,129"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="321,114,369,114,369,119,321,119"/>
+</map>

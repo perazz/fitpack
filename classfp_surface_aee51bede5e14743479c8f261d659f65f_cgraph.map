@@ -1,0 +1,11 @@
+<map id="fpSurface::dfdx" name="fpSurface::dfdx">
+<area shape="rect" id="Node000001" title="dfdx" alt="" coords="5,22,127,48"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="323,22,415,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,20,174,7,225,3,275,7,317,16,316,21,274,12,225,8,175,12,111,25"/>
+<area shape="rect" id="Node000003" href="$classfp_surface.html#a67ad9433edfcf3eb7b29d7aeb9d27530" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="175,22,275,48"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,32,161,32,161,38,127,38"/>
+<area shape="rect" id="Node000004" href="$classfp_surface.html#addecce3f81028ca4f58eb649fdab6b59" title="Zero&#45;copy fxArray view of component &#39;y&#39;." alt="" coords="175,72,275,97"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="108,45,171,65,169,70,107,50"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="275,32,309,32,309,38,275,38"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="262,69,317,50,319,55,263,74"/>
+</map>

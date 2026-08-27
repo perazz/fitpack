@@ -1,0 +1,9 @@
+<map id="fpSphere::make_view" name="fpSphere::make_view">
+<area shape="rect" id="Node000001" title="Construct an empty (non&#45;owning) wrapper, for use as a view target." alt="" coords="5,31,168,56"/>
+<area shape="rect" id="Node000002" href="$classfp_sphere.html#a3ce079991303974a654cd3006b492884" title="Default constructor &#45; allocates new fitpack_sphere." alt="" coords="216,31,363,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,41,202,41,202,46,168,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="427,5,519,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,31,413,24,413,29,363,36"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="411,55,535,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="363,50,397,55,397,60,363,56"/>
+</map>

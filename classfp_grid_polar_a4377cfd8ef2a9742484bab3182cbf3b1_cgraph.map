@@ -1,0 +1,8 @@
+<map id="fpGridPolar::fit" name="fpGridPolar::fit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,121,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="364,5,456,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,15,350,15,350,21,121,21"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="169,31,316,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,24,156,28,155,34,121,29"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="316,30,350,24,351,30,317,35"/>
+</map>

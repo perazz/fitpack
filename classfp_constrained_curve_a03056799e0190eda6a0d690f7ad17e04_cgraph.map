@@ -1,0 +1,9 @@
+<map id="fpConstrainedCurve::fpConstrainedCurve" name="fpConstrainedCurve::fpConstrainedCurve">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,164,63"/>
+<area shape="rect" id="Node000002" href="$classfp_parametric_curve.html#a05e4fa4d2bf89cd65950320257ffe5eb" title="Default constructor &#45; allocates new fitpack_parametric_curve." alt="" coords="212,23,363,63"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,41,198,41,198,46,164,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="427,5,519,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,30,413,23,413,29,363,36"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="411,55,535,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="363,50,397,55,397,60,363,56"/>
+</map>

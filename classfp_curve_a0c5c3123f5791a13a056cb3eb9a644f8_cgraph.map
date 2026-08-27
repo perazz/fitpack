@@ -1,0 +1,26 @@
+<map id="fpCurve::new_fit" name="fpCurve::new_fit">
+<area shape="rect" id="Node000001" title="Fit a new curve through (x, y) with per&#45;point weights w." alt="" coords="5,155,133,180"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html#a93181083ccd8d3de3b2392644c6cb7d4" title="new_fit" alt="" coords="181,104,309,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,152,186,131,188,136,115,157"/>
+<area shape="rect" id="Node000005" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="357,5,504,31"/>
+<area shape="poly" id="edge13_Node000001_Node000005" title=" " alt="" coords="84,152,126,121,180,89,268,55,353,31,354,36,270,60,182,94,129,126,87,157"/>
+<area shape="rect" id="Node000006" href="$classfp_curve.html#ad466a55bc793366e85c40fd58a3bf108" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="385,156,477,181"/>
+<area shape="poly" id="edge14_Node000001_Node000006" title=" " alt="" coords="134,165,370,166,370,171,134,170"/>
+<area shape="rect" id="Node000007" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="386,205,475,231"/>
+<area shape="poly" id="edge15_Node000001_Node000007" title=" " alt="" coords="134,174,373,207,372,213,133,179"/>
+<area shape="rect" id="Node000008" href="$classfp_curve.html#ac12897c52d8d5a75cb00677a52d7a22c" title="Zero&#45;copy fxArray view of component &#39;y&#39;." alt="" coords="386,255,475,280"/>
+<area shape="poly" id="edge16_Node000001_Node000008" title=" " alt="" coords="105,177,182,203,373,252,372,257,181,209,103,183"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="552,132,644,157"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,101,335,92,389,84,447,83,505,91,539,105,570,122,567,127,537,109,503,97,447,89,390,90,336,97,291,107"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#a5ed50f73b5c9947b484a2a1dd001def8" title=" " alt="" coords="373,107,488,132"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="310,115,360,116,360,121,309,120"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="265,102,356,48,385,34,387,39,359,52,268,106"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="292,127,372,150,371,155,291,132"/>
+<area shape="poly" id="edge9_Node000002_Node000007" title=" " alt="" coords="264,127,306,158,359,190,375,198,373,203,356,195,303,163,261,132"/>
+<area shape="poly" id="edge11_Node000002_Node000008" title=" " alt="" coords="257,128,296,182,325,214,359,241,375,250,372,254,356,246,322,218,292,186,252,131"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="489,125,539,133,538,138,488,131"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="469,28,505,48,547,83,580,119,576,123,543,87,503,52,467,33"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="477,159,538,151,539,156,477,165"/>
+<area shape="poly" id="edge10_Node000007_Node000003" title=" " alt="" coords="470,203,503,190,561,161,564,166,505,195,472,208"/>
+<area shape="poly" id="edge12_Node000008_Node000003" title=" " alt="" coords="474,254,503,241,545,205,578,167,582,170,549,209,505,246,477,259"/>
+</map>

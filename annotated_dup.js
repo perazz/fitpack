@@ -164,5 +164,24 @@ var annotated_dup =
     [ "fitpack_surfaces_c_types", "namespacefitpack__surfaces__c__types.html", [
       [ "f_type_name", "interfacefitpack__surfaces__c__types_1_1f__type__name.html", "interfacefitpack__surfaces__c__types_1_1f__type__name" ],
       [ "fitpack_surface_c", "structfitpack__surfaces__c__types_1_1fitpack__surface__c.html", "structfitpack__surfaces__c__types_1_1fitpack__surface__c" ]
-    ] ]
+    ] ],
+    [ "fp_detail", "namespacefp__detail.html", [
+      [ "fpPointLayout", "structfp__detail_1_1fp_point_layout.html", "structfp__detail_1_1fp_point_layout" ]
+    ] ],
+    [ "fpClosedCurve", "classfp_closed_curve.html", "classfp_closed_curve" ],
+    [ "fpConstrainedCurve", "classfp_constrained_curve.html", "classfp_constrained_curve" ],
+    [ "fpConvexCurve", "classfp_convex_curve.html", "classfp_convex_curve" ],
+    [ "fpCurve", "classfp_curve.html", "classfp_curve" ],
+    [ "fpFitter", "classfp_fitter.html", "classfp_fitter" ],
+    [ "fpGridPolar", "classfp_grid_polar.html", "classfp_grid_polar" ],
+    [ "fpGridSphere", "classfp_grid_sphere.html", "classfp_grid_sphere" ],
+    [ "fpGridSpline", "classfp_grid_spline.html", "classfp_grid_spline" ],
+    [ "fpGridSurface", "classfp_grid_surface.html", "classfp_grid_surface" ],
+    [ "fpParametricCurve", "classfp_parametric_curve.html", "classfp_parametric_curve" ],
+    [ "fpParametricSurface", "classfp_parametric_surface.html", "classfp_parametric_surface" ],
+    [ "fpPeriodicCurve", "classfp_periodic_curve.html", "classfp_periodic_curve" ],
+    [ "fpPoint", "structfp_point.html", "structfp_point" ],
+    [ "fpPolar", "classfp_polar.html", "classfp_polar" ],
+    [ "fpSphere", "classfp_sphere.html", "classfp_sphere" ],
+    [ "fpSurface", "classfp_surface.html", "classfp_surface" ]
 ];

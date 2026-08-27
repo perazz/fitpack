@@ -39,5 +39,6 @@ var searchData=
   ['fitpack_5fsphere_5fdomains_5fc_5ftypes_36',['fitpack_sphere_domains_c_types',['../namespacefitpack__sphere__domains__c__types.html',1,'']]],
   ['fitpack_5fsurfaces_37',['fitpack_surfaces',['../namespacefitpack__surfaces.html',1,'']]],
   ['fitpack_5fsurfaces_5fc_38',['fitpack_surfaces_c',['../namespacefitpack__surfaces__c.html',1,'']]],
-  ['fitpack_5fsurfaces_5fc_5ftypes_39',['fitpack_surfaces_c_types',['../namespacefitpack__surfaces__c__types.html',1,'']]]
+  ['fitpack_5fsurfaces_5fc_5ftypes_39',['fitpack_surfaces_c_types',['../namespacefitpack__surfaces__c__types.html',1,'']]],
+  ['fp_5fdetail_40',['fp_detail',['../namespacefp__detail.html',1,'']]]
 ];

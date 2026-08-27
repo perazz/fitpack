@@ -1,0 +1,8 @@
+<map id="fpPeriodicCurve::interpolate" name="fpPeriodicCurve::interpolate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,209,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="420,5,512,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,15,406,15,406,21,210,21"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a5ed50f73b5c9947b484a2a1dd001def8" title=" " alt="" coords="257,31,372,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,28,244,32,243,37,209,33"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="372,31,406,25,407,31,373,36"/>
+</map>

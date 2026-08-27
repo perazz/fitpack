@@ -91,5 +91,27 @@ var hierarchy =
     [ "fitpack_core::fp_comm_expand", "interfacefitpack__core_1_1fp__comm__expand.html", null ],
     [ "fitpack_core::fp_comm_pack", "interfacefitpack__core_1_1fp__comm__pack.html", null ],
     [ "fitpack_core::fp_comm_size", "interfacefitpack__core_1_1fp__comm__size.html", null ],
-    [ "fitpack_fx_status::fx_status", "structfitpack__fx__status_1_1fx__status.html", null ]
+    [ "fpFitter", "classfp_fitter.html", [
+      [ "fpCurve", "classfp_curve.html", [
+        [ "fpConvexCurve", "classfp_convex_curve.html", null ],
+        [ "fpPeriodicCurve", "classfp_periodic_curve.html", null ]
+      ] ],
+      [ "fpGridPolar", "classfp_grid_polar.html", null ],
+      [ "fpGridSphere", "classfp_grid_sphere.html", null ],
+      [ "fpGridSpline", "classfp_grid_spline.html", null ],
+      [ "fpGridSurface", "classfp_grid_surface.html", null ],
+      [ "fpParametricCurve", "classfp_parametric_curve.html", [
+        [ "fpClosedCurve", "classfp_closed_curve.html", null ],
+        [ "fpConstrainedCurve", "classfp_constrained_curve.html", null ]
+      ] ],
+      [ "fpParametricSurface", "classfp_parametric_surface.html", null ],
+      [ "fpPolar", "classfp_polar.html", null ],
+      [ "fpSphere", "classfp_sphere.html", null ],
+      [ "fpSurface", "classfp_surface.html", null ]
+    ] ],
+    [ "fpPoint< dims >", "structfp_point.html", null ],
+    [ "fp_detail::fpPointLayout< dims >", "structfp__detail_1_1fp_point_layout.html", null ],
+    [ "fitpack_fx_status::fx_status", "structfitpack__fx__status_1_1fx__status.html", null ],
+    [ "fpFitter::NoAlloc", "structfp_fitter_1_1_no_alloc.html", null ],
+    [ "fpFitter::ViewTag", "structfp_fitter_1_1_view_tag.html", null ]
 ];

@@ -1,0 +1,7 @@
+<map id="fpParametricCurve::degree" name="fpParametricCurve::degree">
+<area shape="rect" id="Node000001" title="Spline degree k of the current fit." alt="" coords="5,5,156,45"/>
+<area shape="rect" id="Node000002" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="204,5,355,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,23,190,23,190,28,156,28"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="403,13,495,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,23,389,23,389,28,355,28"/>
+</map>

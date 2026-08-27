@@ -1,0 +1,5 @@
+<map id="fpPointFlatten" name="fpPointFlatten">
+<area shape="rect" id="Node000001" title="Flatten a vector of points into Fortran x(dims,m) order. One contiguous copy." alt="" coords="5,5,120,31"/>
+<area shape="rect" id="Node000002" href="$fp_point_8hpp.html#ab4fb83d816128b74db86d355a5a0278c" title="Borrow a vector of points as a Fortran x(dims,m) buffer. No copy, no allocation." alt="" coords="168,5,267,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,15,154,15,154,21,120,21"/>
+</map>

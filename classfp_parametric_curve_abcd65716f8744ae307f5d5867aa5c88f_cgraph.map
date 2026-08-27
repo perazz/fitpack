@@ -1,0 +1,11 @@
+<map id="fpParametricCurve::fit" name="fpParametricCurve::fit">
+<area shape="rect" id="Node000001" title="Refit the current points with a new smoothing and spline order." alt="" coords="5,42,169,67"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="54,44,46,34,50,24,64,18,87,15,116,19,127,28,124,32,114,24,87,21,65,23,54,27,52,33,58,40"/>
+<area shape="rect" id="Node000002" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="217,5,368,45"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="169,40,203,35,204,41,170,46"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="219,70,366,95"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="170,63,206,68,205,73,169,68"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="416,42,508,67"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="369,36,403,42,402,47,368,41"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="366,68,402,62,403,67,367,73"/>
+</map>

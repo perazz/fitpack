@@ -1,0 +1,11 @@
+<map id="fpPolar::fpPolar" name="fpPolar::fpPolar">
+<area shape="rect" id="Node000001" title="Copy constructor &#45; deep copy." alt="" coords="5,29,128,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="363,5,455,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,27,176,14,267,9,349,11,348,16,267,14,176,19,112,32"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="347,55,471,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,52,176,65,257,70,333,69,333,74,257,75,176,70,111,57"/>
+<area shape="rect" id="Node000004" href="$classfp_polar.html#a360c99d103fc42d790d57a9d47403b56" title="Default constructor &#45; allocates new fitpack_polar." alt="" coords="176,29,299,55"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="128,39,162,39,162,45,128,45"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="299,31,348,24,349,29,299,36"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="299,48,333,53,332,59,299,54"/>
+</map>

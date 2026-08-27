@@ -1,0 +1,14 @@
+<map id="fpConstrainedCurve::new_points" name="fpConstrainedCurve::new_points">
+<area shape="rect" id="Node000001" title="new_points" alt="" coords="5,48,156,88"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="415,56,507,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,46,159,28,203,15,249,6,286,3,322,5,367,15,402,28,432,45,430,50,400,33,366,20,321,11,286,8,250,12,205,20,161,33,121,50"/>
+<area shape="rect" id="Node000003" href="$classfp_parametric_curve.html#a4b86c363b1ade24d29a727fc3a294f72" title="Zero&#45;copy fxArray view of component &#39;u&#39;." alt="" coords="206,30,365,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,56,192,52,193,57,156,62"/>
+<area shape="rect" id="Node000004" href="$classfp_parametric_curve.html#ae5d2cd686a06d0d3d2fa65a8c6347cef" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="204,80,367,105"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="156,74,191,78,190,84,156,80"/>
+<area shape="rect" id="Node000005" href="$classfp_parametric_curve.html#a57e4010c1bf0c028e9f748a491ac8c60" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="206,129,365,154"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="132,86,205,114,230,122,228,127,203,119,130,91"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="365,52,402,57,401,62,365,57"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="367,78,401,74,401,79,367,84"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="331,126,366,114,424,85,427,90,368,119,332,131"/>
+</map>

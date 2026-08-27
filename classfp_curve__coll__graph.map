@@ -1,0 +1,5 @@
+<map id="fpCurve" name="fpCurve">
+<area shape="rect" id="Node000001" title="Standalone C++ RAII wrapper for Fortran fitpack_curve." alt="" coords="5,79,79,104"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html" title="Standalone C++ RAII wrapper for Fortran fitpack_fitter." alt="" coords="7,5,77,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,44,45,79,39,79,39,44"/>
+</map>

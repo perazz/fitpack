@@ -1,0 +1,15 @@
+<map id="fpParametricCurve.hpp" name="fpParametricCurve.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="104,5,275,31"/>
+<area shape="rect" id="Node000002" href="$fitpack_8hpp.html" title=" " alt="" coords="49,152,144,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,32,48,50,29,63,13,80,9,90,9,100,22,119,45,136,70,150,68,154,42,140,18,122,4,101,3,89,9,77,25,59,45,45,90,27"/>
+<area shape="rect" id="Node000003" href="$fp_closed_curve_8hpp.html" title=" " alt="" coords="24,79,169,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,41,113,81,110,76,162,37"/>
+<area shape="rect" id="Node000004" href="$fp_fitter__subtypes_8hpp.html" title=" " alt="" coords="202,152,364,177"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="289,23,316,30,343,41,367,57,386,77,392,90,391,102,375,124,348,141,318,154,316,150,345,136,372,120,386,100,387,91,382,80,363,61,340,46,315,35,288,28"/>
+<area shape="rect" id="Node000005" href="$fp_constrained_curve_8hpp.html" title=" " alt="" coords="194,79,372,104"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="217,37,269,76,266,81,214,41"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="99,118,99,152,94,152,94,118"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="140,106,253,149,251,154,138,111"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="241,111,128,154,126,149,239,106"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="286,118,286,152,280,152,280,118"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="fpPeriodicCurve::fit" name="fpPeriodicCurve::fit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,152,49"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="395,24,487,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,21,200,9,273,3,347,9,389,18,388,23,346,14,273,8,200,14,129,27"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a5ed50f73b5c9947b484a2a1dd001def8" title=" " alt="" coords="216,24,331,49"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,34,202,34,202,39,152,39"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="200,73,347,99"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="130,47,210,67,208,72,129,52"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="331,34,380,34,380,39,331,39"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="316,71,383,51,384,56,318,76"/>
+</map>

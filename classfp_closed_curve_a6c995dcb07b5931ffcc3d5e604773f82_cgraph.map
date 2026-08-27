@@ -1,0 +1,20 @@
+<map id="fpClosedCurve::new_fit" name="fpClosedCurve::new_fit">
+<area shape="rect" id="Node000001" title="new_fit" alt="" coords="5,129,177,154"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="436,129,528,154"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,127,148,74,184,46,224,24,270,9,308,3,345,8,389,24,417,43,440,67,471,115,467,118,435,70,413,47,387,29,344,13,308,8,271,14,226,29,187,50,152,78,104,130"/>
+<area shape="rect" id="Node000003" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="231,39,382,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="124,126,240,81,242,86,126,131"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="233,104,380,129"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="178,129,219,124,220,129,178,134"/>
+<area shape="rect" id="Node000005" href="$classfp_parametric_curve.html#a4b86c363b1ade24d29a727fc3a294f72" title="Zero&#45;copy fxArray view of component &#39;u&#39;." alt="" coords="227,153,386,178"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="178,148,214,153,214,158,178,154"/>
+<area shape="rect" id="Node000006" href="$classfp_parametric_curve.html#ae5d2cd686a06d0d3d2fa65a8c6347cef" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="225,202,388,228"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="128,152,226,187,252,195,250,200,224,192,126,157"/>
+<area shape="rect" id="Node000007" href="$classfp_parametric_curve.html#a57e4010c1bf0c028e9f748a491ac8c60" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="227,252,386,277"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="108,152,159,193,227,236,244,244,242,249,224,241,155,197,105,156"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="362,77,389,88,448,120,446,124,387,93,360,81"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="381,124,423,130,422,136,380,129"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="386,152,422,147,423,152,387,157"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="352,200,387,187,446,158,448,163,389,192,354,205"/>
+<area shape="poly" id="edge11_Node000007_Node000002" title=" " alt="" coords="360,249,387,237,429,201,462,164,466,167,433,205,389,241,362,254"/>
+</map>

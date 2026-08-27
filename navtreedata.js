@@ -275,7 +275,8 @@ var NAVTREE =
       [ "File List", "files.html", "files_dup" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
-        [ "Functions/Subroutines", "globals_func.html", null ]
+        [ "Functions/Subroutines", "globals_func.html", null ],
+        [ "Typedefs", "globals_type.html", null ]
       ] ]
     ] ]
   ] ]
@@ -284,16 +285,20 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"interfacefitpack__gridded__polar__c_1_1fitpack__grid__polar__c.html#af45cafc0797fa058a945d8cf36feb027",
-"namespacefitpack__core.html#a3d07187113a320a4bf1fa751018181d2",
-"namespacefitpack__curves__c.html#a462ddd270337221dd650e7868a53c7ad",
-"namespacefitpack__gridded__splines.html#adb6c3408413d6e3204120223aa31f056",
-"namespacefitpack__parametric__curves__c__types.html#a5d59c4b3f5618f00c6e652780dd39daf",
-"namespacemembers_func_i.html",
-"structfitpack__gridded__polar_1_1fitpack__grid__polar.html#a7ecff74ef9824352515fedd35f724c1e",
-"structfitpack__gridded__surfaces_1_1fitpack__grid__surface.html#ac8dddec521b41c2a116ac521f58acf90",
-"structfitpack__polar__domains_1_1fitpack__polar.html#acf92c07749717d22d0ba4447c161818f",
-"tutorial_convex_curve.html#autotoc_md128"
+"classfp_fitter.html#a23ebf17c80932f5cff8d8696a33e819c",
+"classfp_grid_surface.html#af0cd89d402708d1bc7d6c0cefba76dd3",
+"classfp_sphere.html#a223ff9f677d6c020f078da5899a185bf",
+"functions_vars.html",
+"interfacefitpack__parametric__surfaces__c_1_1f__associated.html#a6b1be8dc60687d92061c796652c2c7d4",
+"namespacefitpack__core.html#aa452051613d61831a99b2f9ef8e21bc8",
+"namespacefitpack__fitters__c.html#add4846e45fcd69fd4a1185f33e06cea6",
+"namespacefitpack__gridded__surfaces__c.html#a9f63a96ded709321f19b23a3623e6014",
+"namespacefitpack__polar__domains__c.html#a8f689c85309ed55f37f2dc18ffc9d3b4",
+"structfitpack__curves_1_1fitpack__curve.html#a6fb1f3284d1718bb94d4da99f65992d9",
+"structfitpack__gridded__sphere_1_1fitpack__grid__sphere.html#aaed9c4373c13b313a8c27c145ef81c06",
+"structfitpack__parametric__curves_1_1fitpack__parametric__curve.html#a8aef881a8fcc0621022b76622fae7cea",
+"structfitpack__surfaces_1_1fitpack__surface.html#a3f42bb481154f8448c67e3543673d753",
+"tutorial_polar.html#autotoc_md168"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

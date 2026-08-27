@@ -1,0 +1,14 @@
+<map id="fpClosedCurve::new_points" name="fpClosedCurve::new_points">
+<area shape="rect" id="Node000001" title="new_points" alt="" coords="5,48,157,88"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="416,56,508,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,46,160,28,205,15,250,6,287,3,323,5,369,15,403,28,434,45,431,50,401,33,367,20,323,11,287,8,251,12,206,20,162,33,122,50"/>
+<area shape="rect" id="Node000003" href="$classfp_parametric_curve.html#a4b86c363b1ade24d29a727fc3a294f72" title="Zero&#45;copy fxArray view of component &#39;u&#39;." alt="" coords="207,30,366,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,56,193,52,194,57,158,62"/>
+<area shape="rect" id="Node000004" href="$classfp_parametric_curve.html#ae5d2cd686a06d0d3d2fa65a8c6347cef" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="205,80,368,105"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="158,74,192,79,192,84,157,80"/>
+<area shape="rect" id="Node000005" href="$classfp_parametric_curve.html#a57e4010c1bf0c028e9f748a491ac8c60" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="207,129,366,154"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="133,86,206,114,231,122,229,127,204,119,131,91"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="367,52,403,57,402,62,366,57"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="368,78,402,74,403,79,369,84"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="332,126,367,114,426,85,428,90,369,119,334,131"/>
+</map>

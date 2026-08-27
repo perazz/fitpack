@@ -1,0 +1,12 @@
+<map id="fpClosedCurve::make_view" name="fpClosedCurve::make_view">
+<area shape="rect" id="Node000001" title="Construct an empty (non&#45;owning) wrapper, for use as a view target." alt="" coords="5,31,204,56"/>
+<area shape="rect" id="Node000002" href="$classfp_closed_curve.html#ad77a1632b3766cad5f18eacf735e74c8" title="Default constructor &#45; allocates new fitpack_closed_curve." alt="" coords="252,31,472,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,41,238,41,238,46,204,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="735,5,827,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="472,34,721,19,721,24,472,39"/>
+<area shape="rect" id="Node000004" href="$classfp_parametric_curve.html#a05e4fa4d2bf89cd65950320257ffe5eb" title="Default constructor &#45; allocates new fitpack_parametric_curve." alt="" coords="520,51,671,91"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="468,53,507,58,506,63,468,59"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="664,49,722,32,724,37,666,54"/>
+<area shape="rect" id="Node000005" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="719,59,843,84"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="671,69,705,69,705,74,671,74"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="fpPolar::least_squares" name="fpPolar::least_squares">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,172,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="415,5,507,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,15,400,15,400,21,172,21"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="220,31,367,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,26,206,30,206,35,172,31"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="366,30,401,24,402,30,367,35"/>
+</map>

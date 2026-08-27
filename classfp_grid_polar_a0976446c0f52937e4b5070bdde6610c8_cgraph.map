@@ -1,0 +1,10 @@
+<map id="fpGridPolar::operator=" name="fpGridPolar::operator=">
+<area shape="rect" id="Node000001" title="Copy assignment &#45; deep copy." alt="" coords="5,29,175,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="463,5,555,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,35,449,19,449,24,175,40"/>
+<area shape="rect" id="Node000003" href="$classfp_grid_polar.html#a4856d3f241f6cdb54f504b24e9fe1305" title="Default constructor &#45; allocates new fitpack_grid_polar." alt="" coords="223,55,399,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,49,210,53,209,58,175,54"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="362,52,449,30,450,35,363,57"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="447,55,571,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="399,65,433,65,433,70,399,70"/>
+</map>

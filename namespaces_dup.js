@@ -67,5 +67,6 @@ var namespaces_dup =
     [ "fitpack_sphere_domains_c_types", "namespacefitpack__sphere__domains__c__types.html", "namespacefitpack__sphere__domains__c__types" ],
     [ "fitpack_surfaces", "namespacefitpack__surfaces.html", "namespacefitpack__surfaces" ],
     [ "fitpack_surfaces_c", "namespacefitpack__surfaces__c.html", "namespacefitpack__surfaces__c" ],
-    [ "fitpack_surfaces_c_types", "namespacefitpack__surfaces__c__types.html", "namespacefitpack__surfaces__c__types" ]
+    [ "fitpack_surfaces_c_types", "namespacefitpack__surfaces__c__types.html", "namespacefitpack__surfaces__c__types" ],
+    [ "fp_detail", "namespacefp__detail.html", "namespacefp__detail" ]
 ];

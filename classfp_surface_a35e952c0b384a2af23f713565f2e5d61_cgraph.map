@@ -1,0 +1,17 @@
+<map id="fpSurface::new_points" name="fpSurface::new_points">
+<area shape="rect" id="Node000001" title="new_points" alt="" coords="5,78,172,103"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="371,78,463,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,75,154,42,185,25,219,13,272,3,295,5,324,13,365,36,397,65,393,69,362,41,322,18,294,10,272,8,221,18,188,30,156,47,107,80"/>
+<area shape="rect" id="Node000003" href="$classfp_surface.html#af5433bbbd7c3fb1c360f6f4158ef8457" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="220,28,323,54"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,75,209,55,211,60,137,80"/>
+<area shape="rect" id="Node000004" href="$classfp_surface.html#a67ad9433edfcf3eb7b29d7aeb9d27530" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="221,78,321,103"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="172,88,207,88,207,93,172,93"/>
+<area shape="rect" id="Node000005" href="$classfp_surface.html#addecce3f81028ca4f58eb649fdab6b59" title="Zero&#45;copy fxArray view of component &#39;y&#39;." alt="" coords="221,127,321,152"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="137,100,211,121,209,126,136,106"/>
+<area shape="rect" id="Node000006" href="$classfp_surface.html#aefac4bdcd4890333c3480c3c70704d5d" title="Zero&#45;copy fxArray view of component &#39;z&#39;." alt="" coords="222,176,321,202"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="113,101,221,161,233,168,231,172,219,166,111,105"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="310,51,366,70,364,76,309,56"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="321,88,357,88,357,93,321,93"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="309,124,364,105,366,110,310,129"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="299,174,321,161,389,110,392,114,324,166,302,179"/>
+</map>

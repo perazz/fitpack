@@ -1,0 +1,8 @@
+<map id="fpCurve::fit" name="fpCurve::fit">
+<area shape="rect" id="Node000001" title="Refit the current points with a new smoothing." alt="" coords="5,29,100,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="25,31,19,21,22,11,33,5,53,3,76,6,86,15,82,19,73,11,53,8,35,10,26,15,24,20,29,28"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="148,29,295,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="100,39,134,39,134,45,100,45"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="343,29,435,55"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="295,39,329,39,329,45,295,45"/>
+</map>

@@ -41,5 +41,22 @@ var searchData=
   ['fp_5fcomm_5fexpand_38',['fp_comm_expand',['../interfacefitpack__core_1_1fp__comm__expand.html',1,'fitpack_core']]],
   ['fp_5fcomm_5fpack_39',['fp_comm_pack',['../interfacefitpack__core_1_1fp__comm__pack.html',1,'fitpack_core']]],
   ['fp_5fcomm_5fsize_40',['fp_comm_size',['../interfacefitpack__core_1_1fp__comm__size.html',1,'fitpack_core']]],
-  ['fx_5fstatus_41',['fx_status',['../structfitpack__fx__status_1_1fx__status.html',1,'fitpack_fx_status']]]
+  ['fpclosedcurve_41',['fpClosedCurve',['../classfp_closed_curve.html',1,'']]],
+  ['fpconstrainedcurve_42',['fpConstrainedCurve',['../classfp_constrained_curve.html',1,'']]],
+  ['fpconvexcurve_43',['fpConvexCurve',['../classfp_convex_curve.html',1,'']]],
+  ['fpcurve_44',['fpCurve',['../classfp_curve.html',1,'']]],
+  ['fpfitter_45',['fpFitter',['../classfp_fitter.html',1,'']]],
+  ['fpgridpolar_46',['fpGridPolar',['../classfp_grid_polar.html',1,'']]],
+  ['fpgridsphere_47',['fpGridSphere',['../classfp_grid_sphere.html',1,'']]],
+  ['fpgridspline_48',['fpGridSpline',['../classfp_grid_spline.html',1,'']]],
+  ['fpgridsurface_49',['fpGridSurface',['../classfp_grid_surface.html',1,'']]],
+  ['fpparametriccurve_50',['fpParametricCurve',['../classfp_parametric_curve.html',1,'']]],
+  ['fpparametricsurface_51',['fpParametricSurface',['../classfp_parametric_surface.html',1,'']]],
+  ['fpperiodiccurve_52',['fpPeriodicCurve',['../classfp_periodic_curve.html',1,'']]],
+  ['fppoint_53',['fpPoint',['../structfp_point.html',1,'']]],
+  ['fppointlayout_54',['fpPointLayout',['../structfp__detail_1_1fp_point_layout.html',1,'fp_detail']]],
+  ['fppolar_55',['fpPolar',['../classfp_polar.html',1,'']]],
+  ['fpsphere_56',['fpSphere',['../classfp_sphere.html',1,'']]],
+  ['fpsurface_57',['fpSurface',['../classfp_surface.html',1,'']]],
+  ['fx_5fstatus_58',['fx_status',['../structfitpack__fx__status_1_1fx__status.html',1,'fitpack_fx_status']]]
 ];

@@ -1,0 +1,15 @@
+<map id="fpCurve::ddx" name="fpCurve::ddx">
+<area shape="rect" id="Node000001" title="Derivative of the given order at x." alt="" coords="5,56,111,81"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html#ab06c1c1b05a2387655b1e1eb26c5b65d" title=" " alt="" coords="159,56,269,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,66,145,66,145,71,111,71"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#a5ed50f73b5c9947b484a2a1dd001def8" title=" " alt="" coords="317,5,432,31"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="107,53,158,42,303,22,304,27,159,47,108,59"/>
+<area shape="rect" id="Node000005" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="330,107,419,132"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="105,79,159,91,242,104,317,112,316,117,241,109,158,97,103,84"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="480,56,572,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="270,66,466,66,466,71,270,71"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="254,53,320,32,321,37,256,58"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="256,79,321,100,320,105,254,84"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="414,28,475,49,474,54,413,33"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="413,104,474,83,475,88,414,109"/>
+</map>

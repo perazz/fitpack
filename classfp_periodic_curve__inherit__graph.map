@@ -1,0 +1,7 @@
+<map id="fpPeriodicCurve" name="fpPeriodicCurve">
+<area shape="rect" id="Node000001" title="Standalone C++ RAII wrapper for Fortran fitpack_periodic_curve." alt="" coords="5,152,131,177"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html" title="Standalone C++ RAII wrapper for Fortran fitpack_curve." alt="" coords="31,79,105,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,118,71,152,65,152,65,118"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html" title="Standalone C++ RAII wrapper for Fortran fitpack_fitter." alt="" coords="33,5,103,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,44,71,79,65,79,65,44"/>
+</map>

@@ -1,0 +1,31 @@
+<map id="fpParametricCurve::new_fit" name="fpParametricCurve::new_fit">
+<area shape="rect" id="Node000001" title="Fit a new curve through the points at parameter values u, with weights w." alt="" coords="5,150,156,190"/>
+<area shape="rect" id="Node000002" href="$fp_point_8hpp.html#af0e521deb43bd73530e0c3ecd578801e" title="Flatten a vector of points into Fortran x(dims,m) order. One contiguous copy." alt="" coords="222,5,337,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,148,141,99,171,72,203,48,228,34,230,39,205,52,174,76,145,103,100,152"/>
+<area shape="rect" id="Node000004" href="$classfp_parametric_curve.html#acf706830f008c11b3d71dab052de978d" title="new_fit" alt="" coords="204,207,355,247"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,187,197,201,195,206,150,193"/>
+<area shape="rect" id="Node000006" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="409,258,559,298"/>
+<area shape="poly" id="edge15_Node000001_Node000006" title=" " alt="" coords="104,188,148,225,175,243,205,257,252,270,301,278,395,282,395,287,301,283,251,275,203,262,173,248,145,229,100,192"/>
+<area shape="rect" id="Node000007" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="411,323,557,348"/>
+<area shape="poly" id="edge16_Node000001_Node000007" title=" " alt="" coords="98,189,142,240,172,266,205,288,252,307,302,320,397,332,397,337,301,325,250,312,203,292,169,270,138,243,94,192"/>
+<area shape="rect" id="Node000008" href="$classfp_parametric_curve.html#a4b86c363b1ade24d29a727fc3a294f72" title="Zero&#45;copy fxArray view of component &#39;u&#39;." alt="" coords="405,59,563,84"/>
+<area shape="poly" id="edge17_Node000001_Node000008" title=" " alt="" coords="130,147,203,122,300,99,391,82,392,88,301,104,205,127,132,152"/>
+<area shape="rect" id="Node000009" href="$classfp_parametric_curve.html#ae5d2cd686a06d0d3d2fa65a8c6347cef" title="Zero&#45;copy fxArray view of component &#39;w&#39;." alt="" coords="403,108,565,133"/>
+<area shape="poly" id="edge18_Node000001_Node000009" title=" " alt="" coords="156,156,204,149,388,127,389,133,204,154,156,161"/>
+<area shape="rect" id="Node000010" href="$classfp_parametric_curve.html#a57e4010c1bf0c028e9f748a491ac8c60" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="405,157,563,183"/>
+<area shape="poly" id="edge19_Node000001_Node000010" title=" " alt="" coords="156,167,391,167,391,173,156,173"/>
+<area shape="rect" id="Node000003" href="$fp_point_8hpp.html#ab4fb83d816128b74db86d355a5a0278c" title="Borrow a vector of points as a Fortran x(dims,m) buffer. No copy, no allocation." alt="" coords="435,5,533,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="337,15,421,15,421,21,337,21"/>
+<area shape="rect" id="Node000005" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="613,183,705,208"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="355,218,599,198,600,203,355,224"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="355,243,396,254,395,259,354,248"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="307,245,351,277,404,308,423,316,421,321,401,312,348,281,304,250"/>
+<area shape="poly" id="edge9_Node000004_Node000008" title=" " alt="" coords="292,206,336,150,367,119,401,93,412,87,415,92,404,98,370,123,340,153,296,209"/>
+<area shape="poly" id="edge11_Node000004_Node000009" title=" " alt="" coords="304,205,348,173,401,142,418,135,420,140,404,147,351,178,307,209"/>
+<area shape="poly" id="edge13_Node000004_Node000010" title=" " alt="" coords="351,205,424,184,425,189,352,210"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="526,256,618,212,620,216,528,260"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="539,320,564,308,588,288,610,264,642,218,646,221,614,267,592,291,567,312,542,325"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="543,82,567,93,611,130,644,169,639,173,607,134,564,98,541,86"/>
+<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="535,131,566,142,627,173,625,178,564,147,533,136"/>
+<area shape="poly" id="edge14_Node000010_Node000005" title=" " alt="" coords="564,179,600,184,599,189,563,184"/>
+</map>

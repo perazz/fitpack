@@ -1,0 +1,10 @@
+<map id="fpSphere::operator=" name="fpSphere::operator=">
+<area shape="rect" id="Node000001" title="Copy assignment &#45; deep copy." alt="" coords="5,29,160,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="419,5,511,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,35,405,19,405,24,160,40"/>
+<area shape="rect" id="Node000003" href="$classfp_sphere.html#a3ce079991303974a654cd3006b492884" title="Default constructor &#45; allocates new fitpack_sphere." alt="" coords="208,55,355,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,49,194,54,194,59,160,55"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="328,52,405,31,406,36,330,57"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="403,55,527,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="355,65,389,65,389,70,355,70"/>
+</map>

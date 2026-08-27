@@ -1,0 +1,9 @@
+<map id="fpConvexCurve::as_parent" name="fpConvexCurve::as_parent">
+<area shape="rect" id="Node000001" title="Upcast to parent type (reference, no copy)" alt="" coords="5,31,200,56"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html#ad0b5c0d3a3b706a3e41c16959a02abfc" title="Default constructor &#45; allocates new fitpack_curve." alt="" coords="248,31,380,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,41,234,41,234,46,200,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="444,5,536,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,31,430,24,431,29,381,36"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="428,55,552,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="381,50,415,54,414,60,380,55"/>
+</map>

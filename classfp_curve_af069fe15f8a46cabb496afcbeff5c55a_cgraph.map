@@ -1,0 +1,14 @@
+<map id="fpCurve::eval" name="fpCurve::eval">
+<area shape="rect" id="Node000001" title="Evaluate the curve at x, reporting the status through ierr." alt="" coords="5,56,115,81"/>
+<area shape="rect" id="Node000002" href="$classfp_curve.html#a4bad9bbc1a52f9396f5ed9cbee347126" title=" " alt="" coords="163,5,272,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,53,163,33,165,38,101,58"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="320,56,409,81"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="115,66,307,66,307,71,115,71"/>
+<area shape="rect" id="Node000005" href="$classfp_curve.html#ac12897c52d8d5a75cb00677a52d7a22c" title="Zero&#45;copy fxArray view of component &#39;y&#39;." alt="" coords="320,105,409,131"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="115,75,307,106,306,111,115,80"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="457,56,549,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,21,410,41,448,50,447,55,409,46,272,26"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="256,28,315,49,313,54,254,33"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="409,66,443,66,443,71,409,71"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="400,103,453,84,455,89,402,108"/>
+</map>

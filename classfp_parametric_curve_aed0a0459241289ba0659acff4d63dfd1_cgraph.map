@@ -1,0 +1,8 @@
+<map id="fpParametricCurve::fit" name="fpParametricCurve::fit">
+<area shape="rect" id="Node000001" title="Refit the current points with a new spline order." alt="" coords="5,29,169,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="54,31,46,21,50,11,64,5,87,3,116,6,127,15,124,20,114,11,87,8,65,10,54,15,52,20,58,28"/>
+<area shape="rect" id="Node000002" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="217,22,368,62"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="169,39,203,39,203,45,169,45"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="416,29,508,55"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="368,39,402,39,402,45,368,45"/>
+</map>

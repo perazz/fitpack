@@ -1,0 +1,11 @@
+<map id="fpClosedCurve::fit" name="fpClosedCurve::fit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,32,144,58"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="391,32,483,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,30,150,19,192,10,267,3,343,11,395,25,393,30,342,16,267,8,192,16,151,24,113,35"/>
+<area shape="rect" id="Node000003" href="$classfp_parametric_curve.html#aef66e4deea75a2a816f5323e0c2a9220" title=" " alt="" coords="192,25,343,65"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,42,179,42,179,48,144,48"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="194,90,341,115"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="119,55,212,83,210,88,117,60"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="343,42,377,42,377,48,343,48"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="305,87,342,75,385,60,386,65,344,80,307,92"/>
+</map>

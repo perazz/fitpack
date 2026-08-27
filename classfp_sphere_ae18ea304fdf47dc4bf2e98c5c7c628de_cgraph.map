@@ -1,0 +1,9 @@
+<map id="fpSphere::fpSphere" name="fpSphere::fpSphere">
+<area shape="rect" id="Node000001" title="Move constructor &#45; transfer ownership." alt="" coords="5,31,152,56"/>
+<area shape="rect" id="Node000002" href="$classfp_sphere.html#a3ce079991303974a654cd3006b492884" title="Default constructor &#45; allocates new fitpack_sphere." alt="" coords="200,31,347,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,41,186,41,186,46,152,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="411,5,503,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="347,31,397,24,397,29,347,36"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="395,55,519,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="347,50,381,55,381,60,347,56"/>
+</map>

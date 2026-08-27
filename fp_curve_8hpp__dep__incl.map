@@ -1,0 +1,23 @@
+<map id="fpCurve.hpp" name="fpCurve.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="309,5,411,31"/>
+<area shape="rect" id="Node000002" href="$fitpack_8hpp.html" title=" " alt="" coords="227,152,322,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="295,24,219,28,136,38,64,55,37,67,19,80,11,92,8,103,10,111,14,119,35,133,67,144,148,156,227,160,227,166,148,162,66,149,33,138,11,123,4,113,3,102,6,90,15,77,34,62,62,50,135,33,219,23,295,18"/>
+<area shape="rect" id="Node000003" href="$fp_convex_curve_8hpp.html" title=" " alt="" coords="30,79,181,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="306,37,147,81,146,76,305,32"/>
+<area shape="rect" id="Node000004" href="$fp_fitter__subtypes_8hpp.html" title=" " alt="" coords="364,152,527,177"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="425,20,493,25,567,36,632,52,656,64,673,77,683,97,680,114,667,128,646,139,590,153,527,162,526,156,589,148,645,134,664,123,676,111,678,98,668,80,653,68,630,58,566,41,493,31,424,25"/>
+<area shape="rect" id="Node000005" href="$fp_grid_surface_8hpp.html" title=" " alt="" coords="205,79,344,104"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="338,41,290,80,287,76,334,37"/>
+<area shape="rect" id="Node000006" href="$fp_periodic_curve_8hpp.html" title=" " alt="" coords="369,79,522,104"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="386,37,433,76,430,80,382,41"/>
+<area shape="rect" id="Node000007" href="$fp_surface_8hpp.html" title=" " alt="" coords="547,79,659,104"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="412,32,564,76,562,81,411,37"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="146,107,248,149,246,154,144,112"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="173,104,391,149,390,155,172,109"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="277,118,277,152,272,152,272,118"/>
+<area shape="poly" id="edge8_Node000005_Node000004" title=" " alt="" coords="316,107,418,149,416,154,314,112"/>
+<area shape="poly" id="edge10_Node000006_Node000002" title=" " alt="" coords="406,112,303,154,301,149,404,107"/>
+<area shape="poly" id="edge11_Node000006_Node000004" title=" " alt="" coords="448,118,448,152,443,152,443,118"/>
+<area shape="poly" id="edge13_Node000007_Node000002" title=" " alt="" coords="537,109,323,156,322,150,536,104"/>
+<area shape="poly" id="edge14_Node000007_Node000004" title=" " alt="" coords="566,112,472,154,470,149,564,107"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="fpPeriodicCurve::dfdx" name="fpPeriodicCurve::dfdx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,168,48"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="379,23,471,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,20,216,7,273,3,331,7,373,16,372,21,330,13,273,8,216,13,140,25"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a5ed50f73b5c9947b484a2a1dd001def8" title=" " alt="" coords="216,23,331,48"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,33,202,33,202,38,168,38"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="229,72,318,97"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="136,45,216,67,215,72,135,51"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="331,33,365,33,365,38,331,38"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="312,69,371,50,373,55,314,74"/>
+</map>

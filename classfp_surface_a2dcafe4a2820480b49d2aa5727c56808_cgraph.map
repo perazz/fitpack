@@ -1,0 +1,11 @@
+<map id="fpSurface::fpSurface" name="fpSurface::fpSurface">
+<area shape="rect" id="Node000001" title="Copy constructor &#45; deep copy." alt="" coords="5,29,160,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="427,5,519,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,27,208,14,285,11,363,14,413,14,413,20,363,19,285,17,208,19,135,32"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="411,55,535,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,52,208,65,307,70,397,69,397,74,307,75,208,70,134,57"/>
+<area shape="rect" id="Node000004" href="$classfp_surface.html#a3017c8c1afd5c5f8a57910ff5cc96fb1" title="Default constructor &#45; allocates new fitpack_surface." alt="" coords="208,29,363,55"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,39,194,39,194,45,160,45"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="363,29,413,23,413,28,363,35"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="363,50,397,54,397,60,362,55"/>
+</map>

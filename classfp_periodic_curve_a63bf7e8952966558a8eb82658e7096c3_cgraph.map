@@ -1,0 +1,12 @@
+<map id="fpPeriodicCurve::make_view" name="fpPeriodicCurve::make_view">
+<area shape="rect" id="Node000001" title="Construct an empty (non&#45;owning) wrapper, for use as a view target." alt="" coords="5,29,212,55"/>
+<area shape="rect" id="Node000002" href="$classfp_periodic_curve.html#ae44162a0c7ccb86d4af640ca4d57c10c" title="Default constructor &#45; allocates new fitpack_periodic_curve." alt="" coords="260,22,459,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,39,246,39,246,45,212,45"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="703,5,795,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="459,33,689,19,689,24,459,39"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#ad0b5c0d3a3b706a3e41c16959a02abfc" title="Default constructor &#45; allocates new fitpack_curve." alt="" coords="507,55,639,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="460,51,494,55,493,61,459,56"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="618,52,688,32,690,37,619,57"/>
+<area shape="rect" id="Node000005" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="687,55,811,80"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="639,65,673,65,673,70,639,70"/>
+</map>

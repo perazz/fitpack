@@ -1,0 +1,7 @@
+<map id="fpPolar::fpPolar" name="fpPolar::fpPolar">
+<area shape="rect" id="Node000001" title="Construct from existing C wrapper (takes ownership if move=true)" alt="" coords="5,31,128,56"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="192,5,284,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,32,177,24,178,29,129,37"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="176,55,300,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,49,162,54,162,59,128,55"/>
+</map>

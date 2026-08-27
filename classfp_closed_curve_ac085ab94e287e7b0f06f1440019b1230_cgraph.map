@@ -1,0 +1,10 @@
+<map id="fpClosedCurve::fpClosedCurve" name="fpClosedCurve::fpClosedCurve">
+<area shape="rect" id="Node000001" title="Non&#45;owning view ctor: bit&#45;copy the C handle, mark is_pointer=true. Used by parent classes&#39; polymorphi..." alt="" coords="5,31,225,56"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="488,5,580,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,34,474,19,475,24,226,39"/>
+<area shape="rect" id="Node000003" href="$classfp_parametric_curve.html#a05e4fa4d2bf89cd65950320257ffe5eb" title="Default constructor &#45; allocates new fitpack_parametric_curve." alt="" coords="273,51,424,91"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,53,260,58,259,63,221,59"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="418,49,476,32,477,37,419,54"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="472,59,596,84"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="424,69,458,69,458,74,424,74"/>
+</map>

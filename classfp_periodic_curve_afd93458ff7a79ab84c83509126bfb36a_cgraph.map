@@ -1,0 +1,13 @@
+<map id="fpPeriodicCurve::operator=" name="fpPeriodicCurve::operator=">
+<area shape="rect" id="Node000001" title="Copy assignment &#45; deep copy." alt="" coords="5,5,204,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="695,27,787,52"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,12,252,11,442,9,525,12,631,21,682,27,681,32,630,26,524,17,442,14,252,17,204,18"/>
+<area shape="rect" id="Node000003" href="$classfp_periodic_curve.html#ae44162a0c7ccb86d4af640ca4d57c10c" title="Default constructor &#45; allocates new fitpack_periodic_curve." alt="" coords="252,26,451,66"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,27,239,31,238,36,204,32"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="451,42,681,38,681,43,451,47"/>
+<area shape="rect" id="Node000004" href="$classfp_curve.html#ad0b5c0d3a3b706a3e41c16959a02abfc" title="Default constructor &#45; allocates new fitpack_curve." alt="" coords="499,77,631,103"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="449,63,490,72,489,77,448,69"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="609,75,681,53,683,59,610,80"/>
+<area shape="rect" id="Node000005" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="679,77,803,103"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="631,87,665,87,665,93,631,93"/>
+</map>

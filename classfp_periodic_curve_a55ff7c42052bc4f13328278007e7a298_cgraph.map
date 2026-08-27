@@ -1,0 +1,8 @@
+<map id="fpPeriodicCurve::least_squares" name="fpPeriodicCurve::least_squares">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,171,45"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="413,13,505,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,23,400,23,400,28,171,28"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="219,38,365,63"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,33,205,37,205,43,171,38"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="365,37,400,32,400,37,366,42"/>
+</map>

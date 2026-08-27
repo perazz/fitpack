@@ -1,0 +1,14 @@
+<map id="fpGridSpline::integral" name="fpGridSpline::integral">
+<area shape="rect" id="Node000001" title="Integral of the spline over the box [lower, upper]." alt="" coords="5,80,165,105"/>
+<area shape="rect" id="Node000002" href="$structfp_point.html#aa1ba8608667e16a739adc00b1f36fc8b" title=" " alt="" coords="237,5,349,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,77,212,39,234,32,236,37,214,45,118,82"/>
+<area shape="rect" id="Node000003" href="$classfp_grid_spline.html#a256aba5ecdfe26b13161a398b2d3cc65" title=" " alt="" coords="222,55,365,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,80,208,75,209,80,166,86"/>
+<area shape="rect" id="Node000005" href="$structfp_point.html#aa348a84517967cbbfa33126097d0fb02" title=" " alt="" coords="243,104,343,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="166,99,230,107,229,112,165,105"/>
+<area shape="rect" id="Node000006" href="$classfp_grid_spline.html#a1653cdf20487186dea3ce9a5e7dbed0f" title="integral" alt="" coords="213,153,373,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="120,103,214,138,239,147,237,152,212,143,118,108"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="421,104,513,129"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="340,77,409,98,408,103,338,83"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="338,151,408,131,409,136,340,156"/>
+</map>

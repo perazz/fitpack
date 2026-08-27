@@ -1,0 +1,8 @@
+<map id="fpSphere::least_squares" name="fpSphere::least_squares">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,184,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="427,5,519,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,15,413,15,413,21,184,21"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a2e229ae0a3ce6a16a05949e1e13202ec" title=" " alt="" coords="232,31,379,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="185,26,218,30,218,36,184,31"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="378,30,413,24,414,30,379,35"/>
+</map>

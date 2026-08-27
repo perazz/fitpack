@@ -1,0 +1,9 @@
+<map id="fpGridSpline::make_view" name="fpGridSpline::make_view">
+<area shape="rect" id="Node000001" title="Construct an empty (non&#45;owning) wrapper, for use as a view target." alt="" coords="5,31,189,56"/>
+<area shape="rect" id="Node000002" href="$classfp_grid_spline.html#a8757df02cdc76c123f02d7e7511ee5a7" title="Default constructor &#45; allocates new fitpack_gridded_spline." alt="" coords="237,31,428,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,41,223,41,223,46,190,46"/>
+<area shape="rect" id="Node000003" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="492,5,584,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="428,29,478,23,479,28,429,34"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="476,55,600,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="429,52,463,56,462,61,428,57"/>
+</map>

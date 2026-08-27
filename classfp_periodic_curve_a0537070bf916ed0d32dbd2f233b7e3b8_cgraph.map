@@ -1,0 +1,8 @@
+<map id="fpPeriodicCurve::eval" name="fpPeriodicCurve::eval">
+<area shape="rect" id="Node000001" title="eval" alt="" coords="5,5,167,31"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="352,5,444,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,15,338,15,338,21,167,21"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#a3a76bed74cb9ab3389037ba209be7656" title="Zero&#45;copy fxArray view of component &#39;x&#39;." alt="" coords="215,31,304,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,27,201,32,200,37,166,32"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="304,33,338,26,339,31,305,38"/>
+</map>

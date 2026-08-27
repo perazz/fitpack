@@ -1,0 +1,10 @@
+<map id="fpConvexCurve::fpConvexCurve" name="fpConvexCurve::fpConvexCurve">
+<area shape="rect" id="Node000001" title="Construct from existing C wrapper (takes ownership if move=true)" alt="" coords="5,29,236,55"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html#a7b0d94b1de2ff002624656ef4fb8d8c0" title=" " alt="" coords="480,5,572,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,33,466,19,467,24,236,38"/>
+<area shape="rect" id="Node000003" href="$classfp_curve.html#ad0b5c0d3a3b706a3e41c16959a02abfc" title="Default constructor &#45; allocates new fitpack_curve." alt="" coords="284,55,416,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,52,271,56,270,61,236,57"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="395,52,466,32,467,37,397,57"/>
+<area shape="rect" id="Node000004" href="$classfp_fitter.html#a56013f0d6a642e6ae57dfa9aab682875" title="Protected constructor for derived classes (does not allocate)" alt="" coords="464,55,588,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="416,65,450,65,450,70,416,70"/>
+</map>

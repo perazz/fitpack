@@ -1,0 +1,9 @@
+<map id="fpParametricCurve" name="fpParametricCurve">
+<area shape="rect" id="Node000001" title="Standalone C++ RAII wrapper for Fortran fitpack_parametric_curve." alt="" coords="71,79,214,104"/>
+<area shape="rect" id="Node000003" href="$classfp_closed_curve.html" title="Standalone C++ RAII wrapper for Fortran fitpack_closed_curve." alt="" coords="5,152,123,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,115,79,154,75,150,118,111"/>
+<area shape="rect" id="Node000004" href="$classfp_constrained_curve.html" title="Standalone C++ RAII wrapper for Fortran fitpack_constrained_curve." alt="" coords="147,152,298,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,111,211,150,208,154,164,115"/>
+<area shape="rect" id="Node000002" href="$classfp_fitter.html" title="Standalone C++ RAII wrapper for Fortran fitpack_fitter." alt="" coords="108,5,177,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,44,145,79,140,79,140,44"/>
+</map>
