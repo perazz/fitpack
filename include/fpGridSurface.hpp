@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fpGridSurface.hpp                                                                     **
- *   ** @brief Standalone C++ wrapper for fitpack_grid_surface (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fpGridSurface.hpp (class fpGridSurface)
+!> @brief Standalone C++ wrapper for fitpack_grid_surface (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FPGRIDSURFACE_HPP_INCLUDED
 #define FPGRIDSURFACE_HPP_INCLUDED
@@ -18,7 +31,7 @@
 #endif
 
 #include "fitpack_grid_surface_c.h"
-#include "fxFitpackFitter.hpp"
+#include "fpFitter.hpp"
 #include "fpCurve.hpp"
 #include <string>
 #include <vector>
@@ -27,7 +40,6 @@
 #include <stdexcept>
 #include <variant>
 #include <optional>
-#include <cstring>
 #include <array>
 
 static_assert(sizeof(fitpack_grid_surface_c) == sizeof(fitpack_fitter_c),
@@ -39,9 +51,9 @@ static_assert(sizeof(fitpack_grid_surface_c) == sizeof(fitpack_fitter_c),
  * This class provides automatic memory management (RAII) and a natural C++ API
  * for the underlying Fortran fitpack_grid_surface, without requiring the fortran-arrays library.
  * Array arguments use std::vector<T> for standalone operation.
- * Extends fxFitpackFitter (Fortran: extends(fitpack_fitter))
+ * Extends fpFitter (Fortran: extends(fitpack_fitter))
  */
-class fpGridSurface : public fxFitpackFitter {
+class fpGridSurface : public fpFitter {
 public:
     // ===========================================================================================
     // Constructors and Destructor
@@ -50,7 +62,7 @@ public:
     /**
      * @brief Default constructor - allocates new fitpack_grid_surface
      */
-    fpGridSurface() : fxFitpackFitter(NoAlloc{}) {
+    fpGridSurface() : fpFitter(NoAlloc{}) {
         fitpack_grid_surface_c_allocate(as<fitpack_grid_surface_c>(), nullptr);
     }
 
@@ -64,7 +76,7 @@ public:
     /**
      * @brief Copy constructor - deep copy
      */
-    fpGridSurface(const fpGridSurface& other) : fxFitpackFitter(NoAlloc{}) {
+    fpGridSurface(const fpGridSurface& other) : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_surface_c>() = fitpack_grid_surface_c_null;
         fitpack_grid_surface_c_copy(as<fitpack_grid_surface_c>(), other.as<fitpack_grid_surface_c>(), false, nullptr);
     }
@@ -83,7 +95,7 @@ public:
     /**
      * @brief Move constructor - transfer ownership
      */
-    fpGridSurface(fpGridSurface&& other) noexcept : fxFitpackFitter(NoAlloc{}) {
+    fpGridSurface(fpGridSurface&& other) noexcept : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_surface_c>() = fitpack_grid_surface_c_null;
         fitpack_grid_surface_c_move_alloc(as<fitpack_grid_surface_c>(), other.as<fitpack_grid_surface_c>(), nullptr);
     }
@@ -102,7 +114,7 @@ public:
     /**
      * @brief Construct from existing C wrapper (takes ownership if move=true)
      */
-    explicit fpGridSurface(fitpack_grid_surface_c& c_wrapper, bool move = false) : fxFitpackFitter(NoAlloc{}) {
+    explicit fpGridSurface(fitpack_grid_surface_c& c_wrapper, bool move = false) : fpFitter(NoAlloc{}) {
         if (move) {
             fitpack_grid_surface_c_move_alloc(as<fitpack_grid_surface_c>(), &c_wrapper, nullptr);
         } else {
@@ -116,7 +128,7 @@ public:
      * is_pointer=true. Used by parent classes' polymorphic accessors
      * to wrap a base-class handle as the correct concrete subtype.
      */
-    explicit fpGridSurface(fitpack_grid_surface_c& c_wrapper, ViewTag) : fxFitpackFitter(NoAlloc{}) {
+    explicit fpGridSurface(fitpack_grid_surface_c& c_wrapper, ViewTag) : fpFitter(NoAlloc{}) {
         *as<fitpack_grid_surface_c>() = c_wrapper;
         as<fitpack_grid_surface_c>()->is_pointer = true;
     }
@@ -183,11 +195,11 @@ public:
     /**
      * @brief Upcast to parent type (reference, no copy)
      */
-    fxFitpackFitter& as_parent() {
-        return static_cast<fxFitpackFitter&>(*this);
+    fpFitter& as_parent() {
+        return static_cast<fpFitter&>(*this);
     }
-    const fxFitpackFitter& as_parent() const {
-        return static_cast<const fxFitpackFitter&>(*this);
+    const fpFitter& as_parent() const {
+        return static_cast<const fpFitter&>(*this);
     }
 
     // ===========================================================================================
@@ -206,25 +218,25 @@ public:
     /**
      * @brief new_fit
      */
-    virtual int32_t new_fit(std::vector<double>& x, std::vector<double>& y, int32_t z_n1, int32_t z_n2, std::vector<double>& z, double* smoothing = nullptr, int32_t* order = nullptr) const {
+    virtual int32_t new_fit(std::vector<double>& x, std::vector<double>& y, int32_t z_n1, int32_t z_n2, std::vector<double>& z, double* smoothing = nullptr, int32_t* order = nullptr) {
         int32_t n = static_cast<int32_t>(x.size());
         return fitpack_grid_surface_c_new_fit(as<fitpack_grid_surface_c>(), n, x.data(), y.data(), z_n1, z_n2, z.data(), smoothing, order);
     }
 
 
-    virtual int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) const {
+    virtual int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) {
         return fitpack_grid_surface_c_fit(as<fitpack_grid_surface_c>(), smoothing, order, keep_knots);
     }
 
-    virtual int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const {
+    virtual int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) {
         return fitpack_grid_surface_c_least_squares(as<fitpack_grid_surface_c>(), smoothing, reset_knots);
     }
 
-    virtual int32_t interpolate(bool* reset_knots = nullptr) const {
+    virtual int32_t interpolate(bool* reset_knots = nullptr) {
         return fitpack_grid_surface_c_interpolate(as<fitpack_grid_surface_c>(), reset_knots);
     }
 
-    virtual double eval(double x, double y, int32_t* ierr = nullptr) const {
+    virtual double eval(double x, double y, int32_t* ierr = nullptr) {
         return fitpack_grid_surface_c_gridsurf_eval_one(as<fitpack_grid_surface_c>(), x, y, ierr);
     }
 
@@ -241,7 +253,7 @@ public:
     }
 
 
-    virtual double eval_ongrid(double x, double y, int32_t* ierr = nullptr) const {
+    virtual double eval_ongrid(double x, double y, int32_t* ierr = nullptr) {
         return fitpack_grid_surface_c_gridded_eval_one(as<fitpack_grid_surface_c>(), x, y, ierr);
     }
 
@@ -258,7 +270,7 @@ public:
     }
 
 
-    virtual double dfdx(double x, double y, int32_t dx, int32_t dy, int32_t* ierr = nullptr) const {
+    virtual double dfdx(double x, double y, int32_t dx, int32_t dy, int32_t* ierr = nullptr) {
         return fitpack_grid_surface_c_gridded_derivatives_one(as<fitpack_grid_surface_c>(), x, y, dx, dy, ierr);
     }
 
@@ -316,7 +328,7 @@ public:
     /**
      * @brief comm_pack
      */
-    void comm_pack(std::vector<double>& buffer) override {
+    void comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_grid_surface_c_comm_pack(as<fitpack_grid_surface_c>(), n, buffer.data());
     }
@@ -342,7 +354,7 @@ public:
     /**
      * @brief core_comm_pack
      */
-    void core_comm_pack(std::vector<double>& buffer) override {
+    void core_comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_grid_surface_c_core_comm_pack(as<fitpack_grid_surface_c>(), n, buffer.data());
     }
@@ -383,12 +395,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'x'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through x()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through x()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -396,22 +408,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_grid_surface_c_getcomp_x(as<fitpack_grid_surface_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "x", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "x", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -434,12 +440,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'y'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through y()(i) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through y()(i) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -447,22 +453,16 @@ public:
         double* raw = nullptr;
         int64_t extents[1] = {0};
         fitpack_grid_surface_c_getcomp_y(as<fitpack_grid_surface_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "y", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(1);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[2];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 1; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "y", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(1), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -500,12 +500,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 'z'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through z()(i, j) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through z()(i, j) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -513,22 +513,16 @@ public:
         double* raw = nullptr;
         int64_t extents[2] = {0, 0};
         fitpack_grid_surface_c_getcomp_z(as<fitpack_grid_surface_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "z", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(2);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[4];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 2; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "z", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(2), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -566,12 +560,12 @@ public:
     /**
      * @brief Zero-copy fxArray view of component 't'.
      *
-     * The descriptor is built here from the borrowed pointer and extents, so
-     * the view aliases the Fortran storage directly — nothing is copied and
-     * writes through t()(i, j) land in the object. Requires linking
-     * fortran-arrays (implied by HAVE_FXARRAY, which is set from
-     * __has_include("fxArrays.hpp")).
+     * `array_c_from_ptr` builds the descriptor from the borrowed pointer and
+     * bounds, so the view aliases the Fortran storage directly — nothing is
+     * copied and writes through t()(i, j) land in the object.
      *
+     * @note Only available when the Fortran-Arrays library is present and
+     *       enabled (HAVE_FXARRAY).
      * @warning The view is invalidated by any refit, assignment or destroy
      *          call on this object; re-read it rather than retaining it.
      */
@@ -579,22 +573,16 @@ public:
         double* raw = nullptr;
         int64_t extents[2] = {0, 0};
         fitpack_grid_surface_c_getcomp_t(as<fitpack_grid_surface_c>(), &raw, extents);
-        array_c descr = array_c_null;
-        std::strncpy(descr.name, "t", FX_LEN_NAME - 1);
-        descr.base_address = static_cast<void*>(raw);
-        descr.type = getCFITypeFlag<double>();
-        descr.elem_bytes = static_cast<FX_SIZE>(sizeof(double));
-        descr.rank = static_cast<FX_RANK>(2);
-        descr.is_pointer = true;   // non-owning: the object still owns the storage
-        descr.is_slice = false;
-        descr.attribute = static_cast<FX_ATTR>(FX_ATTR_POINTER);
-        FX_SIZE stride = descr.elem_bytes;
+        FX_SIZE bounds[4];   // (lower, upper) per dimension, Fortran lbound 1
         for (int k = 0; k < 2; ++k) {
-            descr.dim[k].lower_bound = 0;   // C 0-based; Fortran lbound 1
-            descr.dim[k].extent = static_cast<FX_SIZE>(extents[k]);
-            descr.dim[k].stride_bytes = stride;
-            stride *= descr.dim[k].extent;
+            bounds[2 * k] = 1;
+            bounds[2 * k + 1] = static_cast<FX_SIZE>(extents[k]);
         }
+        array_c descr = array_c_null;
+        array_c_from_ptr(&descr, "t", static_cast<void*>(raw),
+                         getCFITypeFlag<double>(),
+                         static_cast<FX_SIZE>(sizeof(double)),
+                         static_cast<FX_RANK>(2), bounds);
         return fxArray<double>(descr);
     }
 #endif // HAVE_FXARRAY
@@ -611,7 +599,7 @@ public:
     }
 
 protected:
-    explicit fpGridSurface(NoAlloc tag) : fxFitpackFitter(tag) {}
+    explicit fpGridSurface(NoAlloc tag) : fpFitter(tag) {}
 
 };
 

@@ -1,12 +1,25 @@
-!   ***********************************************************************************************
-!   **                                        fxArray                                          **
-!   **                                  Fortran Arrays for C++                                 **
-!   ***********************************************************************************************
-!   **    fitpack_gridded_sphere_c_types                                                                   **
+! **************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fitpack_gridded_sphere_c_types.f90 (module fitpack_gridded_sphere_c_types)
 !> @brief C wrapper type definitions for fitpack_gridded_sphere
-!   ***********************************************************************************************
-!> @author Binding Generator
-!   ***********************************************************************************************
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************
 
 module fitpack_gridded_sphere_c_types
     use, intrinsic :: iso_c_binding

@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fitpack_parametric_curve_c.h                                                                          **
- *   ** @brief Standalone C interface to fitpack_parametric_curve (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fitpack_parametric_curve_c.h (module fitpack_parametric_curves)
+!> @brief Standalone C interface to fitpack_parametric_curve (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FITPACK_PARAMETRIC_CURVE_C_H_INCLUDED
 #define FITPACK_PARAMETRIC_CURVE_C_H_INCLUDED
@@ -15,7 +28,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* Minimal fx_status definition for standalone use.
+/* Minimal fp_status definition for standalone use.
  * Layout contract: this struct is the C half of type(fx_status) in the
  * generated <project>_fx_status module (templates/fortran_fx_status.f90.jinja2),
  * which in turn mirrors fortran-arrays' arrays_c. Field order, widths and
@@ -24,11 +37,17 @@
  * translation unit ahead of this header (via fxArrays.hpp), and it defines the
  * same struct and macro behind no FX_STATUS_DEFINED guard — so where both are
  * present the real definition wins and this copy stands down. */
-#if !defined(FX_STATUS_DEFINED) && !defined(ARRAYS_C_H_INCLUDED)
-#define FX_STATUS_DEFINED
+#ifndef FP_STATUS_TYPEDEF_INCLUDED
+#define FP_STATUS_TYPEDEF_INCLUDED
+#if defined(FX_STATUS_DEFINED) || defined(ARRAYS_C_H_INCLUDED)
+typedef fx_status fp_status;               /* the real fortran-arrays struct */
+#else
 #define FX_LEN_STATUS_MSG 248
-typedef struct fx_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fx_status;
+typedef struct fp_status { bool ok; int code; char message[FX_LEN_STATUS_MSG]; } fp_status;
+typedef fp_status fx_status;               /* layout-identical interop alias */
+#define FX_STATUS_DEFINED
 #endif
+#endif /* FP_STATUS_TYPEDEF_INCLUDED */
 
 #include "fitpack_capi_export.h"
 #include "fitpack_parametric_curves_c_types.h"  /* For fitpack_parametric_curve_c, fitpack_parametric_curve_c_null */
@@ -50,14 +69,14 @@ extern "C" {
  * @param self Pointer to wrapper (will be initialized)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_allocate(fitpack_parametric_curve_c* self, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_allocate(fitpack_parametric_curve_c* self, fp_status* status);
 
 /**
  * @brief Deallocate fitpack_parametric_curve object
  * @param self Pointer to wrapper (will be nullified)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_destroy(fitpack_parametric_curve_c* self, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_destroy(fitpack_parametric_curve_c* self, fp_status* status);
 
 /**
  * @brief Copy fitpack_parametric_curve object.
@@ -74,7 +93,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_destroy(fitpack_parametric_c
  *                  deep-copy data, even if the source is a view.
  * @param status    Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_copy(fitpack_parametric_curve_c* self, const fitpack_parametric_curve_c* other, bool deep_copy, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_copy(fitpack_parametric_curve_c* self, const fitpack_parametric_curve_c* other, bool deep_copy, fp_status* status);
 
 /**
  * @brief Shallow copy (pointer semantics — Fortran "associate" construct)
@@ -82,7 +101,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_copy(fitpack_parametric_curv
  * @param other Source wrapper (read-only)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_associate(fitpack_parametric_curve_c* self, const fitpack_parametric_curve_c* other, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_associate(fitpack_parametric_curve_c* self, const fitpack_parametric_curve_c* other, fp_status* status);
 
 /**
  * @brief Move allocation (transfer ownership)
@@ -90,7 +109,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_associate(fitpack_parametric
  * @param from Source wrapper (becomes null)
  * @param status Optional error status (NULL = error stop on failure)
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_move_alloc(fitpack_parametric_curve_c* to, fitpack_parametric_curve_c* from, fx_status* status);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_move_alloc(fitpack_parametric_curve_c* to, fitpack_parametric_curve_c* from, fp_status* status);
 
 /* ===========================================================================================
  * Method Wrappers (standalone-compatible only)
@@ -108,7 +127,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_set_default_parameters(fitpa
  * @param keep_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_fit(const fitpack_parametric_curve_c* self, double* smoothing, int32_t* order, bool* keep_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_fit(fitpack_parametric_curve_c* self, double* smoothing, int32_t* order, bool* keep_knots);
 
 /**
  * @brief interpolate
@@ -116,7 +135,7 @@ FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_fit(const fitpack_paramet
  * @param reset_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_interpolate(const fitpack_parametric_curve_c* self, int32_t* order, bool* reset_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_interpolate(fitpack_parametric_curve_c* self, int32_t* order, bool* reset_knots);
 
 /**
  * @brief least_squares
@@ -124,7 +143,7 @@ FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_interpolate(const fitpack
  * @param reset_knots 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_least_squares(const fitpack_parametric_curve_c* self, double* smoothing, bool* reset_knots);
+FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_least_squares(fitpack_parametric_curve_c* self, double* smoothing, bool* reset_knots);
 
 /**
  * @brief comm_size
@@ -166,7 +185,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_new_points(fitpack_parametri
  * @param order 
  * @return Result value
  */
-FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_new_fit(const fitpack_parametric_curve_c* self, int32_t x_n1, int32_t x_n2, const double* x, double* u, double* w, double* smoothing, int32_t* order);
+FITPACK_CAPI_EXPORT int32_t fitpack_parametric_curve_c_new_fit(fitpack_parametric_curve_c* self, int32_t x_n1, int32_t x_n2, const double* x, double* u, double* w, double* smoothing, int32_t* order);
 
 /**
  * @brief eval_one
@@ -217,7 +236,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_curve_all_derivatives(fitpac
  * @brief comm_pack
  * @param buffer 
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_comm_pack(fitpack_parametric_curve_c* self, int32_t n, double* buffer);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_comm_pack(const fitpack_parametric_curve_c* self, int32_t n, double* buffer);
 
 /**
  * @brief comm_expand
@@ -229,7 +248,7 @@ FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_comm_expand(fitpack_parametr
  * @brief core_comm_pack
  * @param buffer 
  */
-FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_core_comm_pack(fitpack_parametric_curve_c* self, int32_t n, double* buffer);
+FITPACK_CAPI_EXPORT void fitpack_parametric_curve_c_core_comm_pack(const fitpack_parametric_curve_c* self, int32_t n, double* buffer);
 
 /**
  * @brief core_comm_expand

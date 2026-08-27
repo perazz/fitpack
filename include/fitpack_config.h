@@ -1,16 +1,29 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fitpack_config.h                                                                      **
- *   ** @brief Build-feature configuration for the generated C++ wrappers
- *   **
- *   ** Single source of truth for the optional-feature macros. Every generated .hpp includes
- *   ** this header before it uses a gate, so the wrappers and their consumers can never
- *   ** disagree on conditionally-compiled class layout.
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fitpack_config.h
+!> @brief Build-feature configuration for the generated C++ wrappers
+!
+!   Single source of truth for the optional-feature macros. Every generated .hpp includes
+!   this header before it uses a gate, so the wrappers and their consumers can never
+!   disagree on conditionally-compiled class layout.
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FITPACK_CONFIG_H
 #define FITPACK_CONFIG_H

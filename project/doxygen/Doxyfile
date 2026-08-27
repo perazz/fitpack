@@ -118,6 +118,7 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = "../../src/"
+INPUT                 += "../../include/"
 INPUT                 += "../../doc/mainpage.md"
 INPUT                 += "../../doc/book_reference.md"
 # Theory pages
@@ -137,7 +138,8 @@ INPUT                 += "../../doc/tutorial_sphere.md"
 
 INPUT_ENCODING         = UTF-8
 
-FILE_PATTERNS          = *.F90 \
+FILE_PATTERNS          = *.hpp \
+                         *.F90 \
                          *.f90 \
                          *.f95 \
                          *.f03 \
@@ -276,7 +278,7 @@ EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
 INCLUDE_PATH           =
 INCLUDE_FILE_PATTERNS  =
-PREDEFINED             =
+PREDEFINED             = HAVE_FXARRAY=1
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = YES
 

@@ -1,14 +1,14 @@
 # FITPACK binding generation configuration
 #
 # Drives the fortran-arrays binding generator to produce every C/C++ interface
-# in src/*_c.f90, src/*_c_types.f90 and include/. Regenerate with:
+# in src/capi/ and include/. Regenerate with:
 #
-#   ./generate_bindings.sh [--verbose]
+#   ./scripts/generate_bindings.sh [--verbose]
 #
 # NEVER hand-edit a generated file: change the Fortran source or this config
 # and re-run the script. The only hand-written pieces of the interface are
-# src/fitpack_core_c.f90, include/fitpack_core_c.h, include/fpPoint.hpp and the
-# ergonomic snippets under extra_methods/ (spliced into the generated headers).
+# src/capi/fitpack_core_c.f90, include/fitpack_core_c.h, include/fpPoint.hpp and
+# the ergonomic snippets under extra_methods/ (spliced into the generated headers).
 #
 # FITPACK kind parameters (defined in fitpack_core.F90):
 #   integer, parameter :: FP_REAL = c_double
@@ -20,6 +20,20 @@
 
 project_name: FITPACK
 project_description: "Modern Fortran Fitting Package — C/C++ Bindings"
+author: "Federico Perini"
+
+# Project-branded status struct: the generated C declarations name fp_status, and
+# the standalone headers define it as a layout-identical alias of fortran-arrays'
+# fx_status, so a gated build and a bare one share one ABI.
+status_type: fp_status
+
+# House file-header banner (the FITPACK logo block) in place of the generator's
+# built-in box. One fragment serves C and C++ — same /* ... */ form, and the
+# identity line follows whichever of cpp_class/module_name the file has.
+header_template:
+  fortran: bindings_templates/banner.f90.jinja2
+  c:       bindings_templates/banner.h.jinja2
+  cpp:     bindings_templates/banner.h.jinja2
 
 # Standalone headers, with the fxArray views behind a build gate so the very
 # same headers compile with and without fortran-arrays on the include path.
@@ -39,7 +53,7 @@ kind_aliases:
     FP_BOOL: c_bool
 
 source_root: ./src
-fortran_dir: ./src
+fortran_dir: ./src/capi
 c_dir: ./include
 cpp_dir: ./include
 
@@ -49,7 +63,7 @@ bindings:
     type: fitpack_fitter
     abstract: true
     cpp_classes:
-      fitpack_fitter: fxFitpackFitter
+      fitpack_fitter: fpFitter
     fortran_source: fitpack_fitters.f90
 
   # --- Univariate curves ---

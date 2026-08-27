@@ -78,7 +78,8 @@
     }
 
     //! @brief Derivative of the given order at x.
-    FP_REAL ddx(FP_REAL x, FP_SIZE order, FP_FLAG* ierr = nullptr) const { return dfdx(x, order, ierr); }
+    //! @note Not const: the Fortran receiver of curve_derivative is intent(inout).
+    FP_REAL ddx(FP_REAL x, FP_SIZE order, FP_FLAG* ierr = nullptr) { return dfdx(x, order, ierr); }
 
     //! @brief All derivatives (orders 0..k) at x.
     std::vector<FP_REAL> ddx(FP_REAL x, FP_FLAG* ierr = nullptr)

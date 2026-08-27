@@ -1,15 +1,15 @@
 #!/bin/bash
 # Regenerate the C/C++ bindings from fitpack_bindings.yaml.
 #
-# Usage:
-#   ./generate_bindings.sh [--dry-run] [--verbose]
+# Usage (from anywhere — the script locates the repository from its own path):
+#   ./scripts/generate_bindings.sh [--dry-run] [--verbose]
 #
 # The generator is the fortran-arrays binding generator, which this repository does NOT
 # vendor: point FITPACK_BINDINGS_GENERATOR at your checkout, or keep fortran-arrays as a
-# sibling directory and the default below finds it.
+# sibling of the repository and the default below finds it.
 #
 #   FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings \
-#       ./generate_bindings.sh
+#       ./scripts/generate_bindings.sh
 #
 # Requirements: python3 with fparser, jinja2, click and pyyaml (see the generator's
 # requirements.txt). A .venv next to the generator is activated automatically if present.
@@ -18,18 +18,19 @@
 # surface, edit the Fortran source, fitpack_bindings.yaml, or a snippet under extra_methods/,
 # then re-run this script. The hand-written parts of the interface are preserved here:
 #
-#   src/fitpack_core_c.f90    the 25 fp_*_c core procedural bindings + 2 helpers
-#   include/fitpack_core_c.h  their pure-C header
-#   include/fpPoint.hpp       the fixed-dimension point type
+#   src/capi/fitpack_core_c.f90  the 25 fp_*_c core procedural bindings + 2 helpers
+#   include/fitpack_core_c.h     their pure-C header
+#   include/fpPoint.hpp          the fixed-dimension point type
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG="$SCRIPT_DIR/fitpack_bindings.yaml"
-SRC_OUT="$SCRIPT_DIR/src"
-INC_OUT="$SCRIPT_DIR/include"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG="$REPO_ROOT/fitpack_bindings.yaml"
+SRC_OUT="$REPO_ROOT/src/capi"
+INC_OUT="$REPO_ROOT/include"
 
-GENERATOR="${FITPACK_BINDINGS_GENERATOR:-$SCRIPT_DIR/../fortran-arrays/tools/bindings/generate-bindings}"
+GENERATOR="${FITPACK_BINDINGS_GENERATOR:-$REPO_ROOT/../fortran-arrays/tools/bindings/generate-bindings}"
 
 if [ ! -f "$GENERATOR" ]; then
     echo "error: binding generator not found at '$GENERATOR'." >&2
@@ -57,6 +58,8 @@ echo "Fortran:   $SRC_OUT"
 echo "Headers:   $INC_OUT"
 echo ""
 
+mkdir -p "$SRC_OUT"
+
 # Drop the previous output so a type removed from the config cannot leave a stale file behind.
 find "$SRC_OUT" -maxdepth 1 -name '*_c.f90'       ! -name "$KEEP_F90" -delete
 find "$SRC_OUT" -maxdepth 1 -name '*_c_types.f90'                     -delete
@@ -72,7 +75,7 @@ rm -rf "$INC_OUT/export_control"
 
 echo ""
 echo "=== Generated ==="
-echo "src/:"
+echo "src/capi/:"
 ls "$SRC_OUT"/*_c.f90 "$SRC_OUT"/*_c_types.f90 2>/dev/null | sed 's|.*/|  |' || echo "  (none)"
 echo "include/:"
 ls "$INC_OUT"/*.h "$INC_OUT"/*.hpp 2>/dev/null | sed 's|.*/|  |' || echo "  (none)"

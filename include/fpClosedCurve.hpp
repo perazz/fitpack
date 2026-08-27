@@ -1,12 +1,25 @@
-/*   ***********************************************************************************************
- *   **                                         FITPACK                                          **
- *   **                     Modern Fortran Fitting Package — C/C++ Bindings                      **
- *   ***********************************************************************************************
- *   **    fpClosedCurve.hpp                                                                     **
- *   ** @brief Standalone C++ wrapper for fitpack_closed_curve (no fortran-arrays dependency)
- *   ***********************************************************************************************
- *   ** @author Binding Generator
- *   *********************************************************************************************** */
+/***************************************************************************************************
+!                                ____________________  ___   ________ __
+!                               / ____/  _/_  __/ __ \/   | / ____/ //_/
+!                              / /_   / /  / / / /_/ / /| |/ /   / ,<
+!                             / __/ _/ /  / / / ____/ ___ / /___/ /| |
+!                            /_/   /___/ /_/ /_/   /_/  |_\____/_/ |_|
+!
+!                                     A Curve Fitting Package
+!
+!   fpClosedCurve.hpp (class fpClosedCurve)
+!> @brief Standalone C++ wrapper for fitpack_closed_curve (no fortran-arrays dependency)
+!
+!   @author Federico Perini
+!   @date   2026-08-27
+!
+!   References :
+!     - C. De Boor, "On calculating with b-splines", J Approx Theory 6 (1972) 50-62
+!     - M. G. Cox, "The numerical evaluation of b-splines", J Inst Maths Applics 10 (1972) 134-149
+!     - P. Dierckx, "Curve and surface fitting with splines", Monographs on numerical analysis,
+!                    Oxford university press, 1993.
+!
+! **************************************************************************************************/
 
 #ifndef FPCLOSEDCURVE_HPP_INCLUDED
 #define FPCLOSEDCURVE_HPP_INCLUDED
@@ -26,7 +39,6 @@
 #include <stdexcept>
 #include <variant>
 #include <optional>
-#include <cstring>
 
 static_assert(sizeof(fitpack_closed_curve_c) == sizeof(fitpack_parametric_curve_c),
     "C descriptor layout mismatch: fitpack_closed_curve_c vs fitpack_parametric_curve_c");
@@ -207,20 +219,20 @@ public:
     /**
      * @brief new_fit
      */
-    int32_t new_fit(int32_t x_n1, int32_t x_n2, std::vector<double>& x, double* u = nullptr, double* w = nullptr, double* smoothing = nullptr, int32_t* order = nullptr) const override {
+    int32_t new_fit(int32_t x_n1, int32_t x_n2, std::vector<double>& x, double* u = nullptr, double* w = nullptr, double* smoothing = nullptr, int32_t* order = nullptr) override {
         return fitpack_closed_curve_c_new_fit(as<fitpack_closed_curve_c>(), x_n1, x_n2, x.data(), u, w, smoothing, order);
     }
 
 
-    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) const override {
+    int32_t fit(double* smoothing = nullptr, int32_t* order = nullptr, bool* keep_knots = nullptr) override {
         return fitpack_closed_curve_c_fit(as<fitpack_closed_curve_c>(), smoothing, order, keep_knots);
     }
 
-    int32_t interpolate(int32_t* order = nullptr, bool* reset_knots = nullptr) const override {
+    int32_t interpolate(int32_t* order = nullptr, bool* reset_knots = nullptr) override {
         return fitpack_closed_curve_c_interpolate(as<fitpack_closed_curve_c>(), order, reset_knots);
     }
 
-    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) const override {
+    int32_t least_squares(double* smoothing = nullptr, bool* reset_knots = nullptr) override {
         return fitpack_closed_curve_c_least_squares(as<fitpack_closed_curve_c>(), smoothing, reset_knots);
     }
 
@@ -283,7 +295,7 @@ public:
     /**
      * @brief comm_pack
      */
-    void comm_pack(std::vector<double>& buffer) override {
+    void comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_closed_curve_c_comm_pack(as<fitpack_closed_curve_c>(), n, buffer.data());
     }
@@ -309,7 +321,7 @@ public:
     /**
      * @brief core_comm_pack
      */
-    void core_comm_pack(std::vector<double>& buffer) override {
+    void core_comm_pack(std::vector<double>& buffer) const override {
         int32_t n = static_cast<int32_t>(buffer.size());
         fitpack_closed_curve_c_core_comm_pack(as<fitpack_closed_curve_c>(), n, buffer.data());
     }

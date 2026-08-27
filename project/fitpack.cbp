@@ -120,6 +120,8 @@
 		<Unit filename="../include/fpConstrainedCurve.hpp" />
 		<Unit filename="../include/fpConvexCurve.hpp" />
 		<Unit filename="../include/fpCurve.hpp" />
+		<Unit filename="../include/fpFitter.hpp" />
+		<Unit filename="../include/fpFitter_subtypes.hpp" />
 		<Unit filename="../include/fpGridPolar.hpp" />
 		<Unit filename="../include/fpGridSphere.hpp" />
 		<Unit filename="../include/fpGridSpline.hpp" />
@@ -131,127 +133,125 @@
 		<Unit filename="../include/fpPolar.hpp" />
 		<Unit filename="../include/fpSphere.hpp" />
 		<Unit filename="../include/fpSurface.hpp" />
-		<Unit filename="../include/fxFitpackFitter.hpp" />
-		<Unit filename="../include/fxFitpackFitter_subtypes.hpp" />
+		<Unit filename="../src/capi/fitpack_convex_curves_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_convex_curves_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_core_c.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_curves_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_curves_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_fitters_c.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_fitters_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_fx_status.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_polar_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_polar_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_sphere_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_sphere_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_splines_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_splines_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_surfaces_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_gridded_surfaces_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_parametric_curves_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_parametric_curves_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_parametric_surfaces_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_parametric_surfaces_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_polar_domains_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_polar_domains_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_sphere_domains_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_sphere_domains_c_types.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_surfaces_c.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="../src/capi/fitpack_surfaces_c_types.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="../src/fitpack.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="../src/fitpack_convex_curves.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="../src/fitpack_convex_curves_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_convex_curves_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_core.F90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="../src/fitpack_core_c.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_curves.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../src/fitpack_curves_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_curves_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_fitters.f90">
 			<Option weight="1" />
-		</Unit>
-		<Unit filename="../src/fitpack_fitters_c.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="../src/fitpack_fitters_c_types.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="../src/fitpack_fx_status.f90">
-			<Option weight="0" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_polar.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../src/fitpack_gridded_polar_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_polar_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_gridded_sphere.f90">
 			<Option weight="2" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_sphere_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_sphere_c_types.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_gridded_splines.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../src/fitpack_gridded_splines_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_splines_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_gridded_surfaces.f90">
 			<Option weight="3" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_surfaces_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_gridded_surfaces_c_types.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_parametric.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../src/fitpack_parametric_curves_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_parametric_curves_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_parametric_surfaces.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="../src/fitpack_parametric_surfaces_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_parametric_surfaces_c_types.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="../src/fitpack_polar.f90">
 			<Option weight="2" />
-		</Unit>
-		<Unit filename="../src/fitpack_polar_domains_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_polar_domains_c_types.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="../src/fitpack_sphere_domains_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_sphere_domains_c_types.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="../src/fitpack_spheres.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="../src/fitpack_surfaces.f90">
 			<Option weight="3" />
-		</Unit>
-		<Unit filename="../src/fitpack_surfaces_c.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="../src/fitpack_surfaces_c_types.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="../test/fitpack_cpp_tests.f90">
 			<Option weight="6" />

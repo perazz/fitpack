@@ -41,7 +41,7 @@ The C and C++ header-only interfaces are found in the `include` folder. Every fi
 
 Fortran      | C | C++
 ---        | ---         | ---
-`fitpack_fitter` (abstract) | `fitpack_fitter_c` | `fxFitpackFitter`
+`fitpack_fitter` (abstract) | `fitpack_fitter_c` | `fpFitter`
 `fitpack_curve` | `fitpack_curve_c` | `fpCurve`
 `fitpack_periodic_curve` | `fitpack_periodic_curve_c` | `fpPeriodicCurve`
 `fitpack_parametric_curve` | `fitpack_parametric_curve_c` | `fpParametricCurve`
@@ -61,13 +61,17 @@ The choice to provide a header-only `C++` implementation is motivated by the nee
 
 #### Generated bindings
 
-Everything under `include/`, and every `src/*_c.f90` except `src/fitpack_core_c.f90`, is produced by the [fortran-arrays](https://github.com/perazz/fortran-arrays) binding generator from `fitpack_bindings.yaml`. **Never hand-edit a generated file**: change the Fortran source, the config, or an ergonomic snippet under `extra_methods/`, then re-run
+Everything under `include/`, and every `src/capi/*_c.f90` except `src/capi/fitpack_core_c.f90`, is produced by the [fortran-arrays](https://github.com/perazz/fortran-arrays) binding generator from `fitpack_bindings.yaml`. **Never hand-edit a generated file**: change the Fortran source, the config, a banner template under `bindings_templates/`, or an ergonomic snippet under `extra_methods/`, then re-run
 
 ```bash
-FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings ./generate_bindings.sh
+FITPACK_BINDINGS_GENERATOR=/path/to/fortran-arrays/tools/bindings/generate-bindings ./scripts/generate_bindings.sh
 ```
 
-The hand-written parts of the interface are `src/fitpack_core_c.f90` and `include/fitpack_core_c.h` (the 25 `fp_*_c` core procedures; that header is pure C), `include/fpPoint.hpp`, and the snippets in `extra_methods/`.
+The hand-written parts of the interface are `src/capi/fitpack_core_c.f90` and `include/fitpack_core_c.h` (the 25 `fp_*_c` core procedures; that header is pure C), `include/fpPoint.hpp`, and the snippets in `extra_methods/`.
+
+Every C entry point reports through `fp_status`, FITPACK's own name for the status struct. Where the headers are compiled with [fortran-arrays](https://github.com/perazz/fortran-arrays) on the include path it is the library's `fx_status`; where they are not, the headers define a layout-identical struct of their own, so the two spellings share one ABI. That same build gate (`HAVE_FXARRAY`, auto-detected in `fitpack_config.h`) adds a zero-copy `fxArray<T>` view of every array component next to the `std::vector` copy; the C ABI is identical either way. The published documentation is built with the gate on, so those view methods are listed.
+
+A method's constness follows its Fortran receiver: a routine declared `intent(in)` binds to a `const` C++ method and a `const <type>_c*` handle, and anything else — `fit`, `new_fit`, `interpolate`, `least_squares`, and the evaluators that update the fitter's internal state — binds to the mutable spelling.
 
 On Windows, define `FITPACK_CAPI_STATIC` before including any fitpack header when linking the static archive: the export macro otherwise defaults to `__declspec(dllimport)`.
 
@@ -83,7 +87,7 @@ FP_FLAG ierr = curve.new_fit(xy, 0.05);      // dims deduced from the argument
 fpPoint<2> p = curve.eval<2>(0.5, &ierr);    // dims explicit where it is the return type
 ```
 
-A `std::vector<fpPoint<dims>>` is bit-identical to the Fortran `x(dims,m)` it feeds, so there is no per-point allocation and no scatter loop. This replaces the pre-2.0.0 `typedef std::vector<FP_REAL> fpPoint`, which cost one heap allocation per point and leaked C++ into the nominally-C `fitpack_core_c.h`. See [doc/abi_changes_2.0.0.md](doc/abi_changes_2.0.0.md) for the full migration list; `./abi_symbols.sh --diff <ref>` regenerates it.
+A `std::vector<fpPoint<dims>>` is bit-identical to the Fortran `x(dims,m)` it feeds, so there is no per-point allocation and no scatter loop. This replaces the pre-2.0.0 `typedef std::vector<FP_REAL> fpPoint`, which cost one heap allocation per point and leaked C++ into the nominally-C `fitpack_core_c.h`. See [doc/abi_changes_2.0.0.md](doc/abi_changes_2.0.0.md) for the full migration list; `./scripts/abi_symbols.sh --diff <ref>` regenerates it.
 
 Building, using
 ===============
