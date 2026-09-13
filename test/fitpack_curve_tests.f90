@@ -31,6 +31,7 @@ module fitpack_curve_tests
     public :: test_sine_fit
     public :: test_zeros
     public :: test_periodic_fit
+    public :: test_periodic_degrees
     public :: test_parametric_fit
     public :: test_closed_fit
     public :: test_polar_fit
@@ -633,6 +634,74 @@ module fitpack_curve_tests
          end function intgl
 
     end function test_periodic_fit
+
+    ! Periodic test: fit the same data at every degree above the second one. percur asks for a
+    ! larger working array than curfit, so a curve that sizes its workspace for curfit alone
+    ! returns ier=10 from the third degree up.
+    logical function test_periodic_degrees() result(success)
+
+       ! Few enough points that the curfit working-array size falls short at every degree here
+       integer, parameter       :: N = 25
+       integer, parameter       :: MAX_DEGREE = 5   ! the highest degree fitpack fits a curve with
+       real(FP_REAL), parameter :: RTOL = 1.0e-2_FP_REAL
+       real(FP_REAL), parameter :: ATOL = 1.0e-4_FP_REAL
+       type(fitpack_periodic_curve) :: curve
+       real(FP_REAL) :: x(N),y(N),xmid(N-1),yeval,yexact
+       integer(FP_SIZE) :: k
+       integer :: ierr,i
+
+       success = .false.
+
+       ! A periodic function sampled over one whole period
+       x = linspace(zero,pi2,N)
+       y = fun(x)
+
+       ! Probe in between the fitting points
+       xmid = half*(x(1:N-1)+x(2:N))
+
+       degrees: do k = 3,MAX_DEGREE
+
+          ! Create INTERPOLATING
+          ierr = curve%new_fit(x,y,smoothing=zero,order=k)
+
+          if (.not.FITPACK_SUCCESS(ierr)) then
+             print 1, k,FITPACK_MESSAGE(ierr)
+             return
+          end if
+
+          do i = 1,N-1
+
+             yeval = curve%eval(xmid(i),ierr)
+             if (.not.FITPACK_SUCCESS(ierr)) then
+                print 2, k,xmid(i),FITPACK_MESSAGE(ierr)
+                return
+             end if
+
+             yexact = fun(xmid(i))
+             if (.not.(abs(yeval-yexact)*rewt(RTOL,ATOL,yexact)<=one)) then
+                print 3, k,xmid(i),yeval,yexact
+                return
+             end if
+
+          end do
+
+       end do degrees
+
+       ! All checks passed: success!
+       success = .true.
+
+       1 format('[periodic_degrees] cannot fit a periodic curve of degree ',i0,': ',a)
+       2 format('[periodic_degrees] cannot evaluate the degree-',i0,' curve at x=',f6.2,': ',a)
+       3 format('[periodic_degrees] degree-',i0,' error is too large: x=',f6.2,' yspline=',f6.2,' analytical=',f6.2)
+
+       contains
+
+         elemental real(FP_REAL) function fun(x) result(y)
+            real(FP_REAL), intent(in) :: x
+            y = cos(x) + sin(2*x)
+         end function fun
+
+    end function test_periodic_degrees
 
     logical function test_polar_fit(iunit) result(success)
        integer, optional, intent(in) :: iunit
